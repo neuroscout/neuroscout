@@ -1,6 +1,5 @@
 from flask.ext.script import Manager
 from flask.ext.migrate import Migrate, MigrateCommand
-import ConfigParser 
 from app import app, db
 import os
 
