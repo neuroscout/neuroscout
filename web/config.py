@@ -3,16 +3,19 @@ import os
 class Config(object):
     DEBUG = False
     CSRF_ENABLED = True
-    SECRET_KEY = os.environ['SECRET_KEY']
-    DEBUG = os.environ['DEBUG']
-    DB_NAME = os.environ['DB_NAME']
-    DB_USER = os.environ['DB_USER']
-    DB_PASS = os.environ['DB_PASS']
-    DB_SERVICE = os.environ['DB_SERVICE']
-    DB_PORT = os.environ['DB_PORT']
+    SECRET_KEY = 'secret'
+    SQLALCHEMY_TRACK_MODIFICATIONS = False
+
+class DevelopmentConfig(Config):
+    DEBUG = True
+    DB_NAME = 'postgres'
+    DB_USER = 'postgres'
+    DB_PASS = 'postgres'
+    DB_SERVICE = 'postgres'
+    DB_PORT = 5432
     SQLALCHEMY_DATABASE_URI = 'postgresql://{0}:{1}@{2}:{3}/{4}'.format(
         DB_USER, DB_PASS, DB_SERVICE, DB_PORT, DB_NAME
     )
 
-class DevelopmentConfig(Config):
-    DEBUG = True
+class HomeConfig(Config):
+	SQLALCHEMY_DATABASE_URI = "postgresql://localhost/ns_dev"
