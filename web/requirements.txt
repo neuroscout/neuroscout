@@ -1,7 +1,7 @@
 alembic==0.8.8
 Flask==0.11.1
 Flask-Migrate==2.0.0
-Flask-Script==0.4.0
+Flask-Script==2.0.5
 Flask-SQLAlchemy==2.1
 SQLAlchemy==1.0.15
 gunicorn==19.6.0
