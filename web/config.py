@@ -4,11 +4,10 @@ class Config(object):
     DEBUG = False
     CSRF_ENABLED = True
     SECRET_KEY = 'secret'
-    SQLALCHEMY_TRACK_MODIFICATIONS = False
 
 class DevelopmentConfig(Config):
     DEBUG = True
-    DB_NAME = 'postgres'
+    DB_NAME = 'ns_dev'
     DB_USER = 'postgres'
     DB_PASS = 'postgres'
     DB_SERVICE = 'postgres'

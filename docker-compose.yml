@@ -8,7 +8,8 @@ web:
   volumes:
     - /usr/src/app/static
   command: /usr/local/bin/gunicorn -w 2 -b :8000 app:app
-  environment: APP_SETTINGS=config.DevelopmentConfig
+  environment:
+    - APP_SETTINGS=config.DevelopmentConfig
 
 nginx:
   restart: always

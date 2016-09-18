@@ -2,7 +2,7 @@ from database import db
 from flask import current_app
 
 class Dataset(db.Model):
-	pass
+	id = db.Column(db.Integer, primary_key=True)	
 
 class Predictors(db.Model):
 	pass
