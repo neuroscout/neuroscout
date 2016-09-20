@@ -8,7 +8,7 @@ app = Flask(__name__)
 app.config.from_object(os.environ['APP_SETTINGS'])
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
-#app.register_blueprint(api, url_prefix='/api')
+app.register_blueprint(api, url_prefix='/api')
 
 db.init_app(app)
 

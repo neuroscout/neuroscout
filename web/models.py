@@ -2,19 +2,38 @@ from database import db
 from flask import current_app
 
 class Dataset(db.Model):
-	dataset_id = db.Column(db.Integer, primary_key=True)	
+	id = db.Column(db.Integer, primary_key=True)	
+	analyses = db.relationship('Analysis', backref='dataset',
+                                lazy='dynamic')
+class User(db.Model):
+	id = db.Column(db.Integer, primary_key=True)  
+	analyses = db.relationship('Analysis', backref='user',
+                                lazy='dynamic')
+class Analysis(db.Model):
+	id = db.Column(db.Integer, primary_key=True) 
+	dataset_id = db.Column(db.Integer, db.ForeignKey('dataset.id'))
+	user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+	results = db.relationship('Result', backref='analysis',
+                                lazy='dynamic')]
+	predictors = db.relationship('Predictor', backref='analysis',
+                                lazy='dynamic')
 
-class Predictors(db.Model):
-	predictor_id = db.Column(db.Integer, primary_key=True) 
+class Extractor(db.Model):
+	id = db.Column(db.Integer, primary_key=True)
+	predictors = db.relationship('Predictor', backref='extractor',
+                                lazy='dynamic')
 
-# class Users(db.Model):
-# 	pass
+class Predictor(db.Model):
+	id = db.Column(db.Integer, primary_key=True) 
+	extractor_id = db.Column(db.Integer, db.ForeignKey('extractor.id'))
+	analysis_id = db.Column(db.Integer, db.ForeignKey('analysis.id'))
 
-# class Extractors(db.Model):
-# 	pass
+class Result(db.Model):
+	id = db.Column(db.Integer, primary_key=True)
+	analysis_id = db.Column(db.Integer, db.ForeignKey('analysis.id'))
 
-# class Apps(db.Model):
-# 	pass
 
-# class Results(db.Model):
-# 	pass
+
+# Many to many:
+# class App(db.Model):
+# 	id = db.Column(db.Integer, primary_key=True) 
