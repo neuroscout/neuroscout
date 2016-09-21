@@ -1,5 +1,6 @@
 from database import db
 from flask import current_app
+from sqlalchemy.dialects.postgresql import JSON
 
 class Dataset(db.Model):
 	id = db.Column(db.Integer, primary_key=True)	
@@ -7,7 +8,7 @@ class Dataset(db.Model):
                                 lazy='dynamic')
 	stimuli = db.relationship('Stimulus', backref='dataset',
                                 lazy='dynamic')
-	metadata = db.Column(db.JSON) ## BIDS specification
+	attributes = db.Column(JSON) ## BIDS specification
 	name = db.Column(db.String(30))
 	external_id = db.Column(db.String(30))
 	events = db.Column(db.Text()) # TSV events file
@@ -32,7 +33,7 @@ class Analysis(db.Model):
 	analysis_id = db.Column(db.Integer, db.ForeignKey('analysis.id'))
 	user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
 	results = db.relationship('Result', backref='analysis',
-                                lazy='dynamic')]
+                                lazy='dynamic')
 	name = db.Column(db.String(30))
 	description = db.Column(db.String(30))
 	predictors = db.relationship('Predictor', backref='analysis',

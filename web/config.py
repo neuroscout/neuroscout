@@ -17,4 +17,4 @@ class DevelopmentConfig(Config):
     )
 
 class HomeConfig(Config):
-	SQLALCHEMY_DATABASE_URI = "postgresql://localhost/ns_dev"
+	SQLALCHEMY_DATABASE_URI = "postgresql://localhost:5433/ns_dev"

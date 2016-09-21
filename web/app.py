@@ -3,6 +3,7 @@ import os
 from flask import Flask, render_template
 # from api import api
 from database import db
+from api import api
 
 app = Flask(__name__)
 app.config.from_object(os.environ['APP_SETTINGS'])
