@@ -2,11 +2,17 @@ import os
 
 class Config(object):
     DEBUG = False
+    TESTING = False
     CSRF_ENABLED = True
     SECRET_KEY = 'secret'
     SECURITY_PASSWORD_HASH = 'pbkdf2_sha512'
     SECURITY_TRACKABLE = True
     SECURITY_PASSWORD_SALT = 'shh_this_is_a_secret'
+    SECURITY_REGISTERABLE = True
+    SECURITY_RECOVERABLE = True
+    SECURITY_TRACKABLE = True
+    WTF_CSRF_ENABLED = False
+    SQLALCHEMY_TRACK_MODIFICATIONS = False
 
 
 class DevelopmentConfig(Config):

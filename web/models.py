@@ -1,7 +1,7 @@
 from database import db
 from flask import current_app
 from sqlalchemy.dialects.postgresql import JSON
-from flask_security import UserMixin, RoleMixin
+from flask_security import UserMixin, RoleMixin, SQLAlchemyUserDatastore
 class Dataset(db.Model):
 	id = db.Column(db.Integer, primary_key=True)	
 	analyses = db.relationship('Analysis', backref='dataset',
@@ -24,10 +24,15 @@ roles_users = db.Table('roles_users',
 
 class User(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
-    email = db.Column(db.String(255), unique=True)
-    password = db.Column(db.String(255))
+    email = db.Column(db.String(255), nullable=False, unique=True)
+    password = db.Column(db.String(255), nullable=False)
     active = db.Column(db.Boolean())
     confirmed_at = db.Column(db.DateTime())
+    last_login_at = db.Column(db.DateTime())
+    current_login_at = db.Column(db.DateTime())
+    last_login_ip = db.Column(db.String(45))
+    current_login_ip = db.Column(db.String(45))
+    login_count = db.Column(db.Integer)
     roles = db.relationship('Role', secondary=roles_users,
                             backref=db.backref('users', lazy='dynamic'))
 
@@ -35,6 +40,8 @@ class Role(db.Model, RoleMixin):
     id = db.Column(db.Integer(), primary_key=True)
     name = db.Column(db.String(80), unique=True)
     description = db.Column(db.String(255))
+
+user_datastore = SQLAlchemyUserDatastore(db, User, Role)
 
 class Analysis(db.Model):
 	id = db.Column(db.Integer, primary_key=True) 
