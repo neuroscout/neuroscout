@@ -4,9 +4,13 @@ class Config(object):
     DEBUG = False
     CSRF_ENABLED = True
     SECRET_KEY = 'secret'
+    SECURITY_PASSWORD_HASH = 'pbkdf2_sha512'
+    SECURITY_TRACKABLE = True
+    SECURITY_PASSWORD_SALT = 'shh_this_is_a_secret'
+
 
 class DevelopmentConfig(Config):
-    DEBUG = False
+    DEBUG = True
     DB_NAME = 'ns_dev'
     DB_USER = 'postgres'
     DB_PASS = 'postgres'
@@ -18,4 +22,5 @@ class DevelopmentConfig(Config):
     PROPAGATE_EXCEPTIONS = True
 
 class HomeConfig(Config):
-	SQLALCHEMY_DATABASE_URI = "postgresql://localhost:5433/ns_dev"
+    DEBUG = True
+    SQLALCHEMY_DATABASE_URI = "postgresql://localhost:5433/ns_dev"

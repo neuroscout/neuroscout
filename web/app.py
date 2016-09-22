@@ -28,12 +28,14 @@ stream_handler = logging.StreamHandler()
 stream_handler.setLevel(logging.INFO)
 app.logger.addHandler(stream_handler)
 
-@app.before_first_request
-def create_user():
-    user_datastore.create_user(email='delavega@utexas.edu', password='password')
-    db.session.commit()
+### Create fixtures to make fake data, andd customize these ugly templates
+# @app.before_first_request
+# def create_user():
+#     user_datastore.create_user(email='delavega@utexas.edu', password='password')
+#     db.session.commit()
 
 @app.route('/')
+@login_required
 def index():
     ''' Index route '''
     return render_template('default.html')

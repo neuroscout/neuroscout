@@ -1,13 +1,13 @@
 """empty message
 
-Revision ID: c3d8146434a8
+Revision ID: 2745c0bc5018
 Revises: None
-Create Date: 2016-09-21 18:39:12.160310
+Create Date: 2016-09-21 20:47:59.440305
 
 """
 
 # revision identifiers, used by Alembic.
-revision = 'c3d8146434a8'
+revision = '2745c0bc5018'
 down_revision = None
 
 from alembic import op
@@ -33,10 +33,21 @@ def upgrade():
     sa.Column('output_type', sa.String(length=20), nullable=True),
     sa.PrimaryKeyConstraint('id')
     )
+    op.create_table('role',
+    sa.Column('id', sa.Integer(), nullable=False),
+    sa.Column('name', sa.String(length=80), nullable=True),
+    sa.Column('description', sa.String(length=255), nullable=True),
+    sa.PrimaryKeyConstraint('id'),
+    sa.UniqueConstraint('name')
+    )
     op.create_table('user',
     sa.Column('id', sa.Integer(), nullable=False),
-    sa.Column('name', sa.String(length=30), nullable=True),
-    sa.PrimaryKeyConstraint('id')
+    sa.Column('email', sa.String(length=255), nullable=True),
+    sa.Column('password', sa.String(length=255), nullable=True),
+    sa.Column('active', sa.Boolean(), nullable=True),
+    sa.Column('confirmed_at', sa.DateTime(), nullable=True),
+    sa.PrimaryKeyConstraint('id'),
+    sa.UniqueConstraint('email')
     )
     op.create_table('analysis',
     sa.Column('id', sa.Integer(), nullable=False),
@@ -50,6 +61,12 @@ def upgrade():
     sa.ForeignKeyConstraint(['dataset_id'], ['dataset.id'], ),
     sa.ForeignKeyConstraint(['user_id'], ['user.id'], ),
     sa.PrimaryKeyConstraint('id')
+    )
+    op.create_table('roles_users',
+    sa.Column('user_id', sa.Integer(), nullable=True),
+    sa.Column('role_id', sa.Integer(), nullable=True),
+    sa.ForeignKeyConstraint(['role_id'], ['role.id'], ),
+    sa.ForeignKeyConstraint(['user_id'], ['user.id'], )
     )
     op.create_table('stimulus',
     sa.Column('id', sa.Integer(), nullable=False),
@@ -91,8 +108,10 @@ def downgrade():
     op.drop_table('timeline')
     op.drop_table('result')
     op.drop_table('stimulus')
+    op.drop_table('roles_users')
     op.drop_table('analysis')
     op.drop_table('user')
+    op.drop_table('role')
     op.drop_table('extractor')
     op.drop_table('dataset')
     ### end Alembic commands ###

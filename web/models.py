@@ -28,6 +28,8 @@ class User(db.Model, UserMixin):
     password = db.Column(db.String(255))
     active = db.Column(db.Boolean())
     confirmed_at = db.Column(db.DateTime())
+    roles = db.relationship('Role', secondary=roles_users,
+                            backref=db.backref('users', lazy='dynamic'))
 
 class Role(db.Model, RoleMixin):
     id = db.Column(db.Integer(), primary_key=True)
@@ -43,14 +45,14 @@ class Analysis(db.Model):
                                 lazy='dynamic')
 	name = db.Column(db.String(30))
 	description = db.Column(db.String(30))
-	predictors = db.relationship('Predictor', backref='analysis',
+	timelines = db.relationship('Timeline', backref='analysis',
                                 lazy='dynamic')
 	parent = db.Column(db.String(30))
 
 
 class Extractor(db.Model):
 	id = db.Column(db.Integer, primary_key=True)
-	predictors = db.relationship('Predictor', backref='extractor',
+	timelines = db.relationship('Timeline', backref='extractor',
                                 lazy='dynamic')
 	name = db.Column(db.String(30))
 	description = db.Column(db.String(30))
@@ -78,7 +80,7 @@ class Result(db.Model):
 class Stimulus(db.Model):
 	id = db.Column(db.Integer, primary_key=True)
 	dataset_id = db.Column(db.Integer, db.ForeignKey('dataset.id'))
-	analyses = db.relationship('Predictor', backref='stimulus',
+	timelines = db.relationship('Timeline', backref='stimulus',
                                 lazy='dynamic')
 
 
