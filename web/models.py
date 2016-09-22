@@ -1,7 +1,7 @@
 from database import db
 from flask import current_app
 from sqlalchemy.dialects.postgresql import JSON
-
+from flask_security import UserMixin, RoleMixin
 class Dataset(db.Model):
 	id = db.Column(db.Integer, primary_key=True)	
 	analyses = db.relationship('Analysis', backref='dataset',
@@ -17,15 +17,22 @@ class Dataset(db.Model):
 
 # class Run
 
-class User(db.Model):
-	""" Mostly authentication stuff for now """
-	id = db.Column(db.Integer, primary_key=True)  
-	analyses = db.relationship('Analysis', backref='user',
-                                lazy='dynamic')
-	name = db.Column(db.String(30))
-	# email ## Do I need this?
-	# institution
-	# password ## OpenID
+# Define models
+roles_users = db.Table('roles_users',
+        db.Column('user_id', db.Integer(), db.ForeignKey('user.id')),
+        db.Column('role_id', db.Integer(), db.ForeignKey('role.id')))
+
+class User(db.Model, UserMixin):
+    id = db.Column(db.Integer, primary_key=True)
+    email = db.Column(db.String(255), unique=True)
+    password = db.Column(db.String(255))
+    active = db.Column(db.Boolean())
+    confirmed_at = db.Column(db.DateTime())
+
+class Role(db.Model, RoleMixin):
+    id = db.Column(db.Integer(), primary_key=True)
+    name = db.Column(db.String(80), unique=True)
+    description = db.Column(db.String(255))
 
 class Analysis(db.Model):
 	id = db.Column(db.Integer, primary_key=True) 

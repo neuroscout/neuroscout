@@ -6,7 +6,7 @@ class Config(object):
     SECRET_KEY = 'secret'
 
 class DevelopmentConfig(Config):
-    DEBUG = True
+    DEBUG = False
     DB_NAME = 'ns_dev'
     DB_USER = 'postgres'
     DB_PASS = 'postgres'
@@ -15,6 +15,7 @@ class DevelopmentConfig(Config):
     SQLALCHEMY_DATABASE_URI = 'postgresql://{0}:{1}@{2}:{3}/{4}'.format(
         DB_USER, DB_PASS, DB_SERVICE, DB_PORT, DB_NAME
     )
+    PROPAGATE_EXCEPTIONS = True
 
 class HomeConfig(Config):
 	SQLALCHEMY_DATABASE_URI = "postgresql://localhost:5433/ns_dev"

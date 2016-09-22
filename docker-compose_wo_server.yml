@@ -1,27 +1,17 @@
 web:
   restart: always
   build: ./web
+  ports:
+    - 80:80
   expose:
-    - "8000"
+    - 80
   links:
     - postgres:postgres
   volumes:
     - /usr/src/app/static
-  command: /usr/local/bin/gunicorn -w 2 -b :8000 app:app
+  command: python app.py
   environment:
     - APP_SETTINGS=config.DevelopmentConfig
-
-nginx:
-  restart: always
-  build: ./nginx/
-  ports:
-    - "80:80"
-  volumes:
-    - /www/static
-  volumes_from:
-    - web
-  links:
-    - web:web
 
 data:
   image: postgres:latest
