@@ -5,7 +5,7 @@ install: "pip install -r web/requirements.txt"
 script: nosetests web/
 env:
 - APP_SETTINGS=config.TravisConfig
-services:
-  - postgresql
+addons:
+  postgresql: "9.4"
 before_script:
   - psql -c 'create database travis_ci_test;' -U postgres
