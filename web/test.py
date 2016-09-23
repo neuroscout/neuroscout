@@ -63,10 +63,10 @@ class APITest(FlaskTestCase):
         self.token = auth_resp['access_token']
 
         # Get from dummy api 
-        rv = self._get('/dummy-api', content_type=None)
+        rv = self._get('/api/v1', content_type=None)
         self.assertEqual(200, rv.status_code)
         data = json.loads(rv.data.decode())
-        self.assertEqual(data['items'], {u'Key1': u'Value1', u'Key2': u'value2'})
+        self.assertEqual(data, {'hello': 'world'})
 
 class ModelsTest(FlaskTestCase):
     def test_dataset(self):

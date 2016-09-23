@@ -7,14 +7,17 @@ from flask_security import Security
 from flask_security.utils import encrypt_password, verify_password
 from flask_jwt import JWT, jwt_required
 
+from flask_restful import Resource, Api
+
 from database import db
 from models import Dataset, User, Analysis, Extractor, Timeline, \
 	TimelineData, Result, Stimulus, Role, user_datastore
 
 app = Flask(__name__)
 app.config.from_object(os.environ['APP_SETTINGS'])
-
 db.init_app(app)
+
+api = Api(app)
 
 # Setup Flask-Security
 security = Security(app, user_datastore)
@@ -39,14 +42,12 @@ def load_user(payload):
 jwt = JWT(app, authenticate, load_user)
 
 # API
-@app.route('/dummy-api', methods=['GET'])
-@jwt_required()
-def dummyAPI():
-    ret_dict = {
-        "Key1": "Value1",
-        "Key2": "value2"
-    }
-    return jsonify(items=ret_dict)
+class HelloWorld(Resource):
+	@jwt_required()
+	def get(self):
+		return {'hello': 'world'}
+
+api.add_resource(HelloWorld, '/api/v1')
 
 # Bootstrap 
 def create_test_models():
