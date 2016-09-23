@@ -3,7 +3,7 @@ import os
 import logging
 
 from flask import Flask, render_template, jsonify, request
-from flask_security import Security, logout_user, login_required
+from flask_security import Security
 from flask_security.utils import encrypt_password, verify_password
 from flask_jwt import JWT, jwt_required
 
@@ -53,7 +53,7 @@ def create_test_models():
     user_datastore.create_user(email='test', password=encrypt_password('test'))
     user_datastore.create_user(email='test2', password=encrypt_password('test2'))
 
-    db.session.commit()\
+    db.session.commit()
 
 @app.before_first_request
 def bootstrap_app():
