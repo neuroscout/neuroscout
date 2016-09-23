@@ -1,5 +1,7 @@
 # neuroscout ⚜
 
+[![Build Status](https://travis-ci.com/PsychoinformaticsLab/neuroscout.svg?token=mytABRBRnBitJJpBpMxh&branch=master)](https://travis-ci.com/PsychoinformaticsLab/neuroscout)
+
 To set up docker, ensure docker, docker-compose (and if on OSX) docker-machine or docker for mac are installed.
 
 Build the containers and start the services:
