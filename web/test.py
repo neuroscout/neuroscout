@@ -35,7 +35,8 @@ class APITest(unittest.TestCase):
         return self.client.post(route, data=data, content_type=content_type, headers=headers)
 
     def setUp(self):
-        app.config.from_object('config.TestingConfig')
+        if os.environ['APP_SETTINGS'] != 'config.TravisConfig':
+            app.config.from_object('config.TestingConfig')
         self.client = app.test_client()
 
         db.init_app(app)

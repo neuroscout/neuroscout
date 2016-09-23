@@ -5,3 +5,11 @@ python:
 install: "pip install -r web/requirements.txt"
 # command to run tests
 script: nosetests web/
+env:
+- APP_SETTINGS=config.TravisTestingConfig
+
+services:
+  - postgresql
+
+before_script:
+  - psql -c 'create database travis_ci_test;' -U postgres
