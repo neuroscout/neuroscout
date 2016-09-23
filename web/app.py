@@ -39,7 +39,7 @@ def load_user(payload):
 jwt = JWT(app, authenticate, load_user)
 
 # API
-@app.route('/dummy-api/', methods=['GET'])
+@app.route('/dummy-api', methods=['GET'])
 @jwt_required()
 def dummyAPI():
     ret_dict = {

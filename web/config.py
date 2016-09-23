@@ -27,6 +27,10 @@ class DevelopmentConfig(Config):
     )
     PROPAGATE_EXCEPTIONS = True
 
+class TestingConfig(Config):
+    SQLALCHEMY_DATABASE_URI = "postgresql://localhost:5433/scout_test"
+    TESTING = True
+
 class HomeConfig(Config):
     DEBUG = True
     SQLALCHEMY_DATABASE_URI = "postgresql://localhost:5433/ns_dev"
