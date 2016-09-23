@@ -1,15 +1,11 @@
 language: python
 python:
   - "3.5"
-# command to install dependencies
 install: "pip install -r web/requirements.txt"
-# command to run tests
 script: nosetests web/
 env:
-- APP_SETTINGS=config.TravisTestingConfig
-
+- APP_SETTINGS=config.TravisConfig
 services:
   - postgresql
-
 before_script:
   - psql -c 'create database travis_ci_test;' -U postgres
