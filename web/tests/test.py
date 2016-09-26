@@ -1,14 +1,12 @@
 import os
 import unittest
-import tempfile
-import re
+
 import json
 
 from flask_security.utils import encrypt_password
 from flask_security import current_user
-from flask_security.utils import login_user
 
-from models import User, Role, Dataset
+from .models import User, Role, Dataset
 from app import app, user_datastore
 from database import db
 
@@ -63,7 +61,7 @@ class APITest(FlaskTestCase):
         self.token = auth_resp['access_token']
 
         # Get from dummy api 
-        rv = self._get('/api/v1', content_type=None)
+        rv = self._get('/api/v1/hello', content_type=None)
         self.assertEqual(200, rv.status_code)
         data = json.loads(rv.data.decode())
         self.assertEqual(data, {'hello': 'world'})

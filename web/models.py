@@ -1,5 +1,4 @@
 from database import db
-from flask import current_app
 from sqlalchemy.dialects.postgresql import JSON
 from flask_security import UserMixin, RoleMixin, SQLAlchemyUserDatastore
 

@@ -1,5 +1,3 @@
-import os
-
 class Config(object):
     DEBUG = False
     CSRF_ENABLED = True
