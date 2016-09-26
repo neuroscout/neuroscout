@@ -19,20 +19,19 @@ app = Flask(__name__)
 app.config.from_object(os.environ['APP_SETTINGS'])
 db.init_app(app)
 
-api = Api(app)
-
 # Setup Flask-Security and JWT
 security = Security(app, user_datastore)
 jwt = JWT(app, authenticate, load_user)
+
+api = Api(app)
+# Set up API routes
+api.add_resource(HelloWorld, '/api/v1/hello')
 
 # Serve SPA
 @app.route('/')
 def index():
     ''' Index route '''
     return render_template('default.html')
-
-# Set up API routes
-api.add_resource(HelloWorld, '/api/v1/hello')
 
 # Bootstrap 
 def create_test_models():
