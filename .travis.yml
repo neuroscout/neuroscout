@@ -2,7 +2,7 @@ language: python
 python:
   - "3.5"
 install: "pip install -r web/requirements.txt"
-script: nosetests web/
+script: PYTHONPATH="web/" python -m pytest web/
 env:
 - APP_SETTINGS=config.TravisConfig
 addons:
