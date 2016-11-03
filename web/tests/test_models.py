@@ -4,7 +4,7 @@ from models import Dataset
 
 import pytest
 
-@pytest.mark.usefixtures("flask_init")
+@pytest.mark.usefixtures("db_init")
 class TestModels:
     def test_dataset(self):
         with app.app_context():

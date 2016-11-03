@@ -2,41 +2,46 @@ import json
 import pytest
 from app import app
 
-@pytest.mark.usefixtures("flask_init")
-class TestAPI:
-    def _auth(self, username=None, password=None):
-        username = username or 'test1'
-        password = password or 'test1'
-        rv = self._post('/auth',
-                        data=json.dumps({'username': username, 'password': password})
-                        )
-        return json.loads(rv.data.decode())
+def auth(username=None, password=None):
+    username = username or 'test1'
+    password = password or 'test1'
+    rv = post('/auth',
+                    data=json.dumps({'username': username, 'password': password})
+                    )
+    return json.loads(rv.data.decode())
 
-    def _get(self, route, data=None, content_type=None,  headers=None):
-        content_type = content_type or 'application/json'
-        if hasattr(self, 'token'):
-            headers = headers or {'Authorization': 'JWT %s' % self.token}
-        return app.test_client().get(route, data=data, content_type=content_type, headers=headers)
+def get(route, token=None, data=None, content_type=None,  headers=None):
+    content_type = content_type or 'application/json'
 
-    def _post(self, route, data=None, content_type=None, follow_redirects=True, headers=None):
-        content_type = content_type or 'application/json'
-        if hasattr(self, 'token'):
-            headers = headers or {'Authorization': 'Bearer ' + self.token}
-        return app.test_client().post(route, data=data, content_type=content_type, headers=headers)
+    if token is not None:
+        headers = headers or {'Authorization': 'JWT %s' % token}
 
-    def test_auth(self):
-        # Get auth token with invalid credentials
-        auth_resp = self._auth('not', 'existing')
-        assert auth_resp['status_code'] == 401
+    return app.test_client().get(route, data=data, content_type=content_type, headers=headers)
 
-        # Get auth token with valid credentials
-        auth_resp = self._auth('test1', 'test1')
-        assert 'access_token' in auth_resp
+def post(route, token = None, data=None, content_type=None, follow_redirects=True, headers=None):
+    content_type = content_type or 'application/json'
 
-        self.token = auth_resp['access_token']
+    if token is not None:
+        headers = headers or {'Authorization': 'Bearer ' + token}
 
-        # Get from dummy api 
-        rv = self._get('/api/v1/hello', content_type=None)
-        assert rv.status_code == 200
-        data = json.loads(rv.data.decode())
-        assert data == {'hello': 'world'}
+    return app.test_client().post(route, data=data, content_type=content_type, headers=headers)
+
+@pytest.mark.usefixtures("db_init")
+def test_auth(add_user):    
+    # Get auth token with invalid credentials
+    auth_resp = auth('not', 'existing')
+    assert auth_resp['status_code'] == 401
+
+    user_name, password = add_user
+
+    # Get auth token with valid credentials
+    auth_resp = auth(user_name, password)
+    assert 'access_token' in auth_resp
+
+    token = auth_resp['access_token']
+    # Get from dummy api 
+    rv = get('/api/v1/hello', content_type=None, token = token)
+    assert rv.status_code == 200
+
+    data = json.loads(rv.data.decode())
+    assert data == {'hello': 'world'}
