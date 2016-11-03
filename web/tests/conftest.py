@@ -1,5 +1,5 @@
 import os
-
+import pytest
 from flask_security.utils import encrypt_password
 
 if os.environ['APP_SETTINGS'] != 'config.TravisConfig':
@@ -7,8 +7,6 @@ if os.environ['APP_SETTINGS'] != 'config.TravisConfig':
 
 from app import app, user_datastore
 from database import db
-
-import pytest
 
 @pytest.fixture(scope="session")
 def db_init():
@@ -36,3 +34,9 @@ def add_user():
         db.session.commit()
 
     return user_name, password
+
+@pytest.fixture(scope="session")
+def valid_auth_resp(add_user):
+    from request_utils import auth
+    username, password = add_user
+    return auth(username, password)
