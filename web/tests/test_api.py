@@ -1,11 +1,6 @@
 import pytest
 import json
-from request_utils import auth, get
-
-@pytest.fixture(scope="session")
-def valid_auth_resp(add_user):
-    username, password = add_user
-    return auth(username, password)
+from tests.request_utils import auth, get
 
 @pytest.mark.usefixtures("db_init")
 def test_auth(valid_auth_resp):    
