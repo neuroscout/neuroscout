@@ -17,10 +17,10 @@ from auth import authenticate, load_user
 
 app = Flask(__name__)
 try:
-    app.config.from_envvar('APP_SETTINGS')
+    app.config.from_object(os.os.environ['APP_SETTINGS'])
 except RuntimeError:
     app.config.from_object('config.DevelopmentConfig')
-    
+
 db.init_app(app)
 
 # Setup Flask-Security and JWT
