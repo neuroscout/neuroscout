@@ -12,9 +12,8 @@ def test_auth(valid_auth_resp):
     assert 'access_token' in valid_auth_resp
 
     token = valid_auth_resp['access_token']
-    # Get from dummy api 
-    rv = get('/api/v1/hello', content_type=None, token = token)
-    assert rv.status_code == 200
 
-    data = json.loads(rv.data.decode())
-    assert data == {'hello': 'world'}
+    # Test bad URL with correct auth
+    rv = get('/api/v1/hello', token = token)
+    assert rv.status_code == 404
+

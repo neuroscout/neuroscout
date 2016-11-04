@@ -1,10 +1,6 @@
 import os
 import pytest
 from flask_security.utils import encrypt_password
-
-if os.environ['APP_SETTINGS'] != 'config.TravisConfig':
-    os.environ['APP_SETTINGS'] = 'config.TestingConfig'
-
 from app import app, user_datastore
 from database import db
 
@@ -13,6 +9,12 @@ def db_init():
     """" Fixture to initalize db, and clean up at the end of session """
     db.init_app(app)
     with app.app_context():
+        if 'APP_SETTINGS' in os.environ:
+            if os.environ['APP_SETTINGS'] != 'config.TravisConfig':
+                app.config.from_object('config.TestingConfig')
+        else:
+            app.config.from_object('config.TestingConfig')
+
         db.create_all()
         db.session.commit()
 
