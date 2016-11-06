@@ -40,7 +40,7 @@ class Dataset(db.Model):
                                 lazy='dynamic')
 	attributes = db.Column(JSON) ## BIDS specification
 	name = db.Column(db.String(30))
-	external_id = db.Column(db.String(30))
+	external_id = db.Column(db.String(30), unique=True)
 	events = db.Column(db.Text()) # TSV events file
 
 # class Subject
@@ -49,7 +49,6 @@ class Dataset(db.Model):
 class Analysis(db.Model):
 	id = db.Column(db.Integer, primary_key=True) 
 	dataset_id = db.Column(db.Integer, db.ForeignKey('dataset.id'))
-	analysis_id = db.Column(db.Integer, db.ForeignKey('analysis.id'))
 	user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
 	results = db.relationship('Result', backref='analysis',
                                 lazy='dynamic')

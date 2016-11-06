@@ -8,9 +8,9 @@ from flask_restful import Api
 
 from models import user_datastore
 
-from resources.analyses import Analyses
-from resources.datasets import Datasets
-from resources.extractors import Extractors
+from resources.analyses import AnalysisResource, AnalysisListResource
+from resources.datasets import DatasetResource, DatasetListResource
+from resources.extractors import ExtractorResource, ExtractorListResource
 
 from database import db
 from auth import authenticate, load_user
@@ -18,9 +18,8 @@ from auth import authenticate, load_user
 app = Flask(__name__)
 try:
     app.config.from_object(os.environ['APP_SETTINGS'])
-except RuntimeError:
+except KeyError:
     app.config.from_object('config.DevelopmentConfig')
-
 db.init_app(app)
 
 # Setup Flask-Security and JWT
@@ -29,9 +28,14 @@ jwt = JWT(app, authenticate, load_user)
 
 # Set up API routes
 api = Api(app)
-api.add_resource(Analyses, '/api/v1/analyses')
-api.add_resource(Datasets, '/api/v1/datasets')
-api.add_resource(Extractors, '/api/v1/extractors')
+api.add_resource(AnalysisListResource, '/api/v1/analyses')
+api.add_resource(AnalysisResource, '/api/v1/analyses/<analysis_id>')
+
+api.add_resource(DatasetListResource, '/api/v1/datasets')
+api.add_resource(DatasetResource, '/api/v1/datasets/<dataset_id>')
+
+api.add_resource(ExtractorListResource, '/api/v1/extractors')
+api.add_resource(ExtractorResource, '/api/v1/extractors/<extractor_id>')
 
 # Serve SPA
 @app.route('/')

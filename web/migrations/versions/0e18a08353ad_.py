@@ -1,14 +1,14 @@
 """empty message
 
-Revision ID: 48dbc2ef7c36
-Revises: d474befc3897
-Create Date: 2016-09-22 20:41:52.139436
+Revision ID: 0e18a08353ad
+Revises: None
+Create Date: 2016-11-04 15:31:06.306550
 
 """
 
 # revision identifiers, used by Alembic.
-revision = '48dbc2ef7c36'
-down_revision = 'd474befc3897'
+revision = '0e18a08353ad'
+down_revision = None
 
 from alembic import op
 import sqlalchemy as sa
@@ -42,14 +42,14 @@ def upgrade():
     )
     op.create_table('user',
     sa.Column('id', sa.Integer(), nullable=False),
-    sa.Column('email', sa.String(length=255), nullable=False),
-    sa.Column('password', sa.String(length=255), nullable=False),
+    sa.Column('email', sa.String(length=255), nullable=True),
+    sa.Column('password', sa.String(length=255), nullable=True),
     sa.Column('active', sa.Boolean(), nullable=True),
     sa.Column('confirmed_at', sa.DateTime(), nullable=True),
     sa.Column('last_login_at', sa.DateTime(), nullable=True),
     sa.Column('current_login_at', sa.DateTime(), nullable=True),
-    sa.Column('last_login_ip', sa.String(length=45), nullable=True),
-    sa.Column('current_login_ip', sa.String(length=45), nullable=True),
+    sa.Column('last_login_ip', sa.String(length=255), nullable=True),
+    sa.Column('current_login_ip', sa.String(length=255), nullable=True),
     sa.Column('login_count', sa.Integer(), nullable=True),
     sa.PrimaryKeyConstraint('id'),
     sa.UniqueConstraint('email')
@@ -57,12 +57,10 @@ def upgrade():
     op.create_table('analysis',
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('dataset_id', sa.Integer(), nullable=True),
-    sa.Column('analysis_id', sa.Integer(), nullable=True),
     sa.Column('user_id', sa.Integer(), nullable=True),
     sa.Column('name', sa.String(length=30), nullable=True),
     sa.Column('description', sa.String(length=30), nullable=True),
     sa.Column('parent', sa.String(length=30), nullable=True),
-    sa.ForeignKeyConstraint(['analysis_id'], ['analysis.id'], ),
     sa.ForeignKeyConstraint(['dataset_id'], ['dataset.id'], ),
     sa.ForeignKeyConstraint(['user_id'], ['user.id'], ),
     sa.PrimaryKeyConstraint('id')

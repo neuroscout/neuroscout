@@ -3,12 +3,14 @@ import pytest
 from flask_security.utils import encrypt_password
 from app import app, user_datastore
 from database import db
+import json 
 
 @pytest.fixture(scope="session")
 def db_init():
     """" Fixture to initalize db, and clean up at the end of session """
     db.init_app(app)
     with app.app_context():
+        # Check if in testing mode, if not set to
         if 'APP_SETTINGS' in os.environ:
             if os.environ['APP_SETTINGS'] != 'config.TravisConfig':
                 app.config.from_object('config.TestingConfig')
@@ -39,6 +41,8 @@ def add_user():
 
 @pytest.fixture(scope="session")
 def valid_auth_resp(add_user):
-    from request_utils import auth
+    from tests.request_utils import Client
+    client = Client()
     username, password = add_user
-    return auth(username, password)
+    
+    return json.loads(client.auth(username, password).data.decode())
