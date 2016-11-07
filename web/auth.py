@@ -1,4 +1,4 @@
-from models import user_datastore
+from models.auth import user_datastore
 from flask_security.utils import verify_password
 
 # JWT Token authentication

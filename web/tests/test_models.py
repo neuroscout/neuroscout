@@ -1,6 +1,6 @@
 from app import app
 from database import db
-from models import Dataset
+from models.dataset import Dataset
 
 import pytest
 

@@ -26,6 +26,7 @@ py==1.4.31
 PyJWT==1.4.2
 pytest==3.0.2
 python-editor==1.0.1
+requests==2.11.1
 SQLAlchemy==1.0.15
 Werkzeug==0.11.11
 WTForms==2.1

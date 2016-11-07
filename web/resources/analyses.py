@@ -1,5 +1,21 @@
 from flask_restful import Resource
 from flask_jwt import jwt_required
+from marshmallow import Schema, fields, post_load, validates, ValidationError
+from models.analysis import Analysis
+
+class AnalysisSchema(Schema):
+	id = fields.Str(dump_only=True)
+	# results = fields.Nested(ResultsSchema, many=True, only='id')
+	name = fields.Str(required=True)
+	description = fields.Str(required=True)
+	# timelines = fields.Nested(TimelineSchema, many=True, only='id')
+
+	@post_load
+	def make_db(self, data):
+		return Analysis(**data)
+
+	class Meta:
+		additional = ('dataset_id', 'user_id', 'parent')
 
 class AnalysisResource(Resource):
 	@jwt_required()
@@ -15,13 +31,10 @@ class AnalysisResource(Resource):
 class AnalysisListResource(Resource):
 	@jwt_required()
 	def get(self):
-		pass
+		result = Analysis.query.filter_by().all()
+		return AnalysisSchema(many=True).dump(result)
 
 	def put(self):
 		pass
 
-# class AnalysisSchema(Schema):
 	
-
-
-### Write Schemas for each model (maybe place them in  here? with flask-marshmallow)

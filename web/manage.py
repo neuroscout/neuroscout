@@ -14,11 +14,10 @@ def _make_context():
 	from tests.request_utils import Client
 	import resources
 
-	client = Client(requests, 'http://127.0.0.1:5000')
-	token = client.auth('test', 'test')['access_token']
+	client = Client(requests, 'http://127.0.0.1:5000', username='test', password='test')
 
 	return dict(app=app, db=db, models=models, client=client, 
-		resources=resources, token=token)
+		resources=resources)
 
 manager.add_command('db', MigrateCommand)
 manager.add_command("shell", Shell(make_context=_make_context))
