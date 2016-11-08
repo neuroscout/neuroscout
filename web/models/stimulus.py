@@ -3,7 +3,8 @@ from database import db
 class Stimulus(db.Model):
 	id = db.Column(db.Integer, primary_key=True)
 	dataset_id = db.Column(db.Integer, db.ForeignKey('dataset.id'))
-	timelines = db.relationship('Timeline', backref='stimulus',
+	## Onset and duration?
+	predictors = db.relationship('Predictor', backref='stimulus',
                                 lazy='dynamic')
 
 

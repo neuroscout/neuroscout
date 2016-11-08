@@ -8,6 +8,6 @@ class Analysis(db.Model):
                                 lazy='dynamic')
 	name = db.Column(db.String(30))
 	description = db.Column(db.String(30))
-	timelines = db.relationship('Timeline', backref='analysis',
+	predictors = db.relationship('Predictor', backref='analysis',
                                 lazy='dynamic')
 	parent = db.Column(db.String(30))

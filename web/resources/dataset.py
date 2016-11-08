@@ -1,13 +1,11 @@
-from flask import request
 from flask_restful import Resource, abort
 from flask_jwt import jwt_required
 from marshmallow import Schema, fields, post_load, validates, ValidationError
 
-from database import db
 from models.dataset import Dataset
 
-from .analyses import AnalysisSchema
-from .stimuli import StimulusSchema
+from .analysis import AnalysisSchema
+from .stimulus import StimulusSchema
 
 class DatasetSchema(Schema):
 	id = fields.Str(dump_only = True)
@@ -31,9 +29,9 @@ class DatasetSchema(Schema):
 class DatasetResource(Resource):
 	@jwt_required()
 	def get(self, dataset_id):
-		ds = Dataset.query.filter_by(external_id=dataset_id).first()
-		if ds:
-			return DatasetSchema().dump(ds)
+		result = Dataset.query.filter_by(external_id=dataset_id).one()
+		if result:
+			return DatasetSchema().dump(result)
 		else:
 			abort(400, message="Dataset {} doesn't exist".format(dataset_id))
 
@@ -43,15 +41,3 @@ class DatasetListResource(Resource):
 	def get(self):
 		result = Dataset.query.filter_by().all()
 		return DatasetSchema(many=True).dump(result)
-
-	@jwt_required()
-	def put(self):
-		new, errors = DatasetSchema().load(request.get_json())
-
-		if errors:
-			abort(400, errors=errors)
-		else:
-			db.session.add(new)
-			db.session.commit()
-
-			return DatasetSchema().dump(new)[0], 201
