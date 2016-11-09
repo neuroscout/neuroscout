@@ -27,20 +27,8 @@ class AnalysisSchema(Schema):
 		additional = ('dataset_id', 'user_id', 'parent')
 
 class AnalysisResource(Resource):
-	""" This is a user generated analysis """
+	""" User generated analysis """
 	@operation(
-	notes='analyses are useful',
-	nickname='analysis',
-	parameters=[
-	    {
-	      "name": "Analysis",
-	      "description": "A user generate analysis",
-	      "required": True,
-	      "allowMultiple": False,
-	      "dataType": Analysis.__name__,
-	      "paramType": "body"
-	    }
-	  ],
 	responseMessages=[
 	    {
 	      "code": 400,
@@ -50,6 +38,7 @@ class AnalysisResource(Resource):
 	)
 	@jwt_required()
 	def get(self, analysis_id):
+		""" Access individual analysis """
 		result = Analysis.query.filter_by(id=analysis_id).one()
 		if result:
 			return AnalysisSchema().dump(result)
@@ -58,7 +47,7 @@ class AnalysisResource(Resource):
 
 
 class AnalysisListResource(Resource):
-	""" User-generated analyses """
+	""" User generated analyses """
 	@operation()
 	@jwt_required()
 	def get(self):

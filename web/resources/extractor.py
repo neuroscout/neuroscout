@@ -12,9 +12,18 @@ class ExtractorSchema(Schema):
 		additional = ('name', 'description', 'version', 'input_type', 'output_type')
 
 class ExtractorResource(Resource):
-	@operation()
+	""" Individual extractor """
+	@operation(
+	responseMessages=[
+	    {
+	      "code": 400,
+	      "message": "Extractor doesn't exist"
+	    },
+	  ]
+	)
 	@jwt_required()
 	def get(self, extractor_id):
+		""" Access an extractor """
 		result = Extractor.query.filter_by(id=extractor_id).one()
 		if result:
 			return ExtractorSchema().dump(result)
@@ -22,8 +31,10 @@ class ExtractorResource(Resource):
 			abort(400, message="Extractor {} doesn't exist".format(extractor_id))
 
 class ExtractorListResource(Resource):
+	""" Available extractors """
 	@operation()
 	@jwt_required()
 	def get(self):
+		""" Get list of available extractors """
 		result = Extractor.query.filter_by().all()
 		return ExtractorSchema(many=True).dump(result)

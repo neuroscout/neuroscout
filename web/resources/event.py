@@ -15,11 +15,20 @@ class EventSchema(Schema):
 		additional = ('stimulus_id', 'predictor_id', 'analysis_id', 'onset', 'duration', 'amplitude')
 
 class EventResource(Resource):
-	@operation()
+	""" Individual event """
+	@operation(
+	responseMessages=[
+	    {
+	      "code": 400,
+	      "message": "Event doesn't exist"
+	    },
+	  ]
+	)
 	@jwt_required()
-	def get(self, timeline_id):
-		result = Event.query.filter_by(id=timeline_id).one()
+	def get(self, event_id):
+		""" Access individual event """
+		result = Event.query.filter_by(id=event_id).one()
 		if result:
 			return EventSchema().dump(result)
 		else:
-			abort(400, message="Predictor {} doesn't exist".format(timeline_id))
+			abort(400, message="Event {} doesn't exist".format(event_id))

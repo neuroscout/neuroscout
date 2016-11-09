@@ -18,9 +18,18 @@ class StimulusSchema(Schema):
 		additional = ('dataset_id', )
 
 class StimulusResource(Resource):
-	@operation()
+	""" A stimulus """
+	@operation(
+	responseMessages=[
+	    {
+	      "code": 400,
+	      "message": "Stimulus doesn't exist"
+	    },
+	  ]
+	)
 	@jwt_required()
 	def get(self, stimulus_id):
+		""" Acess a specific stimulus """
 		result = Stimulus.query.filter_by(id=stimulus_id).one()
 		if result:
 			return StimulusSchema().dump(result)

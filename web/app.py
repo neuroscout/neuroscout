@@ -44,7 +44,7 @@ api.add_resource(ResultResource, '/api/results/<timeline_id>')
 api.add_resource(StimulusResource, '/api/stimuli/<stimulus_id>')
 
 api.add_resource(PredictorListResource, '/api/predictor')
-api.add_resource(PredictorResource, '/api/timelines/<predictor_id>')
+api.add_resource(PredictorResource, '/api/predictor/<predictor_id>')
 
 
 # Serve SPA

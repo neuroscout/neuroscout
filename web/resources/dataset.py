@@ -28,9 +28,18 @@ class DatasetSchema(Schema):
 		additional = ("events", "attributes")
 
 class DatasetResource(Resource):
-	@operation()
+	""" Individual dataset """
+	@operation(
+	responseMessages=[
+	    {
+	      "code": 400,
+	      "message": "Dataset doesn't exist"
+	    },
+	  ]
+	)
 	@jwt_required()
 	def get(self, dataset_id):
+		""" Access a specific dataset """
 		result = Dataset.query.filter_by(external_id=dataset_id).one()
 		if result:
 			return DatasetSchema().dump(result)
@@ -39,8 +48,10 @@ class DatasetResource(Resource):
 
 
 class DatasetListResource(Resource):
+	""" Available datasets """
 	@operation()
 	@jwt_required()
 	def get(self):
+		""" List of datasets """
 		result = Dataset.query.filter_by().all()
 		return DatasetSchema(many=True).dump(result)

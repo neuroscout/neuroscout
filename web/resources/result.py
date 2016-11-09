@@ -15,9 +15,18 @@ class ResultSchema(Schema):
 		additional = ('analysis_id', )
 
 class ResultResource(Resource):
-	@operation()
+	""" Analysis result """
+	@operation(
+	responseMessages=[
+	    {
+	      "code": 400,
+	      "message": "Result doesn't exist"
+	    },
+	  ]
+	)
 	@jwt_required()
 	def get(self, result_id):
+		""" Access analyis result """
 		result = Result.query.filter_by(id=result_id).one()
 		if result:
 			return ResultSchema().dump(result)
@@ -25,8 +34,10 @@ class ResultResource(Resource):
 			abort(400, message="Result {} doesn't exist".format(result_id))
 
 class ResultListResource(Resource):
+	""" Analysis results """
 	@operation()
 	@jwt_required()
 	def get(self):
+		""" List of available results """
 		result = Result.query.filter_by().all()
 		return ResultSchema(many=True).dump(result)
