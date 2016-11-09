@@ -24,8 +24,8 @@ from resources.analysis import AnalysisResource, AnalysisListResource
 from resources.dataset import DatasetResource, DatasetListResource
 from resources.extractor import ExtractorResource, ExtractorListResource
 from resources.result import ResultResource, ResultListResource
-from resources.stimulus import StimulusResource, StimulusListResource
-from resources.event  import PredictorResource, PredictorListResource
+from resources.stimulus import StimulusResource
+from resources.predictor  import PredictorResource, PredictorListResource
 
 api = swagger.docs(Api(app), apiVersion='0.1')
 
@@ -41,7 +41,6 @@ api.add_resource(ExtractorResource, '/api/extractors/<extractor_id>')
 api.add_resource(ResultListResource, '/api/results')
 api.add_resource(ResultResource, '/api/results/<timeline_id>')
 
-api.add_resource(StimulusListResource, '/api/stimuli')
 api.add_resource(StimulusResource, '/api/stimuli/<stimulus_id>')
 
 api.add_resource(PredictorListResource, '/api/predictor')

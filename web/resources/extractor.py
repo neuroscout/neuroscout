@@ -1,4 +1,5 @@
 from flask_restful import Resource, abort
+from flask_restful_swagger.swagger import operation
 from flask_jwt import jwt_required
 from marshmallow import Schema, fields, post_load, validates, ValidationError
 from models.extractor import Extractor
@@ -11,6 +12,7 @@ class ExtractorSchema(Schema):
 		additional = ('name', 'description', 'version', 'input_type', 'output_type')
 
 class ExtractorResource(Resource):
+	@operation()
 	@jwt_required()
 	def get(self, extractor_id):
 		result = Extractor.query.filter_by(id=extractor_id).one()
@@ -20,6 +22,7 @@ class ExtractorResource(Resource):
 			abort(400, message="Extractor {} doesn't exist".format(extractor_id))
 
 class ExtractorListResource(Resource):
+	@operation()
 	@jwt_required()
 	def get(self):
 		result = Extractor.query.filter_by().all()

@@ -1,4 +1,5 @@
 from flask_restful import Resource, abort
+from flask_restful_swagger.swagger import operation
 from flask_jwt import jwt_required
 from marshmallow import Schema, fields, post_load, validates, ValidationError
 
@@ -27,6 +28,7 @@ class DatasetSchema(Schema):
 		additional = ("events", "attributes")
 
 class DatasetResource(Resource):
+	@operation()
 	@jwt_required()
 	def get(self, dataset_id):
 		result = Dataset.query.filter_by(external_id=dataset_id).one()
@@ -37,6 +39,7 @@ class DatasetResource(Resource):
 
 
 class DatasetListResource(Resource):
+	@operation()
 	@jwt_required()
 	def get(self):
 		result = Dataset.query.filter_by().all()

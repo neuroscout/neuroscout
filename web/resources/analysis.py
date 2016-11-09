@@ -1,14 +1,14 @@
 from flask import request
 from flask_restful import Resource, abort
+from flask_restful_swagger.swagger import operation
 from flask_jwt import jwt_required
 from marshmallow import Schema, fields, post_load, validates, ValidationError
 from models.analysis import Analysis
 from database import db
 
-from flask_restful_swagger.swagger import operation
 
-
-from .event import EventSchema, PredictorSchema
+from .event import EventSchema
+from .predictor import PredictorSchema
 from .result import ResultSchema
 
 class AnalysisSchema(Schema):
