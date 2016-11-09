@@ -5,6 +5,9 @@ from marshmallow import Schema, fields, post_load, validates, ValidationError
 from models.analysis import Analysis
 from database import db
 
+from flask_restful_swagger.swagger import operation
+
+
 from .event import EventSchema, PredictorSchema
 from .result import ResultSchema
 
@@ -24,6 +27,27 @@ class AnalysisSchema(Schema):
 		additional = ('dataset_id', 'user_id', 'parent')
 
 class AnalysisResource(Resource):
+	""" This is a user generated analysis """
+	@operation(
+	notes='analyses are useful',
+	nickname='analysis',
+	parameters=[
+	    {
+	      "name": "Analysis",
+	      "description": "A user generate analysis",
+	      "required": True,
+	      "allowMultiple": False,
+	      "dataType": Analysis.__name__,
+	      "paramType": "body"
+	    }
+	  ],
+	responseMessages=[
+	    {
+	      "code": 400,
+	      "message": "Analysis doesn't exist"
+	    },
+	  ]
+	)
 	@jwt_required()
 	def get(self, analysis_id):
 		result = Analysis.query.filter_by(id=analysis_id).one()
@@ -34,17 +58,29 @@ class AnalysisResource(Resource):
 
 
 class AnalysisListResource(Resource):
+	""" User-generated analyses """
+	@operation()
 	@jwt_required()
 	def get(self):
+		""" Get a list of existing analyses """
 		result = Analysis.query.filter_by().all()
 		return AnalysisSchema(many=True).dump(result)
 
+	@operation(
+	responseMessages=[
+	    {
+	      "code": 405,
+	      "message": "Invalid input"
+	    },
+	  ]
+	)
 	@jwt_required()
 	def post(self):
+		""" Post a new analysis """
 		new, errors = AnalysisSchema().load(request.get_json())
 
 		if errors:
-			abort(400, errors=errors)
+			abort(405 , errors=errors)
 		else:
 			db.session.add(new)
 			db.session.commit()

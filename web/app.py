@@ -18,6 +18,8 @@ jwt = JWT(app, authenticate, load_user)
 
 # Set up API routes
 from flask_restful import Api
+from flask_restful_swagger import swagger
+
 from resources.analysis import AnalysisResource, AnalysisListResource
 from resources.dataset import DatasetResource, DatasetListResource
 from resources.extractor import ExtractorResource, ExtractorListResource
@@ -25,24 +27,25 @@ from resources.result import ResultResource, ResultListResource
 from resources.stimulus import StimulusResource, StimulusListResource
 from resources.event  import PredictorResource, PredictorListResource
 
-api = Api(app)
-api.add_resource(AnalysisListResource, '/api/v1/analyses')
-api.add_resource(AnalysisResource, '/api/v1/analyses/<analysis_id>')
+api = swagger.docs(Api(app), apiVersion='0.1')
 
-api.add_resource(DatasetListResource, '/api/v1/datasets')
-api.add_resource(DatasetResource, '/api/v1/datasets/<dataset_id>')
+api.add_resource(AnalysisListResource, '/api/analyses')
+api.add_resource(AnalysisResource, '/api/analyses/<analysis_id>')
 
-api.add_resource(ExtractorListResource, '/api/v1/extractors')
-api.add_resource(ExtractorResource, '/api/v1/extractors/<extractor_id>')
+api.add_resource(DatasetListResource, '/api/datasets')
+api.add_resource(DatasetResource, '/api/datasets/<dataset_id>')
 
-api.add_resource(ResultListResource, '/api/v1/results')
-api.add_resource(ResultResource, '/api/v1/results/<timeline_id>')
+api.add_resource(ExtractorListResource, '/api/extractors')
+api.add_resource(ExtractorResource, '/api/extractors/<extractor_id>')
 
-api.add_resource(StimulusListResource, '/api/v1/stimuli')
-api.add_resource(StimulusResource, '/api/v1/stimuli/<stimulus_id>')
+api.add_resource(ResultListResource, '/api/results')
+api.add_resource(ResultResource, '/api/results/<timeline_id>')
 
-api.add_resource(PredictorListResource, '/api/v1/predictor')
-api.add_resource(PredictorResource, '/api/v1/timelines/<predictor_id>')
+api.add_resource(StimulusListResource, '/api/stimuli')
+api.add_resource(StimulusResource, '/api/stimuli/<stimulus_id>')
+
+api.add_resource(PredictorListResource, '/api/predictor')
+api.add_resource(PredictorResource, '/api/timelines/<predictor_id>')
 
 
 # Serve SPA
