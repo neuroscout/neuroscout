@@ -8,6 +8,6 @@ class Dataset(db.Model):
 	stimuli = db.relationship('Stimulus', backref='dataset',
                                 lazy='dynamic')
 	attributes = db.Column(JSON) ## BIDS specification
-	name = db.Column(db.String(30))
-	external_id = db.Column(db.String(30), unique=True)
+	name = db.Column(db.String(30), nullable=False)
+	external_id = db.Column(db.String(30), unique=True, nullable=False)
 	events = db.Column(db.Text()) # TSV events file

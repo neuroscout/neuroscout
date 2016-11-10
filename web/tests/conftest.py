@@ -3,10 +3,9 @@ import pytest
 from flask_security.utils import encrypt_password
 from app import app, user_datastore
 from database import db
-import json 
 
-@pytest.fixture(scope="session")
-def db_init():
+@pytest.fixture(scope="function")
+def db_init_clean():
     """" Fixture to initalize db, and clean up at the end of session """
     db.init_app(app)
     with app.app_context():
@@ -26,23 +25,26 @@ def db_init():
         db.session.remove()
         db.drop_all()
 
-@pytest.fixture(scope="session")
-def add_user():
+@pytest.fixture(scope="function")
+def add_users():
     """ Adds a test user to db """
 
-    user_name = 'test1'
-    password = 'test1'
+    user1 = 'test1'
+    pass1 = 'test1'
 
     with app.app_context():
-        user_datastore.create_user(email=user_name, password=encrypt_password(password))
+        user_datastore.create_user(email=user1, password=encrypt_password(pass1))
         db.session.commit()
 
-    return user_name, password
+        user_datastore.create_user(email='test2', password=encrypt_password('test2'))
+        db.session.commit()
 
-@pytest.fixture(scope="session")
-def valid_auth_resp(add_user):
+    return user1, pass1
+
+@pytest.fixture(scope="function")
+def auth_client(add_users):
     from tests.request_utils import Client
     client = Client()
-    username, password = add_user
-    
-    return json.loads(client.auth(username, password).data.decode())
+    username, password = add_users
+    client.auth(username, password)
+    return client

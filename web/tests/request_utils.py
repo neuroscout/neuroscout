@@ -17,6 +17,7 @@ class Client(object):
             self.username = username
             self.password = password
             self.reauthorize()
+            
     def _get_headers(self, token):
         if token is not None:
             return {'Authorization': 'JWT %s' % token}
@@ -44,7 +45,7 @@ class Client(object):
             return self.client.get(self.prepend + route, json=data, 
                 headers=headers)
 
-    def post(self, route, token = None, data=None, follow_redirects=True, headers=None):
+    def post(self, route, token = None, data=None, headers=None):
         """" Perform post request to a route and return response"""
         headers = headers or self._get_headers(token)
 
@@ -55,7 +56,7 @@ class Client(object):
             return self.client.post(self.prepend + route, json=data, 
                 headers=headers)
 
-    def put(self, route, token = None, data=None, follow_redirects=True, headers=None):
+    def put(self, route, token = None, data=None, headers=None):
         """" Perform post request to a route and return response"""
         headers = headers or self._get_headers(token)
 
