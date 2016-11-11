@@ -1,6 +1,7 @@
 import pytest
 from models.dataset import Dataset
 from models.analysis import Analysis
+from models.auth import User
 
 @pytest.fixture(scope="function")
 def add_datasets(session):
@@ -17,7 +18,7 @@ def add_datasets(session):
 	return [dataset.id, dataset_2.id]
 
 @pytest.fixture(scope="function")
-def add_analyses(session):
+def add_analyses(session, add_users):
 	"""" Add test analyses """
 	analysis = Analysis(dataset_id = 1, user_id = 1, 
 		name = "My first fMRI analysis!", description = "Ground breaking")
@@ -33,7 +34,7 @@ def add_analyses(session):
 
 	return [analysis.id, analysis_2.id]
 
-def test_dataset(session, add_users, add_datasets, add_analyses):
+def test_dataset(session, add_datasets, add_analyses):
 	# Number of entries
 	assert Dataset.query.count() == 2
 
@@ -49,7 +50,7 @@ def test_dataset(session, add_users, add_datasets, add_analyses):
 		session.commit()
 	assert 'not-null constraint' in str(excinfo)
 	session.rollback()
-	
+
 	# Try adding dataset with same external id as existing one
 	with pytest.raises(Exception) as excinfo:
 		session.add(Dataset(name="Test", 

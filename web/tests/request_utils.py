@@ -4,65 +4,57 @@ class Client(object):
     def __init__(self, test_client=None, prepend='', username=None, password=None):
         if test_client is None:
             from app import app
-            self.client = app.test_client()
+            test_client = app.test_client()
             self.client_flask = True
         else:
-            self.client = test_client
             self.client_flask = False
 
+        self.client = test_client
         self.prepend = prepend
         self.token = None
 
         if username is not None and password is not None:
             self.username = username
             self.password = password
-            self.reauthorize()
-            
-    def _get_headers(self, token):
-        if token is not None:
-            return {'Authorization': 'JWT %s' % token}
-        elif self.token is not None:
+            self.authorize(username, password)
+
+    def _get_headers(self):
+        if self.token is not None:
            return {'Authorization': 'JWT %s' % self.token}
+        else:
+            return None
 
-    def auth(self, username, password):
-        """" Perform authorized request to /auth and return response"""
+    def _make_request(self, request, route, data, headers):
+        """ Generic request handler """
+        request_function = getattr(self.client, request)
+        headers = headers or self._get_headers()
+
+        if self.client_flask:
+            return request_function(self.prepend + route, data=json.dumps(data), 
+                content_type='application/json', headers=headers)
+        else:
+            return request_function(self.prepend + route, json=data, 
+                headers=headers)
+
+    def authorize(self, username, password):
+        if username is not None and password is not None:
+            self.username = username
+            self.password = password
+
         rv = self.post('/auth',
-                        data={'username': username, 'password': password}
-                        )
-        return rv
-
-    def reauthorize(self):
-        self.token = self.auth(self.username, self.password).json()['access_token']
-
-    def get(self, route, token=None, data=None, headers=None):
-        """" Perform get request to a route and return response"""
-        headers = headers or self._get_headers(token)
+                        data={'username': self.username, 'password': self.password})
 
         if self.client_flask:
-            return self.client.get(self.prepend + route, data=json.dumps(data), 
-                content_type='application/json', headers=headers)
+             self.token = json.loads(rv.data.decode())['access_token']
         else:
-            return self.client.get(self.prepend + route, json=data, 
-                headers=headers)
+            self.token = rv.json()['access_token']
 
-    def post(self, route, token = None, data=None, headers=None):
-        """" Perform post request to a route and return response"""
-        headers = headers or self._get_headers(token)
+    def get(self, route, data=None, headers=None):
+        return self._make_request('get', route, data, headers)
 
-        if self.client_flask:
-            return self.client.post(self.prepend + route, data=json.dumps(data), 
-                content_type='application/json', headers=headers)
-        else:
-            return self.client.post(self.prepend + route, json=data, 
-                headers=headers)
+    def post(self, route, data=None, headers=None):
+        return self._make_request('post', route, data, headers)
 
-    def put(self, route, token = None, data=None, headers=None):
-        """" Perform post request to a route and return response"""
-        headers = headers or self._get_headers(token)
+    def put(self, route, data=None, headers=None):
+        return self._make_request('put', route, data, headers)
 
-        if self.client_flask:
-            return self.client.post(self.prepend + route, data=json.dumps(data), 
-                content_type='application/json', headers=headers)
-        else:
-            return self.client.put(self.prepend + route, json=data, 
-                headers=headers)

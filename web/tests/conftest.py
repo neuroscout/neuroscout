@@ -2,7 +2,6 @@ import os
 import pytest
 from flask_security.utils import encrypt_password
 from app import app as _app
-from app import user_datastore
 from database import db as _db
 
 @pytest.fixture(scope='session')
@@ -22,7 +21,6 @@ def app():
 
     ctx.pop()
 
-
 @pytest.fixture(scope='session')
 def db(app):
     """Session-wide test database."""
@@ -36,7 +34,7 @@ def db(app):
 
 @pytest.fixture(scope='function')
 def session(db):
-    """Creates a new user_datastorebase session for a test."""
+    """Creates a new db session for a test."""
     connection = db.engine.connect()
     transaction = connection.begin()
 
@@ -53,24 +51,34 @@ def session(db):
 
 
 @pytest.fixture(scope="function")
-def add_users(session):
+def add_users(app, db, session):
     """ Adds a test user to db """
+    from flask_security import SQLAlchemyUserDatastore
+    from models.auth import User, Role
+
+    user_datastore = SQLAlchemyUserDatastore(db, User, Role)
 
     user1 = 'test1'
     pass1 = 'test1'
 
-    user_datastore.create_user(email=user1, password=encrypt_password(pass1))
-    session.commit()
+    # Hacky way to avoid duplicate entries
+    if not user_datastore.find_user(email=user1):
 
-    user_datastore.create_user(email='test2', password=encrypt_password('test2'))
-    session.commit()
+        user_datastore.create_user(email=user1, password=encrypt_password(pass1))
+        session.commit()
 
-    return user1, pass1
+        user_datastore.create_user(email='test2', password=encrypt_password('test2'))
+        session.commit()
+
+    else:
+        pass
+
+    yield user1, pass1
 
 @pytest.fixture(scope="function")
 def auth_client(add_users):
     from tests.request_utils import Client
-    client = Client()
+
     username, password = add_users
-    client.auth(username, password)
+    client = Client(username=username, password=password)
     return client
