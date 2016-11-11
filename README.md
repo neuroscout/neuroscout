@@ -9,7 +9,7 @@ Build the containers and start the services:
     docker-compose build
     docker-compose up -d
 
-The server should now be running. Navigate to localhost if on Docker for Mac
+The server should now be running. Navigate to http://localhost:80 if on Docker for Mac
 
 To access psql (and first time running, create the db), run this command (port is forwarded to host!)
 
