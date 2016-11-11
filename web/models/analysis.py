@@ -6,7 +6,7 @@ class Analysis(db.Model):
 	user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
 	results = db.relationship('Result', backref='analysis',
                                 lazy='dynamic')
-	name = db.Column(db.String(30))
+	name = db.Column(db.String(30), nullable=False)
 	description = db.Column(db.String(30))
 	predictors = db.relationship('Predictor', backref='analysis',
                                 lazy='dynamic')

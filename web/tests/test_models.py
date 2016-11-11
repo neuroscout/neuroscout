@@ -18,12 +18,13 @@ def add_datasets(session):
 	return [dataset.id, dataset_2.id]
 
 @pytest.fixture(scope="function")
-def add_analyses(session, add_users):
+def add_analyses(session, add_users, add_datasets):
 	"""" Add test analyses """
-	analysis = Analysis(dataset_id = 1, user_id = 1, 
+
+	analysis = Analysis(dataset_id = add_datasets[0], user_id = add_users[0][0], 
 		name = "My first fMRI analysis!", description = "Ground breaking")
 
-	analysis_2 = Analysis(dataset_id = 1, user_id = 2,
+	analysis_2 = Analysis(dataset_id = add_datasets[0], user_id = add_users[0][1],
 		name = "fMRI is cool" , description = "Earth shattering")
 
 	session.add(analysis)
@@ -34,9 +35,11 @@ def add_analyses(session, add_users):
 
 	return [analysis.id, analysis_2.id]
 
+
 def test_dataset(session, add_datasets, add_analyses):
 	# Number of entries
 	assert Dataset.query.count() == 2
+
 
 	first_dataset = Dataset.query.first()
 
@@ -59,9 +62,22 @@ def test_dataset(session, add_datasets, add_analyses):
 	assert 'unique constraint "dataset_external_id_key"' in str(excinfo)
 	session.rollback()
 
+def test_analysis(session, add_datasets, add_analyses):
+	# Number of entries
+	assert Analysis.query.count() == 2
 
-# @pytest.mark.usefixtures("db_init_clean")
-# def test_analysis(add_users, add_datasets, add_analyses):
-# 		assert Analysis.query.count() == 2
-# 		first_analysis = Analysis.query.first()
+	first_analysis = Analysis.query.first()
+	assert User.query.filter_by(id=first_analysis.user_id).count() == 1
+	
+	# Add relationship to a predictor
+
+	# Try adding analysis without a name
+	with pytest.raises(Exception) as excinfo:
+		session.add(Analysis())
+		session.commit()
+	assert 'not-null constraint' in str(excinfo)
+	session.rollback()
+
+	# Try cloning analysis
+
 
