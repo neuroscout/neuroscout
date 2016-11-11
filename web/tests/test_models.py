@@ -1,74 +1,66 @@
-from app import app
-from database import db
+import pytest
 from models.dataset import Dataset
 from models.analysis import Analysis
-	
-import pytest
 
-from psycopg2 import IntegrityError
-
-@pytest.fixture(scope="session")
-def add_datasets():
+@pytest.fixture(scope="function")
+def add_datasets(session):
 	"""" Add test datasets """
-	with app.app_context():
-		dataset = Dataset(name='Fancy fMRI study', external_id = 'ds_32', 
-			attributes = {'some' : 'attribute'})
-		db.session.add(dataset)
-		db.session.commit()
+	dataset = Dataset(name='Fancy fMRI study', external_id = 'ds_32', 
+		attributes = {'some' : 'attribute'})
+	session.add(dataset)
+	session.commit()
 
-		dataset_2 = Dataset(name='Indiana Jones', external_id = 'ds_33')
-		db.session.add(dataset_2)
-		db.session.commit()
+	dataset_2 = Dataset(name='Indiana Jones', external_id = 'ds_33')
+	session.add(dataset_2)
+	session.commit()
 
-		return [dataset.id, dataset_2.id]
+	return [dataset.id, dataset_2.id]
 
-@pytest.fixture(scope="session")
-def add_analyses():
+@pytest.fixture(scope="function")
+def add_analyses(session):
 	"""" Add test analyses """
-	with app.app_context():
-		analysis = Analysis(dataset_id = 1, user_id = 1, 
-			name = "My first fMRI analysis!", description = "Ground breaking")
+	analysis = Analysis(dataset_id = 1, user_id = 1, 
+		name = "My first fMRI analysis!", description = "Ground breaking")
 
-		analysis_2 = Analysis(dataset_id = 1, user_id = 2,
-			name = "fMRI is cool" , description = "Earth shattering")
+	analysis_2 = Analysis(dataset_id = 1, user_id = 2,
+		name = "fMRI is cool" , description = "Earth shattering")
 
-		db.session.add(analysis)
-		db.session.commit()
+	session.add(analysis)
+	session.commit()
 
-		db.session.add(analysis_2)
-		db.session.commit()
+	session.add(analysis_2)
+	session.commit()
 
-		return [analysis.id, analysis_2.id]
+	return [analysis.id, analysis_2.id]
 
-@pytest.mark.usefixtures("db_init_clean")
-def test_dataset(add_users, add_datasets, add_analyses):
-	with app.app_context():
-		# Number of entries
-		assert Dataset.query.count() == 2
+def test_dataset(session, add_users, add_datasets, add_analyses):
+	# Number of entries
+	assert Dataset.query.count() == 2
 
-		first_dataset = Dataset.query.first()
+	first_dataset = Dataset.query.first()
 
-		# Datatypes of columns
-		assert type(first_dataset.id) is int
-		assert type(first_dataset.attributes) is dict
-		assert type(first_dataset.name) is str
-		assert type(first_dataset.external_id) is str
+	# Relationship to Analyses
+	assert first_dataset.analyses.count() == 2
+	assert isinstance(first_dataset.analyses.first(), Analysis)
 
-		# Relationship to Analyses
-		assert first_dataset.analyses.count() == 2
-		assert isinstance(first_dataset.analyses.first(), Analysis)
+	# Try adding dataset without a name
+	with pytest.raises(Exception) as excinfo:
+		session.add(Dataset())
+		session.commit()
+	assert 'not-null constraint' in str(excinfo)
+	session.rollback()
+	
+	# Try adding dataset with same external id as existing one
+	with pytest.raises(Exception) as excinfo:
+		session.add(Dataset(name="Test", 
+			external_id=first_dataset.external_id))
+		session.commit()
+	assert 'unique constraint "dataset_external_id_key"' in str(excinfo)
+	session.rollback()
 
-		# Try adding dataset without a name
-		with pytest.raises(Exception) as excinfo:
-			db.session.add(Dataset())
-			db.session.commit()
-		assert 'not-null constraint' in str(excinfo)
-		db.session.rollback()
 
-		# Try adding dataset with same external id as existing one
-		with pytest.raises(Exception) as excinfo:
-			db.session.add(Dataset(name="Test", 
-				external_id=first_dataset.external_id))
-			db.session.commit()
-		assert 'unique constraint "dataset_external_id_key"' in str(excinfo)
-		db.session.rollback()
+# @pytest.mark.usefixtures("db_init_clean")
+# def test_analysis(add_users, add_datasets, add_analyses):
+# 		assert Analysis.query.count() == 2
+# 		first_analysis = Analysis.query.first()
+
