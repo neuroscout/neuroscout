@@ -37,6 +37,22 @@ def test_put_user(auth_client, add_analyses):
 	assert put_rv.status_code == 400
 	assert 'email' in decode_json(put_rv)['errors']
 
+def test_post_user(auth_client):
+	# Make incomplete post
+	post_rv = auth_client.post('/api/user', data = {'name' : 'me'})
+	assert post_rv.status_code == 400
+	assert 'Missing data' in decode_json(post_rv)['errors']['email'][0]
+
+	# Invalid email
+	post_rv = auth_client.post('/api/user', 
+		data = {'name' : 'me', 'email' : 'fake'})
+	assert post_rv.status_code == 400
+	assert 'Not a valid' in decode_json(post_rv)['errors']['email'][0]	
+
+	# Invalid email
+	post_rv = auth_client.post('/api/user', 
+		data = {'name' : 'me', 'email' : 'fake@gmail.com', 'password' : 'something'})
+	assert post_rv.status_code == 200
 
 def test_datasets(auth_client, add_datasets):
 	rv = auth_client.get('/api/datasets')

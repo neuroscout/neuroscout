@@ -21,6 +21,7 @@ class UserSchema(Schema):
 class NewUserSchema(Schema):
 	password = fields.Str(load_only=True, required=True)
 	email = fields.Email(required=True)
+	name = fields.Str(required=True)
 
 	@post_load
 	def create_user(self, data):
