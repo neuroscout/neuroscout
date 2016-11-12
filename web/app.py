@@ -49,6 +49,7 @@ api.add_resource(PredictorResource, '/api/predictor/<predictor_id>')
 
 api.add_resource(UserResource, '/api/user')
 
+
 # Serve SPA
 @app.route('/')
 def index():

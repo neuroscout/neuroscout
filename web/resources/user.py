@@ -2,9 +2,12 @@ from flask import request
 from flask_restful import Resource, abort
 from flask_restful_swagger.swagger import operation
 from flask_jwt import jwt_required, current_identity
+from flask_security.utils import encrypt_password
+
 from marshmallow import Schema, fields, post_load, validates, ValidationError
 from models.auth import User
 from database import db
+from models.auth import user_datastore
 
 from .analysis import AnalysisSchema
 from db_utils import put_record
@@ -14,7 +17,25 @@ class UserSchema(Schema):
 	last_login_at = fields.DateTime(dump_only = True)
 
 	class Meta:
-		additional = ('email', )
+		additional = ('email', 'name')
+
+class NewUserSchema(Schema):
+	password = fields.Str(load_only=True, required=True)
+	email = fields.Email(required=True)
+
+	@post_load
+	def create_user(self, data):
+		data['password']= encrypt_password(data['password'])
+		user_datastore.create_user(**data)
+		db.session.commit()
+
+	@validates('email')
+	def validate_name(self, value):
+		if User.query.filter_by(email=value).count() > 0:
+			raise ValidationError('This email is already associated with an acccount.')
+
+	class Meta:
+		additional = ('name', )
 
 class UserResource(Resource):
 	""" Current user data """
@@ -25,7 +46,7 @@ class UserResource(Resource):
 
 	@jwt_required()
 	def put(self):
-		""" Get user info """
+		""" Update user info """
 		### This could maybe be a patch request instead, esp given nested fields
 		updated, errors = UserSchema().load(request.get_json())
 
@@ -33,4 +54,11 @@ class UserResource(Resource):
 			abort(405 , errors=errors)
 		else:
 			put_record(db.session, updated, current_identity)
+
+	def post(self):
+		""" Create a new user """
+		new, errors = NewUserSchema().load(request.get_json())
+
+		if errors:
+			abort(405 , errors=errors)
 
