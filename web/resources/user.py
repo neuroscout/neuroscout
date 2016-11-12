@@ -15,9 +15,8 @@ from db_utils import put_record
 class UserSchema(Schema):
 	analyses = fields.Nested(AnalysisSchema, many=True, dump_only=True)
 	last_login_at = fields.DateTime(dump_only = True)
-
-	class Meta:
-		additional = ('email', 'name')
+	email = fields.Email(required=True)
+	name = fields.Str(required=True)
 
 class NewUserSchema(Schema):
 	password = fields.Str(load_only=True, required=True)
@@ -46,32 +45,21 @@ class UserResource(Resource):
 		return UserSchema().dump(current_identity)
 
 	@operation(
-	responseMessages=[
-	    {
-	      "code": 400,
-	      "message": "Bad request"
-	    },
-	  ]
-	)
+	responseMessages=[{"code": 400, "message": "Bad request"}])
 	@jwt_required()
 	def put(self):
 		""" Update user info """
 		### This could maybe be a patch request instead, esp given nested fields
 		updated, errors = UserSchema().load(request.get_json())
+		print(updated)
 
 		if errors:
 			abort(400 , errors=errors)
 		else:
 			put_record(db.session, updated, current_identity)
-			
+
 	@operation(
-	responseMessages=[
-	    {
-	      "code": 400,
-	      "message": "Bad request"
-	    },
-	  ]
-	)
+	responseMessages=[{"code": 400, "message": "Bad request"}])
 	def post(self):
 		""" Create a new user """
 		new, errors = NewUserSchema().load(request.get_json())

@@ -90,16 +90,16 @@ def add_users(app, db, session):
 
     user_datastore = SQLAlchemyUserDatastore(db, User, Role)
 
-    user1 = 'test1'
+    user1 = 'test1@gmail.com'
     pass1 = 'test1'
 
     user_datastore.create_user(email=user1, password=encrypt_password(pass1))
     session.commit()
     id_1 = user_datastore.find_user(email=user1).id
 
-    user_datastore.create_user(email='test2', password=encrypt_password('test2'))
+    user_datastore.create_user(email='test2@gmail.com', password=encrypt_password('test2'))
     session.commit()
-    id_2 = user_datastore.find_user(email='test2').id
+    id_2 = user_datastore.find_user(email='test2@gmail.com').id
 
     yield (id_1, id_2), (user1, pass1)
 

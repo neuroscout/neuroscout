@@ -19,7 +19,6 @@ def put_record(session, updated_values, instance):
 		for key, value in updated_values.items():
 			setattr(instance, key, value)
 			session.commit()
-			print(key, value)
 
 	except SQLAlchemyError:
 		session.rollback()

@@ -10,8 +10,8 @@ from flask_security.utils import encrypt_password
 
 # Bootstrap 
 def create_test_models():
-    user_datastore.create_user(email='test', password=encrypt_password('test'))
-    user_datastore.create_user(email='test2', password=encrypt_password('test2'))
+    user_datastore.create_user(email='test@gmail.com', password=encrypt_password('test'))
+    user_datastore.create_user(email='test2@gmail.com', password=encrypt_password('test2'))
 
     ds = Dataset(name='test_fmri', external_id='ds_30')
     ds_2 = Dataset(name='test_fmri', external_id='ds_31')
