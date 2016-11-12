@@ -20,6 +20,9 @@ class User(db.Model, UserMixin):
     current_login_ip = db.Column(db.String(255))
     login_count = db.Column(db.Integer)
 
+    analyses = db.relationship('Analysis', backref='user',
+                            lazy='dynamic')
+
     def __repr__(self):
         return '<models.User[email=%s]>' % self.email
 

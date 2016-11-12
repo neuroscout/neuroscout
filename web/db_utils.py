@@ -1,3 +1,6 @@
+from sqlalchemy.exc import SQLAlchemyError
+from flask_restful import abort
+
 def copy_row(model, row, ignored_columns=[]):
     copy = model()
 
@@ -10,3 +13,14 @@ def copy_row(model, row, ignored_columns=[]):
                 continue
 
     return copy
+
+def put_record(session, updated_values, instance):
+	try:
+		for key, value in updated_values.items():
+			setattr(instance, key, value)
+			session.commit()
+			print(key, value)
+
+	except SQLAlchemyError:
+		session.rollback()
+		abort(400, message="Database error")

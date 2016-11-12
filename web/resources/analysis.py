@@ -18,13 +18,14 @@ class AnalysisSchema(Schema):
 	description = fields.Str(required=True)
 	events = fields.Nested(EventSchema, many=True, only='id')
 	predictors = fields.Nested(PredictorSchema, many=True, only='id')
+	parent = fields.Nested('AnalysisSchema', only='id')
 
 	@post_load
 	def make_db(self, data):
 		return Analysis(**data)
 
 	class Meta:
-		additional = ('dataset_id', 'user_id', 'parent')
+		additional = ('dataset_id', 'user_id')
 
 class AnalysisResource(Resource):
 	""" User generated analysis """

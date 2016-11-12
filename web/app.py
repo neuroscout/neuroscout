@@ -26,6 +26,7 @@ from resources.extractor import ExtractorResource, ExtractorListResource
 from resources.result import ResultResource, ResultListResource
 from resources.stimulus import StimulusResource
 from resources.predictor  import PredictorResource, PredictorListResource
+from resources.user  import UserResource
 
 api = swagger.docs(Api(app), apiVersion='0.1')
 
@@ -46,6 +47,7 @@ api.add_resource(StimulusResource, '/api/stimuli/<stimulus_id>')
 api.add_resource(PredictorListResource, '/api/predictor')
 api.add_resource(PredictorResource, '/api/predictor/<predictor_id>')
 
+api.add_resource(UserResource, '/api/user')
 
 # Serve SPA
 @app.route('/')

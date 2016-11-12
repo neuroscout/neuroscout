@@ -36,7 +36,7 @@ class Client(object):
             return request_function(self.prepend + route, json=data, 
                 headers=headers)
 
-    def authorize(self, username, password):
+    def authorize(self, username=None, password=None):
         if username is not None and password is not None:
             self.username = username
             self.password = password

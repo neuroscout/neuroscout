@@ -19,7 +19,7 @@ def create_test_models():
     db.session.add(ds_2)
     db.session.commit()
 
-    an = Analysis(dataset_id=1, name="test_fmri_analysis", description="some crazy shit")
+    an = Analysis(dataset_id=1, user_id = 1, name="test_fmri_analysis", description="some crazy shit")
     db.session.add(an)
     db.session.commit()
 
