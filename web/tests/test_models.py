@@ -88,7 +88,6 @@ def test_dataset(session, add_analyses):
 			external_id=first_dataset.external_id))
 		session.commit()
 	assert 'unique constraint "dataset_external_id_key"' in str(excinfo)
-	session.rollback()
 
 def test_analysis(session, add_analyses, add_predictor):
 	# Number of entries
@@ -109,7 +108,6 @@ def test_analysis(session, add_analyses, add_predictor):
 		session.add(Analysis())
 		session.commit()
 	assert 'not-null constraint' in str(excinfo)
-	session.rollback()
 
 	# Try cloning analysis
 
