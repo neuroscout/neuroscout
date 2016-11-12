@@ -39,11 +39,20 @@ class NewUserSchema(Schema):
 
 class UserResource(Resource):
 	""" Current user data """
+	@operation()
 	@jwt_required()
 	def get(self):
 		""" Get user info """
 		return UserSchema().dump(current_identity)
 
+	@operation(
+	responseMessages=[
+	    {
+	      "code": 400,
+	      "message": "Bad request"
+	    },
+	  ]
+	)
 	@jwt_required()
 	def put(self):
 		""" Update user info """
@@ -51,14 +60,22 @@ class UserResource(Resource):
 		updated, errors = UserSchema().load(request.get_json())
 
 		if errors:
-			abort(405 , errors=errors)
+			abort(400 , errors=errors)
 		else:
 			put_record(db.session, updated, current_identity)
-
+			
+	@operation(
+	responseMessages=[
+	    {
+	      "code": 400,
+	      "message": "Bad request"
+	    },
+	  ]
+	)
 	def post(self):
 		""" Create a new user """
 		new, errors = NewUserSchema().load(request.get_json())
 
 		if errors:
-			abort(405 , errors=errors)
+			abort(400 , errors=errors)
 
