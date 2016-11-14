@@ -16,8 +16,7 @@ def test_auth(auth_client):
 
 	# Test without auth token
 	auth_client.token = None
-	domains = ['user', 'datasets', 'analyses', 'extractors', 'predictors',
-	'predictors']
+	domains = ['user', 'datasets', 'analyses', 'extractors']
 
 	for domain in domains:
 		rv = auth_client.get('/api/{}'.format(domain))

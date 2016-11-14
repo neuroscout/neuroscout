@@ -4,6 +4,8 @@ from flask_jwt import jwt_required
 from marshmallow import Schema, fields, post_load, validates, ValidationError
 from models.extractor import Extractor
 
+from sqlalchemy.orm.exc import NoResultFound
+
 class ExtractorSchema(Schema):
 	id = fields.Str(dump_only=True)
 
@@ -17,18 +19,18 @@ class ExtractorResource(Resource):
 	responseMessages=[
 	    {
 	      "code": 400,
-	      "message": "Extractor doesn't exist"
+	      "message": "Extractor does not exist"
 	    },
 	  ]
 	)
 	@jwt_required()
 	def get(self, extractor_id):
 		""" Access an extractor """
-		result = Extractor.query.filter_by(id=extractor_id).one()
-		if result:
+		try:
+			result = Extractor.query.filter_by(id=extractor_id).one()
 			return ExtractorSchema().dump(result)
-		else:
-			abort(400, message="Extractor {} doesn't exist".format(extractor_id))
+		except NoResultFound:
+			abort(400, message="Extractor {} does not exist".format(extractor_id))
 
 class ExtractorListResource(Resource):
 	""" Available extractors """

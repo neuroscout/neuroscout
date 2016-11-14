@@ -11,10 +11,10 @@ def test_get(auth_client, add_analyses):
 
 	# Get first analysis
 	assert 'id' in decode_json(rv)[0]
-	first_dataset_id = decode_json(rv)[0]['id']
+	first_extractor_id = decode_json(rv)[0]['id']
 
 	# Get first analysis by id
-	rv = auth_client.get('/api/analyses/{}'.format(first_dataset_id))
+	rv = auth_client.get('/api/analyses/{}'.format(first_extractor_id))
 	assert rv.status_code == 200
 	analysis = decode_json(rv)
 	assert analysis_list[0] == analysis
@@ -30,6 +30,7 @@ def test_get(auth_client, add_analyses):
 def test_post(auth_client, add_datasets):
 	## Add analysis 
 	dataset_id = decode_json(auth_client.get('/api/datasets'))[0]['id']
+
 	test_analysis = {
 	'dataset_id' : dataset_id,
 	'name' : 'some analysis',
@@ -74,6 +75,8 @@ def test_bad_post(auth_client, add_datasets):
 	assert rv.status_code == 405
 	assert decode_json(rv)['errors']['name'][0] == 'Missing data for required field.'
 
+def test_put():
+	pass
 
 def test_clone():
 	pass

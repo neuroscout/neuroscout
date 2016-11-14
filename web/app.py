@@ -44,7 +44,6 @@ api.add_resource(ResultResource, '/api/results/<timeline_id>')
 
 api.add_resource(StimulusResource, '/api/stimuli/<stimulus_id>')
 
-api.add_resource(PredictorListResource, '/api/predictors')
 api.add_resource(PredictorResource, '/api/predictors/<predictor_id>')
 
 api.add_resource(UserResource, '/api/user')
