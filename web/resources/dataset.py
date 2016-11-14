@@ -8,17 +8,13 @@ from models.dataset import Dataset
 from .analysis import AnalysisSchema
 from .stimulus import StimulusSchema
 
+from sqlalchemy.orm.exc import NoResultFound
+
 class DatasetSchema(Schema):
-	id = fields.Str(dump_only = True)
 	external_id = fields.Str(required=True)
 	analyses = fields.Nested(AnalysisSchema, many=True, only='id')
 	stimuli = fields.Nested(StimulusSchema, many=True, only='id')
 	name = fields.Str(required=True)
-
-	@validates('name')
-	def validate_name(self, value):
-		if len(value) < 5:
-			raise ValidationError('Name must be longer than 5 characters.')
 
 	@post_load
 	def make_db(self, data):
@@ -30,21 +26,16 @@ class DatasetSchema(Schema):
 class DatasetResource(Resource):
 	""" Individual dataset """
 	@operation(
-	responseMessages=[
-	    {
-	      "code": 400,
-	      "message": "Dataset doesn't exist"
-	    },
-	  ]
-	)
+	responseMessages=[{"code": 400,
+	      "message": "Dataset does not exist"}])
 	@jwt_required()
 	def get(self, dataset_id):
 		""" Access a specific dataset """
-		result = Dataset.query.filter_by(external_id=dataset_id).one()
-		if result:
+		try:
+			result = Dataset.query.filter_by(external_id=dataset_id).one()
 			return DatasetSchema().dump(result)
-		else:
-			abort(400, message="Dataset {} doesn't exist".format(dataset_id))
+		except NoResultFound:
+			abort(400, message="Dataset {} does not exist".format(dataset_id))
 
 
 class DatasetListResource(Resource):

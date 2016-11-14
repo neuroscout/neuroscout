@@ -58,3 +58,5 @@ class Client(object):
     def put(self, route, data=None, headers=None):
         return self._make_request('put', route, data, headers)
 
+def decode_json(rv):
+    return json.loads(rv.data.decode())
