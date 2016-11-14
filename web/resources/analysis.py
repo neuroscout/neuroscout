@@ -30,13 +30,8 @@ class AnalysisSchema(Schema):
 class AnalysisResource(Resource):
 	""" User generated analysis """
 	@operation(
-	responseMessages=[
-	    {
-	      "code": 400,
-	      "message": "Analysis doesn't exist"
-	    },
-	  ]
-	)
+	responseMessages=[{"code": 400,
+	      "message": "Analysis does not exist"}])
 	@jwt_required()
 	def get(self, analysis_id):
 		""" Access individual analysis """
@@ -44,7 +39,7 @@ class AnalysisResource(Resource):
 		if result:
 			return AnalysisSchema().dump(result)
 		else:
-			abort(400, message="Analysis {} doesn't exist".format(analysis_id))
+			abort(400, message="Analysis {} does not exist".format(analysis_id))
 
 
 class AnalysisListResource(Resource):
@@ -57,13 +52,8 @@ class AnalysisListResource(Resource):
 		return AnalysisSchema(many=True).dump(result)
 
 	@operation(
-	responseMessages=[
-	    {
-	      "code": 405,
-	      "message": "Invalid input"
-	    },
-	  ]
-	)
+	responseMessages=[{"code": 405,
+	      "message": "Invalid input"}])
 	@jwt_required()
 	def post(self):
 		""" Post a new analysis """

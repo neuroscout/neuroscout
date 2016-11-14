@@ -4,15 +4,25 @@ def decode_json(rv):
 	return json.loads(rv.data.decode())
 
 def test_auth(auth_client):    
-    # Test bad URL with correct auth
-    rv = auth_client.get('/api/v1/hello')
-    assert rv.status_code == 404
+	# Test bad URL with correct auth
+	rv = auth_client.get('/api/v1/hello')
+	assert rv.status_code == 404
 
-    # Get auth token with invalid credentials
-    auth_resp = auth_client.post('/auth',
-                        data={'username': 'not', 'password': 'existing'},
-                        headers=None)
-    assert auth_resp.status_code == 401
+	# Get auth token with invalid credentials
+	auth_resp = auth_client.post('/auth',
+						data={'username': 'not', 'password': 'existing'},
+						headers=None)
+	assert auth_resp.status_code == 401
+
+	# Test without auth token
+	auth_client.token = None
+	domains = ['user', 'datasets', 'analyses', 'extractors', 'predictors',
+	'predictors']
+
+	for domain in domains:
+		rv = auth_client.get('/api/{}'.format(domain))
+		assert rv.status_code == 401
+		assert decode_json(rv)['description'] == 'Request does not contain an access token'
 
 def test_get_user(auth_client, add_analyses):
 	rv = auth_client.get('/api/user')
