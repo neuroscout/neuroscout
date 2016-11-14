@@ -11,6 +11,7 @@ from .stimulus import StimulusSchema
 from sqlalchemy.orm.exc import NoResultFound
 
 class DatasetSchema(Schema):
+	id = fields.Str(dump_only=True)
 	external_id = fields.Str(required=True)
 	analyses = fields.Nested(AnalysisSchema, many=True, only='id')
 	stimuli = fields.Nested(StimulusSchema, many=True, only='id')

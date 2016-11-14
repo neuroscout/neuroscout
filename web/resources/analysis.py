@@ -1,18 +1,24 @@
 from flask import request
 from flask_restful import Resource, abort
 from flask_restful_swagger.swagger import operation
-from flask_jwt import jwt_required
+from flask_jwt import jwt_required, current_identity
 from marshmallow import Schema, fields, post_load, validates, ValidationError
 from models.analysis import Analysis
-from database import db
+from models.dataset import Dataset
 
+from database import db
 
 from .event import EventSchema
 from .predictor import PredictorSchema
 from .result import ResultSchema
 
+from sqlalchemy.orm.exc import NoResultFound
+
 class AnalysisSchema(Schema):
-	id = fields.Str(dump_only=True)
+	id = fields.Int(dump_only=True)
+	dataset_id = fields.Int(required=True)
+	user_id = fields.Int(required=True, dump_only=True)
+
 	results = fields.Nested(ResultSchema, many=True, only='id')
 	name = fields.Str(required=True)
 	description = fields.Str(required=True)
@@ -24,8 +30,13 @@ class AnalysisSchema(Schema):
 	def make_db(self, data):
 		return Analysis(**data)
 
+	@validates('dataset_id')
+	def validate_dsid(self, value):
+		if Dataset.query.filter_by(id=value).count() == 0:
+			raise ValidationError('Invalid dataset id.')
+
 	class Meta:
-		additional = ('dataset_id', 'user_id')
+		additional = ('user_id', )
 
 class AnalysisResource(Resource):
 	""" User generated analysis """
@@ -35,10 +46,10 @@ class AnalysisResource(Resource):
 	@jwt_required()
 	def get(self, analysis_id):
 		""" Access individual analysis """
-		result = Analysis.query.filter_by(id=analysis_id).one()
-		if result:
+		try:
+			result = Analysis.query.filter_by(id=analysis_id).one()
 			return AnalysisSchema().dump(result)
-		else:
+		except NoResultFound:
 			abort(400, message="Analysis {} does not exist".format(analysis_id))
 
 
@@ -57,13 +68,16 @@ class AnalysisListResource(Resource):
 	@jwt_required()
 	def post(self):
 		""" Post a new analysis """
-		new, errors = AnalysisSchema().load(request.get_json())
+		data = request.get_json()
+		new, errors = AnalysisSchema().load(data)
 
 		if errors:
 			abort(405 , errors=errors)
 		else:
+			new.user_id = current_identity.id
 			db.session.add(new)
 			db.session.commit()
+			return AnalysisSchema().dump(new)
 
 	## Return some information like the analysis id
 

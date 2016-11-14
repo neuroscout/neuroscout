@@ -24,7 +24,7 @@ def test_auth(auth_client):
 		assert rv.status_code == 401
 		assert decode_json(rv)['description'] == 'Request does not contain an access token'
 
-def test_get_user(auth_client, add_analyses):
+def test_get(auth_client, add_analyses):
 	rv = auth_client.get('/api/user')
 	assert rv.status_code == 200
 
@@ -32,7 +32,7 @@ def test_get_user(auth_client, add_analyses):
 	assert type(decode_json(rv)['analyses']) == list
 	assert len(decode_json(rv)['analyses']) > 0 
 
-def test_put_user(auth_client, add_analyses):
+def test_put(auth_client, add_analyses):
 	# Testing changing name
 	values = decode_json(auth_client.get('/api/user'))
 	values['name'] = 'new_name'
@@ -47,7 +47,7 @@ def test_put_user(auth_client, add_analyses):
 	assert rv.status_code == 400
 	assert 'email' in decode_json(rv)['errors']
 
-def test_post_user(auth_client):
+def test_post(auth_client):
 	# Make incomplete post
 	rv = auth_client.post('/api/user', data = {'name' : 'me'})
 	assert rv.status_code == 400
