@@ -7,7 +7,13 @@ class Dataset(db.Model):
                                 lazy='dynamic')
 	stimuli = db.relationship('Stimulus', backref='dataset',
                                 lazy='dynamic')
-	attributes = db.Column(JSON) ## BIDS specification
+	description = db.Column(JSON) ## BIDS specification
 	name = db.Column(db.String(30), nullable=False)
 	external_id = db.Column(db.String(30), unique=True, nullable=False)
-	events = db.Column(db.Text()) # TSV events file
+
+
+	## Should we also have a task model? Since ds can have multiple tasks
+	## Should we represent details such as aquisition parameters, or leave to BIDS
+		# - May want to show to users
+		# It may make sense to have BIDS marshamllow to model deserializer
+			# e.g. have a 1:1 match between description and acq params
