@@ -105,8 +105,7 @@ def add_users(app, db, session):
 
 @pytest.fixture(scope="function")
 def add_datasets(session):
-    dataset = Dataset(name='Fancy fMRI study', external_id = 'ds_32', 
-        attributes = {'some' : 'attribute'})
+    dataset = Dataset(name='Fancy fMRI study', external_id = 'ds_32')
     session.add(dataset)
     session.commit()
 
@@ -162,7 +161,7 @@ def add_event(session):
 
 @pytest.fixture(scope="function")
 def add_stimulus(session, add_datasets):
-    stim = Stimulus(dataset_id = add_datasets[0], onset=0)
+    stim = Stimulus(dataset_id = add_datasets[0])
 
     session.add(stim)
     session.commit()

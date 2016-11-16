@@ -21,9 +21,6 @@ class DatasetSchema(Schema):
 	def make_db(self, data):
 		return Dataset(**data)
 
-	class Meta:
-		additional = ("events", "attributes")
-
 class DatasetResource(Resource):
 	""" Individual dataset """
 	@operation(
