@@ -1,0 +1,12 @@
+{
+  "transformations": [
+    {
+      "name": "standardize",
+      "input": [
+        "incongruent_correct"
+      ],
+    "demean": true,
+    "rescale": true
+    }
+  ]
+}

@@ -16,23 +16,19 @@ def get_events(bids_dir, subject_id, run_id):
     return layout.get(
         type='events', return_type='file', subject=subject_id, run=run_id)
 
+def create_contrasts(contrasts, condition):
+    pass
 
-if __name__ == '__main__':
+def run_worflow(task, subjects, run, bids_dir):
     # Add Info Source to loop over subjects
     # infosource = pe.Node(niu.IdentityInterface(fields=['subject_id',
     #                                                'run_id']),
     #                  name='infosource')
 
-    subjects = '01'
-    task = 'flanker'
-    # I think current SpecifyEvents does not handle more than 1 run nicely 
-    # (FSL style just processes ALL events)
-    runs = 1
-    bids_dir = '/vagrant/local/datasets/ds000102'
     TR = json.load(open(os.path.join(bids_dir, 'task-' + task + '_bold.json'), 'r'))['RepetitionTime']
 
     wf = pe.Workflow(name='transformer_test')
-    # wf.base_dir = os.path.join(bids_dir, 'derivatives/test_transform')
+    wf.base_dir = os.path.join(bids_dir, 'derivatives/test_transform')
 
     datasource = pe.Node(nio.DataGrabber(infields=['subject_id', 'run'],
                                          outfields=['func']), name='datasource')
@@ -73,6 +69,7 @@ if __name__ == '__main__':
     conditions = ['congruent_correct', 'incongruent_correct']
     contrasts = [['first',   'T', conditions, [1, 0]], 
                 ['second',   'T', conditions, [0, 1]]]
+
     modelfit = create_modelfit_workflow()
 
     modelfit.inputs.inputspec.contrasts = contrasts
@@ -99,3 +96,14 @@ if __name__ == '__main__':
     wf.connect(modelfit, 'outputspec.parameter_estimates', datasink, 'pes')
 
     wf.run()
+
+""""
+Usage: test_events.py
+if __name__ == '__main__':
+
+
+    subjects = '01'
+    task = 'flanker'
+    runs = [1, 2]
+    bids_dir = '/vagrant/local/datasets/ds000102'
+ 
