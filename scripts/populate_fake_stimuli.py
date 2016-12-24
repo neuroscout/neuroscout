@@ -3,7 +3,7 @@ import pandas as pd
 from bids.grabbids import BIDSLayout
 from glob import glob
 
-dataset_dir = '/Users/alejandro/datasets/phase2/'
+dataset_dir = '/Users/alejandro/datasets/forrest/phase2/'
 categories = ['body', 'face', 'house', 'object', 'scene', 'scramble']
 
 stimuli = {cat: [s.replace(dataset_dir + 'code/stimulus/', '')
@@ -22,4 +22,4 @@ for subject in layout.get_subjects():
                lambda x: choice(stimuli[x['trial_type']]), axis=1)
             events.to_csv(f, sep='\t')
         except IOError:
-            pass
+            print(f)

@@ -16,9 +16,9 @@ import nipype.algorithms.modelgen as model
 import nipype.algorithms.events as events
 import nipype.interfaces.io as nio
 
-from nipype.interfaces.utility import Function
-from nipype.workflows.fmri.fsl.estimate import create_modelfit_workflow
-
+from nipype.interfaces.utility import Function, IdentityInterface
+from nipype.workflows.fmri.fsl import (create_modelfit_workflow,
+                                       create_fixed_effects_flow)
 import json
 import os
 
@@ -41,15 +41,15 @@ def validate_arguments(args):
     if task not in layout.get_tasks():
         raise Exception("Task {} not found in BIDS project".format(task))
 
-    subject = args['-s']
+    subject = args['-s'].split(" ")
     ## Assign subject ids
     all_subjects = layout.get_subjects()
     if subject is None:
         subject = all_subjects
     else:
-        if subject not in all_subjects:
-            raise Exception("Invalid subject id.")
-        subject = [subject]
+        for s in subject:
+            if s not in all_subjects:
+                raise Exception("Invalid subject id {}.".format(s))
 
     out_dir = args['-o']
     if out_dir is None:
@@ -61,7 +61,7 @@ def validate_arguments(args):
     transformations = args['-t']
     if transformations is not None:
         try:
-            transformations = json.load(open(transformations, 'r'))
+            t = json.load(open(transformations, 'r'))
         except ValueError:
             raise Exception("Invalid transformation JSON file")
         except IOError:
@@ -87,39 +87,44 @@ def create_contrasts(contrasts, condition):
 def run_worflow(bids_dir, task, out_dir=None, subjects=None,
                 transformations=None, read_options=None):
     layout = BIDSLayout(bids_dir)
-    # Add Info Source to loop over subjects
-    # infosource = pe.Node(niu.IdentityInterface(fields=['subject_id',
-    #                                                'run_id']),
-    #                  name='infosource')
-    ## This should probably be added to pybids, to be able to quiery meta data for task not just file
+    runs = layout.get_runs()
     TR = json.load(open(os.path.join(bids_dir, 'task-' + task + '_bold.json'), 'r'))['RepetitionTime']
 
+    ## Meta-workflow
     wf = pe.Workflow(name='fmri_bids')
     wf.base_dir = os.path.join(bids_dir, 'derivatives/fmri_bids')
 
+    ## Infosource
+    infosource = pe.Node(IdentityInterface(fields=['subject_id']),
+                     name="infosource")
+    infosource.iterables = ('subject_id', subjects)
+
+    ## Datasource
     datasource = pe.Node(nio.DataGrabber(infields=['subject_id', 'runs'],
                                          outfields=['func']), name='datasource')
     datasource.inputs.base_directory = os.path.join(bids_dir, 'derivatives/fmri_prep/derivatives/')
     datasource.inputs.template = '*'
     datasource.inputs.sort_filelist = True
-    datasource.inputs.field_template = dict(func='sub-%s/func/sub-%s_task-' + task + '_%s_bold_preproc.nii.gz')
+    datasource.inputs.field_template = dict(
+        func='sub-%s/func/sub-%s_task-' + task + '_%s_bold_space-MNI152NLin2009cAsym_preproc.nii.gz')
     datasource.inputs.template_args = dict(func=[['subject_id', 'subject_id', 'runs']])
-    datasource.inputs.subject_id = '01'
-    datasource.inputs.runs = 'run-1'
+    datasource.inputs.runs = runs
 
+    ## BIDS event tsv getter
     event_getter = pe.Node(name='eventgetter', interface=Function(
                            input_names=['bids_dir', 'subject_id'],
                            output_names=["events"], function=get_events))
 
     event_getter.inputs.bids_dir = bids_dir
-    event_getter.inputs.subject_id = subjects[0]
 
+    ## Event and model specs
     eventspec = pe.Node(interface=events.SpecifyEvents(), name="eventspec")
     modelspec = pe.Node(interface=model.SpecifyModel(), name="modelspec")
 
     eventspec.inputs.input_units = 'secs'
     eventspec.inputs.time_repetition = TR
-    eventspec.inputs.transformations = '/vagrant/local/tests/transformations.json'
+    if transformations is not None:
+        eventspec.inputs.transformations = transformations
 
     wf.connect(event_getter, 'events', eventspec, 'bids_events')
 
@@ -129,12 +134,15 @@ def run_worflow(bids_dir, task, out_dir=None, subjects=None,
 
     wf.connect(datasource, 'func', modelspec, 'functional_runs')
     wf.connect(eventspec, 'subject_info', modelspec, 'subject_info')
+    wf.connect([(infosource, datasource, [('subject_id', 'subject_id')]),
+                (infosource, event_getter, [('subject_id', 'subject_id')])])
 
     ## Model fitting
     ## Temporary contrasts
     conditions = ['congruent_correct', 'incongruent_correct']
-    contrasts = [['first',   'T', conditions, [1, 0]],
-                 ['second',   'T', conditions, [0, 1]]]
+    contrasts = [['cong',   'T', conditions, [1, 0]],
+                 ['incong',   'T', conditions, [0, 1]],
+                 ['c > i', 'T', conditions, [1, -1]]]
 
     modelfit = create_modelfit_workflow()
 
@@ -142,27 +150,75 @@ def run_worflow(bids_dir, task, out_dir=None, subjects=None,
     modelfit.inputs.inputspec.interscan_interval = TR
     modelfit.inputs.inputspec.model_serial_correlations = True
     modelfit.inputs.inputspec.film_threshold = 1000
-    modelfit.inputs.inputspec.bases = {'dgamma': {'derivs': False}}
-
-    ## Load contrasts and input
-    # wf.connect(contrastgen, 'contrasts', modelfit, 'inputspec.contrasts')
+    modelfit.inputs.inputspec.bases = {'hrf':{'derivs': [0,0]}
 
     wf.connect(modelspec, 'session_info', modelfit, 'inputspec.session_info')
     wf.connect(datasource, 'func', modelfit, 'inputspec.functional_data')
 
 
-    ### Start configuring from
+    ### Fixed effects
+    fixed_fx = create_fixed_effects_flow()
 
-    # Datasink
+    ### Use mask from first sub and run as mask file
+    fixed_fx.inputs.flameo.mask_file = os.path.join(os.path.join(bids_dir, 'derivatives/fmri_prep/derivatives/'),
+        'sub-{}/func/sub-{}_task-{}_{}_bold_space-MNI152NLin2009cAsym_brainmask.nii.gz'.format(
+            subjects[0], subjects[0], task, runs[0]))
+
+    def sort_copes(copes, varcopes, contrasts):
+        import numpy as np
+        if not isinstance(copes, list):
+            copes = [copes]
+            varcopes = [varcopes]
+        num_copes = len(contrasts)
+        n_runs = len(copes)
+        all_copes = np.array(copes).flatten()
+        all_varcopes = np.array(varcopes).flatten()
+        outcopes = all_copes.reshape(int(len(all_copes) / num_copes),
+                                     num_copes).T.tolist()
+        outvarcopes = all_varcopes.reshape(int(len(all_varcopes) / num_copes),
+                                           num_copes).T.tolist()
+        return outcopes, outvarcopes, n_runs
+
+    cope_sorter = pe.Node(Function(input_names=['copes', 'varcopes',
+                                                    'contrasts'],
+                                       output_names=['copes', 'varcopes',
+                                                     'n_runs'],
+                                       function=sort_copes),
+                          name='cope_sorter')
+    cope_sorter.inputs.contrasts = contrasts
+
+    wf.connect([(modelfit, cope_sorter, [('outputspec.copes', 'copes')]),
+                (modelfit, cope_sorter, [('outputspec.varcopes', 'varcopes')]),
+                (cope_sorter, fixed_fx, [('copes', 'inputspec.copes'),
+                                         ('varcopes', 'inputspec.varcopes'),
+                                         ('n_runs', 'l2model.num_copes')]),
+                (modelfit, fixed_fx, [('outputspec.dof_file',
+                                       'inputspec.dof_files'),
+                                      ])
+                ])
+
+    ### Datasink
     datasink = pe.Node(nio.DataSink(), name="datasink")
     datasink.inputs.base_directory = os.path.join(bids_dir, 'derivatives')
     datasink.inputs.container = 'test_transform'
 
-    wf.connect(modelfit, 'outputspec.zfiles', datasink, 'zfiles')
-    wf.connect(modelfit, 'outputspec.parameter_estimates', datasink, 'pes')
+    wf.connect(eventspec, 'str_info', datasink, 'modelspec')
+
+    wf.connect([(modelfit.get_node('modelgen'), datasink,
+                 [('design_cov', 'qa.model'),
+                  ('design_image', 'qa.model.@matrix_image'),
+                  ('design_file', 'qa.model.@matrix'),
+                  ])])
+
+    wf.connect([(fixed_fx.get_node('outputspec'), datasink,
+                 [('res4d', 'res4d'),
+                  ('copes', 'copes'),
+                  ('varcopes', 'varcopes'),
+                  ('zstats', 'ls'),
+                  ('tstats', 'tstats')])
+                ])
 
     wf.run()
-
 
 if __name__ == '__main__':
     arguments = docopt(__doc__)

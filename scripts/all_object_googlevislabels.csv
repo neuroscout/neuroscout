@@ -1,0 +1,2236 @@
+,categories,stimulus,label,confidence
+0,body,body01,clothing,0.93517685
+1,body,body01,t shirt,0.93138713
+2,body,body01,sleeve,0.89331836
+3,body,body01,outerwear,0.73949349
+4,body,body01,arm,0.65675372
+5,body,body01,pocket,0.63954067
+6,body,body01,leather,0.54979151
+7,body,body01,textile,0.51985109
+8,body,body02,clothing,0.94040942
+9,body,body02,suit,0.9061901
+10,body,body02,formal wear,0.84469414
+11,body,body02,tuxedo,0.83519405
+12,body,body02,outerwear,0.82600588
+13,body,body02,sleeve,0.74470037
+14,body,body02,jacket,0.71543515
+15,body,body02,textile,0.54490042
+16,body,body02,blazer,0.53275669
+17,body,body02,leather,0.506414
+18,body,body03,clothing,0.9339968
+19,body,body03,sleeve,0.82991064
+20,body,body03,outerwear,0.79014379
+21,body,body03,pattern,0.73397028
+22,body,body03,t shirt,0.65470433
+23,body,body03,jacket,0.64164621
+24,body,body03,design,0.60897386
+25,body,body04,clothing,0.93787521
+26,body,body04,sleeve,0.78098893
+27,body,body04,outerwear,0.72197729
+28,body,body04,trousers,0.66809922
+29,body,body04,pocket,0.65513527
+30,body,body04,active pants,0.64469832
+31,body,body04,t shirt,0.60348147
+32,body,body04,leather,0.59683132
+33,body,body04,dry suit,0.57580727
+34,body,body04,suit,0.56089765
+35,body,body04,jeans,0.52645278
+36,body,body04,formal wear,0.51993412
+37,body,body04,denim,0.51010364
+38,body,body05,clothing,0.93977928
+39,body,body05,sleeve,0.79137695
+40,body,body05,suit,0.68238479
+41,body,body05,outerwear,0.6745953
+42,body,body05,pocket,0.63937253
+43,body,body05,dry suit,0.63456434
+44,body,body05,tuxedo,0.61698842
+45,body,body05,leather,0.58545411
+46,body,body05,formal wear,0.57906222
+47,body,body05,trousers,0.53304297
+48,body,body05,jacket,0.52182394
+49,body,body05,active pants,0.50812507
+50,body,body05,diving equipment,0.50402945
+51,body,body06,clothing,0.935387
+52,body,body06,suit,0.81176621
+53,body,body06,sleeve,0.80024451
+54,body,body06,outerwear,0.78284764
+55,body,body06,tuxedo,0.74284977
+56,body,body06,formal wear,0.71504468
+57,body,body06,leather,0.59833932
+58,body,body06,t shirt,0.57798165
+59,body,body06,pattern,0.55060846
+60,body,body06,textile,0.54974091
+61,body,body06,pocket,0.52859944
+62,body,body07,clothing,0.93460619
+63,body,body07,sleeve,0.794604
+64,body,body07,outerwear,0.73796648
+65,body,body07,arm,0.67648631
+66,body,body07,tuxedo,0.65784782
+67,body,body07,formal wear,0.6377694
+68,body,body07,trousers,0.60756373
+69,body,body07,suit,0.606619
+70,body,body07,t shirt,0.59803504
+71,body,body07,pocket,0.58324182
+72,body,body07,active pants,0.55572784
+73,body,body07,leather,0.53973758
+74,body,body07,textile,0.52200764
+75,body,body08,clothing,0.93862689
+76,body,body08,outerwear,0.80947316
+77,body,body08,sleeve,0.77462268
+78,body,body08,jeans,0.6847313
+79,body,body08,denim,0.62599713
+80,body,body08,suit,0.6257261
+81,body,body08,trousers,0.60989785
+82,body,body08,tuxedo,0.57390982
+83,body,body08,pocket,0.5719856
+84,body,body08,formal wear,0.53623188
+85,body,body08,pattern,0.533748
+86,body,body09,clothing,0.9388876
+87,body,body09,active pants,0.78308445
+88,body,body09,sleeve,0.72053432
+89,body,body09,pocket,0.60646033
+90,body,body09,suit,0.57196927
+91,body,body10,clothing,0.93756163
+92,body,body10,sleeve,0.82293409
+93,body,body10,tuxedo,0.68370116
+94,body,body10,formal wear,0.67093062
+95,body,body10,outerwear,0.60684979
+96,body,body10,trousers,0.60106522
+97,body,body10,suit,0.59100974
+98,body,body10,abdomen,0.58004332
+99,body,body10,jeans,0.55616713
+100,body,body10,human body,0.54404777
+101,body,body10,textile,0.52882975
+102,body,body11,clothing,0.93871361
+103,body,body11,suit,0.86024904
+104,body,body11,sleeve,0.81121427
+105,body,body11,tuxedo,0.80202746
+106,body,body11,formal wear,0.79975367
+107,body,body11,outerwear,0.77179658
+108,body,body11,jacket,0.64097995
+109,body,body11,pocket,0.58921629
+110,body,body11,trousers,0.58225149
+111,body,body11,leather,0.57193553
+112,body,body11,denim,0.53278279
+113,body,body11,t shirt,0.50821215
+114,body,body11,pattern,0.5062378
+115,body,body12,clothing,0.93619496
+116,body,body12,jeans,0.84303212
+117,body,body12,sleeve,0.81712532
+118,body,body12,outerwear,0.76180178
+119,body,body12,t shirt,0.71872532
+120,body,body12,denim,0.6965974
+121,body,body12,trousers,0.59544891
+122,body,body12,leather,0.59521568
+123,body,body12,pocket,0.58936757
+124,body,body12,suit,0.56790704
+125,body,body12,textile,0.55891031
+126,body,body12,jacket,0.55872864
+127,body,body12,pattern,0.55564135
+128,body,body12,formal wear,0.511411
+129,body,body13,clothing,0.93748128
+130,body,body13,sleeve,0.86531729
+131,body,body13,outerwear,0.74986517
+132,body,body13,t shirt,0.67262834
+133,body,body13,trousers,0.66668975
+134,body,body13,jeans,0.62772918
+135,body,body13,neck,0.55583042
+136,body,body13,formal wear,0.55291742
+137,body,body13,tuxedo,0.54798055
+138,body,body13,pocket,0.54399955
+139,body,body13,abdomen,0.53307635
+140,body,body13,textile,0.51787084
+141,body,body13,zipper,0.50780582
+142,body,body13,pattern,0.5052157
+143,body,body13,leather,0.50483906
+144,body,body14,clothing,0.92860097
+145,body,body14,sleeve,0.77952623
+146,body,body14,outerwear,0.55766076
+147,body,body14,formal wear,0.55477118
+148,body,body14,tuxedo,0.547088
+149,body,body14,textile,0.5371421
+150,body,body14,latex clothing,0.53699732
+151,body,body15,clothing,0.93261009
+152,body,body15,sleeve,0.752531
+153,body,body15,outerwear,0.72661537
+154,body,body15,tights,0.69095397
+155,body,body15,pattern,0.56252855
+156,body,body15,tuxedo,0.5068512
+157,body,body16,white,0.939401
+158,body,body16,clothing,0.93857974
+159,body,body16,active undergarment,0.90664536
+160,body,body16,undergarment,0.89625841
+161,body,body16,sleeve,0.83726627
+162,body,body16,lingerie,0.73971224
+163,body,body16,arm,0.63617349
+164,body,body16,lingerie top,0.63495368
+165,body,body16,girdle,0.59251988
+166,body,body16,pattern,0.54128349
+167,body,body16,textile,0.52685148
+168,body,body16,outerwear,0.51893562
+169,body,body17,clothing,0.92211026
+170,body,body17,wetsuit,0.84731722
+171,body,body17,sleeve,0.80082113
+172,body,body17,personal protective equipment,0.75587434
+173,body,body17,active undergarment,0.74128741
+174,body,body17,sports uniform,0.72065806
+175,body,body17,arm,0.666267
+176,body,body17,textile,0.52553552
+177,body,body17,outerwear,0.5199424
+178,body,body18,clothing,0.93551737
+179,body,body18,sleeve,0.82666749
+180,body,body18,jeans,0.69037372
+181,body,body18,trousers,0.67049956
+182,body,body18,arm,0.66473097
+183,body,body18,t shirt,0.64820254
+184,body,body18,outerwear,0.61016452
+185,body,body18,leg,0.57444358
+186,body,body18,human body,0.54612857
+187,body,body18,textile,0.54469472
+188,body,body18,tights,0.53793323
+189,body,body18,abdomen,0.52857906
+190,body,body18,leggings,0.50903755
+191,body,body19,clothing,0.92019206
+192,body,body19,tights,0.820873
+193,body,body19,arm,0.70275271
+194,body,body19,thigh,0.65374118
+195,body,body19,leg,0.59853762
+196,body,body19,hand,0.56518155
+197,body,body19,textile,0.55045927
+198,body,body20,clothing,0.91602844
+199,body,body20,tights,0.78879309
+200,body,body20,wetsuit,0.68886769
+201,body,body20,sleeve,0.67473739
+202,body,body20,active undergarment,0.67212576
+203,body,body20,arm,0.6611653
+204,body,body20,muscle,0.64647079
+205,body,body20,fashion accessory,0.63125741
+206,body,body20,undergarment,0.54410565
+207,body,body20,personal protective equipment,0.5321914
+208,body,body20,textile,0.52337873
+209,body,body20,spandex,0.50785029
+210,body,body21,white,0.93580419
+211,body,body21,black,0.93120897
+212,body,body21,clothing,0.93065035
+213,body,body21,sleeve,0.88513929
+214,body,body21,t shirt,0.87843227
+215,body,body21,outerwear,0.74847788
+216,body,body21,arm,0.67206353
+217,body,body21,footwear,0.65493995
+218,body,body21,jeans,0.6491425
+219,body,body21,leather,0.64555413
+220,body,body21,denim,0.6049515
+221,body,body21,textile,0.58113086
+222,body,body21,neck,0.54533684
+223,body,body21,pocket,0.53938937
+224,body,body22,clothing,0.9318276
+225,body,body22,black,0.93031275
+226,body,body22,dress,0.92483991
+227,body,body22,sleeve,0.88684916
+228,body,body22,cocktail dress,0.81046432
+229,body,body22,little black dress,0.74423051
+230,body,body22,outerwear,0.67160845
+231,body,body22,gown,0.63932
+232,body,body22,formal wear,0.61664557
+233,body,body22,textile,0.597237
+234,body,body22,pattern,0.57434964
+235,body,body22,human body,0.54287285
+236,body,body22,abdomen,0.53448075
+237,body,body22,neck,0.52753782
+238,body,body22,photo shoot,0.52665633
+239,body,body23,dress,0.92324591
+240,body,body23,clothing,0.92225641
+241,body,body23,gown,0.86830121
+242,body,body23,sleeve,0.81197268
+243,body,body23,formal wear,0.71823037
+244,body,body23,cocktail dress,0.66497743
+245,body,body23,outerwear,0.62300175
+246,body,body23,textile,0.54533917
+247,body,body23,costume,0.51747215
+248,body,body23,fashion design,0.50429124
+249,body,body24,clothing,0.94003057
+250,body,body24,black,0.93995923
+251,body,body24,t shirt,0.92806792
+252,body,body24,sleeve,0.91982013
+253,body,body24,long sleeved t shirt,0.85394579
+254,body,body24,outerwear,0.70095468
+255,body,body24,arm,0.61716747
+256,body,body24,active shirt,0.59679431
+257,body,body24,shirt,0.56820941
+258,body,body24,pocket,0.55678427
+259,body,body24,hoodie,0.50076246
+260,face,face01,face,0.96977961
+261,face,face01,hair,0.96847123
+262,face,face01,person,0.91700149
+263,face,face01,black and white,0.90599072
+264,face,face01,nose,0.89778829
+265,face,face01,forehead,0.89477611
+266,face,face01,chin,0.88751149
+267,face,face01,cheek,0.84097064
+268,face,face01,hairstyle,0.83283126
+269,face,face01,man,0.80958945
+270,face,face01,male,0.80429763
+271,face,face01,head,0.7630235
+272,face,face01,mouth,0.70515764
+273,face,face01,close up,0.70219457
+274,face,face01,facial hair,0.66692507
+275,face,face01,sense,0.579274
+276,face,face01,monochrome photography,0.56009471
+277,face,face01,hand,0.5558269
+278,face,face01,portrait,0.5532642
+279,face,face01,jaw,0.53052682
+280,face,face02,face,0.97143513
+281,face,face02,eyebrow,0.95903087
+282,face,face02,hair,0.93600297
+283,face,face02,black and white,0.92570984
+284,face,face02,nose,0.91461623
+285,face,face02,cheek,0.90752393
+286,face,face02,forehead,0.87599373
+287,face,face02,photography,0.83826584
+288,face,face02,chin,0.82376856
+289,face,face02,head,0.76204723
+290,face,face02,skin,0.74125248
+291,face,face02,monochrome photography,0.73677433
+292,face,face02,hairstyle,0.72853982
+293,face,face02,brown hair,0.7157855
+294,face,face02,eye,0.70784241
+295,face,face02,mouth,0.69229937
+296,face,face02,long hair,0.6743542
+297,face,face02,monochrome,0.67265618
+298,face,face02,organ,0.64743632
+299,face,face02,portrait photography,0.6373896
+300,face,face02,model,0.60104924
+301,face,face02,portrait,0.57402068
+302,face,face02,lip,0.54452252
+303,face,face02,photo shoot,0.50747859
+304,face,face03,face,0.967834
+305,face,face03,eyebrow,0.94711214
+306,face,face03,black and white,0.92175722
+307,face,face03,person,0.90716857
+308,face,face03,nose,0.89490557
+309,face,face03,forehead,0.869628
+310,face,face03,cheek,0.86824024
+311,face,face03,chin,0.83403283
+312,face,face03,head,0.75717729
+313,face,face03,hairstyle,0.72152805
+314,face,face03,monochrome photography,0.70112938
+315,face,face03,brown hair,0.68780684
+316,face,face03,monochrome,0.65354759
+317,face,face03,organ,0.64762491
+318,face,face03,eye,0.64662993
+319,face,face03,long hair,0.63753104
+320,face,face03,portrait photography,0.60449165
+321,face,face03,model,0.6014778
+322,face,face03,portrait,0.58629459
+323,face,face04,face,0.96803182
+324,face,face04,hair,0.94110394
+325,face,face04,person,0.927728
+326,face,face04,nose,0.90332252
+327,face,face04,black and white,0.9003666
+328,face,face04,chin,0.87494445
+329,face,face04,forehead,0.86874181
+330,face,face04,male,0.79737961
+331,face,face04,hairstyle,0.76325357
+332,face,face04,head,0.76057971
+333,face,face04,mouth,0.72734278
+334,face,face04,organ,0.6542623
+335,face,face04,finger,0.61703736
+336,face,face04,hand,0.5949735
+337,face,face04,facial hair,0.58919734
+338,face,face04,sense,0.579274
+339,face,face04,portrait,0.533472
+340,face,face04,jaw,0.52408
+341,face,face04,eye,0.52283323
+342,face,face04,monochrome photography,0.51184624
+343,face,face05,face,0.97001624
+344,face,face05,hair,0.96257007
+345,face,face05,nose,0.91471851
+346,face,face05,black and white,0.90561736
+347,face,face05,person,0.90146416
+348,face,face05,chin,0.89236766
+349,face,face05,forehead,0.88844138
+350,face,face05,hairstyle,0.80652159
+351,face,face05,head,0.76255733
+352,face,face05,facial hair,0.702732
+353,face,face05,mouth,0.70210004
+354,face,face05,sense,0.579274
+355,face,face05,monochrome photography,0.55708671
+356,face,face05,hand,0.55526024
+357,face,face05,jaw,0.54255182
+358,face,face05,portrait,0.53728384
+359,face,face06,face,0.96964443
+360,face,face06,eyebrow,0.92597562
+361,face,face06,person,0.92500281
+362,face,face06,black and white,0.914947
+363,face,face06,nose,0.91472006
+364,face,face06,cheek,0.90755242
+365,face,face06,forehead,0.86946309
+366,face,face06,chin,0.83934146
+367,face,face06,head,0.75983864
+368,face,face06,mouth,0.70386636
+369,face,face06,hairstyle,0.69616365
+370,face,face06,brown hair,0.68071061
+371,face,face06,eye,0.67141944
+372,face,face06,organ,0.65374136
+373,face,face06,monochrome photography,0.64077449
+374,face,face06,monochrome,0.61818916
+375,face,face06,portrait photography,0.5810526
+376,face,face06,sense,0.579274
+377,face,face06,portrait,0.56164408
+378,face,face06,model,0.55913848
+379,face,face06,jaw,0.53366786
+380,face,face07,face,0.96947145
+381,face,face07,hair,0.93365473
+382,face,face07,black and white,0.92790383
+383,face,face07,eyebrow,0.90465456
+384,face,face07,person,0.90004343
+385,face,face07,nose,0.89684427
+386,face,face07,cheek,0.85966271
+387,face,face07,photography,0.83974051
+388,face,face07,forehead,0.83492172
+389,face,face07,head,0.76033735
+390,face,face07,monochrome photography,0.75540727
+391,face,face07,skin,0.73561227
+392,face,face07,eye,0.71935534
+393,face,face07,close up,0.71170986
+394,face,face07,monochrome,0.71035409
+395,face,face07,portrait,0.69641781
+396,face,face07,mouth,0.68717736
+397,face,face07,brown hair,0.67424536
+398,face,face07,organ,0.64736289
+399,face,face07,portrait photography,0.64609957
+400,face,face07,long hair,0.62219942
+401,face,face07,model,0.58716679
+402,face,face08,face,0.97313362
+403,face,face08,eyebrow,0.95112485
+404,face,face08,nose,0.919406
+405,face,face08,black and white,0.90853161
+406,face,face08,cheek,0.89492482
+407,face,face08,forehead,0.87273037
+408,face,face08,chin,0.85257804
+409,face,face08,head,0.76503026
+410,face,face08,skin,0.74498832
+411,face,face08,mouth,0.69425112
+412,face,face08,brown hair,0.67851186
+413,face,face08,eye,0.64378738
+414,face,face08,long hair,0.63392889
+415,face,face08,monochrome photography,0.58423823
+416,face,face08,model,0.53600776
+417,face,face08,jaw,0.51412147
+418,face,face09,hair,0.97158194
+419,face,face09,face,0.96409
+420,face,face09,person,0.92917341
+421,face,face09,nose,0.90471083
+422,face,face09,black and white,0.90369409
+423,face,face09,forehead,0.89597547
+424,face,face09,chin,0.88901389
+425,face,face09,hairstyle,0.84780842
+426,face,face09,man,0.84307724
+427,face,face09,male,0.83400851
+428,face,face09,head,0.75777394
+429,face,face09,facial hair,0.72561854
+430,face,face09,mouth,0.71217364
+431,face,face09,moustache,0.62910062
+432,face,face09,sense,0.579274
+433,face,face09,jaw,0.55646515
+434,face,face09,hand,0.55586988
+435,face,face09,monochrome photography,0.53981888
+436,face,face09,portrait,0.51203364
+437,face,face09,finger,0.50063092
+438,face,face10,face,0.96480304
+439,face,face10,hair,0.94845629
+440,face,face10,eyebrow,0.94147247
+441,face,face10,black and white,0.92659825
+442,face,face10,person,0.92304653
+443,face,face10,nose,0.89046437
+444,face,face10,cheek,0.86207104
+445,face,face10,photography,0.84452772
+446,face,face10,hairstyle,0.7677561
+447,face,face10,head,0.75389779
+448,face,face10,monochrome photography,0.7436865
+449,face,face10,close up,0.72320253
+450,face,face10,brown hair,0.713119
+451,face,face10,monochrome,0.6926921
+452,face,face10,portrait photography,0.68038034
+453,face,face10,eye,0.67797285
+454,face,face10,portrait,0.65503883
+455,face,face10,model,0.63974988
+456,face,face10,long hair,0.63636315
+457,face,face10,black hair,0.6108377
+458,face,face10,photo shoot,0.52380288
+459,face,face11,hair,0.98044366
+460,face,face11,face,0.96033931
+461,face,face11,black and white,0.90309459
+462,face,face11,nose,0.87489372
+463,face,face11,chin,0.86167008
+464,face,face11,hairstyle,0.86001945
+465,face,face11,head,0.75153774
+466,face,face11,facial hair,0.73194003
+467,face,face11,mouth,0.68008268
+468,face,face11,long hair,0.60696775
+469,face,face11,monochrome photography,0.53680331
+470,face,face12,hair,0.96909964
+471,face,face12,face,0.96643871
+472,face,face12,person,0.91069776
+473,face,face12,nose,0.90346664
+474,face,face12,chin,0.89399242
+475,face,face12,black and white,0.89363241
+476,face,face12,forehead,0.86488283
+477,face,face12,hairstyle,0.82895839
+478,face,face12,cheek,0.79621953
+479,face,face12,male,0.79081196
+480,face,face12,head,0.75875592
+481,face,face12,facial hair,0.75148
+482,face,face12,mouth,0.69322091
+483,face,face12,moustache,0.62800181
+484,face,face12,sense,0.579274
+485,face,face12,jaw,0.525511
+486,face,face13,face,0.96870369
+487,face,face13,hair,0.95861137
+488,face,face13,person,0.91287655
+489,face,face13,nose,0.91051537
+490,face,face13,black and white,0.89629716
+491,face,face13,chin,0.88810438
+492,face,face13,forehead,0.88580412
+493,face,face13,man,0.82317913
+494,face,face13,hairstyle,0.80359828
+495,face,face13,head,0.76082093
+496,face,face13,mouth,0.71161342
+497,face,face13,facial hair,0.64053488
+498,face,face13,moustache,0.59805214
+499,face,face13,sense,0.579274
+500,face,face13,hand,0.57439452
+501,face,face13,finger,0.53910524
+502,face,face13,jaw,0.51399255
+503,face,face13,eye,0.50731635
+504,face,face14,face,0.96735322
+505,face,face14,hair,0.96550912
+506,face,face14,black and white,0.90987551
+507,face,face14,nose,0.89859456
+508,face,face14,chin,0.87110209
+509,face,face14,forehead,0.82952791
+510,face,face14,hairstyle,0.82306933
+511,face,face14,head,0.76006919
+512,face,face14,mouth,0.69473207
+513,face,face14,monochrome photography,0.5946365
+514,face,face14,monochrome,0.57289296
+515,face,face14,hand,0.55425566
+516,face,face14,facial hair,0.51474714
+517,face,face15,hair,0.97290742
+518,face,face15,face,0.96723545
+519,face,face15,black and white,0.91747457
+520,face,face15,nose,0.88553309
+521,face,face15,chin,0.85507661
+522,face,face15,hairstyle,0.83831131
+523,face,face15,head,0.76208842
+524,face,face15,mouth,0.69611931
+525,face,face15,monochrome photography,0.66456437
+526,face,face15,facial hair,0.65037465
+527,face,face15,moustache,0.64304262
+528,face,face15,monochrome,0.62535715
+529,face,face15,portrait,0.6026848
+530,face,face15,sense,0.579274
+531,face,face15,drawing,0.5241226
+532,face,face16,hair,0.96473229
+533,face,face16,face,0.96160251
+534,face,face16,facial hair,0.90848559
+535,face,face16,nose,0.88783628
+536,face,face16,chin,0.8811273
+537,face,face16,forehead,0.83229315
+538,face,face16,man,0.80824047
+539,face,face16,beard,0.78631932
+540,face,face16,hairstyle,0.7754088
+541,face,face16,head,0.75563633
+542,face,face16,mouth,0.69269931
+543,face,face16,moustache,0.67388415
+544,face,face16,arm,0.66137648
+545,face,face16,sense,0.579274
+546,face,face16,hand,0.56219137
+547,face,face16,drawing,0.51536614
+548,face,face16,finger,0.50106943
+549,face,face17,face,0.96778911
+550,face,face17,hair,0.95603681
+551,face,face17,nose,0.9208678
+552,face,face17,person,0.91432512
+553,face,face17,black and white,0.89938563
+554,face,face17,chin,0.89620447
+555,face,face17,forehead,0.88848865
+556,face,face17,man,0.81575549
+557,face,face17,hairstyle,0.7976411
+558,face,face17,head,0.75950307
+559,face,face17,facial hair,0.7565766
+560,face,face17,mouth,0.7060793
+561,face,face17,moustache,0.65288585
+562,face,face17,finger,0.59898025
+563,face,face17,sense,0.579274
+564,face,face17,hand,0.57892537
+565,face,face17,jaw,0.51611584
+566,face,face17,eye,0.512265
+567,face,face17,beard,0.50511175
+568,face,face17,monochrome photography,0.50311357
+569,face,face18,hair,0.97997665
+570,face,face18,face,0.96357393
+571,face,face18,clothing,0.91554123
+572,face,face18,black and white,0.90830034
+573,face,face18,nose,0.89810497
+574,face,face18,chin,0.87167543
+575,face,face18,hairstyle,0.86714625
+576,face,face18,forehead,0.86005449
+577,face,face18,head,0.75704026
+578,face,face18,monochrome photography,0.581115
+579,face,face18,facial hair,0.55533987
+580,face,face19,hair,0.96999377
+581,face,face19,face,0.96727043
+582,face,face19,black and white,0.91297132
+583,face,face19,nose,0.88670921
+584,face,face19,chin,0.828783
+585,face,face19,hairstyle,0.81507975
+586,face,face19,forehead,0.8130216
+587,face,face19,cheek,0.78170794
+588,face,face19,head,0.75893712
+589,face,face19,brown hair,0.723929
+590,face,face19,long hair,0.69748294
+591,face,face19,layered hair,0.626016
+592,face,face19,monochrome,0.62532115
+593,face,face19,monochrome photography,0.62457824
+594,face,face19,portrait photography,0.58664215
+595,face,face19,portrait,0.58635974
+596,face,face19,model,0.5665229
+597,face,face19,eye,0.54814857
+598,face,face20,face,0.96996969
+599,face,face20,black and white,0.92363703
+600,face,face20,nose,0.90479058
+601,face,face20,cheek,0.87816226
+602,face,face20,eyebrow,0.85260093
+603,face,face20,chin,0.83052045
+604,face,face20,forehead,0.8124252
+605,face,face20,head,0.7598986
+606,face,face20,skin,0.74666148
+607,face,face20,monochrome photography,0.71851462
+608,face,face20,monochrome,0.68225831
+609,face,face20,mouth,0.67988282
+610,face,face20,brown hair,0.66375262
+611,face,face20,portrait,0.63593966
+612,face,face20,eye,0.62421769
+613,face,face20,portrait photography,0.5721963
+614,face,face21,face,0.96958405
+615,face,face21,eyebrow,0.94214851
+616,face,face21,black and white,0.92463189
+617,face,face21,person,0.90743148
+618,face,face21,nose,0.89772838
+619,face,face21,cheek,0.86292487
+620,face,face21,forehead,0.86192787
+621,face,face21,chin,0.80117697
+622,face,face21,head,0.76050913
+623,face,face21,monochrome photography,0.727219
+624,face,face21,hairstyle,0.72603494
+625,face,face21,eye,0.71096873
+626,face,face21,mouth,0.68984193
+627,face,face21,monochrome,0.67479295
+628,face,face21,brown hair,0.67138648
+629,face,face21,organ,0.65273923
+630,face,face21,portrait,0.64181459
+631,face,face21,long hair,0.62080061
+632,face,face21,portrait photography,0.61772639
+633,face,face21,model,0.56859905
+634,face,face22,face,0.97262275
+635,face,face22,nose,0.92149341
+636,face,face22,black and white,0.9121747
+637,face,face22,person,0.90424764
+638,face,face22,eyebrow,0.90191597
+639,face,face22,cheek,0.89249831
+640,face,face22,chin,0.87537372
+641,face,face22,forehead,0.86818486
+642,face,face22,head,0.76418918
+643,face,face22,hairstyle,0.73400092
+644,face,face22,skin,0.7299791
+645,face,face22,mouth,0.69436431
+646,face,face22,organ,0.64786726
+647,face,face22,eye,0.61844552
+648,face,face22,monochrome photography,0.61631978
+649,face,face22,monochrome,0.60151547
+650,face,face22,sense,0.579274
+651,face,face22,portrait photography,0.55784309
+652,face,face22,jaw,0.53239512
+653,face,face22,portrait,0.5274387
+654,face,face23,hair,0.97729087
+655,face,face23,face,0.96725947
+656,face,face23,clothing,0.91294867
+657,face,face23,black and white,0.8991158
+658,face,face23,nose,0.88841158
+659,face,face23,chin,0.8787598
+660,face,face23,hairstyle,0.85697943
+661,face,face23,forehead,0.85324836
+662,face,face23,male,0.80830449
+663,face,face23,head,0.7618956
+664,face,face23,mouth,0.69277442
+665,face,face23,facial hair,0.622745
+666,face,face23,monochrome photography,0.50324649
+667,face,face24,hair,0.97328275
+668,face,face24,face,0.96886808
+669,face,face24,black and white,0.91339231
+670,face,face24,clothing,0.90851432
+671,face,face24,nose,0.900191
+672,face,face24,chin,0.85954106
+673,face,face24,hairstyle,0.83463883
+674,face,face24,head,0.76346362
+675,face,face24,mouth,0.70184445
+676,face,face24,moustache,0.63312566
+677,face,face24,monochrome photography,0.62774438
+678,face,face24,facial hair,0.61031479
+679,face,face24,sense,0.579274
+680,face,face24,drawing,0.54718989
+681,face,face24,portrait,0.52919304
+682,face,face24,sketch,0.51330125
+683,house,house01,house,0.91698229
+684,house,house01,home,0.90445274
+685,house,house01,property,0.89279813
+686,house,house01,residential area,0.74146348
+687,house,house01,product,0.70177877
+688,house,house01,facade,0.64946651
+689,house,house01,cottage,0.62099224
+690,house,house01,roof,0.59746206
+691,house,house01,drawing,0.59659469
+692,house,house01,design,0.56721497
+693,house,house01,siding,0.56499147
+694,house,house01,farmhouse,0.53067863
+695,house,house01,estate,0.508519
+696,house,house02,property,0.88242865
+697,house,house02,house,0.80585223
+698,house,house02,home,0.79908168
+699,house,house02,product,0.729783
+700,house,house02,facade,0.59476179
+701,house,house02,design,0.5644812
+702,house,house02,drawing,0.54587835
+703,house,house02,window,0.50249577
+704,house,house03,property,0.87555104
+705,house,house03,house,0.77083015
+706,house,house03,home,0.74340647
+707,house,house03,shed,0.65525949
+708,house,house03,facade,0.59686071
+709,house,house03,drawing,0.50048
+710,house,house04,property,0.88729215
+711,house,house04,house,0.8155604
+712,house,house04,home,0.79105824
+713,house,house04,product,0.70189059
+714,house,house04,facade,0.63982755
+715,house,house05,property,0.87135273
+716,house,house05,home,0.831519
+717,house,house05,house,0.75018412
+718,house,house05,design,0.57488108
+719,house,house05,barn,0.57316196
+720,house,house05,cottage,0.53344995
+721,house,house05,shed,0.51080739
+722,house,house06,property,0.88571656
+723,house,house06,home,0.814853
+724,house,house06,house,0.78598964
+725,house,house06,facade,0.60934764
+726,house,house06,design,0.555787
+727,house,house07,house,0.93424767
+728,house,house07,siding,0.9195891
+729,house,house07,home,0.91776639
+730,house,house07,property,0.88488084
+731,house,house07,building,0.80618459
+732,house,house07,residential area,0.80013043
+733,house,house07,facade,0.74131578
+734,house,house07,roof,0.7127952
+735,house,house07,window,0.710111
+736,house,house07,cottage,0.68429935
+737,house,house07,historic house,0.66931915
+738,house,house07,suburb,0.65615147
+739,house,house07,porch,0.64336604
+740,house,house07,farmhouse,0.63222343
+741,house,house07,mansion,0.613367
+742,house,house07,sash window,0.5808118
+743,house,house07,estate,0.54808027
+744,house,house07,outdoor structure,0.54558438
+745,house,house07,design,0.54370993
+746,house,house08,house,0.91056252
+747,house,house08,property,0.89526486
+748,house,house08,home,0.88394886
+749,house,house08,siding,0.82615912
+750,house,house08,building,0.81984097
+751,house,house08,residential area,0.74693418
+752,house,house08,facade,0.70481187
+753,house,house08,cottage,0.622856
+754,house,house08,roof,0.59370255
+755,house,house08,shed,0.5410158
+756,house,house08,farmhouse,0.53151911
+757,house,house08,suburb,0.52589232
+758,house,house08,outdoor structure,0.52310896
+759,house,house09,property,0.8888973
+760,house,house09,home,0.82594997
+761,house,house09,house,0.78868061
+762,house,house09,product,0.71330261
+763,house,house09,residential area,0.70395523
+764,house,house09,facade,0.66105914
+765,house,house09,drawing,0.59765977
+766,house,house09,cottage,0.55777192
+767,house,house10,property,0.8714996
+768,house,house10,home,0.86680132
+769,house,house10,house,0.7771942
+770,house,house10,product,0.72880918
+771,house,house10,residential area,0.70322394
+772,house,house10,drawing,0.61422992
+773,house,house10,facade,0.59948808
+774,house,house10,sketch,0.55172646
+775,house,house11,property,0.88989419
+776,house,house11,house,0.87393862
+777,house,house11,home,0.86429214
+778,house,house11,facade,0.63091385
+779,house,house11,cottage,0.62937611
+780,house,house11,outdoor structure,0.60842109
+781,house,house11,roof,0.55929214
+782,house,house11,design,0.54031962
+783,house,house11,porch,0.52093816
+784,house,house11,farmhouse,0.51342893
+785,house,house11,window,0.50296229
+786,house,house12,house,0.89692265
+787,house,house12,property,0.88464171
+788,house,house12,home,0.86444151
+789,house,house12,residential area,0.65628636
+790,house,house12,cottage,0.63958371
+791,house,house12,facade,0.59504247
+792,house,house12,outdoor structure,0.54997963
+793,house,house13,property,0.87845778
+794,house,house13,home,0.80462933
+795,house,house13,house,0.77811188
+796,house,house13,product,0.72787708
+797,house,house13,facade,0.601093
+798,house,house13,shed,0.55679303
+799,house,house13,drawing,0.51776779
+800,house,house14,property,0.87571222
+801,house,house14,house,0.77523524
+802,house,house14,home,0.75778717
+803,house,house14,facade,0.59217221
+804,house,house14,shed,0.5070942
+805,house,house16,automotive exterior,0.71703666
+806,house,house16,bumper,0.64435661
+807,house,house17,property,0.88491368
+808,house,house17,home,0.73370034
+809,house,house17,facade,0.577217
+810,house,house17,drawing,0.57712132
+811,house,house18,property,0.87409151
+812,house,house18,product,0.72310162
+813,house,house18,home,0.67202044
+814,house,house18,multimedia,0.58284312
+815,house,house19,house,0.9275167
+816,house,house19,home,0.90351
+817,house,house19,property,0.89585346
+818,house,house19,building,0.806785
+819,house,house19,siding,0.74695379
+820,house,house19,residential area,0.69331932
+821,house,house19,cottage,0.67796433
+822,house,house19,facade,0.66912431
+823,house,house19,farmhouse,0.6290074
+824,house,house19,log cabin,0.582701
+825,house,house19,roof,0.577944
+826,house,house19,drawing,0.5064953
+827,house,house20,house,0.90962183
+828,house,house20,property,0.89853066
+829,house,house20,home,0.88437217
+830,house,house20,building,0.80680895
+831,house,house20,roof,0.68215668
+832,house,house20,facade,0.65546012
+833,house,house20,residential area,0.65220791
+834,house,house20,cottage,0.62868685
+835,house,house20,window,0.6228798
+836,house,house20,farmhouse,0.59669065
+837,house,house20,outdoor structure,0.58859915
+838,house,house20,siding,0.5878967
+839,house,house20,mansion,0.534802
+840,house,house21,property,0.87755942
+841,house,house21,home,0.79318911
+842,house,house21,house,0.744571
+843,house,house21,facade,0.6073854
+844,house,house21,shed,0.59714931
+845,house,house21,design,0.55413055
+846,house,house21,outdoor structure,0.53573567
+847,house,house22,property,0.88412011
+848,house,house22,building,0.8114841
+849,house,house22,house,0.80950737
+850,house,house22,home,0.76278543
+851,house,house22,facade,0.66812104
+852,house,house22,shed,0.59656811
+853,house,house22,design,0.55511874
+854,house,house22,roof,0.55017805
+855,house,house22,outdoor structure,0.51989239
+856,house,house23,property,0.86590177
+857,house,house23,automotive exterior,0.66677856
+858,house,house23,lighting,0.64602137
+859,house,house24,property,0.87096488
+860,house,house24,lighting,0.64372206
+861,object,object01,binoculars,0.97407144
+862,object,object02,nut,0.60640532
+863,object,object02,screw,0.54200095
+864,object,object03,footwear,0.98257428
+865,object,object03,boot,0.9788667
+866,object,object03,work boots,0.85131836
+867,object,object03,snow boot,0.83334011
+868,object,object03,motorcycle boot,0.7632314
+869,object,object03,shoe,0.75824904
+870,object,object03,leather,0.60237515
+871,object,object03,outdoor shoe,0.55067694
+872,object,object04,knife,0.79268253
+873,object,object04,utility knife,0.70586276
+874,object,object04,arm,0.70583582
+875,object,object04,footwear,0.66593975
+876,object,object04,hand,0.60596669
+877,object,object04,blade,0.58801067
+878,object,object04,throwing knife,0.57608986
+879,object,object04,weapon,0.55811304
+880,object,object04,tool,0.544614
+881,object,object05,brush,0.80727041
+882,object,object05,tool,0.604362
+883,object,object06,dishware,0.54594946
+884,object,object06,sink,0.50448436
+885,object,object07,furniture,0.9413541
+886,object,object07,chair,0.93337423
+887,object,object07,office chair,0.66886377
+888,object,object07,armrest,0.57634491
+889,object,object08,tool,0.62698257
+890,object,object08,utility knife,0.50233966
+891,object,object09,cup,0.87276542
+892,object,object09,kettle,0.77698243
+893,object,object09,product,0.7438426
+894,object,object09,small appliance,0.71085781
+895,object,object09,teapot,0.65109515
+896,object,object09,drinkware,0.62936324
+897,object,object09,tableware,0.53410083
+898,object,object10,mug,0.91464818
+899,object,object10,cup,0.90710086
+900,object,object10,coffee cup,0.85176373
+901,object,object10,drinkware,0.68151647
+902,object,object10,tableware,0.64948386
+903,object,object10,saucer,0.59494019
+904,object,object10,dishware,0.534249
+905,object,object11,games,0.95378727
+906,object,object11,board game,0.94925469
+907,object,object11,sports,0.94915718
+908,object,object11,indoor games and sports,0.94582617
+909,object,object11,dice,0.88862824
+910,object,object11,dice game,0.83195192
+911,object,object11,recreation,0.73022664
+912,object,object11,tabletop game,0.69937992
+913,object,object11,pattern,0.51362455
+914,object,object12,tool,0.59320241
+915,object,object13,arm,0.68007028
+916,object,object14,cookware and bakeware,0.87246162
+917,object,object14,frying pan,0.70000696
+918,object,object14,wok,0.50023574
+919,object,object15,hair dryer,0.97560734
+920,object,object16,tool,0.62042415
+921,object,object17,product,0.71804309
+922,object,object17,tool,0.57071114
+923,object,object18,lighting,0.70260084
+924,object,object18,light fixture,0.68608576
+925,object,object18,lamp,0.66247523
+926,object,object18,technology,0.58485359
+927,object,object18,glasses,0.56671315
+928,object,object18,ear,0.55777931
+929,object,object18,audio equipment,0.50501132
+930,object,object19,pliers,0.74381179
+931,object,object19,tool,0.59587377
+932,object,object19,diagonal pliers,0.55031192
+933,object,object19,needle nose pliers,0.5187549
+934,object,object20,bottle,0.84953767
+935,object,object20,product,0.811271
+936,object,object20,drinkware,0.71826565
+937,object,object20,glass bottle,0.65977764
+938,object,object20,plastic bottle,0.53799272
+939,object,object21,scissors,0.91125339
+940,object,object21,tool,0.53447127
+941,object,object21,office supplies,0.52598947
+942,object,object23,light fixture,0.82616711
+943,object,object23,light,0.80670083
+944,object,object23,product,0.78719383
+945,object,object23,lighting,0.76624393
+946,object,object23,lamp,0.73660523
+947,object,object23,incandescent light bulb,0.60236949
+948,object,object23,sconce,0.537869
+949,object,object24,man made object,0.91119987
+950,object,object24,wine bottle,0.89367855
+951,object,object24,bottle,0.87616634
+952,object,object24,alcoholic beverage,0.852247
+953,object,object24,beer bottle,0.85138005
+954,object,object24,drink,0.81712484
+955,object,object24,distilled beverage,0.77567643
+956,object,object24,liqueur,0.70952529
+957,object,object24,drinkware,0.70763725
+958,object,object24,glass bottle,0.66530603
+959,object,object24,wine,0.63954985
+960,object,object24,tableware,0.51698714
+961,scene,scene01,ruins,0.94115132
+962,scene,scene01,black and white,0.93232304
+963,scene,scene01,ancient history,0.814472
+964,scene,scene01,building,0.80272794
+965,scene,scene01,wall,0.79641265
+966,scene,scene01,monochrome photography,0.79089564
+967,scene,scene01,rock,0.78533423
+968,scene,scene01,monochrome,0.77396464
+969,scene,scene01,history,0.60936767
+970,scene,scene01,monastery,0.54174453
+971,scene,scene01,terrain,0.53669155
+972,scene,scene02,mountainous landforms,0.97296077
+973,scene,scene02,black and white,0.93119478
+974,scene,scene02,mountain,0.92775989
+975,scene,scene02,geographical feature,0.88825285
+976,scene,scene02,landform,0.88811809
+977,scene,scene02,atmospheric phenomenon,0.88265151
+978,scene,scene02,wilderness,0.86738694
+979,scene,scene02,photography,0.8346861
+980,scene,scene02,monochrome photography,0.78396738
+981,scene,scene02,loch,0.77507573
+982,scene,scene02,lake,0.7749868
+983,scene,scene02,mountain range,0.76963669
+984,scene,scene02,monochrome,0.73501211
+985,scene,scene02,valley,0.69929796
+986,scene,scene02,fell,0.69636589
+987,scene,scene02,landscape,0.65603304
+988,scene,scene02,plateau,0.55329442
+989,scene,scene02,snow,0.55234712
+990,scene,scene02,mountain pass,0.51479524
+991,scene,scene03,black and white,0.94399351
+992,scene,scene03,nature,0.94329727
+993,scene,scene03,tree,0.92222124
+994,scene,scene03,atmospheric phenomenon,0.87850755
+995,scene,scene03,monochrome photography,0.87550485
+996,scene,scene03,photography,0.84011316
+997,scene,scene03,monochrome,0.82410723
+998,scene,scene03,plant,0.80193
+999,scene,scene03,branch,0.79344952
+1000,scene,scene03,woody plant,0.70991945
+1001,scene,scene03,flower,0.703343
+1002,scene,scene03,morning,0.6908595
+1003,scene,scene03,rural area,0.6641416
+1004,scene,scene03,woodland,0.6465652
+1005,scene,scene03,landscape,0.6130864
+1006,scene,scene04,habitat,0.96031743
+1007,scene,scene04,nature,0.94964188
+1008,scene,scene04,black and white,0.94296294
+1009,scene,scene04,reflection,0.93587714
+1010,scene,scene04,tree,0.927427
+1011,scene,scene04,atmospheric phenomenon,0.89070266
+1012,scene,scene04,monochrome photography,0.86909932
+1013,scene,scene04,photography,0.84113497
+1014,scene,scene04,monochrome,0.8373304
+1015,scene,scene04,water,0.82934731
+1016,scene,scene04,plant,0.79888952
+1017,scene,scene04,grass,0.76861888
+1018,scene,scene04,season,0.75111443
+1019,scene,scene04,morning,0.74766129
+1020,scene,scene04,woody plant,0.71297812
+1021,scene,scene04,river,0.70002186
+1022,scene,scene04,winter,0.69866228
+1023,scene,scene04,leaf,0.69244379
+1024,scene,scene04,forest,0.68649578
+1025,scene,scene04,landscape,0.65068752
+1026,scene,scene04,rural area,0.627604
+1027,scene,scene04,mist,0.54327857
+1028,scene,scene04,autumn,0.53092772
+1029,scene,scene04,flower,0.53038359
+1030,scene,scene04,woodland,0.51743531
+1031,scene,scene04,dawn,0.50603563
+1032,scene,scene05,lighthouse,0.96221691
+1033,scene,scene05,tower,0.95508605
+1034,scene,scene05,black and white,0.933934
+1035,scene,scene05,monochrome photography,0.80402321
+1036,scene,scene05,monochrome,0.75136036
+1037,scene,scene05,coast,0.62420315
+1038,scene,scene05,sea,0.58713442
+1039,scene,scene05,wind,0.5330345
+1040,scene,scene06,black and white,0.91937733
+1041,scene,scene06,sea,0.89357227
+1042,scene,scene06,shore,0.81266123
+1043,scene,scene06,vehicle,0.782588
+1044,scene,scene06,boat,0.78103137
+1045,scene,scene06,coast,0.74719232
+1046,scene,scene06,monochrome,0.73300821
+1047,scene,scene06,ocean,0.69129312
+1048,scene,scene06,monochrome photography,0.67858726
+1049,scene,scene06,dock,0.64338559
+1050,scene,scene06,bay,0.62497044
+1051,scene,scene06,wave,0.55989724
+1052,scene,scene06,harbor,0.51291943
+1053,scene,scene07,highland,0.9844225
+1054,scene,scene07,mountainous landforms,0.97716063
+1055,scene,scene07,habitat,0.9604488
+1056,scene,scene07,mountain,0.95663434
+1057,scene,scene07,nature,0.93712538
+1058,scene,scene07,black and white,0.92877138
+1059,scene,scene07,geographical feature,0.92142725
+1060,scene,scene07,landform,0.90113127
+1061,scene,scene07,wilderness,0.8980279
+1062,scene,scene07,atmospheric phenomenon,0.87216884
+1063,scene,scene07,natural environment,0.84960359
+1064,scene,scene07,grassland,0.81676489
+1065,scene,scene07,fell,0.79513532
+1066,scene,scene07,hill,0.79364872
+1067,scene,scene07,ridge,0.77357405
+1068,scene,scene07,monochrome photography,0.7631734
+1069,scene,scene07,monochrome,0.76154953
+1070,scene,scene07,mountain range,0.74457836
+1071,scene,scene07,grass,0.72634363
+1072,scene,scene07,loch,0.69893
+1073,scene,scene07,landscape,0.67653406
+1074,scene,scene07,plateau,0.67037654
+1075,scene,scene07,rural area,0.64244491
+1076,scene,scene07,rock,0.6251502
+1077,scene,scene07,valley,0.56845325
+1078,scene,scene07,meadow,0.56136978
+1079,scene,scene07,mountain pass,0.55391788
+1080,scene,scene07,snow,0.53312767
+1081,scene,scene07,tundra,0.52807438
+1082,scene,scene08,black and white,0.93086821
+1083,scene,scene08,tree,0.90217358
+1084,scene,scene08,road,0.86711878
+1085,scene,scene08,road surface,0.82271987
+1086,scene,scene08,grass,0.79111141
+1087,scene,scene08,asphalt,0.78992057
+1088,scene,scene08,monochrome,0.78228921
+1089,scene,scene08,monochrome photography,0.78048503
+1090,scene,scene08,plant,0.7707743
+1091,scene,scene08,residential area,0.76497316
+1092,scene,scene08,walkway,0.73725545
+1093,scene,scene08,woody plant,0.68922567
+1094,scene,scene08,soil,0.64673686
+1095,scene,scene08,street,0.64491385
+1096,scene,scene08,rural area,0.64109743
+1097,scene,scene08,suburb,0.58360946
+1098,scene,scene08,lawn,0.58346307
+1099,scene,scene08,garden,0.51483339
+1100,scene,scene09,black and white,0.93819731
+1101,scene,scene09,tree,0.85623705
+1102,scene,scene09,monochrome photography,0.83679765
+1103,scene,scene09,monochrome,0.81673974
+1104,scene,scene09,ruins,0.59986883
+1105,scene,scene09,ancient history,0.59032452
+1106,scene,scene09,flower,0.58990848
+1107,scene,scene10,black and white,0.93846327
+1108,scene,scene10,body of water,0.89202809
+1109,scene,scene10,atmospheric phenomenon,0.87013167
+1110,scene,scene10,water,0.86818641
+1111,scene,scene10,monochrome photography,0.83892173
+1112,scene,scene10,monochrome,0.82232916
+1113,scene,scene10,coast,0.77872127
+1114,scene,scene10,river,0.76893872
+1115,scene,scene10,rock,0.74072516
+1116,scene,scene10,sea,0.72379345
+1117,scene,scene10,landscape,0.6143744
+1118,scene,scene10,wave,0.60032982
+1119,scene,scene11,mountainous landforms,0.97252047
+1120,scene,scene11,mountain,0.93731815
+1121,scene,scene11,nature,0.93109262
+1122,scene,scene11,black and white,0.93016267
+1123,scene,scene11,landform,0.8984257
+1124,scene,scene11,geographical feature,0.89603853
+1125,scene,scene11,wilderness,0.8656075
+1126,scene,scene11,photography,0.83099812
+1127,scene,scene11,snow,0.82266051
+1128,scene,scene11,mountain range,0.77774072
+1129,scene,scene11,monochrome photography,0.77515292
+1130,scene,scene11,geological phenomenon,0.76915288
+1131,scene,scene11,monochrome,0.75661087
+1132,scene,scene11,fell,0.70353407
+1133,scene,scene11,valley,0.65440863
+1134,scene,scene11,landscape,0.64154422
+1135,scene,scene11,mountain pass,0.59660047
+1136,scene,scene11,plateau,0.58352327
+1137,scene,scene11,ridge,0.58232093
+1138,scene,scene12,sky,0.96726817
+1139,scene,scene12,black and white,0.94190449
+1140,scene,scene12,nature,0.932625
+1141,scene,scene12,cloud,0.90836483
+1142,scene,scene12,atmospheric phenomenon,0.87888694
+1143,scene,scene12,horizon,0.86321247
+1144,scene,scene12,monochrome photography,0.86221731
+1145,scene,scene12,coast,0.85158694
+1146,scene,scene12,rock,0.84245771
+1147,scene,scene12,monochrome,0.835511
+1148,scene,scene12,photography,0.8350777
+1149,scene,scene12,tower,0.82714677
+1150,scene,scene12,sea,0.79650772
+1151,scene,scene12,shore,0.75334322
+1152,scene,scene12,grass,0.74389493
+1153,scene,scene12,hill,0.70430231
+1154,scene,scene12,ocean,0.68514526
+1155,scene,scene12,rural area,0.62865466
+1156,scene,scene12,landscape,0.62391007
+1157,scene,scene12,wave,0.51412374
+1158,scene,scene12,lighthouse,0.51179636
+1159,scene,scene12,material,0.51015282
+1160,scene,scene12,wind,0.50344276
+1161,scene,scene13,mountainous landforms,0.96414584
+1162,scene,scene13,black and white,0.93316925
+1163,scene,scene13,mountain,0.90375578
+1164,scene,scene13,landform,0.8983832
+1165,scene,scene13,geographical feature,0.89532846
+1166,scene,scene13,wilderness,0.87490827
+1167,scene,scene13,geological phenomenon,0.80517083
+1168,scene,scene13,monochrome photography,0.80094439
+1169,scene,scene13,monochrome,0.78596288
+1170,scene,scene13,rock,0.76398849
+1171,scene,scene13,coast,0.674904
+1172,scene,scene13,snow,0.67344069
+1173,scene,scene13,landscape,0.66867763
+1174,scene,scene13,mountain range,0.63376379
+1175,scene,scene13,valley,0.60496444
+1176,scene,scene13,plateau,0.59023511
+1177,scene,scene13,sea,0.56739974
+1178,scene,scene13,geology,0.56130004
+1179,scene,scene13,ridge,0.54711014
+1180,scene,scene14,mountainous landforms,0.96290165
+1181,scene,scene14,nature,0.93710315
+1182,scene,scene14,black and white,0.93653083
+1183,scene,scene14,black,0.92462826
+1184,scene,scene14,mountain,0.9028461
+1185,scene,scene14,atmospheric phenomenon,0.871455
+1186,scene,scene14,tree,0.86952686
+1187,scene,scene14,photography,0.8419044
+1188,scene,scene14,monochrome photography,0.8252129
+1189,scene,scene14,monochrome,0.81040925
+1190,scene,scene14,hill,0.78129244
+1191,scene,scene14,rock,0.70551533
+1192,scene,scene14,snow,0.68578088
+1193,scene,scene14,landscape,0.67296267
+1194,scene,scene14,rural area,0.64928359
+1195,scene,scene14,loch,0.628512
+1196,scene,scene15,highland,0.9844225
+1197,scene,scene15,mountainous landforms,0.97708881
+1198,scene,scene15,mountain,0.96021932
+1199,scene,scene15,nature,0.93739063
+1200,scene,scene15,black and white,0.93209255
+1201,scene,scene15,geographical feature,0.92484534
+1202,scene,scene15,landform,0.91109371
+1203,scene,scene15,wilderness,0.86183214
+1204,scene,scene15,monochrome photography,0.79172069
+1205,scene,scene15,monochrome,0.78517288
+1206,scene,scene15,fell,0.76908356
+1207,scene,scene15,mountain range,0.76521575
+1208,scene,scene15,rock,0.72552979
+1209,scene,scene15,hill,0.71603155
+1210,scene,scene15,cloud,0.70424533
+1211,scene,scene15,loch,0.70103252
+1212,scene,scene15,ridge,0.67579323
+1213,scene,scene15,landscape,0.6644522
+1214,scene,scene15,mountain pass,0.63693196
+1215,scene,scene15,valley,0.581502
+1216,scene,scene15,snow,0.56824386
+1217,scene,scene15,plateau,0.5619359
+1218,scene,scene16,black and white,0.93365067
+1219,scene,scene16,nature,0.93277359
+1220,scene,scene16,rock,0.89494783
+1221,scene,scene16,wilderness,0.87818581
+1222,scene,scene16,monochrome photography,0.80406332
+1223,scene,scene16,monochrome,0.77615023
+1224,scene,scene16,stream,0.76884264
+1225,scene,scene16,river,0.66506535
+1226,scene,scene16,waterfall,0.663593
+1227,scene,scene16,forest,0.651919
+1228,scene,scene16,boulder,0.62210137
+1229,scene,scene16,water feature,0.56867671
+1230,scene,scene16,geology,0.54171067
+1231,scene,scene16,rapid,0.5314182
+1232,scene,scene16,material,0.51340038
+1233,scene,scene17,waterfall,0.96494567
+1234,scene,scene17,nature,0.93400455
+1235,scene,scene17,black and white,0.92608792
+1236,scene,scene17,body of water,0.89089787
+1237,scene,scene17,wilderness,0.86739981
+1238,scene,scene17,water,0.83057874
+1239,scene,scene17,water feature,0.75180233
+1240,scene,scene17,river,0.74692684
+1241,scene,scene17,monochrome photography,0.74118263
+1242,scene,scene17,stream,0.7392599
+1243,scene,scene17,season,0.72901726
+1244,scene,scene17,monochrome,0.71829885
+1245,scene,scene17,rock,0.69672203
+1246,scene,scene17,forest,0.63854527
+1247,scene,scene18,black and white,0.9361186
+1248,scene,scene18,nature,0.93252033
+1249,scene,scene18,waterfall,0.91633958
+1250,scene,scene18,atmospheric phenomenon,0.88125694
+1251,scene,scene18,monochrome photography,0.82198775
+1252,scene,scene18,monochrome,0.77365679
+1253,scene,scene18,rock,0.7361688
+1254,scene,scene18,water feature,0.69631183
+1255,scene,scene18,mountain,0.6707235
+1256,scene,scene18,terrain,0.51157033
+1257,scene,scene19,mountainous landforms,0.97125471
+1258,scene,scene19,nature,0.937327
+1259,scene,scene19,black and white,0.93504685
+1260,scene,scene19,mountain,0.927156
+1261,scene,scene19,geographical feature,0.89801085
+1262,scene,scene19,landform,0.88854831
+1263,scene,scene19,atmospheric phenomenon,0.88850981
+1264,scene,scene19,wilderness,0.87646979
+1265,scene,scene19,tree,0.87224835
+1266,scene,scene19,photography,0.84040463
+1267,scene,scene19,snow,0.82103908
+1268,scene,scene19,monochrome photography,0.81355411
+1269,scene,scene19,weather,0.80788684
+1270,scene,scene19,monochrome,0.77678037
+1271,scene,scene19,mountain range,0.73288423
+1272,scene,scene19,winter,0.72829264
+1273,scene,scene19,landscape,0.659147
+1274,scene,scene19,rock,0.63517922
+1275,scene,scene19,valley,0.52105975
+1276,scene,scene20,mountainous landforms,0.96797395
+1277,scene,scene20,black and white,0.9366594
+1278,scene,scene20,mountain,0.91858274
+1279,scene,scene20,geographical feature,0.88994545
+1280,scene,scene20,wilderness,0.88680393
+1281,scene,scene20,atmospheric phenomenon,0.8695749
+1282,scene,scene20,snow,0.86927688
+1283,scene,scene20,photography,0.84377593
+1284,scene,scene20,natural environment,0.84227026
+1285,scene,scene20,monochrome photography,0.82610822
+1286,scene,scene20,weather,0.81498617
+1287,scene,scene20,monochrome,0.79022932
+1288,scene,scene20,hill,0.75648111
+1289,scene,scene20,loch,0.75542676
+1290,scene,scene20,winter,0.75332481
+1291,scene,scene20,fell,0.74786276
+1292,scene,scene20,plain,0.72900587
+1293,scene,scene20,landscape,0.67990828
+1294,scene,scene20,plateau,0.64745575
+1295,scene,scene20,tundra,0.63865095
+1296,scene,scene20,mountain range,0.55627126
+1297,scene,scene20,lake,0.54010427
+1298,scene,scene20,ridge,0.51445788
+1299,scene,scene21,black and white,0.92861539
+1300,scene,scene21,tree,0.92803639
+1301,scene,scene21,road,0.91751534
+1302,scene,scene21,neighbourhood,0.87637734
+1303,scene,scene21,street,0.87243205
+1304,scene,scene21,residential area,0.86187142
+1305,scene,scene21,lane,0.84760123
+1306,scene,scene21,city,0.84194058
+1307,scene,scene21,urban area,0.8287701
+1308,scene,scene21,house,0.81225991
+1309,scene,scene21,town,0.80114245
+1310,scene,scene21,monochrome,0.77641106
+1311,scene,scene21,plant,0.76667547
+1312,scene,scene21,downtown,0.76551968
+1313,scene,scene21,suburb,0.76469445
+1314,scene,scene21,monochrome photography,0.76040554
+1315,scene,scene21,architecture,0.73360884
+1316,scene,scene21,woody plant,0.71097803
+1317,scene,scene21,infrastructure,0.63134462
+1318,scene,scene21,lighting,0.63124341
+1319,scene,scene21,home,0.60390395
+1320,scene,scene21,snow,0.54464495
+1321,scene,scene21,town square,0.53287876
+1322,scene,scene22,road,0.9450047
+1323,scene,scene22,black and white,0.9274556
+1324,scene,scene22,lane,0.914371
+1325,scene,scene22,street,0.85844022
+1326,scene,scene22,road surface,0.82271987
+1327,scene,scene22,weather,0.80588526
+1328,scene,scene22,monochrome,0.75180757
+1329,scene,scene22,monochrome photography,0.75004518
+1330,scene,scene22,residential area,0.68840688
+1331,scene,scene22,asphalt,0.66285729
+1332,scene,scene22,infrastructure,0.66146845
+1333,scene,scene22,snow,0.57432967
+1334,scene,scene22,pedestrian,0.51025063
+1335,scene,scene23,white,0.93546575
+1336,scene,scene23,road,0.93263316
+1337,scene,scene23,black and white,0.92794955
+1338,scene,scene23,lane,0.87770712
+1339,scene,scene23,street,0.85598904
+1340,scene,scene23,house,0.85001665
+1341,scene,scene23,road surface,0.82271987
+1342,scene,scene23,neighbourhood,0.81838453
+1343,scene,scene23,residential area,0.80436826
+1344,scene,scene23,monochrome,0.78440672
+1345,scene,scene23,monochrome photography,0.75471139
+1346,scene,scene23,asphalt,0.74273556
+1347,scene,scene23,infrastructure,0.64098614
+1348,scene,scene23,suburb,0.61898524
+1349,scene,scene24,white,0.9380129
+1350,scene,scene24,black and white,0.92952573
+1351,scene,scene24,black,0.92557037
+1352,scene,scene24,road,0.923609
+1353,scene,scene24,house,0.902493
+1354,scene,scene24,tree,0.87504089
+1355,scene,scene24,street,0.86635441
+1356,scene,scene24,neighbourhood,0.85027283
+1357,scene,scene24,lane,0.838097
+1358,scene,scene24,urban area,0.82954144
+1359,scene,scene24,city,0.80805349
+1360,scene,scene24,monochrome,0.80578637
+1361,scene,scene24,town,0.79980493
+1362,scene,scene24,residential area,0.78927809
+1363,scene,scene24,monochrome photography,0.76845849
+1364,scene,scene24,architecture,0.74900758
+1365,scene,scene24,infrastructure,0.64260721
+1366,scene,scene24,home,0.62213266
+1367,scene,scene24,suburb,0.56693465
+1368,scramble,scramble01,black,0.95346546
+1369,scramble,scramble01,white,0.93936956
+1370,scramble,scramble01,black and white,0.92905617
+1371,scramble,scramble01,wood,0.90044039
+1372,scramble,scramble01,green,0.89375204
+1373,scramble,scramble01,texture,0.87293756
+1374,scramble,scramble01,floor,0.81431186
+1375,scramble,scramble01,monochrome photography,0.76572609
+1376,scramble,scramble01,monochrome,0.75484484
+1377,scramble,scramble01,flooring,0.7505452
+1378,scramble,scramble01,hardwood,0.70479
+1379,scramble,scramble01,pattern,0.60874128
+1380,scramble,scramble01,laminate flooring,0.60467786
+1381,scramble,scramble01,wood flooring,0.57701939
+1382,scramble,scramble01,soil,0.56100881
+1383,scramble,scramble01,line,0.5297718
+1384,scramble,scramble01,plank,0.50481021
+1385,scramble,scramble02,black and white,0.92825204
+1386,scramble,scramble02,tree,0.88559407
+1387,scramble,scramble02,texture,0.84909415
+1388,scramble,scramble02,wood,0.81675029
+1389,scramble,scramble02,grass,0.77415371
+1390,scramble,scramble02,monochrome photography,0.75885719
+1391,scramble,scramble02,monochrome,0.71572584
+1392,scramble,scramble02,flooring,0.67125559
+1393,scramble,scramble02,trunk,0.6571517
+1394,scramble,scramble02,soil,0.61952156
+1395,scramble,scramble02,pattern,0.6019845
+1396,scramble,scramble03,black,0.9463219
+1397,scramble,scramble03,black and white,0.92996395
+1398,scramble,scramble03,texture,0.88920009
+1399,scramble,scramble03,green,0.86627722
+1400,scramble,scramble03,wood,0.860742
+1401,scramble,scramble03,tree,0.84572917
+1402,scramble,scramble03,monochrome photography,0.77317804
+1403,scramble,scramble03,floor,0.76126
+1404,scramble,scramble03,monochrome,0.7517401
+1405,scramble,scramble03,flooring,0.74287504
+1406,scramble,scramble03,pattern,0.64672911
+1407,scramble,scramble03,laminate flooring,0.57589406
+1408,scramble,scramble03,design,0.5522123
+1409,scramble,scramble03,trunk,0.5173012
+1410,scramble,scramble04,black,0.95469582
+1411,scramble,scramble04,white,0.93939704
+1412,scramble,scramble04,black and white,0.92652529
+1413,scramble,scramble04,green,0.90528458
+1414,scramble,scramble04,wood,0.90475142
+1415,scramble,scramble04,texture,0.8462792
+1416,scramble,scramble04,brown,0.83682805
+1417,scramble,scramble04,floor,0.81727976
+1418,scramble,scramble04,flooring,0.78568178
+1419,scramble,scramble04,monochrome,0.74831057
+1420,scramble,scramble04,monochrome photography,0.7451039
+1421,scramble,scramble04,hardwood,0.71836591
+1422,scramble,scramble04,laminate flooring,0.62747431
+1423,scramble,scramble04,wood flooring,0.59890074
+1424,scramble,scramble04,pattern,0.56979728
+1425,scramble,scramble04,soil,0.55767149
+1426,scramble,scramble04,plank,0.5089789
+1427,scramble,scramble04,line,0.50661707
+1428,scramble,scramble05,black,0.94125324
+1429,scramble,scramble05,black and white,0.92724341
+1430,scramble,scramble05,tree,0.89520252
+1431,scramble,scramble05,texture,0.8840372
+1432,scramble,scramble05,green,0.87273383
+1433,scramble,scramble05,wood,0.86173642
+1434,scramble,scramble05,monochrome photography,0.75045443
+1435,scramble,scramble05,monochrome,0.74170184
+1436,scramble,scramble05,trunk,0.7092905
+1437,scramble,scramble05,floor,0.70702571
+1438,scramble,scramble05,flooring,0.70501494
+1439,scramble,scramble05,leaf,0.66094351
+1440,scramble,scramble05,pattern,0.63440043
+1441,scramble,scramble06,black,0.94853538
+1442,scramble,scramble06,black and white,0.91649079
+1443,scramble,scramble06,wood,0.86093974
+1444,scramble,scramble06,brown,0.85149693
+1445,scramble,scramble06,floor,0.84056276
+1446,scramble,scramble06,flooring,0.83688617
+1447,scramble,scramble06,texture,0.78219342
+1448,scramble,scramble06,hardwood,0.74242693
+1449,scramble,scramble06,wood flooring,0.68666071
+1450,scramble,scramble06,laminate flooring,0.67170537
+1451,scramble,scramble06,monochrome photography,0.65464443
+1452,scramble,scramble06,pattern,0.64978021
+1453,scramble,scramble06,monochrome,0.64882821
+1454,scramble,scramble06,wood stain,0.58930296
+1455,scramble,scramble06,design,0.56135207
+1456,scramble,scramble07,black,0.95257652
+1457,scramble,scramble07,white,0.93919361
+1458,scramble,scramble07,black and white,0.92452294
+1459,scramble,scramble07,wood,0.89816296
+1460,scramble,scramble07,green,0.88226885
+1461,scramble,scramble07,brown,0.85145086
+1462,scramble,scramble07,floor,0.839372
+1463,scramble,scramble07,texture,0.82217187
+1464,scramble,scramble07,flooring,0.79834914
+1465,scramble,scramble07,hardwood,0.73558927
+1466,scramble,scramble07,monochrome photography,0.72779197
+1467,scramble,scramble07,monochrome,0.72104549
+1468,scramble,scramble07,laminate flooring,0.65502143
+1469,scramble,scramble07,wood flooring,0.63746423
+1470,scramble,scramble07,pattern,0.58646381
+1471,scramble,scramble07,line,0.51589143
+1472,scramble,scramble07,plank,0.50371486
+1473,scramble,scramble08,black,0.95209265
+1474,scramble,scramble08,white,0.93801159
+1475,scramble,scramble08,black and white,0.927468
+1476,scramble,scramble08,texture,0.87221408
+1477,scramble,scramble08,green,0.86812812
+1478,scramble,scramble08,wood,0.85123336
+1479,scramble,scramble08,floor,0.80539632
+1480,scramble,scramble08,flooring,0.78055692
+1481,scramble,scramble08,monochrome,0.76294863
+1482,scramble,scramble08,monochrome photography,0.75239444
+1483,scramble,scramble08,close up,0.70058376
+1484,scramble,scramble08,laminate flooring,0.594249
+1485,scramble,scramble08,pattern,0.56936961
+1486,scramble,scramble08,wood flooring,0.55807585
+1487,scramble,scramble08,line,0.51242536
+1488,scramble,scramble09,black,0.94971037
+1489,scramble,scramble09,white,0.93738794
+1490,scramble,scramble09,black and white,0.92340058
+1491,scramble,scramble09,wood,0.89856482
+1492,scramble,scramble09,green,0.88249987
+1493,scramble,scramble09,texture,0.87371427
+1494,scramble,scramble09,tree,0.85392225
+1495,scramble,scramble09,floor,0.81566316
+1496,scramble,scramble09,flooring,0.80183637
+1497,scramble,scramble09,monochrome,0.72933477
+1498,scramble,scramble09,hardwood,0.72014308
+1499,scramble,scramble09,monochrome photography,0.71780592
+1500,scramble,scramble09,close up,0.70035678
+1501,scramble,scramble09,laminate flooring,0.63966471
+1502,scramble,scramble09,wood flooring,0.60022819
+1503,scramble,scramble09,trunk,0.58840019
+1504,scramble,scramble09,pattern,0.55183077
+1505,scramble,scramble10,black,0.9307335
+1506,scramble,scramble10,black and white,0.90462446
+1507,scramble,scramble10,texture,0.7852484
+1508,scramble,scramble10,flooring,0.75506544
+1509,scramble,scramble10,floor,0.74054241
+1510,scramble,scramble10,rock,0.68095481
+1511,scramble,scramble10,monochrome,0.65383184
+1512,scramble,scramble10,asphalt,0.57706517
+1513,scramble,scramble10,monochrome photography,0.550622
+1514,scramble,scramble10,textile,0.54763353
+1515,scramble,scramble10,material,0.5472818
+1516,scramble,scramble11,black,0.95772517
+1517,scramble,scramble11,black and white,0.94128978
+1518,scramble,scramble11,white,0.94125289
+1519,scramble,scramble11,texture,0.89739543
+1520,scramble,scramble11,green,0.8866092
+1521,scramble,scramble11,monochrome photography,0.85743672
+1522,scramble,scramble11,monochrome,0.82024229
+1523,scramble,scramble11,wall,0.781515
+1524,scramble,scramble11,pattern,0.77063829
+1525,scramble,scramble11,wood,0.76888973
+1526,scramble,scramble11,floor,0.72100341
+1527,scramble,scramble11,leaf,0.7005294
+1528,scramble,scramble11,darkness,0.69721806
+1529,scramble,scramble11,design,0.65891564
+1530,scramble,scramble11,line,0.6011132
+1531,scramble,scramble11,shape,0.59211725
+1532,scramble,scramble11,circle,0.5854978
+1533,scramble,scramble11,flooring,0.55263114
+1534,scramble,scramble11,symmetry,0.541602
+1535,scramble,scramble12,black,0.95150512
+1536,scramble,scramble12,white,0.93653142
+1537,scramble,scramble12,black and white,0.93201911
+1538,scramble,scramble12,green,0.89025581
+1539,scramble,scramble12,texture,0.88828766
+1540,scramble,scramble12,photography,0.82844037
+1541,scramble,scramble12,wood,0.81248873
+1542,scramble,scramble12,monochrome,0.79457361
+1543,scramble,scramble12,monochrome photography,0.79040647
+1544,scramble,scramble12,grass,0.77185053
+1545,scramble,scramble12,floor,0.75799489
+1546,scramble,scramble12,close up,0.72750551
+1547,scramble,scramble12,darkness,0.70350534
+1548,scramble,scramble12,flooring,0.67887378
+1549,scramble,scramble12,leaf,0.66422635
+1550,scramble,scramble12,soil,0.60582954
+1551,scramble,scramble12,pattern,0.5445441
+1552,scramble,scramble12,material,0.52860576
+1553,scramble,scramble12,line,0.51603556
+1554,scramble,scramble13,black,0.94801879
+1555,scramble,scramble13,black and white,0.9389444
+1556,scramble,scramble13,white,0.93623841
+1557,scramble,scramble13,texture,0.88335049
+1558,scramble,scramble13,monochrome photography,0.84215748
+1559,scramble,scramble13,monochrome,0.80543381
+1560,scramble,scramble13,darkness,0.72780681
+1561,scramble,scramble13,pattern,0.63199866
+1562,scramble,scramble13,wood,0.60440546
+1563,scramble,scramble13,line,0.59255445
+1564,scramble,scramble13,shape,0.58350807
+1565,scramble,scramble13,design,0.56354851
+1566,scramble,scramble14,black,0.94333988
+1567,scramble,scramble14,black and white,0.93827611
+1568,scramble,scramble14,white,0.93757254
+1569,scramble,scramble14,texture,0.88165671
+1570,scramble,scramble14,monochrome photography,0.83749849
+1571,scramble,scramble14,monochrome,0.80031335
+1572,scramble,scramble14,pattern,0.62582862
+1573,scramble,scramble14,line,0.5985654
+1574,scramble,scramble14,shape,0.58397752
+1575,scramble,scramble14,design,0.57161069
+1576,scramble,scramble14,symmetry,0.54818064
+1577,scramble,scramble15,black,0.94756979
+1578,scramble,scramble15,black and white,0.93951756
+1579,scramble,scramble15,white,0.93657535
+1580,scramble,scramble15,texture,0.888561
+1581,scramble,scramble15,monochrome photography,0.84579974
+1582,scramble,scramble15,monochrome,0.80616748
+1583,scramble,scramble15,font,0.73012346
+1584,scramble,scramble15,darkness,0.70475435
+1585,scramble,scramble15,line,0.59537625
+1586,scramble,scramble15,shape,0.58400887
+1587,scramble,scramble15,pattern,0.5729413
+1588,scramble,scramble15,symmetry,0.53851849
+1589,scramble,scramble16,black,0.9460867
+1590,scramble,scramble16,black and white,0.93738389
+1591,scramble,scramble16,white,0.93617988
+1592,scramble,scramble16,texture,0.89986593
+1593,scramble,scramble16,monochrome photography,0.8315658
+1594,scramble,scramble16,monochrome,0.80985618
+1595,scramble,scramble16,darkness,0.75888717
+1596,scramble,scramble16,line,0.58628631
+1597,scramble,scramble16,shape,0.58315378
+1598,scramble,scramble16,pattern,0.50273508
+1599,scramble,scramble17,black,0.95078039
+1600,scramble,scramble17,white,0.93580258
+1601,scramble,scramble17,black and white,0.93559837
+1602,scramble,scramble17,text,0.91548473
+1603,scramble,scramble17,texture,0.8376044
+1604,scramble,scramble17,pattern,0.83249092
+1605,scramble,scramble17,monochrome photography,0.81680113
+1606,scramble,scramble17,monochrome,0.77042145
+1607,scramble,scramble17,font,0.73645335
+1608,scramble,scramble17,design,0.71352071
+1609,scramble,scramble17,line,0.60711372
+1610,scramble,scramble17,shape,0.58766943
+1611,scramble,scramble17,circle,0.57417494
+1612,scramble,scramble17,symmetry,0.5508191
+1613,scramble,scramble17,textile,0.53499043
+1614,scramble,scramble17,flooring,0.50743252
+1615,scramble,scramble18,black,0.94807678
+1616,scramble,scramble18,black and white,0.93854851
+1617,scramble,scramble18,white,0.93764818
+1618,scramble,scramble18,texture,0.8981337
+1619,scramble,scramble18,monochrome photography,0.839065
+1620,scramble,scramble18,monochrome,0.81253093
+1621,scramble,scramble18,wall,0.77756
+1622,scramble,scramble18,darkness,0.70934194
+1623,scramble,scramble18,pattern,0.64010912
+1624,scramble,scramble18,line,0.60501534
+1625,scramble,scramble18,shape,0.58912021
+1626,scramble,scramble18,design,0.57925296
+1627,scramble,scramble18,symmetry,0.54798752
+1628,scramble,scramble19,black,0.95216554
+1629,scramble,scramble19,black and white,0.94004524
+1630,scramble,scramble19,white,0.93838209
+1631,scramble,scramble19,texture,0.88779408
+1632,scramble,scramble19,monochrome photography,0.84908092
+1633,scramble,scramble19,monochrome,0.81063545
+1634,scramble,scramble19,pattern,0.771068
+1635,scramble,scramble19,design,0.65977168
+1636,scramble,scramble19,leaf,0.6544
+1637,scramble,scramble19,wood,0.64441013
+1638,scramble,scramble19,line,0.61496407
+1639,scramble,scramble19,shape,0.58947033
+1640,scramble,scramble19,circle,0.57369637
+1641,scramble,scramble19,symmetry,0.55535263
+1642,scramble,scramble20,black,0.950568
+1643,scramble,scramble20,black and white,0.9398306
+1644,scramble,scramble20,white,0.93708009
+1645,scramble,scramble20,texture,0.89157134
+1646,scramble,scramble20,monochrome photography,0.84805351
+1647,scramble,scramble20,monochrome,0.80966032
+1648,scramble,scramble20,pattern,0.78429222
+1649,scramble,scramble20,wall,0.7837401
+1650,scramble,scramble20,font,0.77250344
+1651,scramble,scramble20,leaf,0.67530739
+1652,scramble,scramble20,design,0.66321152
+1653,scramble,scramble20,line,0.62684661
+1654,scramble,scramble20,wood,0.60745996
+1655,scramble,scramble20,shape,0.589476
+1656,scramble,scramble20,circle,0.57637435
+1657,scramble,scramble20,symmetry,0.55337882
+1658,scramble,scramble21,black,0.95082134
+1659,scramble,scramble21,black and white,0.93997622
+1660,scramble,scramble21,white,0.93904406
+1661,scramble,scramble21,texture,0.88291752
+1662,scramble,scramble21,monochrome photography,0.84855682
+1663,scramble,scramble21,monochrome,0.81841284
+1664,scramble,scramble21,pattern,0.7317856
+1665,scramble,scramble21,leaf,0.66447943
+1666,scramble,scramble21,wood,0.661159
+1667,scramble,scramble21,design,0.62736815
+1668,scramble,scramble21,line,0.61492294
+1669,scramble,scramble21,shape,0.58966613
+1670,scramble,scramble21,symmetry,0.55458528
+1671,scramble,scramble21,drawing,0.52778095
+1672,scramble,scramble22,sky,0.96868104
+1673,scramble,scramble22,black and white,0.93500286
+1674,scramble,scramble22,black,0.93267924
+1675,scramble,scramble22,cloud,0.91763628
+1676,scramble,scramble22,atmosphere,0.84758174
+1677,scramble,scramble22,monochrome photography,0.81426215
+1678,scramble,scramble22,monochrome,0.80316907
+1679,scramble,scramble22,texture,0.7995531
+1680,scramble,scramble22,darkness,0.753083
+1681,scramble,scramble22,atmosphere of earth,0.72695845
+1682,scramble,scramble22,line,0.59902704
+1683,scramble,scramble22,shape,0.58223104
+1684,scramble,scramble22,meteorological phenomenon,0.53392643
+1685,scramble,scramble23,black,0.95297796
+1686,scramble,scramble23,black and white,0.9405424
+1687,scramble,scramble23,white,0.93809718
+1688,scramble,scramble23,texture,0.88748652
+1689,scramble,scramble23,monochrome photography,0.85275942
+1690,scramble,scramble23,monochrome,0.81678057
+1691,scramble,scramble23,pattern,0.76189733
+1692,scramble,scramble23,darkness,0.69962561
+1693,scramble,scramble23,design,0.65579242
+1694,scramble,scramble23,wood,0.60895336
+1695,scramble,scramble23,line,0.60054761
+1696,scramble,scramble23,shape,0.58759576
+1697,scramble,scramble23,circle,0.57801259
+1698,scramble,scramble23,symmetry,0.55585456
+1699,scramble,scramble24,black,0.953474
+1700,scramble,scramble24,white,0.94024658
+1701,scramble,scramble24,black and white,0.940138
+1702,scramble,scramble24,texture,0.88967156
+1703,scramble,scramble24,green,0.85733575
+1704,scramble,scramble24,monochrome photography,0.84996891
+1705,scramble,scramble24,monochrome,0.82062936
+1706,scramble,scramble24,light,0.79744512
+1707,scramble,scramble24,darkness,0.734342
+1708,scramble,scramble24,pattern,0.68664014
+1709,scramble,scramble24,leaf,0.67184174
+1710,scramble,scramble24,line,0.63280404
+1711,scramble,scramble24,design,0.6075629
+1712,scramble,scramble24,shape,0.59103823
+1713,scramble,scramble24,wood,0.5808447
+1714,scramble,scramble24,circle,0.57233375
+1715,scramble,scramble24,symmetry,0.55226988
+1716,scramble,scramble25,black,0.94434738
+1717,scramble,scramble25,black and white,0.92764944
+1718,scramble,scramble25,pattern,0.81681305
+1719,scramble,scramble25,texture,0.79323047
+1720,scramble,scramble25,monochrome photography,0.75236332
+1721,scramble,scramble25,monochrome,0.71696585
+1722,scramble,scramble25,floor,0.713437
+1723,scramble,scramble25,flooring,0.71313792
+1724,scramble,scramble25,design,0.6760748
+1725,scramble,scramble25,textile,0.58887804
+1726,scramble,scramble25,line,0.55331522
+1727,scramble,scramble25,circle,0.53660911
+1728,scramble,scramble26,black,0.94109446
+1729,scramble,scramble26,black and white,0.9327262
+1730,scramble,scramble26,pattern,0.82320154
+1731,scramble,scramble26,monochrome photography,0.79398358
+1732,scramble,scramble26,texture,0.79392004
+1733,scramble,scramble26,wall,0.78614438
+1734,scramble,scramble26,monochrome,0.73711008
+1735,scramble,scramble26,floor,0.70871592
+1736,scramble,scramble26,font,0.70117557
+1737,scramble,scramble26,design,0.67321849
+1738,scramble,scramble26,flooring,0.66916353
+1739,scramble,scramble26,shape,0.580216
+1740,scramble,scramble26,line,0.57979417
+1741,scramble,scramble26,textile,0.5666728
+1742,scramble,scramble26,circle,0.55589634
+1743,scramble,scramble27,black,0.940289
+1744,scramble,scramble27,black and white,0.935478
+1745,scramble,scramble27,pattern,0.83503479
+1746,scramble,scramble27,monochrome photography,0.81520587
+1747,scramble,scramble27,wall,0.78463274
+1748,scramble,scramble27,texture,0.78202266
+1749,scramble,scramble27,monochrome,0.73669189
+1750,scramble,scramble27,floor,0.71381426
+1751,scramble,scramble27,design,0.69774067
+1752,scramble,scramble27,flooring,0.66857916
+1753,scramble,scramble27,wood,0.58457738
+1754,scramble,scramble27,textile,0.5710898
+1755,scramble,scramble27,line,0.561865
+1756,scramble,scramble27,circle,0.54763865
+1757,scramble,scramble28,black,0.95085377
+1758,scramble,scramble28,black and white,0.93337405
+1759,scramble,scramble28,pattern,0.84703618
+1760,scramble,scramble28,texture,0.8242352
+1761,scramble,scramble28,monochrome photography,0.79953605
+1762,scramble,scramble28,wall,0.77690929
+1763,scramble,scramble28,monochrome,0.75559247
+1764,scramble,scramble28,font,0.73013014
+1765,scramble,scramble28,design,0.72342837
+1766,scramble,scramble28,floor,0.70074767
+1767,scramble,scramble28,flooring,0.6298551
+1768,scramble,scramble28,shape,0.58373708
+1769,scramble,scramble28,textile,0.58168972
+1770,scramble,scramble28,line,0.57524538
+1771,scramble,scramble28,circle,0.56548119
+1772,scramble,scramble28,wallpaper,0.5133068
+1773,scramble,scramble29,black,0.93002135
+1774,scramble,scramble29,black and white,0.92651051
+1775,scramble,scramble29,texture,0.82791322
+1776,scramble,scramble29,pattern,0.81068343
+1777,scramble,scramble29,wall,0.80209827
+1778,scramble,scramble29,monochrome photography,0.74285132
+1779,scramble,scramble29,floor,0.74261147
+1780,scramble,scramble29,flooring,0.73507249
+1781,scramble,scramble29,monochrome,0.679337
+1782,scramble,scramble29,design,0.66444886
+1783,scramble,scramble29,wood,0.62696123
+1784,scramble,scramble29,textile,0.57070518
+1785,scramble,scramble29,circle,0.53794843
+1786,scramble,scramble29,line,0.53645593
+1787,scramble,scramble29,drawing,0.50205195
+1788,scramble,scramble30,black,0.94901764
+1789,scramble,scramble30,black and white,0.93760151
+1790,scramble,scramble30,text,0.91667461
+1791,scramble,scramble30,texture,0.86450768
+1792,scramble,scramble30,monochrome photography,0.83161479
+1793,scramble,scramble30,pattern,0.82987791
+1794,scramble,scramble30,wall,0.77879131
+1795,scramble,scramble30,monochrome,0.77636266
+1796,scramble,scramble30,font,0.7619316
+1797,scramble,scramble30,floor,0.70338428
+1798,scramble,scramble30,design,0.700316
+1799,scramble,scramble30,flooring,0.5926137
+1800,scramble,scramble30,line,0.58862817
+1801,scramble,scramble30,circle,0.586397
+1802,scramble,scramble30,shape,0.585226
+1803,scramble,scramble30,textile,0.51936078
+1804,scramble,scramble30,wallpaper,0.5055635
+1805,scramble,scramble31,black,0.93802762
+1806,scramble,scramble31,black and white,0.92493534
+1807,scramble,scramble31,pattern,0.80411381
+1808,scramble,scramble31,wall,0.78244042
+1809,scramble,scramble31,flooring,0.73613513
+1810,scramble,scramble31,monochrome photography,0.72852153
+1811,scramble,scramble31,texture,0.71737391
+1812,scramble,scramble31,floor,0.70919394
+1813,scramble,scramble31,font,0.69705284
+1814,scramble,scramble31,monochrome,0.6865769
+1815,scramble,scramble31,design,0.65534866
+1816,scramble,scramble31,textile,0.58544606
+1817,scramble,scramble31,line,0.552299
+1818,scramble,scramble31,material,0.5167346
+1819,scramble,scramble31,circle,0.51520073
+1820,scramble,scramble32,black,0.9473722
+1821,scramble,scramble32,white,0.93920368
+1822,scramble,scramble32,black and white,0.93210244
+1823,scramble,scramble32,texture,0.83050859
+1824,scramble,scramble32,pattern,0.81269431
+1825,scramble,scramble32,monochrome photography,0.78899854
+1826,scramble,scramble32,monochrome,0.75358737
+1827,scramble,scramble32,floor,0.71637803
+1828,scramble,scramble32,design,0.66865766
+1829,scramble,scramble32,flooring,0.63845009
+1830,scramble,scramble32,line,0.59851462
+1831,scramble,scramble32,textile,0.59823054
+1832,scramble,scramble32,shape,0.58311296
+1833,scramble,scramble32,circle,0.56827992
+1834,scramble,scramble32,drawing,0.52688789
+1835,scramble,scramble33,black,0.9511674
+1836,scramble,scramble33,black and white,0.93755758
+1837,scramble,scramble33,white,0.93702549
+1838,scramble,scramble33,text,0.9159379
+1839,scramble,scramble33,texture,0.83607066
+1840,scramble,scramble33,pattern,0.83447069
+1841,scramble,scramble33,monochrome photography,0.83084774
+1842,scramble,scramble33,monochrome,0.77711564
+1843,scramble,scramble33,font,0.75563753
+1844,scramble,scramble33,design,0.70688647
+1845,scramble,scramble33,floor,0.70447332
+1846,scramble,scramble33,flooring,0.61815155
+1847,scramble,scramble33,line,0.60743904
+1848,scramble,scramble33,circle,0.58703518
+1849,scramble,scramble33,shape,0.58447665
+1850,scramble,scramble33,textile,0.55782324
+1851,scramble,scramble33,symmetry,0.53010607
+1852,scramble,scramble33,wallpaper,0.50505471
+1853,scramble,scramble34,black,0.94234234
+1854,scramble,scramble34,black and white,0.9325586
+1855,scramble,scramble34,texture,0.86148179
+1856,scramble,scramble34,pattern,0.83151269
+1857,scramble,scramble34,monochrome photography,0.79300112
+1858,scramble,scramble34,monochrome,0.7466628
+1859,scramble,scramble34,font,0.72146279
+1860,scramble,scramble34,design,0.69629121
+1861,scramble,scramble34,floor,0.68957126
+1862,scramble,scramble34,flooring,0.6287545
+1863,scramble,scramble34,shape,0.58364779
+1864,scramble,scramble34,line,0.57675827
+1865,scramble,scramble34,circle,0.55955905
+1866,scramble,scramble34,textile,0.54068577
+1867,scramble,scramble34,drawing,0.5342477
+1868,scramble,scramble34,symmetry,0.53007555
+1869,scramble,scramble34,wallpaper,0.50741047
+1870,scramble,scramble35,black,0.94769323
+1871,scramble,scramble35,black and white,0.93677515
+1872,scramble,scramble35,pattern,0.85187197
+1873,scramble,scramble35,texture,0.82663053
+1874,scramble,scramble35,monochrome photography,0.82514143
+1875,scramble,scramble35,wall,0.78440011
+1876,scramble,scramble35,monochrome,0.76554251
+1877,scramble,scramble35,design,0.72991157
+1878,scramble,scramble35,font,0.723613
+1879,scramble,scramble35,floor,0.700645
+1880,scramble,scramble35,flooring,0.65005559
+1881,scramble,scramble35,line,0.58310586
+1882,scramble,scramble35,shape,0.58220887
+1883,scramble,scramble35,textile,0.56914842
+1884,scramble,scramble35,circle,0.55871773
+1885,scramble,scramble36,black,0.95181406
+1886,scramble,scramble36,white,0.93574321
+1887,scramble,scramble36,black and white,0.93425947
+1888,scramble,scramble36,pattern,0.85489714
+1889,scramble,scramble36,monochrome photography,0.80574054
+1890,scramble,scramble36,monochrome,0.76393646
+1891,scramble,scramble36,texture,0.75781274
+1892,scramble,scramble36,design,0.74561191
+1893,scramble,scramble36,floor,0.71246183
+1894,scramble,scramble36,font,0.68811047
+1895,scramble,scramble36,flooring,0.66894031
+1896,scramble,scramble36,art,0.6601162
+1897,scramble,scramble36,line,0.61434937
+1898,scramble,scramble36,textile,0.59764642
+1899,scramble,scramble36,shape,0.58207411
+1900,scramble,scramble36,circle,0.55554062
+1901,scramble,scramble37,black,0.93516487
+1902,scramble,scramble37,black and white,0.91146797
+1903,scramble,scramble37,floor,0.79863888
+1904,scramble,scramble37,flooring,0.78771687
+1905,scramble,scramble37,texture,0.77351248
+1906,scramble,scramble37,asphalt,0.72282296
+1907,scramble,scramble37,monochrome,0.66570264
+1908,scramble,scramble37,monochrome photography,0.61271232
+1909,scramble,scramble37,soil,0.56942457
+1910,scramble,scramble37,material,0.54504991
+1911,scramble,scramble37,tile,0.53817612
+1912,scramble,scramble37,pattern,0.51276577
+1913,scramble,scramble38,black,0.93514925
+1914,scramble,scramble38,black and white,0.91941231
+1915,scramble,scramble38,texture,0.84035331
+1916,scramble,scramble38,wall,0.79058844
+1917,scramble,scramble38,flooring,0.76255512
+1918,scramble,scramble38,pattern,0.75138789
+1919,scramble,scramble38,floor,0.73675734
+1920,scramble,scramble38,monochrome photography,0.68077427
+1921,scramble,scramble38,monochrome,0.66116941
+1922,scramble,scramble38,design,0.601022
+1923,scramble,scramble38,wood,0.57961375
+1924,scramble,scramble38,circle,0.54424661
+1925,scramble,scramble38,line,0.52493477
+1926,scramble,scramble38,textile,0.51933718
+1927,scramble,scramble39,black,0.93837672
+1928,scramble,scramble39,black and white,0.90962154
+1929,scramble,scramble39,flooring,0.84891576
+1930,scramble,scramble39,floor,0.84873676
+1931,scramble,scramble39,wood,0.8396436
+1932,scramble,scramble39,hardwood,0.70647484
+1933,scramble,scramble39,wood flooring,0.67796
+1934,scramble,scramble39,laminate flooring,0.6456849
+1935,scramble,scramble39,monochrome,0.6393317
+1936,scramble,scramble39,tile,0.62992293
+1937,scramble,scramble39,monochrome photography,0.59533942
+1938,scramble,scramble39,pattern,0.58757186
+1939,scramble,scramble39,line,0.57720512
+1940,scramble,scramble39,texture,0.53441519
+1941,scramble,scramble39,material,0.51479095
+1942,scramble,scramble40,black,0.93376023
+1943,scramble,scramble40,black and white,0.91336972
+1944,scramble,scramble40,flooring,0.80667442
+1945,scramble,scramble40,texture,0.76701242
+1946,scramble,scramble40,floor,0.757771
+1947,scramble,scramble40,asphalt,0.69094348
+1948,scramble,scramble40,pattern,0.67996985
+1949,scramble,scramble40,monochrome,0.64791346
+1950,scramble,scramble40,monochrome photography,0.62705016
+1951,scramble,scramble40,design,0.56481504
+1952,scramble,scramble40,carpet,0.52678907
+1953,scramble,scramble40,line,0.51489013
+1954,scramble,scramble40,soil,0.50500953
+1955,scramble,scramble41,black,0.94339222
+1956,scramble,scramble41,white,0.93728578
+1957,scramble,scramble41,black and white,0.9361248
+1958,scramble,scramble41,texture,0.89587569
+1959,scramble,scramble41,monochrome photography,0.8221519
+1960,scramble,scramble41,monochrome,0.80331993
+1961,scramble,scramble41,darkness,0.70620179
+1962,scramble,scramble41,shape,0.58901817
+1963,scramble,scramble41,line,0.58686513
+1964,scramble,scramble41,drawing,0.51419157
+1965,scramble,scramble42,black,0.92718339
+1966,scramble,scramble42,black and white,0.92637223
+1967,scramble,scramble42,texture,0.83039582
+1968,scramble,scramble42,monochrome,0.74539453
+1969,scramble,scramble42,monochrome photography,0.74442422
+1970,scramble,scramble42,font,0.70050073
+1971,scramble,scramble42,pattern,0.64767522
+1972,scramble,scramble42,design,0.59277272
+1973,scramble,scramble42,line,0.58972079
+1974,scramble,scramble42,shape,0.58383518
+1975,scramble,scramble42,circle,0.5702855
+1976,scramble,scramble42,astronomical object,0.550046
+1977,scramble,scramble42,symmetry,0.51487917
+1978,scramble,scramble43,black,0.9560259
+1979,scramble,scramble43,white,0.94093448
+1980,scramble,scramble43,black and white,0.93365258
+1981,scramble,scramble43,green,0.8777408
+1982,scramble,scramble43,texture,0.84276384
+1983,scramble,scramble43,pattern,0.81504565
+1984,scramble,scramble43,monochrome photography,0.802129
+1985,scramble,scramble43,monochrome,0.77773583
+1986,scramble,scramble43,wall,0.77758557
+1987,scramble,scramble43,font,0.72970861
+1988,scramble,scramble43,floor,0.71163994
+1989,scramble,scramble43,design,0.68314874
+1990,scramble,scramble43,wood,0.62219548
+1991,scramble,scramble43,line,0.61997014
+1992,scramble,scramble43,circle,0.61839044
+1993,scramble,scramble43,shape,0.58741027
+1994,scramble,scramble43,flooring,0.58038974
+1995,scramble,scramble43,textile,0.56411117
+1996,scramble,scramble43,symmetry,0.5315516
+1997,scramble,scramble44,black,0.95386583
+1998,scramble,scramble44,white,0.94009984
+1999,scramble,scramble44,black and white,0.92940366
+2000,scramble,scramble44,green,0.88561666
+2001,scramble,scramble44,pattern,0.83060437
+2002,scramble,scramble44,texture,0.82999629
+2003,scramble,scramble44,monochrome photography,0.76785064
+2004,scramble,scramble44,monochrome,0.75804514
+2005,scramble,scramble44,floor,0.71305507
+2006,scramble,scramble44,design,0.69754893
+2007,scramble,scramble44,wood,0.66815305
+2008,scramble,scramble44,line,0.62708229
+2009,scramble,scramble44,flooring,0.61065805
+2010,scramble,scramble44,circle,0.597269
+2011,scramble,scramble44,shape,0.5856629
+2012,scramble,scramble44,textile,0.55279464
+2013,scramble,scramble44,symmetry,0.52280146
+2014,scramble,scramble45,black,0.92736328
+2015,scramble,scramble45,black and white,0.89801043
+2016,scramble,scramble45,flooring,0.78092539
+2017,scramble,scramble45,floor,0.76869166
+2018,scramble,scramble45,asphalt,0.69180155
+2019,scramble,scramble45,texture,0.59725535
+2020,scramble,scramble45,monochrome,0.59504408
+2021,scramble,scramble45,material,0.56948626
+2022,scramble,scramble45,textile,0.56243157
+2023,scramble,scramble45,soil,0.52734369
+2024,scramble,scramble46,black,0.93437165
+2025,scramble,scramble46,black and white,0.90811008
+2026,scramble,scramble46,fur,0.80355853
+2027,scramble,scramble46,flooring,0.73099381
+2028,scramble,scramble46,floor,0.72439456
+2029,scramble,scramble46,textile,0.66572952
+2030,scramble,scramble46,texture,0.64789087
+2031,scramble,scramble46,monochrome,0.64594495
+2032,scramble,scramble46,material,0.59308904
+2033,scramble,scramble46,monochrome photography,0.581059
+2034,scramble,scramble46,wool,0.5295698
+2035,scramble,scramble47,black,0.92920715
+2036,scramble,scramble47,black and white,0.89602023
+2037,scramble,scramble47,asphalt,0.89407808
+2038,scramble,scramble47,road surface,0.82271987
+2039,scramble,scramble47,flooring,0.81809682
+2040,scramble,scramble47,floor,0.80703115
+2041,scramble,scramble47,monochrome,0.61503696
+2042,scramble,scramble47,soil,0.59068894
+2043,scramble,scramble47,texture,0.56630313
+2044,scramble,scramble47,material,0.55159169
+2045,scramble,scramble47,tile,0.52609444
+2046,scramble,scramble48,sky,0.97089154
+2047,scramble,scramble48,white,0.93866837
+2048,scramble,scramble48,black,0.93769234
+2049,scramble,scramble48,black and white,0.93164015
+2050,scramble,scramble48,cloud,0.87614095
+2051,scramble,scramble48,texture,0.8518635
+2052,scramble,scramble48,atmosphere,0.83870149
+2053,scramble,scramble48,monochrome,0.80201024
+2054,scramble,scramble48,monochrome photography,0.78808779
+2055,scramble,scramble48,darkness,0.73262894
+2056,scramble,scramble48,atmosphere of earth,0.72846973
+2057,scramble,scramble48,line,0.61437851
+2058,scramble,scramble48,shape,0.58591211
+2059,scramble,scramble48,symmetry,0.53485608
+2060,scramble,scramble48,meteorological phenomenon,0.50114989
+2061,scramble,scramble49,black,0.94753033
+2062,scramble,scramble49,white,0.93572026
+2063,scramble,scramble49,black and white,0.93072331
+2064,scramble,scramble49,texture,0.89619112
+2065,scramble,scramble49,green,0.86442137
+2066,scramble,scramble49,wall,0.78807163
+2067,scramble,scramble49,monochrome photography,0.77919185
+2068,scramble,scramble49,monochrome,0.76122195
+2069,scramble,scramble49,floor,0.69608074
+2070,scramble,scramble49,pattern,0.68350929
+2071,scramble,scramble49,wood,0.66686863
+2072,scramble,scramble49,shape,0.58378106
+2073,scramble,scramble49,flooring,0.57888126
+2074,scramble,scramble49,design,0.57520181
+2075,scramble,scramble49,line,0.56816733
+2076,scramble,scramble49,drawing,0.53746527
+2077,scramble,scramble49,material,0.51365757
+2078,scramble,scramble50,black,0.9437238
+2079,scramble,scramble50,white,0.93607521
+2080,scramble,scramble50,black and white,0.93272746
+2081,scramble,scramble50,texture,0.88939697
+2082,scramble,scramble50,green,0.8607524
+2083,scramble,scramble50,wall,0.80187863
+2084,scramble,scramble50,monochrome photography,0.79543644
+2085,scramble,scramble50,monochrome,0.76876009
+2086,scramble,scramble50,floor,0.70168751
+2087,scramble,scramble50,pattern,0.65519375
+2088,scramble,scramble50,flooring,0.62162548
+2089,scramble,scramble50,line,0.59074283
+2090,scramble,scramble50,shape,0.58313835
+2091,scramble,scramble50,design,0.56524026
+2092,scramble,scramble50,symmetry,0.54258597
+2093,scramble,scramble51,black,0.94523591
+2094,scramble,scramble51,black and white,0.92719293
+2095,scramble,scramble51,texture,0.82948762
+2096,scramble,scramble51,pattern,0.80119067
+2097,scramble,scramble51,monochrome photography,0.74843991
+2098,scramble,scramble51,floor,0.73336071
+2099,scramble,scramble51,monochrome,0.72854173
+2100,scramble,scramble51,wood,0.66955572
+2101,scramble,scramble51,design,0.64981347
+2102,scramble,scramble51,line,0.6086219
+2103,scramble,scramble51,flooring,0.59206593
+2104,scramble,scramble51,shape,0.59006971
+2105,scramble,scramble51,textile,0.58489507
+2106,scramble,scramble51,circle,0.57908368
+2107,scramble,scramble51,drawing,0.54797494
+2108,scramble,scramble51,material,0.5165965
+2109,scramble,scramble52,black,0.94068336
+2110,scramble,scramble52,black and white,0.93162853
+2111,scramble,scramble52,texture,0.88878822
+2112,scramble,scramble52,monochrome photography,0.78718776
+2113,scramble,scramble52,wall,0.78582549
+2114,scramble,scramble52,monochrome,0.78058171
+2115,scramble,scramble52,floor,0.68772346
+2116,scramble,scramble52,shape,0.58457965
+2117,scramble,scramble52,line,0.5798291
+2118,scramble,scramble52,pattern,0.57271123
+2119,scramble,scramble52,drawing,0.55223757
+2120,scramble,scramble52,flooring,0.54737312
+2121,scramble,scramble52,symmetry,0.53687072
+2122,scramble,scramble53,black,0.93224627
+2123,scramble,scramble53,black and white,0.91449195
+2124,scramble,scramble53,texture,0.83030778
+2125,scramble,scramble53,flooring,0.75808209
+2126,scramble,scramble53,floor,0.72798163
+2127,scramble,scramble53,pattern,0.72317117
+2128,scramble,scramble53,monochrome,0.65854156
+2129,scramble,scramble53,monochrome photography,0.63778049
+2130,scramble,scramble53,asphalt,0.626491
+2131,scramble,scramble53,design,0.58984
+2132,scramble,scramble53,line,0.51567876
+2133,scramble,scramble53,soil,0.50949579
+2134,scramble,scramble53,carpet,0.50744414
+2135,scramble,scramble54,black,0.94248122
+2136,scramble,scramble54,black and white,0.93194175
+2137,scramble,scramble54,texture,0.87021989
+2138,scramble,scramble54,monochrome photography,0.78960943
+2139,scramble,scramble54,monochrome,0.77615958
+2140,scramble,scramble54,floor,0.72827458
+2141,scramble,scramble54,flooring,0.62746644
+2142,scramble,scramble54,wood,0.59118849
+2143,scramble,scramble54,shape,0.5825572
+2144,scramble,scramble54,line,0.57819432
+2145,scramble,scramble54,pattern,0.57492518
+2146,scramble,scramble54,drawing,0.55083281
+2147,scramble,scramble55,black,0.94171548
+2148,scramble,scramble55,black and white,0.9273361
+2149,scramble,scramble55,texture,0.86219347
+2150,scramble,scramble55,wall,0.78027344
+2151,scramble,scramble55,floor,0.77660275
+2152,scramble,scramble55,monochrome,0.75394464
+2153,scramble,scramble55,monochrome photography,0.75195229
+2154,scramble,scramble55,flooring,0.72860879
+2155,scramble,scramble55,asphalt,0.61879742
+2156,scramble,scramble55,pattern,0.59467608
+2157,scramble,scramble55,line,0.57664043
+2158,scramble,scramble56,black,0.94702941
+2159,scramble,scramble56,white,0.93789726
+2160,scramble,scramble56,black and white,0.93306118
+2161,scramble,scramble56,texture,0.88021868
+2162,scramble,scramble56,monochrome photography,0.799383
+2163,scramble,scramble56,monochrome,0.79235953
+2164,scramble,scramble56,wall,0.77903104
+2165,scramble,scramble56,cloud,0.73986518
+2166,scramble,scramble56,floor,0.711318
+2167,scramble,scramble56,darkness,0.70946932
+2168,scramble,scramble56,line,0.58579767
+2169,scramble,scramble56,shape,0.58307564
+2170,scramble,scramble56,pattern,0.56951416
+2171,scramble,scramble56,flooring,0.56089896
+2172,scramble,scramble56,drawing,0.52985579
+2173,scramble,scramble57,black,0.94697672
+2174,scramble,scramble57,white,0.93720186
+2175,scramble,scramble57,black and white,0.93412787
+2176,scramble,scramble57,texture,0.89728022
+2177,scramble,scramble57,monochrome photography,0.80705523
+2178,scramble,scramble57,monochrome,0.78942221
+2179,scramble,scramble57,wall,0.77952307
+2180,scramble,scramble57,line,0.603563
+2181,scramble,scramble57,pattern,0.59406871
+2182,scramble,scramble57,shape,0.58724588
+2183,scramble,scramble57,design,0.55158627
+2184,scramble,scramble57,symmetry,0.54124111
+2185,scramble,scramble57,flooring,0.51880491
+2186,scramble,scramble57,drawing,0.50077939
+2187,scramble,scramble58,black,0.95616931
+2188,scramble,scramble58,white,0.94140196
+2189,scramble,scramble58,black and white,0.93695843
+2190,scramble,scramble58,texture,0.86710745
+2191,scramble,scramble58,green,0.85388541
+2192,scramble,scramble58,monochrome photography,0.82735717
+2193,scramble,scramble58,monochrome,0.79440057
+2194,scramble,scramble58,pattern,0.7522527
+2195,scramble,scramble58,floor,0.7135272
+2196,scramble,scramble58,darkness,0.70825827
+2197,scramble,scramble58,wood,0.64969474
+2198,scramble,scramble58,design,0.64286274
+2199,scramble,scramble58,line,0.60269016
+2200,scramble,scramble58,shape,0.58983082
+2201,scramble,scramble58,circle,0.57602948
+2202,scramble,scramble58,symmetry,0.54195786
+2203,scramble,scramble58,textile,0.53261179
+2204,scramble,scramble58,flooring,0.521837
+2205,scramble,scramble59,black,0.94717067
+2206,scramble,scramble59,black and white,0.92949396
+2207,scramble,scramble59,texture,0.88468051
+2208,scramble,scramble59,green,0.86492968
+2209,scramble,scramble59,wall,0.78486073
+2210,scramble,scramble59,monochrome photography,0.76910073
+2211,scramble,scramble59,monochrome,0.75374204
+2212,scramble,scramble59,pattern,0.72662157
+2213,scramble,scramble59,floor,0.72347075
+2214,scramble,scramble59,wood,0.6403175
+2215,scramble,scramble59,flooring,0.63052374
+2216,scramble,scramble59,design,0.59888232
+2217,scramble,scramble59,shape,0.58510232
+2218,scramble,scramble59,line,0.57976836
+2219,scramble,scramble59,circle,0.55243713
+2220,scramble,scramble59,symmetry,0.53322047
+2221,scramble,scramble60,black,0.94229978
+2222,scramble,scramble60,black and white,0.92946941
+2223,scramble,scramble60,texture,0.8952142
+2224,scramble,scramble60,wall,0.79380137
+2225,scramble,scramble60,monochrome photography,0.76928681
+2226,scramble,scramble60,monochrome,0.75863826
+2227,scramble,scramble60,pattern,0.70368493
+2228,scramble,scramble60,floor,0.69522184
+2229,scramble,scramble60,flooring,0.61219233
+2230,scramble,scramble60,design,0.58675039
+2231,scramble,scramble60,shape,0.58225566
+2232,scramble,scramble60,line,0.56736887
+2233,scramble,scramble60,circle,0.54152793
+2234,scramble,scramble60,drawing,0.51254618
