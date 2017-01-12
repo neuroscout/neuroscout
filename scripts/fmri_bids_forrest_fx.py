@@ -73,12 +73,44 @@ def validate_arguments(args):
     return (bids_dir, task, out_dir, subject, transformations, read_options)
 
 
-def get_events(bids_dir, subject_id):
+def get_events(bids_dir, subject_id, task_id):
     from bids.grabbids import BIDSLayout
-    layout = BIDSLayout(bids_dir)
-    return layout.get(
-        type='events', return_type='file', subject=subject_id)
+    from tempfile import NamedTemporaryFile
+    import pandas as pd
 
+    ### Hardcoded stuff
+    top_cats = ['clothing', 'face', 'property', 'product', 'black and white']
+    ref = pd.read_csv('/datasets/forrest/phase2/derivatives/featurex/all_object_googlevislabels.csv')
+
+    def lookup(row):
+        """ This function looks up the featurex feats in ref file, given a stim name """
+        confs = []
+        stim_name = row.stim_file.split('/')[2].split('.')[0]
+        for cat in top_cats:
+            res = ref[(ref.label == cat) & (ref.stimulus==stim_name)]
+            if res.shape[0] == 1:
+                conf = res.confidence.values[0]
+            else:
+                conf = 0
+            confs.append(conf)
+
+        return pd.Series(confs, index=top_cats)
+
+    layout = BIDSLayout(bids_dir)
+    event_files = layout.get(
+        type='events', return_type='file', subject=subject_id, task=task_id)
+
+    all_runs = []
+    for f in event_files:
+        df = pd.read_table(f)
+        new_events = pd.concat([df[['onset', 'duration']], df.apply(lookup, axis=1)], axis=1)
+        new_events = pd.melt(new_events, id_vars=['onset', 'duration'], var_name='trial_type', value_name='amplitude')
+
+        with NamedTemporaryFile(delete=False, mode='w') as tf:
+            all_runs.append(tf.name)
+            new_events.to_csv(tf.file, sep='\t')
+
+    return all_runs
 
 def create_contrasts(contrasts, condition):
     pass
@@ -102,21 +134,24 @@ def run_worflow(bids_dir, task, out_dir=None, subjects=None,
     ## Datasource
     datasource = Node(DataGrabber(infields=['subject_id', 'runs'],
                                          outfields=['func', 'mask']), name='datasource')
-    datasource.inputs.base_directory = os.path.join(bids_dir, 'derivatives/fmri_prep/derivatives/')
+    datasource.inputs.base_directory = bids_dir
     datasource.inputs.template = '*'
     datasource.inputs.sort_filelist = True
     datasource.inputs.field_template = dict(
-        func='sub-%s/func/sub-%s_task-' + task + '_%s_bold_space-MNI152NLin2009cAsym_preproc.nii.gz',
-        mask='sub-%s/func/sub-%s_task-' + task + '_%s_bold_space-MNI152NLin2009cAsym_brainmask.nii.gz')
-    datasource.inputs.template_args = dict(func=[['subject_id', 'subject_id', 'runs']], mask=[['subject_id', 'subject_id', 'runs']])
+        func='derivatives/studyforrest-data-aligned/sub-%s/in_bold3Tp2/sub-%s_task-%s_%s_bold.nii.gz',
+        mask='sub-%s/ses-localizer/func/sub-%s_ses-localizer_task-%s_%s_defacemask.nii.gz')
+    datasource.inputs.template_args = dict(func=[['subject_id', 'subject_id', 'task', 'runs']], 
+        mask=[['subject_id', 'subject_id', 'task', 'runs']],)
     datasource.inputs.runs = runs
+    datasource.inputs.task = task
 
     ## BIDS event tsv getter
     event_getter = Node(name='eventgetter', interface=Function(
-                           input_names=['bids_dir', 'subject_id'],
+                           input_names=['bids_dir', 'subject_id', 'task_id'],
                            output_names=["events"], function=get_events))
 
     event_getter.inputs.bids_dir = bids_dir
+    event_getter.inputs.task_id = task
 
     ## Event and model specs
     eventspec = Node(interface=events.SpecifyEvents(), name="eventspec")
@@ -139,11 +174,17 @@ def run_worflow(bids_dir, task, out_dir=None, subjects=None,
                 (infosource, event_getter, [('subject_id', 'subject_id')])])
 
     ## Model fitting
-    ## Temporary contrasts
-    conditions = ['congruent_correct', 'incongruent_correct']
-    contrasts = [['cong',   'T', conditions, [1, 0]],
-                 ['incong',   'T', conditions, [0, 1]],
-                 ['c > i', 'T', conditions, [1, -1]]]
+    conditions = ['clothing', 'face', 'property', 'product', 'black and white']
+    contrasts = [['clothing', 'T', conditions,      [1, 0, 0, 0, 0]],
+                 ['face', 'T', conditions,          [0, 1, 0, 0, 0]],
+                 ['property', 'T', conditions,      [0, 0, 1, 0, 0]],
+                 ['product', 'T', conditions,       [0, 0, 0, 1, 0]],
+                 ['bw', 'T', conditions,             [0, 0, 0, 0, 1]],
+                 ['faces vs all', 'T', conditions,  [-1, 4, -1, -1, -1]],
+                 ['faces vs prop', 'T', conditions, [0, 1, 0, -1, 0]],
+                 ['prop vs all', 'T', conditions,   [-1, -1, -1, -4, -1]],
+                 ['prop vs faces', 'T', conditions, [0, -1, 0, 1, 0]]]
+
 
     modelfit = create_modelfit_workflow()
 
@@ -159,7 +200,8 @@ def run_worflow(bids_dir, task, out_dir=None, subjects=None,
 
     ### Fixed effects
     fixed_fx = create_fixed_effects_flow()
-    wf.connect(datasource, ('mask', lambda x: x[0]), fixed_fx, 'flameo.mask_file')
+    pick_first = lambda x: x[0]
+    wf.connect(datasource, ('mask', pick_first), fixed_fx, 'flameo.mask_file')
 
     def sort_copes(copes, varcopes, contrasts):
         import numpy as np
