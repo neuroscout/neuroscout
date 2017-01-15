@@ -43,8 +43,9 @@ def group_onesample(bids_dir, model, num_copes,
                           outfields=['copes', 'varcopes']),
                           name='grabber')
 
+    datasource.inputs.base_directory = os.path.join(bids_dir, 'derivatives/{}'.format(model))
     dg.inputs.template = os.path.join(
-        bids_dir, 'derivatives/{}/%s/*/_flameo%s/%s1.nii.gz'.format(model))
+        bids_dir, '%s/*/_flameo%s/%s1.nii.gz'.format(model))
     dg.inputs.template_args['copes'] = [['copes', 'cope_id', 'cope']]
     dg.inputs.template_args['varcopes'] = [['varcopes', 'cope_id', 'varcope']]
     dg.iterables = ('cope_id', range(0, num_copes))
