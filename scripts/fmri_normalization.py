@@ -2,6 +2,9 @@ import os
 from nipype.pipeline.engine import Workflow, Node, MapNode
 from nipype.interfaces.io import DataGrabber, DataSink
 from nipype.interfaces import fsl
+from bids.grabbids import BIDSLayout
+from nipype.interfaces.utility import IdentityInterface
+
 """Create a FEAT preprocessing workflow
 Parameters
 ----------
@@ -17,32 +20,42 @@ Outputs::
 Example
 -------
 """
-
-### custom parameters
-sub = '01'
-target = fsl.Info.standard_image('MNI152_T1_2mm_brain.nii.gz')
 bids_dir = os.path.abspath('../../forrest')
 task = 'objectcategories'
 
+layout = BIDSLayout(bids_dir)
+### custom parameters
+subjects = layout.get_subjects(task=task)
+target = fsl.Info.standard_image('MNI152_T1_2mm_brain.nii.gz')
+
+
 register = Workflow(name='registration')
+## Infosource
+infosource = Node(IdentityInterface(fields=['subject_id']),
+                 name="infosource")
+infosource.iterables = ('subject_id', subjects)
 
 ## Datasource
 inputnode = Node(DataGrabber(infields=['subject_id'],
-                             outfields=['source_files', 'mean_image', 'anatomical_image']), name='datasource')
+                             outfields=['source_files', 'mean_image', 'anatomical_image', 'brain_mask']), name='datasource')
 inputnode.inputs.base_directory = bids_dir
 inputnode.inputs.template = '*'
+inputnode.inputs.sort_filelist = False
 inputnode.inputs.field_template = dict(
-    source_files='derivatives/studyforrest-data-aligned/sub-%s/in_bold3Tp2/sub-%s_task-%s_*_bold.nii.gz',
+    source_files='derivatives/studyforrest-data-aligned/sub-%s/in_bold3Tp2/sub-%s_task-%s_%s_bold.nii.gz',
     mean_image='derivatives/studyforrest-data-templatetransforms/sub-%s/bold3Tp2/brain.nii.gz',
-    anatomical_image='derivatives/studyforrest-data-templatetransforms/sub-%s/t1w/brain.nii.gz')
-inputnode.inputs.template_args = dict(func=[['subject_id', 'subject_id', 'task']],
-    mean_image=[['subject_id']], anatomical_image=[['subject_id']])
-inputnode.inputs.subject_id = sub
+    anatomical_image='derivatives/studyforrest-data-templatetransforms_struct/sub-%s/t1w/in_bold3Tp2/brain.nii.gz',
+    brain_mask='derivatives/studyforrest-data-templatetransforms/sub-%s/bold3Tp2/brain_mask.nii.gz')
+inputnode.inputs.template_args = dict(source_files=[['subject_id', 'subject_id', 'task', 'runs']],
+    mean_image=[['subject_id']], anatomical_image=[['subject_id']], brain_mask=[['subject_id']])
 inputnode.inputs.task = task
+inputnode.inputs.runs = layout.get_runs(task=task)
 
-"""
-Estimate the tissue classes from the anatomical image.
-"""
+register.connect(infosource,'subject_id', inputnode, 'subject_id')
+
+# """
+# Estimate the tissue classes from the anatomical image.
+# """
 
 ### Datasource here to read in brain anat files
 # fast = pe.Node(fsl.FAST(), name='fast')
@@ -93,7 +106,7 @@ anat2target_affine.inputs.searchr_z = [-180, 180]
 register.connect(inputnode, 'anatomical_image', anat2target_affine, 'in_file')
 # register.connect(inputnode, 'target_image_brain',
 #                  anat2target_affine, 'reference')
-anat2target_affine.reference = target
+anat2target_affine.inputs.reference = target
 
 
 """
@@ -108,8 +121,9 @@ register.connect(inputnode, 'anatomical_image',
                  anat2target_nonlinear, 'in_file')
 # register.connect(inputnode, 'config_file',
 #                  anat2target_nonlinear, 'config_file')
-register.connect(inputnode, 'target_image',
-                 anat2target_nonlinear, 'ref_file')
+# register.connect(inputnode, 'target_image',
+#                  anat2target_nonlinear, 'ref_file')
+anat2target_nonlinear.inputs.ref_file = target
 
 """
 Transform the mean image. To target
@@ -119,7 +133,7 @@ warpmean = Node(fsl.ApplyWarp(interp='spline'), name='warpmean')
 register.connect(inputnode, 'mean_image', warpmean, 'in_file')
 # register.connect(mean2anatbbr, 'out_matrix_file', warpmean, 'premat')
 # register.connect(inputnode, 'target_image', warpmean, 'ref_file')
-warpmean.input_node.ref_file = target
+warpmean.inputs.ref_file = target
 register.connect(anat2target_nonlinear, 'fieldcoeff_file',
                  warpmean, 'field_file')
 
@@ -133,21 +147,43 @@ warpall = MapNode(fsl.ApplyWarp(interp='spline'),
                      name='warpall')
 register.connect(inputnode, 'source_files', warpall, 'in_file')
 # register.connect(mean2anatbbr, 'out_matrix_file', warpall, 'premat')
-register.connect(inputnode, 'target_image', warpall, 'ref_file')
+# register.connect(inputnode, 'target_image', warpall, 'ref_file')
+warpall.inputs.ref_file = target
 register.connect(anat2target_nonlinear, 'fieldcoeff_file',
                  warpall, 'field_file')
+
+"""
+Transform brain mask
+"""
+warpmask = MapNode(fsl.ApplyWarp(interp='spline'),
+                     iterfield=['in_file'],
+                     nested=True,
+                     name='warpmask')
+register.connect(inputnode, 'brain_mask', warpmask, 'in_file')
+# register.connect(mean2anatbbr, 'out_matrix_file', warpall, 'premat')
+# register.connect(inputnode, 'target_image', warpall, 'ref_file')
+warpmask.inputs.ref_file = target
+register.connect(anat2target_nonlinear, 'fieldcoeff_file',
+                 warpmask, 'field_file')
+
+binarize = Node(fsl.ImageMaths(op_string='-nan -thr 0.9 -bin'),
+                   name='binarize')
+unlist = lambda x: x[0]
+register.connect(warpmask, ('out_file', unlist),
+                 binarize, 'in_file')
 
 """
 Assign all the output files to DataSink
 """
 ### Datasink
 outputnode = Node(DataSink(), name="datasink")
-outputnode.inputs.base_directory = os.path.join(bids_dir, 'derivatives')
-outputnode.inputs.container = 'registration'
+outputnode.inputs.base_directory = os.path.join(bids_dir, 'derivatives/registration')
+register.connect(warpmean, 'out_file', outputnode, 'mean')
+register.connect(warpall, 'out_file', outputnode, 'func')
+register.connect(binarize, 'out_file', outputnode, 'mask')
 
-register.connect(warpmean, 'out_file', outputnode, 'transformed_mean')
-register.connect(warpall, 'out_file', outputnode, 'transformed_files')
 # register.connect(mean2anatbbr, 'out_matrix_file',
 #                  outputnode, 'func2anat_transform')
 register.connect(anat2target_nonlinear, 'fieldcoeff_file',
                  outputnode, 'anat2target_transform')
+register.run(plugin='MultiProc', plugin_args={'n_procs' : 5})

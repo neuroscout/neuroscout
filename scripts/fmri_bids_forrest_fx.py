@@ -139,16 +139,17 @@ def run_worflow(bids_dir, task, out_dir=None, subjects=None,
     infosource.iterables = ('subject_id', subjects)
 
     ## Datasource
-    datasource = Node(DataGrabber(infields=['subject_id', 'runs'],
+    datasource = Node(DataGrabber(infields=['subject_id'],
                                          outfields=['func', 'mask']), name='datasource')
     datasource.inputs.base_directory = bids_dir
     datasource.inputs.template = '*'
     datasource.inputs.sort_filelist = True
     datasource.inputs.field_template = dict(
-        func='derivatives/studyforrest-data-aligned/sub-%s/in_bold3Tp2/sub-%s_task-%s_%s_bold.nii.gz',
-        mask='derivatives/studyforrest-data-templatetransforms/sub-%s/bold3Tp2/brain_mask.nii.gz')
-    datasource.inputs.template_args = dict(func=[['subject_id', 'subject_id', 'task', 'runs']],
-        mask=[['subject_id']])
+        func='derivatives/studyforrest-data-aligned/sub-01/in_bold3Tp2/sub-%s_task-%s_%s_bold.nii.gz',
+        mask='derivatives/studyforrest-data-templatetransforms/sub-%s/bold3Tp2/brain_mask.nii.gz',
+        field_file='derivatives/registration/anat2target_transform/_subject_id_%s/brain_fieldwarp.nii.gz')
+    datasource.inputs.template_args = dict(func=[['subject_id', 'task', 'runs']],
+        mask=[['subject_id']], field_files=[['subject_id']])
     datasource.inputs.runs = runs
     datasource.inputs.task = task
 
@@ -205,8 +206,8 @@ def run_worflow(bids_dir, task, out_dir=None, subjects=None,
 
     ### Fixed effects
     fixed_fx = create_fixed_effects_flow()
-    pick_first = lambda x: x[0]
-    wf.connect(datasource, ('mask', pick_first), fixed_fx, 'flameo.mask_file')
+    # pick_first = lambda x: x[0]
+    wf.connect(datasource, 'mask', fixed_fx, 'flameo.mask_file')
 
     def sort_copes(copes, varcopes, contrasts):
         import numpy as np
@@ -241,6 +242,56 @@ def run_worflow(bids_dir, task, out_dir=None, subjects=None,
                                       ])
                 ])
 
+    ### Apply normalization warp to copes, varcopes and zstats
+    def merge_files(copes, varcopes, zstats):
+            out_files = []
+            splits = []
+            out_files.extend(copes)
+            splits.append(len(copes))
+            out_files.extend(varcopes)
+            splits.append(len(varcopes))
+            out_files.extend(zstats)
+            splits.append(len(zstats))
+            return out_files, splits
+
+    mergefunc = pe.Node(niu.Function(input_names=['copes', 'varcopes',
+                                                  'zstats'],
+                                   output_names=['out_files', 'splits'],
+                                   function=merge_files),
+                      name='merge_files')
+
+    wf.connect([(fixed_fx.get_node('outputspec'), mergefunc,
+                                 [('copes', 'copes'),
+                                  ('varcopes', 'varcopes'),
+                                  ('zstats', 'zstats'),
+                                  ])])
+
+    warpall = MapNode(fsl.ApplyWarp(interp='spline'),
+                         iterfield=['in_file'],
+                         nested=True,
+                         name='warpall')
+    register.connect(mergefunc, 'out_files', warpall, 'in_file')
+    # register.connect(mean2anatbbr, 'out_matrix_file', warpall, 'premat')
+    # register.connect(inputnode, 'target_image', warpall, 'ref_file')
+    warpall.inputs.ref_file = fsl.Info.standard_image('MNI152_T1_2mm_brain.nii.gz')
+    register.connect(datasource, 'field_file',
+                     warpall, 'field_file')
+
+    def split_files(in_files, splits):
+        copes = in_files[:splits[0]]
+        varcopes = in_files[splits[0]:(splits[0] + splits[1])]
+        zstats = in_files[(splits[0] + splits[1]):]
+        return copes, varcopes, zstats
+
+    splitfunc = pe.Node(niu.Function(input_names=['in_files', 'splits'],
+                                     output_names=['copes', 'varcopes',
+                                                   'zstats'],
+                                     function=split_files),
+                      name='split_files')
+    wf.connect(mergefunc, 'splits', splitfunc, 'splits')
+    wf.connect(warpall, 'out_file',
+               splitfunc, 'in_files')
+
     ### Datasink
     datasink = Node(DataSink(), name="datasink")
     datasink.inputs.base_directory = os.path.join(bids_dir, 'derivatives')
@@ -259,6 +310,12 @@ def run_worflow(bids_dir, task, out_dir=None, subjects=None,
                   ('zstats', 'ls'),
                   ('tstats', 'tstats')])
                 ])
+
+    wf.connect([(splitfunc, datasink,
+                 [('copes', 'copes.mni'),
+                  ('varcopes', 'varcopes.mni'),
+                  ('zstats', 'zstats.mni'),
+                  ])])
 
     if jobs == 1:
         wf.run()
