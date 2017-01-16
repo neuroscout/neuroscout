@@ -5,10 +5,14 @@ Usage: fmri_bids [options] <bids_dir> <task>
                         Defaults to simple contrasts for each predictor.
 -t <transformations>    Transformation to apply to events.
 -r <read_options>       Options to pass to BIDS events reader.
--s <subject_id>         Subjects to analyze. Otherwise run all. 
--o <output>             Output folder. 
-                        Defaults to <bids_dir>/derivatives/fmri_bids
+-s <subject_id>         Subjects to analyze. [default: all]
+-o <output>             Output folder.
+                        [default: <bids_dir>/derivatives/fmri_bids]
+--jobs=<n>              Number of parallel jobs [default: 1].
 """
+from nipype import config
+config.enable_debug_mode()
+
 from docopt import docopt
 
 from nipype.pipeline.engine import Workflow, Node
@@ -27,7 +31,8 @@ from bids.grabbids import BIDSLayout
 
 def validate_arguments(args):
     """ Validate and preload command line arguments """
-    bids_dir = args['<bids_dir>']
+
+    bids_dir = os.path.abspath(args['<bids_dir>'])
 
     layout = BIDSLayout(bids_dir)
 
@@ -44,7 +49,7 @@ def validate_arguments(args):
     subject = args['-s'].split(" ")
     ## Assign subject ids
     all_subjects = layout.get_subjects()
-    if subject is None:
+    if subject == 'all':
         subject = all_subjects
     else:
         for s in subject:
@@ -52,8 +57,8 @@ def validate_arguments(args):
                 raise Exception("Invalid subject id {}.".format(s))
 
     out_dir = args['-o']
-    if out_dir is None:
-        out_dir = os.path.join(bids_dir, 'derivatives/fmri_prep/derivatives/')
+    if out_dir == '<bids_dir>/derivatives/fmri_bids':
+        out_dir = os.path.join(bids_dir, 'derivatives/fmri_bids')
     else:
         if not os.path.exists(out_dir):
             os.makedirs(out_dir)
@@ -70,7 +75,9 @@ def validate_arguments(args):
     ## Add options checker here
     read_options = None
 
-    return (bids_dir, task, out_dir, subject, transformations, read_options)
+    jobs = int(args['--jobs'])
+
+    return (bids_dir, task, out_dir, subject, transformations, read_options, jobs)
 
 
 def get_events(bids_dir, subject_id, task_id):
@@ -79,15 +86,14 @@ def get_events(bids_dir, subject_id, task_id):
     import pandas as pd
 
     ### Hardcoded stuff
-    top_cats = ['clothing', 'face', 'property', 'product', 'black and white']
-    ref = pd.read_csv('/datasets/forrest/phase2/derivatives/featurex/all_object_googlevislabels.csv')
+    top_cats = ['clothing', 'face', 'property', 'product']
+    ref = pd.read_csv('/mnt/c/Users/aid338/Documents/neuroscout_scripts/forrest_extract_results/visionapi_labels_objectcategories.csv')
 
     def lookup(row):
         """ This function looks up the featurex feats in ref file, given a stim name """
         confs = []
-        stim_name = row.stim_file.split('/')[2].split('.')[0]
         for cat in top_cats:
-            res = ref[(ref.label == cat) & (ref.stimulus==stim_name)]
+            res = ref[(ref.label == cat) & (ref.stimulus==row.stim_file)]
             if res.shape[0] == 1:
                 conf = res.confidence.values[0]
             else:
@@ -108,23 +114,24 @@ def get_events(bids_dir, subject_id, task_id):
 
         with NamedTemporaryFile(delete=False, mode='w') as tf:
             all_runs.append(tf.name)
-            new_events.to_csv(tf.file, sep='\t')
+            new_events.to_csv(tf.file, sep=str('\t'), index=False)
 
     return all_runs
-
-def create_contrasts(contrasts, condition):
-    pass
+#
+# def create_contrasts(contrasts, condition):
+#     pass
 
 
 def run_worflow(bids_dir, task, out_dir=None, subjects=None,
-                transformations=None, read_options=None):
+                transformations=None, read_options=None, jobs=1):
+
     layout = BIDSLayout(bids_dir)
-    runs = layout.get_runs()
+    runs = layout.get_runs(task=task)
     TR = json.load(open(os.path.join(bids_dir, 'task-' + task + '_bold.json'), 'r'))['RepetitionTime']
 
     ## Meta-workflow
     wf = Workflow(name='fmri_bids')
-    wf.base_dir = os.path.join(bids_dir, 'derivatives/fmri_bids')
+    wf.base_dir = os.path.join(bids_dir, 'derivatives/fmri_first_wd')
 
     ## Infosource
     infosource = Node(IdentityInterface(fields=['subject_id']),
@@ -139,9 +146,9 @@ def run_worflow(bids_dir, task, out_dir=None, subjects=None,
     datasource.inputs.sort_filelist = True
     datasource.inputs.field_template = dict(
         func='derivatives/studyforrest-data-aligned/sub-%s/in_bold3Tp2/sub-%s_task-%s_%s_bold.nii.gz',
-        mask='sub-%s/ses-localizer/func/sub-%s_ses-localizer_task-%s_%s_defacemask.nii.gz')
-    datasource.inputs.template_args = dict(func=[['subject_id', 'subject_id', 'task', 'runs']], 
-        mask=[['subject_id', 'subject_id', 'task', 'runs']],)
+        mask='derivatives/studyforrest-data-templatetransforms/sub-%s/bold3Tp2/brain_mask.nii.gz')
+    datasource.inputs.template_args = dict(func=[['subject_id', 'subject_id', 'task', 'runs']],
+        mask=[['subject_id']])
     datasource.inputs.runs = runs
     datasource.inputs.task = task
 
@@ -166,7 +173,7 @@ def run_worflow(bids_dir, task, out_dir=None, subjects=None,
 
     modelspec.inputs.input_units = 'secs'
     modelspec.inputs.time_repetition = TR
-    modelspec.inputs.high_pass_filter_cutoff = 128.
+    modelspec.inputs.high_pass_filter_cutoff = 100.
 
     wf.connect(datasource, 'func', modelspec, 'functional_runs')
     wf.connect(eventspec, 'subject_info', modelspec, 'subject_info')
@@ -174,16 +181,15 @@ def run_worflow(bids_dir, task, out_dir=None, subjects=None,
                 (infosource, event_getter, [('subject_id', 'subject_id')])])
 
     ## Model fitting
-    conditions = ['clothing', 'face', 'property', 'product', 'black and white']
-    contrasts = [['clothing', 'T', conditions,      [1, 0, 0, 0, 0]],
-                 ['face', 'T', conditions,          [0, 1, 0, 0, 0]],
-                 ['property', 'T', conditions,      [0, 0, 1, 0, 0]],
-                 ['product', 'T', conditions,       [0, 0, 0, 1, 0]],
-                 ['bw', 'T', conditions,             [0, 0, 0, 0, 1]],
-                 ['faces vs all', 'T', conditions,  [-1, 4, -1, -1, -1]],
-                 ['faces vs prop', 'T', conditions, [0, 1, 0, -1, 0]],
-                 ['prop vs all', 'T', conditions,   [-1, -1, -1, -4, -1]],
-                 ['prop vs faces', 'T', conditions, [0, -1, 0, 1, 0]]]
+    conditions = ['clothing', 'face', 'property', 'product']
+    contrasts = [['clothing', 'T', conditions,      [1, 0, 0, 0]],
+                 ['face', 'T', conditions,          [0, 1, 0, 0]],
+                 ['property', 'T', conditions,      [0, 0, 1, 0]],
+                 ['product', 'T', conditions,       [0, 0, 0, 1]],
+                 ['faces vs all', 'T', conditions,  [-1, 3, -1, -1]],
+                 ['faces vs prop', 'T', conditions, [0, 1, 0, -1]],
+                 ['prop vs all', 'T', conditions,   [-1, -1, -1, -3]],
+                 ['prop vs faces', 'T', conditions, [0, -1, 0, 1]]]
 
 
     modelfit = create_modelfit_workflow()
@@ -191,8 +197,7 @@ def run_worflow(bids_dir, task, out_dir=None, subjects=None,
     modelfit.inputs.inputspec.contrasts = contrasts
     modelfit.inputs.inputspec.interscan_interval = TR
     modelfit.inputs.inputspec.model_serial_correlations = True
-    modelfit.inputs.inputspec.film_threshold = 1000
-    modelfit.inputs.inputspec.bases = {'dgamma': {'derivs': False}}
+    modelfit.inputs.inputspec.bases = {'dgamma': {'derivs': True}}
 
     wf.connect(modelspec, 'session_info', modelfit, 'inputspec.session_info')
     wf.connect(datasource, 'func', modelfit, 'inputspec.functional_data')
@@ -239,7 +244,7 @@ def run_worflow(bids_dir, task, out_dir=None, subjects=None,
     ### Datasink
     datasink = Node(DataSink(), name="datasink")
     datasink.inputs.base_directory = os.path.join(bids_dir, 'derivatives')
-    datasink.inputs.container = 'test_transform'
+    datasink.inputs.container = 'fmri_firstlevel'
 
     wf.connect([(modelfit.get_node('modelgen'), datasink,
                  [('design_cov', 'qa.model'),
@@ -255,7 +260,11 @@ def run_worflow(bids_dir, task, out_dir=None, subjects=None,
                   ('tstats', 'tstats')])
                 ])
 
-    wf.run()
+    if jobs == 1:
+        wf.run()
+    else:
+        print("Running {} processes".format(jobs))
+        wf.run(plugin='MultiProc', plugin_args={'n_procs' : jobs})
 
 if __name__ == '__main__':
     arguments = docopt(__doc__)
