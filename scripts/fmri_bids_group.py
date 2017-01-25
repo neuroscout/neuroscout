@@ -17,7 +17,6 @@ from nipype.interfaces.fsl import (L2Model, Merge, FLAMEO,
                                    SmoothEstimate, Cluster, ImageMaths)
 import nipype.interfaces.fsl as fsl
 from nipype.interfaces.fsl.maths import BinaryMaths
-from nipype import config
 from glob import glob
 import re
 
@@ -33,7 +32,7 @@ def group_onesample(firstlv_dir, work_dir=None,
 
     dg = Node(DataGrabber(infields=['cope_id'],
                           outfields=['copes', 'varcopes']),
-                          name='grabber')
+              name='grabber')
 
     dg.inputs.base_directory = firstlv_dir
     dg.inputs.template = '*/%s/mni/%s%s.nii.gz'
@@ -119,26 +118,28 @@ def group_onesample(firstlv_dir, work_dir=None,
 
     return wf
 
+
 def validate_arguments(args):
     """ Validate and preload command line arguments """
 
     # Clean up names
-    var_names = {'<firstlv_dir>' : 'firstlv_dir',
-                 '<output>' : 'out_dir',
-                 '-w' : 'work_dir'}
+    var_names = {'<firstlv_dir>': 'firstlv_dir',
+                 '<output>': 'out_dir',
+                 '-w': 'work_dir'}
 
     for old, new in var_names.iteritems():
         args[new] = args.pop(old)
 
     for directory in ['out_dir', 'work_dir']:
         if args[directory] is not None:
-            args[directory]  = os.path.abspath(args[directory])
+            args[directory] = os.path.abspath(args[directory])
             if not os.path.exists(args[directory]):
                 os.makedirs(args[directory])
 
     args['--jobs'] = int(args['--jobs'])
 
     return args
+
 
 if __name__ == '__main__':
     arguments = validate_arguments(docopt(__doc__))
@@ -148,4 +149,4 @@ if __name__ == '__main__':
     wf = group_onesample(**arguments)
 
     if run:
-        wf.run(plugin='MultiProc', plugin_args={'n_procs' : jobs})
+        wf.run(plugin='MultiProc', plugin_args={'n_procs': jobs})
