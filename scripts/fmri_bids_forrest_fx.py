@@ -1,167 +1,156 @@
 """"
-Usage: fmri_bids [options] <bids_dir> <task>
+Usage:
+    fmri_bids_first run [options] <bids_dir> <task> <in_dir> <out_dir>
+    fmri_bids_first make [options] <bids_dir> <task> [<in_dir> <out_dir>]
 
--m <bids_model>         JSON specification of model and contrasts.
-                        Defaults to simple contrasts for each predictor.
 -t <transformations>    Transformation to apply to events.
--r <read_options>       Options to pass to BIDS events reader.
 -s <subject_id>         Subjects to analyze. [default: all]
--o <output>             Output folder.
-                        [default: <bids_dir>/derivatives/fmri_bids]
+-r <run_ids>            Runs to analyze. [default: all]
+-f <fwhm>               Smoothing kernel file to use. [default: 5]
+-w <work_dir>           Working directory.
+                        [default: /tmp]
 --jobs=<n>              Number of parallel jobs [default: 1].
 """
-from nipype import config
-config.enable_debug_mode()
-
 from docopt import docopt
 
-from nipype.pipeline.engine import Workflow, Node
+from nipype.pipeline.engine import Workflow, Node, MapNode
 import nipype.algorithms.modelgen as model
 import nipype.algorithms.events as events
 from nipype.interfaces.io import DataGrabber, DataSink
+from nipype.interfaces import fsl
 
 from nipype.interfaces.utility import Function, IdentityInterface
 from nipype.workflows.fmri.fsl import (create_modelfit_workflow,
                                        create_fixed_effects_flow)
+
 import json
 import os
-
 from bids.grabbids import BIDSLayout
 
 
-def validate_arguments(args):
-    """ Validate and preload command line arguments """
-
-    bids_dir = os.path.abspath(args['<bids_dir>'])
-
-    layout = BIDSLayout(bids_dir)
-
-    ### Check data ###
-    if 'bold' not in layout.get_types():
-        raise Exception("BIDS project does not contain"
-                        " preprocessed BOLD data.")
-
-    task = args['<task>']
-    ## Check that task exists
-    if task not in layout.get_tasks():
-        raise Exception("Task {} not found in BIDS project".format(task))
-
-    subject = args['-s'].split(" ")
-    ## Assign subject ids
-    all_subjects = layout.get_subjects()
-    if subject == 'all':
-        subject = all_subjects
-    else:
-        for s in subject:
-            if s not in all_subjects:
-                raise Exception("Invalid subject id {}.".format(s))
-
-    out_dir = args['-o']
-    if out_dir == '<bids_dir>/derivatives/fmri_bids':
-        out_dir = os.path.join(bids_dir, 'derivatives/fmri_bids')
-    else:
-        if not os.path.exists(out_dir):
-            os.makedirs(out_dir)
-
-    transformations = args['-t']
-    if transformations is not None:
-        try:
-            t = json.load(open(transformations, 'r'))
-        except ValueError:
-            raise Exception("Invalid transformation JSON file")
-        except IOError:
-            raise Exception("Transformation file not found")
-
-    ## Add options checker here
-    read_options = None
-
-    jobs = int(args['--jobs'])
-
-    return (bids_dir, task, out_dir, subject, transformations, read_options, jobs)
-
-
 def get_events(bids_dir, subject_id, task_id):
+    """ Get a single subjects event files """
     from bids.grabbids import BIDSLayout
-    from tempfile import NamedTemporaryFile
-    import pandas as pd
-
-    ### Hardcoded stuff
-    top_cats = ['clothing', 'face', 'property', 'product']
-    ref = pd.read_csv('/mnt/c/Users/aid338/Documents/neuroscout_scripts/forrest_extract_results/visionapi_labels_objectcategories.csv')
-
-    def lookup(row):
-        """ This function looks up the featurex feats in ref file, given a stim name """
-        confs = []
-        for cat in top_cats:
-            res = ref[(ref.label == cat) & (ref.stimulus==row.stim_file)]
-            if res.shape[0] == 1:
-                conf = res.confidence.values[0]
-            else:
-                conf = 0
-            confs.append(conf)
-
-        return pd.Series(confs, index=top_cats)
-
     layout = BIDSLayout(bids_dir)
     event_files = layout.get(
         type='events', return_type='file', subject=subject_id, task=task_id)
-
-    all_runs = []
-    for f in event_files:
-        df = pd.read_table(f)
-        new_events = pd.concat([df[['onset', 'duration']], df.apply(lookup, axis=1)], axis=1)
-        new_events = pd.melt(new_events, id_vars=['onset', 'duration'], var_name='trial_type', value_name='amplitude')
-
-        with NamedTemporaryFile(delete=False, mode='w') as tf:
-            all_runs.append(tf.name)
-            new_events.to_csv(tf.file, sep=str('\t'), index=False)
-
-    return all_runs
-#
-# def create_contrasts(contrasts, condition):
-#     pass
+    return event_files
 
 
-def run_worflow(bids_dir, task, out_dir=None, subjects=None,
-                transformations=None, read_options=None, jobs=1):
+def get_features(event_files):
+    """ Inject extracted features into event files """
+    import pandas as pd
+    from glob import glob
+    from functools import partial
+    from os import path
 
-    layout = BIDSLayout(bids_dir)
-    runs = layout.get_runs(task=task)
-    TR = json.load(open(os.path.join(bids_dir, 'task-' + task + '_bold.json'), 'r'))['RepetitionTime']
+    event_files = sorted(event_files)
+    features = sorted(glob(
+        '/mnt/c/Users/aid338/Documents/neuroscout_scripts/forrest_extract_results/clip*'))
 
-    ## Meta-workflow
-    wf = Workflow(name='fmri_bids')
-    wf.base_dir = os.path.join(bids_dir, 'derivatives/fmri_first_wd')
+    def setmaxConfidence(confidence_cols, row):
+        maxcol = row[confidence_cols].idxmax()
+        if pd.notnull(maxcol):
+            val = row[maxcol]
+        else:
+            val = 0
+        return val
 
-    ## Infosource
+    new_event_files = []
+    for i, run_file in enumerate(event_files):
+        run_events = pd.read_table(run_file)
+        clip_start = run_events.iloc[0].onset
+
+        run_features = pd.read_csv(features[i])
+        confidence_cols = [c for c in run_features.columns if c.endswith(
+            'face_detectionConfidence')]
+        apply_func = partial(setmaxConfidence, confidence_cols)
+        run_features['maxfaceConfidence'] = run_features.apply(apply_func, axis=1)
+        run_features['onset'] = run_features['onset'] + clip_start
+        run_features = run_features[['onset', 'duration', 'maxfaceConfidence']]
+        run_features = pd.melt(run_features, id_vars=['onset', 'duration'],
+                               value_name='amplitude', var_name='trial_type')
+
+        # Save to curr dir, but give abs path
+        base_file = path.splitext(path.basename(run_file))
+        new_file = path.abspath('{}_fx{}'.format(*base_file))
+        new_event_files.append(new_file)
+        run_features.to_csv(new_file, sep=str('\t'), index=False)
+
+    return new_event_files
+
+
+def first_level(bids_dir, task, in_dir, subjects, runs, out_dir=None, work_dir=None,
+                transformations=None, read_options=None, fwhm=5):
+    """
+    Set up workflow
+    """
+    wf = Workflow(name='first_level')
+    if work_dir:
+        wf.base_dir = work_dir
+    """
+    Define conditions and contrasts
+    (this should be auto-generated or loaded from model json in the future)
+    """
+
+    conditions = ['maxfaceConfidence']
+    contrasts = [['maxfaceConfidence', 'T', conditions, [1]]]
+
+    TR = json.load(open(os.path.join(
+        bids_dir, 'task-' + task + '_bold.json'), 'r'))['RepetitionTime']
+    """
+    Subject iterator
+    """
     infosource = Node(IdentityInterface(fields=['subject_id']),
-                     name="infosource")
+                      name="infosource")
     infosource.iterables = ('subject_id', subjects)
 
-    ## Datasource
+    """
+    Grab data for each subject
+    """
+
     datasource = Node(DataGrabber(infields=['subject_id'],
-                                         outfields=['func', 'mask']), name='datasource')
-    datasource.inputs.base_directory = bids_dir
+                                  outfields=['smooth_func', 'mask', 'field_file']),
+                      name='datasource')
+    datasource.inputs.base_directory = in_dir
     datasource.inputs.template = '*'
     datasource.inputs.sort_filelist = True
     datasource.inputs.field_template = dict(
-        func='derivatives/studyforrest-data-aligned/sub-01/in_bold3Tp2/sub-%s_task-%s_%s_bold.nii.gz',
-        mask='derivatives/studyforrest-data-templatetransforms/sub-%s/bold3Tp2/brain_mask.nii.gz',
-        field_file='derivatives/registration/anat2target_transform/_subject_id_%s/brain_fieldwarp.nii.gz')
-    datasource.inputs.template_args = dict(func=[['subject_id', 'task', 'runs']],
-        mask=[['subject_id']], field_files=[['subject_id']])
+        smooth_func='smooth_func/%s/smooth_func/sub-%s_task-%s_%s_bold_smooth_mask.nii.gz',
+        mask='templatetransforms/sub-%s/bold3Tp2/brain_mask.nii.gz',
+        field_file='registration/anat2target_transform/%s/brain_fieldwarp.nii.gz')
+    datasource.inputs.template_args = dict(
+        smooth_func=[['fwhm', 'subject_id', 'task', 'runs']],
+        mask=[['subject_id']], field_file=[['subject_id']])
     datasource.inputs.runs = runs
     datasource.inputs.task = task
+    datasource.inputs.fwhm = fwhm
 
-    ## BIDS event tsv getter
-    event_getter = Node(name='eventgetter', interface=Function(
-                           input_names=['bids_dir', 'subject_id', 'task_id'],
-                           output_names=["events"], function=get_events))
+    """
+    Get events.tsv file for each subject
+    """
+
+    event_getter = Node(name='event_getter', interface=Function(
+        input_names=['bids_dir', 'subject_id', 'task_id'],
+        output_names=["events"], function=get_events))
 
     event_getter.inputs.bids_dir = bids_dir
     event_getter.inputs.task_id = task
+    wf.connect(infosource, 'subject_id', event_getter, 'subject_id')
 
-    ## Event and model specs
+    """
+    Add pliers features
+    """
+
+    fx_getter = Node(name='fx_getter', interface=Function(
+        input_names=['event_files'],
+        output_names=["transformed_events"], function=get_features))
+    wf.connect(event_getter, 'events', fx_getter, 'event_files')
+
+    """
+    Specify model, apply transformations and specify fMRI model
+    """
+
     eventspec = Node(interface=events.SpecifyEvents(), name="eventspec")
     modelspec = Node(interface=model.SpecifyModel(), name="modelspec")
 
@@ -170,28 +159,18 @@ def run_worflow(bids_dir, task, out_dir=None, subjects=None,
     if transformations is not None:
         eventspec.inputs.transformations = transformations
 
-    wf.connect(event_getter, 'events', eventspec, 'bids_events')
-
     modelspec.inputs.input_units = 'secs'
     modelspec.inputs.time_repetition = TR
     modelspec.inputs.high_pass_filter_cutoff = 100.
 
-    wf.connect(datasource, 'func', modelspec, 'functional_runs')
-    wf.connect(eventspec, 'subject_info', modelspec, 'subject_info')
     wf.connect([(infosource, datasource, [('subject_id', 'subject_id')]),
-                (infosource, event_getter, [('subject_id', 'subject_id')])])
+                (datasource, modelspec, [('smooth_func', 'functional_runs')]),
+                (eventspec, modelspec, [('subject_info', 'subject_info')]),
+                (fx_getter, eventspec, [('transformed_events', 'bids_events')])])
 
-    ## Model fitting
-    conditions = ['clothing', 'face', 'property', 'product']
-    contrasts = [['clothing', 'T', conditions,      [1, 0, 0, 0]],
-                 ['face', 'T', conditions,          [0, 1, 0, 0]],
-                 ['property', 'T', conditions,      [0, 0, 1, 0]],
-                 ['product', 'T', conditions,       [0, 0, 0, 1]],
-                 ['faces vs all', 'T', conditions,  [-1, 3, -1, -1]],
-                 ['faces vs prop', 'T', conditions, [0, 1, 0, -1]],
-                 ['prop vs all', 'T', conditions,   [-1, -1, -1, -3]],
-                 ['prop vs faces', 'T', conditions, [0, -1, 0, 1]]]
-
+    """
+    Fit model to each run
+    """
 
     modelfit = create_modelfit_workflow()
 
@@ -201,12 +180,13 @@ def run_worflow(bids_dir, task, out_dir=None, subjects=None,
     modelfit.inputs.inputspec.bases = {'dgamma': {'derivs': True}}
 
     wf.connect(modelspec, 'session_info', modelfit, 'inputspec.session_info')
-    wf.connect(datasource, 'func', modelfit, 'inputspec.functional_data')
+    wf.connect(datasource, 'smooth_func', modelfit, 'inputspec.functional_data')
 
+    """
+    Fixed effects workflow to combine runs
+    """
 
-    ### Fixed effects
     fixed_fx = create_fixed_effects_flow()
-    # pick_first = lambda x: x[0]
     wf.connect(datasource, 'mask', fixed_fx, 'flameo.mask_file')
 
     def sort_copes(copes, varcopes, contrasts):
@@ -225,11 +205,11 @@ def run_worflow(bids_dir, task, out_dir=None, subjects=None,
         return outcopes, outvarcopes, n_runs
 
     cope_sorter = Node(Function(input_names=['copes', 'varcopes',
-                                                    'contrasts'],
-                                       output_names=['copes', 'varcopes',
-                                                     'n_runs'],
-                                       function=sort_copes),
-                          name='cope_sorter')
+                                             'contrasts'],
+                                output_names=['copes', 'varcopes',
+                                              'n_runs'],
+                                function=sort_copes),
+                       name='cope_sorter')
     cope_sorter.inputs.contrasts = contrasts
 
     wf.connect([(modelfit, cope_sorter, [('outputspec.copes', 'copes')]),
@@ -242,40 +222,42 @@ def run_worflow(bids_dir, task, out_dir=None, subjects=None,
                                       ])
                 ])
 
-    ### Apply normalization warp to copes, varcopes and zstats
-    def merge_files(copes, varcopes, zstats):
-            out_files = []
-            splits = []
-            out_files.extend(copes)
-            splits.append(len(copes))
-            out_files.extend(varcopes)
-            splits.append(len(varcopes))
-            out_files.extend(zstats)
-            splits.append(len(zstats))
-            return out_files, splits
+    """
+    Apply normalization warp (to MNI) to copes, varcopes, and tstats
+    """
 
-    mergefunc = pe.Node(niu.Function(input_names=['copes', 'varcopes',
-                                                  'zstats'],
-                                   output_names=['out_files', 'splits'],
-                                   function=merge_files),
-                      name='merge_files')
+    def merge_files(copes, varcopes, zstats):
+        out_files = []
+        splits = []
+        out_files.extend(copes)
+        splits.append(len(copes))
+        out_files.extend(varcopes)
+        splits.append(len(varcopes))
+        out_files.extend(zstats)
+        splits.append(len(zstats))
+        return out_files, splits
+
+    mergefunc = Node(Function(input_names=['copes', 'varcopes',
+                                           'zstats'],
+                              output_names=['out_files', 'splits'],
+                              function=merge_files),
+                     name='merge_files')
 
     wf.connect([(fixed_fx.get_node('outputspec'), mergefunc,
-                                 [('copes', 'copes'),
-                                  ('varcopes', 'varcopes'),
-                                  ('zstats', 'zstats'),
-                                  ])])
+                 [('copes', 'copes'),
+                  ('varcopes', 'varcopes'),
+                  ('zstats', 'zstats'),
+                  ])])
 
     warpall = MapNode(fsl.ApplyWarp(interp='spline'),
-                         iterfield=['in_file'],
-                         nested=True,
-                         name='warpall')
-    register.connect(mergefunc, 'out_files', warpall, 'in_file')
-    # register.connect(mean2anatbbr, 'out_matrix_file', warpall, 'premat')
-    # register.connect(inputnode, 'target_image', warpall, 'ref_file')
+                      iterfield=['in_file'],
+                      nested=True,
+                      name='warpall')
+    wf.connect(mergefunc, 'out_files', warpall, 'in_file')
+
     warpall.inputs.ref_file = fsl.Info.standard_image('MNI152_T1_2mm_brain.nii.gz')
-    register.connect(datasource, 'field_file',
-                     warpall, 'field_file')
+    wf.connect(datasource, 'field_file',
+               warpall, 'field_file')
 
     def split_files(in_files, splits):
         copes = in_files[:splits[0]]
@@ -283,19 +265,56 @@ def run_worflow(bids_dir, task, out_dir=None, subjects=None,
         zstats = in_files[(splits[0] + splits[1]):]
         return copes, varcopes, zstats
 
-    splitfunc = pe.Node(niu.Function(input_names=['in_files', 'splits'],
-                                     output_names=['copes', 'varcopes',
-                                                   'zstats'],
-                                     function=split_files),
-                      name='split_files')
+    splitfunc = Node(Function(input_names=['in_files', 'splits'],
+                              output_names=['copes', 'varcopes',
+                                            'zstats'],
+                              function=split_files),
+                     name='split_files')
     wf.connect(mergefunc, 'splits', splitfunc, 'splits')
     wf.connect(warpall, 'out_file',
                splitfunc, 'in_files')
 
-    ### Datasink
+    """
+    Save to datasink
+    """
+
+    def get_subs(subject_id, conds):
+        """ Generate substitutions """
+        subs = [('_subject_id_%s' % subject_id, '')]
+
+        for i in range(len(conds)):
+            subs.append(('_flameo%d/cope1.' % i, 'cope%02d.' % (i + 1)))
+            subs.append(('_flameo%d/varcope1.' % i, 'varcope%02d.' % (i + 1)))
+            subs.append(('_flameo%d/zstat1.' % i, 'zstat%02d.' % (i + 1)))
+            subs.append(('_flameo%d/tstat1.' % i, 'tstat%02d.' % (i + 1)))
+            subs.append(('_flameo%d/res4d.' % i, 'res4d%02d.' % (i + 1)))
+            subs.append(('_warpall%d/cope1_warp.' % i,
+                         'cope%02d.' % (i + 1)))
+            subs.append(('_warpall%d/varcope1_warp.' % (len(conds) + i),
+                         'varcope%02d.' % (i + 1)))
+            subs.append(('_warpall%d/zstat1_warp.' % (2 * len(conds) + i),
+                         'zstat%02d.' % (i + 1)))
+            subs.append(('_warpall%d/cope1_trans.' % i,
+                         'cope%02d.' % (i + 1)))
+            subs.append(('_warpall%d/varcope1_trans.' % (len(conds) + i),
+                         'varcope%02d.' % (i + 1)))
+            subs.append(('_warpall%d/zstat1_trans.' % (2 * len(conds) + i),
+                         'zstat%02d.' % (i + 1)))
+        return subs
+
+    subsgen = Node(Function(input_names=['subject_id', 'conds'],
+                            output_names=['substitutions'],
+                            function=get_subs),
+                   name='subsgen')
+
     datasink = Node(DataSink(), name="datasink")
-    datasink.inputs.base_directory = os.path.join(bids_dir, 'derivatives')
-    datasink.inputs.container = 'fmri_firstlevel'
+    if out_dir is not None:
+        datasink.inputs.base_directory = os.path.abspath(out_dir)
+
+    wf.connect(infosource, 'subject_id', datasink, 'container')
+    wf.connect(infosource, 'subject_id', subsgen, 'subject_id')
+    wf.connect(subsgen, 'substitutions', datasink, 'substitutions')
+    subsgen.inputs.conds = contrasts
 
     wf.connect([(modelfit.get_node('modelgen'), datasink,
                  [('design_cov', 'qa.model'),
@@ -307,7 +326,7 @@ def run_worflow(bids_dir, task, out_dir=None, subjects=None,
                  [('res4d', 'res4d'),
                   ('copes', 'copes'),
                   ('varcopes', 'varcopes'),
-                  ('zstats', 'ls'),
+                  ('zstats', 'zstats'),
                   ('tstats', 'tstats')])
                 ])
 
@@ -317,12 +336,78 @@ def run_worflow(bids_dir, task, out_dir=None, subjects=None,
                   ('zstats', 'zstats.mni'),
                   ])])
 
-    if jobs == 1:
-        wf.run()
-    else:
-        print("Running {} processes".format(jobs))
-        wf.run(plugin='MultiProc', plugin_args={'n_procs' : jobs})
+    return wf
+
+
+def validate_arguments(args):
+    """ Validate and preload command line arguments """
+
+    # Clean up names
+    var_names = {'<bids_dir>': 'bids_dir',
+                 '<task>': 'task',
+                 '<out_dir>': 'out_dir',
+                 '-w': 'work_dir',
+                 '-s': 'subjects',
+                 '-r': 'runs',
+                 '-t': 'transformations',
+                 '-f': 'fwhm'}
+
+    for old, new in var_names.iteritems():
+        args[new] = args.pop(old)
+
+    for directory in ['out_dir', 'work_dir']:
+        if args[directory] is not None:
+            args[directory] = os.path.abspath(args[directory])
+            if not os.path.exists(args[directory]):
+                os.makedirs(args[directory])
+
+    args['bids_dir'] = os.path.abspath(args['bids_dir'])
+    layout = BIDSLayout(args['bids_dir'])
+
+    # Check BOLD data
+    if 'bold' not in layout.get_types():
+        raise Exception("BIDS project does not contain"
+                        " preprocessed BOLD data.")
+
+    # Check that task exists
+    if args['task'] not in layout.get_tasks():
+        raise Exception("Task not found in BIDS project")
+
+    # Check subject ids and runs
+    for entity in ['subjects', 'runs']:
+        all_ents = layout.get(
+            target=entity[:-1], return_type='id', task='movie')
+
+        if args[entity] == 'all':
+            args[entity] = all_ents
+        else:
+            args[entity] = args[entity].split(" ")
+            for e in args[entity]:
+                if e not in all_ents:
+                    raise Exception("Invalid {} id {}.".format(entity[:-1], e))
+
+    if args['transformations'] is not None:
+        try:
+            json.load(open(args['transformations'], 'r'))
+        except ValueError:
+            raise Exception("Invalid transformation JSON file")
+        except IOError:
+            raise Exception("Transformation file not found")
+
+    args['--jobs'] = int(args['--jobs'])
+
+    return args
+
 
 if __name__ == '__main__':
-    arguments = docopt(__doc__)
-    run_worflow(*validate_arguments(arguments))
+    arguments = validate_arguments(docopt(__doc__))
+    jobs = arguments.pop('--jobs')
+    run = arguments.pop('run')
+    arguments.pop('make')
+    wf = first_level(**arguments)
+
+    if run:
+        if jobs == 1:
+            wf.run()
+        else:
+            wf.run(plugin='MultiProc', plugin_args={'n_procs': jobs})

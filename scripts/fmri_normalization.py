@@ -38,14 +38,14 @@ infosource.iterables = ('subject_id', subjects)
 ## Datasource
 inputnode = Node(DataGrabber(infields=['subject_id'],
                              outfields=['source_files', 'mean_image', 'anatomical_image', 'brain_mask']), name='datasource')
-inputnode.inputs.base_directory = bids_dir
+inputnode.inputs.base_directory = os.path.join(bids_dir, 'derivatives/')
 inputnode.inputs.template = '*'
 inputnode.inputs.sort_filelist = False
 inputnode.inputs.field_template = dict(
-    source_files='derivatives/studyforrest-data-aligned/sub-%s/in_bold3Tp2/sub-%s_task-%s_%s_bold.nii.gz',
-    mean_image='derivatives/studyforrest-data-templatetransforms/sub-%s/bold3Tp2/brain.nii.gz',
-    anatomical_image='derivatives/studyforrest-data-templatetransforms_struct/sub-%s/t1w/in_bold3Tp2/brain.nii.gz',
-    brain_mask='derivatives/studyforrest-data-templatetransforms/sub-%s/bold3Tp2/brain_mask.nii.gz')
+    source_files='studyforrest-data-aligned/sub-%s/in_bold3Tp2/sub-%s_task-%s_%s_bold.nii.gz',
+    mean_image='studyforrest-data-templatetransforms/sub-%s/bold3Tp2/brain.nii.gz',
+    anatomical_image='studyforrest-data-templatetransforms/sub-%s/t1w/in_bold3Tp2/brain.nii.gz',
+    brain_mask='studyforrest-data-templatetransforms/sub-%s/bold3Tp2/brain_mask.nii.gz')
 inputnode.inputs.template_args = dict(source_files=[['subject_id', 'subject_id', 'task', 'runs']],
     mean_image=[['subject_id']], anatomical_image=[['subject_id']], brain_mask=[['subject_id']])
 inputnode.inputs.task = task
@@ -175,6 +175,18 @@ register.connect(warpmask, ('out_file', unlist),
 """
 Assign all the output files to DataSink
 """
+
+
+def get_subs(subject_id):
+    """ Generate substitutions """
+    subs = [('_subject_id_%s' % subject_id, '{}'.format(subject_id))]
+    return subs
+
+subsgen = Node(Function(input_names=['subject_id', 'conds'],
+                        output_names=['substitutions'],
+                        function=get_subs),
+               name='subsgen')
+
 ### Datasink
 outputnode = Node(DataSink(), name="datasink")
 outputnode.inputs.base_directory = os.path.join(bids_dir, 'derivatives/registration')
@@ -184,6 +196,8 @@ register.connect(binarize, 'out_file', outputnode, 'mask')
 
 # register.connect(mean2anatbbr, 'out_matrix_file',
 #                  outputnode, 'func2anat_transform')
+wf.connect(infosource, 'subject_id', subsgen, 'subject_id')
+wf.connect(subsgen, 'substitutions', datasink, 'substitutions')
 register.connect(anat2target_nonlinear, 'fieldcoeff_file',
                  outputnode, 'anat2target_transform')
 register.run(plugin='MultiProc', plugin_args={'n_procs' : 5})
