@@ -11,6 +11,8 @@ Usage:
                         [default: /tmp]
 --jobs=<n>              Number of parallel jobs [default: 1].
 """
+import json
+import os
 from docopt import docopt
 
 from nipype.pipeline.engine import Workflow, Node, MapNode
@@ -22,18 +24,22 @@ from nipype.interfaces import fsl
 from nipype.interfaces.utility import Function, IdentityInterface
 from nipype.workflows.fmri.fsl import (create_modelfit_workflow,
                                        create_fixed_effects_flow)
+from nipype.algorithms.rapidart import ArtifactDetect
 
-import json
-import os
 from bids.grabbids import BIDSLayout
 
+# from nipype import config
+# cfg = dict(logging=dict(workflow_level='DEBUG'),
+#            execution={'stop_on_first_crash': True})
+# config.update_config(cfg)
 
-def get_events(bids_dir, subject_id, task_id):
+
+def get_events(bids_dir, subject_id, runs, task_id):
     """ Get a single subjects event files """
     from bids.grabbids import BIDSLayout
     layout = BIDSLayout(bids_dir)
-    event_files = layout.get(
-        type='events', return_type='file', subject=subject_id, task=task_id)
+    event_files = [layout.get(
+        type='events', return_type='file', subject=subject_id, run=r, task=task_id)[0] for r in runs]
     return event_files
 
 
@@ -41,33 +47,66 @@ def get_features(event_files):
     """ Inject extracted features into event files """
     import pandas as pd
     from glob import glob
-    from functools import partial
     from os import path
+    import numpy as np
+    import re
+    from functools import partial
 
     event_files = sorted(event_files)
     features = sorted(glob(
         '/mnt/c/Users/aid338/Documents/neuroscout_scripts/forrest_extract_results/clip*'))
 
-    def setmaxConfidence(confidence_cols, row):
-        maxcol = row[confidence_cols].idxmax()
+    def setmaxConfidence(row):
+        maxcol = row['maxFace']
         if pd.notnull(maxcol):
             val = row[maxcol]
         else:
             val = 0
         return val
 
+    def polyArea(x, y):
+        return 0.5 * np.abs(np.dot(x, np.roll(y, 1)) - np.dot(y, np.roll(x, 1)))
+
+    def computeMaxFaceArea(row):
+        maxcol = row['maxFace']
+
+        if pd.notnull(maxcol):
+            prepend = re.sub('face_detectionConfidence', '', maxcol)
+            x = []
+            y = []
+
+            for i in range(1, 5):
+                x.append(row[prepend + 'boundingPoly_vertex{}_x'.format(i)])
+                y.append(row[prepend + 'boundingPoly_vertex{}_y'.format(i)])
+
+            val = polyArea(x, y)
+        else:
+            val = 0
+        return val
+
+    def calcNumFaces(confidence_cols, row):
+        return (row[confidence_cols].isnull() == False).sum()
+
     new_event_files = []
     for i, run_file in enumerate(event_files):
         run_events = pd.read_table(run_file)
-        clip_start = run_events.iloc[0].onset
-
         run_features = pd.read_csv(features[i])
+
+        # Move onset to when clip begins
+        clip_start = run_events.iloc[0].onset
+        run_features['onset'] = run_features['onset'] + clip_start
+
+        # Calculate computed values
         confidence_cols = [c for c in run_features.columns if c.endswith(
             'face_detectionConfidence')]
-        apply_func = partial(setmaxConfidence, confidence_cols)
-        run_features['maxfaceConfidence'] = run_features.apply(apply_func, axis=1)
-        run_features['onset'] = run_features['onset'] + clip_start
-        run_features = run_features[['onset', 'duration', 'maxfaceConfidence']]
+        run_features['maxFace'] = run_features.apply(lambda x: x[confidence_cols].idxmax(), axis=1)
+        run_features['maxfaceConfidence'] = run_features.apply(setmaxConfidence, axis=1)
+        run_features['maxfaceArea'] = run_features.apply(computeMaxFaceArea, axis=1)
+        partialnFaces = partial(calcNumFaces, confidence_cols)
+        run_features['numFaces'] = run_features.apply(partialnFaces, axis=1)
+
+        # Select only relevant columns
+        run_features = run_features[['onset', 'duration', 'maxfaceConfidence', 'maxfaceArea', 'numFaces']]
         run_features = pd.melt(run_features, id_vars=['onset', 'duration'],
                                value_name='amplitude', var_name='trial_type')
 
@@ -80,8 +119,8 @@ def get_features(event_files):
     return new_event_files
 
 
-def first_level(bids_dir, task, in_dir, subjects, runs, out_dir=None, work_dir=None,
-                transformations=None, read_options=None, fwhm=5):
+def first_level(bids_dir, task, in_dir, subjects, runs, out_dir=None,
+                work_dir=None, transformations=None, read_options=None, fwhm=5):
     """
     Set up workflow
     """
@@ -93,8 +132,11 @@ def first_level(bids_dir, task, in_dir, subjects, runs, out_dir=None, work_dir=N
     (this should be auto-generated or loaded from model json in the future)
     """
 
-    conditions = ['maxfaceConfidence']
-    contrasts = [['maxfaceConfidence', 'T', conditions, [1]]]
+    conditions = ['maxfaceConfidence', 'numFaces_orth']
+    contrasts = [['maxfaceConfidence', 'T', conditions, [1, 0]],
+                 ['maxfaceConfidencevall', 'T', conditions, [1, -1]],
+                 ['numFaces_orth', 'T', conditions, [0, 1]],
+                 ['numFaces_orthvall', 'T', conditions, [-1, 1]]]
 
     TR = json.load(open(os.path.join(
         bids_dir, 'task-' + task + '_bold.json'), 'r'))['RepetitionTime']
@@ -110,7 +152,8 @@ def first_level(bids_dir, task, in_dir, subjects, runs, out_dir=None, work_dir=N
     """
 
     datasource = Node(DataGrabber(infields=['subject_id'],
-                                  outfields=['smooth_func', 'mask', 'field_file']),
+                                  outfields=['smooth_func', 'mask', 'field_file',
+                                             'realignment_parameters', 'dil_mask']),
                       name='datasource')
     datasource.inputs.base_directory = in_dir
     datasource.inputs.template = '*'
@@ -118,24 +161,47 @@ def first_level(bids_dir, task, in_dir, subjects, runs, out_dir=None, work_dir=N
     datasource.inputs.field_template = dict(
         smooth_func='smooth_func/%s/smooth_func/sub-%s_task-%s_%s_bold_smooth_mask.nii.gz',
         mask='templatetransforms/sub-%s/bold3Tp2/brain_mask.nii.gz',
-        field_file='registration/anat2target_transform/%s/brain_fieldwarp.nii.gz')
+        field_file='registration/anat2target_transform/%s/brain_fieldwarp.nii.gz',
+        realignment_parameters='aligned/sub-%s/in_bold3Tp2/sub-%s_task-%s_%s_bold_mcparams.txt',
+        dil_mask='smooth_func/%s/dil_mask/sub-%s_task-%s_%s_bold_dilmask.nii.gz')
     datasource.inputs.template_args = dict(
         smooth_func=[['fwhm', 'subject_id', 'task', 'runs']],
-        mask=[['subject_id']], field_file=[['subject_id']])
+        mask=[['subject_id']], field_file=[['subject_id']],
+        realignment_parameters=[['subject_id', 'subject_id', 'task', 'runs']],
+        dil_mask=[['fwhm', 'subject_id', 'task', 'runs']])
     datasource.inputs.runs = runs
     datasource.inputs.task = task
     datasource.inputs.fwhm = fwhm
 
     """
+    Artifact detection
+    """
+    art = MapNode(interface=ArtifactDetect(use_differences=[True, False],
+                                           use_norm=True,
+                                           norm_threshold=1,
+                                           zintensity_threshold=3,
+                                           parameter_source='FSL',
+                                           mask_type='file'),
+                  iterfield=['realigned_files', 'realignment_parameters',
+                             'mask_file'],
+                  name="art")
+
+    wf.connect([(datasource, art, [('realignment_parameters',
+                                    'realignment_parameters'),
+                                   ('smooth_func',
+                                    'realigned_files'),
+                                   ('dil_mask', 'mask_file')])])
+    """
     Get events.tsv file for each subject
     """
 
     event_getter = Node(name='event_getter', interface=Function(
-        input_names=['bids_dir', 'subject_id', 'task_id'],
+        input_names=['bids_dir', 'subject_id', 'runs', 'task_id'],
         output_names=["events"], function=get_events))
 
     event_getter.inputs.bids_dir = bids_dir
     event_getter.inputs.task_id = task
+    event_getter.inputs.runs = runs
     wf.connect(infosource, 'subject_id', event_getter, 'subject_id')
 
     """
@@ -165,6 +231,7 @@ def first_level(bids_dir, task, in_dir, subjects, runs, out_dir=None, work_dir=N
 
     wf.connect([(infosource, datasource, [('subject_id', 'subject_id')]),
                 (datasource, modelspec, [('smooth_func', 'functional_runs')]),
+                (datasource, modelspec, [('realignment_parameters', 'realignment_parameters')]),
                 (eventspec, modelspec, [('subject_info', 'subject_info')]),
                 (fx_getter, eventspec, [('transformed_events', 'bids_events')])])
 
@@ -177,7 +244,7 @@ def first_level(bids_dir, task, in_dir, subjects, runs, out_dir=None, work_dir=N
     modelfit.inputs.inputspec.contrasts = contrasts
     modelfit.inputs.inputspec.interscan_interval = TR
     modelfit.inputs.inputspec.model_serial_correlations = True
-    modelfit.inputs.inputspec.bases = {'dgamma': {'derivs': True}}
+    modelfit.inputs.inputspec.bases = {'dgamma': {'derivs': False}}
 
     wf.connect(modelspec, 'session_info', modelfit, 'inputspec.session_info')
     wf.connect(datasource, 'smooth_func', modelfit, 'inputspec.functional_data')
@@ -346,6 +413,7 @@ def validate_arguments(args):
     var_names = {'<bids_dir>': 'bids_dir',
                  '<task>': 'task',
                  '<out_dir>': 'out_dir',
+                 '<in_dir>': 'in_dir',
                  '-w': 'work_dir',
                  '-s': 'subjects',
                  '-r': 'runs',
@@ -376,7 +444,7 @@ def validate_arguments(args):
     # Check subject ids and runs
     for entity in ['subjects', 'runs']:
         all_ents = layout.get(
-            target=entity[:-1], return_type='id', task='movie')
+            target=entity[:-1], return_type='id', session='movie')
 
         if args[entity] == 'all':
             args[entity] = all_ents
@@ -387,6 +455,7 @@ def validate_arguments(args):
                     raise Exception("Invalid {} id {}.".format(entity[:-1], e))
 
     if args['transformations'] is not None:
+        args['transformations'] = os.path.abspath(args['transformations'])
         try:
             json.load(open(args['transformations'], 'r'))
         except ValueError:
