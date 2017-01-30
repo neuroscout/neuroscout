@@ -10,6 +10,10 @@ Usage:
                         [default: <in_dir>/smooth_func]
 -w <work_dir>           Working directory.
                         [default: /tmp]
+-c                      Stop on first crash.
+--method=<name>         Smoothing method: susan or isotropic.
+                        [Default: susan]
+
 --jobs=<n>              Number of parallel jobs [default: 1].
 """
 
@@ -26,7 +30,7 @@ import os
 from bids.grabbids import BIDSLayout
 
 
-def premodel(bids_dir, task, subjects, runs, fwhm, in_dir=None,
+def premodel(bids_dir, task, subjects, runs, fwhm, in_dir=None, method='susan',
              out_dir=None, work_dir=None):
     """
     Experiment specific variables
@@ -137,12 +141,19 @@ def premodel(bids_dir, task, subjects, runs, fwhm, in_dir=None,
     of the median value for each run and a mask consituting the mean
     functional
     """
-
-    smooth = create_susan_smooth()
     to_int = lambda x: int(x)
-    wf.connect(infosource, ('fwhm', to_int), smooth, 'inputnode.fwhm')
-    wf.connect(maskfunc2, 'out_file', smooth, 'inputnode.in_files')
-    wf.connect(dilatemask, 'out_file', smooth, 'inputnode.mask_file')
+
+    if method == 'susan':
+        smooth = create_susan_smooth()
+        wf.connect(infosource, ('fwhm', to_int), smooth, 'inputnode.fwhm')
+        wf.connect(maskfunc2, 'out_file', smooth, 'inputnode.in_files')
+        wf.connect(dilatemask, 'out_file', smooth, 'inputnode.mask_file')
+    else:
+        smooth = MapNode(interface=fsl.IsotropicSmooth(),
+                         iterfield=['in_file'],
+                         name='smooth')
+        wf.connect(infosource, ('fwhm', to_int), smooth, 'fwhm')
+        wf.connect(maskfunc2, 'out_file', smooth, 'in_file')
 
     """
     Mask the smoothed data with the dilated mask
@@ -152,7 +163,10 @@ def premodel(bids_dir, task, subjects, runs, fwhm, in_dir=None,
                                                  op_string='-mas'),
                         iterfield=['in_file', 'in_file2'],
                         name='maskfunc3')
-    wf.connect(smooth, 'outputnode.smoothed_files', maskfunc3, 'in_file')
+    if method == 'susan':
+        wf.connect(smooth, 'outputnode.smoothed_files', maskfunc3, 'in_file')
+    else:
+        wf.connect(smooth, 'out_file', maskfunc3, 'in_file')
 
     wf.connect(dilatemask, 'out_file', maskfunc3, 'in_file2')
 
@@ -199,7 +213,17 @@ def validate_arguments(args):
                  '-f': 'fwhm',
                  '-w': 'work_dir',
                  '-s': 'subjects',
-                 '-r': 'runs'}
+                 '-r': 'runs',
+                 '--method': 'method'}
+
+    if args['method'] not in ['susan', 'isotropic']:
+        raise Exception("Invalid smoothing method specified.")
+
+    if args.pop('-c'):
+        from nipype import config
+        cfg = dict(logging=dict(workflow_level='DEBUG'),
+                   execution={'stop_on_first_crash': True})
+        config.update_config(cfg)
 
     for old, new in var_names.iteritems():
         args[new] = args.pop(old)

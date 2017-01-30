@@ -9,6 +9,7 @@ Usage:
 -f <fwhm>               Smoothing kernel file to use. [default: 5]
 -w <work_dir>           Working directory.
                         [default: /tmp]
+-c                      Stop on first crash.
 --jobs=<n>              Number of parallel jobs [default: 1].
 """
 import json
@@ -27,11 +28,6 @@ from nipype.workflows.fmri.fsl import (create_modelfit_workflow,
 from nipype.algorithms.rapidart import ArtifactDetect
 
 from bids.grabbids import BIDSLayout
-
-# from nipype import config
-# cfg = dict(logging=dict(workflow_level='DEBUG'),
-#            execution={'stop_on_first_crash': True})
-# config.update_config(cfg)
 
 
 def get_events(bids_dir, subject_id, runs, task_id):
@@ -149,6 +145,8 @@ def first_level(bids_dir, task, in_dir, subjects, runs, out_dir=None,
 
     """
     Grab data for each subject
+    #### ADD func2anat_transform
+    #### RENAME anat2target_transform
     """
 
     datasource = Node(DataGrabber(infields=['subject_id'],
@@ -419,6 +417,12 @@ def validate_arguments(args):
                  '-r': 'runs',
                  '-t': 'transformations',
                  '-f': 'fwhm'}
+
+    if args.pop('-c'):
+        from nipype import config
+        cfg = dict(logging=dict(workflow_level='DEBUG'),
+                   execution={'stop_on_first_crash': True})
+        config.update_config(cfg)
 
     for old, new in var_names.iteritems():
         args[new] = args.pop(old)

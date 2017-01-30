@@ -5,7 +5,7 @@ Usage:
 
 -w <work_dir>           Working directory.
                         [default: None]
---jobs=<n>              Number of parallel jobs [default: 1].
+-c                      Stop on first crash.
 
 """
 from docopt import docopt
@@ -24,7 +24,7 @@ import re
 def group_onesample(firstlv_dir, work_dir=None,
                     out_dir=None, no_reversal=False):
     max_cope = sorted(glob(os.path.join(firstlv_dir, '*/copes/mni/*.nii.gz')))[-1].split('/')[-1]
-    n_contrasts = int(re.findall('cope([0-9]*).*', max_cope)[0]) + 1
+    n_contrasts = int(re.findall('cope([0-9]*).*', max_cope)[0])
 
     wf = Workflow(name='group_onesample')
     if work_dir:
@@ -127,6 +127,12 @@ def validate_arguments(args):
                  '<output>': 'out_dir',
                  '-w': 'work_dir'}
 
+    if args.pop('-c'):
+        from nipype import config
+        cfg = dict(logging=dict(workflow_level='DEBUG'),
+                   execution={'stop_on_first_crash': True})
+        config.update_config(cfg)
+
     for old, new in var_names.iteritems():
         args[new] = args.pop(old)
 
@@ -143,10 +149,8 @@ def validate_arguments(args):
 
 if __name__ == '__main__':
     arguments = validate_arguments(docopt(__doc__))
-    jobs = arguments.pop('--jobs')
     run = arguments.pop('run')
     arguments.pop('make')
     wf = group_onesample(**arguments)
 
-    if run:
-        wf.run(plugin='MultiProc', plugin_args={'n_procs': jobs})
+    wf.run()
