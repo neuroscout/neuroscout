@@ -89,7 +89,7 @@ def get_features(runs):
         run_features['numFaces'] = run_features.apply(partialnFaces, axis=1)
 
         # Select only relevant columns
-        run_features = run_features[['onset', 'duration', 'maxfaceConfidence', 'maxfaceArea', 'numFaces']]
+        run_features = run_features[['onset', 'duration', 'maxfaceConfidence']]
         run_features = pd.melt(run_features, id_vars=['onset', 'duration'],
                                value_name='amplitude', var_name='trial_type')
 
@@ -114,12 +114,8 @@ def first_level(in_dir, subjects, runs, out_dir=None,
     (this should be auto-generated or loaded from model json in the future)
     """
 
-    conditions = ['maxfaceConfidence', 'numFaces_orth']
-    contrasts = [['maxfaceConfidence', 'T', conditions, [1, 0]],
-                 ['maxfaceConfidencevall', 'T', conditions, [1, -1]],
-                 ['numFaces_orth', 'T', conditions, [0, 1]],
-                 ['numFaces_orthvall', 'T', conditions, [-1, 1]]]
-
+    conditions = ['maxfaceConfidence']
+    contrasts = [['maxfaceConfidence', 'T', conditions, [1]]]
     TR = 1
     """
     Subject iterator
@@ -139,7 +135,7 @@ def first_level(in_dir, subjects, runs, out_dir=None,
     datasource.inputs.template = '*'
     datasource.inputs.sort_filelist = True
     datasource.inputs.field_template = dict(
-        func='smooth_func/%s/smooth_func/_fwhm_5/tfMRI_MOVIE%s*.nii.gz')
+        func='downsample/2.5/downsampled_func/%s/tfMRI_MOVIE%s*[AP]_flirt.nii.gz')
     datasource.inputs.template_args = dict(
         func=[['subject_id', 'runs']])
     datasource.inputs.runs = runs
