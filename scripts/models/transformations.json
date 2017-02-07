@@ -1,0 +1,15 @@
+{
+  "transformations": [
+    {
+      "name": "standardize",
+      "input": [
+        "street",
+        "outdoors",
+        "light",
+        "adult"
+      ],
+    "demean": true,
+    "rescale": true
+  }
+  ]
+}

@@ -1,22 +1,17 @@
 """"
 Usage:
-    fmri_hcp_first run [options] <in_dir> <out_dir>
-    fmri_hcp_first make [options] [<in_dir> <out_dir>]
+    fmri_bids_first run [options] <bids_dir> <task> <in_dir> <out_dir>
+    fmri_bids_first make [options] <bids_dir> <task> [<in_dir> <out_dir>]
 
 -t <transformations>    Transformation to apply to events.
 -s <subject_id>         Subjects to analyze. [default: all]
 -r <run_ids>            Runs to analyze. [default: all]
+-f <fwhm>               Smoothing kernel file to use. [default: 5]
 -w <work_dir>           Working directory.
                         [default: /tmp]
 -c                      Stop on first crash.
 --jobs=<n>              Number of parallel jobs [default: 1].
 """
-
-# Need to remove BIDS stuff
-# Update inputspec
-# Remove motion regressors / art detection
-# Add func -> anat .mat transform as input
-
 import json
 import os
 from docopt import docopt
@@ -30,79 +25,13 @@ from nipype.interfaces import fsl
 from nipype.interfaces.utility import Function, IdentityInterface
 from nipype.workflows.fmri.fsl import (create_modelfit_workflow,
                                        create_fixed_effects_flow)
+from nipype.algorithms.rapidart import ArtifactDetect
 
-
-def get_features(runs):
-    """ Inject extracted features into event files """
-    import pandas as pd
-    from glob import glob
-    from os import path
-    import numpy as np
-    import re
-    from functools import partial
-
-    def setmaxConfidence(row):
-        maxcol = row['maxFace']
-        if pd.notnull(maxcol):
-            val = row[maxcol]
-        else:
-            val = 0
-        return val
-
-    def polyArea(x, y):
-        return 0.5 * np.abs(np.dot(x, np.roll(y, 1)) - np.dot(y, np.roll(x, 1)))
-
-    def computeMaxFaceArea(row):
-        maxcol = row['maxFace']
-
-        if pd.notnull(maxcol):
-            prepend = re.sub('face_detectionConfidence', '', maxcol)
-            x = []
-            y = []
-
-            for i in range(1, 5):
-                x.append(row[prepend + 'boundingPoly_vertex{}_x'.format(i)])
-                y.append(row[prepend + 'boundingPoly_vertex{}_y'.format(i)])
-
-            val = polyArea(x, y)
-        else:
-            val = 0
-        return val
-
-    def calcNumFaces(confidence_cols, row):
-        return (row[confidence_cols].isnull() == False).sum()
-
-    features = sorted(glob(
-        '/mnt/c/Users/aid338/Documents/neuroscout_scripts/hcp_extract_results/clip*'))
-
-    new_event_files = []
-    for run in runs:
-        run_features = pd.read_csv(features[int(run) - 1])
-
-        # Calculate computed values
-        confidence_cols = [c for c in run_features.columns if c.endswith(
-            'face_detectionConfidence')]
-        run_features['maxFace'] = run_features.apply(lambda x: x[confidence_cols].idxmax(), axis=1)
-        run_features['maxfaceConfidence'] = run_features.apply(setmaxConfidence, axis=1)
-        run_features['maxfaceArea'] = run_features.apply(computeMaxFaceArea, axis=1)
-        partialnFaces = partial(calcNumFaces, confidence_cols)
-        run_features['numFaces'] = run_features.apply(partialnFaces, axis=1)
-
-        # Select only relevant columns
-        run_features = run_features[['onset', 'duration', 'maxfaceConfidence']]
-        run_features = pd.melt(run_features, id_vars=['onset', 'duration'],
-                               value_name='amplitude', var_name='trial_type')
-
-        # Save to curr dir, but give abs path
-        new_file = path.abspath('events_run{}'.format(run))
-        new_event_files.append(new_file)
-        run_features.to_csv(new_file, sep=str('\t'), index=False)
-
-    return new_event_files
+from bids.grabbids import BIDSLayout
 
 
 def first_level(in_dir, subjects, runs, out_dir=None,
-                work_dir=None, transformations=None, read_options=None):
+                work_dir=None, transformations=None, read_options=None, fwhm=5):
     """
     Set up workflow
     """
@@ -114,9 +43,14 @@ def first_level(in_dir, subjects, runs, out_dir=None,
     (this should be auto-generated or loaded from model json in the future)
     """
 
-    conditions = ['maxfaceConfidence']
-    contrasts = [['maxfaceConfidence', 'T', conditions, [1]]]
-    TR = 1
+    conditions = ['maxfaceConfidence', 'numFaces_orth']
+    contrasts = [['maxfaceConfidence', 'T', conditions, [1, 0]],
+                 ['maxfaceConfidencevall', 'T', conditions, [1, -1]],
+                 ['numFaces_orth', 'T', conditions, [0, 1]],
+                 ['numFaces_orthvall', 'T', conditions, [-1, 1]]]
+
+    TR = json.load(open(os.path.join(
+        bids_dir, 'task-' + task + '_bold.json'), 'r'))['RepetitionTime']
     """
     Subject iterator
     """
@@ -126,28 +60,67 @@ def first_level(in_dir, subjects, runs, out_dir=None,
 
     """
     Grab data for each subject
+    #### ADD func2anat_transform
+    #### RENAME anat2target_transform
     """
 
     datasource = Node(DataGrabber(infields=['subject_id'],
-                                  outfields=['func']),
+                                  outfields=['smooth_func', 'field_file',
+                                             'realignment_parameters', 'dil_mask']),
                       name='datasource')
     datasource.inputs.base_directory = in_dir
     datasource.inputs.template = '*'
     datasource.inputs.sort_filelist = True
     datasource.inputs.field_template = dict(
-        func='downsample/2.5/downsampled_func/%s/tfMRI_MOVIE%s*[AP]_flirt.nii.gz')
+        smooth_func='smooth_func/%s/smooth_func/sub-%s_task-%s_%s_bold_smooth_mask.nii.gz',
+        field_file='registration/anat2target_transform/%s/brain_fieldwarp.nii.gz',
+        realignment_parameters='aligned/sub-%s/in_bold3Tp2/sub-%s_task-%s_%s_bold_mcparams.txt')
     datasource.inputs.template_args = dict(
-        func=[['subject_id', 'runs']])
+        smooth_func=[['fwhm', 'subject_id', 'task', 'runs']],
+        realignment_parameters=[['subject_id', 'subject_id', 'task', 'runs']])
     datasource.inputs.runs = runs
+    datasource.inputs.task = task
+    datasource.inputs.fwhm = fwhm
+
+    """
+    Artifact detection
+    """
+    art = MapNode(interface=ArtifactDetect(use_differences=[True, False],
+                                           use_norm=True,
+                                           norm_threshold=1,
+                                           zintensity_threshold=3,
+                                           parameter_source='FSL',
+                                           mask_type='file'),
+                  iterfield=['realigned_files', 'realignment_parameters',
+                             'mask_file'],
+                  name="art")
+
+    wf.connect([(datasource, art, [('realignment_parameters',
+                                    'realignment_parameters'),
+                                   ('smooth_func',
+                                    'realigned_files'),
+                                   ('dil_mask', 'mask_file')])])
+    """
+    Get events.tsv file for each subject
+    """
+
+    event_getter = Node(name='event_getter', interface=Function(
+        input_names=['bids_dir', 'subject_id', 'runs', 'task_id'],
+        output_names=["events"], function=get_events))
+
+    event_getter.inputs.bids_dir = bids_dir
+    event_getter.inputs.task_id = task
+    event_getter.inputs.runs = runs
+    wf.connect(infosource, 'subject_id', event_getter, 'subject_id')
 
     """
     Add pliers features
     """
 
     fx_getter = Node(name='fx_getter', interface=Function(
-        input_names=['runs'],
+        input_names=['event_files'],
         output_names=["transformed_events"], function=get_features))
-    fx_getter.inputs.runs = runs
+    wf.connect(event_getter, 'events', fx_getter, 'event_files')
 
     """
     Specify model, apply transformations and specify fMRI model
@@ -166,7 +139,8 @@ def first_level(in_dir, subjects, runs, out_dir=None,
     modelspec.inputs.high_pass_filter_cutoff = 100.
 
     wf.connect([(infosource, datasource, [('subject_id', 'subject_id')]),
-                (datasource, modelspec, [('func', 'functional_runs')]),
+                (datasource, modelspec, [('smooth_func', 'functional_runs')]),
+                (datasource, modelspec, [('realignment_parameters', 'realignment_parameters')]),
                 (eventspec, modelspec, [('subject_info', 'subject_info')]),
                 (fx_getter, eventspec, [('transformed_events', 'bids_events')])])
 
@@ -182,14 +156,14 @@ def first_level(in_dir, subjects, runs, out_dir=None,
     modelfit.inputs.inputspec.bases = {'dgamma': {'derivs': False}}
 
     wf.connect(modelspec, 'session_info', modelfit, 'inputspec.session_info')
-    wf.connect(datasource, 'func', modelfit, 'inputspec.functional_data')
+    wf.connect(datasource, 'smooth_func', modelfit, 'inputspec.functional_data')
 
     """
     Fixed effects workflow to combine runs
     """
 
     fixed_fx = create_fixed_effects_flow()
-    fixed_fx.inputs.flameo.mask_file = '/mnt/d/neuroscout/datasets/hcp/MNI_25mm_brain_mask_thr.nii.gz'
+    wf.connect(datasource, 'dil_mask', fixed_fx, 'flameo.mask_file')
 
     def sort_copes(copes, varcopes, contrasts):
         import numpy as np
@@ -224,59 +198,57 @@ def first_level(in_dir, subjects, runs, out_dir=None,
                                       ])
                 ])
 
-    # """
-    # Apply normalization warp (to MNI) to copes, varcopes, and tstats
-    # """
-    #
-    # def merge_files(copes, varcopes, zstats):
-    #     out_files = []
-    #     splits = []
-    #     out_files.extend(copes)
-    #     splits.append(len(copes))
-    #     out_files.extend(varcopes)
-    #     splits.append(len(varcopes))
-    #     out_files.extend(zstats)
-    #     splits.append(len(zstats))
-    #     return out_files, splits
-    #
-    # mergefunc = Node(Function(input_names=['copes', 'varcopes',
-    #                                        'zstats'],
-    #                           output_names=['out_files', 'splits'],
-    #                           function=merge_files),
-    #                  name='merge_files')
-    #
-    # wf.connect([(fixed_fx.get_node('outputspec'), mergefunc,
-    #              [('copes', 'copes'),
-    #               ('varcopes', 'varcopes'),
-    #               ('zstats', 'zstats'),
-    #               ])])
-    #
-    # warpall = MapNode(fsl.ApplyWarp(interp='spline'),
-    #                   iterfield=['in_file'],
-    #                   nested=True,
-    #                   name='warpall')
-    # wf.connect(mergefunc, 'out_files', warpall, 'in_file')
-    #
-    # warpall.inputs.ref_file = fsl.Info.standard_image('MNI152_T1_2mm_brain.nii.gz')
-    # wf.connect(datasource, 'anat2target',
-    #            warpall, 'field_file')
-    # wf.connect(datasource, 'func2anat',
-    #            warpall, 'premat')
-    #
-    # def split_files(in_files, splits):
-    #     copes = in_files[:splits[0]]
-    #     varcopes = in_files[splits[0]:(splits[0] + splits[1])]
-    #     zstats = in_files[(splits[0] + splits[1]):]
-    #     return copes, varcopes, zstats
-    #
-    # splitfunc = Node(Function(input_names=['in_files', 'splits'],
-    #                           output_names=['copes', 'varcopes',
-    #                                         'zstats'],
-    #                           function=split_files),
-    #                  name='split_files')
-    # wf.connect(mergefunc, 'splits', splitfunc, 'splits')
-    # wf.connect(warpall, 'out_file',
-    #            splitfunc, 'in_files')
+    """
+    Apply normalization warp (to MNI) to copes, varcopes, and tstats
+    """
+
+    def merge_files(copes, varcopes, zstats):
+        out_files = []
+        splits = []
+        out_files.extend(copes)
+        splits.append(len(copes))
+        out_files.extend(varcopes)
+        splits.append(len(varcopes))
+        out_files.extend(zstats)
+        splits.append(len(zstats))
+        return out_files, splits
+
+    mergefunc = Node(Function(input_names=['copes', 'varcopes',
+                                           'zstats'],
+                              output_names=['out_files', 'splits'],
+                              function=merge_files),
+                     name='merge_files')
+
+    wf.connect([(fixed_fx.get_node('outputspec'), mergefunc,
+                 [('copes', 'copes'),
+                  ('varcopes', 'varcopes'),
+                  ('zstats', 'zstats'),
+                  ])])
+
+    warpall = MapNode(fsl.ApplyWarp(interp='spline'),
+                      iterfield=['in_file'],
+                      nested=True,
+                      name='warpall')
+    wf.connect(mergefunc, 'out_files', warpall, 'in_file')
+
+    warpall.inputs.ref_file = fsl.Info.standard_image('MNI152_T1_2mm_brain.nii.gz')
+    wf.connect(datasource, 'field_file',
+               warpall, 'field_file')
+
+    def split_files(in_files, splits):
+        copes = in_files[:splits[0]]
+        varcopes = in_files[splits[0]:(splits[0] + splits[1])]
+        zstats = in_files[(splits[0] + splits[1]):]
+        return copes, varcopes, zstats
+
+    splitfunc = Node(Function(input_names=['in_files', 'splits'],
+                              output_names=['copes', 'varcopes',
+                                            'zstats'],
+                              function=split_files),
+                     name='split_files')
+    wf.connect(mergefunc, 'splits', splitfunc, 'splits')
+    wf.connect(warpall, 'out_file',
+               splitfunc, 'in_files')
 
     """
     Save to datasink
@@ -334,11 +306,11 @@ def first_level(in_dir, subjects, runs, out_dir=None,
                   ('tstats', 'tstats')])
                 ])
 
-    # wf.connect([(splitfunc, datasink,
-    #              [('copes', 'copes.mni'),
-    #               ('varcopes', 'varcopes.mni'),
-    #               ('zstats', 'zstats.mni'),
-    #               ])])
+    wf.connect([(splitfunc, datasink,
+                 [('copes', 'copes.mni'),
+                  ('varcopes', 'varcopes.mni'),
+                  ('zstats', 'zstats.mni'),
+                  ])])
 
     return wf
 
@@ -347,12 +319,15 @@ def validate_arguments(args):
     """ Validate and preload command line arguments """
 
     # Clean up names
-    var_names = {'<out_dir>': 'out_dir',
+    var_names = {'<bids_dir>': 'bids_dir',
+                 '<task>': 'task',
+                 '<out_dir>': 'out_dir',
                  '<in_dir>': 'in_dir',
                  '-w': 'work_dir',
                  '-s': 'subjects',
                  '-r': 'runs',
-                 '-t': 'transformations'}
+                 '-t': 'transformations',
+                 '-f': 'fwhm'}
 
     if args.pop('-c'):
         from nipype import config
@@ -369,9 +344,30 @@ def validate_arguments(args):
             if not os.path.exists(args[directory]):
                 os.makedirs(args[directory])
 
+    args['bids_dir'] = os.path.abspath(args['bids_dir'])
+    layout = BIDSLayout(args['bids_dir'])
+
+    # Check BOLD data
+    if 'bold' not in layout.get_types():
+        raise Exception("BIDS project does not contain"
+                        " preprocessed BOLD data.")
+
+    # Check that task exists
+    if args['task'] not in layout.get_tasks():
+        raise Exception("Task not found in BIDS project")
+
     # Check subject ids and runs
     for entity in ['subjects', 'runs']:
-        args[entity] = args[entity].split(" ")
+        all_ents = layout.get(
+            target=entity[:-1], return_type='id', session='movie')
+
+        if args[entity] == 'all':
+            args[entity] = all_ents
+        else:
+            args[entity] = args[entity].split(" ")
+            for e in args[entity]:
+                if e not in all_ents:
+                    raise Exception("Invalid {} id {}.".format(entity[:-1], e))
 
     if args['transformations'] is not None:
         args['transformations'] = os.path.abspath(args['transformations'])
