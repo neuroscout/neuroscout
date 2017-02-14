@@ -9,89 +9,22 @@ from nipype.workflows.fmri.fsl import (create_modelfit_workflow,
 
 import os
 import json
-import importlib
 import abc
+import importlib
 
 
-class FirstLevel(object):
-    """ Validates arguments, and connect inputs to first level workflow"""
-    __metaclass__ = abc.ABCMeta
+def load_class(full_class_string):
+    """
+    dynamically load a class from a string
+    """
 
-    def __init__(self, args):
-        self.validate_arguments(args)
-        self.create_workflow()
-        self._add_custom()
+    class_data = full_class_string.split(".")
+    module_path = ".".join(class_data[:-1])
+    class_str = class_data[-1]
 
-    def execute(self):
-        if self.run:
-            if self.jobs == 1:
-                self.wf.run()
-            else:
-                self.wf.run(plugin='MultiProc', plugin_args={'n_procs': self.jobs})
-        else:
-            return self.wf
-
-    def validate_arguments(self, args):
-        """ Validate and preload command line arguments """
-
-        # Clean up names
-        var_names = {'<out_dir>': 'out_dir',
-                     '<in_dir>': 'in_dir',
-                     '-w': 'work_dir',
-                     '-s': 'subjects',
-                     '-r': 'runs',
-                     '-t': 'transformations',
-                     '<model>': 'model'}
-
-        if args.pop('-c'):
-            from nipype import config
-            cfg = dict(logging=dict(workflow_level='DEBUG'),
-                       execution={'stop_on_first_crash': True})
-            config.update_config(cfg)
-
-        for old, new in var_names.iteritems():
-            args[new] = args.pop(old)
-
-        for directory in ['out_dir', 'work_dir']:
-            if args[directory] is not None:
-                args[directory] = os.path.abspath(args[directory])
-                if not os.path.exists(args[directory]):
-                    os.makedirs(args[directory])
-
-        # Check subject ids and runs
-        for entity in ['subjects', 'runs']:
-            args[entity] = args[entity].split(" ")
-
-        if args['transformations'] is not None:
-            args['transformations'] = os.path.abspath(args['transformations'])
-            try:
-                json.load(open(args['transformations'], 'r'))
-            except ValueError:
-                raise Exception("Invalid transformation JSON file")
-            except IOError:
-                raise Exception("Transformation file not found")
-
-        self.jobs = int(args.pop('--jobs'))
-        self.run = args.pop('run')
-        self.model = args.pop('model')
-        args.pop('make')
-
-        self.arguments = args
-
-    def create_workflow(self):
-        """
-        Import model specific files
-        """
-        self.model = importlib.import_module(self.model)
-        self.wf = create_first_level(conditions=self.model.conditions,
-                                     contrasts=self.model.contrasts,
-                                     TR=self.model.TR,
-                                     **self.arguments)
-
-    @abc.abstractmethod
-    def _add_custom(self):
-        """ Add custom connections to the workflow after having loaded it
-        Datasource templates *must* be updated """
+    module = importlib.import_module(module_path)
+    # Finally, we retrieve the Class
+    return getattr(module, class_str)
 
 
 def create_first_level(in_dir, subjects, runs, conditions, contrasts, mask,
@@ -150,7 +83,7 @@ def create_first_level(in_dir, subjects, runs, conditions, contrasts, mask,
     modelfit.inputs.inputspec.contrasts = contrasts
     modelfit.inputs.inputspec.interscan_interval = TR
     modelfit.inputs.inputspec.model_serial_correlations = True
-    modelfit.inputs.inputspec.bases = {'dgamma': {'derivs': False}}
+    modelfit.inputs.inputspec.bases = {'gamma': {'derivs': True}}
 
     wf.connect(modelspec, 'session_info', modelfit, 'inputspec.session_info')
     wf.connect(datasource, 'func', modelfit, 'inputspec.functional_data')
@@ -249,11 +182,79 @@ def create_first_level(in_dir, subjects, runs, conditions, contrasts, mask,
                   ('zstats', 'zstats'),
                   ('tstats', 'tstats')])
                 ])
-
-    # wf.connect([(splitfunc, datasink,
-    #              [('copes', 'copes.mni'),
-    #               ('varcopes', 'varcopes.mni'),
-    #               ('zstats', 'zstats.mni'),
-    #               ])])
-
     return wf
+
+
+class FirstLevel(object):
+    """ Validates arguments, and connect inputs to first level workflow"""
+    __metaclass__ = abc.ABCMeta
+
+    def __init__(self, args):
+        self.validate_arguments(args)
+        self.create_workflow()
+        self._add_custom()
+
+    def execute(self):
+        if self.run:
+            if self.jobs == 1:
+                self.wf.run()
+            else:
+                self.wf.run(plugin='MultiProc', plugin_args={'n_procs': self.jobs})
+        else:
+            return self.wf
+
+    def validate_arguments(self, args):
+        """ Validate and preload command line arguments """
+
+        # Clean up names
+        var_names = {'<out_dir>': 'out_dir',
+                     '<in_dir>': 'in_dir',
+                     '-w': 'work_dir',
+                     '-s': 'subjects',
+                     '-r': 'runs',
+                     '-t': 'transformations'}
+
+        if args.pop('-c'):
+            from nipype import config
+            cfg = dict(logging=dict(workflow_level='DEBUG'),
+                       execution={'stop_on_first_crash': True})
+            config.update_config(cfg)
+
+        for old, new in var_names.iteritems():
+            args[new] = args.pop(old)
+
+        for directory in ['out_dir', 'work_dir']:
+            if args[directory] is not None:
+                args[directory] = os.path.abspath(args[directory])
+                if not os.path.exists(args[directory]):
+                    os.makedirs(args[directory])
+
+        # Check subject ids and runs
+        for entity in ['subjects', 'runs']:
+            args[entity] = args[entity].split(" ")
+
+        if args['transformations'] is not None:
+            args['transformations'] = os.path.abspath(args['transformations'])
+            try:
+                json.load(open(args['transformations'], 'r'))
+            except ValueError:
+                raise Exception("Invalid transformation JSON file")
+            except IOError:
+                raise Exception("Transformation file not found")
+
+        self.jobs = int(args.pop('--jobs'))
+        self.run = args.pop('run')
+        args.pop('make')
+
+        self.arguments = args
+
+    def create_workflow(self):
+        """
+        Import model specific files
+        """
+        self.wf = create_first_level(**self.arguments)
+
+    @abc.abstractmethod
+    def _add_custom(self):
+        """ Add custom connections to the workflow after having loaded it
+        Datasource templates *must* be updated """

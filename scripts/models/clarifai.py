@@ -1,4 +1,9 @@
-def get_features(runs):
+import sys
+sys.path.insert(0, "../")
+from fmri_hcp_firstlevel import FirstLevelHCP
+
+
+def _get_features(runs):
     """ Inject extracted features into event files """
     import pandas as pd
     from glob import glob
@@ -35,24 +40,25 @@ def get_features(runs):
     return new_event_files
 
 
-"""
-Define conditions and contrasts
-(this should be auto-generated or loaded from model json in the future)
-"""
-
-conditions = ['street', 'outdoors', 'light', 'adult']
-contrasts = [['street', 'T', conditions, [1, 0, 0, 0]],
-             ['outdoors', 'T', conditions, [0, 1, 0, 0]],
-             ['light', 'T', conditions, [0, 0, 1, 0]],
-             ['adult', 'T', conditions, [0, 0, 0, 1]],
-             ['svo', 'T', conditions, [1, -1, 0, 0]],
-             ['svl', 'T', conditions, [1, 0, -1, 0]],
-             ['sva', 'T', conditions, [1, 0, 0, -1]],
-             ['ovl', 'T', conditions, [0, 1, -1, 0]],
-             ['ova', 'T', conditions, [0, 1, 0, -1]],
-             ['lva', 'T', conditions, [0, 0, 1, -1]]
-             ]
-TR = 1
-
-field_template = dict(
-    func='downsample/2.5/downsampled_func/%s/tfMRI_MOVIE%s*[AP]_flirt.nii.gz')
+class FourLabels(FirstLevelHCP):
+    def validate_arguments(self, args):
+        super(FourLabels, self).validate_arguments(args)
+        self.field_template = dict(
+            func='downsample/2.5/downsampled_func/%s/tfMRI_MOVIE%s*[AP]_flirt.nii.gz')
+        self.template_args = dict(
+            func=[['subject_id', 'runs']])
+        conditions = ['street', 'outdoors', 'light', 'adult']
+        self.arguments['conditions'] = conditions
+        self.arguments['contrasts'] = [
+            ['street', 'T', conditions, [1, 0, 0, 0]],
+            ['outdoors', 'T', conditions, [0, 1, 0, 0]],
+            ['light', 'T', conditions, [0, 0, 1, 0]],
+            ['adult', 'T', conditions, [0, 0, 0, 1]],
+            ['svo', 'T', conditions, [1, -1, 0, 0]],
+            ['svl', 'T', conditions, [1, 0, -1, 0]],
+            ['sva', 'T', conditions, [1, 0, 0, -1]],
+            ['ovl', 'T', conditions, [0, 1, -1, 0]],
+            ['ova', 'T', conditions, [0, 1, 0, -1]],
+            ['lva', 'T', conditions, [0, 0, 1, -1]]]
+        self.arguments['TR'] = 1
+        self._get_features = _get_features

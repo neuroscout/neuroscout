@@ -7,7 +7,6 @@ Usage:
 -s <subject_id>         Subjects to analyze. [default: all]
 -r <run_ids>            Runs to analyze. [default: all]
 -w <work_dir>           Working directory.
-                        [default: /tmp]
 -c                      Stop on first crash.
 --jobs=<n>              Number of parallel jobs [default: 1].
 """
@@ -16,12 +15,13 @@ from docopt import docopt
 from base import FirstLevel
 from nipype.pipeline.engine import Node
 from nipype.interfaces.utility import Function
+from base import load_class
 
 
 class FirstLevelHCP(FirstLevel):
     def validate_arguments(self, args):
         super(FirstLevelHCP, self).validate_arguments(args)
-        self.arguments['mask'] = '/mnt/d/neuroscout/datasets/hcp/MNI_25mm_brain_mask.nii.gz'
+        self.arguments['mask'] = '/mnt/d/neuroscout/datasets/hcp/MNI_3mm_brain_mask.nii.gz'
 
     def _add_custom(self):
         """
@@ -29,7 +29,7 @@ class FirstLevelHCP(FirstLevel):
         """
         fx_getter = Node(name='fx_getter', interface=Function(
             input_names=['runs'],
-            output_names=["transformed_events"], function=self.model.get_features))
+            output_names=["transformed_events"], function=self._get_features))
         fx_getter.inputs.runs = self.arguments['runs']
         self.wf.connect(fx_getter, 'transformed_events', self.wf.get_node('eventspec'), 'bids_events')
 
@@ -37,13 +37,13 @@ class FirstLevelHCP(FirstLevel):
         Add inputs to datasource
         """
         datasource = self.wf.get_node('datasource')
-        datasource.inputs.field_template = dict(
-            func='downsample/2.5/downsampled_func/%s/tfMRI_MOVIE%s*[AP]_flirt.nii.gz')
-        datasource.inputs.template_args = dict(
-            func=[['subject_id', 'runs']])
+        datasource.inputs.field_template = self.field_template
+        datasource.inputs.template_args = self.template_args
         datasource.inputs.runs = self.arguments['runs']
 
 
 if __name__ == '__main__':
-    runner = FirstLevelHCP(docopt(__doc__))
+    args = docopt(__doc__)
+    Analysis = load_class(args.pop('<model>'))
+    runner = Analysis(args)
     runner.execute()

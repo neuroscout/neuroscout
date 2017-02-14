@@ -1,15 +1,5 @@
 """"
-Usage:
-    fmri_hcp_first run [options] <in_dir> <out_dir>
-    fmri_hcp_first make [options] [<in_dir> <out_dir>]
-
--t <transformations>    Transformation to apply to events.
--s <subject_id>         Subjects to analyze. [default: all]
--r <run_ids>            Runs to analyze. [default: all]
--w <work_dir>           Working directory.
-                        [default: /tmp]
--c                      Stop on first crash.
---jobs=<n>              Number of parallel jobs [default: 1].
+Patch script to go from lower levels to fixed fx
 """
 
 # Need to remove BIDS stuff
@@ -36,28 +26,37 @@ from nipype.workflows.fmri.fsl import (create_modelfit_workflow,
 #            execution={'stop_on_first_crash': True})
 # config.update_config(cfg)
 
-subjects = ['100610', '104416', '114823', '128935']
+subjects = ['102311', '104416', '105923', '146129', '146432', '150423', '155938', '203418', '209228', '573249']
+out_dir = '/mnt/d/neuroscout/analyses/hcp/kdd_fx'
+in_dir = '/tmp/first_level/modelfit'
 runs = ['1', '2', '3', '4']
-out_dir = '/mnt/d/neuroscout/analyses/hcp/clarifai_fx'
-in_dir = '/mnt/d/tmp/first_level/modelfit'
-conditions = ['street', 'outdoors', 'light', 'adult']
-contrasts = [['street', 'T', conditions, [1, 0, 0, 0]],
-             ['outdoors', 'T', conditions, [0, 1, 0, 0]],
-             ['light', 'T', conditions, [0, 0, 1, 0]],
-             ['adult', 'T', conditions, [0, 0, 0, 1]],
-             ['svo', 'T', conditions, [1, -1, 0, 0]],
-             ['svl', 'T', conditions, [1, 0, -1, 0]],
-             ['sva', 'T', conditions, [1, 0, 0, -1]],
-             ['ovl', 'T', conditions, [0, 1, -1, 0]],
-             ['ova', 'T', conditions, [0, 1, 0, -1]],
-             ['lva', 'T', conditions, [0, 0, 1, -1]]
-             ]
+jobs = 5
+conditions = ['street', 'outdoors', 'light', 'adult', 'sentiment',
+              'long_freq', 'concreteness', 'word',
+              '60_250',
+              'maxfaceConfidence']
+
+
+def create_contrasts(conditions):
+    """ Creates basic contrasts.
+    Expand this and stick into main script later """
+    contrasts = []
+    for i, con in enumerate(conditions):
+        mat = [0] * len(conditions)
+        mat[i] = 1
+        c = [con, 'T', conditions, mat]
+        contrasts.append(c)
+
+    return contrasts
+
+
+contrasts = create_contrasts(conditions)
 
 """
 Set up workflow
 """
 wf = Workflow(name='fixed_fx')
-wf.base_dir = '/mnt/d/tmp/fixed_patch_c/'
+wf.base_dir = '/mnt/d/tmp/fixed_patch_kdd/'
 """
 Subject iterator
 """
@@ -68,7 +67,6 @@ infosource.iterables = ('subject_id', subjects)
 """
 Grab data for each subject
 """
-
 datasource = MapNode(DataGrabber(infields=['subject_id', 'run'],
                                  outfields=['copes', 'varcopes', 'dof']),
                      name='datasource', iterfield=['run'])
@@ -93,7 +91,7 @@ Fixed effects workflow to combine runs
 """
 
 fixed_fx = create_fixed_effects_flow()
-fixed_fx.inputs.flameo.mask_file = '/mnt/d/neuroscout/datasets/hcp/MNI_25mm_brain_mask_thr.nii.gz'
+fixed_fx.inputs.flameo.mask_file = '/mnt/d/neuroscout/datasets/hcp/MNI_3mm_brain_mask_thr.nii.gz'
 
 
 def sort_copes(copes, varcopes, contrasts):
@@ -186,4 +184,4 @@ wf.connect([(fixed_fx.get_node('outputspec'), datasink,
               ('tstats', 'tstats')])
             ])
 
-wf.run()
+wf.run(plugin='MultiProc', plugin_args={'n_procs': jobs})
