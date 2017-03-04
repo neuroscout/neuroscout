@@ -192,7 +192,7 @@ class FirstLevel(object):
     def __init__(self, args):
         self.validate_arguments(args)
         self.create_workflow()
-        self._add_custom()
+        self._add_connectons()
 
     def execute(self):
         if self.run:
@@ -220,8 +220,9 @@ class FirstLevel(object):
                        execution={'stop_on_first_crash': True})
             config.update_config(cfg)
 
-        for old, new in var_names.iteritems():
-            args[new] = args.pop(old)
+        for old, new in var_names.items():
+            if old in args:
+                args[new] = args.pop(old)
 
         for directory in ['out_dir', 'work_dir']:
             if args[directory] is not None:
@@ -255,6 +256,6 @@ class FirstLevel(object):
         self.wf = create_first_level(**self.arguments)
 
     @abc.abstractmethod
-    def _add_custom(self):
+    def _add_connectons(self):
         """ Add custom connections to the workflow after having loaded it
         Datasource templates *must* be updated """

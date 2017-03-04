@@ -23,7 +23,7 @@ class FirstLevelHCP(FirstLevel):
         super(FirstLevelHCP, self).validate_arguments(args)
         self.arguments['mask'] = '/mnt/d/neuroscout/datasets/hcp/MNI_3mm_brain_mask.nii.gz'
 
-    def _add_custom(self):
+    def _add_connectons(self):
         """
         Add pliers features and connect to workflow.
         """
