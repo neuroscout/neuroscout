@@ -27,7 +27,7 @@ def load_class(full_class_string):
     return getattr(module, class_str)
 
 
-def create_first_level(in_dir, subjects, runs, contrasts, mask,
+def create_first_level(in_dir, subjects, runs, contrasts, mask=None,
                        out_dir=None, work_dir=None, transformations=None, TR=1):
     """
     Set up workflow
@@ -93,7 +93,9 @@ def create_first_level(in_dir, subjects, runs, contrasts, mask,
     """
 
     fixed_fx = create_fixed_effects_flow()
-    fixed_fx.inputs.flameo.mask_file = mask
+
+    if mask is not None:
+        fixed_fx.inputs.flameo.mask_file = mask
 
     def sort_copes(copes, varcopes, contrasts):
         import numpy as np

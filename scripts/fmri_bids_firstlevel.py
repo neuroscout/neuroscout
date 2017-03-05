@@ -81,11 +81,14 @@ class FirstLevelBIDS(FirstLevel):
         """
         datasource = self.wf.get_node('datasource')
         datasource.inputs.field_template =  dict(
-            func='sub-%s/func/sub-%s_task-%s_%s_bold_space-MNI152NLin2009cAsym_preproc.nii.gz')
+            func='sub-%s/func/sub-%s_task-%s_%s_bold_space-MNI152NLin2009cAsym_preproc.nii.gz',
+            mask='sub-%s/func/sub-%s_task-%s_%s_bold_space-MNI152NLin2009cAsym_brainmask.nii.gz',)
         datasource.inputs.template_args = dict(
-            func=[['subject_id', 'subject_id', 'task', 'runs']])
+            func=[['subject_id', 'subject_id', 'task', 'runs']],
+            mask=[['subject_id', 'subject_id', 'task', 'runs']])
         datasource.inputs.runs = self.arguments['runs']
         datasource.inputs.task = self.bids_args['task']
+        self.wf.connect(datasource, 'mask', fixed_fx, 'inputs.flameo.mask_file')
 
 if __name__ == '__main__':
     args = docopt(__doc__)
