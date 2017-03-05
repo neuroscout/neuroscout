@@ -43,7 +43,7 @@ class FirstLevelBIDS(FirstLevel):
         # Check subject ids and runs
         for entity in ['subjects', 'runs']:
             all_ents = layout.get(
-                target=entity[:-1], return_type='id', task=self.bids_args['task']) ### Session??
+                target=entity[:-1], return_type='id', task=self.bids_args['task'])
 
             if self.arguments[entity] == 'all':
                 self.arguments[entity] = all_ents
@@ -52,7 +52,8 @@ class FirstLevelBIDS(FirstLevel):
                     if e not in all_ents:
                         raise Exception("Invalid {} id {}.".format(entity[:-1], e))
 
-        self.arguments['in_dir'] = os.path.join(os.path.abspath(self.bids_args['<bids_dir>']), 'derivatives/fmriprep')
+        self.arguments['in_dir'] = os.path.join(
+            os.path.abspath(self.bids_args['<bids_dir>']), 'derivatives/fmriprep')
 
     def _add_connectons(self):
         """
