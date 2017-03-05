@@ -27,7 +27,7 @@ def load_class(full_class_string):
     return getattr(module, class_str)
 
 
-def create_first_level(in_dir, subjects, runs, conditions, contrasts, mask,
+def create_first_level(in_dir, subjects, runs, contrasts, mask,
                        out_dir=None, work_dir=None, transformations=None, TR=1):
     """
     Set up workflow
@@ -259,3 +259,15 @@ class FirstLevel(object):
     def _add_connectons(self):
         """ Add custom connections to the workflow after having loaded it
         Datasource templates *must* be updated """
+
+def create_basic_contrasts(conditions):
+    """ Creates basic contrasts.
+    Expand this and stick into main script later """
+    contrasts = []
+    for i, con in enumerate(conditions):
+        mat = [0] * len(conditions)
+        mat[i] = 1
+        c = [con, 'T', conditions, mat]
+        contrasts.append(c)
+
+    return contrasts

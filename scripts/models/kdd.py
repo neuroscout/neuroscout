@@ -133,7 +133,7 @@ def _get_features(runs):
 
 class AllFeatures(FirstLevelHCP):
     def validate_arguments(self, args):
-        super(AllFeatures, self).validate_arguments(args)
+        super().validate_arguments(args)
         self.field_template = dict(
             func='downsample/3/downsampled_func/%s/tfMRI_MOVIE%s*[AP]_flirt.nii.gz')
         self.template_args = dict(
@@ -144,17 +144,6 @@ class AllFeatures(FirstLevelHCP):
                       '60_250',
                       'maxfaceConfidence']
 
-        def create_contrasts(conditions):
-            """ Creates basic contrasts.
-            Expand this and stick into main script later """
-            contrasts = []
-            for i, con in enumerate(conditions):
-                mat = [0] * len(conditions)
-                mat[i] = 1
-                c = [con, 'T', conditions, mat]
-                contrasts.append(c)
-
-            return contrasts
         self.arguments['conditions'] = conditions
         self.arguments['contrasts'] = create_contrasts(conditions)
         self.arguments['TR'] = 1

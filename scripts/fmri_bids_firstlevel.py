@@ -22,7 +22,6 @@ import os
 class FirstLevelBIDS(FirstLevel):
     def validate_arguments(self, args):
         super(FirstLevelBIDS, self).validate_arguments(args)
-        self.arguments['mask'] = '/home/zorro/datasets/ds009/derivatives/fmriprep/sub-01/func/sub-01_task-emotionalregulation_run-01_bold_space-MNI152NLin2009cAsym_brainmask.nii.gz'
 
         ext = ['<bids_dir>', 'task']
         self.bids_args = {key : self.arguments.pop(key) for key in ext}
@@ -64,11 +63,11 @@ class FirstLevelBIDS(FirstLevel):
             from bids.grabbids import BIDSLayout
             layout = BIDSLayout(bids_dir)
             event_files = [layout.get(
-                type='events', return_type='file', subject=subject_id, run=r, task=task_id)[0] for r in runs]
+                type='events', return_type='file', subject=subject_id, run=r, task=task)[0] for r in runs]
             return event_files
 
         events_getter = Node(name='events_getter', interface=Function(
-            input_names=['bids_dir', 'subject_id', 'runs', 'task_id'],
+            input_names=['bids_dir', 'subject_id', 'runs', 'task'],
             output_names=['events'], function=_get_events))
         events_getter.inputs.runs = self.arguments['runs']
         events_getter.inputs.bids_dir = self.bids_args['<bids_dir>']
@@ -82,7 +81,7 @@ class FirstLevelBIDS(FirstLevel):
         """
         datasource = self.wf.get_node('datasource')
         datasource.inputs.field_template =  dict(
-            func='%s/func/%s_task-%s_run-%s_bold_space-MNI152NLin2009cAsym_preproc.nii.gz')
+            func='sub-%s/func/sub-%s_task-%s_%s_bold_space-MNI152NLin2009cAsym_preproc.nii.gz')
         datasource.inputs.template_args = dict(
             func=[['subject_id', 'subject_id', 'task', 'runs']])
         datasource.inputs.runs = self.arguments['runs']
