@@ -2,16 +2,22 @@ from database import db
 from db_utils import copy_row
 
 class Analysis(db.Model):
-	id = db.Column(db.Integer, primary_key=True) 
-	dataset_id = db.Column(db.Integer, db.ForeignKey('dataset.id'))
-	user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-	results = db.relationship('Result', backref='analysis',
-                                lazy='dynamic')
+	"""" A single fMRI analysis. """
+	id = db.Column(db.Integer, primary_key=True)
 	name = db.Column(db.String(30), nullable=False)
 	description = db.Column(db.String(30))
+
+	dataset_id = db.Column(db.Integer, db.ForeignKey('dataset.id'), nullable=False)
+	user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+	# If cloned, this is the parent analysis:
+	parent_id = db.Column(db.Integer, db.ForeignKey('analysis.id'))
+
+	results = db.relationship('Result', backref='analysis',
+                                lazy='dynamic')
 	predictors = db.relationship('Predictor', backref='analysis',
                                 lazy='dynamic')
-	parent_id = db.Column(db.Integer, db.ForeignKey('analysis.id'))
+	runs = db.relationship('Run', backref='analysis',
+                                lazy='dynamic')
 
 	def clone(self):
 		""" Make copy of analysis, with new id, and linking to parent """
