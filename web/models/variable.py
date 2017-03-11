@@ -5,15 +5,17 @@ class Variable(db.Model):
 	id = db.Column(db.Integer, primary_key=True)
 	events = db.relationship('VariableEvent', backref='variable',
                                 lazy='dynamic')
-	predictor = db.relationship('Predictor', backref='variable',
+	predictor_var = db.relationship('PredictorEvent', backref='variable',
 								lazy='dynamic')
 class ExtractedVariable(Variable):
 	""" A variable extracted from a Stimulus using an Extractor. """
+	id = db.Column(db.Integer, db.ForeignKey('variable.id'), primary_key=True)
 	extractor_id = db.Column(db.Integer, db.ForeignKey('extractor.id'))
 	stimulus_id = db.Column(db.Integer, db.ForeignKey('stimulus.id'))
 
 class OriginalVariable(Variable):
 	""" A variable that appears in the original BIDS study (e.g. RT) """
+	id = db.Column(db.Integer, db.ForeignKey('variable.id'), primary_key=True)
 
 
 class VariableEvent(db.Model):

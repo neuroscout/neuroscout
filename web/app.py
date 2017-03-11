@@ -12,6 +12,9 @@ from flask_security import Security
 from models.auth import user_datastore
 from auth import authenticate, load_user
 
+from models.run import Run
+from models.variable import Variable
+
 # Setup Flask-Security and JWT
 security = Security(app, user_datastore)
 jwt = JWT(app, authenticate, load_user)

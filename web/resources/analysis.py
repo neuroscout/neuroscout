@@ -8,7 +8,6 @@ from models.dataset import Dataset
 
 from database import db
 
-from .event import EventSchema
 from .predictor import PredictorSchema
 from .result import ResultSchema
 
@@ -22,7 +21,6 @@ class AnalysisSchema(Schema):
 	results = fields.Nested(ResultSchema, many=True, only='id')
 	name = fields.Str(required=True)
 	description = fields.Str(required=True)
-	events = fields.Nested(EventSchema, many=True, only='id')
 	predictors = fields.Nested(PredictorSchema, many=True, only='id')
 	parent = fields.Nested('AnalysisSchema', only='id')
 
@@ -80,5 +78,3 @@ class AnalysisListResource(Resource):
 			return AnalysisSchema().dump(new)
 
 	## Return some information like the analysis id
-
-	

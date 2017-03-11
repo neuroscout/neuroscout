@@ -15,9 +15,9 @@ class Config(object):
 
 class DevelopmentConfig(Config):
     DEBUG = True
-    DB_NAME = 'ns_dev'
+    DB_NAME = 'neuroscout'
     DB_USER = 'postgres'
-    DB_PASS = 'postgres'
+    DB_PASS = ''
     DB_SERVICE = 'postgres'
     DB_PORT = 5432
     SQLALCHEMY_DATABASE_URI = 'postgresql://{0}:{1}@{2}:{3}/{4}'.format(
@@ -34,5 +34,5 @@ class TravisConfig(Config):
     TESTING = True
 
 class HomeConfig(Config):
-    DEBUG = True
-    SQLALCHEMY_DATABASE_URI = "postgresql://localhost:5433/ns_dev"
+    SQLALCHEMY_DATABASE_URI = 'postgresql://postgres@localhost:5432/neuroscout'
+    PROPAGATE_EXCEPTIONS = True

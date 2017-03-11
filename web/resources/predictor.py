@@ -3,11 +3,9 @@ from flask_restful_swagger.swagger import operation
 from flask_jwt import jwt_required
 from marshmallow import Schema, fields, post_load, validates, ValidationError
 from models.predictor import Predictor
-from .event import EventSchema
 
 class PredictorSchema(Schema):
 	id = fields.Str(dump_only=True)
-	stimuli = fields.Nested(EventSchema, many=True, only='id')
 
 	@post_load
 	def make_db(self, data):
