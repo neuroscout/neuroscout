@@ -5,7 +5,8 @@ class ExtractedFeature(db.Model):
 	id = db.Column(db.Integer, primary_key=True)
 	description = db.Column(db.Text)
 
-	extractor_id = db.Column(db.Integer, db.ForeignKey('extractor.id'))
+	extractor_id = db.Column(db.Integer, db.ForeignKey('extractor.id'),
+				   nullable=False)
 
 	predictor_events = db.relationship('ExtractedEvent', backref='extractedfeature',
 								lazy='dynamic')
@@ -14,8 +15,9 @@ class ExtractedEvent(db.Model):
 	""" Events extracted from a Stimuli"""
 	id = db.Column(db.Integer, primary_key=True)
 	onset = db.Column(db.Float, nullable=False)
-	duration = db.Column(db.Float)
+	duration = db.Column(db.Float, nullable=False)
 	value = db.Column(db.Float, nullable=False)
 
-	stimulus_id = db.Column(db.Integer, db.ForeignKey('stimulus.id'))
-	extracted_feature_id = db.Column(db.Integer, db.ForeignKey('extractedfeature.id'))
+	stimulus_id = db.Column(db.Integer, db.ForeignKey('stimulus.id'), nullable=False)
+	extracted_feature_id = db.Column(db.Integer, db.ForeignKey('extractedfeature.id'),
+						   nullable=False)
