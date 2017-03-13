@@ -4,8 +4,8 @@ from db_utils import copy_row
 class Analysis(db.Model):
 	"""" A single fMRI analysis. """
 	id = db.Column(db.Integer, primary_key=True)
-	name = db.Column(db.String(30), nullable=False)
-	description = db.Column(db.String(30))
+	name = db.Column(db.String, nullable=False)
+	description = db.Column(db.Text)
 
 	dataset_id = db.Column(db.Integer, db.ForeignKey('dataset.id'), nullable=False)
 	user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)

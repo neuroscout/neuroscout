@@ -1,18 +1,15 @@
 from database import db
 
 class Predictor(db.Model):
-	""" Specific instantiation of a variable in a run, or a "column".
+	""" Instantiation of a predictor in a run, with run specific
+		onsets.
 
 		A collection of PredictorEvents.
 
-		In the case of ExtractedVariables, various can becombined
-		to form a single predictor.
-
-		In the case of OriginalVariable, it is usually a single variable per
-		predictor.
-
-	 	Also, join table between Analysis and Run. """
+	 	Also, joins Analysis and Run. """
 	id = db.Column(db.Integer, primary_key=True)
+	name = db.Column(db.Text)
+	description = db.Column(db.Text)
 
 	run_id = db.Column(db.Integer, db.ForeignKey('run.id'))
 	analysis_id = db.Column(db.Integer, db.ForeignKey('analysis.id'))
@@ -21,9 +18,10 @@ class Predictor(db.Model):
 								lazy='dynamic')
 
 class PredictorEvent(db.Model):
-	""" A variable instantiated in a specifc run. Onset is relative to run. """
+	""" An event within a Predictor. Onset is relative to run. """
 	id = db.Column(db.Integer, primary_key=True)
 	onset = db.Column(db.Float, nullable=False)
+	duration = db.Column(db.Float)
+	value = db.Column(db.Float, nullable=False)
 
 	predictor_id = db.Column(db.Integer, db.ForeignKey('predictor.id'))
-	variable_id = db.Column(db.Integer, db.ForeignKey('variable.id'))

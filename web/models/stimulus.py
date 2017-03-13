@@ -1,11 +1,5 @@
 from database import db
 
-# Join table between stimuli and runs.
-run_stimuli = db.Table('run_stimuli',
-                       db.Column('run_id', db.Integer(), db.ForeignKey('run.id')),
-                       db.Column('stimulus_id', db.Integer(), db.ForeignKey('stimulus.id')))
-
-
 class Stimulus(db.Model):
 	""" A unique stimulus. A stimulus may occur at different points in time,
 		and perhaps even across different datasets"""
@@ -13,5 +7,11 @@ class Stimulus(db.Model):
 
 	dataset_id = db.Column(db.Integer, db.ForeignKey('dataset.id'))
 
-	variables = db.relationship('ExtractedVariable', backref='stimulus',
+	extracted_events = db.relationship('ExtractedEvent', backref='stimulus',
                                 lazy='dynamic')
+
+class RunStimulus(db.Model):
+    """ Run Stimulus association table """
+    stimulus_id = db.Column(db.Integer, db.ForeignKey('stimulus.id'), primary_key=True)
+    run_id = db.Column(db.Integer, db.ForeignKey('run.id'), primary_key=True)
+    onset = db.Column(db.Float, nullable=False)

@@ -10,19 +10,23 @@ from database import db
 
 from .predictor import PredictorSchema
 from .result import ResultSchema
+from .run import RunSchema
 
 from sqlalchemy.orm.exc import NoResultFound
 
 class AnalysisSchema(Schema):
 	id = fields.Int(dump_only=True)
-	dataset_id = fields.Int(required=True)
-	user_id = fields.Int(required=True, dump_only=True)
-
-	results = fields.Nested(ResultSchema, many=True, only='id')
 	name = fields.Str(required=True)
 	description = fields.Str(required=True)
-	predictors = fields.Nested(PredictorSchema, many=True, only='id')
+
+	dataset_id = fields.Int(required=True)
+	user_id = fields.Int(required=True, dump_only=True)
 	parent = fields.Nested('AnalysisSchema', only='id')
+
+	results = fields.Nested(ResultSchema, many=True, only='id')
+	predictors = fields.Nested(PredictorSchema, many=True, only='id')
+	runs = fields.Nested(RunSchema, many=True, only='id')
+
 
 	@post_load
 	def make_db(self, data):

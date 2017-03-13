@@ -4,12 +4,10 @@ from flask_jwt import jwt_required
 from marshmallow import Schema, fields, post_load, validates, ValidationError
 from models.stimulus import Stimulus
 
-from .predictor import PredictorSchema
-
 class StimulusSchema(Schema):
 	id = fields.Str(dump_only=True)
-	predictors = fields.Nested(PredictorSchema, many=True, only='id')
 
+	# Could potentially include ExtractedEvents as a nested Schema
 	@post_load
 	def make_db(self, data):
 		return Stimulus(**data)

@@ -6,6 +6,7 @@ from models.extractor import Extractor
 
 from sqlalchemy.orm.exc import NoResultFound
 
+
 class ExtractorSchema(Schema):
 	id = fields.Str(dump_only=True)
 
