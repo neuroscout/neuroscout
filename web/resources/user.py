@@ -67,4 +67,3 @@ class UserResource(Resource):
 
 		if errors:
 			abort(400 , errors=errors)
-

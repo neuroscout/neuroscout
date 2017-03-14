@@ -59,7 +59,6 @@ def session(db):
 
     yield session
 
-    print("Rollin")
     session.remove()
     transaction.rollback()
     connection.close()
@@ -74,13 +73,8 @@ def auth_client(add_users):
     return client
 
 ### Data population fixtures
-from models.dataset import Dataset
-from models.analysis import Analysis
-from models.predictor import Predictor
-from models.extractor import Extractor
-from models.stimulus import Stimulus
-from models.result import Result
-from models.event import Event
+from models import (Analysis, User, Dataset, Predictor, Extractor, Stimulus,
+					Result, ExtractedFeature, ExtractedEvent)
 
 @pytest.fixture(scope="function")
 def add_users(app, db, session):
@@ -117,7 +111,7 @@ def add_datasets(session):
 
 @pytest.fixture(scope="function")
 def add_analyses(session, add_users, add_datasets):
-    analysis = Analysis(dataset_id = add_datasets[0], user_id = add_users[0][0], 
+    analysis = Analysis(dataset_id = add_datasets[0], user_id = add_users[0][0],
         name = "My first fMRI analysis!", description = "Ground breaking")
 
     analysis_2 = Analysis(dataset_id = add_datasets[0], user_id = add_users[0][1],
@@ -151,15 +145,6 @@ def add_result(session, add_analyses):
     return result.id
 
 @pytest.fixture(scope="function")
-def add_event(session):
-    event = Event(onset = 0, duration = 1, amplitude = 1)
-
-    session.add(event)
-    session.commit()
-
-    return event.id
-
-@pytest.fixture(scope="function")
 def add_stimulus(session, add_datasets):
     stim = Stimulus(dataset_id = add_datasets[0])
 
@@ -169,7 +154,27 @@ def add_stimulus(session, add_datasets):
     return stim.id
 
 @pytest.fixture(scope="function")
-def add_predictor(session, add_extractor, add_stimulus):
+def add_extracted_feature(session, add_extractor):
+    extracted_feature = ExtractedFeature(description="Something",
+                        extractor_id=add_extractor)
+    session.add(extracted_feature)
+    session.commit()
+
+    return extracted_feature.id
+
+@pytest.fixture(scope="function")
+def add_extracted_event(session, add_extracted_feature, add_stimulus):
+    extracted_feature = ExtractedEvent(onset=0, duration=1, value=1,
+                        stimulus_id=add_stimulus,
+                        extracted_feature_id=add_extracted_feature)
+
+    session.add(extracted_feature)
+    session.commit()
+
+    return extracted_feature.id
+
+@pytest.fixture(scope="function")
+def add_predictor(session):
     predictor = Predictor()
 
     session.add(predictor)

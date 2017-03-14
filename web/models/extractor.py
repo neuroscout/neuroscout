@@ -1,11 +1,13 @@
 from database import db
 
 class Extractor(db.Model):
+	""" A pliers extractor that transforms a Stimulus into ExtractedEvents """
 	id = db.Column(db.Integer, primary_key=True)
-	name = db.Column(db.String(30))
-	predictors = db.relationship('Predictor', backref='extractor',
+	name = db.Column(db.String)
+	description = db.Column(db.Text)
+	version = db.Column(db.Float)
+	input_type = db.Column(db.Text)
+	output_type  = db.Column(db.Text)
+
+	extracted_features = db.relationship('ExtractedFeature', backref='extractor',
                                 lazy='dynamic')
-	description = db.Column(db.String(30))
-	version = db.Column(db.Float(10))
-	input_type = db.Column(db.String(20))
-	output_type  = db.Column(db.String(20))

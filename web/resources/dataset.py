@@ -6,16 +6,18 @@ from marshmallow import Schema, fields, post_load, validates, ValidationError
 from models.dataset import Dataset
 
 from .analysis import AnalysisSchema
-from .stimulus import StimulusSchema
+from .run import RunSchema
 
 from sqlalchemy.orm.exc import NoResultFound
 
 class DatasetSchema(Schema):
 	id = fields.Str(dump_only=True)
 	external_id = fields.Str(required=True)
-	analyses = fields.Nested(AnalysisSchema, many=True, only='id')
-	stimuli = fields.Nested(StimulusSchema, many=True, only='id')
 	name = fields.Str(required=True)
+	description = fields.Str(required=True)
+
+	analyses = fields.Nested(AnalysisSchema, many=True, only='id')
+	runs = fields.Nested(RunSchema, many=True, only='id')
 
 	@post_load
 	def make_db(self, data):

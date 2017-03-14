@@ -18,12 +18,9 @@ def test_get_dataset(auth_client, add_datasets):
 	assert dataset_list[0] == dataset
 
 	assert type(dataset['analyses']) == list
-	assert type(dataset['stimuli']) == list
 	assert dataset['name'] != ''
 
 	# Try getting nonexistent datset
 	rv = auth_client.get('/api/datasets/{}'.format('non-existent'))
 	assert rv.status_code == 400
 	assert 'does not exist' in decode_json(rv)['message']
-
-

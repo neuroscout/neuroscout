@@ -1,12 +1,6 @@
 import pytest
-from models.dataset import Dataset
-from models.analysis import Analysis
-from models.auth import User
-from models.predictor import Predictor
-from models.extractor import Extractor
-from models.stimulus import Stimulus
-from models.result import Result
-from models.event import Event
+from models import (Analysis, User, Dataset, Predictor, Extractor, Stimulus,
+					Result, ExtractedFeature, ExtractedEvent)
 
 #### Tests
 def test_dataset(session, add_analyses):
@@ -28,7 +22,7 @@ def test_dataset(session, add_analyses):
 
 	# Try adding dataset with same external id as existing one
 	with pytest.raises(Exception) as excinfo:
-		session.add(Dataset(name="Test", 
+		session.add(Dataset(name="Test",
 			external_id=first_dataset.external_id))
 		session.commit()
 	assert 'unique constraint "dataset_external_id_key"' in str(excinfo)
@@ -45,7 +39,7 @@ def test_analysis(session, add_analyses, add_predictor):
 	first_analysis.predictors = [pred]
 	session.commit()
 	assert Predictor.query.filter_by(id = add_predictor).one().analysis_id \
-		== first_analysis.id 
+		== first_analysis.id
 
 	# Try adding analysis without a name
 	with pytest.raises(Exception) as excinfo:
@@ -67,40 +61,25 @@ def test_extractor(session, add_extractor, add_predictor):
 
 	extractor = Extractor.query.first()
 
-	# Add predictor
-	pred = Predictor.query.filter_by(id = add_predictor).one()
-	extractor.predictors = [pred]
-	session.commit()
-	assert Predictor.query.filter_by(id = add_predictor).one().extractor_id \
-		== extractor.id 
+	# Add more stuff here
 
 
-def test_predictor(session, add_predictor, add_event):
+def test_predictor(session, add_predictor):
 	assert Predictor.query.count() == 1
 
 	predictor = Predictor.query.first()
 
-	# Add event
-	event = Event.query.filter_by(id = add_event).one()
-	predictor.events = [event]
-	session.commit()
-	assert Event.query.filter_by(id = add_event).one().predictor_id \
-		== predictor.id 
+def test_features(add_extracted_event):
+	assert ExtractedEvent.query.filter_by(id=add_extracted_event).count() == 1
 
-def test_event(add_event, add_predictor):
-	assert Event.query.count() == 1
+	ev = ExtractedEvent.query.filter_by(id=add_extracted_event).first()
+	assert ExtractedFeature.query.filter_by(id=ev.extracted_feature_id).count() == 1
+
 
 def test_stimulus(session, add_stimulus, add_predictor):
 	assert Stimulus.query.count() == 1
 
 	stim = Stimulus.query.first()
-
-	# Add predictor
-	pred = Predictor.query.filter_by(id = add_predictor).one()
-	stim.predictors = [pred]
-	session.commit()
-	assert Predictor.query.filter_by(id = add_predictor).one().stimulus_id \
-		== stim.id 
 
 def test_result(add_result):
 	assert Result.query.count() == 1

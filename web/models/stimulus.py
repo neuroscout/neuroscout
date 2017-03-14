@@ -1,15 +1,17 @@
 from database import db
 
 class Stimulus(db.Model):
-	""" Points to unique stimulus """
+	""" A unique stimulus. A stimulus may occur at different points in time,
+		and perhaps even across different datasets"""
 	id = db.Column(db.Integer, primary_key=True)
+
 	dataset_id = db.Column(db.Integer, db.ForeignKey('dataset.id'))
-	predictors = db.relationship('Predictor', backref='stimulus',
+
+	extracted_events = db.relationship('ExtractedEvent', backref='stimulus',
                                 lazy='dynamic')
 
-	## Hash of actual file. MD5 has of the unique file
-
-### Many to many between analysis and predictor
-# Many to many:
-# class App(db.Model):
-# 	id = db.Column(db.Integer, primary_key=True) 
+class RunStimulus(db.Model):
+    """ Run Stimulus association table """
+    stimulus_id = db.Column(db.Integer, db.ForeignKey('stimulus.id'), primary_key=True)
+    run_id = db.Column(db.Integer, db.ForeignKey('run.id'), primary_key=True)
+    onset = db.Column(db.Float, nullable=False)
