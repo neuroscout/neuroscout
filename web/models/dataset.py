@@ -4,10 +4,11 @@ from sqlalchemy.dialects.postgresql import JSON
 class Dataset(db.Model):
 	""" A BIDS dataset """
 	id = db.Column(db.Integer, primary_key=True)
-	description = db.Column(JSON) ## BIDS specification
-	name = db.Column(db.Text, nullable=False)
-	external_id = db.Column(db.Text, unique=True, nullable=False)
+	name = db.Column(db.Text, nullable=False, unique=True)
 
+	description = db.Column(JSON) # BIDS description
+	task_description = db.Column(JSON) # BIDS task descrition
+	task = db.Column(db.Text, nullable=False)
 	analyses = db.relationship('Analysis', backref='dataset',
                                 lazy='dynamic')
 	runs = db.relationship('Run', backref='dataset',
