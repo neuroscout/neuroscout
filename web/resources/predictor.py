@@ -4,6 +4,17 @@ from flask_jwt import jwt_required
 from marshmallow import Schema, fields, post_load, validates, ValidationError
 from models.predictor import Predictor, PredictorEvent
 
+# Predictor Event Resources
+class PredictorEventSchema(Schema):
+	id = fields.Str(dump_only=True)
+
+	@post_load
+	def make_db(self, data):
+		return Predictor(**data)
+
+	class Meta:
+		additional = ('onset', 'duraton', 'value')
+
 # Predictor Resources
 class PredictorSchema(Schema):
 	id = fields.Str(dump_only=True)
@@ -46,14 +57,3 @@ class PredictorListResource(Resource):
 		""" List of extracted predictors """
 		result = Predictor.query.filter_by().all()
 		return PredictorSchema(many=True).dump(result)
-
-# Predictor Event Resources
-class PredictorEventSchema(Schema):
-	id = fields.Str(dump_only=True)
-
-	@post_load
-	def make_db(self, data):
-		return Predictor(**data)
-
-	class Meta:
-		additional = ('onset', 'duraton', 'value')

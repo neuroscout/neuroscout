@@ -19,7 +19,7 @@ class DevelopmentConfig(Config):
     PROPAGATE_EXCEPTIONS = True
 
 class TestingConfig(Config):
-    SQLALCHEMY_DATABASE_URI = "postgresql://localhost:5433/scout_test"
+    SQLALCHEMY_DATABASE_URI = 'postgresql://zorro:dbpass@localhost:5432/scout_test'
     TESTING = True
 
 class TravisConfig(Config):

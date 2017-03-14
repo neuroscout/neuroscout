@@ -19,5 +19,5 @@ class ExtractedEvent(db.Model):
 	value = db.Column(db.Float, nullable=False)
 
 	stimulus_id = db.Column(db.Integer, db.ForeignKey('stimulus.id'), nullable=False)
-	extracted_feature_id = db.Column(db.Integer, db.ForeignKey('extractedfeature.id'),
+	extracted_feature_id = db.Column(db.Integer, db.ForeignKey(ExtractedFeature.id),
 						   nullable=False)

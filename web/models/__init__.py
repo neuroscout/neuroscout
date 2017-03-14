@@ -19,7 +19,7 @@ __all__ = [
     'Dataset',
     'Extractor',
     'ExtractedFeature',
-    'ExtractedVariable',
+    'ExtractedEvent',
     'Predictor',
     'PredictorEvent',
     'Result',

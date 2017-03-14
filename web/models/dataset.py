@@ -10,5 +10,5 @@ class Dataset(db.Model):
 
 	analyses = db.relationship('Analysis', backref='dataset',
                                 lazy='dynamic')
-	runs = db.relationship('Runs', backref='dataset',
+	runs = db.relationship('Run', backref='dataset',
                                 lazy='dynamic')

@@ -6,7 +6,7 @@ from marshmallow import Schema, fields, post_load, validates, ValidationError
 from models.dataset import Dataset
 
 from .analysis import AnalysisSchema
-from .stimulus import RunSchema
+from .run import RunSchema
 
 from sqlalchemy.orm.exc import NoResultFound
 
