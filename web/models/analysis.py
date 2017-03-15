@@ -14,8 +14,8 @@ class Analysis(db.Model):
 
 	results = db.relationship('Result', backref='analysis',
                                 lazy='dynamic')
-	predictors = db.relationship('Predictor', backref='analysis',
-                                lazy='dynamic')
+	# predictors = db.relationship('Predictor', backref='analysis',
+    #                             lazy='dynamic')
 
 	def clone(self):
 		""" Make copy of analysis, with new id, and linking to parent """

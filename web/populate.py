@@ -15,7 +15,7 @@ manager = Manager(app)
 
 @manager.command
 def add_dataset(bids_path, task):
-    from models import Dataset, Run, Predictor, PredictorEvent, StimulusResource
+    from models import Dataset, Run, Predictor, PredictorEvent
 
     dataset_di = {}
     dataset_di['description'] = json.load(open(
@@ -39,6 +39,7 @@ def add_dataset(bids_path, task):
         db.session.commit()
 
     for run in layout.get(task=task, type='events'):
+        print("Processing subject {}, {}".format(run.subject, run.run))
         run_model = Run(subject=run.subject, number=run.run, task=task,
                         dataset_id=dataset.id)
         db.session.add(run_model)
@@ -55,10 +56,10 @@ def add_dataset(bids_path, task):
             db.session.add(predictor)
             db.session.commit()
 
-            for i, val in tsv[col].items:
-                predictor_event = PredictorEvent(onset=onsets[i],
-                                                 duration = durations[i],
-                                                 value = val,
+            for i, val in tsv[col].items():
+                predictor_event = PredictorEvent(onset=onsets[i].item(),
+                                                 duration = durations[i].item(),
+                                                 value = str(val),
                                                  predictor_id=predictor.id)
                 db.session.add(predictor_event)
                 db.session.commit()
