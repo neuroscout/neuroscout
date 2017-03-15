@@ -8,6 +8,7 @@ import json
 
 from bids.grabbids import BIDSLayout
 import pandas as pd
+import db_utils
 
 app.config.from_object(os.environ['APP_SETTINGS'])
 db.init_app(app)
@@ -30,20 +31,22 @@ def add_dataset(bids_path, task):
     if task not in layout.get_tasks():
         raise ValueError("No such task")
 
-    dataset = Dataset.query.filter_by(name=dataset_di['name']).first()
-    if dataset:
-        print("Dataset already in db.")
-    else:
-        dataset = Dataset(**dataset_di)
-        db.session.add(dataset)
-        db.session.commit()
+    dataset_model, new = db_utils.get_or_create(db.session, Dataset, name=dataset_di['name'])
+
+    if new is False:
+        print("Dataset already in db")
 
     for run in layout.get(task=task, type='events'):
         print("Processing subject {}, {}".format(run.subject, run.run))
-        run_model = Run(subject=run.subject, number=run.run, task=task,
-                        dataset_id=dataset.id)
-        db.session.add(run_model)
-        db.session.commit()
+        run_model, new = db_utils.get_or_create(db.session, Run,
+                                                subject=run.subject,
+                                                number=run.run, task=task,
+                                                dataset_id=dataset_model.id)
+
+
+        if new is False:
+            print("Run is already in db")
+            continue
 
         tsv = pd.read_csv(run.filename, delimiter='\t', index_col=0)
         tsv = dict(tsv.iteritems())
@@ -52,17 +55,15 @@ def add_dataset(bids_path, task):
         stims = tsv.pop('stim_file')
 
         for col in tsv.keys():
-            predictor = Predictor(name=col, run_id=run_model.id)
-            db.session.add(predictor)
-            db.session.commit()
+            predictor, _ = db_utils.get_or_create(db.session, Predictor,
+                                                    name=col, run_id=run_model.id)
 
             for i, val in tsv[col].items():
-                predictor_event = PredictorEvent(onset=onsets[i].item(),
-                                                 duration = durations[i].item(),
-                                                 value = str(val),
-                                                 predictor_id=predictor.id)
-                db.session.add(predictor_event)
-                db.session.commit()
+                pe, _ = db_utils.get_or_create(db.session, PredictorEvent,
+                                               onset=onsets[i].item(),
+                                               duration = durations[i].item(),
+                                               value = str(val),
+                                               predictor_id=predictor.id)
 
         # Ingest stimuli, maybe do some hashing here if you want
 
