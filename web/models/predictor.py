@@ -1,5 +1,7 @@
 from database import db
 
+# Need to add join table between Predictor and Analysis
+
 class Predictor(db.Model):
 	""" Instantiation of a predictor in a run, with run specific
 		onsets.
@@ -8,11 +10,10 @@ class Predictor(db.Model):
 
 	 	Also, joins Analysis and Run. """
 	id = db.Column(db.Integer, primary_key=True)
-	name = db.Column(db.Text)
+	name = db.Column(db.Text, nullable=False)
 	description = db.Column(db.Text)
 
-	run_id = db.Column(db.Integer, db.ForeignKey('run.id'))
-	analysis_id = db.Column(db.Integer, db.ForeignKey('analysis.id'))
+	run_id = db.Column(db.Integer, db.ForeignKey('run.id'), nullable=False)
 
 	predictor_events = db.relationship('PredictorEvent', backref='predictor',
 								lazy='dynamic')
@@ -24,4 +25,5 @@ class PredictorEvent(db.Model):
 	duration = db.Column(db.Float)
 	value = db.Column(db.Float, nullable=False)
 
-	predictor_id = db.Column(db.Integer, db.ForeignKey('predictor.id'))
+	predictor_id = db.Column(db.Integer, db.ForeignKey('predictor.id'),
+							nullable=False)

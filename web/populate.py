@@ -7,6 +7,7 @@ from database import db
 import json
 
 from bids.grabbids import BIDSLayout
+import pandas as pd
 
 app.config.from_object(os.environ['APP_SETTINGS'])
 db.init_app(app)
@@ -14,6 +15,8 @@ manager = Manager(app)
 
 @manager.command
 def add_dataset(bids_path, task):
+    from models import Dataset, Run, Predictor, PredictorEvent, StimulusResource
+
     dataset_di = {}
     dataset_di['description'] = json.load(open(
         os.path.join(bids_path, 'dataset_description.json'), 'r'))
@@ -27,7 +30,6 @@ def add_dataset(bids_path, task):
     if task not in layout.get_tasks():
         raise ValueError("No such task")
 
-    from models import Dataset
     dataset = Dataset.query.filter_by(name=dataset_di['name']).first()
     if dataset:
         print("Dataset already in db.")
@@ -36,13 +38,32 @@ def add_dataset(bids_path, task):
         db.session.add(dataset)
         db.session.commit()
 
-    from models import Run
     for run in layout.get(task=task, type='events'):
         run_model = Run(subject=run.subject, number=run.run, task=task,
                         dataset_id=dataset.id)
         db.session.add(run_model)
         db.session.commit()
 
+        tsv = pd.read_csv(run.filename, delimiter='\t', index_col=0)
+        tsv = dict(tsv.iteritems())
+        onsets = tsv.pop('onset')
+        durations = tsv.pop('duration')
+        stims = tsv.pop('stim_file')
+
+        for col in tsv.keys():
+            predictor = Predictor(name=col, run_id=run_model.id)
+            db.session.add(predictor)
+            db.session.commit()
+
+            for i, val in tsv[col].items:
+                predictor_event = PredictorEvent(onset=onsets[i],
+                                                 duration = durations[i],
+                                                 value = val,
+                                                 predictor_id=predictor.id)
+                db.session.add(predictor_event)
+                db.session.commit()
+
+        # Ingest stimuli, maybe do some hashing here if you want
 
 if __name__ == '__main__':
     manager.run()
