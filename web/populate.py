@@ -63,7 +63,7 @@ def add_dataset(bids_path, task):
         durations = tsv.pop('duration')
         stims = tsv.pop('stim_file')
 
-        # # Parse event colums and insert as Predictors
+        # Parse event columns and insert as Predictors
         for col in tsv.keys():
             predictor, _ = db_utils.get_or_create(db.session, Predictor,
                                                     name=col, run_id=run_model.id)
