@@ -15,7 +15,7 @@ def _make_context():
 	import resources
 
 	client = Client(requests, 'http://127.0.0.1:5000',
-		username='test@gmail.com', password='test')
+		username='test2@test.com', password='password')
 
 	return dict(app=app, db=db, models=models, client=client,
 		resources=resources)

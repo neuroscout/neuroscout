@@ -28,7 +28,7 @@ from resources.extractor import ExtractorResource, ExtractorListResource
 from resources.result import ResultResource, ResultListResource
 from resources.run import RunResource
 from resources.stimulus import StimulusResource
-from resources.predictor  import PredictorResource, PredictorListResource
+from resources.predictor  import PredictorResource
 from resources.user  import UserResource
 
 api = swagger.docs(Api(app), apiVersion='0.1')
@@ -62,4 +62,4 @@ def index():
 
 if __name__ == '__main__':
     db.init_app(app)
-    app.run()
+    app.run(debug=app.config['DEBUG'])

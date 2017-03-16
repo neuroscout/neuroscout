@@ -45,4 +45,4 @@ class DatasetListResource(Resource):
 	def get(self):
 		""" List of datasets """
 		result = Dataset.query.filter_by().all()
-		return DatasetSchema(many=True).dump(result)
+		return DatasetSchema(many=True, only=['id', 'name', 'task']).dump(result)

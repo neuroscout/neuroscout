@@ -95,8 +95,13 @@ def add_dataset(bids_path, task):
                                                       stimulus_id=stimulus_model.id,
                                                       run_id=run_model.id,
                                                       onset=onsets[i].item())
+@manager.command
+def add_user(email, password):
+    from models import user_datastore
+    from flask_security.utils import encrypt_password
 
-### Add ingestion of Extractors, maybe from json config file ###
+    user_datastore.create_user(email=email, password=encrypt_password(password))
+    db.session.commit()
 
 if __name__ == '__main__':
     manager.run()
