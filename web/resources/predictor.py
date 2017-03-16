@@ -1,7 +1,7 @@
 from flask_restful import Resource, abort
 from flask_restful_swagger.swagger import operation
 from flask_jwt import jwt_required
-from marshmallow import Schema, fields, post_load, validates, ValidationError
+from marshmallow import Schema, fields, post_load
 from models.predictor import Predictor, PredictorEvent
 
 # Predictor Event Resources
@@ -10,7 +10,7 @@ class PredictorEventSchema(Schema):
 
 	@post_load
 	def make_db(self, data):
-		return Predictor(**data)
+		return PredictorEvent(**data)
 
 	class Meta:
 		additional = ('onset', 'duraton', 'value')
