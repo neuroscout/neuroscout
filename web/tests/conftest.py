@@ -73,8 +73,8 @@ def auth_client(add_users):
     return client
 
 ### Data population fixtures
-from models import (Analysis, User, Dataset, Predictor, Extractor, Stimulus,
-					Result, ExtractedFeature, ExtractedEvent)
+from models import (Analysis, Dataset, Predictor, Extractor, Stimulus,
+					Result, ExtractedFeature, ExtractedEvent, Run)
 
 @pytest.fixture(scope="function")
 def add_users(app, db, session):
@@ -99,15 +99,23 @@ def add_users(app, db, session):
 
 @pytest.fixture(scope="function")
 def add_datasets(session):
-    dataset = Dataset(name='Fancy fMRI study', external_id = 'ds_32')
+    dataset = Dataset(name='ds39', task='moviewatching')
     session.add(dataset)
     session.commit()
 
-    dataset_2 = Dataset(name='Indiana Jones', external_id = 'ds_33')
+    dataset_2 = Dataset(name='ds09', task='objectrecognition')
     session.add(dataset_2)
     session.commit()
 
     return [dataset.id, dataset_2.id]
+
+@pytest.fixture(scope="function")
+def add_run(session, add_datasets):
+    run = Run(subject=1, dataset_id=add_datasets[0])
+    session.add(run)
+    session.commit()
+
+    return run.id
 
 @pytest.fixture(scope="function")
 def add_analyses(session, add_users, add_datasets):
@@ -145,8 +153,8 @@ def add_result(session, add_analyses):
     return result.id
 
 @pytest.fixture(scope="function")
-def add_stimulus(session, add_datasets):
-    stim = Stimulus(dataset_id = add_datasets[0])
+def add_stimulus(session, add_run):
+    stim = Stimulus(path='/some/stim', sha1_hash='i9j23inf3f')
 
     session.add(stim)
     session.commit()
@@ -174,8 +182,8 @@ def add_extracted_event(session, add_extracted_feature, add_stimulus):
     return extracted_feature.id
 
 @pytest.fixture(scope="function")
-def add_predictor(session):
-    predictor = Predictor()
+def add_predictor(session, add_run):
+    predictor = Predictor(name='rt', run_id=add_run)
 
     session.add(predictor)
     session.commit()

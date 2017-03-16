@@ -36,7 +36,7 @@ api.add_resource(AnalysisListResource, '/api/analyses')
 api.add_resource(AnalysisResource, '/api/analyses/<analysis_id>')
 
 api.add_resource(DatasetListResource, '/api/datasets')
-api.add_resource(DatasetResource, '/api/datasets/<dataset_id>')
+api.add_resource(DatasetResource, '/api/datasets/<dataset_name>')
 
 api.add_resource(ExtractorListResource, '/api/extractors')
 api.add_resource(ExtractorResource, '/api/extractors/<extractor_id>')

@@ -13,7 +13,7 @@ class Run(db.Model):
 	number = db.Column(db.Text)
 	task = db.Column(db.Text)
 
-	dataset_id = db.Column(db.Integer, db.ForeignKey('dataset.id'))
+	dataset_id = db.Column(db.Integer, db.ForeignKey('dataset.id'), nullable=False)
 
 	predictors = db.relationship('Predictor', backref='run',
                                 lazy='dynamic')
