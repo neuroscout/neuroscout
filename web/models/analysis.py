@@ -1,6 +1,12 @@
 from database import db
 from db_utils import copy_row
 
+# Association table between analysis and predictor.
+analysis_predictor = db.Table('analysis_predictor',
+                       db.Column('analysis_id', db.Integer(), db.ForeignKey('analysis.id')),
+                       db.Column('predictor_id', db.Integer(), db.ForeignKey('predictor.id')))
+
+
 class Analysis(db.Model):
 	"""" A single fMRI analysis. """
 	id = db.Column(db.Integer, primary_key=True)
@@ -14,8 +20,6 @@ class Analysis(db.Model):
 
 	results = db.relationship('Result', backref='analysis',
                                 lazy='dynamic')
-	# predictors = db.relationship('Predictor', backref='analysis',
-    #                             lazy='dynamic')
 
 	def clone(self):
 		""" Make copy of analysis, with new id, and linking to parent """

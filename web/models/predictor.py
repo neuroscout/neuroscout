@@ -1,7 +1,5 @@
 from database import db
 
-# Need to add join table between Predictor and Analysis
-
 class Predictor(db.Model):
 	""" Instantiation of a predictor in a run, with run specific
 		onsets.
