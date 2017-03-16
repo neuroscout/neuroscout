@@ -15,7 +15,7 @@ def test_get_dataset(auth_client, add_datasets):
 	rv = auth_client.get('/api/datasets/{}'.format(first_dataset_name))
 	assert rv.status_code == 200
 	dataset = decode_json(rv)
-	assert dataset_list[0] == dataset
+	assert dataset_list[0]['name'] == dataset['name']
 
 	assert type(dataset['analyses']) == list
 	assert dataset['name'] != ''
