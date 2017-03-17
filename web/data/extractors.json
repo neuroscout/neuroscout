@@ -1,0 +1,40 @@
+[{
+  "name" : "IndicoAPITextExtractor",
+  "description" : "Indio API's Text extraction features",
+  "input_type" : "text"
+},
+{
+  "name" : "IndicoAPIImageExtractor",
+  "description" : "Indio API's Text extraction features",
+  "input_type" : "image"
+},
+{
+  "name" : "ClarifaiAPIExtractor",
+  "description" : "Clarifai's Labeling service",
+  "input_type" : "image"
+},{
+  "name" : "STFTAudioExtractor",
+  "description" : "Fourier Transform",
+  "input_type" : "audio"
+},{
+  "name" : "MeanAmplitudeExtractor",
+  "description" : "Mean frequency amplitude",
+  "input_type" : "audio"
+},{
+  "name" : "GoogleVisionAPIFaceExtractor",
+  "description" : "Face detection",
+  "input_type" : "image"
+},{
+  "name" : "GoogleVisionAPILabelExtractor",
+  "description" : "Categorical labeling of images.",
+  "input_type" : "image"
+},{
+  "name" : "GoogleVisionAPIPropertyExtractor",
+  "description" : "Visual property labeling",
+  "input_type" : "image"
+},{
+  "name" : "GoogleVisionAPISafeSearchExtractor",
+  "description" : "Detecting of NSFW categories",
+  "input_type" : "image"
+}
+]

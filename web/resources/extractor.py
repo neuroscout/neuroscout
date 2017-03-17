@@ -1,18 +1,21 @@
 from flask_restful import Resource, abort
 from flask_restful_swagger.swagger import operation
 from flask_jwt import jwt_required
-from marshmallow import Schema, fields
+from marshmallow import Schema, fields, post_load
 from models.extractor import Extractor
 
 from sqlalchemy.orm.exc import NoResultFound
 
-
 class ExtractorSchema(Schema):
 	id = fields.Str(dump_only=True)
+	name = fields.Str(required=True)
+
+	@post_load
+	def make_db(self, data):
+		return Extractor(**data)
 
 	class Meta:
-		# How many of these should be required
-		additional = ('name', 'description', 'version', 'input_type', 'output_type')
+		additional = ('description', 'version', 'input_type', 'output_type')
 
 class ExtractorResource(Resource):
 	""" Individual extractor """
