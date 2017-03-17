@@ -1,4 +1,4 @@
-# neuroscout ⚜
+# neuroscout 
 
 [![Build Status](https://travis-ci.com/PsychoinformaticsLab/neuroscout.svg?token=mytABRBRnBitJJpBpMxh&branch=master)](https://travis-ci.com/PsychoinformaticsLab/neuroscout)
 
@@ -22,7 +22,39 @@ If you make a change to /web but don't want your db to be nuked, reload like thi
 If you need to upgrade the db:
 
     docker-compose run --rm web python manage.py db migrate
+    docker-compose run --rm web python manage.py db upgrade
+    
+## Populating the database
+You can use `populate.py` to ingest data into the database. At the least you want to add a user to be able to access the API.
 
-Ideally, run migration scripts outside of Docker so they are tracked by git (in the future this will be forced)
+To add users:
 
-    python manage.py db migrate
+    python manage.py add_user useremail password
+    
+To add BIDS datasets
+
+    python manage,py add_dataset bids_directory_path task_name
+    
+
+## API
+Once the server is up and running, you can access the API however you'd like. 
+### Authorization
+To authorize API requests, we use JSON Web Tokens using Flask-JWT. Simply navigate to localhost:5000/auth and post the following
+
+    {
+        "username": "joe",
+        "password": "pass"
+    }
+
+You will receive an authorization token in return, such as:
+
+    {
+        "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZGVudGl0eSI6MSwiaWF0IjoxNDQ0OTE3NjQwLCJuYmYiOjE0NDQ5MTc2NDAsImV4cCI6MTQ0NDkxNzk0MH0.KPmI6WSjRjlpzecPvs3q_T3cJQvAgJvaQAPtk1abC_E"
+    }
+
+You can then insert this token into the header to authorize API requests:
+
+    GET /protected HTTP/1.1
+    Authorization: JWT eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZGVudGl0eSI6MSwiaWF0IjoxNDQ0OTE3NjQwLCJuYmYiOjE0NDQ5MTc2NDAsImV4cCI6MTQ0NDkxNzk0MH0.KPmI6WSjRjlpzecPvs3q_T3cJQvAgJvaQAPtk1abC_E
+    
+Tokens expire, so you'll probably need to get a new one soon. To facitate this, I've wrapped a Flask Client that auto authenticates and inserts the token into the header in web/tests/request_utils.py. You can use this more easily by entering into Shell mode: `python manage.py shell`. A client object will be preloaded (given the username in the file), that can be used to make requests to Flask. 

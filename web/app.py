@@ -26,8 +26,9 @@ from resources.analysis import AnalysisResource, AnalysisListResource
 from resources.dataset import DatasetResource, DatasetListResource
 from resources.extractor import ExtractorResource, ExtractorListResource
 from resources.result import ResultResource, ResultListResource
+from resources.run import RunResource
 from resources.stimulus import StimulusResource
-from resources.predictor  import PredictorResource, PredictorListResource
+from resources.predictor  import PredictorResource
 from resources.user  import UserResource
 
 api = swagger.docs(Api(app), apiVersion='0.1')
@@ -36,15 +37,17 @@ api.add_resource(AnalysisListResource, '/api/analyses')
 api.add_resource(AnalysisResource, '/api/analyses/<analysis_id>')
 
 api.add_resource(DatasetListResource, '/api/datasets')
-api.add_resource(DatasetResource, '/api/datasets/<dataset_id>')
+api.add_resource(DatasetResource, '/api/datasets/<dataset_name>')
 
 api.add_resource(ExtractorListResource, '/api/extractors')
 api.add_resource(ExtractorResource, '/api/extractors/<extractor_id>')
 
 api.add_resource(ResultListResource, '/api/results')
-api.add_resource(ResultResource, '/api/results/<timeline_id>')
+api.add_resource(ResultResource, '/api/results/<result_id>')
 
 api.add_resource(StimulusResource, '/api/stimuli/<stimulus_id>')
+
+api.add_resource(RunResource, '/api/runs/<run_id>')
 
 api.add_resource(PredictorResource, '/api/predictors/<predictor_id>')
 
@@ -59,4 +62,4 @@ def index():
 
 if __name__ == '__main__':
     db.init_app(app)
-    app.run()
+    app.run(debug=app.config['DEBUG'])

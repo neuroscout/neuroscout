@@ -20,12 +20,11 @@ def test_dataset(session, add_analyses):
 	assert 'not-null constraint' in str(excinfo)
 	session.rollback()
 
-	# Try adding dataset with same external id as existing one
+	# Try adding dataset with same name as existing one
 	with pytest.raises(Exception) as excinfo:
-		session.add(Dataset(name="Test",
-			external_id=first_dataset.external_id))
+		session.add(Dataset(name=first_dataset.name, task='whatever'))
 		session.commit()
-	assert 'unique constraint "dataset_external_id_key"' in str(excinfo)
+	assert 'unique constraint "dataset_name_key"' in str(excinfo)
 
 def test_analysis(session, add_analyses, add_predictor):
 	# Number of entries
@@ -35,11 +34,11 @@ def test_analysis(session, add_analyses, add_predictor):
 	assert User.query.filter_by(id=first_analysis.user_id).count() == 1
 
 	# Add relationship to a predictor
-	pred = Predictor.query.filter_by(id = add_predictor).one()
-	first_analysis.predictors = [pred]
-	session.commit()
-	assert Predictor.query.filter_by(id = add_predictor).one().analysis_id \
-		== first_analysis.id
+	# pred = Predictor.query.filter_by(id = add_predictor).one()
+	# first_analysis.predictors = [pred]
+	# session.commit()
+	# assert Predictor.query.filter_by(id = add_predictor).one().analysis_id \
+	# 	== first_analysis.id
 
 	# Try adding analysis without a name
 	with pytest.raises(Exception) as excinfo:
@@ -76,10 +75,8 @@ def test_features(add_extracted_event):
 	assert ExtractedFeature.query.filter_by(id=ev.extracted_feature_id).count() == 1
 
 
-def test_stimulus(session, add_stimulus, add_predictor):
+def test_stimulus(session, add_stimulus):
 	assert Stimulus.query.count() == 1
-
-	stim = Stimulus.query.first()
 
 def test_result(add_result):
 	assert Result.query.count() == 1

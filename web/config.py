@@ -29,3 +29,4 @@ class TravisConfig(Config):
 class HomeConfig(Config):
     SQLALCHEMY_DATABASE_URI = 'postgresql://zorro:dbpass@localhost:5432/neuroscout'
     PROPAGATE_EXCEPTIONS = True
+    DEBUG = True

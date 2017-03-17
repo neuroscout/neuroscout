@@ -2,10 +2,10 @@ from database import db
 
 class Stimulus(db.Model):
 	""" A unique stimulus. A stimulus may occur at different points in time,
-		and perhaps even across different datasets"""
+		and perhaps even across different datasets. """
 	id = db.Column(db.Integer, primary_key=True)
-
-	dataset_id = db.Column(db.Integer, db.ForeignKey('dataset.id'))
+	path = db.Column(db.Text, nullable=False)
+	sha1_hash = db.Column(db.Text, nullable=False)
 
 	extracted_events = db.relationship('ExtractedEvent', backref='stimulus',
                                 lazy='dynamic')

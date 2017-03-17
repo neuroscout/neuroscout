@@ -14,10 +14,10 @@ def _make_context():
 	from tests.request_utils import Client
 	import resources
 
-	client = Client(requests, 'http://127.0.0.1:5000', 
-		username='test@gmail.com', password='test')
+	client = Client(requests, 'http://127.0.0.1:5000',
+		username='test2@test.com', password='password')
 
-	return dict(app=app, db=db, models=models, client=client, 
+	return dict(app=app, db=db, models=models, client=client,
 		resources=resources)
 
 manager.add_command('db', MigrateCommand)

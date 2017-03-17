@@ -8,11 +8,10 @@ class Predictor(db.Model):
 
 	 	Also, joins Analysis and Run. """
 	id = db.Column(db.Integer, primary_key=True)
-	name = db.Column(db.Text)
+	name = db.Column(db.Text, nullable=False)
 	description = db.Column(db.Text)
 
-	run_id = db.Column(db.Integer, db.ForeignKey('run.id'))
-	analysis_id = db.Column(db.Integer, db.ForeignKey('analysis.id'))
+	run_id = db.Column(db.Integer, db.ForeignKey('run.id'), nullable=False)
 
 	predictor_events = db.relationship('PredictorEvent', backref='predictor',
 								lazy='dynamic')
@@ -22,6 +21,7 @@ class PredictorEvent(db.Model):
 	id = db.Column(db.Integer, primary_key=True)
 	onset = db.Column(db.Float, nullable=False)
 	duration = db.Column(db.Float)
-	value = db.Column(db.Float, nullable=False)
+	value = db.Column(db.String, nullable=False)
 
-	predictor_id = db.Column(db.Integer, db.ForeignKey('predictor.id'))
+	predictor_id = db.Column(db.Integer, db.ForeignKey('predictor.id'),
+							nullable=False)
