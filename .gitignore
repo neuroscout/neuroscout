@@ -96,3 +96,6 @@ ENV/
 .ropeproject
 
 virtualenv/
+
+# Temporarily ignore migration files
+web/migrations
