@@ -4,9 +4,8 @@ Usage:
     fmri_bids_group make <firstlv_dir> [<output>]
 
 -w <work_dir>           Working directory.
-                        [default: None]
 -c                      Stop on first crash.
-
+--jobs=<n>              Number of parallel jobs [default: 1].
 """
 from docopt import docopt
 import os
@@ -54,7 +53,7 @@ def group_onesample(firstlv_dir, work_dir=None,
     mergevarcopes = Node(Merge(dimension='t'), name='merge_varcopes')
     wf.connect(dg, 'varcopes', mergevarcopes, 'in_files')
 
-    mask_file = fsl.Info.standard_image('MNI_25mm_brain_mask_thr.nii.gz')
+    mask_file = fsl.Info.standard_image('MNI_3mm_brain_mask_thr.nii.gz')
     flame = Node(FLAMEO(), name='flameo')
     flame.inputs.mask_file = mask_file
     flame.inputs.run_mode = 'flame1'
@@ -149,6 +148,13 @@ if __name__ == '__main__':
     arguments = validate_arguments(docopt(__doc__))
     run = arguments.pop('run')
     arguments.pop('make')
+    jobs = int(arguments.pop('--jobs'))
     wf = group_onesample(**arguments)
 
-    wf.run()
+    if run:
+        if jobs == 1:
+            wf.run()
+        else:
+            wf.run(plugin='MultiProc', plugin_args={'n_procs': jobs})
+    else:
+        wf
