@@ -9,5 +9,5 @@ class Extractor(db.Model):
 	input_type = db.Column(db.Text)
 	output_type  = db.Column(db.Text)
 
-	extracted_features = db.relationship('ExtractedFeature', backref='extractor',
-                                lazy='dynamic')
+	# extracted_features = db.relationship('ExtractedFeature', backref='extractor',
+    #                             lazy='dynamic')
