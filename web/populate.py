@@ -24,8 +24,10 @@ app.config.from_object(os.environ['APP_SETTINGS'])
 db.init_app(app)
 manager = Manager(app)
 
+
 @manager.command
-def add_dataset(bids_path, task):
+def add_dataset(bids_path, task, replace=False, **kwargs):
+    """ Adds a BIDS dataset task to the database """
     layout = BIDSLayout(bids_path)
     if task not in layout.get_tasks():
         raise ValueError("No such task exists in BIDS dataset.")
@@ -50,19 +52,20 @@ def add_dataset(bids_path, task):
 
 
     # For every run in dataset, add to db if not in
-    for run in layout.get(task=task, type='events'):
-        print("Processing subject {}, {}".format(run.subject, run.run))
+    for run_events in layout.get(task=task, type='events', **kwargs):
+        print("Processing subject {}, run {}".format(
+            run_events.subject, run_events.run))
         run_model, new = db_utils.get_or_create(db.session, Run,
-                                                subject=run.subject,
-                                                number=run.run, task=task,
+                                                subject=run_events.subject,
+                                                number=run_events.run, task=task,
                                                 dataset_id=dataset_model.id)
 
-        if new is False:
-            print("Run already in db")
+        if new is False and replace is False:
+            print("Run already in db, skipping...")
             continue
 
         # Read event file and extract information
-        tsv = pd.read_csv(run.filename, delimiter='\t', index_col=0)
+        tsv = pd.read_csv(run_events.filename, delimiter='\t')
         tsv = dict(tsv.iteritems())
         onsets = tsv.pop('onset')
         durations = tsv.pop('duration')
@@ -146,6 +149,7 @@ def extract_features(bids_path, graph_spec, **kwargs):
 
     # For every extracted feature
     for res in results:
+        # Hash extractor name + feature name
         ef_hash = hash_str(str(res.extractor.__hash__()) + res.features[0])
 
         # Get or create feature
@@ -155,7 +159,7 @@ def extract_features(bids_path, graph_spec, **kwargs):
                                              extractor_name=res.extractor.name,
                                              feature_name=res.features[0])
 
-        # Get or create stimulus
+        # Get associated stimulus record
         stim_hash = hash_file(res.stim.filename)
         stimulus = db.session.query(Stimulus).filter_by(sha1_hash=stim_hash).one()
 
