@@ -134,16 +134,6 @@ def add_analyses(session, add_users, add_datasets):
     return [analysis.id, analysis_2.id]
 
 @pytest.fixture(scope="function")
-def add_extractor(session):
-    extractor = Extractor(name="Google API", description="Deepest learning",
-        version = 0.1)
-
-    session.add(extractor)
-    session.commit()
-
-    return extractor.id
-
-@pytest.fixture(scope="function")
 def add_result(session, add_analyses):
     result = Result(analysis_id = add_analyses[0])
 
@@ -162,9 +152,8 @@ def add_stimulus(session, add_run):
     return stim.id
 
 @pytest.fixture(scope="function")
-def add_extracted_feature(session, add_extractor):
-    extracted_feature = ExtractedFeature(description="Something",
-                        extractor_id=add_extractor)
+def add_extracted_feature(session):
+    extracted_feature = ExtractedFeature(description="Something")
     session.add(extracted_feature)
     session.commit()
 

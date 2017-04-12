@@ -112,20 +112,6 @@ def add_user(email, password):
     user_datastore.create_user(email=email, password=encrypt_password(password))
     db.session.commit()
 
-@manager.command
-def add_extractors(path_json):
-    es = ExtractorSchema()
-
-    for extractor in json.load(open(path_json, 'r')):
-        new, errors = es.load(extractor)
-
-        if errors:
-        	raise Exception("Error parsing extractor")
-        else:
-        	db.session.add(new)
-        	db.session.commit()
-
-    es = ExtractorSchema()
 
 @manager.command
 def extract_features(bids_path, graph_spec, **kwargs):

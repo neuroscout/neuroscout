@@ -40,12 +40,6 @@ For example for dataset ds009
     python manage.py add_dataset data/ds009 emotionalregulation
 
 
-Finally, to add extractors, use the add_extractors command and point it to a JSON
-file that describes them:
-
-    python manage.py add_extractors data/extractors.json
-
-
 ## API
 Once the server is up and running, you can access the API however you'd like.
 ### Authorization

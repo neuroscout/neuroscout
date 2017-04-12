@@ -6,9 +6,8 @@ class ExtractedFeature(db.Model):
 	sha1_hash = db.Column(db.Text, nullable=False, unique=True)
 
 	extractor_name = db.Column(db.String)
+	extractor_parameters = db.Column(db.String)
 	feature_name = db.Column(db.String)
-
-	# extractor_id = db.Column(db.Integer, db.ForeignKey('extractor.id'))
 
 	extracted_events = db.relationship('ExtractedEvent', backref='extractedfeature',
                                 lazy='dynamic')
