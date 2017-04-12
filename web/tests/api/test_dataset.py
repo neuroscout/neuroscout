@@ -1,6 +1,6 @@
 from tests.request_utils import decode_json
 
-def test_get_dataset(auth_client, add_datasets):
+def test_get_dataset(auth_client, add_dataset):
 	# List of datasets
 	rv = auth_client.get('/api/datasets')
 	assert rv.status_code == 200

@@ -23,15 +23,13 @@ def test_auth(auth_client):
 		assert rv.status_code == 401
 		assert decode_json(rv)['description'] == 'Request does not contain an access token'
 
-def test_get(auth_client, add_analyses):
+def test_get(auth_client):
 	rv = auth_client.get('/api/user')
 	assert rv.status_code == 200
 
 	assert 'email' in decode_json(rv)
-	assert type(decode_json(rv)['analyses']) == list
-	assert len(decode_json(rv)['analyses']) > 0
 
-def test_put(auth_client, add_analyses):
+def test_put(auth_client):
 	# Testing changing name
 	values = decode_json(auth_client.get('/api/user'))
 	values['name'] = 'new_name'
