@@ -1,12 +1,9 @@
-""" Populate database from command line """
+""" Functions to populate database from datasets and extracted features """
 import os
 import re
 import json
 import pandas as pd
 
-from flask_script import Manager
-from app import app
-from database import db
 import db_utils
 from utils import hash_file, hash_str
 
@@ -18,13 +15,9 @@ from pliers.graph import Graph
 from models import (Dataset, Run, Predictor, PredictorEvent,
                     Stimulus, RunStimulus, ExtractedFeature, ExtractedEvent)
 
-app.config.from_object(os.environ['APP_SETTINGS'])
-db.init_app(app)
-manager = Manager(app)
 
+def add_dataset(session, bids_path, task, replace=False, verbose=True, **kwargs):
 
-@manager.command
-def add_dataset(bids_path, task, replace=False, **kwargs):
     """ Adds a BIDS dataset task to the database """
     layout = BIDSLayout(bids_path)
     if task not in layout.get_tasks():
@@ -37,29 +30,31 @@ def add_dataset(bids_path, task, replace=False, **kwargs):
         os.path.join(bids_path, 'task-{}_bold.json'.format(task)), 'r'))
 
     # Get or create dataset model from mandatory arguments
-    dataset_model, new = db_utils.get_or_create(db.session, Dataset,
+    dataset_model, new = db_utils.get_or_create(session, Dataset,
                                                 name=description['Name'],
                                                 task=task)
 
     if new:
         dataset_model.task_description = task_description
         dataset_model.description = description
-        db.session.commit()
+        session.commit()
     else:
         print("Dataset already in db")
 
 
     # For every run in dataset, add to db if not in
     for run_events in layout.get(task=task, type='events', **kwargs):
-        print("Processing subject {}, run {}".format(
-            run_events.subject, run_events.run))
-        run_model, new = db_utils.get_or_create(db.session, Run,
+        if verbose:
+            print("Processing subject {}, run {}".format(
+                run_events.subject, run_events.run))
+        run_model, new = db_utils.get_or_create(session, Run,
                                                 subject=run_events.subject,
                                                 number=run_events.run, task=task,
                                                 dataset_id=dataset_model.id)
 
         if new is False and replace is False:
-            print("Run already in db, skipping...")
+            if verbose:
+                print("Run already in db, skipping...")
             continue
 
         # Read event file and extract information
@@ -71,12 +66,12 @@ def add_dataset(bids_path, task, replace=False, **kwargs):
 
         # Parse event columns and insert as Predictors
         for col in tsv.keys():
-            predictor, _ = db_utils.get_or_create(db.session, Predictor,
+            predictor, _ = db_utils.get_or_create(session, Predictor,
                                                     name=col, run_id=run_model.id)
 
             # Insert each row of Predictor as PredictorEvent
             for i, val in tsv[col].items():
-                pe, _ = db_utils.get_or_create(db.session, PredictorEvent,
+                pe, _ = db_utils.get_or_create(session, PredictorEvent,
                                                onset=onsets[i].item(),
                                                duration = durations[i].item(),
                                                value = str(val),
@@ -89,30 +84,23 @@ def add_dataset(bids_path, task, replace=False, **kwargs):
                 try:
                     stim_hash = hash_file(path)
                 except FileNotFoundError:
-                    print('Stimulus: {} not found. Skipping.'.format(val))
+                    if verbose:
+                        print('Stimulus: {} not found. Skipping.'.format(val))
                     continue
 
                 # Get or create stimulus model
-                stimulus_model, new = db_utils.get_or_create(db.session, Stimulus,
+                stimulus_model, new = db_utils.get_or_create(session, Stimulus,
                                                              path=path,
                                                              sha1_hash=stim_hash)
                 # Get or create Run Stimulus association
-                runstim, new = db_utils.get_or_create(db.session, RunStimulus,
+                runstim, new = db_utils.get_or_create(session, RunStimulus,
                                                       stimulus_id=stimulus_model.id,
                                                       run_id=run_model.id,
                                                       onset=onsets[i].item())
 
-@manager.command
-def add_user(email, password):
-    from models import user_datastore
-    from flask_security.utils import encrypt_password
+    return dataset_model.id
 
-    user_datastore.create_user(email=email, password=encrypt_password(password))
-    db.session.commit()
-
-
-@manager.command
-def extract_features(bids_path, graph_spec, **kwargs):
+def extract_features(session, bids_path, graph_spec,  verbose=True, **kwargs):
     # Load event files
     collection = BIDSEventCollection(bids_path)
     collection.read(**kwargs)
@@ -132,28 +120,31 @@ def extract_features(bids_path, graph_spec, **kwargs):
     results = graph.run(stims, merge=False)
 
     # For every extracted feature
+    ef_model_ids = []
     for res in results:
         # Hash extractor name + feature name
         ef_hash = hash_str(str(res.extractor.__hash__()) + res.features[0])
 
         # Get or create feature
-        ef_model, _ = db_utils.get_or_create(db.session,
+        ef_model, _ = db_utils.get_or_create(session,
                                              ExtractedFeature,
                                              sha1_hash=ef_hash,
                                              extractor_name=res.extractor.name,
                                              feature_name=res.features[0])
+        ef_model_ids.append(ef_model.id)
 
         # Get associated stimulus record
         stim_hash = hash_file(res.stim.filename)
-        stimulus = db.session.query(Stimulus).filter_by(sha1_hash=stim_hash).one()
+        stimulus = session.query(Stimulus).filter_by(sha1_hash=stim_hash).one()
 
         if not stimulus:
-            raise Exception("No stim found!")
+            raise Exception("Stimulus not found in database, have you added"
+                            "this dataset to the database?")
 
         # Set onset for event
         onset = None if pd.isnull(res.onsets) else res.onsets[0]
         # Get or create ExtractedEvent
-        ee_model, _ = db_utils.get_or_create(db.session,
+        ee_model, _ = db_utils.get_or_create(session,
                                                ExtractedEvent,
                                                commit=False,
                                                onset=onset,
@@ -166,8 +157,6 @@ def extract_features(bids_path, graph_spec, **kwargs):
             ee_model.duration = res.durations[0]
         ee_model.history = res.history.string
 
-        db.session.commit()
+        session.commit()
 
-
-if __name__ == '__main__':
-    manager.run()
+    return ef_model_ids

@@ -25,7 +25,7 @@ If you need to upgrade the db:
     docker-compose run --rm web python manage.py db upgrade
 
 ## Populating the database
-You can use `populate.py` to ingest data into the database. At the least you want to add a user to be able to access the API.
+You can use `manage.py` commands to ingest data into the database. At the least you want to add a user to be able to access the API.
 
 To add users:
 

@@ -6,7 +6,9 @@ from database import db as _db
 
 import sqlalchemy as sa
 
-### Session / db managment tools
+"""
+Session / db managment tools
+"""
 @pytest.fixture(scope='session')
 def app():
     """Session-wide test `Flask` application."""
@@ -63,6 +65,7 @@ def session(db):
     transaction.rollback()
     connection.close()
 
+
 @pytest.fixture(scope="function")
 def auth_client(add_users):
     """ Return authorized client wrapper """
@@ -72,9 +75,16 @@ def auth_client(add_users):
     client = Client(username=username, password=password)
     return client
 
-### Data population fixtures
-from models import (Analysis, Dataset, Predictor, Stimulus,
-					Result, ExtractedFeature, ExtractedEvent, Run)
+"""
+Data population fixtures
+"""
+from models import Analysis, Result
+import populate
+
+DATASET_PATH = os.path.join(
+    os.path.dirname(os.path.realpath(__file__)), 'data/datasets/ds009')
+SPEC_PATH = os.path.join(
+    os.path.dirname(os.path.realpath(__file__)), 'data/test_spec.json')
 
 @pytest.fixture(scope="function")
 def add_users(app, db, session):
@@ -98,40 +108,28 @@ def add_users(app, db, session):
     yield (id_1, id_2), (user1, pass1)
 
 @pytest.fixture(scope="function")
-def add_datasets(session):
-    dataset = Dataset(name='ds39', task='moviewatching')
-    session.add(dataset)
-    session.commit()
-
-    dataset_2 = Dataset(name='ds09', task='objectrecognition')
-    session.add(dataset_2)
-    session.commit()
-
-    return [dataset.id, dataset_2.id]
+def add_dataset(session):
+    """ Add a dataset (only first run) with two subjects """
+    return populate.add_dataset(session, DATASET_PATH, 'emotionalregulation',
+                                verbose=False, run='01')
 
 @pytest.fixture(scope="function")
-def add_run(session, add_datasets):
-    run = Run(subject=1, dataset_id=add_datasets[0])
-    session.add(run)
-    session.commit()
-
-    return run.id
+def extract_features(session, add_dataset):
+    """ Extract features from a dataset """
+    return populate.extract_features(session, DATASET_PATH, SPEC_PATH,
+                                     verbose=False,
+                                     task='emotionalregulation', run='01')
 
 @pytest.fixture(scope="function")
-def add_analyses(session, add_users, add_datasets):
-    analysis = Analysis(dataset_id = add_datasets[0], user_id = add_users[0][0],
+def add_analysis(session, add_users, add_dataset):
+    analysis = Analysis(dataset_id = add_dataset, user_id = add_users[0][0],
         name = "My first fMRI analysis!", description = "Ground breaking")
 
-    analysis_2 = Analysis(dataset_id = add_datasets[0], user_id = add_users[0][1],
-        name = "fMRI is cool" , description = "Earth shattering")
 
     session.add(analysis)
     session.commit()
 
-    session.add(analysis_2)
-    session.commit()
-
-    return [analysis.id, analysis_2.id]
+    return analysis.id
 
 @pytest.fixture(scope="function")
 def add_result(session, add_analyses):
@@ -141,41 +139,3 @@ def add_result(session, add_analyses):
     session.commit()
 
     return result.id
-
-@pytest.fixture(scope="function")
-def add_stimulus(session, add_run):
-    stim = Stimulus(path='/some/stim', sha1_hash='i9j23inf3f')
-
-    session.add(stim)
-    session.commit()
-
-    return stim.id
-
-@pytest.fixture(scope="function")
-def add_extracted_feature(session):
-    from utils import hash_str
-    extracted_feature = ExtractedFeature(sha1_hash=hash_str("SomeExtractor"))
-    session.add(extracted_feature)
-    session.commit()
-
-    return extracted_feature.id
-
-@pytest.fixture(scope="function")
-def add_extracted_event(session, add_extracted_feature, add_stimulus):
-    extracted_feature = ExtractedEvent(onset=0, duration=1, value=1,
-                        stimulus_id=add_stimulus,
-                        ef_id=add_extracted_feature)
-
-    session.add(extracted_feature)
-    session.commit()
-
-    return extracted_feature.id
-
-@pytest.fixture(scope="function")
-def add_predictor(session, add_run):
-    predictor = Predictor(name='rt', run_id=add_run)
-
-    session.add(predictor)
-    session.commit()
-
-    return predictor.id
