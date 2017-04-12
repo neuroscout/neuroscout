@@ -1,5 +1,5 @@
 import pytest
-from models import (Analysis, User, Dataset, Predictor, Extractor, Stimulus,
+from models import (Analysis, User, Dataset, Predictor, Stimulus,
 					Result, ExtractedFeature, ExtractedEvent)
 
 #### Tests
@@ -59,13 +59,11 @@ def test_analysis(session, add_analyses, add_predictor):
 def test_predictor(session, add_predictor):
 	assert Predictor.query.count() == 1
 
-	predictor = Predictor.query.first()
-
 def test_features(add_extracted_event):
 	assert ExtractedEvent.query.filter_by(id=add_extracted_event).count() == 1
 
 	ev = ExtractedEvent.query.filter_by(id=add_extracted_event).first()
-	assert ExtractedFeature.query.filter_by(id=ev.extracted_feature_id).count() == 1
+	assert ExtractedFeature.query.filter_by(id=ev.ef_id).count() == 1
 
 
 def test_stimulus(session, add_stimulus):

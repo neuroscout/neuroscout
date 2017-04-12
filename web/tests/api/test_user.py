@@ -3,7 +3,7 @@ import json
 def decode_json(rv):
 	return json.loads(rv.data.decode())
 
-def test_auth(auth_client):    
+def test_auth(auth_client):
 	# Test bad URL with correct auth
 	rv = auth_client.get('/api/v1/hello')
 	assert rv.status_code == 404
@@ -16,7 +16,7 @@ def test_auth(auth_client):
 
 	# Test without auth token
 	auth_client.token = None
-	domains = ['user', 'datasets', 'analyses', 'extractors']
+	domains = ['user', 'datasets', 'analyses']
 
 	for domain in domains:
 		rv = auth_client.get('/api/{}'.format(domain))
@@ -29,7 +29,7 @@ def test_get(auth_client, add_analyses):
 
 	assert 'email' in decode_json(rv)
 	assert type(decode_json(rv)['analyses']) == list
-	assert len(decode_json(rv)['analyses']) > 0 
+	assert len(decode_json(rv)['analyses']) > 0
 
 def test_put(auth_client, add_analyses):
 	# Testing changing name
@@ -53,12 +53,12 @@ def test_post(auth_client):
 	assert 'Missing data' in decode_json(rv)['errors']['email'][0]
 
 	# Invalid email
-	rv = auth_client.post('/api/user', 
+	rv = auth_client.post('/api/user',
 		data = {'name' : 'me', 'email' : 'fake'})
 	assert rv.status_code == 400
-	assert 'Not a valid' in decode_json(rv)['errors']['email'][0]	
+	assert 'Not a valid' in decode_json(rv)['errors']['email'][0]
 
 	# Invalid email
-	rv = auth_client.post('/api/user', 
+	rv = auth_client.post('/api/user',
 		data = {'name' : 'me', 'email' : 'fake@gmail.com', 'password' : 'something'})
 	assert rv.status_code == 200

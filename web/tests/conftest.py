@@ -73,7 +73,7 @@ def auth_client(add_users):
     return client
 
 ### Data population fixtures
-from models import (Analysis, Dataset, Predictor, Extractor, Stimulus,
+from models import (Analysis, Dataset, Predictor, Stimulus,
 					Result, ExtractedFeature, ExtractedEvent, Run)
 
 @pytest.fixture(scope="function")
@@ -153,7 +153,8 @@ def add_stimulus(session, add_run):
 
 @pytest.fixture(scope="function")
 def add_extracted_feature(session):
-    extracted_feature = ExtractedFeature(description="Something")
+    from utils import hash_str
+    extracted_feature = ExtractedFeature(sha1_hash=hash_str("SomeExtractor"))
     session.add(extracted_feature)
     session.commit()
 
@@ -163,7 +164,7 @@ def add_extracted_feature(session):
 def add_extracted_event(session, add_extracted_feature, add_stimulus):
     extracted_feature = ExtractedEvent(onset=0, duration=1, value=1,
                         stimulus_id=add_stimulus,
-                        extracted_feature_id=add_extracted_feature)
+                        ef_id=add_extracted_feature)
 
     session.add(extracted_feature)
     session.commit()

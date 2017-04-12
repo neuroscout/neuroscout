@@ -10,8 +10,6 @@ from database import db
 import db_utils
 from utils import hash_file, hash_str
 
-from resources.extractor import ExtractorSchema
-
 from bids.grabbids import BIDSLayout
 from bids.transform import BIDSEventCollection
 from pliers.stimuli import load_stims
