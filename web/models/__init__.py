@@ -3,7 +3,6 @@
 from .analysis import Analysis
 from .auth import User, Role, roles_users, user_datastore
 from .dataset import Dataset
-from .extractor import Extractor
 from .features import ExtractedFeature, ExtractedEvent
 from .predictor import Predictor, PredictorEvent
 from .result import Result
@@ -17,7 +16,6 @@ __all__ = [
     'roles_users',
     'user_datastore',
     'Dataset',
-    'Extractor',
     'ExtractedFeature',
     'ExtractedEvent',
     'Predictor',

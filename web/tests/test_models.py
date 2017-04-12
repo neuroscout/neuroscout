@@ -55,13 +55,6 @@ def test_analysis(session, add_analyses, add_predictor):
 	assert clone.id > first_analysis.id
 	assert clone.name == first_analysis.name
 
-def test_extractor(session, add_extractor, add_predictor):
-	assert Extractor.query.count() == 1
-
-	extractor = Extractor.query.first()
-
-	# Add more stuff here
-
 
 def test_predictor(session, add_predictor):
 	assert Predictor.query.count() == 1
