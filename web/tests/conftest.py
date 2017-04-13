@@ -132,8 +132,8 @@ def add_analysis(session, add_users, add_dataset):
     return analysis.id
 
 @pytest.fixture(scope="function")
-def add_result(session, add_analyses):
-    result = Result(analysis_id = add_analyses[0])
+def add_result(session, add_analysis):
+    result = Result(analysis_id = add_analysis)
 
     session.add(result)
     session.commit()
