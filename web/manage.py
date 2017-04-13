@@ -33,14 +33,14 @@ def add_user(email, password):
     db.session.commit()
 
 @manager.command
-def add_dataset(bids_path, task, replace=False, verbose=True, **kwargs):
+def add_dataset(bids_path, task, replace=False, **kwargs):
 	populate.add_dataset(db.session, bids_path, task, replace=False,
-						 verbose=verbose, **kwargs)
+						 verbose=True, **kwargs)
 
 @manager.command
-def extract_features(bids_path, graph_spec,  verbose=True, **kwargs):
-	populate.extract_features(db.session, bids_path, graph_spec,
-							  verbose=verbose, **kwargs)
+def extract_features(bids_path, task, graph_spec, **kwargs):
+	populate.extract_features(db.session, bids_path, graph_spec, task=task,
+							  verbose=True, **kwargs)
 
 if __name__ == '__main__':
     manager.run()

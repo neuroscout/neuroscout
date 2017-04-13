@@ -122,15 +122,26 @@ def extract_features(session, bids_path, graph_spec,  verbose=True, **kwargs):
     # For every extracted feature
     ef_model_ids = []
     for res in results:
+        extractor = res.extractor
         # Hash extractor name + feature name
-        ef_hash = hash_str(str(res.extractor.__hash__()) + res.features[0])
+        ef_hash = hash_str(str(extractor.__hash__()) + res.features[0])
 
         # Get or create feature
-        ef_model, _ = db_utils.get_or_create(session,
+        ef_model, ef_new = db_utils.get_or_create(session,
                                              ExtractedFeature,
-                                             sha1_hash=ef_hash,
-                                             extractor_name=res.extractor.name,
-                                             feature_name=res.features[0])
+                                             commit=False,
+                                             sha1_hash=ef_hash)
+
+        if ef_new:
+            ef_model.extractor_name=extractor.name,
+            ef_model.feature_name=res.features[0]
+
+            # Save extractor parameters as JSON
+            tr_attrs = [getattr(res, attr) for attr in extractor._log_attributes]
+            ef_model.extractor_parameters = str(dict(
+                zip(extractor._log_attributes, tr_attrs)))
+            session.commit()
+
         ef_model_ids.append(ef_model.id)
 
         # Get associated stimulus record
@@ -144,14 +155,14 @@ def extract_features(session, bids_path, graph_spec,  verbose=True, **kwargs):
         # Set onset for event
         onset = None if pd.isnull(res.onsets) else res.onsets[0]
         # Get or create ExtractedEvent
-        ee_model, _ = db_utils.get_or_create(session,
+        ee_model, ee_new = db_utils.get_or_create(session,
                                                ExtractedEvent,
                                                commit=False,
                                                onset=onset,
                                                stimulus_id=stimulus.id,
                                                ef_id=ef_model.id)
 
-        ## Add data to it
+        # Add data to it (whether or not its new, as we may want to update)
         ee_model.value = res.data[0][0]
         if not pd.isnull(res.durations):
             ee_model.duration = res.durations[0]
