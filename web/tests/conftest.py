@@ -82,9 +82,9 @@ from models import Analysis, Result
 import populate
 
 DATASET_PATH = os.path.join(
-    os.path.dirname(os.path.realpath(__file__)), 'data/datasets/ds009')
+    os.path.dirname(os.path.realpath(__file__)), 'data/datasets/bids_test')
 SPEC_PATH = os.path.join(
-    os.path.dirname(os.path.realpath(__file__)), 'data/test_spec.json')
+    os.path.dirname(os.path.realpath(__file__)), 'data/test_pliers.json')
 
 @pytest.fixture(scope="function")
 def add_users(app, db, session):
@@ -110,15 +110,15 @@ def add_users(app, db, session):
 @pytest.fixture(scope="function")
 def add_dataset(session):
     """ Add a dataset (only first run) with two subjects """
-    return populate.add_dataset(session, DATASET_PATH, 'emotionalregulation',
-                                verbose=False, run='01')
+    return populate.add_dataset(session, DATASET_PATH, 'bidstest',
+                                verbose=False)
 
 @pytest.fixture(scope="function")
 def extract_features(session, add_dataset):
     """ Extract features from a dataset """
     return populate.extract_features(session, DATASET_PATH, SPEC_PATH,
                                      verbose=False,
-                                     task='emotionalregulation', run='01')
+                                     task='bidstest', run='01')
 
 @pytest.fixture(scope="function")
 def add_analysis(session, add_users, add_dataset):

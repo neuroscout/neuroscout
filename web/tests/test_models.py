@@ -15,17 +15,17 @@ def test_dataset_ingestion(session, add_dataset):
 	session.rollback()
 
 	# Test properties of Run
-	assert Run.query.count() == dataset_model.runs.count() == 2
+	assert Run.query.count() == dataset_model.runs.count() == 4
 	run_model =  dataset_model.runs.first()
 	assert run_model.dataset_id == dataset_model.id
 
 	# Test properties of first run's predictors
-	assert run_model.predictors.count() == 12
-	assert Predictor.query.count() == 24 # because two runs total
+	assert run_model.predictors.count() == 2
+	assert Predictor.query.count() == 8 # because four runs total
 
 	run_predictor = run_model.predictors.first()
-	run_predictor.name == 'iaps_id'
-	assert run_predictor.predictor_events.count() == 60
+	run_predictor.name == 'trial_type'
+	assert run_predictor.predictor_events.count() == 4
 
 	# Test predictor event
 	predictor_event = run_predictor.predictor_events.first()
@@ -33,10 +33,10 @@ def test_dataset_ingestion(session, add_dataset):
 	assert predictor_event.onset is not None
 
 	# Test that Stimiuli were extracted
-	Stimulus.query.count() == 47
+	Stimulus.query.count() == 4
 
-	# and that they were associated with runs
-	RunStimulus.query.count() == 51
+	# and that they were associated with runs (4 runs )
+	RunStimulus.query.count() == Stimulus.query.count() * Run.query.count() == 16
 
 
 def test_extracted_features(extract_features):
