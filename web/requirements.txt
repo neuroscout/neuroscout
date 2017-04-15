@@ -29,9 +29,10 @@ numpy==1.12.0
 packaging==16.8
 pandas==0.19.2
 passlib==1.6.5
+pliers
 psycopg2==2.6.2
 py==1.4.31
-pybids==0.0.1
+-e git+https://github.com/INCF/pybids.git@transformer#egg=pybids
 PyJWT==1.4.2
 pyparsing==2.2.0
 pytest==3.0.2

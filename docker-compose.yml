@@ -7,7 +7,9 @@ web:
     - postgres:postgres
   volumes:
     - /usr/src/app/static
-  command: /usr/local/bin/gunicorn -w 2 -b :8000 app:app --log-level debug
+
+  command: /usr/local/bin/gunicorn -w 2 -b :8000 app:app --log-level debu
+
   environment:
     - APP_SETTINGS=config.DevelopmentConfig
 
@@ -36,3 +38,5 @@ postgres:
     - data
   ports:
     - "5432:5432"
+  environment:
+    - POSTGRES_DB=neuroscout
