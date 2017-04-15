@@ -1,3 +1,5 @@
+import os
+
 class Config(object):
     DEBUG = False
     TESTING = False
@@ -15,7 +17,9 @@ class Config(object):
 
 class DevelopmentConfig(Config):
     DEBUG = True
-    SQLALCHEMY_DATABASE_URI = 'postgresql://postgres@localhost:5432/neuroscout'
+    SQLALCHEMY_DATABASE_URI = 'postgresql://postgres@{}:{}/neuroscout'.format(
+        os.environ['NEUROSCOUT_POSTGRES_1_PORT_5432_TCP_ADDR'],
+        os.environ['NEUROSCOUT_POSTGRES_1_PORT_5432_TCP_PORT'])
     PROPAGATE_EXCEPTIONS = True
 
 class TestingConfig(Config):

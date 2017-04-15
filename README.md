@@ -9,11 +9,15 @@ Build the containers and start the services:
     docker-compose build
     docker-compose up -d
 
-The server should now be running. Navigate to http://localhost:80 if on Docker for Mac
+The server should now be running at http://localhost:80
 
-To access psql (and first time running, create the db), run this command (port is forwarded to host!)
+Next, initialize, migrate and upgrade the database migrations:
 
-    psql -h localhost -p 5432 -U postgres --password
+    docker-compose exec web python manage.py db init
+    docker-compose exec web python manage.py db migrate
+    docker-compose exec web python manage.py db upgrade
+
+## Maintaining docker image and db
 
 If you make a change to /web but don't want your db to be nuked, reload like this:
 
@@ -21,11 +25,16 @@ If you make a change to /web but don't want your db to be nuked, reload like thi
 
 If you need to upgrade the db:
 
-    docker-compose run --rm web python manage.py db migrate
-    docker-compose run --rm web python manage.py db upgrade
+    docker-compose exec web python manage.py db migrate
+    docker-compose exec web python manage.py db upgrade
+
+To inspect the database using psql:
+
+    psql -h localhost -p 5432 -U postgres --password
 
 ## Populating the database
 You can use `manage.py` commands to ingest data into the database. At the least you want to add a user to be able to access the API.
+[Note, for docker, precede commands with `docker-compose exec web`]
 
 To add users:
 
@@ -33,11 +42,20 @@ To add users:
 
 To add BIDS datasets
 
-    python manage,py add_dataset bids_directory_path task_name
+    python manage.py add_dataset bids_directory_path task_name
 
 For example for dataset ds009
 
-    python manage.py add_dataset data/ds009 emotionalregulation
+    python manage.py add_dataset /home/user/data/ds009 emotionalregulation
+
+Finally, once having added a dataset to the database, you can extract features
+  using pliers into the database as follows:
+
+    python manage.py extract_features bids_directory_path task_name graph_json
+
+For example:
+
+    python manage.py extract_features /home/user/data/ds009 emotionalregulation graph.json
 
 
 ## API
