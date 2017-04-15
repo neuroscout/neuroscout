@@ -24,7 +24,6 @@ from flask_restful_swagger import swagger
 
 from resources.analysis import AnalysisResource, AnalysisListResource
 from resources.dataset import DatasetResource, DatasetListResource
-from resources.extractor import ExtractorResource, ExtractorListResource
 from resources.result import ResultResource, ResultListResource
 from resources.run import RunResource
 from resources.stimulus import StimulusResource
@@ -38,9 +37,6 @@ api.add_resource(AnalysisResource, '/api/analyses/<analysis_id>')
 
 api.add_resource(DatasetListResource, '/api/datasets')
 api.add_resource(DatasetResource, '/api/datasets/<dataset_name>')
-
-api.add_resource(ExtractorListResource, '/api/extractors')
-api.add_resource(ExtractorResource, '/api/extractors/<extractor_id>')
 
 api.add_resource(ResultListResource, '/api/results')
 api.add_resource(ResultResource, '/api/results/<result_id>')

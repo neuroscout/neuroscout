@@ -24,22 +24,25 @@ def put_record(session, updated_values, instance):
 		session.rollback()
 		abort(400, message="Database error")
 
-def get_or_create(session, model, **kwargs):
-	""" Checks to see if instance of model is in db.
-	If not add and commit. If true, return all matches.
-	Args:
-		session: db session
-		model: Model class
-		**kwargs: columns to filter by
+def get_or_create(session, model, commit=True, **kwargs):
+    """ Checks to see if instance of model is in db.
+    If not add and commit. If true, return all matches.
+    Args:
+    session: db session
+    model: Model class
+    **kwargs: columns to filter by
 
-	Returns:
-		(all matching or created instances, if instance is new)
-	"""
-	instance = session.query(model).filter_by(**kwargs).first()
-	if instance:
-		return instance, False
-	else:
-		instance = model(**kwargs)
-		session.add(instance)
-		session.commit()
-		return instance, True
+    Returns:
+    (all matching or created instances, if instance is new)
+    """
+    instance = session.query(model).filter_by(**kwargs).first()
+    if instance:
+        return instance, False
+    else:
+        instance = model(**kwargs)
+        session.add(instance)
+
+        if commit is True:
+            session.commit()
+
+        return instance, True

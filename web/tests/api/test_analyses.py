@@ -1,20 +1,20 @@
 from tests.request_utils import decode_json
 from models.analysis import Analysis
 
-def test_get(auth_client, add_analyses):
+def test_get(auth_client, add_analysis):
 	# List of analyses
 	rv = auth_client.get('/api/analyses')
 	assert rv.status_code == 200
 	analysis_list = decode_json(rv)
-	assert type(analysis_list) == list	
-	assert len(analysis_list) == 2
+	assert type(analysis_list) == list
+	assert len(analysis_list) == 1
 
 	# Get first analysis
 	assert 'id' in decode_json(rv)[0]
-	first_extractor_id = decode_json(rv)[0]['id']
+	first_analysis_id = decode_json(rv)[0]['id']
 
 	# Get first analysis by id
-	rv = auth_client.get('/api/analyses/{}'.format(first_extractor_id))
+	rv = auth_client.get('/api/analyses/{}'.format(first_analysis_id))
 	assert rv.status_code == 200
 	analysis = decode_json(rv)
 	assert analysis_list[0] == analysis
@@ -27,8 +27,8 @@ def test_get(auth_client, add_analyses):
 	assert rv.status_code == 400
 	assert 'does not exist' in decode_json(rv)['message']
 
-def test_post(auth_client, add_datasets):
-	## Add analysis 
+def test_post(auth_client, add_dataset):
+	## Add analysis
 	dataset_id = decode_json(auth_client.get('/api/datasets'))[0]['id']
 
 	test_analysis = {
@@ -53,7 +53,7 @@ def test_post(auth_client, add_datasets):
 	assert rv_2.status_code == 200
 	assert decode_json(rv_2)['id'] > decode_json(rv)['id']
 
-def test_bad_post(auth_client, add_datasets):
+    ## Test incorrect post
 	dataset_id = decode_json(auth_client.get('/api/datasets'))[0]['id']
 
 	bad_post = {

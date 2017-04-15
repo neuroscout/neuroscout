@@ -1,0 +1,10 @@
+{
+    "roots": [
+        {
+           "transformer":"BrightnessExtractor"
+        },
+        {
+           "transformer":"VibranceExtractor"
+        }
+    ]
+}
