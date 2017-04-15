@@ -9,7 +9,7 @@ Build the containers and start the services:
     docker-compose build
     docker-compose up -d
 
-The server should now be running. Navigate to http://localhost:80 if on Docker for Mac
+The server should now be running at http://localhost:80
 
 Next, initialize, migrate and upgrade the database migrations:
 
