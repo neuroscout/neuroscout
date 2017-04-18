@@ -5,7 +5,6 @@ from marshmallow import Schema, fields, post_load
 
 from models.dataset import Dataset
 
-from .analysis import AnalysisSchema
 from .run import RunSchema
 
 from sqlalchemy.orm.exc import NoResultFound
@@ -13,11 +12,10 @@ from sqlalchemy.orm.exc import NoResultFound
 class DatasetSchema(Schema):
 	id = fields.Str(dump_only=True)
 
-	analyses = fields.Nested(AnalysisSchema, many=True, only='id')
 	runs = fields.Nested(RunSchema, many=True, only='id')
 
 	class Meta:
-		additional = ('name', 'task', 'description', 'task_description')
+		additional = ('name', 'description', 'mimetypes')
 
 	@post_load
 	def make_db(self, data):
@@ -45,4 +43,4 @@ class DatasetListResource(Resource):
 	def get(self):
 		""" List of datasets """
 		result = Dataset.query.filter_by().all()
-		return DatasetSchema(many=True, only=['id', 'name', 'task']).dump(result)
+		return DatasetSchema(many=True, only=['id', 'name', 'mimetypes']).dump(result)

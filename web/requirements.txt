@@ -22,6 +22,7 @@ gunicorn==19.6.0
 itsdangerous==0.24
 Jinja2==2.8
 jsonify==0.5
+magic
 Mako==1.0.4
 MarkupSafe==0.23
 marshmallow==2.10.3

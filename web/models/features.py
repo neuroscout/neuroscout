@@ -1,5 +1,4 @@
 from database import db
-from sqlalchemy.dialects.postgresql import JSON
 
 class ExtractedFeature(db.Model):
 	""" Events extracted from a Stimulus using an Extractor"""
@@ -10,13 +9,13 @@ class ExtractedFeature(db.Model):
 	id = db.Column(db.Integer, primary_key=True)
 	sha1_hash = db.Column(db.Text, nullable=False, unique=True)
 	extractor_name = db.Column(db.String)
-	extractor_parameters = db.Column(JSON)
+	extractor_parameters = db.Column(db.Text)
 	feature_name = db.Column(db.String)
 
-	extracted_events = db.relationship('ExtractedEvent', backref='extractedfeature',
+	extracted_events = db.relationship('ExtractedEvent', backref='extracted_feature',
                                 		lazy='dynamic')
 	generated_predictors = db.relationship('Predictor',
-											backref='extractedfeature')
+											backref='extracted_feature')
 
 
 class ExtractedEvent(db.Model):

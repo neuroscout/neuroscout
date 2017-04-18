@@ -12,7 +12,7 @@ class Stimulus(db.Model):
 	extracted_events = db.relationship('ExtractedEvent', backref='stimulus',
 	                            lazy='dynamic')
 	runs = db.relationship('Run',
-	                        secondary='RunStimulus',
+	                        secondary='run_stimulus',
 	                        backref='stimulus')
 
 class RunStimulus(db.Model):

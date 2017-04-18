@@ -15,9 +15,10 @@ from pliers.graph import Graph
 from models import (Dataset, Run, Predictor, PredictorEvent,
                     Stimulus, RunStimulus, ExtractedFeature, ExtractedEvent)
 
+import magic
+import nibabel as nib
 
 def add_dataset(session, bids_path, task, replace=False, verbose=True, **kwargs):
-
     """ Adds a BIDS dataset task to the database """
     layout = BIDSLayout(bids_path)
     if task not in layout.get_tasks():
@@ -31,31 +32,58 @@ def add_dataset(session, bids_path, task, replace=False, verbose=True, **kwargs)
 
     # Get or create dataset model from mandatory arguments
     dataset_model, new = db_utils.get_or_create(session, Dataset,
-                                                name=description['Name'],
-                                                task=task)
+                                                name=description['Name'])
 
     if new:
-        dataset_model.task_description = task_description
         dataset_model.description = description
         session.commit()
     else:
         print("Dataset already in db")
-
 
     # For every run in dataset, add to db if not in
     for run_events in layout.get(task=task, type='events', **kwargs):
         if verbose:
             print("Processing subject {}, run {}".format(
                 run_events.subject, run_events.run))
-        run_model, new = db_utils.get_or_create(session, Run,
-                                                subject=run_events.subject,
-                                                number=run_events.run, task=task,
-                                                dataset_id=dataset_model.id)
 
-        if new is False and replace is False:
-            if verbose:
-                print("Run already in db, skipping...")
-            continue
+        # Get entities
+
+        entities = {entity : getattr(run_events, entity)
+                    for entity in ['session', 'task', 'subject']
+                    if entity in run_events._fields}
+        run_model, new = db_utils.get_or_create(session, Run,
+                                                dataset_id=dataset_model.id,
+                                                number = run_events.run,
+                                                **entities)
+        entities['run'] = run_events.run
+
+        if new is False:
+            if replace is False:
+                if verbose:
+                    print("Run already in db, skipping...")
+                continue
+        else:
+            # Get BOLD
+            try:
+                img = nib.load(layout.get(type='bold', extensions='.nii.gz',
+                                  return_type='file',
+                                  **entities)[0])
+                run_model.duration = img.shape[3] * img.header.get_zooms()[-1] / 1000
+            except (nib.filebasedimages.ImageFileError, IndexError) as e:
+                print("Error loading BOLD file, duration not loaded.")
+
+            run_model.task_description = task_description
+            run_model.TR = task_description['RepetitionTime']
+
+            preprocs = layout.get(type='preproc', return_type='file',
+                                  **entities)
+            try:
+                mni = [re.findall('derivatives.*MNI152.*', pre)
+                           for pre in preprocs
+                           if re.findall('derivatives.*MNI152.*', pre)]
+                run_model.path = [item for sublist in mni for item in sublist][0]
+            except IndexError:
+                pass
 
         # Read event file and extract information
         tsv = pd.read_csv(run_events.filename, delimiter='\t')
@@ -67,7 +95,8 @@ def add_dataset(session, bids_path, task, replace=False, verbose=True, **kwargs)
         # Parse event columns and insert as Predictors
         for col in tsv.keys():
             predictor, _ = db_utils.get_or_create(session, Predictor,
-                                                    name=col, run_id=run_model.id)
+                                                  name=col,
+                                                  dataset_id=dataset_model.id)
 
             # Insert each row of Predictor as PredictorEvent
             for i, val in tsv[col].items():
@@ -75,28 +104,38 @@ def add_dataset(session, bids_path, task, replace=False, verbose=True, **kwargs)
                                                onset=onsets[i].item(),
                                                duration = durations[i].item(),
                                                value = str(val),
-                                               predictor_id=predictor.id)
+                                               predictor_id=predictor.id,
+                                               run_id = run_model.id)
 
         # Ingest stimuli
+        mimetypes = set()
         for i, val in stims.items():
             if val != 'n/a':
                 path = os.path.join(bids_path, 'stimuli/{}'.format(val))
+                name = os.path.basename(path)
                 try:
                     stim_hash = hash_file(path)
+                    mimetype = magic.from_file(path, mime=True)
+                    mimetypes.update([mimetype])
                 except FileNotFoundError:
                     if verbose:
                         print('Stimulus: {} not found. Skipping.'.format(val))
                     continue
 
                 # Get or create stimulus model
-                stimulus_model, new = db_utils.get_or_create(session, Stimulus,
-                                                             path=path,
-                                                             sha1_hash=stim_hash)
+                stimulus_model, _ = db_utils.get_or_create(session, Stimulus,
+                                                           name=name,
+                                                           path=path,
+                                                           sha1_hash=stim_hash,
+                                                           mimetype=mimetype)
                 # Get or create Run Stimulus association
-                runstim, new = db_utils.get_or_create(session, RunStimulus,
-                                                      stimulus_id=stimulus_model.id,
-                                                      run_id=run_model.id,
-                                                      onset=onsets[i].item())
+                runstim, _ = db_utils.get_or_create(session, RunStimulus,
+                                                    stimulus_id=stimulus_model.id,
+                                                    run_id=run_model.id,
+                                                    onset=onsets[i].item())
+
+    dataset_model.mimetypes = list(mimetypes)
+    session.commit()
 
     return dataset_model.id
 

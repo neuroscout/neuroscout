@@ -7,11 +7,11 @@ class Dataset(db.Model):
 	name = db.Column(db.Text, nullable=False, unique=True)
 
 	description = db.Column(JSON) # BIDS description
-	task_description = db.Column(JSON) # BIDS task description
-	modalities =  db.Column(db.Text)
+	mimetypes =  db.Column(JSON) # Mimetypes in stimuli
 
 	runs = db.relationship('Run', backref='dataset',
                                 lazy='dynamic')
+	predictors = db.relationship('Predictor', backref='dataset',
+                                 lazy='dynamic')
 
-
-	### Meta-data, such as preprocessed history, etc, etc
+	# Meta-data, such as preprocessed history, etc...

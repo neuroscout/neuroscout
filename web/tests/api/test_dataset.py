@@ -17,7 +17,6 @@ def test_get_dataset(auth_client, add_dataset):
 	dataset = decode_json(rv)
 	assert dataset_list[0]['name'] == dataset['name']
 
-	assert type(dataset['analyses']) == list
 	assert dataset['name'] != ''
 
 	# Try getting nonexistent datset
