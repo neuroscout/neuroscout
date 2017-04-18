@@ -6,14 +6,22 @@ analysis_run = db.Table('analysis_run',
                        db.Column('run_id', db.Integer(), db.ForeignKey('run.id')))
 
 class Run(db.Model):
-	""" A single scan run. The basic unit of fMRI analysis. """
-	id = db.Column(db.Integer, primary_key=True)
-	session = db.Column(db.Text)
-	subject = db.Column(db.Text)
-	number = db.Column(db.Text)
-	task = db.Column(db.Text)
+    """ A single scan run. The basic unit of fMRI analysis. """
+    id = db.Column(db.Integer, primary_key=True)
+    session = db.Column(db.Text)
+    subject = db.Column(db.Text)
+    number = db.Column(db.Text)
+    task = db.Column(db.Text)
+    duration = db.Column(db.Real)
+    TR = db.Column(db.Real)
+    path = db.Column(db.Text) # Relative to BIDS root
 
-	dataset_id = db.Column(db.Integer, db.ForeignKey('dataset.id'), nullable=False)
+    dataset_id = db.Column(db.Integer, db.ForeignKey('dataset.id'), nullable=False)
+    predictors = db.relationship('Predictor', backref='run',
+                                 secondary='PredictorRun',
+                                 lazy='dynamic')
+    analyses = db.relationship('Analysis',
+                            secondary='analysis_run',
+                            backref='run')
 
-	predictors = db.relationship('Predictor', backref='run',
-                                lazy='dynamic')
+    # Anything else that a nipype interface needs to work with that run?
