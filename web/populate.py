@@ -38,53 +38,51 @@ def add_dataset(session, bids_path, task, replace=False, verbose=True, **kwargs)
         dataset_model.description = description
         session.commit()
     else:
-        print("Dataset already in db")
+        if not replace:
+            print("Dataset already in db. Exiting.")
+            return dataset_model.id
 
-    # For every run in dataset, add to db if not in
+    # Add every Run to db.
     for run_events in layout.get(task=task, type='events', **kwargs):
         if verbose:
             print("Processing subject {}, run {}".format(
                 run_events.subject, run_events.run))
 
         # Get entities
-
         entities = {entity : getattr(run_events, entity)
                     for entity in ['session', 'task', 'subject']
                     if entity in run_events._fields}
+
+        """ Extract Run information """
         run_model, new = db_utils.get_or_create(session, Run,
                                                 dataset_id=dataset_model.id,
-                                                number = run_events.run,
+                                                number=run_events.run,
                                                 **entities)
         entities['run'] = run_events.run
 
-        if new is False:
-            if replace is False:
-                if verbose:
-                    print("Run already in db, skipping...")
-                continue
-        else:
-            # Get BOLD
-            try:
-                img = nib.load(layout.get(type='bold', extensions='.nii.gz',
-                                  return_type='file',
-                                  **entities)[0])
-                run_model.duration = img.shape[3] * img.header.get_zooms()[-1] / 1000
-            except (nib.filebasedimages.ImageFileError, IndexError) as e:
-                print("Error loading BOLD file, duration not loaded.")
+        # Get BOLD
+        try:
+            img = nib.load(layout.get(type='bold', extensions='.nii.gz',
+                              return_type='file', **entities)[0])
+            run_model.duration = img.shape[3] * img.header.get_zooms()[-1] / 1000
+        except (nib.filebasedimages.ImageFileError, IndexError) as e:
+            print("Error loading BOLD file, duration not loaded.")
 
-            run_model.task_description = task_description
-            run_model.TR = task_description['RepetitionTime']
+        run_model.task_description = task_description
+        run_model.TR = task_description['RepetitionTime']
 
-            preprocs = layout.get(type='preproc', return_type='file',
-                                  **entities)
-            try:
-                mni = [re.findall('derivatives.*MNI152.*', pre)
-                           for pre in preprocs
-                           if re.findall('derivatives.*MNI152.*', pre)]
-                run_model.path = [item for sublist in mni for item in sublist][0]
-            except IndexError:
-                pass
+        preprocs = layout.get(type='preproc', return_type='file', **entities)
 
+        try: # Try to get path of preprocessed data
+            mni = [re.findall('derivatives.*MNI152.*', pre)
+                       for pre in preprocs
+                       if re.findall('derivatives.*MNI152.*', pre)]
+            run_model.path = [item for sublist in mni for item in sublist][0]
+        except IndexError:
+            pass
+        session.commit()
+
+        """ Extract Predictors"""
         # Read event file and extract information
         tsv = pd.read_csv(run_events.filename, delimiter='\t')
         tsv = dict(tsv.iteritems())
@@ -101,11 +99,13 @@ def add_dataset(session, bids_path, task, replace=False, verbose=True, **kwargs)
             # Insert each row of Predictor as PredictorEvent
             for i, val in tsv[col].items():
                 pe, _ = db_utils.get_or_create(session, PredictorEvent,
+                                               commit=False,
                                                onset=onsets[i].item(),
-                                               duration = durations[i].item(),
-                                               value = str(val),
                                                predictor_id=predictor.id,
                                                run_id = run_model.id)
+                pe.duration = durations[i].item()
+                pe.value = str(val)
+                session.commit()
 
         # Ingest stimuli
         mimetypes = set()
@@ -124,15 +124,20 @@ def add_dataset(session, bids_path, task, replace=False, verbose=True, **kwargs)
 
                 # Get or create stimulus model
                 stimulus_model, _ = db_utils.get_or_create(session, Stimulus,
-                                                           name=name,
-                                                           path=path,
-                                                           sha1_hash=stim_hash,
-                                                           mimetype=mimetype)
+                                                           commit=False,
+                                                           sha1_hash=stim_hash)
+                stimulus_model.name=name
+                stimulus_model.path=path
+                stimulus_model.mimetype=mimetype
+                session.commit()
+
                 # Get or create Run Stimulus association
                 runstim, _ = db_utils.get_or_create(session, RunStimulus,
+                                                    commit=False,
                                                     stimulus_id=stimulus_model.id,
-                                                    run_id=run_model.id,
-                                                    onset=onsets[i].item())
+                                                    run_id=run_model.id)
+                runstim.onset=onsets[i].item()
+                session.commit()
 
     dataset_model.mimetypes = list(mimetypes)
     session.commit()

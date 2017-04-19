@@ -7,6 +7,7 @@ class ExtractedFeature(db.Model):
 	)
 
 	id = db.Column(db.Integer, primary_key=True)
+	# Hash of next three variables
 	sha1_hash = db.Column(db.Text, nullable=False, unique=True)
 	extractor_name = db.Column(db.String)
 	extractor_parameters = db.Column(db.Text)
