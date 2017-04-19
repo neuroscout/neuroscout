@@ -13,7 +13,8 @@ from pliers.stimuli import load_stims
 from pliers.graph import Graph
 
 from models import (Dataset, Run, Predictor, PredictorEvent,
-                    Stimulus, RunStimulus, ExtractedFeature, ExtractedEvent)
+                    Stimulus, RunStimulus, ExtractedFeature, ExtractedEvent,
+                    GroupPredictor, GroupPredictorValue)
 
 import magic
 import nibabel as nib
@@ -42,7 +43,7 @@ def add_dataset(session, bids_path, task, replace=False, verbose=True, **kwargs)
             print("Dataset already in db. Exiting.")
             return dataset_model.id
 
-    # Add every Run to db.
+    """ Parse every Run """
     for run_events in layout.get(task=task, type='events', **kwargs):
         if verbose:
             print("Processing subject {}, run {}".format(
@@ -141,6 +142,37 @@ def add_dataset(session, bids_path, task, replace=False, verbose=True, **kwargs)
 
     dataset_model.mimetypes = list(mimetypes)
     session.commit()
+
+    """ Add GroupPredictors """
+    # Participants
+    participants_path = os.path.join(bids_path, 'participants.tsv')
+    if os.path.exists(participants_path):
+        if verbose:
+            print("Processing participants.tsv")
+        participants = pd.read_csv(participants_path, delimiter='\t')
+        participants = dict(participants.iteritems())
+        subs = participants.pop('participant_id')
+
+        # Parse participant columns and insert as GroupPredictors
+        for col in participants.keys():
+            gp, _ = db_utils.get_or_create(session, GroupPredictor,
+                                                  name=col,
+                                                  dataset_id=dataset_model.id,
+                                                  level='subject')
+
+            for i, val in participants[col].items():
+                sub_id = subs[i].split('-')[1]
+                subject_runs = Run.query.filter_by(dataset_id=dataset_model.id,
+                                                   subject=sub_id)
+                for run in subject_runs:
+                    gpv, _ = db_utils.get_or_create(session, GroupPredictorValue,
+                                                   commit=False,
+                                                   gp_id=gp.id,
+                                                   run_id = run_model.id,
+                                                   level_id=sub_id)
+                    gpv.value = str(val)
+                    session.commit()
+
 
     return dataset_model.id
 

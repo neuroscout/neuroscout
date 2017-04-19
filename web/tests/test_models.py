@@ -1,12 +1,13 @@
 import pytest
 from models import (Analysis, User, Dataset, Predictor, Stimulus, Run,
-					RunStimulus, Result, ExtractedFeature)
+					RunStimulus, Result, ExtractedFeature,
+					GroupPredictor, GroupPredictorValue)
 
 def test_dataset_ingestion(session, add_dataset):
 	# Number of entries
 	assert Dataset.query.count() == 1
 	dataset_model = Dataset.query.filter_by(id=add_dataset).one()
-	
+
 	# Test mimetypes
 	assert 'image/jpeg' in dataset_model.mimetypes
 
@@ -30,8 +31,9 @@ def test_dataset_ingestion(session, add_dataset):
 	assert run_model.predictor_events.count() == 8
 	assert Predictor.query.count() == dataset_model.predictors.count() == 2
 
+	assert 'rt' in [p.name for p in Predictor.query.all()]
+
 	predictor = dataset_model.predictors.first()
-	predictor.name == 'trial_type'
 	assert predictor.predictor_events.count() == 16
 
 	# Test predictor event
@@ -40,10 +42,18 @@ def test_dataset_ingestion(session, add_dataset):
 	assert predictor_event.onset is not None
 
 	# Test that Stimiuli were extracted
-	Stimulus.query.count() == 4
+	assert Stimulus.query.count() == 4
 
 	# and that they were associated with runs (4 runs )
-	RunStimulus.query.count() == Stimulus.query.count() * Run.query.count() == 16
+	assert RunStimulus.query.count() == Stimulus.query.count() * Run.query.count() == 16
+
+	# Test participants.tsv ingestion
+	assert GroupPredictor.query.count() == 3
+	assert GroupPredictor.query.filter_by(name='sex').count() == 1
+
+	gpv = GroupPredictor.query.filter_by(name='sex').one().values
+	assert gpv.count() == 2
+	assert 'F' in [v.value for v in gpv]
 
 
 def test_extracted_features(extract_features):
