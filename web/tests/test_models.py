@@ -69,6 +69,12 @@ def test_extracted_features(extract_features):
 	# And that a sensical value was extracted
 	assert ef.extracted_events.first().value < 1
 
+	# Test that Predictors were created from EF
+	pred = Predictor.query.filter_by(ef_id=ef.id).one()
+	assert pred.predictor_events.first().onset == 1.0
+
+	# Add a test checking that values correspond from Predictors to EFs?
+
 
 # def test_analysis(session, add_analyses, add_predictor):
 # 	# Number of entries

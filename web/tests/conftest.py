@@ -116,9 +116,9 @@ def add_dataset(session):
 @pytest.fixture(scope="function")
 def extract_features(session, add_dataset):
     """ Extract features from a dataset """
-    return populate.extract_features(session, DATASET_PATH, SPEC_PATH,
-                                     verbose=False,
-                                     task='bidstest', run='01')
+    return populate.extract_features(session, DATASET_PATH, 'bidstest',
+                                     SPEC_PATH,
+                                     verbose=False, run='01')
 
 @pytest.fixture(scope="function")
 def add_analysis(session, add_users, add_dataset):

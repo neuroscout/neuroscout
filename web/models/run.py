@@ -28,5 +28,10 @@ class Run(db.Model):
     analyses = db.relationship('Analysis',
                             secondary='analysis_run',
                             backref='run')
+    stimuli = db.relationship('Stimulus',
+                            secondary='run_stimulus',
+                            backref='run',
+                            lazy='joined')
+
 
     # Anything else that a nipype interface needs to work with that run?
