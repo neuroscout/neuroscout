@@ -5,10 +5,15 @@ class Stimulus(db.Model):
 		and perhaps even across different datasets. """
 	id = db.Column(db.Integer, primary_key=True)
 	sha1_hash = db.Column(db.Text, nullable=False, unique=True)
+	name = db.Column(db.Text, nullable=False) # Default: base path
+	mimetype = db.Column(db.Text, nullable=False)
 	path = db.Column(db.Text, nullable=False)
 
 	extracted_events = db.relationship('ExtractedEvent', backref='stimulus',
-                                lazy='dynamic')
+	                            lazy='dynamic')
+	runs = db.relationship('Run',
+	                        secondary='run_stimulus',
+	                        backref='stimulus')
 
 class RunStimulus(db.Model):
     """ Run Stimulus association table """

@@ -1,19 +1,15 @@
 from flask_restful import Resource, abort
 from flask_restful_swagger.swagger import operation
 from flask_jwt import jwt_required
-from marshmallow import Schema, fields, post_load
-from models.predictor import Predictor, PredictorEvent
+from marshmallow import Schema, fields
+from models.predictor import Predictor
 
 # Predictor Event Resources
 class PredictorEventSchema(Schema):
 	id = fields.Str(dump_only=True)
 
-	@post_load
-	def make_db(self, data):
-		return PredictorEvent(**data)
-
 	class Meta:
-		additional = ('onset', 'duraton', 'value')
+		additional = ('onset', 'duration', 'value', 'run_id', 'predictor_id')
 
 # Predictor Resources
 class PredictorSchema(Schema):
@@ -21,12 +17,8 @@ class PredictorSchema(Schema):
 
 	predictor_events = fields.Nested(PredictorEventSchema, many=True, only='id')
 
-	@post_load
-	def make_db(self, data):
-		return Predictor(**data)
-
 	class Meta:
-		additional = ('name', 'description', 'run_id', 'analysis_id')
+		additional = ('name', 'description', 'ef_id', 'analysis_id')
 
 class PredictorResource(Resource):
 	""" Predictors """
