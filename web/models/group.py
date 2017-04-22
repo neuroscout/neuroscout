@@ -7,7 +7,7 @@ class GroupPredictor(db.Model):
     description = db.Column(db.Text) # Where to get this from?
     level = db.Column(db.String, nullable=False) # Session? Subject?
 
-    dataset_id = db.Column(db.Integer, db.ForeignKey('dataset.id'), nullable=False)
+    dataset_id = db.Column(db.Text, db.ForeignKey('dataset.id'), nullable=False)
 
     values = db.relationship('GroupPredictorValue', backref='group_predictor',
 								lazy='dynamic')

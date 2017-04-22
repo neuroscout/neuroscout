@@ -22,7 +22,7 @@ class Run(db.Model):
     TR = db.Column(db.Float)
     path = db.Column(db.Text) # Relative to BIDS root
 
-    dataset_id = db.Column(db.Integer, db.ForeignKey('dataset.id'), nullable=False)
+    dataset_id = db.Column(db.Text, db.ForeignKey('dataset.id'), nullable=False)
     predictor_events = db.relationship('PredictorEvent', backref='run',
                                         lazy='dynamic')
     analyses = db.relationship('Analysis',

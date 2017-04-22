@@ -4,8 +4,7 @@ from sqlalchemy.ext.hybrid import hybrid_property
 
 class Dataset(db.Model):
 	""" A BIDS dataset """
-	id = db.Column(db.Integer, primary_key=True)
-	name = db.Column(db.Text, nullable=False, unique=True)
+	id = db.Column(db.Text, primary_key=True)
 
 	description = db.Column(JSON) # BIDS description
 	mimetypes =  db.Column(JSON) # Mimetypes in stimuli

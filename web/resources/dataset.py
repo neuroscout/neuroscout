@@ -10,12 +10,10 @@ from .run import RunSchema
 from sqlalchemy.orm.exc import NoResultFound
 
 class DatasetSchema(Schema):
-	id = fields.Str(dump_only=True)
-
 	runs = fields.Nested(RunSchema, many=True, only='id')
 
 	class Meta:
-		additional = ('name', 'description', 'mimetypes', 'tasks')
+		additional = ('id', 'description', 'mimetypes', 'tasks')
 
 	@post_load
 	def make_db(self, data):
@@ -27,13 +25,13 @@ class DatasetResource(Resource):
 	responseMessages=[{"code": 400,
 	      "message": "Dataset does not exist"}])
 	@jwt_required()
-	def get(self, dataset_name):
+	def get(self, dataset_id):
 		""" Access a specific dataset """
 		try:
-			result = Dataset.query.filter_by(name=dataset_name).one()
+			result = Dataset.query.filter_by(id=dataset_id).one()
 			return DatasetSchema().dump(result)
 		except NoResultFound:
-			abort(400, message="Dataset {} does not exist".format(dataset_name))
+			abort(400, message="Dataset {} does not exist".format(dataset_id))
 
 
 class DatasetListResource(Resource):
@@ -43,4 +41,4 @@ class DatasetListResource(Resource):
 	def get(self):
 		""" List of datasets """
 		result = Dataset.query.filter_by().all()
-		return DatasetSchema(many=True, only=['id', 'name', 'mimetypes', 'tasks']).dump(result)
+		return DatasetSchema(many=True, only=['id', 'mimetypes', 'tasks']).dump(result)
