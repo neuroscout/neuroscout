@@ -15,7 +15,7 @@ class DatasetSchema(Schema):
 	runs = fields.Nested(RunSchema, many=True, only='id')
 
 	class Meta:
-		additional = ('name', 'description', 'mimetypes')
+		additional = ('name', 'description', 'mimetypes', 'tasks')
 
 	@post_load
 	def make_db(self, data):
@@ -43,4 +43,4 @@ class DatasetListResource(Resource):
 	def get(self):
 		""" List of datasets """
 		result = Dataset.query.filter_by().all()
-		return DatasetSchema(many=True, only=['id', 'name', 'mimetypes']).dump(result)
+		return DatasetSchema(many=True, only=['id', 'name', 'mimetypes', 'tasks']).dump(result)
