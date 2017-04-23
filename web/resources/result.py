@@ -16,22 +16,12 @@ class ResultSchema(Schema):
 
 class ResultResource(Resource):
 	""" Analysis result """
-	@operation(
-	responseMessages=[
-	    {
-	      "code": 400,
-	      "message": "Result doesn't exist"
-	    },
-	  ]
-	)
+	@operation()
 	@jwt_required()
 	def get(self, result_id):
 		""" Access analyis result """
-		result = Result.query.filter_by(id=result_id).one()
-		if result:
-			return ResultSchema().dump(result)
-		else:
-			abort(400, message="Result {} doesn't exist".format(result_id))
+		result = Result.query.filter_by(id=result_id).first_or_404()
+		return ResultSchema().dump(result)
 
 class ResultListResource(Resource):
 	""" Analysis results """

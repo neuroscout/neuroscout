@@ -22,5 +22,5 @@ def test_get_dataset(auth_client, add_dataset):
 
 	# Try getting nonexistent datset
 	rv = auth_client.get('/api/datasets/{}'.format('non-existent'))
-	assert rv.status_code == 400
-	assert 'does not exist' in decode_json(rv)['message']
+	assert rv.status_code == 404
+	assert 'requested URL was not found' in decode_json(rv)['message']

@@ -1,16 +1,12 @@
-from flask import request
-from flask_restful import Resource, abort
+from flask_restful import Resource
 from flask_restful_swagger.swagger import operation
 from flask_jwt import jwt_required
 from marshmallow import Schema, fields, post_load
-import webargs as wa
-from webargs.flaskparser import parser
 
 from models.dataset import Dataset
 
 from .run import RunSchema
 
-from sqlalchemy.orm.exc import NoResultFound
 
 class DatasetSchema(Schema):
 	runs = fields.Nested(RunSchema, many=True, only='id')
@@ -25,17 +21,13 @@ class DatasetSchema(Schema):
 class DatasetResource(Resource):
 	""" Individual dataset """
 	@operation(
-	responseMessages=[{"code": 400,
+	responseMessages=[{"code": 404,
 	      "message": "Dataset does not exist"}])
 	@jwt_required()
 	def get(self, dataset_id):
 		""" Access a specific dataset """
-		try:
-			result = Dataset.query.filter_by(id=dataset_id).one()
-			return DatasetSchema().dump(result)
-		except NoResultFound:
-			abort(400, message="Dataset {} does not exist".format(dataset_id))
-
+		result = Dataset.query.filter_by(id=dataset_id).first_or_404()
+		return DatasetSchema().dump(result)
 
 class DatasetListResource(Resource):
 	""" Available datasets """
@@ -44,5 +36,4 @@ class DatasetListResource(Resource):
 	def get(self):
 		""" List of datasets """
 		result = Dataset.query.all()
-
 		return DatasetSchema(many=True, only=['id', 'mimetypes', 'tasks']).dump(result)

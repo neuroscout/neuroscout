@@ -12,19 +12,9 @@ class StimulusSchema(Schema):
 
 class StimulusResource(Resource):
 	""" A stimulus """
-	@operation(
-	responseMessages=[
-	    {
-	      "code": 400,
-	      "message": "Stimulus doesn't exist"
-	    },
-	  ]
-	)
+	@operation()
 	@jwt_required()
 	def get(self, stimulus_id):
 		""" Acess a specific stimulus """
-		result = Stimulus.query.filter_by(id=stimulus_id).one()
-		if result:
-			return StimulusSchema().dump(result)
-		else:
-			abort(400, message="Stimulus {} doesn't exist".format(stimulus_id))
+		result = Stimulus.query.filter_by(id=stimulus_id).first_or_404()
+		return StimulusSchema().dump(result)

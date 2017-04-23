@@ -1,7 +1,7 @@
-from flask_restful import Resource, abort
+from flask_restful import Resource
 from flask_restful_swagger.swagger import operation
 from flask_jwt import jwt_required
-from flask import request, current_app
+from flask import request
 from marshmallow import Schema, fields
 from models.run import Run
 
@@ -13,22 +13,12 @@ class RunSchema(Schema):
 
 class RunResource(Resource):
 	""" Resource for Run """
-	@operation(
-	responseMessages=[
-	    {
-	      "code": 400,
-	      "message": "Run doesn't exist"
-	    },
-	  ]
-	)
+	@operation()
 	@jwt_required()
 	def get(self, run_id):
 		""" Access a run """
-		result = Run.query.filter_by(id=run_id).one()
-		if result:
-			return RunSchema().dump(result)
-		else:
-			abort(400, message="Run {} doesn't exist".format(run_id))
+		result = Run.query.filter_by(id=run_id).first_or_404()
+		return RunSchema().dump(result)
 
 class RunListResource(Resource):
 	""" Available datasets """

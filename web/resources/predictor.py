@@ -22,22 +22,12 @@ class PredictorSchema(Schema):
 
 class PredictorResource(Resource):
 	""" Predictors """
-	@operation(
-	responseMessages=[
-	    {
-	      "code": 400,
-	      "message": "Predictor doesn't exist"
-	    },
-	  ]
-	)
+	@operation()
 	@jwt_required()
 	def get(self, id):
 		""" Access a predictor by id """
-		result = Predictor.query.filter_by(id=id).one()
-		if result:
-			return PredictorSchema().dump(result)
-		else:
-			abort(400, message="Predictor {} doesn't exist".format(id))
+		result = Predictor.query.filter_by(id=id).one_or_404()
+		return PredictorSchema().dump(result)
 
 # This might not be necessary, unless you can query by run,
 # which might violate standard REST
