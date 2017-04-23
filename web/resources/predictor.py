@@ -29,8 +29,6 @@ class PredictorResource(Resource):
 		result = Predictor.query.filter_by(id=id).one_or_404()
 		return PredictorSchema().dump(result)
 
-# This might not be necessary, unless you can query by run,
-# which might violate standard REST
 class PredictorListResource(Resource):
 	""" Extracted predictors """
 	@operation()

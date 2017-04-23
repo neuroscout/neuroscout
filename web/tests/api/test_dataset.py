@@ -16,7 +16,7 @@ def test_get_dataset(auth_client, add_dataset):
 	rv = auth_client.get('/api/datasets/{}'.format(first_dataset_id))
 	assert rv.status_code == 200
 	dataset = decode_json(rv)
-	assert dataset_list[0]['id'] == dataset['id']
+	assert first_dataset_id == dataset['id']
 	assert dataset['mimetypes'] == ['image/jpeg']
 	assert dataset['tasks'] == ['bidstest']
 
