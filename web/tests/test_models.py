@@ -10,6 +10,7 @@ def test_dataset_ingestion(session, add_dataset):
 
 	# Test mimetypes
 	assert 'image/jpeg' in dataset_model.mimetypes
+	assert 'bidstest' in dataset_model.tasks
 
 	# Try adding dataset without a name
 	with pytest.raises(Exception) as excinfo:

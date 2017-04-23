@@ -119,7 +119,6 @@ def add_dataset(session, bids_path, task, replace=False, verbose=True, **kwargs)
                           onsets, durations, tsv[predictor].tolist())
 
         """ Ingest Stimuli """
-        mimetypes = set()
         for i, val in stims.items():
             if val != 'n/a':
                 base_path = 'stimuli/{}'.format(val)
@@ -128,7 +127,6 @@ def add_dataset(session, bids_path, task, replace=False, verbose=True, **kwargs)
                 try:
                     stim_hash = hash_file(path)
                     mimetype = magic.from_file(path, mime=True)
-                    mimetypes.update([mimetype])
                 except FileNotFoundError:
                     if verbose:
                         print('Stimulus: {} not found. Skipping.'.format(val))
@@ -151,7 +149,6 @@ def add_dataset(session, bids_path, task, replace=False, verbose=True, **kwargs)
                 runstim.onset=onsets[i]
                 session.commit()
 
-    dataset_model.mimetypes = list(mimetypes)
     session.commit()
 
     """ Add GroupPredictors """
