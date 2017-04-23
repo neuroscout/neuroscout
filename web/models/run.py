@@ -1,5 +1,5 @@
 from database import db
-from sqlalchemy.dialects.postgresql import JSON
+from sqlalchemy.dialects.postgresql import JSONB
 
 # Association table between analysis and run.
 analysis_run = db.Table('analysis_run',
@@ -18,7 +18,7 @@ class Run(db.Model):
     task = db.Column(db.Text)
 
     duration = db.Column(db.Float)
-    task_description = db.Column(JSON) # BIDS task description
+    task_description = db.Column(JSONB) # BIDS task description
     TR = db.Column(db.Float)
     path = db.Column(db.Text) # Relative to BIDS root
 

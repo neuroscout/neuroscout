@@ -1,7 +1,10 @@
+from flask import request
 from flask_restful import Resource, abort
 from flask_restful_swagger.swagger import operation
 from flask_jwt import jwt_required
 from marshmallow import Schema, fields, post_load
+import webargs as wa
+from webargs.flaskparser import parser
 
 from models.dataset import Dataset
 
@@ -40,5 +43,6 @@ class DatasetListResource(Resource):
 	@jwt_required()
 	def get(self):
 		""" List of datasets """
-		result = Dataset.query.filter_by().all()
+		result = Dataset.query.all()
+
 		return DatasetSchema(many=True, only=['id', 'mimetypes', 'tasks']).dump(result)

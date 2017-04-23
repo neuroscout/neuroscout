@@ -1,6 +1,6 @@
 from database import db
 from db_utils import copy_row
-from sqlalchemy.dialects.postgresql import JSON
+from sqlalchemy.dialects.postgresql import JSONB
 
 # Association table between analysis and predictor.
 analysis_predictor = db.Table('analysis_predictor',
@@ -13,8 +13,8 @@ class Analysis(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String, nullable=False)
     description = db.Column(db.Text)
-    filters = db.Column(JSON) # List of filters used to select runs
-    transformations = db.Column(JSON)
+    filters = db.Column(JSONB) # List of filters used to select runs
+    transformations = db.Column(JSONB)
     created_at = db.Column(db.DateTime)
     modified_at = db.Column(db.DateTime)
     saved_count = db.Column(db.Integer)
