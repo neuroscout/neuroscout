@@ -1,4 +1,5 @@
 import os
+import datetime
 
 class Config(object):
     DEBUG = False
@@ -13,7 +14,7 @@ class Config(object):
     SECURITY_TRACKABLE = True
     WTF_CSRF_ENABLED = False
     SQLALCHEMY_TRACK_MODIFICATIONS = False
-
+    JWT_EXPIRATION_DELTA = datetime.timedelta(days=7)
 
 class DevelopmentConfig(Config):
     try:
@@ -23,7 +24,7 @@ class DevelopmentConfig(Config):
             os.environ['NEUROSCOUT_POSTGRES_1_PORT_5432_TCP_PORT'])
         PROPAGATE_EXCEPTIONS = True
     except KeyError:
-        pass    
+        pass
 
 class TestingConfig(Config):
     SQLALCHEMY_DATABASE_URI = 'postgresql://zorro:dbpass@localhost:5432/scout_test'
