@@ -7,7 +7,7 @@ import populate
 
 app.config.from_object(os.environ['APP_SETTINGS'])
 
-migrate = Migrate(app, db)
+migrate = Migrate(app, db, directory=app.config['MIGRATIONS_DIR'])
 manager = Manager(app)
 
 def _make_context():

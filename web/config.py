@@ -15,16 +15,13 @@ class Config(object):
     WTF_CSRF_ENABLED = False
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     JWT_EXPIRATION_DELTA = datetime.timedelta(days=7)
+    MIGRATIONS_DIR = 'migrations'
 
 class DevelopmentConfig(Config):
-    try:
-        DEBUG = True
-        SQLALCHEMY_DATABASE_URI = 'postgresql://postgres@{}:{}/neuroscout'.format(
-            os.environ['NEUROSCOUT_POSTGRES_1_PORT_5432_TCP_ADDR'],
-            os.environ['NEUROSCOUT_POSTGRES_1_PORT_5432_TCP_PORT'])
-        PROPAGATE_EXCEPTIONS = True
-    except KeyError:
-        pass
+    DEBUG = True
+    SQLALCHEMY_DATABASE_URI = 'postgres://postgres@postgres:5432/neuroscout'
+    PROPAGATE_EXCEPTIONS = True
+    MIGRATIONS_DIR = '/migrations/migrations'
 
 class TestingConfig(Config):
     SQLALCHEMY_DATABASE_URI = 'postgresql://zorro:dbpass@localhost:5432/scout_test'
