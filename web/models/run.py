@@ -1,5 +1,5 @@
 from database import db
-from sqlalchemy.dialects.postgresql import JSON
+from sqlalchemy.dialects.postgresql import JSONB
 
 # Association table between analysis and run.
 analysis_run = db.Table('analysis_run',
@@ -18,20 +18,21 @@ class Run(db.Model):
     task = db.Column(db.Text)
 
     duration = db.Column(db.Float)
-    task_description = db.Column(JSON) # BIDS task description
+    task_description = db.Column(JSONB) # BIDS task description
     TR = db.Column(db.Float)
     path = db.Column(db.Text) # Relative to BIDS root
 
-    dataset_id = db.Column(db.Integer, db.ForeignKey('dataset.id'), nullable=False)
+    dataset_id = db.Column(db.Text, db.ForeignKey('dataset.id'), nullable=False)
     predictor_events = db.relationship('PredictorEvent', backref='run',
                                         lazy='dynamic')
     analyses = db.relationship('Analysis',
                             secondary='analysis_run',
-                            backref='run')
+                            backref='run',
+                            lazy='dynamic')
     stimuli = db.relationship('Stimulus',
                             secondary='run_stimulus',
                             backref='run',
-                            lazy='joined')
+                            lazy='dynamic')
 
 
     # Anything else that a nipype interface needs to work with that run?

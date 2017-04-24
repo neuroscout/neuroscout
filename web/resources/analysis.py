@@ -12,14 +12,12 @@ from .predictor import PredictorSchema
 from .result import ResultSchema
 from .run import RunSchema
 
-from sqlalchemy.orm.exc import NoResultFound
-
 class AnalysisSchema(Schema):
 	id = fields.Int(dump_only=True)
 	name = fields.Str(required=True)
 	description = fields.Str(required=True)
 
-	dataset_id = fields.Int(required=True)
+	dataset_id = fields.Str(required=True)
 	user_id = fields.Int(required=True, dump_only=True)
 	parent = fields.Nested('AnalysisSchema', only='id')
 
@@ -42,18 +40,12 @@ class AnalysisSchema(Schema):
 
 class AnalysisResource(Resource):
 	""" User generated analysis """
-	@operation(
-	responseMessages=[{"code": 400,
-	      "message": "Analysis does not exist"}])
+	@operation()
 	@jwt_required()
 	def get(self, analysis_id):
 		""" Access individual analysis """
-		try:
-			result = Analysis.query.filter_by(id=analysis_id).one()
-			return AnalysisSchema().dump(result)
-		except NoResultFound:
-			abort(400, message="Analysis {} does not exist".format(analysis_id))
-
+		result = Analysis.query.filter_by(id=analysis_id).first_or_404()
+		return AnalysisSchema().dump(result)
 
 class AnalysisListResource(Resource):
 	""" User generated analyses """
