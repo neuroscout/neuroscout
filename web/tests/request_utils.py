@@ -24,17 +24,17 @@ class Client(object):
         else:
             return None
 
-    def _make_request(self, request, route, data, headers):
+    def _make_request(self, request, route, params, data, headers):
         """ Generic request handler """
         request_function = getattr(self.client, request)
         headers = headers or self._get_headers()
 
         if self.client_flask:
-            return request_function(self.prepend + route, data=json.dumps(data), 
+            return request_function(self.prepend + route, data=json.dumps(data),
                 content_type='application/json', headers=headers)
         else:
-            return request_function(self.prepend + route, json=data, 
-                headers=headers)
+            return request_function(self.prepend + route, json=data,
+                headers=headers, params=params)
 
     def authorize(self, username=None, password=None):
         if username is not None and password is not None:
@@ -49,14 +49,14 @@ class Client(object):
         else:
             self.token = rv.json()['access_token']
 
-    def get(self, route, data=None, headers=None):
-        return self._make_request('get', route, data, headers)
+    def get(self, route, params=None, data=None, headers=None):
+        return self._make_request('get', route, params, data, headers)
 
-    def post(self, route, data=None, headers=None):
-        return self._make_request('post', route, data, headers)
+    def post(self, route, params=None, data=None, headers=None):
+        return self._make_request('post', route, params, data, headers)
 
-    def put(self, route, data=None, headers=None):
-        return self._make_request('put', route, data, headers)
+    def put(self, route, params=None, data=None, headers=None):
+        return self._make_request('put', route, params, data, headers)
 
 def decode_json(rv):
     return json.loads(rv.data.decode())

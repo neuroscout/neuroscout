@@ -24,8 +24,8 @@ def test_get(auth_client, add_analysis):
 
 	# Try getting nonexistent analysis
 	rv = auth_client.get('/api/analyses/{}'.format(987654))
-	assert rv.status_code == 400
-	assert 'does not exist' in decode_json(rv)['message']
+	assert rv.status_code == 404
+	assert 'requested URL was not found' in decode_json(rv)['message']
 
 def test_post(auth_client, add_dataset):
 	## Add analysis
