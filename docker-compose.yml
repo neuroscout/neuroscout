@@ -1,42 +1,48 @@
-web:
-  restart: always
-  build: ./web
-  expose:
-    - "8000"
-  links:
-    - postgres:postgres
-  volumes:
-    - /usr/src/app/static
-    # ADD DATA VOLUMES /host/dir:/docker/dir
-  command: /usr/local/bin/gunicorn -w 2 -b :8000 app:app --log-level debu
+version: "2"
+services:
+  web:
+    restart: always
+    build: ./web
+    expose:
+      - "8000"
+    links:
+      - postgres:postgres
+    volumes:
+      - /usr/src/app/static
+      - migrations:/migrations
+      # ADD OTHERS VOLUMES HERE
+    command: /usr/local/bin/gunicorn -w 2 -b :8000 app:app --log-level debu
 
-  environment:
-    - APP_SETTINGS=config.DevelopmentConfig
+    environment:
+      - APP_SETTINGS=config.DevelopmentConfig
 
-nginx:
-  restart: always
-  build: ./nginx/
-  ports:
-    - "80:80"
-  volumes:
-    - /www/static
-  volumes_from:
-    - web
-  links:
-    - web:web
+  nginx:
+    restart: always
+    build: ./nginx/
+    ports:
+      - "80:80"
+    volumes:
+      - /www/static
+    volumes_from:
+      - web
+    links:
+      - web:web
 
-data:
-  image: postgres:latest
-  volumes:
-    - /var/lib/postgresql
-  command: "true"
+  data:
+    image: postgres:latest
+    volumes:
+      - /var/lib/postgresql
+    command: "true"
 
-postgres:
-  restart: always
-  image: postgres:latest
-  volumes_from:
-    - data
-  ports:
-    - "5432:5432"
-  environment:
-    - POSTGRES_DB=neuroscout
+  postgres:
+    restart: always
+    image: postgres:latest
+    volumes_from:
+      - data
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_DB=neuroscout
+
+volumes:
+  migrations:
