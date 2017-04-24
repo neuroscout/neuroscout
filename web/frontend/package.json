@@ -1,0 +1,26 @@
+{
+  "name": "frontend",
+  "version": "0.1.0",
+  "proxy": "http://localhost:80",
+  "private": true,
+  "dependencies": {
+    "@types/antd": "^1.0.0",
+    "@types/jest": "^19.2.2",
+    "@types/jquery": "^2.0.41",
+    "@types/node": "^7.0.12",
+    "@types/react": "^15.0.21",
+    "@types/react-dom": "^0.14.23",
+    "antd": "^2.9.1",
+    "react": "^15.5.4",
+    "react-dom": "^15.5.4"
+  },
+  "devDependencies": {
+    "react-scripts-ts": "1.2.0"
+  },
+  "scripts": {
+    "start": "react-scripts-ts start",
+    "build": "react-scripts-ts build",
+    "test": "react-scripts-ts test --env=jsdom",
+    "eject": "react-scripts-ts eject"
+  }
+}
