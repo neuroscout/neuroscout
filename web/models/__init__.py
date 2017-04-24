@@ -1,16 +1,18 @@
 ''' Model hierarchy. '''
 
-from .analysis import Analysis
+from .analysis import Analysis, analysis_predictor
 from .auth import User, Role, roles_users, user_datastore
+from .group import GroupPredictor, GroupPredictorValue
 from .dataset import Dataset
 from .features import ExtractedFeature, ExtractedEvent
 from .predictor import Predictor, PredictorEvent
 from .result import Result
-from .run import Run
+from .run import Run, analysis_run
 from .stimulus import Stimulus, RunStimulus
 
 __all__ = [
     'Analysis',
+    'analysis_predictor',
     'User',
     'Role',
     'roles_users',
@@ -18,10 +20,14 @@ __all__ = [
     'Dataset',
     'ExtractedFeature',
     'ExtractedEvent',
+    'GroupPredictor',
+    'GroupPredictorValue',
     'Predictor',
     'PredictorEvent',
+    # 'PredictorRun',
     'Result',
     'Run',
+    'analysis_run',
     'Stimulus',
     'RunStimulus'
 ]

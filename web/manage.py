@@ -39,7 +39,7 @@ def add_dataset(bids_path, task, replace=False, **kwargs):
 
 @manager.command
 def extract_features(bids_path, task, graph_spec, **kwargs):
-	populate.extract_features(db.session, bids_path, graph_spec, task=task,
+	populate.extract_features(db.session, bids_path, task, graph_spec,
 							  verbose=True, **kwargs)
 
 if __name__ == '__main__':

@@ -1,21 +1,14 @@
 from flask_restful import Resource, abort
 from flask_restful_swagger.swagger import operation
 from flask_jwt import jwt_required
-from marshmallow import Schema, fields, post_load
+from marshmallow import Schema, fields
 from models.run import Run
-
-from .predictor import PredictorSchema
 
 class RunSchema(Schema):
 	id = fields.Str(dump_only=True)
-
-	predictors = fields.Nested(PredictorSchema, only=['id', 'name'])
-	@post_load
-	def make_db(self, data):
-		return Run(**data)
-
 	class Meta:
-		additional = ('session', 'subject', 'number', 'task')
+		additional = ('session', 'subject', 'number', 'task', 'duration',
+					  'task_description', 'TR', 'path', 'datset_id')
 
 class RunResource(Resource):
 	""" Resource for Run """

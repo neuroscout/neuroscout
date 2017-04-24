@@ -9,7 +9,7 @@ web:
     - /usr/src/app/static
     - /Users/pouya/projects/neuro/shared_data:/shared_data
 
-  command: /usr/local/bin/gunicorn -w 2 -b :8000 app:app --log-level debu
+  command: /usr/local/bin/gunicorn -w 2 -b :8000 app:app --log-level debug
 
   environment:
     - APP_SETTINGS=config.DevelopmentConfig

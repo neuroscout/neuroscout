@@ -1,11 +1,15 @@
 import pytest
 from models import (Analysis, User, Dataset, Predictor, Stimulus, Run,
-					RunStimulus, Result, ExtractedFeature, ExtractedEvent)
+					RunStimulus, Result, ExtractedFeature,
+					GroupPredictor, GroupPredictorValue)
 
 def test_dataset_ingestion(session, add_dataset):
 	# Number of entries
 	assert Dataset.query.count() == 1
 	dataset_model = Dataset.query.filter_by(id=add_dataset).one()
+
+	# Test mimetypes
+	assert 'image/jpeg' in dataset_model.mimetypes
 
 	# Try adding dataset without a name
 	with pytest.raises(Exception) as excinfo:
@@ -18,25 +22,38 @@ def test_dataset_ingestion(session, add_dataset):
 	assert Run.query.count() == dataset_model.runs.count() == 4
 	run_model =  dataset_model.runs.first()
 	assert run_model.dataset_id == dataset_model.id
+	assert 'TaskName' in run_model.task_description
+	assert run_model.duration is None
+	assert run_model.path is None
+	assert run_model.TR == 2.0
 
-	# Test properties of first run's predictors
-	assert run_model.predictors.count() == 2
-	assert Predictor.query.count() == 8 # because four runs total
+	# Test properties of first run's predictor events
+	assert run_model.predictor_events.count() == 8
+	assert Predictor.query.count() == dataset_model.predictors.count() == 2
 
-	run_predictor = run_model.predictors.first()
-	run_predictor.name == 'trial_type'
-	assert run_predictor.predictor_events.count() == 4
+	assert 'rt' in [p.name for p in Predictor.query.all()]
+
+	predictor = dataset_model.predictors.first()
+	assert predictor.predictor_events.count() == 16
 
 	# Test predictor event
-	predictor_event = run_predictor.predictor_events.first()
+	predictor_event = predictor.predictor_events.first()
 	assert predictor_event.value is not None
 	assert predictor_event.onset is not None
 
 	# Test that Stimiuli were extracted
-	Stimulus.query.count() == 4
+	assert Stimulus.query.count() == 4
 
 	# and that they were associated with runs (4 runs )
-	RunStimulus.query.count() == Stimulus.query.count() * Run.query.count() == 16
+	assert RunStimulus.query.count() == Stimulus.query.count() * Run.query.count() == 16
+
+	# Test participants.tsv ingestion
+	assert GroupPredictor.query.count() == 3
+	assert GroupPredictor.query.filter_by(name='sex').count() == 1
+
+	gpv = GroupPredictor.query.filter_by(name='sex').one().values
+	assert gpv.count() == 2
+	assert 'F' in [v.value for v in gpv]
 
 
 def test_extracted_features(extract_features):
@@ -51,6 +68,12 @@ def test_extracted_features(extract_features):
 
 	# And that a sensical value was extracted
 	assert ef.extracted_events.first().value < 1
+
+	# Test that Predictors were created from EF
+	pred = Predictor.query.filter_by(ef_id=ef.id).one()
+	assert pred.predictor_events.first().onset == 1.0
+
+	# Add a test checking that values correspond from Predictors to EFs?
 
 
 # def test_analysis(session, add_analyses, add_predictor):

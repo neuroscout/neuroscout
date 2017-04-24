@@ -3,6 +3,7 @@
 [![Build Status](https://travis-ci.com/PsychoinformaticsLab/neuroscout.svg?token=mytABRBRnBitJJpBpMxh&branch=master)](https://travis-ci.com/PsychoinformaticsLab/neuroscout)
 
 To set up docker, ensure docker and docker-compose are installed.
+Next, edit docker-compose.yml to configure mounting of data volumes.
 
 Build the containers and start the services:
 
@@ -46,7 +47,7 @@ To add BIDS datasets
 
 For example for dataset ds009
 
-    python manage.py add_dataset /home/user/data/ds009 emotionalregulation
+    python manage.py add_dataset /datasets/ds009 emotionalregulation
 
 Finally, once having added a dataset to the database, you can extract features
   using pliers into the database as follows:
@@ -55,7 +56,7 @@ Finally, once having added a dataset to the database, you can extract features
 
 For example:
 
-    python manage.py extract_features /home/user/data/ds009 emotionalregulation graph.json
+    python manage.py extract_features /datsets/ds009 emotionalregulation graph.json
 
 
 ## API

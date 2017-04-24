@@ -1,18 +1,14 @@
 from flask_restful import Resource, abort
 from flask_restful_swagger.swagger import operation
 from flask_jwt import jwt_required
-from marshmallow import Schema, fields, post_load
+from marshmallow import Schema, fields
 from models.stimulus import Stimulus
 
 class StimulusSchema(Schema):
 	id = fields.Str(dump_only=True)
 
-	@post_load
-	def make_db(self, data):
-		return Stimulus(**data)
-
 	class Meta:
-		additional = ('dataset_id', 'path')
+		additional = ('name', 'mimetype', 'path')
 
 class StimulusResource(Resource):
 	""" A stimulus """

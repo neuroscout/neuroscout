@@ -16,11 +16,14 @@ class Config(object):
 
 
 class DevelopmentConfig(Config):
-    DEBUG = True
-    SQLALCHEMY_DATABASE_URI = 'postgresql://postgres@{}:{}/neuroscout'.format(
-        os.environ['NEUROSCOUT_POSTGRES_1_PORT_5432_TCP_ADDR'],
-        os.environ['NEUROSCOUT_POSTGRES_1_PORT_5432_TCP_PORT'])
-    PROPAGATE_EXCEPTIONS = True
+    try:
+        DEBUG = True
+        SQLALCHEMY_DATABASE_URI = 'postgresql://postgres@{}:{}/neuroscout'.format(
+            os.environ['NEUROSCOUT_POSTGRES_1_PORT_5432_TCP_ADDR'],
+            os.environ['NEUROSCOUT_POSTGRES_1_PORT_5432_TCP_PORT'])
+        PROPAGATE_EXCEPTIONS = True
+    except KeyError:
+        pass    
 
 class TestingConfig(Config):
     SQLALCHEMY_DATABASE_URI = 'postgresql://zorro:dbpass@localhost:5432/scout_test'
