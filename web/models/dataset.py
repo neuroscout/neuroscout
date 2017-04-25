@@ -3,7 +3,6 @@ from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.ext.hybrid import hybrid_property
 from .run import Run
 from .stimulus import Stimulus
-from sqlalchemy import select
 
 class Dataset(db.Model):
 	""" A BIDS dataset """
@@ -23,19 +22,10 @@ class Dataset(db.Model):
 					Run, Stimulus).filter_by(
 						dataset_id=self.id).distinct('mimetype')]
 
-	@mimetypes.expression
-	def mimetypes(cls):
-		return select([Stimulus.mimetype]).select_from(
-			Stimulus.join(Run)).where(Run.dataset_id == cls.id).distinct()
-
 	@hybrid_property
 	def tasks(self):
 		""" List of tasks dataset """
 		return [r.task for r in self.runs.distinct('task')]
 
-	@tasks.expression
-	def tasks(cls):
-	    return select([Run.task]).where(
-			Run.dataset_id == cls.id).distinct()
 
 	# Meta-data, such as preprocessed history, etc...
