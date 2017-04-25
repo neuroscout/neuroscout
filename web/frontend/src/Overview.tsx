@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { Form, Input, AutoComplete, Table } from 'antd'
-import { TableProps } from "antd/lib/table/Table";
+import { TableProps, TableRowSelection } from "antd/lib/table/Table";
 
 const FormItem = Form.Item;
 
@@ -24,15 +24,14 @@ interface OverviewTabProps {
 }
 
 export class OverviewTab extends React.Component<OverviewTabProps, any>{
-  updateAnalysis = (attrName: string) => (event: any) => {
+  updateAnalysis = (attrName: string) => (value: any) => {
     let newAnalysis = { ...this.props.analysis };
-    if (typeof (event) === 'string') {
-      newAnalysis[attrName] = event;
-    }
-    else {
-      newAnalysis[attrName] = event.target.value;
-    }
+    newAnalysis[attrName] = value;
     this.props.updateAnalysis(newAnalysis)
+  }
+
+  updateAnalysisFromEvent = (attrName: string) => (event: any) => {
+    this.updateAnalysis(attrName)(event.target.value);
   }
 
   render() {
@@ -43,25 +42,29 @@ export class OverviewTab extends React.Component<OverviewTabProps, any>{
       { title: 'Subject', dataIndex: 'subject' },
       { title: 'Session', dataIndex: 'session' }
     ];
-    const rowSelection = {
-      onSelect: (record, selected, selectedRows) => {
+    
+    const rowSelection: TableRowSelection<Run> = {
+      onSelect: (record, selected, selectedRows:any) => {
         console.log('Selected rows = ', selectedRows);
-        this.updateAnalysis('runIds')(selectedRows.map(x => x.id ))
+        this.updateAnalysis('runIds')(selectedRows.map(x => x.id))
+      },
+      onSelectAll: (selected, selectedRows:any, changeRows) => {
+        this.updateAnalysis('runIds')(selectedRows.map(x => x.id))
       }
     }
+
     return <div>
-      <p>Analysis Overview</p>
       <Form layout='vertical'>
         <FormItem label="Analysis name:">
           <Input placeholder="Analysis name"
             value={analysis.analysisName}
-            onChange={this.updateAnalysis('analysisName')}
+            onChange={this.updateAnalysisFromEvent('analysisName')}
           />
         </FormItem>
         <FormItem label="Description:">
           <Input placeholder="Description of your analysis"
             value={analysis.analysisDescription}
-            onChange={this.updateAnalysis('analysisDescription')}
+            onChange={this.updateAnalysisFromEvent('analysisDescription')}
             type="textarea"
             autosize={{ minRows: 3, maxRows: 20 }}
           />
@@ -69,13 +72,13 @@ export class OverviewTab extends React.Component<OverviewTabProps, any>{
         <FormItem label="Predictions:">
           <Input placeholder="Enter your preditions about what you expect the results to look like"
             value={analysis.predictions}
-            onChange={this.updateAnalysis('predictions')}
+            onChange={this.updateAnalysisFromEvent('predictions')}
             type="textarea"
             autosize={{ minRows: 3, maxRows: 20 }}
           />
         </FormItem>
 
-        <FormItem label="Dataset">
+        <FormItem label="Dataset:">
           <AutoComplete
             dataSource={datasets.map(item =>
               ({ value: item.id.toString(), text: item.name || item.id.toString() }))} // TODO: stop using id in text once name is included
@@ -89,19 +92,11 @@ export class OverviewTab extends React.Component<OverviewTabProps, any>{
             <RunTable
               columns={columns}
               rowKey="id"
+              pagination={false}
               dataSource={availableRuns}
               rowSelection={rowSelection} />
           </div>
           : null}
-        {/*<FormItem label="Dataset">
-          <Select
-            mode="tags"
-          >
-          {this.props.datasets.map((dataset) => 
-            <Option key={dataset.value}>{dataset.name}</Option>
-          )}
-          </Select>
-        </FormItem>*/}
       </Form>
     </div>
   }
