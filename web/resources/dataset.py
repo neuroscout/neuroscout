@@ -6,6 +6,9 @@ from models.dataset import Dataset
 
 from .run import RunSchema
 
+from flask import request
+import webargs as wa
+from webargs.flaskparser import parser
 
 class DatasetSchema(Schema):
 	runs = fields.Nested(RunSchema, many=True, only='id')
@@ -32,5 +35,14 @@ class DatasetListResource(Resource):
 	@operation()
 	def get(self):
 		""" List of datasets """
+		user_args = {
+			'all_fields': wa.fields.Bool(missing=False)
+		}
+		args = parser.parse(user_args, request)
+
+		marsh_args = {'many' : True}
+		if not args.pop('all_fields'):
+			marsh_args['only'] = \
+			['id', 'mimetypes', 'tasks']
 		result = Dataset.query.all()
-		return DatasetSchema(many=True, only=['id', 'mimetypes', 'tasks']).dump(result)
+		return DatasetSchema(**marsh_args).dump(result)
