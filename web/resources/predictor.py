@@ -1,8 +1,11 @@
 from flask_restful import Resource, abort
 from flask_restful_swagger.swagger import operation
-from flask_jwt import jwt_required
 from marshmallow import Schema, fields
-from models.predictor import Predictor
+from models import Predictor, PredictorEvent, Run
+
+from flask import request
+import webargs as wa
+from webargs.flaskparser import parser
 
 # Predictor Event Resources
 class PredictorEventSchema(Schema):
@@ -18,22 +21,43 @@ class PredictorSchema(Schema):
 	predictor_events = fields.Nested(PredictorEventSchema, many=True, only='id')
 
 	class Meta:
-		additional = ('name', 'description', 'ef_id', 'analysis_id')
+		additional = ('name', 'description', 'ef_id', 'analysis')
 
 class PredictorResource(Resource):
 	""" Predictors """
 	@operation()
-	@jwt_required()
-	def get(self, id):
+	def get(self, predictor_id):
 		""" Access a predictor by id """
-		result = Predictor.query.filter_by(id=id).one_or_404()
+		result = Predictor.query.filter_by(id=predictor_id).first_or_404()
 		return PredictorSchema().dump(result)
 
 class PredictorListResource(Resource):
 	""" Extracted predictors """
 	@operation()
-	@jwt_required()
 	def get(self):
 		""" List of extracted predictors """
-		result = Predictor.query.filter_by().all()
-		return PredictorSchema(many=True).dump(result)
+		user_args = {
+			'all_fields': wa.fields.Bool(missing=False),
+		    'run_id': wa.fields.DelimitedList(fields.Str()),
+		    'name': wa.fields.DelimitedList(fields.Str()),
+		}
+		args = parser.parse(user_args, request)
+		marsh_args = {'many' : True}
+		if not args.pop('all_fields'):
+			marsh_args['only'] = \
+			['id', 'name']
+
+		try:
+			run_ids = args.pop('run_id')
+		except KeyError:
+			run_ids = None
+
+		query = Predictor.query
+		for param in args:
+			query = query.filter(getattr(Predictor, param).in_(args[param]))
+
+		if run_ids:
+			query = query.join('predictor_events').filter(
+				PredictorEvent.run_id.in_(run_ids))
+
+		return PredictorSchema(**marsh_args).dump(query.all())

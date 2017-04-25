@@ -27,16 +27,12 @@ class RunListResource(Resource):
 	@operation()
 	def get(self):
 		""" List of runs """
-		def ds_exists(val):
-		    if not Dataset.query.get(val):
-		        raise wa.ValidationError('Dataset does not exist',
-										 status_code=400)
 		user_args = {
 		    'session': wa.fields.DelimitedList(fields.Str()),
 		    'number': wa.fields.DelimitedList(fields.Str()),
 		    'task': wa.fields.DelimitedList(fields.Str()),
 		    'subject': wa.fields.DelimitedList(fields.Str()),
-		    'dataset_id': wa.fields.Str(validate=ds_exists),
+		    'dataset_id': wa.fields.Str(),
 			'all_fields': wa.fields.Bool(missing=False)
 		}
 		args = parser.parse(user_args, request)

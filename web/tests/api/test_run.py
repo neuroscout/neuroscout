@@ -37,8 +37,8 @@ def test_get_run(auth_client, add_dataset):
 		assert run['dataset_id'] == add_dataset
 
 	rv = auth_client.get('/api/runs', data={'dataset_id' : 'non-existent'})
-	assert rv.status_code == 400
-	assert 'does not exist' in decode_json(rv)['messages']['dataset_id'][0]
+	assert rv.status_code == 200
+	assert len(decode_json(rv)) == 0
 
 	# Test getting all fields
 	rv = auth_client.get('/api/runs', data={'dataset_id' : add_dataset,

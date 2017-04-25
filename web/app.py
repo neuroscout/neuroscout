@@ -27,7 +27,7 @@ from resources.dataset import DatasetResource, DatasetListResource
 from resources.result import ResultResource, ResultListResource
 from resources.run import RunResource, RunListResource
 from resources.stimulus import StimulusResource
-from resources.predictor  import PredictorResource
+from resources.predictor  import PredictorResource, PredictorListResource
 from resources.user  import UserResource
 
 api = swagger.docs(Api(app), apiVersion='0.1')
@@ -46,6 +46,7 @@ api.add_resource(StimulusResource, '/api/stimuli/<stimulus_id>')
 api.add_resource(RunListResource, '/api/runs')
 api.add_resource(RunResource, '/api/runs/<run_id>')
 
+api.add_resource(PredictorListResource, '/api/predictors')
 api.add_resource(PredictorResource, '/api/predictors/<predictor_id>')
 
 api.add_resource(UserResource, '/api/user')

@@ -16,15 +16,6 @@ class Predictor(db.Model):
 	predictor_events = db.relationship('PredictorEvent', backref='predictor',
 								lazy='dynamic')
 
-# class PredictorDataset(db.Model):
-#     """ Predictor dataset association table """
-#     predictor_id = db.Column(db.Integer, db.ForeignKey('predictor.id'), primary_key=True)
-#     run_id = db.Column(db.Integer, db.ForeignKey('run.id'), primary_key=True)
-# 	# Cache a plot of the timecourse
-# 	# Run level Predictor diagnostics (cached) will go in here
-
-# PredictorRun table does not make sense since Run is tied to PredictorEvent now
-# Separate cache table?
 
 class PredictorEvent(db.Model):
 	""" An event within a Predictor. Onset is relative to run. """
@@ -40,3 +31,13 @@ class PredictorEvent(db.Model):
 	run_id = db.Column(db.Integer, db.ForeignKey('run.id'), nullable=False)
 	predictor_id = db.Column(db.Integer, db.ForeignKey('predictor.id'),
 							nullable=False)
+
+# class PredictorDataset(db.Model):
+#     """ Predictor dataset association table """
+#     predictor_id = db.Column(db.Integer, db.ForeignKey('predictor.id'), primary_key=True)
+#     run_id = db.Column(db.Integer, db.ForeignKey('run.id'), primary_key=True)
+# 	# Cache a plot of the timecourse
+# 	# Run level Predictor diagnostics (cached) will go in here
+
+# PredictorRun table does not make sense since Run is tied to PredictorEvent now
+# Separate cache table?
