@@ -1,6 +1,5 @@
 from flask_restful import Resource
 from flask_restful_swagger.swagger import operation
-from flask_jwt import jwt_required
 from marshmallow import Schema, fields
 from models import Run, Dataset
 
@@ -18,7 +17,6 @@ class RunSchema(Schema):
 class RunResource(Resource):
 	""" Resource for Run """
 	@operation()
-	@jwt_required()
 	def get(self, run_id):
 		""" Access a run """
 		result = Run.query.filter_by(id=run_id).first_or_404()
@@ -27,7 +25,6 @@ class RunResource(Resource):
 class RunListResource(Resource):
 	""" Available runs """
 	@operation()
-	@jwt_required()
 	def get(self):
 		""" List of runs """
 		def ds_exists(val):
