@@ -32,7 +32,7 @@ class RunListResource(Resource):
 		    'number': wa.fields.DelimitedList(fields.Str()),
 		    'task': wa.fields.DelimitedList(fields.Str()),
 		    'subject': wa.fields.DelimitedList(fields.Str()),
-		    'dataset_id': wa.fields.Str(),
+		    'dataset_id': wa.fields.Int(),
 			'all_fields': wa.fields.Bool(missing=False)
 		}
 		args = parser.parse(user_args, request)

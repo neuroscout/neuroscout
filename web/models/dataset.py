@@ -6,9 +6,9 @@ from .stimulus import Stimulus
 
 class Dataset(db.Model):
 	""" A BIDS dataset """
-	id = db.Column(db.Text, primary_key=True)
+	id = db.Column(db.Integer, primary_key=True)
 	description = db.Column(JSONB) # BIDS description
-
+	name = db.Column(db.Text, unique=True, nullable=False)
 	runs = db.relationship('Run', backref='dataset',
 	                        lazy='dynamic')
 	predictors = db.relationship('Predictor', backref='dataset',

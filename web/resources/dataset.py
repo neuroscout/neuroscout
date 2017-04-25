@@ -14,7 +14,7 @@ class DatasetSchema(Schema):
 	runs = fields.Nested(RunSchema, many=True, only='id')
 
 	class Meta:
-		additional = ('id', 'description', 'mimetypes', 'tasks')
+		additional = ('id', 'name', 'description', 'mimetypes', 'tasks')
 
 	@post_load
 	def make_db(self, data):
@@ -43,6 +43,6 @@ class DatasetListResource(Resource):
 		marsh_args = {'many' : True}
 		if not args.pop('all_fields'):
 			marsh_args['only'] = \
-			['id', 'mimetypes', 'tasks']
+			['id', 'name', 'mimetypes', 'tasks']
 		result = Dataset.query.all()
 		return DatasetSchema(**marsh_args).dump(result)

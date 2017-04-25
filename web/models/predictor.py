@@ -10,7 +10,7 @@ class Predictor(db.Model):
 	name = db.Column(db.Text, nullable=False)
 	description = db.Column(db.Text) # Where to get this from?
 
-	dataset_id = db.Column(db.Text, db.ForeignKey('dataset.id'), nullable=False)
+	dataset_id = db.Column(db.Integer, db.ForeignKey('dataset.id'), nullable=False)
 	ef_id = db.Column(db.Integer, db.ForeignKey('extracted_feature.id'))
 
 	predictor_events = db.relationship('PredictorEvent', backref='predictor',

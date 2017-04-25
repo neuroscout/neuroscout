@@ -17,7 +17,7 @@ class AnalysisSchema(Schema):
 	name = fields.Str(required=True)
 	description = fields.Str(required=True)
 
-	dataset_id = fields.Str(required=True)
+	dataset_id = fields.Int(required=True)
 	user_id = fields.Int(required=True, dump_only=True)
 	parent = fields.Nested('AnalysisSchema', only='id')
 
