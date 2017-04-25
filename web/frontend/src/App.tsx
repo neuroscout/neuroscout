@@ -1,24 +1,15 @@
 import * as React from 'react';
-// import * as $ from 'jquery'
 import { Button, Tabs, Row, Col } from 'antd';
 import './App.css';
 
-import { Analysis, Dataset, OverviewTab } from './Overview'
+import { OverviewTab } from './Overview'
+import { Store } from './commontypes'
 
 const TabPane = Tabs.TabPane;
 // const logo = require('./logo.svg');
 const domainRoot = 'http://localhost:80'
 const USERNAME = 'test2@test.com';
 const PASSWORD = 'password';
-
-interface Store {
-  activeTab: 'overview' | 'predictors' | 'transformations' | 'contrasts' | 'modeling' | 'overview';
-  predictorsActive: boolean;
-  transformationsActive: boolean;
-  analysis: Analysis;
-  datasets: Dataset[];
-}
-
 const initializeStore = (): Store => ({
   activeTab: 'overview',
   predictorsActive: false,
@@ -28,23 +19,22 @@ const initializeStore = (): Store => ({
     analysisName: 'Untitled',
     analysisDescription: '',
     datasetId: null,
-    predictions: ''
+    predictions: '',
+    runIds: []
   },
-  datasets: []
+  datasets: [],
+  availableRuns: []
 });
 
 const getJwt = () => new Promise((resolve, reject) => {
   /* Returns an access token (JWT) as a promise, either straight from local 
      storage or by fetching from server (/auth) with username/password and 
      caching it to local storage. */
-  console.log('Inside getJwt executor...');
   let jwt = window.localStorage.getItem('jwt')
   if (jwt) {
-    console.log('Getting JWT from localstorage...');
     resolve(jwt);
   }
   else {
-    console.log('Fetching from /auth...');
     fetch(domainRoot + '/auth', {
       method: 'post',
       body: JSON.stringify({ username: USERNAME, password: PASSWORD }),
@@ -53,10 +43,8 @@ const getJwt = () => new Promise((resolve, reject) => {
       }
     })
       .then((response) => {
-        console.log('Received response from /auth...');
         response.json().then((data: { access_token: string }) => {
           window.localStorage.setItem('jwt', data.access_token);
-          console.log('Saving JWT to local storage');
           resolve(data.access_token);
         })
       });
@@ -81,21 +69,29 @@ class App extends React.Component<{}, Store> {
     this.state = initializeStore();
     aFetch(domainRoot + '/api/datasets').then(response => {
       response.json().then(data => {
-        this.setState({'datasets': data})
-        console.log(`Received ${data.length} datasets from /api/datasets/ data`);
+        this.setState({ 'datasets': data })
       })
     })
   }
 
   updateState = (attrName: string) => (value: any) => {
+    if (attrName == 'analysis' && value.datasetId != this.state.analysis.datasetId) {
+      aFetch(`${domainRoot}/api/runs?dataset=${value.datasetId}`)
+        .then(response => {
+          response.json().then(data => {
+            console.log(`Received ${data.length} datasets from /api/runs`);
+            console.log(data);
+            this.setState({availableRuns: data});
+          })
+        })
+    }
     let stateUpdate = {}
     stateUpdate[attrName] = value;
     this.setState(stateUpdate);
   }
 
   render() {
-    const { activeTab, predictorsActive, transformationsActive, analysis, datasets } = this.state;
-    console.log(activeTab);
+    const { predictorsActive, transformationsActive, analysis, datasets, availableRuns } = this.state;
     return (
       <div className="App">
         <div className="App-header">
@@ -109,6 +105,7 @@ class App extends React.Component<{}, Store> {
                 <OverviewTab
                   analysis={analysis}
                   datasets={datasets}
+                  availableRuns={availableRuns}
                   updateAnalysis={this.updateState('analysis')}
                 />
               </TabPane>
