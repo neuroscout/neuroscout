@@ -36,9 +36,15 @@ class RunListResource(Resource):
 		    'number': wa.fields.DelimitedList(fields.Str()),
 		    'task': wa.fields.DelimitedList(fields.Str()),
 		    'subject': wa.fields.DelimitedList(fields.Str()),
-		    'dataset_id': wa.fields.Str(validate=ds_exists)
+		    'dataset_id': wa.fields.Str(validate=ds_exists),
+			'all_fields': wa.fields.Bool(missing=False)
 		}
 		args = parser.parse(user_args, request)
+
+		marsh_args = {'many' : True}
+		if not args.pop('all_fields'):
+			marsh_args['only'] = \
+			['id', 'dataset_id', 'session', 'subject', 'number', 'task']
 
 		try:
 			dataset = args.pop('dataset_id')
@@ -52,5 +58,4 @@ class RunListResource(Resource):
 		if dataset:
 			query = query.join('dataset').filter_by(id=dataset)
 
-		return RunSchema(many=True,
-			only=['id', 'dataset_id', 'session', 'subject', 'number', 'task']).dump(query.all())
+		return RunSchema(**marsh_args).dump(query.all())

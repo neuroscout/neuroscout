@@ -40,6 +40,11 @@ def test_get_run(auth_client, add_dataset):
 	assert rv.status_code == 400
 	assert 'does not exist' in decode_json(rv)['messages']['dataset_id'][0]
 
+	# Test getting all fields
+	rv = auth_client.get('/api/runs', data={'dataset_id' : add_dataset,
+											'all_fields' : 'True'})
+	assert 'TR' in decode_json(rv)[0]
+
 	# Test filtering by multiple parameters
 	rv = auth_client.get('/api/runs', data={'number': '01,02',
 											'task': 'bidstest'})
