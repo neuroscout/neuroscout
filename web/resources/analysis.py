@@ -1,7 +1,7 @@
-from flask import request, abort
+from flask import abort
 from flask_apispec import MethodResource, marshal_with, use_kwargs
 from flask_jwt import jwt_required, current_identity
-from marshmallow import Schema, fields, post_load, validates, ValidationError
+from marshmallow import Schema, fields, validates, ValidationError
 from models.analysis import Analysis
 from models.dataset import Dataset
 
@@ -23,10 +23,6 @@ class AnalysisSchema(Schema):
 	results = fields.Nested(ResultSchema, many=True, only='id')
 	predictors = fields.Nested(PredictorSchema, many=True, only='id')
 	runs = fields.Nested(RunSchema, many=True, only='id')
-
-	@post_load
-	def make_db(self, data):
-		return Analysis(**data)
 
 	@validates('dataset_id')
 	def validate_dsid(self, value):
@@ -55,13 +51,13 @@ class AnalysisListResource(MethodResource):
 	@jwt_required()
 	def post(self, **kwargs):
 		""" Post a new analysis """
-		data = request.get_json()
-		new = Analysis(**kwargs)
-		new, errors = AnalysisSchema().load(data)
+		new, errors = AnalysisSchema().load(kwargs)
 
 		if errors:
+			# Add errors to error handler
 			abort(405)
 		else:
+			new = Analysis(**kwargs)
 			new.user_id = current_identity.id
 			db.session.add(new)
 			db.session.commit()

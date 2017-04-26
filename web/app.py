@@ -11,6 +11,7 @@ from flask_jwt import JWT
 from flask_security import Security
 from models.auth import user_datastore
 from auth import authenticate, load_user
+from flask_apispec import FlaskApiSpec
 
 from models import *
 
@@ -18,6 +19,8 @@ from models import *
 security = Security(app, user_datastore)
 jwt = JWT(app, authenticate, load_user)
 
+# Swagger docs
+docs = FlaskApiSpec(app)
 
 from resources.analysis import AnalysisResource, AnalysisListResource
 from resources.dataset import DatasetResource, DatasetListResource
@@ -28,10 +31,15 @@ from resources.dataset import DatasetResource, DatasetListResource
 # from resources.user  import UserResource
 
 app.add_url_rule('/api/analyses', view_func=AnalysisListResource.as_view('analyses'))
+docs.register(AnalysisListResource)
 app.add_url_rule('/api/analyses/<int:analysis_id>', view_func=AnalysisResource.as_view('analysis'))
+docs.register(AnalysisResource)
 
 app.add_url_rule('/api/datasets', view_func=DatasetListResource.as_view('datasets'))
+docs.register(DatasetListResource)
+
 app.add_url_rule('/api/datasets/<int:dataset_id>', view_func=DatasetResource.as_view('dataset'))
+docs.register(DatasetResource)
 
 
 # Serve SPA
