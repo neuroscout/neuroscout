@@ -19,7 +19,7 @@ class Analysis(db.Model):
     modified_at = db.Column(db.DateTime)
     saved_count = db.Column(db.Integer)
 
-    dataset_id = db.Column(db.Text, db.ForeignKey('dataset.id'), nullable=False)
+    dataset_id = db.Column(db.Integer, db.ForeignKey('dataset.id'), nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     # If cloned, this is the parent analysis:
     parent_id = db.Column(db.Integer, db.ForeignKey('analysis.id'))

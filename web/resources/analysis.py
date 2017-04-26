@@ -17,7 +17,7 @@ class AnalysisSchema(Schema):
 	name = fields.Str(required=True)
 	description = fields.Str(required=True)
 
-	dataset_id = fields.Str(required=True)
+	dataset_id = fields.Int(required=True)
 	user_id = fields.Int(required=True, dump_only=True)
 	parent = fields.Nested('AnalysisSchema', only='id')
 
@@ -41,7 +41,6 @@ class AnalysisSchema(Schema):
 class AnalysisResource(Resource):
 	""" User generated analysis """
 	@operation()
-	@jwt_required()
 	def get(self, analysis_id):
 		""" Access individual analysis """
 		result = Analysis.query.filter_by(id=analysis_id).first_or_404()
@@ -50,7 +49,6 @@ class AnalysisResource(Resource):
 class AnalysisListResource(Resource):
 	""" User generated analyses """
 	@operation()
-	@jwt_required()
 	def get(self):
 		""" Get a list of existing analyses """
 		result = Analysis.query.filter_by().all()

@@ -16,12 +16,10 @@ def test_auth(auth_client):
 
 	# Test without auth token
 	auth_client.token = None
-	domains = ['user', 'datasets', 'analyses']
 
-	for domain in domains:
-		rv = auth_client.get('/api/{}'.format(domain))
-		assert rv.status_code == 401
-		assert decode_json(rv)['description'] == 'Request does not contain an access token'
+	rv = auth_client.get('/api/{}'.format('user'))
+	assert rv.status_code == 401
+	assert decode_json(rv)['description'] == 'Request does not contain an access token'
 
 def test_get(auth_client):
 	rv = auth_client.get('/api/user')

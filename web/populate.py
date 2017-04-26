@@ -55,7 +55,7 @@ def add_dataset(session, bids_path, task, replace=False, verbose=True, **kwargs)
 
     # Get or create dataset model from mandatory arguments
     dataset_model, new = db_utils.get_or_create(session, Dataset,
-                                                id=description['Name'])
+                                                name=description['Name'])
 
     if new:
         dataset_model.description = description

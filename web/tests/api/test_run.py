@@ -20,7 +20,7 @@ def test_get_run(auth_client, add_dataset):
 	assert 'task_description' in run
 
 	assert run['TR'] == 2
-	assert run['dataset_id'] == 'Test Dataset'
+	assert run['dataset_id'] == add_dataset
 	assert run['subject'] == '01'
 
 	# Try getting nonexistent run
@@ -36,9 +36,14 @@ def test_get_run(auth_client, add_dataset):
 	for run in run_p:
 		assert run['dataset_id'] == add_dataset
 
-	rv = auth_client.get('/api/runs', data={'dataset_id' : 'non-existent'})
-	assert rv.status_code == 400
-	assert 'does not exist' in decode_json(rv)['messages']['dataset_id'][0]
+	rv = auth_client.get('/api/runs', data={'dataset_id' : '1232'})
+	assert rv.status_code == 200
+	assert len(decode_json(rv)) == 0
+
+	# Test getting all fields
+	rv = auth_client.get('/api/runs', data={'dataset_id' : add_dataset,
+											'all_fields' : 'True'})
+	assert 'TR' in decode_json(rv)[0]
 
 	# Test filtering by multiple parameters
 	rv = auth_client.get('/api/runs', data={'number': '01,02',
