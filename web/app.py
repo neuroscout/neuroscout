@@ -18,38 +18,20 @@ from models import *
 security = Security(app, user_datastore)
 jwt = JWT(app, authenticate, load_user)
 
-# Set up API routes
-from flask_restful import Api
-from flask_restful_swagger import swagger
 
 from resources.analysis import AnalysisResource, AnalysisListResource
 from resources.dataset import DatasetResource, DatasetListResource
-from resources.result import ResultResource, ResultListResource
-from resources.run import RunResource, RunListResource
-from resources.stimulus import StimulusResource
-from resources.predictor  import PredictorResource, PredictorListResource
-from resources.user  import UserResource
+# from resources.result import ResultResource, ResultListResource
+# from resources.run import RunResource, RunListResource
+# from resources.stimulus import StimulusResource
+# from resources.predictor  import PredictorResource, PredictorListResource
+# from resources.user  import UserResource
 
-api = swagger.docs(Api(app), apiVersion='0.1')
+app.add_url_rule('/api/analyses', view_func=AnalysisListResource.as_view('analyses'))
+app.add_url_rule('/api/analyses/<int:analysis_id>', view_func=AnalysisResource.as_view('analysis'))
 
-api.add_resource(AnalysisListResource, '/api/analyses')
-api.add_resource(AnalysisResource, '/api/analyses/<analysis_id>')
-
-api.add_resource(DatasetListResource, '/api/datasets')
-api.add_resource(DatasetResource, '/api/datasets/<dataset_id>')
-
-api.add_resource(ResultListResource, '/api/results')
-api.add_resource(ResultResource, '/api/results/<result_id>')
-
-api.add_resource(StimulusResource, '/api/stimuli/<stimulus_id>')
-
-api.add_resource(RunListResource, '/api/runs')
-api.add_resource(RunResource, '/api/runs/<run_id>')
-
-api.add_resource(PredictorListResource, '/api/predictors')
-api.add_resource(PredictorResource, '/api/predictors/<predictor_id>')
-
-api.add_resource(UserResource, '/api/user')
+app.add_url_rule('/api/datasets', view_func=DatasetListResource.as_view('datasets'))
+app.add_url_rule('/api/datasets/<int:dataset_id>', view_func=DatasetResource.as_view('dataset'))
 
 
 # Serve SPA

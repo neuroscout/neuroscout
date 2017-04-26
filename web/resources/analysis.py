@@ -1,6 +1,5 @@
-from flask import request
-from flask_restful import Resource, abort
-from flask_restful_swagger.swagger import operation
+from flask import request, abort
+from flask_apispec import MethodResource, marshal_with, use_kwargs
 from flask_jwt import jwt_required, current_identity
 from marshmallow import Schema, fields, post_load, validates, ValidationError
 from models.analysis import Analysis
@@ -25,7 +24,6 @@ class AnalysisSchema(Schema):
 	predictors = fields.Nested(PredictorSchema, many=True, only='id')
 	runs = fields.Nested(RunSchema, many=True, only='id')
 
-
 	@post_load
 	def make_db(self, data):
 		return Analysis(**data)
@@ -38,37 +36,35 @@ class AnalysisSchema(Schema):
 	class Meta:
 		additional = ('user_id', )
 
-class AnalysisResource(Resource):
+@marshal_with(AnalysisSchema)
+class AnalysisResource(MethodResource):
 	""" User generated analysis """
-	@operation()
 	def get(self, analysis_id):
 		""" Access individual analysis """
-		result = Analysis.query.filter_by(id=analysis_id).first_or_404()
-		return AnalysisSchema().dump(result)
+		return Analysis.query.filter_by(id=analysis_id).first_or_404()
 
-class AnalysisListResource(Resource):
+class AnalysisListResource(MethodResource):
 	""" User generated analyses """
-	@operation()
+	@marshal_with(AnalysisSchema(many=True))
 	def get(self):
 		""" Get a list of existing analyses """
-		result = Analysis.query.filter_by().all()
-		return AnalysisSchema(many=True).dump(result)
+		return Analysis.query.filter_by().all()
 
-	@operation(
-	responseMessages=[{"code": 405,
-	      "message": "Invalid input"}])
+	@marshal_with(AnalysisSchema)
+	@use_kwargs(AnalysisSchema)
 	@jwt_required()
-	def post(self):
+	def post(self, **kwargs):
 		""" Post a new analysis """
 		data = request.get_json()
+		new = Analysis(**kwargs)
 		new, errors = AnalysisSchema().load(data)
 
 		if errors:
-			abort(405 , errors=errors)
+			abort(405)
 		else:
 			new.user_id = current_identity.id
 			db.session.add(new)
 			db.session.commit()
-			return AnalysisSchema().dump(new)
+			return new
 
 	## Return some information like the analysis id

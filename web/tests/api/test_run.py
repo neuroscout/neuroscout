@@ -26,7 +26,6 @@ def test_get_run(auth_client, add_dataset):
 	# Try getting nonexistent run
 	rv = auth_client.get('/api/runs/{}'.format('123'))
 	assert rv.status_code == 404
-	assert 'requested URL was not found' in decode_json(rv)['message']
 
 	# Test parameters
 	rv = auth_client.get('/api/runs', data={'dataset_id' : add_dataset})

@@ -21,7 +21,6 @@ def test_get_predictor(auth_client, add_dataset):
 	# Try getting nonexistent predictor
 	rv = auth_client.get('/api/predictors/{}'.format('123'))
 	assert rv.status_code == 404
-	assert 'requested URL was not found' in decode_json(rv)['message']
 
 	# Test parameters
 	ds = decode_json(

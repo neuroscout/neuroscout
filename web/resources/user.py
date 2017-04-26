@@ -1,6 +1,4 @@
 from flask import request
-from flask_restful import Resource, abort
-from flask_restful_swagger.swagger import operation
 from flask_jwt import jwt_required, current_identity
 from flask_security.utils import encrypt_password
 
@@ -36,34 +34,34 @@ class NewUserSchema(Schema):
 
 	class Meta:
 		additional = ('name', )
-
-class UserResource(Resource):
-	""" Current user data """
-	@operation()
-	@jwt_required()
-	def get(self):
-		""" Get user info """
-		return UserSchema().dump(current_identity)
-
-	@operation(
-	responseMessages=[{"code": 400, "message": "Bad request"}])
-	@jwt_required()
-	def put(self):
-		""" Update user info """
-		### This could maybe be a patch request instead, esp given nested fields
-		updated, errors = UserSchema().load(request.get_json())
-		print(updated)
-
-		if errors:
-			abort(400 , errors=errors)
-		else:
-			put_record(db.session, updated, current_identity)
-
-	@operation(
-	responseMessages=[{"code": 400, "message": "Bad request"}])
-	def post(self):
-		""" Create a new user """
-		new, errors = NewUserSchema().load(request.get_json())
-
-		if errors:
-			abort(400 , errors=errors)
+#
+# class UserResource(Resource):
+# 	""" Current user data """
+# 	@operation()
+# 	@jwt_required()
+# 	def get(self):
+# 		""" Get user info """
+# 		return UserSchema().dump(current_identity)
+#
+# 	@operation(
+# 	responseMessages=[{"code": 400, "message": "Bad request"}])
+# 	@jwt_required()
+# 	def put(self):
+# 		""" Update user info """
+# 		### This could maybe be a patch request instead, esp given nested fields
+# 		updated, errors = UserSchema().load(request.get_json())
+# 		print(updated)
+#
+# 		if errors:
+# 			abort(400 , errors=errors)
+# 		else:
+# 			put_record(db.session, updated, current_identity)
+#
+# 	@operation(
+# 	responseMessages=[{"code": 400, "message": "Bad request"}])
+# 	def post(self):
+# 		""" Create a new user """
+# 		new, errors = NewUserSchema().load(request.get_json())
+#
+# 		if errors:
+# 			abort(400 , errors=errors)

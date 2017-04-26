@@ -1,14 +1,10 @@
-from flask_restful import Resource
-from flask_restful_swagger.swagger import operation
-from marshmallow import Schema, fields, post_load
+from flask_apispec import MethodResource, marshal_with
+from marshmallow import Schema, fields
 
 from models.dataset import Dataset
-
 from .run import RunSchema
 
-from flask import request
-import webargs as wa
-from webargs.flaskparser import parser
+from flask_jwt import jwt_required
 
 class DatasetSchema(Schema):
 	runs = fields.Nested(RunSchema, many=True, only='id')
@@ -16,33 +12,14 @@ class DatasetSchema(Schema):
 	class Meta:
 		additional = ('id', 'name', 'description', 'mimetypes', 'tasks')
 
-	@post_load
-	def make_db(self, data):
-		return Dataset(**data)
-
-class DatasetResource(Resource):
-	""" Individual dataset """
-	@operation(
-	responseMessages=[{"code": 404,
-	      "message": "Dataset does not exist"}])
+@marshal_with(DatasetSchema)
+class DatasetResource(MethodResource):
 	def get(self, dataset_id):
-		""" Access a specific dataset """
-		result = Dataset.query.filter_by(id=dataset_id).first_or_404()
-		return DatasetSchema().dump(result)
+		""" Retrieve a dataset resource.  """
+		return Dataset.query.filter_by(id=dataset_id).first_or_404()
 
-class DatasetListResource(Resource):
-	""" Available datasets """
-	@operation()
+@marshal_with(DatasetSchema(many=True))
+class DatasetListResource(MethodResource):
 	def get(self):
 		""" List of datasets """
-		user_args = {
-			'all_fields': wa.fields.Bool(missing=False)
-		}
-		args = parser.parse(user_args, request)
-
-		marsh_args = {'many' : True}
-		if not args.pop('all_fields'):
-			marsh_args['only'] = \
-			['id', 'name', 'mimetypes', 'tasks']
-		result = Dataset.query.all()
-		return DatasetSchema(**marsh_args).dump(result)
+		return Dataset.query.all()
