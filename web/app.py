@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 import os
-from flask import Flask, render_template
+from flask import Flask, render_template, jsonify
 from database import db
 
 app = Flask(__name__)
@@ -11,18 +11,35 @@ from flask_jwt import JWT
 from flask_security import Security
 from models.auth import user_datastore
 from auth import authenticate, load_user
-from flask_apispec import FlaskApiSpec
-
-from models import *
 
 # Setup Flask-Security and JWT
 security = Security(app, user_datastore)
 jwt = JWT(app, authenticate, load_user)
 
-# Swagger docs
+# Setup apispec
+from apispec import APISpec
+from flask_apispec.extension import FlaskApiSpec
+
+app.config.update({
+    'APISPEC_SPEC': APISpec(
+        title='neuroscout',
+        version='v1',
+        plugins=['apispec.ext.marshmallow'],
+    ),
+    'APISPEC_SWAGGER_UI_URL' : None})
+
 docs = FlaskApiSpec(app)
 
-from resources.analysis import AnalysisResource, AnalysisListResource
+# Enable CORS
+from flask_cors import CORS
+cors = CORS(app, resources={r"/api/*": {"origins": "*"},
+                            r"/swagger/": {"origins": "*"}})
+
+
+from models import *
+
+from resources.analysis import (AnalysisResource, AnalysisListResource,
+                                AnalysisPostResource)
 from resources.dataset import DatasetResource, DatasetListResource
 # from resources.result import ResultResource, ResultListResource
 # from resources.run import RunResource, RunListResource
@@ -30,17 +47,20 @@ from resources.dataset import DatasetResource, DatasetListResource
 # from resources.predictor  import PredictorResource, PredictorListResource
 # from resources.user  import UserResource
 
-app.add_url_rule('/api/analyses', view_func=AnalysisListResource.as_view('analyses'))
-docs.register(AnalysisListResource)
-app.add_url_rule('/api/analyses/<int:analysis_id>', view_func=AnalysisResource.as_view('analysis'))
-docs.register(AnalysisResource)
 
-app.add_url_rule('/api/datasets', view_func=DatasetListResource.as_view('datasets'))
+app.add_url_rule('/api/datasets', view_func=DatasetListResource.as_view('datasetlistresource'))
+app.add_url_rule('/api/datasets/<int:dataset_id>', view_func=DatasetResource.as_view('datasetresource'))
+
 docs.register(DatasetListResource)
-
-app.add_url_rule('/api/datasets/<int:dataset_id>', view_func=DatasetResource.as_view('dataset'))
 docs.register(DatasetResource)
 
+app.add_url_rule('/api/analyses', view_func=AnalysisListResource.as_view('analysislistresource'))
+app.add_url_rule('/api/analyses', view_func=AnalysisPostResource.as_view('analysispostresource'))
+app.add_url_rule('/api/analyses/<int:analysis_id>', view_func=AnalysisResource.as_view('analysisresource'))
+
+docs.register(AnalysisPostResource)
+docs.register(AnalysisListResource)
+docs.register(AnalysisResource)
 
 # Serve SPA
 @app.route('/')

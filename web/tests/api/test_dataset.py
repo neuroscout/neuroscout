@@ -7,11 +7,6 @@ def test_get_dataset(auth_client, add_dataset):
 	dataset_list = decode_json(rv)
 	assert type(dataset_list) == list
 
-	# Test all_frields
-	rv = auth_client.get('/api/datasets', data = {'all_fields' : 'True'})
-	assert rv.status_code == 200
-	assert 'description' in decode_json(rv)[0]
-
 	# Get first dataset
 	assert 'mimetypes' in dataset_list[0]
 	assert 'tasks' in dataset_list[0]

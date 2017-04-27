@@ -4,22 +4,40 @@ from marshmallow import Schema, fields
 from models.dataset import Dataset
 from .run import RunSchema
 
-from flask_jwt import jwt_required
-
 class DatasetSchema(Schema):
+	""" Dataset validation schema. """
+	id = fields.Int()
+	name = fields.Str()
+	description = fields.Str()
+	mimetypes = fields.List(fields.Str())
+	tasks = fields.List(fields.Str())
 	runs = fields.Nested(RunSchema, many=True, only='id')
 
-	class Meta:
-		additional = ('id', 'name', 'description', 'mimetypes', 'tasks')
 
-@marshal_with(DatasetSchema)
 class DatasetResource(MethodResource):
+	""" Dataset
+    ---
+    get:
+        summary: Get dataset by id.
+        responses:
+            200:
+                description: successful operation
+                schema: DatasetSchema
+    """
+	@marshal_with(DatasetSchema)
 	def get(self, dataset_id):
-		""" Retrieve a dataset resource.  """
 		return Dataset.query.filter_by(id=dataset_id).first_or_404()
 
-@marshal_with(DatasetSchema(many=True))
 class DatasetListResource(MethodResource):
+	""" Dataset list.
+    ---
+    get:
+        summary: Returns list of datasets.
+        responses:
+            200:
+                description: successful operation
+                schema: DatasetSchema
+    """
+	@marshal_with(DatasetSchema(many=True))
 	def get(self):
-		""" List of datasets """
 		return Dataset.query.all()
