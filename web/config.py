@@ -16,6 +16,7 @@ class Config(object):
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     JWT_EXPIRATION_DELTA = datetime.timedelta(days=7)
     MIGRATIONS_DIR = 'migrations'
+    APISPEC_SWAGGER_UI_URL = None
 
 class DevelopmentConfig(Config):
     DEBUG = True

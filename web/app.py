@@ -25,8 +25,7 @@ app.config.update({
         title='neuroscout',
         version='v1',
         plugins=['apispec.ext.marshmallow'],
-    ),
-    'APISPEC_SWAGGER_UI_URL' : None})
+    )})
 
 docs = FlaskApiSpec(app)
 
@@ -34,7 +33,6 @@ docs = FlaskApiSpec(app)
 from flask_cors import CORS
 cors = CORS(app, resources={r"/api/*": {"origins": "*"},
                             r"/swagger/": {"origins": "*"}})
-
 
 from models import *
 
