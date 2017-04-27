@@ -18,6 +18,8 @@ class DatasetResource(MethodResource):
 	""" Dataset
     ---
     get:
+		tags:
+			- dataset
         summary: Get dataset by id.
         responses:
             200:
@@ -32,6 +34,8 @@ class DatasetListResource(MethodResource):
 	""" Dataset list.
     ---
     get:
+		tags:
+			- dataset
         summary: Returns list of datasets.
         responses:
             200:

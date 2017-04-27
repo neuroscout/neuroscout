@@ -40,7 +40,7 @@ from resources.analysis import (AnalysisResource, AnalysisListResource,
                                 AnalysisPostResource)
 from resources.dataset import DatasetResource, DatasetListResource
 # from resources.result import ResultResource, ResultListResource
-# from resources.run import RunResource, RunListResource
+from resources.run import RunResource, RunListResource
 # from resources.stimulus import StimulusResource
 # from resources.predictor  import PredictorResource, PredictorListResource
 # from resources.user  import UserResource
@@ -59,6 +59,12 @@ app.add_url_rule('/api/analyses/<int:analysis_id>', view_func=AnalysisResource.a
 docs.register(AnalysisPostResource)
 docs.register(AnalysisListResource)
 docs.register(AnalysisResource)
+
+app.add_url_rule('/api/runs', view_func=RunListResource.as_view('runlistresource'))
+app.add_url_rule('/api/runs/<int:run_id>', view_func=RunResource.as_view('runresource'))
+
+docs.register(RunListResource)
+docs.register(RunResource)
 
 # Serve SPA
 @app.route('/')

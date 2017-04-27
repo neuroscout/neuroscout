@@ -39,6 +39,8 @@ class AnalysisResource(MethodResource):
 	""" Analysis.
     ---
     get:
+		tags:
+			- analysis
         summary: Get analysis by id.
         responses:
             200:
@@ -54,6 +56,8 @@ class AnalysisListResource(MethodResource):
 	""" Analysis list.
     ---
     get:
+		tags:
+			- analysis
         summary: Returns list of analyses.
         responses:
             200:
@@ -70,10 +74,12 @@ class AnalysisPostResource(MethodResource):
 	""" Create Analysis.
 	---
 	post:
+		tags:
+			- analysis
 		summary: Create a new analysis.
 		responses:
 			200:
-				description: analyses created sucesfully.
+				description: analysis created sucesfully.
 				schema: AnalysisSchema
 	"""
 	@marshal_with(AnalysisSchema)
