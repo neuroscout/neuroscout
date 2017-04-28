@@ -24,8 +24,16 @@ class PredictorSchema(Schema):
 class PredictorResource(MethodResource):
     @marshal_with(PredictorSchema)
     def get(self, predictor_id):
-    	""" Access a predictor by id """
-    	return Predictor.query.filter_by(id=predictor_id).first_or_404()
+        """ Predictor.
+        ---
+    	get:
+    		summary: Get predictor by id.
+    		responses:
+    			200:
+    				description: successful operation
+    				schema: PredictorSchema
+        """
+        return Predictor.query.filter_by(id=predictor_id).first_or_404()
 
 class PredictorListResource(MethodResource):
     @marshal_with(PredictorSchema(many=True))
@@ -34,7 +42,15 @@ class PredictorListResource(MethodResource):
         'name': wa.fields.DelimitedList(fields.Str()),
     })
     def get(self, **kwargs):
-        """ List of extracted predictors """
+        """ Predictor List.
+        ---
+    	get:
+    		summary: Get list of predictors.
+    		responses:
+    			200:
+    				description: successful operation
+    				schema: PredictorSchema
+        """
         try:
             run_id = kwargs.pop('run_id')
         except KeyError:
