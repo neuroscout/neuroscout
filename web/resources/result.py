@@ -1,31 +1,35 @@
-from flask_jwt import jwt_required
-from marshmallow import Schema, fields, post_load
+from marshmallow import Schema, fields
 from models.result import Result
+from flask_apispec import MethodResource, marshal_with
 
 class ResultSchema(Schema):
-	id = fields.Str(dump_only=True)
+    id = fields.Str(dump_only=True)
+    analysis_id = fields.Int(dump_only=True)
 
-	@post_load
-	def make_db(self, data):
-		return Result(**data)
+class ResultResource(MethodResource):
+    @marshal_with(ResultSchema)
+    def get(self, result_id):
+        """ Result.
+        ---
+    	get:
+    		summary: Get Result by id.
+    		responses:
+    			200:
+    				description: successful operation
+    				schema: ResultSchema
+        """
+        return Result.query.filter_by(id=result_id).first_or_404()
 
-	class Meta:
-		additional = ('analysis_id', )
-#
-# class ResultResource(Resource):
-# 	""" Analysis result """
-# 	@operation()
-# 	@jwt_required()
-# 	def get(self, result_id):
-# 		""" Access analyis result """
-# 		result = Result.query.filter_by(id=result_id).first_or_404()
-# 		return ResultSchema().dump(result)
-#
-# class ResultListResource(Resource):
-# 	""" Analysis results """
-# 	@operation()
-# 	@jwt_required()
-# 	def get(self):
-# 		""" List of available results """
-# 		result = Result.query.filter_by().all()
-# 		return ResultSchema(many=True).dump(result)
+class ResultListResource(MethodResource):
+    @marshal_with(ResultSchema(many=True))
+    def get(self):
+        """ Result list.
+        ---
+    	get:
+    		summary: Get list of results.
+    		responses:
+    			200:
+    				description: successful operation
+    				schema: ResultSchema
+        """
+        return Result.query.filter_by().all()

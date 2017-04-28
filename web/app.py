@@ -48,10 +48,14 @@ route_factory(app, docs,
         ('AnalysisListResource', 'analyses'),
         ('AnalysisPostResource', 'analyses'),
         ('AnalysisResource', 'analyses/<int:analysis_id>'),
+        ('ResultResource', 'results/<int:result_id>'),
+        ('ResultListResource', 'results'),
         ('RunListResource', 'runs'),
         ('RunResource', 'runs/<int:run_id>'),
         ('PredictorListResource', 'predictors'),
-        ('PredictorResource', 'predictors/<int:predictor_id>')
+        ('PredictorResource', 'predictors/<int:predictor_id>'),
+        ('UserResource', 'profile'),
+        ('UserPostResource', 'users'),
     ])
 
 @app.route('/')
