@@ -16,54 +16,48 @@ class RunSchema(Schema):
 	dataset_id = fields.Int()
 
 class RunResource(MethodResource):
-	""" Run.
-    ---
-    get:
-		tags:
-			- Runs
-        summary: Get run by id.
-        responses:
-            200:
-                description: successful operation
-                schema: RunSchema
-    """
-	@marshal_with(RunSchema(many=True))
-	def get(self, run_id):
-		""" Access a run """
-		return Run.query.filter_by(id=run_id).first_or_404()
+    @marshal_with(RunSchema(many=True))
+    def get(self, run_id):
+        """ Run.
+        ---
+    	get:
+    		summary: Get run by id.
+    		responses:
+    			200:
+    				description: successful operation
+    				schema: RunSchema
+        """
+        return Run.query.filter_by(id=run_id).first_or_404()
 
 class RunListResource(MethodResource):
-	""" Run list.
-    ---
-    get:
-		tags:
-			- Runs
-        summary: Returns list of runs.
-        responses:
-            200:
-                description: successful operation
-                schema: RunSchema
-    """
-	@marshal_with(RunSchema(many=True))
-	@use_kwargs({
-		'session': wa.fields.DelimitedList(fields.Str()),
-	    'number': wa.fields.DelimitedList(fields.Str()),
-	    'task': wa.fields.DelimitedList(fields.Str()),
-	    'subject': wa.fields.DelimitedList(fields.Str()),
-	    'dataset_id': wa.fields.Int(),
-	})
-	def get(self, **kwargs):
-		""" List of runs """
-		try:
-			dataset = kwargs.pop('dataset_id')
-		except KeyError:
-			dataset = None
+    @marshal_with(RunSchema(many=True))
+    @use_kwargs({
+    	'session': wa.fields.DelimitedList(fields.Str()),
+        'number': wa.fields.DelimitedList(fields.Str()),
+        'task': wa.fields.DelimitedList(fields.Str()),
+        'subject': wa.fields.DelimitedList(fields.Str()),
+        'dataset_id': wa.fields.Int(),
+    })
+    def get(self, **kwargs):
+        """ Run list.
+        ---
+        get:
+            description: Returns list of runs.
+            responses:
+                200:
+                    description: successful operation
+                    schema: RunSchema
+        """
+        try:
+        	dataset = kwargs.pop('dataset_id')
+        except KeyError:
+        	dataset = None
 
-		query = Run.query
-		for param in kwargs:
-			query = query.filter(getattr(Run, param).in_(kwargs[param]))
+        query = Run.query
+        for param in kwargs:
+        	query = query.filter(getattr(Run, param).in_(kwargs[param]))
 
-		if dataset:
-			query = query.join('dataset').filter_by(id=dataset)
+        if dataset:
+        	query = query.join('dataset').filter_by(id=dataset)
 
-		return query.all()
+        return query.all()

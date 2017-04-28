@@ -17,14 +17,12 @@ class DatasetSchema(Schema):
 class DatasetResource(MethodResource):
 	""" Dataset
     ---
-    get:
-		tags:
-			- dataset
-        summary: Get dataset by id.
-        responses:
-            200:
-                description: successful operation
-                schema: DatasetSchema
+	get:
+		summary: Get dataset by id.
+		responses:
+			200:
+				description: successful operation
+				schema: DatasetSchema
     """
 	@marshal_with(DatasetSchema)
 	def get(self, dataset_id):
@@ -33,14 +31,12 @@ class DatasetResource(MethodResource):
 class DatasetListResource(MethodResource):
 	""" Dataset list.
     ---
-    get:
-		tags:
-			- dataset
-        summary: Returns list of datasets.
-        responses:
-            200:
-                description: successful operation
-                schema: DatasetSchema
+	get:
+		summary: Returns list of datasets.
+		responses:
+			200:
+				description: successful operation
+				schema: DatasetSchema
     """
 	@marshal_with(DatasetSchema(many=True))
 	def get(self):

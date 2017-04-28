@@ -1,4 +1,3 @@
-import os
 import datetime
 
 class Config(object):

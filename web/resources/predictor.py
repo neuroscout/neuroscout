@@ -1,61 +1,51 @@
 from marshmallow import Schema, fields
-from models import Predictor, PredictorEvent, Run
-
-from flask import request
 import webargs as wa
-from webargs.flaskparser import parser
+from flask_apispec import MethodResource, marshal_with, use_kwargs
 
-# Predictor Event Resources
+from models import Predictor, PredictorEvent
+
+
 class PredictorEventSchema(Schema):
-	id = fields.Str(dump_only=True)
+    id = fields.Str(dump_only=True)
+    onset = fields.Number(dump_only=True)
+    duration = fields.Number(dump_only=True)
+    value = fields.Number(dump_only=True)
+    run_id = fields.Int(dump_only=True)
+    predictor_id = fields.Int(dump_only=True)
 
-	class Meta:
-		additional = ('onset', 'duration', 'value', 'run_id', 'predictor_id')
-
-# Predictor Resources
 class PredictorSchema(Schema):
 	id = fields.Str(dump_only=True)
-
+	name = fields.Str(dump_only=True)
+	description = fields.Str(dump_only=True)
+	ef_id = fields.Int(dump_only=True)
 	predictor_events = fields.Nested(PredictorEventSchema, many=True, only='id')
 
-	class Meta:
-		additional = ('name', 'description', 'ef_id', 'analysis')
-#
-# class PredictorResource(Resource):
-# 	""" Predictors """
-# 	@operation()
-# 	def get(self, predictor_id):
-# 		""" Access a predictor by id """
-# 		result = Predictor.query.filter_by(id=predictor_id).first_or_404()
-# 		return PredictorSchema().dump(result)
-#
-# class PredictorListResource(Resource):
-# 	""" Extracted predictors """
-# 	@operation()
-# 	def get(self):
-# 		""" List of extracted predictors """
-# 		user_args = {
-# 			'all_fields': wa.fields.Bool(missing=False),
-# 		    'run_id': wa.fields.DelimitedList(fields.Str()),
-# 		    'name': wa.fields.DelimitedList(fields.Str()),
-# 		}
-# 		args = parser.parse(user_args, request)
-# 		marsh_args = {'many' : True}
-# 		if not args.pop('all_fields'):
-# 			marsh_args['only'] = \
-# 			['id', 'name']
-#
-# 		try:
-# 			run_ids = args.pop('run_id')
-# 		except KeyError:
-# 			run_ids = None
-#
-# 		query = Predictor.query
-# 		for param in args:
-# 			query = query.filter(getattr(Predictor, param).in_(args[param]))
-#
-# 		if run_ids:
-# 			query = query.join('predictor_events').filter(
-# 				PredictorEvent.run_id.in_(run_ids))
-#
-# 		return PredictorSchema(**marsh_args).dump(query.all())
+
+class PredictorResource(MethodResource):
+    @marshal_with(PredictorSchema)
+    def get(self, predictor_id):
+    	""" Access a predictor by id """
+    	return Predictor.query.filter_by(id=predictor_id).first_or_404()
+
+class PredictorListResource(MethodResource):
+    @marshal_with(PredictorSchema(many=True))
+    @use_kwargs({
+        'run_id': wa.fields.DelimitedList(fields.Int()),
+        'name': wa.fields.DelimitedList(fields.Str()),
+    })
+    def get(self, **kwargs):
+        """ List of extracted predictors """
+        try:
+            run_id = kwargs.pop('run_id')
+        except KeyError:
+            run_id = None
+            
+        query = Predictor.query
+        for param in kwargs:
+        	query = query.filter(getattr(Predictor, param).in_(kwargs[param]))
+
+        if run_id:
+        	query = query.join('predictor_events').filter(
+        		PredictorEvent.run_id.in_(run_id))
+
+        return query.all()

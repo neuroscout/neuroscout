@@ -38,14 +38,12 @@ class AnalysisSchema(Schema):
 class AnalysisResource(MethodResource):
 	""" Analysis.
     ---
-    get:
-		tags:
-			- analysis
-        summary: Get analysis by id.
-        responses:
-            200:
-                description: successful operation
-                schema: AnalysisSchema
+	get:
+		summary: Get analysis by id.
+		responses:
+			200:
+				description: successful operation
+				schema: AnalysisSchema
     """
 	@marshal_with(AnalysisSchema)
 	def get(self, analysis_id):
@@ -55,14 +53,12 @@ class AnalysisResource(MethodResource):
 class AnalysisListResource(MethodResource):
 	""" Analysis list.
     ---
-    get:
-		tags:
-			- analysis
-        summary: Returns list of analyses.
-        responses:
-            200:
-                description: successful operation
-                schema: AnalysisSchema
+	get:
+		summary: Returns list of analyses.
+		responses:
+			200:
+				description: successful operation
+				schema: AnalysisSchema
 
     """
 	@marshal_with(AnalysisSchema(many=True))
@@ -74,8 +70,8 @@ class AnalysisPostResource(MethodResource):
 	""" Create Analysis.
 	---
 	post:
-		tags:
-			- analysis
+        tags:
+            - none
 		summary: Create a new analysis.
 		responses:
 			200:

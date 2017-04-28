@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 import os
-from flask import Flask, render_template, jsonify
+from flask import Flask, render_template
 from database import db
 
 app = Flask(__name__)
@@ -9,16 +9,29 @@ db.init_app(app)
 
 from flask_jwt import JWT
 from flask_security import Security
-from models.auth import user_datastore
 from auth import authenticate, load_user
+from models import *
 
 # Setup Flask-Security and JWT
 security = Security(app, user_datastore)
 jwt = JWT(app, authenticate, load_user)
 
-# Setup apispec
+# Enable CORS
+from flask_cors import CORS
+cors = CORS(app, resources={r"/api/*": {"origins": "*"},
+                            r"/swagger/": {"origins": "*"}})
+
+# Setup API
+import resources
 from apispec import APISpec
 from flask_apispec.extension import FlaskApiSpec
+
+def route_factory(app, docs, pairings, prepend='/api/'):
+    for res_name, route in pairings:
+        res = getattr(resources, res_name)
+        app.add_url_rule(prepend + route,
+                         view_func=res.as_view(res_name.lower()))
+        docs.register(res)
 
 app.config.update({
     'APISPEC_SPEC': APISpec(
@@ -28,48 +41,22 @@ app.config.update({
     )})
 
 docs = FlaskApiSpec(app)
+route_factory(app, docs,
+    [
+        ('DatasetResource', 'datasets/<int:dataset_id>'),
+        ('DatasetListResource', 'datasets'),
+        ('AnalysisListResource', 'analyses'),
+        ('AnalysisPostResource', 'analyses'),
+        ('AnalysisResource', 'analyses/<int:analysis_id>'),
+        ('RunListResource', 'runs'),
+        ('RunResource', 'runs/<int:run_id>'),
+        ('PredictorListResource', 'predictors'),
+        ('PredictorResource', 'predictors/<int:predictor_id>')
+    ])
 
-# Enable CORS
-from flask_cors import CORS
-cors = CORS(app, resources={r"/api/*": {"origins": "*"},
-                            r"/swagger/": {"origins": "*"}})
-
-from models import *
-
-from resources.analysis import (AnalysisResource, AnalysisListResource,
-                                AnalysisPostResource)
-from resources.dataset import DatasetResource, DatasetListResource
-# from resources.result import ResultResource, ResultListResource
-from resources.run import RunResource, RunListResource
-# from resources.stimulus import StimulusResource
-# from resources.predictor  import PredictorResource, PredictorListResource
-# from resources.user  import UserResource
-
-
-app.add_url_rule('/api/datasets', view_func=DatasetListResource.as_view('datasetlistresource'))
-app.add_url_rule('/api/datasets/<int:dataset_id>', view_func=DatasetResource.as_view('datasetresource'))
-
-docs.register(DatasetListResource)
-docs.register(DatasetResource)
-
-app.add_url_rule('/api/analyses', view_func=AnalysisListResource.as_view('analysislistresource'))
-app.add_url_rule('/api/analyses', view_func=AnalysisPostResource.as_view('analysispostresource'))
-app.add_url_rule('/api/analyses/<int:analysis_id>', view_func=AnalysisResource.as_view('analysisresource'))
-
-docs.register(AnalysisPostResource)
-docs.register(AnalysisListResource)
-docs.register(AnalysisResource)
-
-app.add_url_rule('/api/runs', view_func=RunListResource.as_view('runlistresource'))
-app.add_url_rule('/api/runs/<int:run_id>', view_func=RunResource.as_view('runresource'))
-
-docs.register(RunListResource)
-docs.register(RunResource)
-
-# Serve SPA
 @app.route('/')
 def index():
-    ''' Index route '''
+    ''' Serve SPA '''
     return render_template('default.html')
 
 if __name__ == '__main__':
