@@ -22,16 +22,9 @@ cors = CORS(app, resources={r"/api/*": {"origins": "*"},
                             r"/swagger/": {"origins": "*"}})
 
 # Setup API
-import resources
 from apispec import APISpec
 from flask_apispec.extension import FlaskApiSpec
-
-def route_factory(app, docs, pairings, prepend='/api/'):
-    for res_name, route in pairings:
-        res = getattr(resources, res_name)
-        app.add_url_rule(prepend + route,
-                         view_func=res.as_view(res_name.lower()))
-        docs.register(res)
+from utils import route_factory
 
 app.config.update({
     'APISPEC_SPEC': APISpec(
