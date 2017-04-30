@@ -10,17 +10,12 @@ Build the containers and start the services:
     docker-compose build
     docker-compose up -d
 
-The server should now be running at http://localhost:80
+The server should now be running at http://localhost:80/
 
-Next, initialize, migrate and upgrade the database migrations.
+Next, initialize, migrate and upgrade the database migrations. This script will
+also add a test user.
 
-    docker-compose exec web python manage.py db init
-    docker-compose exec web python manage.py db migrate
-    docker-compose exec web python manage.py db upgrade
-
-You can also run this initialization script to do it for you, plus add a test user:
-
-docker-compose exec web bash init_reset.sh
+    docker-compose exec web bash init_reset.sh
 
 
 ## Maintaining docker image and db
@@ -44,6 +39,16 @@ all services:
     docker-compose down
 
 and run the original initialization commands above.
+
+## Running tests
+To run tests, after starting services, create a test database:
+
+    docker-compose exec postgres psql -h postgres -U postgres -c "create database scout_test"
+
+and execute:
+
+    docker-compose exec web python -m pytest tests/
+
 
 ## Populating the database
 You can use `manage.py` commands to ingest data into the database. At the least you want to add a user to be able to access the API.
@@ -74,9 +79,9 @@ For example:
 ## API
 Once the server is up and running, you can access the API however you'd like.
 
-The API is documented using swagger under:
+The API is document using Swagger UI at:
 
-    http://localhost:80/api/spec.html
+    http://localhost:5000/
 
 ### Authorization
 To authorize API requests, we use JSON Web Tokens using Flask-JWT. Simply navigate to localhost:5000/auth and post the following
