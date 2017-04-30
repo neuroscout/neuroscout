@@ -11,24 +11,28 @@ from .analysis import AnalysisSchema
 # from db_utils import put_record
 
 class UserSchema(Schema):
-	name = fields.Str(required=True)
-	email = fields.Email(required=True)
-	password = fields.Str(load_only=True, required=True)
-	last_login_at = fields.DateTime(dump_only= True)
+    name = fields.Str(required=True)
+    email = fields.Email(required=True)
+    password = fields.Str(load_only=True, required=True)
+    last_login_at = fields.DateTime(dump_only= True)
 
-	analyses = fields.Nested(AnalysisSchema, many=True, dump_only=True)
+    analyses = fields.Nested(AnalysisSchema, many=True, dump_only=True)
 
-	@validates('email')
-	def validate_name(self, value):
-		if User.query.filter_by(email=value).count() > 0:
-			raise ValidationError('This email is already associated with an acccount.')
+    @validates('email')
+    def validate_name(self, value):
+    	if User.query.filter_by(email=value).count() > 0:
+    		raise ValidationError('This email is already associated with an acccount.')
+
+    class Meta:
+        strict = True
 
 class UserResource(MethodResource):
-	""" Current user data """
-	@jwt_required()
-	def get(self):
-		""" Get user info """
-		return current_identity
+    """ Current user data """
+    @marshal_with(UserSchema)
+    @jwt_required()
+    def get(self):
+    	""" Get user info """
+    	return current_identity
 
 class UserPostResource(MethodResource):
     @marshal_with(UserSchema)
@@ -46,5 +50,5 @@ class UserPostResource(MethodResource):
 	# 	### This could maybe be a patch request instead, esp given nested fields
 	# 	updated, errors = UserSchema().load(request.get_json())
 	# 	print(updated)
-    # 
+    #
 	# 	put_record(db.session, updated, current_identity)

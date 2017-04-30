@@ -47,8 +47,8 @@ route_factory(app, docs,
         ('RunResource', 'runs/<int:run_id>'),
         ('PredictorListResource', 'predictors'),
         ('PredictorResource', 'predictors/<int:predictor_id>'),
-        ('UserResource', 'profile'),
-        ('UserPostResource', 'users'),
+        ('UserResource', 'user'),
+        ('UserPostResource', 'user'),
     ])
 
 @app.route('/')

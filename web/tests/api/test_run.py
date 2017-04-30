@@ -10,7 +10,6 @@ def test_get_run(auth_client, add_dataset):
 	# Get first dataset
 	first_run_id = run_list[0]['id']
 	assert 'dataset_id' in run_list[0]
-	assert 'task_description' not in run_list[0]
 
 	# Get first dataset by external id
 	rv = auth_client.get('/api/runs/{}'.format(first_run_id))

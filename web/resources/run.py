@@ -16,7 +16,7 @@ class RunSchema(Schema):
 	dataset_id = fields.Int()
 
 class RunResource(MethodResource):
-    @marshal_with(RunSchema(many=True))
+    @marshal_with(RunSchema)
     def get(self, run_id):
         """ Run.
         ---
