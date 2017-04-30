@@ -23,6 +23,10 @@ class DevelopmentConfig(Config):
     PROPAGATE_EXCEPTIONS = True
     MIGRATIONS_DIR = '/migrations/migrations'
 
+class DockerTestConfig(Config):
+    SQLALCHEMY_DATABASE_URI = 'postgres://postgres@postgres:5432/neuroscout'
+    TESTING = True
+
 class TestingConfig(Config):
     SQLALCHEMY_DATABASE_URI = 'postgresql://zorro:dbpass@localhost:5432/scout_test'
     TESTING = True

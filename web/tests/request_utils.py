@@ -3,7 +3,7 @@ import json
 class Client(object):
     def __init__(self, test_client=None, prepend='', username=None, password=None):
         if test_client is None:
-            from app import app
+            from core import app
             test_client = app.test_client()
             self.client_flask = True
         else:
