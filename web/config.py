@@ -24,7 +24,7 @@ class DevelopmentConfig(Config):
     MIGRATIONS_DIR = '/migrations/migrations'
 
 class DockerTestConfig(Config):
-    SQLALCHEMY_DATABASE_URI = 'postgres://postgres@postgres:5432/neuroscout'
+    SQLALCHEMY_DATABASE_URI = 'postgres://postgres@postgres:5432/scout_test'
     TESTING = True
 
 class TestingConfig(Config):

@@ -11,7 +11,7 @@ services:
       - /usr/src/app/static
       - migrations:/migrations
       # ADD OTHERS VOLUMES HERE
-    command: /usr/local/bin/gunicorn -w 2 -b :8000 core:core --log-level debu
+    command: /usr/local/bin/gunicorn -w 2 -b :8000 core:app --log-level debu
     environment:
       - APP_SETTINGS=config.DevelopmentConfig
 
@@ -43,13 +43,12 @@ services:
     environment:
       - POSTGRES_DB=neuroscout
 
-  test_flask:
-    restart: always
-    build: ./web
-    links:
-      - postgres:postgres
-    command: python -m pytest tests/
+  swagger-ui:
+    image: swaggerapi/swagger-ui
     environment:
-      - APP_SETTINGS=config.DockerTestConfig
+      - "API_URL=http://localhost/swagger/"
+    ports:
+      - '5000:8080'
+
 volumes:
   migrations:
