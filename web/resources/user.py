@@ -36,6 +36,9 @@ class UserSchema(Schema):
 class UserResource(MethodResource):
     @doc(tags=['auth'], summary='Get current user information.')
     @marshal_with(UserSchema)
+    @doc(params={"authorization": {
+        "in": "header", "required": True,
+        "description": "Format:  JWT {authorization_token}"}})
     @jwt_required()
     def get(self):
     	return current_identity

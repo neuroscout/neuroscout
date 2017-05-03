@@ -51,10 +51,13 @@ class AnalysisListResource(MethodResource):
     	return Analysis.query.filter_by().all()
 
 class AnalysisPostResource(MethodResource):
+    @doc(params={"authorization": {
+        "in": "header", "required": True,
+        "description": "Format:  JWT {authorization_token}"}})
+    @jwt_required()
     @doc(tags=['analysis'], summary='Add a new analysis.')
     @marshal_with(AnalysisSchema)
     @use_kwargs(AnalysisSchema)
-    @jwt_required()
     def post(self, **kwargs):
     	new = Analysis(user_id = current_identity.id, **kwargs)
     	db.session.add(new)
