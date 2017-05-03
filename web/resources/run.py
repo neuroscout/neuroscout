@@ -1,53 +1,42 @@
 from marshmallow import Schema, fields
 from models import Run
-from flask_apispec import MethodResource, marshal_with, use_kwargs
+from flask_apispec import MethodResource, marshal_with, use_kwargs, doc
 import webargs as wa
 
 class RunSchema(Schema):
 	id = fields.Int()
-	session = fields.Str()
-	subject = fields.Str()
-	number = fields.Str()
-	task = fields.Str()
-	duration = fields.Number()
-	task_description = fields.Str()
-	TR = fields.Number()
-	path = fields.Str()
-	dataset_id = fields.Int()
+	session = fields.Str(description='Session number')
+	subject = fields.Str(description='Subject id')
+	number = fields.Str(description='Run id')
+	task = fields.Str(description='Task name')
+	duration = fields.Number(description='Total run duration in seconds.')
+	task_description = fields.Dict(description='BIDS description of task (JSON).')
+	TR = fields.Number(description='Aquisition repetition time.')
+	dataset_id = fields.Int(description='Dataset run belongs to.')
 
 class RunResource(MethodResource):
-    @marshal_with(RunSchema)
+    @doc(tags=['run'], summary='Get run by id.')
+    @marshal_with(RunSchema, code='200')
     def get(self, run_id):
-        """ Run.
-        ---
-    	get:
-    		summary: Get run by id.
-    		responses:
-    			200:
-    				description: successful operation
-    				schema: RunSchema
-        """
+        """ Run. """
         return Run.query.filter_by(id=run_id).first_or_404()
 
 class RunListResource(MethodResource):
-    @marshal_with(RunSchema(many=True))
+    @doc(tags=['run'], summary='Returns list of runs.')
+    @marshal_with(RunSchema(many=True), code='200')
     @use_kwargs({
-    	'session': wa.fields.DelimitedList(fields.Str()),
-        'number': wa.fields.DelimitedList(fields.Str()),
-        'task': wa.fields.DelimitedList(fields.Str()),
-        'subject': wa.fields.DelimitedList(fields.Str()),
-        'dataset_id': wa.fields.Int(),
-    })
+    	'session': wa.fields.DelimitedList(fields.Str(),
+                                        description='Session number(s).'),
+        'number': wa.fields.DelimitedList(fields.Str(),
+                                          description='Run number(s).'),
+        'task': wa.fields.DelimitedList(fields.Str(),
+                                        description='Task name(s).'),
+        'subject': wa.fields.DelimitedList(fields.Str(),
+                                           description='Subject id(s).'),
+        'dataset_id': wa.fields.Int(description='Dataset id.'),
+    }, locations=['query'])
     def get(self, **kwargs):
-        """ Run list.
-        ---
-        get:
-            description: Returns list of runs.
-            responses:
-                200:
-                    description: successful operation
-                    schema: RunSchema
-        """
+        """ Run list. """
         try:
         	dataset = kwargs.pop('dataset_id')
         except KeyError:
