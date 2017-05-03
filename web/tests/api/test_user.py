@@ -53,7 +53,7 @@ def test_post(auth_client):
 	assert rv.status_code == 422
 	# assert 'Not a valid' in decode_json(rv)['errors']['email'][0]
 
-	# Invalid email
+	# Valid email
 	rv = auth_client.post('/api/user',
 		data = {'name' : 'me', 'email' : 'fake@gmail.com', 'password' : 'something'})
 	assert rv.status_code == 200
