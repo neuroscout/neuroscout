@@ -1,33 +1,13 @@
-from flask_restful import Resource, abort
-from flask_restful_swagger.swagger import operation
-from flask_jwt import jwt_required
-from marshmallow import Schema, fields, post_load
+from marshmallow import Schema, fields
 from models.result import Result
+from flask_apispec import MethodResource, marshal_with, doc
 
 class ResultSchema(Schema):
-	id = fields.Str(dump_only=True)
+    id = fields.Str(dump_only=True)
+    analysis_id = fields.Int(dump_only=True)
 
-	@post_load
-	def make_db(self, data):
-		return Result(**data)
-
-	class Meta:
-		additional = ('analysis_id', )
-
-class ResultResource(Resource):
-	""" Analysis result """
-	@operation()
-	@jwt_required()
-	def get(self, result_id):
-		""" Access analyis result """
-		result = Result.query.filter_by(id=result_id).first_or_404()
-		return ResultSchema().dump(result)
-
-class ResultListResource(Resource):
-	""" Analysis results """
-	@operation()
-	@jwt_required()
-	def get(self):
-		""" List of available results """
-		result = Result.query.filter_by().all()
-		return ResultSchema(many=True).dump(result)
+class ResultResource(MethodResource):
+    @marshal_with(ResultSchema)
+    @doc(tags=['result'], summary='Get Result by id.')
+    def get(self, result_id):
+        return Result.query.filter_by(id=result_id).first_or_404()

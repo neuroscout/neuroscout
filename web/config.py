@@ -1,4 +1,3 @@
-import os
 import datetime
 
 class Config(object):
@@ -16,12 +15,17 @@ class Config(object):
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     JWT_EXPIRATION_DELTA = datetime.timedelta(days=7)
     MIGRATIONS_DIR = 'migrations'
+    APISPEC_SWAGGER_UI_URL = None
 
 class DevelopmentConfig(Config):
     DEBUG = True
     SQLALCHEMY_DATABASE_URI = 'postgres://postgres@postgres:5432/neuroscout'
     PROPAGATE_EXCEPTIONS = True
     MIGRATIONS_DIR = '/migrations/migrations'
+
+class DockerTestConfig(Config):
+    SQLALCHEMY_DATABASE_URI = 'postgres://postgres@postgres:5432/scout_test'
+    TESTING = True
 
 class TestingConfig(Config):
     SQLALCHEMY_DATABASE_URI = 'postgresql://zorro:dbpass@localhost:5432/scout_test'

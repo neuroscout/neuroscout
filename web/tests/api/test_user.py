@@ -27,34 +27,33 @@ def test_get(auth_client):
 
 	assert 'email' in decode_json(rv)
 
-def test_put(auth_client):
-	# Testing changing name
-	values = decode_json(auth_client.get('/api/user'))
-	values['name'] = 'new_name'
-	rv = auth_client.get('/api/user', data=values)
-
-	assert rv.status_code == 200
-	new_values = decode_json(auth_client.get('/api/user'))
-	new_values['name'] = 'new_name'
-
-	# Testing incomplete put request
-	rv = auth_client.put('/api/user', data={'name' : 'new_name'})
-	assert rv.status_code == 400
-	assert 'email' in decode_json(rv)['errors']
+# def test_put(auth_client):
+# 	# Testing changing name
+# 	values = decode_json(auth_client.get('/api/user'))
+# 	values['name'] = 'new_name'
+# 	rv = auth_client.get('/api/user', data=values)
+#
+# 	assert rv.status_code == 200
+# 	new_values = decode_json(auth_client.get('/api/user'))
+# 	new_values['name'] = 'new_name'
+#
+# 	# Testing incomplete put request
+# 	rv = auth_client.put('/api/user', data={'name' : 'new_name'})
+# 	assert rv.status_code == 400
+# 	assert 'email' in decode_json(rv)['errors']
 
 def test_post(auth_client):
 	# Make incomplete post
 	rv = auth_client.post('/api/user', data = {'name' : 'me'})
-	assert rv.status_code == 400
-	assert 'Missing data' in decode_json(rv)['errors']['email'][0]
+	assert rv.status_code == 422
 
 	# Invalid email
 	rv = auth_client.post('/api/user',
 		data = {'name' : 'me', 'email' : 'fake'})
-	assert rv.status_code == 400
-	assert 'Not a valid' in decode_json(rv)['errors']['email'][0]
+	assert rv.status_code == 422
+	# assert 'Not a valid' in decode_json(rv)['errors']['email'][0]
 
-	# Invalid email
+	# Valid email
 	rv = auth_client.post('/api/user',
 		data = {'name' : 'me', 'email' : 'fake@gmail.com', 'password' : 'something'})
 	assert rv.status_code == 200

@@ -1,11 +1,8 @@
-from flask import request
-from flask_restful import Resource, abort
-from flask_restful_swagger.swagger import operation
+from flask_apispec import MethodResource, marshal_with, use_kwargs, doc
 from flask_jwt import jwt_required, current_identity
-from marshmallow import Schema, fields, post_load, validates, ValidationError
-from models.analysis import Analysis
-from models.dataset import Dataset
+from marshmallow import Schema, fields, validates, ValidationError
 
+from models import Analysis, Dataset
 from database import db
 
 from .predictor import PredictorSchema
@@ -14,21 +11,23 @@ from .run import RunSchema
 
 class AnalysisSchema(Schema):
 	id = fields.Int(dump_only=True)
-	name = fields.Str(required=True)
-	description = fields.Str(required=True)
+	name = fields.Str(required=True, description='Analysis name.')
+	description = fields.Str()
 
 	dataset_id = fields.Int(required=True)
-	user_id = fields.Int(required=True, dump_only=True)
-	parent = fields.Nested('AnalysisSchema', only='id')
+	user_id = fields.Int(dump_only=True)
+	parent = fields.Nested('AnalysisSchema', only='id', dump_only=True,
+                        description="Parent analysis, if cloned.")
 
-	results = fields.Nested(ResultSchema, many=True, only='id')
-	predictors = fields.Nested(PredictorSchema, many=True, only='id')
-	runs = fields.Nested(RunSchema, many=True, only='id')
-
-
-	@post_load
-	def make_db(self, data):
-		return Analysis(**data)
+	results = fields.Nested(
+		ResultSchema, many=True, only='id', dump_only=True,
+        description='Result id(s) associated with analysis')
+	predictors = fields.Nested(
+		PredictorSchema, many=True, only='id',
+        description='Predictor id(s) associated with analysis')
+	runs = fields.Nested(
+		RunSchema, many=True, only='id',
+        description='Runs associated with analysis')
 
 	@validates('dataset_id')
 	def validate_dsid(self, value):
@@ -36,39 +35,28 @@ class AnalysisSchema(Schema):
 			raise ValidationError('Invalid dataset id.')
 
 	class Meta:
-		additional = ('user_id', )
+		strict = True
 
-class AnalysisResource(Resource):
-	""" User generated analysis """
-	@operation()
-	def get(self, analysis_id):
-		""" Access individual analysis """
-		result = Analysis.query.filter_by(id=analysis_id).first_or_404()
-		return AnalysisSchema().dump(result)
 
-class AnalysisListResource(Resource):
-	""" User generated analyses """
-	@operation()
-	def get(self):
-		""" Get a list of existing analyses """
-		result = Analysis.query.filter_by().all()
-		return AnalysisSchema(many=True).dump(result)
+class AnalysisResource(MethodResource):
+    @doc(tags=['analysis'], summary='Get analysis by id.')
+    @marshal_with(AnalysisSchema)
+    def get(self, analysis_id):
+    	return Analysis.query.filter_by(id=analysis_id).first_or_404()
 
-	@operation(
-	responseMessages=[{"code": 405,
-	      "message": "Invalid input"}])
-	@jwt_required()
-	def post(self):
-		""" Post a new analysis """
-		data = request.get_json()
-		new, errors = AnalysisSchema().load(data)
+class AnalysisListResource(MethodResource):
+    @doc(tags=['analysis'], summary='Returns list of analyses.')
+    @marshal_with(AnalysisSchema(many=True))
+    def get(self):
+    	return Analysis.query.filter_by().all()
 
-		if errors:
-			abort(405 , errors=errors)
-		else:
-			new.user_id = current_identity.id
-			db.session.add(new)
-			db.session.commit()
-			return AnalysisSchema().dump(new)
-
-	## Return some information like the analysis id
+class AnalysisPostResource(MethodResource):
+    @doc(tags=['analysis'], summary='Add a new analysis.')
+    @marshal_with(AnalysisSchema)
+    @use_kwargs(AnalysisSchema)
+    @jwt_required()
+    def post(self, **kwargs):
+    	new = Analysis(user_id = current_identity.id, **kwargs)
+    	db.session.add(new)
+    	db.session.commit()
+    	return new

@@ -1,6 +1,6 @@
 from flask_script import Manager, Shell
 from flask_migrate import Migrate, MigrateCommand
-from app import app, db
+from core import app, db
 import os
 import requests
 import populate
@@ -15,8 +15,11 @@ def _make_context():
 	from tests.request_utils import Client
 	import resources
 
-	client = Client(requests, 'http://127.0.0.1:5000',
-		username='test2@test.com', password='password')
+	try:
+		client = Client(requests, 'http://127.0.0.1:5001',
+			username='test2@test.com', password='password')
+	except:
+		client = None
 
 	return dict(app=app, db=db, models=models, client=client,
 		resources=resources)

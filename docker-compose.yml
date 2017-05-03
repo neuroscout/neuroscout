@@ -11,8 +11,7 @@ services:
       - /usr/src/app/static
       - migrations:/migrations
       # ADD OTHERS VOLUMES HERE
-    command: /usr/local/bin/gunicorn -w 2 -b :8000 app:app --log-level debu
-
+    command: /usr/local/bin/gunicorn -w 2 -b :8000 core:app --log-level debu
     environment:
       - APP_SETTINGS=config.DevelopmentConfig
 
@@ -43,6 +42,13 @@ services:
       - "5432:5432"
     environment:
       - POSTGRES_DB=neuroscout
+
+  swagger-ui:
+    image: swaggerapi/swagger-ui
+    environment:
+      - "API_URL=http://localhost/swagger/"
+    ports:
+      - '5000:8080'
 
 volumes:
   migrations:
