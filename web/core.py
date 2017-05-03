@@ -9,7 +9,7 @@ db.init_app(app)
 
 from flask_jwt import JWT
 from flask_security import Security
-from auth import authenticate, load_user
+from auth import authenticate, load_user, add_auth_to_swagger
 from models import *
 
 # Setup Flask-Security and JWT
@@ -26,12 +26,14 @@ from apispec import APISpec
 from flask_apispec.extension import FlaskApiSpec
 from utils import route_factory
 
+spec = APISpec(
+    title='neuroscout',
+    version='v1',
+    plugins=['apispec.ext.marshmallow'],
+)
 app.config.update({
-    'APISPEC_SPEC': APISpec(
-        title='neuroscout',
-        version='v1',
-        plugins=['apispec.ext.marshmallow'],
-    )})
+    'APISPEC_SPEC': spec})
+add_auth_to_swagger(spec)
 
 docs = FlaskApiSpec(app)
 route_factory(app, docs,
@@ -42,7 +44,6 @@ route_factory(app, docs,
         ('AnalysisPostResource', 'analyses'),
         ('AnalysisResource', 'analyses/<int:analysis_id>'),
         ('ResultResource', 'results/<int:result_id>'),
-        ('ResultListResource', 'results'),
         ('RunListResource', 'runs'),
         ('RunResource', 'runs/<int:run_id>'),
         ('PredictorListResource', 'predictors'),

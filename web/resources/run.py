@@ -16,14 +16,12 @@ class RunSchema(Schema):
 
 class RunResource(MethodResource):
     @doc(tags=['run'], summary='Get run by id.')
-    @marshal_with(RunSchema, code='200')
+    @marshal_with(RunSchema)
     def get(self, run_id):
-        """ Run. """
         return Run.query.filter_by(id=run_id).first_or_404()
 
 class RunListResource(MethodResource):
     @doc(tags=['run'], summary='Returns list of runs.')
-    @marshal_with(RunSchema(many=True), code='200')
     @use_kwargs({
     	'session': wa.fields.DelimitedList(fields.Str(),
                                         description='Session number(s).'),
@@ -35,10 +33,10 @@ class RunListResource(MethodResource):
                                            description='Subject id(s).'),
         'dataset_id': wa.fields.Int(description='Dataset id.'),
     }, locations=['query'])
+    @marshal_with(RunSchema(many=True))
     def get(self, **kwargs):
-        """ Run list. """
         try:
-        	dataset = kwargs.pop('dataset_id')
+            dataset = kwargs.pop('dataset_id')
         except KeyError:
         	dataset = None
 
@@ -48,5 +46,4 @@ class RunListResource(MethodResource):
 
         if dataset:
         	query = query.join('dataset').filter_by(id=dataset)
-
         return query.all()

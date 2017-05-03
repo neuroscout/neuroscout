@@ -1,6 +1,6 @@
 from marshmallow import Schema, fields
 import webargs as wa
-from flask_apispec import MethodResource, marshal_with, use_kwargs
+from flask_apispec import MethodResource, marshal_with, use_kwargs, doc
 
 from models import Predictor, PredictorEvent
 
@@ -15,47 +15,35 @@ class PredictorEventSchema(Schema):
 
 class PredictorSchema(Schema):
 	id = fields.Str(dump_only=True)
-	name = fields.Str(dump_only=True)
+	name = fields.Str(dump_only=True, description="Predictor name.")
 	description = fields.Str(dump_only=True)
-	ef_id = fields.Int(dump_only=True)
-	predictor_events = fields.Nested(PredictorEventSchema, many=True, only='id')
+	ef_id = fields.Int(dump_only=True,
+                    description="If predictor was generated, id of linked extractor feature.")
+	predictor_events = fields.Nested(PredictorEventSchema, many=True, only='id',
+                                  description="Nested predictor event id(s).")
 
 
 class PredictorResource(MethodResource):
+    @doc(tags=['predictor'], summary='Get predictor by id.')
     @marshal_with(PredictorSchema)
     def get(self, predictor_id):
-        """ Predictor.
-        ---
-    	get:
-    		summary: Get predictor by id.
-    		responses:
-    			200:
-    				description: successful operation
-    				schema: PredictorSchema
-        """
         return Predictor.query.filter_by(id=predictor_id).first_or_404()
 
 class PredictorListResource(MethodResource):
+    @doc(tags=['predictor'], summary='Get list of predictors.',)
     @marshal_with(PredictorSchema(many=True))
     @use_kwargs({
-        'run_id': wa.fields.DelimitedList(fields.Int()),
-        'name': wa.fields.DelimitedList(fields.Str()),
-    })
+        'run_id': wa.fields.DelimitedList(fields.Int(),
+                                          description="Run id(s)"),
+        'name': wa.fields.DelimitedList(fields.Str(),
+                                        description="Predictor name(s)"),
+    }, locations=['query'], inherit=True)
     def get(self, **kwargs):
-        """ Predictor List.
-        ---
-    	get:
-    		summary: Get list of predictors.
-    		responses:
-    			200:
-    				description: successful operation
-    				schema: PredictorSchema
-        """
         try:
             run_id = kwargs.pop('run_id')
         except KeyError:
             run_id = None
-            
+
         query = Predictor.query
         for param in kwargs:
         	query = query.filter(getattr(Predictor, param).in_(kwargs[param]))
