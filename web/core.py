@@ -49,6 +49,7 @@ route_factory(app, docs,
         ('PredictorResource', 'predictors/<int:predictor_id>'),
         ('UserResource', 'user'),
         ('UserPostResource', 'user'),
+
     ])
 
 @app.route('/')
@@ -58,4 +59,4 @@ def index():
 
 if __name__ == '__main__':
     db.init_app(app)
-    app.run(debug=app.config['DEBUG'])
+    app.run(debug=app.config['DEBUG'], port=5001)

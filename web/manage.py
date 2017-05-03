@@ -16,7 +16,7 @@ def _make_context():
 	import resources
 
 	try:
-		client = Client(requests, 'http://127.0.0.1:5000',
+		client = Client(requests, 'http://127.0.0.1:5001',
 			username='test2@test.com', password='password')
 	except:
 		client = None
