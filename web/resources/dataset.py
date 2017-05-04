@@ -1,39 +1,29 @@
-from flask_restful import Resource
-from flask_restful_swagger.swagger import operation
-from flask_jwt import jwt_required
-from marshmallow import Schema, fields, post_load
+from flask_apispec import MethodResource, marshal_with, doc
+from marshmallow import Schema, fields
 
 from models.dataset import Dataset
-
 from .run import RunSchema
 
-
 class DatasetSchema(Schema):
+	""" Dataset validation schema. """
+	id = fields.Int()
+	name = fields.Str(description='Dataset name')
+	description = fields.Str()
+	mimetypes = fields.List(fields.Str(),
+                         description='Dataset mimetypes/modalities')
+	tasks = fields.List(fields.Str(),
+                     description='Tasks in dataset runs.')
 	runs = fields.Nested(RunSchema, many=True, only='id')
 
-	class Meta:
-		additional = ('id', 'description', 'mimetypes', 'tasks')
 
-	@post_load
-	def make_db(self, data):
-		return Dataset(**data)
+class DatasetResource(MethodResource):
+    @doc(tags=['dataset'], summary='Get dataset by id.')
+    @marshal_with(DatasetSchema)
+    def get(self, dataset_id):
+    	return Dataset.query.filter_by(id=dataset_id).first_or_404()
 
-class DatasetResource(Resource):
-	""" Individual dataset """
-	@operation(
-	responseMessages=[{"code": 404,
-	      "message": "Dataset does not exist"}])
-	@jwt_required()
-	def get(self, dataset_id):
-		""" Access a specific dataset """
-		result = Dataset.query.filter_by(id=dataset_id).first_or_404()
-		return DatasetSchema().dump(result)
-
-class DatasetListResource(Resource):
-	""" Available datasets """
-	@operation()
-	@jwt_required()
-	def get(self):
-		""" List of datasets """
-		result = Dataset.query.all()
-		return DatasetSchema(many=True, only=['id', 'mimetypes', 'tasks']).dump(result)
+class DatasetListResource(MethodResource):
+    @doc(tags=['dataset'], summary='Returns list of datasets.')
+    @marshal_with(DatasetSchema(many=True))
+    def get(self):
+    	return Dataset.query.all()

@@ -3,7 +3,7 @@ import json
 class Client(object):
     def __init__(self, test_client=None, prepend='', username=None, password=None):
         if test_client is None:
-            from app import app
+            from core import app
             test_client = app.test_client()
             self.client_flask = True
         else:
@@ -31,7 +31,7 @@ class Client(object):
 
         if self.client_flask:
             return request_function(self.prepend + route, data=json.dumps(data),
-                content_type='application/json', headers=headers)
+                content_type='application/json', headers=headers, query_string=params)
         else:
             return request_function(self.prepend + route, json=data,
                 headers=headers, params=params)

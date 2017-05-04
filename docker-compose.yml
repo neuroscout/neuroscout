@@ -1,43 +1,55 @@
-web:
-  restart: always
-  build: ./web
-  expose:
-    - "8000"
-  links:
-    - postgres:postgres
-  volumes:
-    - /usr/src/app/static
-    - /Users/pouya/projects/neuro/shared_data:/shared_data
+version: "2"
+services:
+  web:
+    restart: always
+    build: ./web
+    expose:
+      - "8000"
+    links:
+      - postgres:postgres
+    volumes:
+      - /usr/src/app/static
+      - migrations:/migrations
+      # ADD OTHERS VOLUMES HERE
+      - /Users/pouya/projects/neuro/shared_data:/shared_data
+    command: /usr/local/bin/gunicorn -w 2 -b :8000 core:app --log-level debu
+    environment:
+      - APP_SETTINGS=config.DevelopmentConfig
 
-  command: /usr/local/bin/gunicorn -w 2 -b :8000 app:app --log-level debug
+  nginx:
+    restart: always
+    build: ./nginx/
+    ports:
+      - "80:80"
+    volumes:
+      - /www/static
+    volumes_from:
+      - web
+    links:
+      - web:web
 
-  environment:
-    - APP_SETTINGS=config.DevelopmentConfig
+  data:
+    image: postgres:latest
+    volumes:
+      - /var/lib/postgresql
+    command: "true"
 
-nginx:
-  restart: always
-  build: ./nginx/
-  ports:
-    - "80:80"
-  volumes:
-    - /www/static
-  volumes_from:
-    - web
-  links:
-    - web:web
+  postgres:
+    restart: always
+    image: postgres:latest
+    volumes_from:
+      - data
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_DB=neuroscout
 
-data:
-  image: postgres:latest
-  volumes:
-    - /var/lib/postgresql
-  command: "true"
+  swagger-ui:
+    image: swaggerapi/swagger-ui
+    environment:
+      - "API_URL=http://localhost/swagger/"
+    ports:
+      - '5000:8080'
 
-postgres:
-  restart: always
-  image: postgres:latest
-  volumes_from:
-    - data
-  ports:
-    - "5432:5432"
-  environment:
-    - POSTGRES_DB=neuroscout
+volumes:
+  migrations:

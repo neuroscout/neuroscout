@@ -1,39 +1,55 @@
-from flask_restful import Resource, abort
-from flask_restful_swagger.swagger import operation
-from flask_jwt import jwt_required
 from marshmallow import Schema, fields
-from models.predictor import Predictor
+import webargs as wa
+from flask_apispec import MethodResource, marshal_with, use_kwargs, doc
 
-# Predictor Event Resources
+from models import Predictor, PredictorEvent
+
+
 class PredictorEventSchema(Schema):
-	id = fields.Str(dump_only=True)
+    id = fields.Str(dump_only=True)
+    onset = fields.Number(dump_only=True)
+    duration = fields.Number(dump_only=True)
+    value = fields.Number(dump_only=True)
+    run_id = fields.Int(dump_only=True)
+    predictor_id = fields.Int(dump_only=True)
 
-	class Meta:
-		additional = ('onset', 'duration', 'value', 'run_id', 'predictor_id')
-
-# Predictor Resources
 class PredictorSchema(Schema):
 	id = fields.Str(dump_only=True)
+	name = fields.Str(dump_only=True, description="Predictor name.")
+	description = fields.Str(dump_only=True)
+	ef_id = fields.Int(dump_only=True,
+                    description="If predictor was generated, id of linked extractor feature.")
+	predictor_events = fields.Nested(PredictorEventSchema, many=True, only='id',
+                                  description="Nested predictor event id(s).")
 
-	predictor_events = fields.Nested(PredictorEventSchema, many=True, only='id')
 
-	class Meta:
-		additional = ('name', 'description', 'ef_id', 'analysis_id')
+class PredictorResource(MethodResource):
+    @doc(tags=['predictor'], summary='Get predictor by id.')
+    @marshal_with(PredictorSchema)
+    def get(self, predictor_id):
+        return Predictor.query.filter_by(id=predictor_id).first_or_404()
 
-class PredictorResource(Resource):
-	""" Predictors """
-	@operation()
-	@jwt_required()
-	def get(self, id):
-		""" Access a predictor by id """
-		result = Predictor.query.filter_by(id=id).one_or_404()
-		return PredictorSchema().dump(result)
+class PredictorListResource(MethodResource):
+    @doc(tags=['predictor'], summary='Get list of predictors.',)
+    @marshal_with(PredictorSchema(many=True))
+    @use_kwargs({
+        'run_id': wa.fields.DelimitedList(fields.Int(),
+                                          description="Run id(s)"),
+        'name': wa.fields.DelimitedList(fields.Str(),
+                                        description="Predictor name(s)"),
+    }, locations=['query'], inherit=True)
+    def get(self, **kwargs):
+        try:
+            run_id = kwargs.pop('run_id')
+        except KeyError:
+            run_id = None
 
-class PredictorListResource(Resource):
-	""" Extracted predictors """
-	@operation()
-	@jwt_required()
-	def get(self):
-		""" List of extracted predictors """
-		result = Predictor.query.filter_by().all()
-		return PredictorSchema(many=True).dump(result)
+        query = Predictor.query
+        for param in kwargs:
+        	query = query.filter(getattr(Predictor, param).in_(kwargs[param]))
+
+        if run_id:
+        	query = query.join('predictor_events').filter(
+        		PredictorEvent.run_id.in_(run_id))
+
+        return query.all()

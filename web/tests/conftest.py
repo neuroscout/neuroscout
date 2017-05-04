@@ -1,7 +1,7 @@
 import os
 import pytest
 from flask_security.utils import encrypt_password
-from app import app as _app
+from core import app as _app
 from database import db as _db
 
 import sqlalchemy as sa
@@ -13,7 +13,9 @@ Session / db managment tools
 def app():
     """Session-wide test `Flask` application."""
     if 'APP_SETTINGS' in os.environ:
-        if os.environ['APP_SETTINGS'] != 'config.TravisConfig':
+        if os.environ['APP_SETTINGS'] == 'config.DevelopmentConfig':
+            _app.config.from_object('config.DockerTestConfig')
+        elif os.environ['APP_SETTINGS'] != 'config.TravisConfig':
             _app.config.from_object('config.TestingConfig')
     else:
         _app.config.from_object('config.TestingConfig')

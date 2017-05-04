@@ -19,8 +19,8 @@ def test_get_dataset(auth_client, add_dataset):
 	assert first_dataset_id == dataset['id']
 	assert dataset['mimetypes'] == ['image/jpeg']
 	assert dataset['tasks'] == ['bidstest']
+	assert dataset['name'] == 'Test Dataset'
 
 	# Try getting nonexistent datset
-	rv = auth_client.get('/api/datasets/{}'.format('non-existent'))
+	rv = auth_client.get('/api/datasets/{}'.format('1324'))
 	assert rv.status_code == 404
-	assert 'requested URL was not found' in decode_json(rv)['message']

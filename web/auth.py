@@ -12,3 +12,45 @@ def load_user(payload):
     user = user_datastore.find_user(id=payload['identity'])
     return user
 
+def add_auth_to_swagger(spec):
+    spec.add_path(
+        path='/auth',
+        operations=dict(
+            post=dict(
+                parameters=[
+              {
+                "in": "body",
+                "name": "body",
+                "required": True,
+                "schema": {
+                  "properties": {
+                    "username": {
+                      "type": "string"
+                    },
+                    "password": {
+                      "type": "string"
+                    }},
+                  "type": "object"
+                }
+              }
+            ],
+               tags = [
+                  "auth"
+                ],
+               summary = "Get JWT authorizaton token.",
+                responses={
+     "default": {
+                "description": "",
+                "schema": {
+                  "properties": {
+                    "authorizaton_token": {
+                      "type": "string"
+                    },
+                  "type": "object"
+                }
+              }
+                }
+     }
+            )
+        )
+    )

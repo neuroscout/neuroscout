@@ -1,5 +1,5 @@
 from sqlalchemy.exc import SQLAlchemyError
-from flask_restful import abort
+from flask import abort
 
 def copy_row(model, row, ignored_columns=[]):
     copy = model()
@@ -22,7 +22,7 @@ def put_record(session, updated_values, instance):
 
 	except SQLAlchemyError:
 		session.rollback()
-		abort(400, message="Database error")
+		abort(400)
 
 def get_or_create(session, model, commit=True, **kwargs):
     """ Checks to see if instance of model is in db.
