@@ -49,6 +49,8 @@ route_factory(app, docs,
         ('RunResource', 'runs/<int:run_id>'),
         ('PredictorListResource', 'predictors'),
         ('PredictorResource', 'predictors/<int:predictor_id>'),
+        ('PredictorEventListResource', 'predictor-events'),
+        ('PredictorEventResource', 'predictor-events/<int:pe_id>'),
         ('UserResource', 'user'),
         ('UserPostResource', 'user'),
 
