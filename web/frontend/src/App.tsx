@@ -88,7 +88,7 @@ class App extends React.Component<{}, Store> {
     .catch(error => {message.error(error.toString());})
   }
 
-  updateState = (attrName: string) => (value: any) => {
+  updateState = (attrName: keyof Store) => (value: any) => {
     /* 
      Main function to update application state. May split this up into
      smaller pieces of it gets too complex.
