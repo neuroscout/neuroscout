@@ -42,13 +42,13 @@ export class OverviewTab extends React.Component<OverviewTabProps, any>{
       { title: 'Subject', dataIndex: 'subject' },
       { title: 'Session', dataIndex: 'session' }
     ];
-    
+
     const rowSelection: TableRowSelection<Run> = {
-      onSelect: (record, selected, selectedRows:any) => {
+      onSelect: (record, selected, selectedRows: any) => {
         console.log('Selected rows = ', selectedRows);
         this.updateAnalysis('runIds')(selectedRows.map(x => x.id))
       },
-      onSelectAll: (selected, selectedRows:any, changeRows) => {
+      onSelectAll: (selected, selectedRows: any, changeRows) => {
         this.updateAnalysis('runIds')(selectedRows.map(x => x.id))
       }
     }
@@ -86,7 +86,7 @@ export class OverviewTab extends React.Component<OverviewTabProps, any>{
             onSelect={this.updateAnalysis('datasetId')}
           />
         </FormItem>
-        {availableRuns.length > 0 ?
+        {availableRuns.length > 0 &&
           <div>
             <p>Select runs:</p>
             <RunTable
@@ -96,7 +96,7 @@ export class OverviewTab extends React.Component<OverviewTabProps, any>{
               dataSource={availableRuns}
               rowSelection={rowSelection} />
           </div>
-          : null}
+        }
       </Form>
     </div>
   }

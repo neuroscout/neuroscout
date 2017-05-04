@@ -6,13 +6,15 @@ import './App.css';
 import { OverviewTab } from './Overview'
 import { Store } from './commontypes'
 
-const TabPane = Tabs.TabPane;
+const { TabPane } = Tabs;
 const { Footer, Content } = Layout;
 
 // const logo = require('./logo.svg');
 const domainRoot = 'http://localhost:80'
 const USERNAME = 'test2@test.com';
 const PASSWORD = 'password';
+
+// Create initialized app state (used in the constructor of the top-level App component)
 const initializeStore = (): Store => ({
   activeTab: 'overview',
   predictorsActive: false,
@@ -31,9 +33,9 @@ const initializeStore = (): Store => ({
 
 const getJwt = () => new Promise((resolve, reject) => {
   /* Returns an access token (JWT) as a promise, either straight from local 
-     storage or by fetching from server (/auth) with username/password and 
+     storage or by fetching from the server (/auth) with username/password and 
      caching it to local storage. */
-  let jwt = window.localStorage.getItem('jwt')
+  const jwt = window.localStorage.getItem('jwt')
   if (jwt) {
     resolve(jwt);
   }
@@ -61,6 +63,7 @@ const getJwt = () => new Promise((resolve, reject) => {
   }
 });
 
+// Wrapper around 'fetch' to add JWT authorization header and authenticate first if necessary  
 const aFetch = (path: string, options?: object): Promise<any> => {
   return getJwt().then((jwt: string) => {
     const newOptions = Object.assign({
@@ -86,6 +89,10 @@ class App extends React.Component<{}, Store> {
   }
 
   updateState = (attrName: string) => (value: any) => {
+    /* 
+     Main function to update application state. May split this up into
+     smaller pieces of it gets too complex.
+    */
     let stateUpdate = {}
     if (attrName == 'analysis') {
       if (value.datasetId != this.state.analysis.datasetId) {
