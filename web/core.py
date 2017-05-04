@@ -19,6 +19,7 @@ jwt = JWT(app, authenticate, load_user)
 # Enable CORS
 from flask_cors import CORS
 cors = CORS(app, resources={r"/api/*": {"origins": "*"},
+                            r"/auth": {"origins": "*"},
                             r"/swagger/": {"origins": "*"}})
 
 # Setup API
