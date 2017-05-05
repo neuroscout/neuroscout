@@ -4,7 +4,8 @@ import { Tabs, Row, Col, Layout, message } from 'antd';
 import './App.css';
 
 import { OverviewTab } from './Overview'
-import { Store } from './commontypes'
+import { PredictorsTab } from './Predictors'
+import { Store, Analysis } from './commontypes'
 
 const { TabPane } = Tabs;
 const { Footer, Content } = Layout;
@@ -19,16 +20,21 @@ const initializeStore = (): Store => ({
   activeTab: 'overview',
   predictorsActive: false,
   transformationsActive: false,
+  contrastsActive: false,
+  modelingActive: false,
+  reviewActive: true,
   analysis: {
     analysisId: null,
     analysisName: 'Untitled',
     analysisDescription: '',
     datasetId: null,
     predictions: '',
-    runIds: []
+    runIds: [],
+    predictorIds: []
   },
   datasets: [],
-  availableRuns: []
+  availableRuns: [],
+  availablePredictors: []
 });
 
 const getJwt = () => new Promise((resolve, reject) => {
@@ -85,7 +91,7 @@ class App extends React.Component<{}, Store> {
         this.setState({ 'datasets': data })
       })
     })
-    .catch(error => {message.error(error.toString());})
+      .catch(error => { message.error(error.toString()); })
   }
 
   updateState = (attrName: keyof Store) => (value: any) => {
@@ -95,12 +101,24 @@ class App extends React.Component<{}, Store> {
     */
     let stateUpdate = {}
     if (attrName == 'analysis') {
-      if (value.datasetId != this.state.analysis.datasetId) {
+      const updatedAnalysis: Analysis = value
+      if (updatedAnalysis.datasetId != this.state.analysis.datasetId) {
         // If a new dataset is selected we need to fetch the associated runs
-        aFetch(`${domainRoot}/api/runs?dataset=${value.datasetId}`)
+        aFetch(`${domainRoot}/api/runs?dataset=${updatedAnalysis.datasetId}`)
           .then(response => {
             response.json().then(data => {
               this.setState({ availableRuns: data });
+            })
+          })
+          .catch(error => { console.log(error); })
+      }
+      if (updatedAnalysis.runIds.length != this.state.analysis.runIds.length) {
+        // If there was any change in selection of runs, fetch the associated predictors
+        const runIds = updatedAnalysis.runIds.join(',')
+        aFetch(`${domainRoot}/api/predictors?runs=${runIds}`)
+          .then(response => {
+            response.json().then(data => {
+              this.setState({ availablePredictors: data })
             })
           })
           .catch(error => { console.log(error); })
@@ -113,7 +131,8 @@ class App extends React.Component<{}, Store> {
   }
 
   render() {
-    const { predictorsActive, transformationsActive, analysis, datasets, availableRuns } = this.state;
+    const { predictorsActive, transformationsActive, contrastsActive, modelingActive, 
+      reviewActive, analysis, datasets, availableRuns, availablePredictors } = this.state;
     return (
       <div className="App">
         <Layout>
@@ -140,11 +159,21 @@ class App extends React.Component<{}, Store> {
                       updateAnalysis={this.updateState('analysis')}
                     />
                   </TabPane>
-                  <TabPane tab="Predictors" key="2" disabled={!predictorsActive} />
+                  <TabPane tab="Predictors" key="2" disabled={!predictorsActive}>
+                    <PredictorsTab
+                      analysis={analysis}
+                      availablePredictors={availablePredictors}
+                      updateAnalysis={this.updateState('analysis')}
+                    />
+                  </TabPane>
                   <TabPane tab="Transformations" key="3" disabled={!transformationsActive} />
-                  <TabPane tab="Contrasts" key="4" />
-                  <TabPane tab="Modeling" key="5" />
-                  <TabPane tab="Review" key="6" />
+                  <TabPane tab="Contrasts" key="4" disabled={!contrastsActive}/>
+                  <TabPane tab="Modeling" key="5" disabled={!modelingActive}/>
+                  <TabPane tab="Review" key="6" disabled={!reviewActive}> 
+                    <p>
+                      {JSON.stringify(analysis)}
+                    </p>
+                  </TabPane>
                 </Tabs>
               </Col>
             </Row>
