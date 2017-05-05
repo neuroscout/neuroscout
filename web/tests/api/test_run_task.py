@@ -54,3 +54,4 @@ def test_get_run(auth_client, add_dataset):
 
 	# Test filtering by multiple parameters
 	rv = auth_client.get('/api/task/{}'.format(task_id))
+	assert 'description' in decode_json(rv)
