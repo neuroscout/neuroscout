@@ -1,8 +1,6 @@
 from flask_apispec import MethodResource, marshal_with, doc
 from marshmallow import Schema, fields
-
-from models.dataset import Dataset
-from .run import RunSchema
+from models import Dataset
 
 class DatasetSchema(Schema):
 	""" Dataset validation schema. """
@@ -13,7 +11,7 @@ class DatasetSchema(Schema):
                          description='Dataset mimetypes/modalities')
 	tasks = fields.List(fields.Str(),
                      description='Tasks in dataset runs.')
-	runs = fields.Nested(RunSchema, many=True, only='id')
+	runs = fields.Nested('RunSchema', many=True, only='id')
 
 
 class DatasetResource(MethodResource):

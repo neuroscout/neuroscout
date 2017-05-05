@@ -1,7 +1,7 @@
 from marshmallow import Schema, fields
-from models import Run
 from flask_apispec import MethodResource, marshal_with, use_kwargs, doc
 import webargs as wa
+from models import Run
 
 class RunSchema(Schema):
 	id = fields.Int()
@@ -12,7 +12,7 @@ class RunSchema(Schema):
 	dataset_id = fields.Int(description='Dataset run belongs to.')
 	task = fields.Nested('TaskSchema', only=['id', 'name'],
                         description="Task id and name")
-    
+
 class RunResource(MethodResource):
     @doc(tags=['run'], summary='Get run by id.')
     @marshal_with(RunSchema)

@@ -1,9 +1,8 @@
 from flask_apispec import MethodResource, marshal_with, use_kwargs, doc
 from flask_jwt import jwt_required, current_identity
 from marshmallow import Schema, fields, validates, ValidationError
-
-from models import Analysis, Dataset
 from database import db
+from models import Analysis, Dataset
 
 class AnalysisSchema(Schema):
 	id = fields.Int(dump_only=True)

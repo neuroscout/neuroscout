@@ -1,7 +1,6 @@
 from marshmallow import Schema, fields
 import webargs as wa
 from flask_apispec import MethodResource, marshal_with, use_kwargs, doc
-
 from models import Predictor, PredictorEvent
 
 """ Predictors """
