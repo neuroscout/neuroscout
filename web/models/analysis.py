@@ -13,6 +13,7 @@ class Analysis(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String, nullable=False)
     description = db.Column(db.Text)
+    data = db.Column(JSONB)
     filters = db.Column(JSONB) # List of filters used to select runs
     transformations = db.Column(JSONB)
     created_at = db.Column(db.DateTime)

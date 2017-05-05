@@ -4,7 +4,8 @@ from .analysis import (AnalysisSchema, AnalysisResource,
                        AnalysisListResource, AnalysisPostResource)
 from .dataset import DatasetSchema, DatasetResource, DatasetListResource
 from .predictor import (PredictorEventSchema, PredictorSchema,
-                        PredictorListResource, PredictorResource)
+                        PredictorListResource, PredictorResource,
+                        PredictorEventResource, PredictorEventListResource)
 from .result import ResultSchema, ResultResource
 from .run import RunSchema, RunResource, RunListResource
 from .stimulus import StimulusSchema, StimulusResource
@@ -22,6 +23,8 @@ __all__ = [
     'PredictorSchema',
     'PredictorResource',
     'PredictorListResource',
+    'PredictorEventResource',
+    'PredictorEventListResource',
     'ResultSchema',
     'ResultResource',
     'RunSchema',
