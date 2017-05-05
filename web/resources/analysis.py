@@ -5,10 +5,6 @@ from marshmallow import Schema, fields, validates, ValidationError
 from models import Analysis, Dataset
 from database import db
 
-from .predictor import PredictorSchema
-from .result import ResultSchema
-from .run import RunSchema
-
 class AnalysisSchema(Schema):
 	id = fields.Int(dump_only=True)
 	name = fields.Str(required=True, description='Analysis name.')
@@ -20,13 +16,13 @@ class AnalysisSchema(Schema):
                         description="Parent analysis, if cloned.")
 
 	results = fields.Nested(
-		ResultSchema, many=True, only='id', dump_only=True,
+		'ResultSchema', many=True, only='id', dump_only=True,
         description='Result id(s) associated with analysis')
 	predictors = fields.Nested(
-		PredictorSchema, many=True, only='id',
+		'PredictorSchema', many=True, only='id',
         description='Predictor id(s) associated with analysis')
 	runs = fields.Nested(
-		RunSchema, many=True, only='id',
+		'RunSchema', many=True, only='id',
         description='Runs associated with analysis')
 
 	@validates('dataset_id')

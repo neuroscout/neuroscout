@@ -25,7 +25,7 @@ class Dataset(db.Model):
 	@hybrid_property
 	def tasks(self):
 		""" List of tasks dataset """
-		return [r.task for r in self.runs.distinct('task')]
+		return list(set([r.task.name for r in self.runs]))
 
 
 	# Meta-data, such as preprocessed history, etc...

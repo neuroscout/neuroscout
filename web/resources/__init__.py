@@ -10,6 +10,7 @@ from .result import ResultSchema, ResultResource
 from .run import RunSchema, RunResource, RunListResource
 from .stimulus import StimulusSchema, StimulusResource
 from .user import UserSchema, UserResource, UserPostResource
+from .task import TaskSchema, TaskResource
 
 __all__ = [
     'AnalysisSchema',
@@ -35,5 +36,7 @@ __all__ = [
     'UserSchema',
     'UserResource',
     'UserPostResource',
-    'UserSchema'
+    'UserSchema',
+    'TaskSchema',
+    'TaskResource'
 ]
