@@ -53,7 +53,8 @@ route_factory(app, docs,
         ('PredictorEventResource', 'predictor-events/<int:pe_id>'),
         ('UserResource', 'user'),
         ('UserPostResource', 'user'),
-        ('TaskResource', 'task/<int:task_id>')
+        ('TaskResource', 'tasks/<int:task_id>'),
+        ('TaskListResource', 'tasks')
     ])
 
 @app.route('/')

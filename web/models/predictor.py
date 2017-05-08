@@ -8,6 +8,7 @@ class Predictor(db.Model):
 	)
 	id = db.Column(db.Integer, primary_key=True)
 	name = db.Column(db.Text, nullable=False)
+	short_description = db.Column(db.Text)
 	description = db.Column(db.Text) # Where to get this from?
 
 	dataset_id = db.Column(db.Integer, db.ForeignKey('dataset.id'), nullable=False)
@@ -16,6 +17,14 @@ class Predictor(db.Model):
 	predictor_events = db.relationship('PredictorEvent', backref='predictor',
 								lazy='dynamic')
 
+	# @hybrid_property
+	# def min(self):
+	#
+	# @hybrid_property
+	# def max(self):
+	#
+	# @hybrid_property
+	# def mean(self):
 
 class PredictorEvent(db.Model):
 	""" An event within a Predictor. Onset is relative to run. """

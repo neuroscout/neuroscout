@@ -52,6 +52,10 @@ def test_get_run(auth_client, add_dataset):
 	run_p = decode_json(rv)
 	assert len(run_p) == 4
 
-	# Test filtering by multiple parameters
-	rv = auth_client.get('/api/task/{}'.format(task_id))
+	# Test task route
+	rv = auth_client.get('/api/tasks/{}'.format(task_id))
 	assert 'description' in decode_json(rv)
+
+	# Test task route filtering
+	rv = auth_client.get('/api/tasks', params={'dataset_id' : add_dataset})
+	assert 'description' in decode_json(rv)[0]

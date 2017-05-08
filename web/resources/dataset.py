@@ -12,6 +12,7 @@ class DatasetSchema(Schema):
 	tasks = fields.List(fields.Str(),
                      description='Tasks in dataset runs.')
 	runs = fields.Nested('RunSchema', many=True, only='id')
+	tasks = fields.Nested('TaskSchema', many=True, only=['id', 'name'])
 
 
 class DatasetResource(MethodResource):
