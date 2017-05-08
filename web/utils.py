@@ -22,3 +22,10 @@ def route_factory(app, docs, pairings, prepend='/api/'):
         app.add_url_rule(prepend + route,
                          view_func=res.as_view(res_name.lower()))
         docs.register(res)
+
+def generate_id(n=6):
+    import random
+    import string
+
+    return ''.join(random.SystemRandom().choice(
+        string.ascii_uppercase + string.digits) for _ in range(n))
