@@ -1,5 +1,6 @@
 from database import db
 from sqlalchemy.dialects.postgresql import JSONB
+from sqlalchemy.ext.hybrid import hybrid_property
 
 class Task(db.Model):
     """ A task in a dataset. Usually associated with various runs. """
@@ -14,3 +15,8 @@ class Task(db.Model):
                            nullable=False)
 
     runs = db.relationship('Run', backref='task')
+
+    @hybrid_property
+    def num_runs(self):
+    	""" List of mimetypes of stimuli in dataset """
+    	return len(self.runs)
