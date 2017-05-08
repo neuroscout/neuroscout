@@ -50,6 +50,7 @@ def add_dataset(session, bids_path, task, replace=False, verbose=True, **kwargs)
     # Extract BIDS dataset info and store in dictionary
     description = json.load(open(
         os.path.join(bids_path, 'dataset_description.json'), 'r'))
+    description['URL'] = ''
     task_description = json.load(open(
         os.path.join(bids_path, 'task-{}_bold.json'.format(task)), 'r'))
 
