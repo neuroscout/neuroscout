@@ -3,6 +3,10 @@ from db_utils import copy_row
 from sqlalchemy.dialects.postgresql import JSONB
 import datetime
 
+from sqlalchemy.event import listens_for
+from hashids import Hashids
+from flask import current_app
+
 # Association table between analysis and predictor.
 analysis_predictor = db.Table('analysis_predictor',
                        db.Column('analysis_id', db.Integer(), db.ForeignKey('analysis.id')),
@@ -43,3 +47,12 @@ class Analysis(db.Model):
     	clone_row = copy_row(Analysis, self, ignored_columns='analysis.id')
     	clone_row.parent = self.id
     	return clone_row
+
+@listens_for(Analysis, "after_insert")
+def update_hash(mapper, connection, target):
+    analysis_table = mapper.local_table
+    connection.execute(
+          analysis_table.update().
+              values(hash_id=Hashids(current_app.config['HASH_SALT']).encode(target.id)).
+              where(analysis_table.c.id==target.id)
+    )

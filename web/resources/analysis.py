@@ -64,7 +64,5 @@ class AnalysisPostResource(MethodResource):
 	def post(self, **kwargs):
 		new = Analysis(user_id = current_identity.id, **kwargs)
 		db.session.add(new)
-		db.session.flush()
-		new.hash_id = Hashids(current_app.config['HASH_SALT']).encode(new.id)
 		db.session.commit()
 		return new
