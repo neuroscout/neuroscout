@@ -17,6 +17,7 @@ Flask-SQLAlchemy==2.2
 Flask-WTF==0.14.2
 grabbit==0.0.6
 gunicorn==19.7.1
+hashids==1.2.0
 imageio==2.1.2
 itsdangerous==0.24
 Jinja2==2.9.6
