@@ -6,7 +6,7 @@ class DatasetSchema(Schema):
 	""" Dataset validation schema. """
 	id = fields.Int()
 	name = fields.Str(description='Dataset name')
-	description = fields.Str()
+	description = fields.Dict()
 	mimetypes = fields.List(fields.Str(),
                          description='Dataset mimetypes/modalities')
 	tasks = fields.List(fields.Str(),
