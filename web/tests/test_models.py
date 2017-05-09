@@ -10,7 +10,7 @@ def test_dataset_ingestion(session, add_dataset):
 
 	# Test mimetypes
 	assert 'image/jpeg' in dataset_model.mimetypes
-	assert 'bidstest' in dataset_model.tasks
+	assert 'bidstest' == dataset_model.tasks[0].name
 
 	# Try adding dataset without a name
 	with pytest.raises(Exception) as excinfo:
@@ -23,10 +23,11 @@ def test_dataset_ingestion(session, add_dataset):
 	assert Run.query.count() == dataset_model.runs.count() == 4
 	run_model =  dataset_model.runs.first()
 	assert run_model.dataset_id == dataset_model.id
-	assert 'TaskName' in run_model.task_description
+	assert 'TaskName' in run_model.task.description
+	assert run_model.task.description['RepetitionTime'] == 2.0
+
 	assert run_model.duration is None
 	assert run_model.path is None
-	assert run_model.TR == 2.0
 
 	# Test properties of first run's predictor events
 	assert run_model.predictor_events.count() == 8

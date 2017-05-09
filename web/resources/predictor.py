@@ -1,7 +1,6 @@
 from marshmallow import Schema, fields
 import webargs as wa
 from flask_apispec import MethodResource, marshal_with, use_kwargs, doc
-
 from models import Predictor, PredictorEvent
 
 """ Predictors """
@@ -19,32 +18,29 @@ class PredictorResource(MethodResource):
         return Predictor.query.filter_by(id=predictor_id).first_or_404()
 
 class PredictorListResource(MethodResource):
-    @doc(tags=['predictors'], summary='Get list of predictors.',)
-    @marshal_with(PredictorSchema(many=True))
-    @use_kwargs({
-        'run_id': wa.fields.DelimitedList(fields.Int(),
-                                          description="Run id(s)"),
-        'name': wa.fields.DelimitedList(fields.Str(),
-                                        description="Predictor name(s)"),
-    }, locations=['query'])
-    def get(self, **kwargs):
-        try:
-            run_id = kwargs.pop('run_id')
-        except KeyError:
-            run_id = None
+	@doc(tags=['predictors'], summary='Get list of predictors.',)
+	@marshal_with(PredictorSchema(many=True))
+	@use_kwargs({
+	    'run_id': wa.fields.DelimitedList(fields.Int(),
+	                                      description="Run id(s)"),
+	    'name': wa.fields.DelimitedList(fields.Str(),
+	                                    description="Predictor name(s)"),
+	}, locations=['query'])
+	def get(self, **kwargs):
+		# Get Predictors that match up to specified runs
+		if 'run_id' in kwargs:
+			run_id = kwargs.pop('run_id')
+			kwargs['id'] = PredictorEvent.query.filter(
+				PredictorEvent.run_id.in_(run_id)).distinct(
+					'predictor_id').with_entities('predictor_id').all()
 
-        query = Predictor.query
-        for param in kwargs:
-        	query = query.filter(getattr(Predictor, param).in_(kwargs[param]))
+		query = Predictor.query
+		for param in kwargs:
+			query = query.filter(getattr(Predictor, param).in_(kwargs[param]))
 
-        if run_id:
-        	query = query.join('predictor_events').filter(
-        		PredictorEvent.run_id.in_(run_id))
-
-        return query.all()
+		return query.all()
 
 """ PredictorEvents """
-
 class PredictorEventSchema(Schema):
     id = fields.Str(dump_only=True)
     onset = fields.Number(dump_only=True, description="Onset in seconds.")

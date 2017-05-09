@@ -43,7 +43,7 @@ route_factory(app, docs,
         ('DatasetListResource', 'datasets'),
         ('AnalysisListResource', 'analyses'),
         ('AnalysisPostResource', 'analyses'),
-        ('AnalysisResource', 'analyses/<int:analysis_id>'),
+        ('AnalysisResource', 'analyses/<analysis_id>'),
         ('ResultResource', 'results/<int:result_id>'),
         ('RunListResource', 'runs'),
         ('RunResource', 'runs/<int:run_id>'),
@@ -53,7 +53,8 @@ route_factory(app, docs,
         ('PredictorEventResource', 'predictor-events/<int:pe_id>'),
         ('UserResource', 'user'),
         ('UserPostResource', 'user'),
-
+        ('TaskResource', 'tasks/<int:task_id>'),
+        ('TaskListResource', 'tasks')
     ])
 
 @app.route('/')

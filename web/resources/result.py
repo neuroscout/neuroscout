@@ -1,6 +1,6 @@
 from marshmallow import Schema, fields
-from models.result import Result
 from flask_apispec import MethodResource, marshal_with, doc
+from models import Result
 
 class ResultSchema(Schema):
     id = fields.Str(dump_only=True)

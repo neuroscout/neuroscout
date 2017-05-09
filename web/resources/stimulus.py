@@ -1,6 +1,6 @@
 from marshmallow import Schema, fields
-from models.stimulus import Stimulus
 from flask_apispec import MethodResource, marshal_with, doc
+from models import Stimulus
 
 class StimulusSchema(Schema):
     id = fields.Str(dump_only=True)
