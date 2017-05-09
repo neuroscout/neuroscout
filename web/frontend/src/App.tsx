@@ -3,15 +3,15 @@ import { Tabs, Row, Col, Layout, message } from 'antd';
 
 import './App.css';
 
-import { OverviewTab } from './Overview'
-import { PredictorsTab } from './Predictors'
-import { Store, Analysis } from './commontypes'
+import { OverviewTab } from './Overview';
+import { PredictorsTab } from './Predictors';
+import { Store, Analysis, Dataset, ApiDataset } from './commontypes';
 
 const { TabPane } = Tabs;
 const { Footer, Content } = Layout;
 
 // const logo = require('./logo.svg');
-const domainRoot = 'http://localhost:80'
+const domainRoot = 'http://localhost:80';
 const USERNAME = 'test2@test.com';
 const PASSWORD = 'password';
 
@@ -41,7 +41,7 @@ const getJwt = () => new Promise((resolve, reject) => {
   /* Returns an access token (JWT) as a promise, either straight from local 
      storage or by fetching from the server (/auth) with username/password and 
      caching it to local storage. */
-  const jwt = window.localStorage.getItem('jwt')
+  const jwt = window.localStorage.getItem('jwt');
   if (jwt) {
     resolve(jwt);
   }
@@ -56,14 +56,14 @@ const getJwt = () => new Promise((resolve, reject) => {
       .then((response) => {
         response.json().then((data: { access_token: string }) => {
           if (data.access_token) {
-            message.success('Authentication successful')
+            message.success('Authentication successful');
             window.localStorage.setItem('jwt', data.access_token);
             resolve(data.access_token);
           }
-        })
+        });
       })
       .catch(error => {
-        console.log('An error happened: ', error)
+        console.log('An error happened: ', error);
         message.error(error.toString());
       });
   }
@@ -77,10 +77,16 @@ const aFetch = (path: string, options?: object): Promise<any> => {
         'Content-type': 'application/json',
         'Authorization': 'JWT ' + jwt
       }
-    }, options)
+    }, options);
     return fetch(path, newOptions);
   });
-}
+};
+
+// Helper function to convert dataset object returned by /api/datasets to a normal shape
+const normalizeDataset = (d: ApiDataset): Dataset => {
+  const description = JSON.parse(d.description);
+  return {...description, id: d.id}
+};
 
 class App extends React.Component<{}, Store> {
   constructor(props) {
@@ -88,10 +94,11 @@ class App extends React.Component<{}, Store> {
     this.state = initializeStore();
     aFetch(domainRoot + '/api/datasets').then(response => {
       response.json().then(data => {
-        this.setState({ 'datasets': data })
-      })
+        const datasets: Dataset[] = data.map(d => normalizeDataset(d));
+        this.setState({ 'datasets': datasets });
+      });
     })
-      .catch(error => { message.error(error.toString()); })
+      .catch(error => { message.error(error.toString()); });
   }
 
   updateState = (attrName: keyof Store) => (value: any) => {
@@ -99,29 +106,29 @@ class App extends React.Component<{}, Store> {
      Main function to update application state. May split this up into
      smaller pieces of it gets too complex.
     */
-    let stateUpdate = {}
-    if (attrName == 'analysis') {
-      const updatedAnalysis: Analysis = value
-      if (updatedAnalysis.datasetId != this.state.analysis.datasetId) {
+    let stateUpdate = {};
+    if (attrName === 'analysis') {
+      const updatedAnalysis: Analysis = value;
+      if (updatedAnalysis.datasetId !== this.state.analysis.datasetId) {
         // If a new dataset is selected we need to fetch the associated runs
         aFetch(`${domainRoot}/api/runs?dataset=${updatedAnalysis.datasetId}`)
           .then(response => {
             response.json().then(data => {
               this.setState({ availableRuns: data });
-            })
+            });
           })
-          .catch(error => { console.log(error); })
+          .catch(error => { console.log(error); });
       }
-      if (updatedAnalysis.runIds.length != this.state.analysis.runIds.length) {
+      if (updatedAnalysis.runIds.length !== this.state.analysis.runIds.length) {
         // If there was any change in selection of runs, fetch the associated predictors
-        const runIds = updatedAnalysis.runIds.join(',')
+        const runIds = updatedAnalysis.runIds.join(',');
         aFetch(`${domainRoot}/api/predictors?runs=${runIds}`)
           .then(response => {
             response.json().then(data => {
-              this.setState({ availablePredictors: data })
-            })
+              this.setState({ availablePredictors: data });
+            });
           })
-          .catch(error => { console.log(error); })
+          .catch(error => { console.log(error); });
       }
       // Enable predictors tab only if the number of selected runs is greater than zero
       stateUpdate['predictorsActive'] = value.runIds.length > 0;
@@ -131,7 +138,7 @@ class App extends React.Component<{}, Store> {
   }
 
   render() {
-    const { predictorsActive, transformationsActive, contrastsActive, modelingActive, 
+    const { predictorsActive, transformationsActive, contrastsActive, modelingActive,
       reviewActive, analysis, datasets, availableRuns, availablePredictors } = this.state;
     return (
       <div className="App">
@@ -167,9 +174,9 @@ class App extends React.Component<{}, Store> {
                     />
                   </TabPane>
                   <TabPane tab="Transformations" key="3" disabled={!transformationsActive} />
-                  <TabPane tab="Contrasts" key="4" disabled={!contrastsActive}/>
-                  <TabPane tab="Modeling" key="5" disabled={!modelingActive}/>
-                  <TabPane tab="Review" key="6" disabled={!reviewActive}> 
+                  <TabPane tab="Contrasts" key="4" disabled={!contrastsActive} />
+                  <TabPane tab="Modeling" key="5" disabled={!modelingActive} />
+                  <TabPane tab="Review" key="6" disabled={!reviewActive}>
                     <p>
                       {JSON.stringify(analysis)}
                     </p>
@@ -193,7 +200,7 @@ class App extends React.Component<{}, Store> {
 
 const init = () => {
   window.localStorage.clear(); // Dev-only, will remove later once there is user/password prompt functionality
-}
+};
 
 init();
 export default App;

@@ -36,6 +36,14 @@ export class OverviewTab extends React.Component<OverviewTabProps, any>{
 
   render() {
     const { analysis, datasets, availableRuns } = this.props;
+
+    const datasetColumns = [
+      { title: 'Name', dataIndex: 'name' },
+      { title: 'Description', dataIndex: 'description' },
+      { title: 'Author', dataIndex: 'author' },
+      { title: 'URL', dataIndex: 'url'}
+    ]
+
     const columns = [
       { title: 'ID', dataIndex: 'id' },
       { title: 'Task', dataIndex: 'task' },
@@ -86,6 +94,11 @@ export class OverviewTab extends React.Component<OverviewTabProps, any>{
             onSelect={this.updateAnalysis('datasetId')}
           />
         </FormItem>
+        <RunTable 
+        columns={datasetColumns}
+        rowKey="id"
+        dataSource={datasets}
+        />
         {availableRuns.length > 0 &&
           <div>
             <p>Select runs:</p>

@@ -11,6 +11,8 @@ export interface Analysis {
 export interface Dataset {
   name: string;
   id: number;
+  author: string;
+  url: string;
 }
 
 export interface Run {
