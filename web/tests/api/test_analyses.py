@@ -10,8 +10,8 @@ def test_get(auth_client, add_analysis):
 	assert len(analysis_list) == 1
 
 	# Get first analysis
-	assert 'id' in decode_json(rv)[0]
-	first_analysis_id = decode_json(rv)[0]['id']
+	assert 'hash_id' in decode_json(rv)[0]
+	first_analysis_id = decode_json(rv)[0]['hash_id']
 
 	# Get first analysis by id
 	rv = auth_client.get('/api/analyses/{}'.format(first_analysis_id))
@@ -41,17 +41,17 @@ def test_post(auth_client, add_dataset):
 	assert rv.status_code == 200
 	rv_json = decode_json(rv)
 	assert type(rv_json) == dict
-	for field in ['dataset_id', 'name', 'description', 'id']:
+	for field in ['dataset_id', 'name', 'description', 'hash_id']:
 		assert field in rv_json
 
 	## Check db directly
-	assert Analysis.query.filter_by(id = rv_json['id']).count() == 1
-	assert Analysis.query.filter_by(id = rv_json['id']).one().name == 'some analysis'
+	assert Analysis.query.filter_by(hash_id = rv_json['hash_id']).count() == 1
+	assert Analysis.query.filter_by(hash_id = rv_json['hash_id']).one().name == 'some analysis'
 
-	## Re post analysis, check that id is greater
+	## Re post analysis, check that id is diffeent
 	rv_2 = auth_client.post('/api/analyses', data = test_analysis)
 	assert rv_2.status_code == 200
-	assert decode_json(rv_2)['id'] > decode_json(rv)['id']
+	assert decode_json(rv_2)['hash_id'] != decode_json(rv)['hash_id']
 
     ## Test incorrect post
 	dataset_id = decode_json(auth_client.get('/api/datasets'))[0]['id']

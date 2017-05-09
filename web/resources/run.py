@@ -1,18 +1,17 @@
 from marshmallow import Schema, fields
-from models import Run
 from flask_apispec import MethodResource, marshal_with, use_kwargs, doc
 import webargs as wa
+from models import Run
 
 class RunSchema(Schema):
 	id = fields.Int()
 	session = fields.Str(description='Session number')
 	subject = fields.Str(description='Subject id')
 	number = fields.Str(description='Run id')
-	task = fields.Str(description='Task name')
 	duration = fields.Number(description='Total run duration in seconds.')
-	task_description = fields.Dict(description='BIDS description of task (JSON).')
-	TR = fields.Number(description='Aquisition repetition time.')
 	dataset_id = fields.Int(description='Dataset run belongs to.')
+	task = fields.Nested('TaskSchema', only=['id', 'name'],
+                        description="Task id and name")
 
 class RunResource(MethodResource):
     @doc(tags=['run'], summary='Get run by id.')
@@ -27,8 +26,8 @@ class RunListResource(MethodResource):
                                         description='Session number(s).'),
         'number': wa.fields.DelimitedList(fields.Str(),
                                           description='Run number(s).'),
-        'task': wa.fields.DelimitedList(fields.Str(),
-                                        description='Task name(s).'),
+        'task_id': wa.fields.DelimitedList(fields.Int(),
+                                        description='Task id(s).'),
         'subject': wa.fields.DelimitedList(fields.Str(),
                                            description='Subject id(s).'),
         'dataset_id': wa.fields.Int(description='Dataset id.'),

@@ -14,6 +14,8 @@ class Dataset(db.Model):
 	predictors = db.relationship('Predictor', backref='dataset',
 	                             lazy='dynamic')
 
+	tasks = db.relationship('Task', backref='dataset')
+
 	@hybrid_property
 	def mimetypes(self):
 		""" List of mimetypes of stimuli in dataset """
@@ -21,11 +23,5 @@ class Dataset(db.Model):
 				for r, s in db.session.query(
 					Run, Stimulus).filter_by(
 						dataset_id=self.id).distinct('mimetype')]
-
-	@hybrid_property
-	def tasks(self):
-		""" List of tasks dataset """
-		return [r.task for r in self.runs.distinct('task')]
-
 
 	# Meta-data, such as preprocessed history, etc...

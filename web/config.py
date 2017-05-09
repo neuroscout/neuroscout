@@ -16,6 +16,7 @@ class Config(object):
     JWT_EXPIRATION_DELTA = datetime.timedelta(days=7)
     MIGRATIONS_DIR = 'migrations'
     APISPEC_SWAGGER_UI_URL = None
+    HASH_SALT = 'lksjdfkljsflkjdf'
 
 class DevelopmentConfig(Config):
     DEBUG = True

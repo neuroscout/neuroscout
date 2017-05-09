@@ -14,7 +14,7 @@ from pliers.graph import Graph
 
 from models import (Dataset, Run, Predictor, PredictorEvent,
                     Stimulus, RunStimulus, ExtractedFeature, ExtractedEvent,
-                    GroupPredictor, GroupPredictorValue)
+                    GroupPredictor, GroupPredictorValue, Task)
 
 import magic
 import nibabel as nib
@@ -50,6 +50,7 @@ def add_dataset(session, bids_path, task, replace=False, verbose=True, **kwargs)
     # Extract BIDS dataset info and store in dictionary
     description = json.load(open(
         os.path.join(bids_path, 'dataset_description.json'), 'r'))
+    description['URL'] = ''
     task_description = json.load(open(
         os.path.join(bids_path, 'task-{}_bold.json'.format(task)), 'r'))
 
@@ -65,6 +66,16 @@ def add_dataset(session, bids_path, task, replace=False, verbose=True, **kwargs)
             print("Dataset already in db.")
             return dataset_model.id
 
+    # Get or create task
+    # Get or create dataset model from mandatory arguments
+    task_model, new = db_utils.get_or_create(session, Task,
+                                                name=task,
+                                                dataset_id=dataset_model.id,
+                                                description=task_description)
+    if new:
+        dataset_model.task_description = task_description
+        session.commit()
+
     """ Parse every Run """
     for run_events in layout.get(task=task, type='events', **kwargs):
         if verbose:
@@ -73,15 +84,17 @@ def add_dataset(session, bids_path, task, replace=False, verbose=True, **kwargs)
 
         # Get entities
         entities = {entity : getattr(run_events, entity)
-                    for entity in ['session', 'task', 'subject']
+                    for entity in ['session', 'subject']
                     if entity in run_events._fields}
 
         """ Extract Run information """
         run_model, new = db_utils.get_or_create(session, Run,
                                                 dataset_id=dataset_model.id,
                                                 number=run_events.run,
+                                                task_id = task_model.id,
                                                 **entities)
         entities['run'] = run_events.run
+        entities['task'] = task_model.name
 
         # Get BOLD
         try:
@@ -90,9 +103,6 @@ def add_dataset(session, bids_path, task, replace=False, verbose=True, **kwargs)
             run_model.duration = img.shape[3] * img.header.get_zooms()[-1] / 1000
         except (nib.filebasedimages.ImageFileError, IndexError) as e:
             print("Error loading BOLD file, duration not loaded.")
-
-        run_model.task_description = task_description
-        run_model.TR = task_description['RepetitionTime']
 
         preprocs = layout.get(type='preproc', return_type='file', **entities)
 
@@ -259,7 +269,7 @@ def extract_features(session, bids_path, task, graph_spec, verbose=True, **kwarg
     """" Create Predictors from Extracted Features """
     # For all instances for stimuli in this task's runs
     task_runstimuli = RunStimulus.query.join(
-        Run).filter(Run.dataset_id == dataset_id and Run.task==task).all()
+        Run).filter(Run.dataset_id == dataset_id and Run.task.name==task).all()
     for rs in task_runstimuli:
         # For every feature extracted
         for ef_id in ef_model_ids:

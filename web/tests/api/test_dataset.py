@@ -18,7 +18,7 @@ def test_get_dataset(auth_client, add_dataset):
 	dataset = decode_json(rv)
 	assert first_dataset_id == dataset['id']
 	assert dataset['mimetypes'] == ['image/jpeg']
-	assert dataset['tasks'] == ['bidstest']
+	assert dataset['tasks'][0]['name'] == 'bidstest'
 	assert dataset['name'] == 'Test Dataset'
 
 	# Try getting nonexistent datset

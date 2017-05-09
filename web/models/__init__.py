@@ -9,6 +9,7 @@ from .predictor import Predictor, PredictorEvent
 from .result import Result
 from .run import Run, analysis_run
 from .stimulus import Stimulus, RunStimulus
+from .task import Task
 
 __all__ = [
     'Analysis',
@@ -29,5 +30,6 @@ __all__ = [
     'Run',
     'analysis_run',
     'Stimulus',
-    'RunStimulus'
+    'RunStimulus',
+    'Task'
 ]

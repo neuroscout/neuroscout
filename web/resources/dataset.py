@@ -1,19 +1,18 @@
 from flask_apispec import MethodResource, marshal_with, doc
 from marshmallow import Schema, fields
-
-from models.dataset import Dataset
-from .run import RunSchema
+from models import Dataset
 
 class DatasetSchema(Schema):
 	""" Dataset validation schema. """
 	id = fields.Int()
 	name = fields.Str(description='Dataset name')
-	description = fields.Str()
+	description = fields.Dict()
 	mimetypes = fields.List(fields.Str(),
                          description='Dataset mimetypes/modalities')
 	tasks = fields.List(fields.Str(),
                      description='Tasks in dataset runs.')
-	runs = fields.Nested(RunSchema, many=True, only='id')
+	runs = fields.Nested('RunSchema', many=True, only='id')
+	tasks = fields.Nested('TaskSchema', many=True, only=['id', 'name'])
 
 
 class DatasetResource(MethodResource):

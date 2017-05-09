@@ -5,10 +5,7 @@ from flask_apispec import MethodResource, marshal_with, use_kwargs, doc
 from marshmallow import Schema, fields, validates, ValidationError
 from models.auth import User
 from database import db
-from models.auth import user_datastore
-
-from .analysis import AnalysisSchema
-# from db_utils import put_record
+from models import user_datastore
 
 class UserSchema(Schema):
     name = fields.Str(required=True, description='User full name')
@@ -17,7 +14,7 @@ class UserSchema(Schema):
                           description='Password. Minimum 6 characters.')
     last_login_at = fields.DateTime(dump_only= True)
 
-    analyses = fields.Nested(AnalysisSchema, only='id',
+    analyses = fields.Nested('AnalysisSchema', only='id',
                              many=True, dump_only=True)
 
     @validates('email')
