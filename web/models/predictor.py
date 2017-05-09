@@ -8,7 +8,6 @@ class Predictor(db.Model):
 	)
 	id = db.Column(db.Integer, primary_key=True)
 	name = db.Column(db.Text, nullable=False)
-	short_description = db.Column(db.Text)
 	description = db.Column(db.Text) # Where to get this from?
 
 	dataset_id = db.Column(db.Integer, db.ForeignKey('dataset.id'), nullable=False)
@@ -17,14 +16,6 @@ class Predictor(db.Model):
 	predictor_events = db.relationship('PredictorEvent', backref='predictor',
 								lazy='dynamic')
 
-	# @hybrid_property
-	# def min(self):
-	#
-	# @hybrid_property
-	# def max(self):
-	#
-	# @hybrid_property
-	# def mean(self):
 
 class PredictorEvent(db.Model):
 	""" An event within a Predictor. Onset is relative to run. """
@@ -41,12 +32,6 @@ class PredictorEvent(db.Model):
 	predictor_id = db.Column(db.Integer, db.ForeignKey('predictor.id'),
 							nullable=False)
 
-# class PredictorDataset(db.Model):
+# class PredictorRun(db.Model):
 #     """ Predictor dataset association table """
-#     predictor_id = db.Column(db.Integer, db.ForeignKey('predictor.id'), primary_key=True)
-#     run_id = db.Column(db.Integer, db.ForeignKey('run.id'), primary_key=True)
-# 	# Cache a plot of the timecourse
 # 	# Run level Predictor diagnostics (cached) will go in here
-
-# PredictorRun table does not make sense since Run is tied to PredictorEvent now
-# Separate cache table?
