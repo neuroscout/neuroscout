@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 import os
-from flask import Flask, send_from_directory
+from flask import Flask, send_file
 from database import db
 
-app = Flask(__name__, static_url_path='', static_folder='frontend/build/')
+app = Flask(__name__)
 app.config.from_object(os.environ['APP_SETTINGS'])
 db.init_app(app)
 
@@ -19,7 +19,6 @@ jwt = JWT(app, authenticate, load_user)
 # Enable CORS
 from flask_cors import CORS
 cors = CORS(app, resources={r"/api/*": {"origins": "*"},
-                            r"/auth": {"origins": "*"},
                             r"/swagger/": {"origins": "*"}})
 
 # Setup API
@@ -55,6 +54,11 @@ route_factory(app, docs,
         ('UserPostResource', 'user'),
 
     ])
+
+@app.route('/')
+def index():
+    ''' Serve index '''
+    return send_file("frontend/build/index.html")
 
 if __name__ == '__main__':
     db.init_app(app)
