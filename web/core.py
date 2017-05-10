@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 import os
-from flask import Flask, render_template
+from flask import Flask, send_from_directory
 from database import db
 
-app = Flask(__name__)
+app = Flask(__name__, static_url_path='', static_folder='frontend/build/')
 app.config.from_object(os.environ['APP_SETTINGS'])
 db.init_app(app)
 
@@ -55,11 +55,6 @@ route_factory(app, docs,
         ('UserPostResource', 'user'),
 
     ])
-
-@app.route('/')
-def index():
-    ''' Serve SPA '''
-    return render_template('default.html')
 
 if __name__ == '__main__':
     db.init_app(app)
