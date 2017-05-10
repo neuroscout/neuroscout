@@ -9,8 +9,6 @@ from utils import hash_file, hash_str
 
 from bids.grabbids import BIDSLayout
 from bids.transform import BIDSEventCollection
-from pliers.stimuli import load_stims
-from pliers.graph import Graph
 
 from models import (Dataset, Run, Predictor, PredictorEvent,
                     Stimulus, RunStimulus, ExtractedFeature, ExtractedEvent,
@@ -195,6 +193,8 @@ def add_dataset(session, bids_path, task, replace=False, verbose=True, **kwargs)
     return dataset_model.id
 
 def extract_features(session, bids_path, task, graph_spec, verbose=True, **kwargs):
+    from pliers.stimuli import load_stims
+    from pliers.graph import Graph
     # Try to add dataset, will skip if already in
     dataset_id = add_dataset(session, bids_path, task, verbose=True)
 
