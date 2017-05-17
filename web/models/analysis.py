@@ -18,20 +18,21 @@ class Analysis(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     hash_id = db.Column(db.Text, unique=True)
 
-    name = db.Column(db.String, nullable=False)
+    name = db.Column(db.Text, nullable=False)
     description = db.Column(db.Text)
     data = db.Column(JSONB)
     filters = db.Column(JSONB) # List of filters used to select runs
     transformations = db.Column(JSONB)
     created_at = db.Column(db.DateTime, default=datetime.datetime.utcnow)
-    modified_at = db.Column(db.DateTime)
-    saved_count = db.Column(db.Integer)
-    status = db.Column(db.Text)
+    modified_at = db.Column(db.DateTime, default=datetime.datetime.utcnow)
+    saved_count = db.Column(db.Integer, default=0)
+    locked = db.Column(db.Boolean, default=False)
+    private = db.Column(db.Boolean, default=True)
 
     dataset_id = db.Column(db.Integer, db.ForeignKey('dataset.id'), nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     # If cloned, this is the parent analysis:
-    parent_id = db.Column(db.Integer, db.ForeignKey('analysis.id'))
+    parent_id = db.Column(db.Text, db.ForeignKey('analysis.hash_id'))
 
     results = db.relationship('Result', backref='analysis',
                                 lazy='dynamic')
@@ -43,10 +44,11 @@ class Analysis(db.Model):
                             backref='analysis')
 
     def clone(self):
-    	""" Make copy of analysis, with new id, and linking to parent """
-    	clone_row = copy_row(Analysis, self, ignored_columns='analysis.id')
-    	clone_row.parent = self.id
-    	return clone_row
+        """ Make copy of analysis, with new id, and linking to parent """
+        clone_row = copy_row(Analysis, self, ignored_columns='analysis.id')
+        clone_row.hash_id = None
+        clone_row.parent_id = self.hash_id
+        return clone_row
 
 @listens_for(Analysis, "after_insert")
 def update_hash(mapper, connection, target):

@@ -1,21 +1,22 @@
-from flask_apispec import MethodResource, marshal_with, use_kwargs, doc
-from flask_jwt import jwt_required, current_identity
+from flask_apispec import MethodResource, marshal_with, use_kwargs, doc, Ref
+from flask_jwt import current_identity
 from marshmallow import Schema, fields, validates, ValidationError
 from database import db
 from models import Analysis, Dataset
-from hashids import Hashids
-from flask import current_app
+from .utils import auth_required, abort
 
 class AnalysisSchema(Schema):
 	hash_id = fields.Str(dump_only=True, description='Hashed analysis id.')
 	name = fields.Str(required=True, description='Analysis name.')
 	dataset_id = fields.Int(required=True)
 
-	status = fields.Str(description='Analysis completeness status.')
+	locked = fields.Bool(description='Analysis editable?', dump_only=True)
+	private = fields.Bool(description='Analysis private or discoverable?')
+
 	transformations = fields.Dict(description='Transformation json spec.')
 	description = fields.Str()
 	data = fields.Dict()
-	parent = fields.Nested('AnalysisSchema', only='id', dump_only=True,
+	parent_id = fields.Str(dump_only=True,
                         description="Parent analysis, if cloned.")
 
 
@@ -40,29 +41,48 @@ class AnalysisSchema(Schema):
 	class Meta:
 		strict = True
 
+@doc(tags=['analysis'])
+@marshal_with(Ref('schema'))
+class AnalysisBaseResource(MethodResource):
+	schema = AnalysisSchema
 
-class AnalysisResource(MethodResource):
-    @doc(tags=['analysis'], summary='Get analysis by hash id.')
-    @marshal_with(AnalysisSchema)
+class AnalysisListResource(AnalysisBaseResource):
+	schema = AnalysisSchema(many=True)
+	@doc(summary='Returns list of analyses.')
+	def get(self):
+		return Analysis.query.all()
+
+
+class AnalysisResource(AnalysisBaseResource):
+    @doc(summary='Get analysis by id.')
     def get(self, analysis_id):
     	return Analysis.query.filter_by(hash_id=analysis_id).first_or_404()
 
-class AnalysisListResource(MethodResource):
-    @doc(tags=['analysis'], summary='Returns list of analyses.')
-    @marshal_with(AnalysisSchema(many=True))
-    def get(self):
-    	return Analysis.query.all()
 
-class AnalysisPostResource(MethodResource):
-	@doc(params={"authorization": {
-	    "in": "header", "required": True,
-	    "description": "Format:  JWT {authorization_token}"}})
-	@jwt_required()
-	@doc(tags=['analysis'], summary='Add a new analysis.')
-	@marshal_with(AnalysisSchema)
+class CreateAnalysisResource(AnalysisBaseResource):
+	@doc(summary='Add new analysis.')
 	@use_kwargs(AnalysisSchema)
+	@auth_required
 	def post(self, **kwargs):
 		new = Analysis(user_id = current_identity.id, **kwargs)
 		db.session.add(new)
 		db.session.commit()
 		return new
+
+class CloneAnalysisResource(AnalysisBaseResource):
+	@doc(summary='Clone analysis.')
+	@auth_required
+	def post(self, analysis_id):
+		original = Analysis.query.filter_by(hash_id=analysis_id).first_or_404()
+		# if original.locked is False:
+		# 	abort(422, "Only locked analyses can be cloned")
+		# else:
+		cloned = original.clone()
+		db.session.add(cloned)
+		db.session.commit()
+		print(cloned.hash_id)
+		return cloned
+		### YOU CAN ONLY CLONE COMPLTE add_analyses
+
+#PUT
+## End point for "submitting analysis"

@@ -1,5 +1,7 @@
 from models.auth import user_datastore
 from flask_security.utils import verify_password
+from flask_jwt import jwt_required
+from flask_apispec import doc
 
 # JWT Token authentication
 def authenticate(username, password):
