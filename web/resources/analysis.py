@@ -42,9 +42,9 @@ class AnalysisSchema(Schema):
 		strict = True
 
 @doc(tags=['analysis'])
-@marshal_with(Ref('schema'))
+@marshal_with(AnalysisSchema)
 class AnalysisBaseResource(MethodResource):
-	schema = AnalysisSchema
+	pass
 
 class AnalysisRootResource(AnalysisBaseResource):
 	@marshal_with(AnalysisSchema(many=True))
