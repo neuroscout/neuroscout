@@ -47,11 +47,13 @@ class AnalysisBaseResource(MethodResource):
 	pass
 
 class AnalysisRootResource(AnalysisBaseResource):
+	"""" Resource for root address """
 	@marshal_with(AnalysisSchema(many=True))
-	@doc(summary='Returns list of analyses.')
+	@doc(summary='Returns list of public analyses.')
 	def get(self):
-		return Analysis.query.all()
+		return Analysis.query.filter_by(private=False).all()
 
+	# ### ADD 201 + location header
 	@doc(summary='Add new analysis.')
 	@use_kwargs(AnalysisSchema)
 	@auth_required
@@ -65,9 +67,6 @@ class AnalysisResource(AnalysisBaseResource):
     @doc(summary='Get analysis by id.')
     def get(self, analysis_id):
     	return Analysis.query.filter_by(hash_id=analysis_id).first_or_404()
-
-# ### ADD 201 + location header
-# class CreateAnalysisResource(AnalysisBaseResource):
 
 
 ### ADD 201 + location header

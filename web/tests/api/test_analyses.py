@@ -1,13 +1,25 @@
 from tests.request_utils import decode_json
 from models.analysis import Analysis
 
-def test_get(auth_client, add_analysis):
+def test_get(session, auth_client, add_analysis):
 	# List of analyses
 	rv = auth_client.get('/api/analyses')
 	assert rv.status_code == 200
 	analysis_list = decode_json(rv)
 	assert type(analysis_list) == list
-	assert len(analysis_list) == 1
+	assert len(analysis_list) == 0 # Analysis is private by default
+
+	# Make analysis public
+	analysis  = Analysis.query.filter_by(id=add_analysis).first()
+	analysis.private = False
+	session.commit()
+
+	# List of analyses
+	rv = auth_client.get('/api/analyses')
+	assert rv.status_code == 200
+	analysis_list = decode_json(rv)
+	assert type(analysis_list) == list
+	assert len(analysis_list) == 1 # Analysis should now be public
 
 	# Get first analysis
 	assert 'hash_id' in decode_json(rv)[0]
@@ -92,4 +104,5 @@ def test_clone(auth_client, add_dataset):
 	# assert analysis['hash_id'] != analysis_id
 
 def test_put():
+	### Add test of getting non private
 	pass
