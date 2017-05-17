@@ -1,4 +1,4 @@
-from flask_jwt import jwt_required, current_identity
+from flask_jwt import current_identity
 from flask_security.utils import encrypt_password
 
 from flask_apispec import MethodResource, marshal_with, use_kwargs, doc
@@ -6,6 +6,7 @@ from marshmallow import Schema, fields, validates, ValidationError
 from models.auth import User
 from database import db
 from models import user_datastore
+from .utils import auth_required
 
 class UserSchema(Schema):
     name = fields.Str(required=True, description='User full name')
@@ -30,19 +31,15 @@ class UserSchema(Schema):
     class Meta:
         strict = True
 
-class UserResource(MethodResource):
-    @doc(tags=['auth'], summary='Get current user information.')
-    @marshal_with(UserSchema)
-    @doc(params={"authorization": {
-        "in": "header", "required": True,
-        "description": "Format:  JWT {authorization_token}"}})
-    @jwt_required()
+@doc(tags=['auth'])
+@marshal_with(UserSchema)
+class UserRootResource(MethodResource):
+    @doc(summary='Get current user information.')
+    @auth_required
     def get(self):
     	return current_identity
 
-class UserPostResource(MethodResource):
-    @doc(tags=['auth'], summary='Add a new user.')
-    @marshal_with(UserSchema)
+    @doc(summary='Add a new user.')
     @use_kwargs(UserSchema)
     def post(self, **kwargs):
         kwargs['password']= encrypt_password(kwargs['password'])

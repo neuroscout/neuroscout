@@ -46,20 +46,12 @@ class AnalysisSchema(Schema):
 class AnalysisBaseResource(MethodResource):
 	schema = AnalysisSchema
 
-class AnalysisListResource(AnalysisBaseResource):
-	schema = AnalysisSchema(many=True)
+class AnalysisRootResource(AnalysisBaseResource):
+	@marshal_with(AnalysisSchema(many=True))
 	@doc(summary='Returns list of analyses.')
 	def get(self):
 		return Analysis.query.all()
 
-
-class AnalysisResource(AnalysisBaseResource):
-    @doc(summary='Get analysis by id.')
-    def get(self, analysis_id):
-    	return Analysis.query.filter_by(hash_id=analysis_id).first_or_404()
-
-
-class CreateAnalysisResource(AnalysisBaseResource):
 	@doc(summary='Add new analysis.')
 	@use_kwargs(AnalysisSchema)
 	@auth_required
@@ -69,20 +61,40 @@ class CreateAnalysisResource(AnalysisBaseResource):
 		db.session.commit()
 		return new
 
+class AnalysisResource(AnalysisBaseResource):
+    @doc(summary='Get analysis by id.')
+    def get(self, analysis_id):
+    	return Analysis.query.filter_by(hash_id=analysis_id).first_or_404()
+
+# ### ADD 201 + location header
+# class CreateAnalysisResource(AnalysisBaseResource):
+
+
+### ADD 201 + location header
 class CloneAnalysisResource(AnalysisBaseResource):
 	@doc(summary='Clone analysis.')
 	@auth_required
 	def post(self, analysis_id):
 		original = Analysis.query.filter_by(hash_id=analysis_id).first_or_404()
-		# if original.locked is False:
-		# 	abort(422, "Only locked analyses can be cloned")
-		# else:
-		cloned = original.clone()
-		db.session.add(cloned)
-		db.session.commit()
-		print(cloned.hash_id)
-		return cloned
-		### YOU CAN ONLY CLONE COMPLTE add_analyses
+		if original.locked is False:
+			abort(422, "Only locked analyses can be cloned")
+		else:
+			cloned = original.clone()
+			db.session.add(cloned)
+			db.session.commit()
+			return cloned
 
+# class EditAnalysisResource(AnalysisBaseResource):
+# 	@doc(summary='Edit analysis.')
+# 	@auth_required
+# 	def put(self, analysis_id):
+# 		analysis = Analysis.query.filter_by(hash_id=analysis_id).first_or_404()
+# 		if analysis.locked is True:
+# 			abort(422, "Analysis is not editable. Try cloning it.")
+# 		else:
+# 			cloned = original.clone()
+# 			db.session.add(cloned)
+# 			db.session.commit()
+# 			return cloned
 #PUT
 ## End point for "submitting analysis"

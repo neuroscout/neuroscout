@@ -85,9 +85,11 @@ def test_clone(auth_client, add_dataset):
 
 	# Clone analysis by id
 	rv = auth_client.post('/api/analyses/{}/clone'.format(analysis_id))
-	assert rv.status_code == 200
-	analysis = decode_json(rv)
-	assert analysis['hash_id'] != analysis_id
+	assert rv.status_code == 422
+
+	# PUT to uneditable and try again
+	# analysis = decode_json(rv)
+	# assert analysis['hash_id'] != analysis_id
 
 def test_put():
 	pass

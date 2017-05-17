@@ -1,8 +1,8 @@
 ''' Resources. '''
 
 from .analysis import (AnalysisSchema, AnalysisResource,
-                       AnalysisListResource, CreateAnalysisResource,
-                       CloneAnalysisResource)
+                       AnalysisRootResource, CloneAnalysisResource,
+                       )
 from .dataset import DatasetSchema, DatasetResource, DatasetListResource
 from .predictor import (PredictorEventSchema, PredictorSchema,
                         PredictorListResource, PredictorResource,
@@ -10,14 +10,13 @@ from .predictor import (PredictorEventSchema, PredictorSchema,
 from .result import ResultSchema, ResultResource
 from .run import RunSchema, RunResource, RunListResource
 from .stimulus import StimulusSchema, StimulusResource
-from .user import UserSchema, UserResource, UserPostResource
+from .user import UserSchema, UserRootResource
 from .task import TaskSchema, TaskResource, TaskListResource
 
 __all__ = [
     'AnalysisSchema',
     'AnalysisResource',
-    'AnalysisListResource',
-    'CreateAnalysisResource',
+    'AnalysisRootResource',
     'CloneAnalysisResource',
     'DatasetSchema',
     'DatasetResource',
