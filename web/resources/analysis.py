@@ -5,7 +5,7 @@ from database import db
 from db_utils import put_record
 from models import Analysis, Dataset
 from . import utils
-
+import datetime
 
 class AnalysisSchema(Schema):
 	hash_id = fields.Str(dump_only=True, description='Hashed analysis id.')
@@ -15,7 +15,9 @@ class AnalysisSchema(Schema):
 	modified_at = fields.Time(dump_only=True)
 	user_id = fields.Int(dump_only=True)
 
-	locked = fields.Bool(description='Analysis editable?', dump_only=True)
+	locked = fields.Bool(description='Analysis editable?')
+	locked_at = fields.Time(description='Timestamp of when analysis was locked',
+							dump_only=True)
 	private = fields.Bool(description='Analysis private or discoverable?')
 
 	transformations = fields.Dict(description='Transformation json spec.')
@@ -81,6 +83,9 @@ class AnalysisResource(AnalysisBaseResource):
 		if analysis.locked is True:
 			utils.abort(422, "Analysis is not editable. Try cloning it.")
 		else:
+			if kwargs['locked'] > analysis.locked:
+				kwargs['locked_at'] = datetime.datetime.utcnow()
+				### Add other triggers here
 			return put_record(db.session, kwargs, analysis)
 
 

@@ -27,6 +27,7 @@ class Analysis(db.Model):
     modified_at = db.Column(db.DateTime, default=datetime.datetime.utcnow)
     saved_count = db.Column(db.Integer, default=0)
     locked = db.Column(db.Boolean, default=False)
+    locked_at = db.Column(db.DateTime)
     private = db.Column(db.Boolean, default=True)
 
     dataset_id = db.Column(db.Integer, db.ForeignKey('dataset.id'), nullable=False)

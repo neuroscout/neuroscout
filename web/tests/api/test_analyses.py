@@ -112,3 +112,17 @@ def test_put(auth_client, add_analysis):
 	assert resp.status_code == 200
 	new_analysis = decode_json(resp)
 	assert new_analysis['name'] == "NEW NAME!"
+
+	# Test locking
+	new_analysis['locked'] = True
+	resp = auth_client.put('/api/analyses/{}'.format(analysis.hash_id),
+						data=new_analysis)
+	assert resp.status_code == 200
+	locked_analysis = decode_json(resp)
+	assert locked_analysis['locked'] == True
+	assert locked_analysis['locked_at'] != ''
+
+	locked_analysis['name'] = 'New name should not be allowed'
+	resp = auth_client.put('/api/analyses/{}'.format(analysis.hash_id),
+						data=locked_analysis)
+	assert resp.status_code == 422
