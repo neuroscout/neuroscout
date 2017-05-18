@@ -10,7 +10,7 @@ from utils import hash_file, hash_str
 from bids.grabbids import BIDSLayout
 from bids.transform import BIDSEventCollection
 
-from models import (Dataset, Run, Predictor, PredictorEvent,
+from models import (Dataset, Run, Predictor, PredictorEvent, PredictorRun,
                     Stimulus, RunStimulus, ExtractedFeature, ExtractedEvent,
                     GroupPredictor, GroupPredictorValue, Task)
 
@@ -36,6 +36,11 @@ def add_predictor(session, predictor_name, dataset_id, run_id,
         pe.duration = durations[i]
         pe.value = str(val)
         session.commit()
+
+    # Add PredictorRun
+    pr, _ = db_utils.get_or_create(session, PredictorRun,
+                                   predictor_id=predictor.id,
+                                   run_id = run_id)
 
     return predictor.id
 
@@ -65,7 +70,6 @@ def add_dataset(session, bids_path, task, replace=False, verbose=True, **kwargs)
             return dataset_model.id
 
     # Get or create task
-    # Get or create dataset model from mandatory arguments
     task_model, new = db_utils.get_or_create(session, Task,
                                                 name=task,
                                                 dataset_id=dataset_model.id,

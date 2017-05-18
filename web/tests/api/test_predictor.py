@@ -6,15 +6,16 @@ def test_get_predictor(auth_client, add_dataset):
     pred_list = decode_json(resp)
     assert type(pred_list) == list
 
-    # Get first predictors
-    first_pred_id = pred_list[0]['id']
+    # Get second predictors
+    second_pred_id = pred_list[1]['id']
     assert 'name' in pred_list[0]
 
-    # Get first predictors by id
-    resp = auth_client.get('/api/predictors/{}'.format(first_pred_id))
-    assert resp.status_code == 200
-    pred = decode_json(resp)
-    assert first_pred_id == pred['id']
+
+    rv = auth_client.get('/api/predictors/{}'.format(second_pred_id))
+    assert rv.status_code == 200
+    pred = decode_json(rv)
+    assert second_pred_id == pred['id']
+    assert pred['run_statistics'][0]['mean'] == 167.25
 
     # Try getting nonexistent predictor
     resp = auth_client.get('/api/predictors/{}'.format('123'))

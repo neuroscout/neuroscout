@@ -35,8 +35,12 @@ def test_dataset_ingestion(session, add_dataset):
 
 	assert 'rt' in [p.name for p in Predictor.query.all()]
 
-	predictor = dataset_model.predictors.first()
+	predictor = Predictor.query.filter_by(name='rt').first()
 	assert predictor.predictor_events.count() == 16
+
+	# Test run summary statistics
+	assert len(predictor.run_statistics) == 4
+	assert predictor.run_statistics[0].mean == 167.25
 
 	# Test predictor event
 	predictor_event = predictor.predictor_events.first()

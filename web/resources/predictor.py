@@ -5,16 +5,23 @@ from models import Predictor, PredictorEvent
 from . import utils
 
 """ Predictors """
+class PredictorRunSchema(Schema):
+	run_id = fields.Int()
+	mean = fields.Number()
+	stdev = fields.Number()
+
 class PredictorSchema(Schema):
-	id = fields.Str(dump_only=True)
-	name = fields.Str(dump_only=True, description="Predictor name.")
-	description = fields.Str(dump_only=True)
-	ef_id = fields.Int(dump_only=True,
-                    description="If predictor was generated, id of linked extractor feature.")
+	id = fields.Str()
+	name = fields.Str(description="Predictor name.")
+	description = fields.Str()
+	ef_id = fields.Int(description="Original extracted feature id.")
+
+class PredictorSingleSchema(PredictorSchema):
+	run_statistics = fields.Nested('PredictorRunSchema', many=True)
 
 class PredictorResource(MethodResource):
     @doc(tags=['predictors'], summary='Get predictor by id.')
-    @marshal_with(PredictorSchema)
+    @marshal_with(PredictorSingleSchema)
     def get(self, predictor_id):
         return utils.first_or_404(Predictor.query.filter_by(id=predictor_id))
 
