@@ -6,7 +6,7 @@ from marshmallow import Schema, fields, validates, ValidationError
 from models.auth import User
 from database import db
 from models import user_datastore
-from .utils import auth_required
+from . import utils
 
 class UserSchema(Schema):
     name = fields.Str(required=True, description='User full name')
@@ -35,7 +35,7 @@ class UserSchema(Schema):
 @marshal_with(UserSchema)
 class UserRootResource(MethodResource):
     @doc(summary='Get current user information.')
-    @auth_required
+    @utils.auth_required
     def get(self):
     	return current_identity
 

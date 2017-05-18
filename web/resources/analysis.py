@@ -2,8 +2,10 @@ from flask_apispec import MethodResource, marshal_with, use_kwargs, doc
 from flask_jwt import current_identity
 from marshmallow import Schema, fields, validates, ValidationError
 from database import db
+from db_utils import put_record
 from models import Analysis, Dataset
-from .utils import auth_required, abort
+from . import utils
+
 
 class AnalysisSchema(Schema):
 	hash_id = fields.Str(dump_only=True, description='Hashed analysis id.')
@@ -58,7 +60,7 @@ class AnalysisRootResource(AnalysisBaseResource):
 	# ### ADD 201 + location header
 	@doc(summary='Add new analysis.')
 	@use_kwargs(AnalysisSchema)
-	@auth_required
+	@utils.auth_required
 	def post(self, **kwargs):
 		new = Analysis(user_id = current_identity.id, **kwargs)
 		db.session.add(new)
@@ -68,30 +70,29 @@ class AnalysisRootResource(AnalysisBaseResource):
 class AnalysisResource(AnalysisBaseResource):
 	@doc(summary='Get analysis by id.')
 	def get(self, analysis_id):
-		return Analysis.query.filter_by(hash_id=analysis_id).first_or_404()
+		return utils.first_or_404(Analysis.query.filter_by(hash_id=analysis_id))
 
 	@doc(summary='Edit analysis.')
 	@use_kwargs(AnalysisSchema)
-	@auth_required
+	@utils.auth_required
 	def put(self, analysis_id, **kwargs):
-		analysis = Analysis.query.filter_by(hash_id=analysis_id).first_or_404()
+		analysis = utils.first_or_404(
+			Analysis.query.filter_by(hash_id=analysis_id))
 		if analysis.locked is True:
-			abort(422, "Analysis is not editable. Try cloning it.")
+			utils.abort(422, "Analysis is not editable. Try cloning it.")
 		else:
-			assert 0
-			# cloned = original.clone()
-			# db.session.add(cloned)
-			# db.session.commit()
-			return cloned
+			return put_record(db.session, kwargs, analysis)
+
 
 ### ADD 201 + location header
 class CloneAnalysisResource(AnalysisBaseResource):
 	@doc(summary='Clone analysis.')
-	@auth_required
+	@utils.auth_required
 	def post(self, analysis_id):
-		original = Analysis.query.filter_by(hash_id=analysis_id).first_or_404()
+		original = utils.first_or_404(
+			Analysis.query.filter_by(hash_id=analysis_id))
 		if original.locked is False:
-			abort(422, "Only locked analyses can be cloned")
+			utils.abort(422, "Only locked analyses can be cloned")
 		else:
 			cloned = original.clone()
 			db.session.add(cloned)

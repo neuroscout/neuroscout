@@ -20,9 +20,9 @@ class Analysis(db.Model):
 
     name = db.Column(db.Text, nullable=False)
     description = db.Column(db.Text)
-    data = db.Column(JSONB)
+    data = db.Column(JSONB, default={})
     filters = db.Column(JSONB) # List of filters used to select runs
-    transformations = db.Column(JSONB)
+    transformations = db.Column(JSONB, default={})
     created_at = db.Column(db.DateTime, default=datetime.datetime.utcnow)
     modified_at = db.Column(db.DateTime, default=datetime.datetime.utcnow)
     saved_count = db.Column(db.Integer, default=0)

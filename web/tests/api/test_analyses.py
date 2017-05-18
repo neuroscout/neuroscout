@@ -1,5 +1,5 @@
 from tests.request_utils import decode_json
-from models.analysis import Analysis
+from models import Analysis
 
 def test_get(session, auth_client, add_analysis):
 	# List of analyses
@@ -74,7 +74,7 @@ def test_post(auth_client, add_dataset):
 
 	resp= auth_client.post('/api/analyses', data = bad_post)
 	assert resp.status_code == 422
-	# assert decode_json(resp)['errors']['dataset_id'][0] == 'Invalid dataset id.'
+	assert decode_json(resp)['message']['dataset_id'][0] == 'Invalid dataset id.'
 
 	bad_post_2 = {
 	"dataset_id" : dataset_id,
@@ -83,7 +83,7 @@ def test_post(auth_client, add_dataset):
 
 	resp= auth_client.post('/api/analyses', data = bad_post_2)
 	assert resp.status_code == 422
-	# assert decode_json(resp)['errors']['name'][0] == 'Missing data for required field.'
+	assert decode_json(resp)['message']['name'][0] == 'Missing data for required field.'
 
 def test_clone(session, auth_client, add_dataset, add_analysis):
 	analysis  = Analysis.query.filter_by(id=add_analysis).first()
@@ -105,7 +105,10 @@ def test_put(auth_client, add_analysis):
 	analysis_json = decode_json(
 		auth_client.get('/api/analyses/{}'.format(analysis.hash_id)))
 
-	resp = auth_client.put('/api/analyses/{}'.format(analysis.hash_id),
-						data={"name":"new_name"})
+	analysis_json['name'] = 'NEW NAME!'
 
-	assert 0
+	resp = auth_client.put('/api/analyses/{}'.format(analysis.hash_id),
+						data=analysis_json)
+	assert resp.status_code == 200
+	new_analysis = decode_json(resp)
+	assert new_analysis['name'] == "NEW NAME!"
