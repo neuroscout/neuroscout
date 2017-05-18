@@ -4,12 +4,6 @@ from flask_apispec import MethodResource, marshal_with, use_kwargs, doc
 from models import Predictor, PredictorEvent
 from . import utils
 
-""" Predictors """
-class PredictorRunSchema(Schema):
-	run_id = fields.Int()
-	mean = fields.Number()
-	stdev = fields.Number()
-
 class PredictorSchema(Schema):
 	id = fields.Str()
 	name = fields.Str(description="Predictor name.")
@@ -19,11 +13,24 @@ class PredictorSchema(Schema):
 class PredictorSingleSchema(PredictorSchema):
 	run_statistics = fields.Nested('PredictorRunSchema', many=True)
 
+class PredictorEventSchema(Schema):
+	id = fields.Str()
+	onset = fields.Number(description="Onset in seconds.")
+	duration = fields.Number(description="Duration in seconds.")
+	value = fields.Number(description="Value, or amplitude.")
+	run_id = fields.Int()
+	predictor_id = fields.Int()
+
+class PredictorRunSchema(Schema):
+	run_id = fields.Int()
+	mean = fields.Number()
+	stdev = fields.Number()
+
 class PredictorResource(MethodResource):
-    @doc(tags=['predictors'], summary='Get predictor by id.')
-    @marshal_with(PredictorSingleSchema)
-    def get(self, predictor_id):
-        return utils.first_or_404(Predictor.query.filter_by(id=predictor_id))
+	@doc(tags=['predictors'], summary='Get predictor by id.')
+	@marshal_with(PredictorSingleSchema)
+	def get(self, predictor_id, **kwargs):
+		return utils.first_or_404(Predictor.query.filter_by(id=predictor_id))
 
 class PredictorListResource(MethodResource):
 	@doc(tags=['predictors'], summary='Get list of predictors.',)
@@ -32,8 +39,7 @@ class PredictorListResource(MethodResource):
 	    'run_id': wa.fields.DelimitedList(fields.Int(),
 	                                      description="Run id(s)"),
 	    'name': wa.fields.DelimitedList(fields.Str(),
-	                                    description="Predictor name(s)"),
-	}, locations=['query'])
+	                                    description="Predictor name(s)"),	}, locations=['query'])
 	def get(self, **kwargs):
 		# Get Predictors that match up to specified runs
 		if 'run_id' in kwargs:
@@ -48,36 +54,17 @@ class PredictorListResource(MethodResource):
 
 		return query.all()
 
-""" PredictorEvents """
-class PredictorEventSchema(Schema):
-    id = fields.Str(dump_only=True)
-    onset = fields.Number(dump_only=True, description="Onset in seconds.")
-    duration = fields.Number(dump_only=True, description="Duration in seconds.")
-    value = fields.Number(dump_only=True, description="Value, or amplitude.")
-    run_id = fields.Int(dump_only=True)
-    predictor_id = fields.Int(dump_only=True)
-
-
-class PredictorEventResource(MethodResource):
-    @doc(tags=['predictors'], summary='Get predictor event by id.')
-    @marshal_with(PredictorEventSchema)
-    def get(self, pe_id):
-        return utils.first_or_404(PredictorEvent.query.filter_by(id=pe_id))
-
 class PredictorEventListResource(MethodResource):
-    @doc(tags=['predictors'], summary='Get list of predictor events.',)
-    @marshal_with(PredictorEventSchema(many=True))
-    @use_kwargs({
-        'run_id': wa.fields.DelimitedList(fields.Int(),
-                                          description="Run id(s)",
-                                          missing=[]),
-        'name': wa.fields.Str(description="Predictor name",
-                             load_from="predictor_name",
-                             missing=''),
-    }, locations=['query'])
-    def get(self, **kwargs):
-        query = PredictorEvent.query.filter(
-            PredictorEvent.run_id.in_(kwargs['run_id'])).join(
-                'predictor').filter_by(name=kwargs['name'])
-
-        return query.all()
+	@doc(tags=['predictors'], summary='Get events for predictor(s)',)
+	@marshal_with(PredictorEventSchema(many=True))
+	@use_kwargs({
+	    'run_id': wa.fields.DelimitedList(fields.Int(),
+	                                      description="Run id(s)"),
+	    'predictor_id': wa.fields.DelimitedList(fields.Int(),
+	                                    description="Predictor id(s)"),
+	}, locations=['query'])
+	def get(self, **kwargs):
+		query = PredictorEvent.query
+		for param in kwargs:
+			query = query.filter(getattr(PredictorEvent, param).in_(kwargs[param]))
+		return query.all()

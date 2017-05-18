@@ -50,7 +50,6 @@ route_factory(app, docs,
         ('PredictorListResource', 'predictors'),
         ('PredictorResource', 'predictors/<int:predictor_id>'),
         ('PredictorEventListResource', 'predictor-events'),
-        ('PredictorEventResource', 'predictor-events/<int:pe_id>'),
         ('UserRootResource', 'user'),
         ('TaskResource', 'tasks/<int:task_id>'),
         ('TaskListResource', 'tasks')

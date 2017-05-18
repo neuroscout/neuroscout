@@ -6,7 +6,7 @@ from .analysis import (AnalysisSchema, AnalysisResource,
 from .dataset import DatasetSchema, DatasetResource, DatasetListResource
 from .predictor import (PredictorEventSchema, PredictorSchema,
                         PredictorListResource, PredictorResource,
-                        PredictorEventResource, PredictorEventListResource)
+                        PredictorEventListResource)
 from .result import ResultSchema, ResultResource
 from .run import RunSchema, RunResource, RunListResource
 from .stimulus import StimulusSchema, StimulusResource
@@ -25,7 +25,6 @@ __all__ = [
     'PredictorSchema',
     'PredictorResource',
     'PredictorListResource',
-    'PredictorEventResource',
     'PredictorEventListResource',
     'ResultSchema',
     'ResultResource',

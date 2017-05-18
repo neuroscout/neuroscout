@@ -59,7 +59,7 @@ class AnalysisRootResource(AnalysisBaseResource):
 	def get(self):
 		return Analysis.query.filter_by(private=False).all()
 
-	# ### ADD 201 + location header
+	@marshal_with(AnalysisSchema, code='201')
 	@doc(summary='Add new analysis.')
 	@use_kwargs(AnalysisSchema)
 	@utils.auth_required
@@ -88,9 +88,8 @@ class AnalysisResource(AnalysisBaseResource):
 				### Add other triggers here
 			return put_record(db.session, kwargs, analysis)
 
-
-### ADD 201 + location header
 class CloneAnalysisResource(AnalysisBaseResource):
+	@marshal_with(AnalysisSchema, code='201')
 	@doc(summary='Clone analysis.')
 	@utils.auth_required
 	def post(self, analysis_id):
