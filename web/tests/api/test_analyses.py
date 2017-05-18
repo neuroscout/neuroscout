@@ -3,9 +3,9 @@ from models.analysis import Analysis
 
 def test_get(session, auth_client, add_analysis):
 	# List of analyses
-	rv = auth_client.get('/api/analyses')
-	assert rv.status_code == 200
-	analysis_list = decode_json(rv)
+	resp= auth_client.get('/api/analyses')
+	assert resp.status_code == 200
+	analysis_list = decode_json(resp)
 	assert type(analysis_list) == list
 	assert len(analysis_list) == 0 # Analysis is private by default
 
@@ -15,29 +15,29 @@ def test_get(session, auth_client, add_analysis):
 	session.commit()
 
 	# List of analyses
-	rv = auth_client.get('/api/analyses')
-	assert rv.status_code == 200
-	analysis_list = decode_json(rv)
+	resp= auth_client.get('/api/analyses')
+	assert resp.status_code == 200
+	analysis_list = decode_json(resp)
 	assert type(analysis_list) == list
 	assert len(analysis_list) == 1 # Analysis should now be public
 
 	# Get first analysis
-	assert 'hash_id' in decode_json(rv)[0]
-	first_analysis_id = decode_json(rv)[0]['hash_id']
+	assert 'hash_id' in decode_json(resp)[0]
+	first_analysis_id = decode_json(resp)[0]['hash_id']
 
 	# Get first analysis by id
-	rv = auth_client.get('/api/analyses/{}'.format(first_analysis_id))
-	assert rv.status_code == 200
-	analysis = decode_json(rv)
+	resp= auth_client.get('/api/analyses/{}'.format(first_analysis_id))
+	assert resp.status_code == 200
+	analysis = decode_json(resp)
 	assert analysis_list[0] == analysis
 
 	for required_fields in ['name', 'description']:
 		assert analysis[required_fields] != ''
 
 	# Try getting nonexistent analysis
-	rv = auth_client.get('/api/analyses/{}'.format(987654))
-	assert rv.status_code == 404
-	# assert 'requested URL was not found' in decode_json(rv)['message']
+	resp= auth_client.get('/api/analyses/{}'.format(987654))
+	assert resp.status_code == 404
+	# assert 'requested URL was not found' in decode_json(resp)['message']
 
 def test_post(auth_client, add_dataset):
 	## Add analysis
@@ -47,9 +47,9 @@ def test_post(auth_client, add_dataset):
 	"description" : "pretty damn innovative"
 	}
 
-	rv = auth_client.post('/api/analyses', data = test_analysis)
-	assert rv.status_code == 200
-	rv_json = decode_json(rv)
+	resp= auth_client.post('/api/analyses', data = test_analysis)
+	assert resp.status_code == 200
+	rv_json = decode_json(resp)
 	assert type(rv_json) == dict
 	for field in ['dataset_id', 'name', 'description', 'hash_id']:
 		assert field in rv_json
@@ -61,7 +61,7 @@ def test_post(auth_client, add_dataset):
 	## Re post analysis, check that id is diffeent
 	rv_2 = auth_client.post('/api/analyses', data = test_analysis)
 	assert rv_2.status_code == 200
-	assert decode_json(rv_2)['hash_id'] != decode_json(rv)['hash_id']
+	assert decode_json(rv_2)['hash_id'] != decode_json(resp)['hash_id']
 
     ## Test incorrect post
 	dataset_id = decode_json(auth_client.get('/api/datasets'))[0]['id']
@@ -72,33 +72,40 @@ def test_post(auth_client, add_dataset):
 	"description" : "pretty damn innovative"
 	}
 
-	rv = auth_client.post('/api/analyses', data = bad_post)
-	assert rv.status_code == 422
-	# assert decode_json(rv)['errors']['dataset_id'][0] == 'Invalid dataset id.'
+	resp= auth_client.post('/api/analyses', data = bad_post)
+	assert resp.status_code == 422
+	# assert decode_json(resp)['errors']['dataset_id'][0] == 'Invalid dataset id.'
 
 	bad_post_2 = {
 	"dataset_id" : dataset_id,
 	"description" : "pretty damn innovative"
 	}
 
-	rv = auth_client.post('/api/analyses', data = bad_post_2)
-	assert rv.status_code == 422
-	# assert decode_json(rv)['errors']['name'][0] == 'Missing data for required field.'
+	resp= auth_client.post('/api/analyses', data = bad_post_2)
+	assert resp.status_code == 422
+	# assert decode_json(resp)['errors']['name'][0] == 'Missing data for required field.'
 
 def test_clone(session, auth_client, add_dataset, add_analysis):
 	analysis  = Analysis.query.filter_by(id=add_analysis).first()
 	# Clone analysis by id
-	rv = auth_client.post('/api/analyses/{}/clone'.format(analysis.hash_id))
-	assert rv.status_code == 422
+	resp= auth_client.post('/api/analyses/{}/clone'.format(analysis.hash_id))
+	assert resp.status_code == 422
 
 	# Make uneditable and try again
 	analysis.locked = True
 	session.commit()
 
-	rv = auth_client.post('/api/analyses/{}/clone'.format(analysis.hash_id))
-	clone_json = decode_json(rv)
+	resp= auth_client.post('/api/analyses/{}/clone'.format(analysis.hash_id))
+	clone_json = decode_json(resp)
 	assert clone_json['hash_id'] != analysis.hash_id
 
-def test_put():
-	### Add test of getting non private
-	pass
+def test_put(auth_client, add_analysis):
+	# Get analysis to edit
+	analysis  = Analysis.query.filter_by(id=add_analysis).first()
+	analysis_json = decode_json(
+		auth_client.get('/api/analyses/{}'.format(analysis.hash_id)))
+
+	resp = auth_client.put('/api/analyses/{}'.format(analysis.hash_id),
+						data={"name":"new_name"})
+
+	assert 0
