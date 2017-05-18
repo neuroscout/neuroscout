@@ -78,34 +78,34 @@ def test_extracted_features(extract_features):
 	# Add a test checking that values correspond from Predictors to EFs?
 
 
-# def test_analysis(session, add_analyses, add_predictor):
-# 	# Number of entries
-# 	assert Analysis.query.count() == 2
-#
-# 	first_analysis = Analysis.query.first()
-# 	assert User.query.filter_by(id=first_analysis.user_id).count() == 1
-#
-# 	# Add relationship to a predictor
-# 	# pred = Predictor.query.filter_by(id = add_predictor).one()
-# 	# first_analysis.predictors = [pred]
-# 	# session.commit()
-# 	# assert Predictor.query.filter_by(id = add_predictor).one().analysis_id \
-# 	# 	== first_analysis.id
-#
-# 	# Try adding analysis without a name
-# 	with pytest.raises(Exception) as excinfo:
-# 		session.add(Analysis())
-# 		session.commit()
-# 	assert 'not-null constraint' in str(excinfo)
-# 	session.rollback()
-#
-# 	# Try cloning analysis
-# 	clone = first_analysis.clone()
-# 	session.add(clone)
-# 	session.commit()
-#
-# 	assert clone.id > first_analysis.id
-# 	assert clone.name == first_analysis.name
-#
-# def test_result(add_result):
-# 	assert Result.query.count() == 1
+def test_analysis(session, add_analysis, add_predictor):
+	# Number of entries
+	assert Analysis.query.count() == 1
+
+	first_analysis = Analysis.query.first()
+	assert User.query.filter_by(id=first_analysis.user_id).count() == 1
+
+	# Add relationship to a predictor
+	pred = Predictor.query.filter_by(id = add_predictor).one()
+	first_analysis.predictors = [pred]
+	session.commit()
+	assert Predictor.query.filter_by(id = add_predictor).one().analysis[0].id \
+		== first_analysis.id
+
+	# Try adding analysis without a name
+	with pytest.raises(Exception) as excinfo:
+		session.add(Analysis())
+		session.commit()
+	assert 'not-null constraint' in str(excinfo)
+	session.rollback()
+
+	# Try cloning analysis
+	clone = first_analysis.clone()
+	session.add(clone)
+	session.commit()
+
+	assert clone.id > first_analysis.id
+	assert clone.name == first_analysis.name
+
+def test_result(add_result):
+	assert Result.query.count() == 1
