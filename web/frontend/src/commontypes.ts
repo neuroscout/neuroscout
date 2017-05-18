@@ -2,17 +2,19 @@ export interface Analysis {
   analysisId: number | null;
   analysisName: string;
   analysisDescription: string;
-  datasetId: number | null;
+  datasetId: number | null;  // ID of selected dataset
   runIds: string[];          // IDs of selected runs
   predictions: string; 
   predictorIds: Predictor[]; // IDs of selected predictors
 }
 
+// Normalized dataset object 
 export interface Dataset {
   name: string;
   id: number;
-  author: string;
+  authors: string;
   url: string;
+  description: string;
 }
 
 export interface Run {
@@ -20,7 +22,14 @@ export interface Run {
   number: string;
   session: string | null;
   subject: string | null;
-  task: string;
+  task: {id: string, name: string};
+}
+
+export interface Task {
+  id: string;
+  name: string;
+  description?: string;
+  numRuns: number;
 }
 
 export interface Predictor {
@@ -38,6 +47,26 @@ export interface Store {
   reviewActive: boolean;
   analysis: Analysis;
   datasets: Dataset[];
+  availableTasks: Task[];
   availableRuns: Run[];
+  selectedTaskId: string | null;
   availablePredictors: Predictor[];
+}
+
+// Dataset object as returned by /api/datasets
+export interface ApiDataset {
+  id: number;
+  name: string;
+  description: {
+    Authors: string[];
+    Description: string;
+    URL: string;
+  };
+}
+
+export interface ApiRun {
+  id: string;
+  number: string;
+  session: string | null;
+  subject: string | null;
 }

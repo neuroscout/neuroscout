@@ -5,7 +5,7 @@ import './App.css';
 
 import { OverviewTab } from './Overview';
 import { PredictorsTab } from './Predictors';
-import { Store, Analysis, Dataset, ApiDataset } from './commontypes';
+import { Store, Analysis, Dataset, Task, Run, ApiDataset } from './commontypes';
 
 const { TabPane } = Tabs;
 const { Footer, Content } = Layout;
@@ -33,7 +33,9 @@ const initializeStore = (): Store => ({
     predictorIds: []
   },
   datasets: [],
+  availableTasks: [],
   availableRuns: [],
+  selectedTaskId: null,
   availablePredictors: []
 });
 
@@ -46,7 +48,7 @@ const getJwt = () => new Promise((resolve, reject) => {
     resolve(jwt);
   }
   else {
-    fetch(domainRoot + '/auth', {
+    fetch(domainRoot + '/api/auth', {
       method: 'post',
       body: JSON.stringify({ username: USERNAME, password: PASSWORD }),
       headers: {
@@ -82,11 +84,28 @@ const aFetch = (path: string, options?: object): Promise<any> => {
   });
 };
 
-// Helper function to convert dataset object returned by /api/datasets to a normal shape
+// Normalize dataset object returned by /api/datasets
 const normalizeDataset = (d: ApiDataset): Dataset => {
-  const description = JSON.parse(d.description);
-  return {...description, id: d.id}
+  const authors = d.description.Authors.join(', ');
+  const description = d.description.Description;
+  const url = d.description.URL;
+  const {name, id} = d;
+  return {id, name, authors, url, description};
 };
+
+
+// Get array of unique tasks from a list of runs, and count the number of runs associated with each
+const getTasks = (runs: Run[]): Task[] => {
+  let taskMap: Map<string, Task> = new Map();
+  for (let run of runs) {
+    const key = run.task.id;
+    if (taskMap.has(key))
+      taskMap.get(key)!.numRuns += 1;
+    else
+      taskMap.set(key, { ...run.task, numRuns: 1 });
+  }
+  return Array.from(taskMap.values());
+}
 
 class App extends React.Component<{}, Store> {
   constructor(props) {
@@ -113,8 +132,9 @@ class App extends React.Component<{}, Store> {
         // If a new dataset is selected we need to fetch the associated runs
         aFetch(`${domainRoot}/api/runs?dataset=${updatedAnalysis.datasetId}`)
           .then(response => {
-            response.json().then(data => {
+            response.json().then((data: Run[]) => {
               this.setState({ availableRuns: data });
+              this.setState({ availableTasks: getTasks(data)});
             });
           })
           .catch(error => { console.log(error); });
@@ -139,7 +159,7 @@ class App extends React.Component<{}, Store> {
 
   render() {
     const { predictorsActive, transformationsActive, contrastsActive, modelingActive,
-      reviewActive, analysis, datasets, availableRuns, availablePredictors } = this.state;
+      reviewActive, analysis, datasets, availableTasks, availableRuns, availablePredictors } = this.state;
     return (
       <div className="App">
         <Layout>
@@ -162,8 +182,10 @@ class App extends React.Component<{}, Store> {
                     <OverviewTab
                       analysis={analysis}
                       datasets={datasets}
+                      availableTasks={availableTasks}
                       availableRuns={availableRuns}
                       updateAnalysis={this.updateState('analysis')}
+                      updateSelectedTaskId={this.updateState('selectedTaskId')}                      
                     />
                   </TabPane>
                   <TabPane tab="Predictors" key="2" disabled={!predictorsActive}>
