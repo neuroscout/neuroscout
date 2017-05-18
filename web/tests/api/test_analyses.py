@@ -85,23 +85,19 @@ def test_post(auth_client, add_dataset):
 	assert rv.status_code == 422
 	# assert decode_json(rv)['errors']['name'][0] == 'Missing data for required field.'
 
-def test_clone(auth_client, add_dataset):
-	## Add analysis
-	test_analysis = {
-	"dataset_id" : add_dataset,
-	"name" : "some analysis 2",
-	}
-
-	rv = auth_client.post('/api/analyses', data = test_analysis)
-	analysis_id = decode_json(rv)['hash_id']
-
+def test_clone(session, auth_client, add_dataset, add_analysis):
+	analysis  = Analysis.query.filter_by(id=add_analysis).first()
 	# Clone analysis by id
-	rv = auth_client.post('/api/analyses/{}/clone'.format(analysis_id))
+	rv = auth_client.post('/api/analyses/{}/clone'.format(analysis.hash_id))
 	assert rv.status_code == 422
 
-	# PUT to uneditable and try again
-	# analysis = decode_json(rv)
-	# assert analysis['hash_id'] != analysis_id
+	# Make uneditable and try again
+	analysis.locked = True
+	session.commit()
+
+	rv = auth_client.post('/api/analyses/{}/clone'.format(analysis.hash_id))
+	clone_json = decode_json(rv)
+	assert clone_json['hash_id'] != analysis.hash_id
 
 def test_put():
 	### Add test of getting non private

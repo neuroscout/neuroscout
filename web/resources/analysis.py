@@ -1,4 +1,4 @@
-from flask_apispec import MethodResource, marshal_with, use_kwargs, doc, Ref
+from flask_apispec import MethodResource, marshal_with, use_kwargs, doc
 from flask_jwt import current_identity
 from marshmallow import Schema, fields, validates, ValidationError
 from database import db
@@ -9,6 +9,9 @@ class AnalysisSchema(Schema):
 	hash_id = fields.Str(dump_only=True, description='Hashed analysis id.')
 	name = fields.Str(required=True, description='Analysis name.')
 	dataset_id = fields.Int(required=True)
+	created_at = fields.Time(dump_only=True)
+	modified_at = fields.Time(dump_only=True)
+	user_id = fields.Int(dump_only=True)
 
 	locked = fields.Bool(description='Analysis editable?', dump_only=True)
 	private = fields.Bool(description='Analysis private or discoverable?')
@@ -30,7 +33,6 @@ class AnalysisSchema(Schema):
 	results = fields.Nested(
 		'ResultSchema', many=True, only='id', dump_only=True,
         description='Result id(s) associated with analysis')
-	user_id = fields.Int(dump_only=True)
 
 
 	@validates('dataset_id')
@@ -64,10 +66,23 @@ class AnalysisRootResource(AnalysisBaseResource):
 		return new
 
 class AnalysisResource(AnalysisBaseResource):
-    @doc(summary='Get analysis by id.')
-    def get(self, analysis_id):
-    	return Analysis.query.filter_by(hash_id=analysis_id).first_or_404()
+	@doc(summary='Get analysis by id.')
+	def get(self, analysis_id):
+		return Analysis.query.filter_by(hash_id=analysis_id).first_or_404()
 
+	@doc(summary='Edit analysis.')
+	@use_kwargs(AnalysisSchema)
+	@auth_required
+	def put(self, analysis_id, **kwargs):
+		analysis = Analysis.query.filter_by(hash_id=analysis_id).first_or_404()
+		if analysis.locked is True:
+			abort(422, "Analysis is not editable. Try cloning it.")
+		else:
+			assert 0
+			# cloned = original.clone()
+			# db.session.add(cloned)
+			# db.session.commit()
+			return cloned
 
 ### ADD 201 + location header
 class CloneAnalysisResource(AnalysisBaseResource):
@@ -82,18 +97,3 @@ class CloneAnalysisResource(AnalysisBaseResource):
 			db.session.add(cloned)
 			db.session.commit()
 			return cloned
-
-# class EditAnalysisResource(AnalysisBaseResource):
-# 	@doc(summary='Edit analysis.')
-# 	@auth_required
-# 	def put(self, analysis_id):
-# 		analysis = Analysis.query.filter_by(hash_id=analysis_id).first_or_404()
-# 		if analysis.locked is True:
-# 			abort(422, "Analysis is not editable. Try cloning it.")
-# 		else:
-# 			cloned = original.clone()
-# 			db.session.add(cloned)
-# 			db.session.commit()
-# 			return cloned
-#PUT
-## End point for "submitting analysis"
