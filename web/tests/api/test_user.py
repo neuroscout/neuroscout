@@ -27,20 +27,32 @@ def test_get(auth_client):
 
 	assert 'email' in decode_json(resp)
 
-# def test_put(auth_client):
-# 	# Testing changing name
-# 	values = decode_json(auth_client.get('/api/user'))
-# 	values['name'] = 'new_name'
-# 	resp = auth_client.get('/api/user', data=values)
-#
-# 	assert resp.status_code == 200
-# 	new_values = decode_json(auth_client.get('/api/user'))
-# 	new_values['name'] = 'new_name'
-#
-# 	# Testing incomplete put request
-# 	resp = auth_client.put('/api/user', data={'name' : 'new_name'})
-# 	assert resp.status_code == 400
-# 	assert 'email' in decode_json(resp)['errors']
+def test_put(auth_client):
+	# Testing changing name
+	values = decode_json(auth_client.get('/api/user'))
+	values['name'] = 'new_name'
+	resp = auth_client.put('/api/user', data=values)
+
+	assert resp.status_code == 200
+	new_values = decode_json(auth_client.get('/api/user'))
+	new_values['name'] = 'new_name'
+
+	# Testing incomplete put request
+	resp = auth_client.put('/api/user', data={'name' : 'new_name'})
+	assert resp.status_code == 422
+	assert 'email' in decode_json(resp)['message']
+
+	# Make a new user:
+	resp = auth_client.post('/api/user',
+		data = {'name' : 'me', 'email' : 'fake@gmail.com', 'password' : 'something'})
+
+	# Testing changing name to same email
+	values = decode_json(auth_client.get('/api/user'))
+	values['email'] = 'fake@gmail.com'
+	resp = auth_client.put('/api/user', data=values)
+	assert resp.status_code == 422
+	assert 'Email already in use' in decode_json(resp)['message']
+
 
 def test_post(auth_client):
 	# Make incomplete post
