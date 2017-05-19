@@ -1,6 +1,7 @@
-from flask_jwt import jwt_required
+from flask_jwt import jwt_required, current_identity
 from flask_apispec import doc
 from webargs.flaskparser import parser
+from flask import jsonify
 
 def auth_required(function):
     @doc(params={"authorization": {
@@ -8,6 +9,8 @@ def auth_required(function):
     "description": "Format:  JWT {authorization_token}"}})
     @jwt_required()
     def wrapper(*args, **kwargs):
+        if current_identity.active is False:
+            return jsonify({"message" : "Your account has been disabled."})
         return function(*args, **kwargs)
     return wrapper
 
