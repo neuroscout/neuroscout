@@ -73,14 +73,14 @@ def auth_client(add_users):
     """ Return authorized client wrapper """
     from tests.request_utils import Client
 
-    _ , (username, password) = add_users
-    client = Client(username=username, password=password)
+    _ , (email, password) = add_users
+    client = Client(email=email, password=password)
     return client
 
 """
 Data population fixtures
 """
-from models import Analysis, Result
+from models import Analysis, Result, Predictor, User, Role
 import populate
 
 DATASET_PATH = os.path.join(
@@ -92,7 +92,6 @@ SPEC_PATH = os.path.join(
 def add_users(app, db, session):
     """ Adds a test user to db """
     from flask_security import SQLAlchemyUserDatastore
-    from models.auth import User, Role
 
     user_datastore = SQLAlchemyUserDatastore(db, User, Role)
 
@@ -132,6 +131,16 @@ def add_analysis(session, add_users, add_dataset):
     session.commit()
 
     return analysis.id
+
+@pytest.fixture(scope="function")
+def add_predictor(session, add_dataset):
+    pred = Predictor(dataset_id = add_dataset,
+        name = "RT")
+
+    session.add(pred)
+    session.commit()
+
+    return pred.id
 
 @pytest.fixture(scope="function")
 def add_result(session, add_analysis):

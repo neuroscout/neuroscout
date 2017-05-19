@@ -15,14 +15,15 @@ def copy_row(model, row, ignored_columns=[]):
     return copy
 
 def put_record(session, updated_values, instance):
-	try:
-		for key, value in updated_values.items():
-			setattr(instance, key, value)
-			session.commit()
+    try:
+        for key, value in updated_values.items():
+            setattr(instance, key, value)
+            session.commit()
+        return instance
 
-	except SQLAlchemyError:
-		session.rollback()
-		abort(400)
+    except SQLAlchemyError:
+        session.rollback()
+        abort(400, "Error updating field")
 
 def get_or_create(session, model, commit=True, **kwargs):
     """ Checks to see if instance of model is in db.
