@@ -58,25 +58,25 @@ def add_dataset(session, bids_path, task, replace=False, verbose=True, **kwargs)
         os.path.join(bids_path, 'task-{}_bold.json'.format(task)), 'r'))
 
     # Get or create dataset model from mandatory arguments
-    dataset_model, new = db_utils.get_or_create(session, Dataset,
+    dataset_model, new_ds = db_utils.get_or_create(session, Dataset,
                                                 name=description['Name'])
 
-    if new:
+    if new_ds:
         dataset_model.description = description
         session.commit()
-    else:
-        if not replace:
-            print("Dataset already in db.")
-            return dataset_model.id
 
     # Get or create task
-    task_model, new = db_utils.get_or_create(session, Task,
+    task_model, new_task = db_utils.get_or_create(session, Task,
                                                 name=task,
                                                 dataset_id=dataset_model.id,
                                                 description=task_description)
-    if new:
-        dataset_model.task_description = task_description
+    if new_task:
+        task_model.description = task_description
         session.commit()
+    else:
+        if not replace:
+            print("Task already in db.")
+            return dataset_model.id
 
     """ Parse every Run """
     for run_events in layout.get(task=task, type='events', **kwargs):
