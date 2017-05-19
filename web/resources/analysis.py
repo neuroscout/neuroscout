@@ -15,7 +15,8 @@ class AnalysisSchema(Schema):
 	modified_at = fields.Time(dump_only=True)
 	user_id = fields.Int(dump_only=True)
 
-	locked = fields.Bool(description='Is analysis finished and locked? Locking is irreversible.')
+	locked = fields.Bool(
+		description='Is analysis finished and locked? Locking is irreversible.')
 	locked_at = fields.Time(description='Timestamp of when analysis was locked',
 							dump_only=True)
 	private = fields.Bool(description='Analysis private or discoverable?')
