@@ -1,7 +1,7 @@
 import json
 
 class Client(object):
-    def __init__(self, test_client=None, prepend='', username=None, password=None):
+    def __init__(self, test_client=None, prepend='', email=None, password=None):
         if test_client is None:
             from core import app
             test_client = app.test_client()
@@ -13,10 +13,10 @@ class Client(object):
         self.prepend = prepend
         self.token = None
 
-        if username is not None and password is not None:
-            self.username = username
+        if email is not None and password is not None:
+            self.email = email
             self.password = password
-            self.authorize(username, password)
+            self.authorize(email, password)
 
     def _get_headers(self):
         if self.token is not None:
@@ -36,13 +36,13 @@ class Client(object):
             return request_function(self.prepend + route, json=data,
                 headers=headers, params=params)
 
-    def authorize(self, username=None, password=None):
-        if username is not None and password is not None:
-            self.username = username
+    def authorize(self, email=None, password=None):
+        if email is not None and password is not None:
+            self.email = email
             self.password = password
 
         rv = self.post('/auth',
-                        data={'username': self.username, 'password': self.password})
+                        data={'email': self.email, 'password': self.password})
 
         if self.client_flask:
              self.token = json.loads(rv.data.decode())['access_token']

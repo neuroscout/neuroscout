@@ -73,8 +73,8 @@ def auth_client(add_users):
     """ Return authorized client wrapper """
     from tests.request_utils import Client
 
-    _ , (username, password) = add_users
-    client = Client(username=username, password=password)
+    _ , (email, password) = add_users
+    client = Client(email=email, password=password)
     return client
 
 """
