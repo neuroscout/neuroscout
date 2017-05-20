@@ -24,7 +24,7 @@ def add_auth_to_swagger(spec):
                 "required": True,
                 "schema": {
                   "properties": {
-                    "username": {
+                    "email": {
                       "type": "string"
                     },
                     "password": {

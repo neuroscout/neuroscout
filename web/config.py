@@ -18,6 +18,7 @@ class Config(object):
     MIGRATIONS_DIR = 'migrations'
     APISPEC_SWAGGER_UI_URL = None
     HASH_SALT = 'lksjdfkljsflkjdf'
+    JWT_AUTH_USERNAME_KEY = 'email'
 
 class DevelopmentConfig(Config):
     DEBUG = True

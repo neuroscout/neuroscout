@@ -14,7 +14,7 @@ class User(db.Model, UserMixin):
     password = db.Column(db.String(255))
 
     name = db.Column(db.String(40))
-    active = db.Column(db.Boolean())
+    active = db.Column(db.Boolean()) # If set to disabled, cannot access.
     confirmed_at = db.Column(db.DateTime())
     roles = db.relationship('Role', secondary=roles_users,
                             backref=db.backref('users', lazy='dynamic'))

@@ -1,22 +1,23 @@
 ''' Resources. '''
 
 from .analysis import (AnalysisSchema, AnalysisResource,
-                       AnalysisListResource, AnalysisPostResource)
+                       AnalysisRootResource, CloneAnalysisResource,
+                       )
 from .dataset import DatasetSchema, DatasetResource, DatasetListResource
 from .predictor import (PredictorEventSchema, PredictorSchema,
                         PredictorListResource, PredictorResource,
-                        PredictorEventResource, PredictorEventListResource)
+                        PredictorEventListResource)
 from .result import ResultSchema, ResultResource
 from .run import RunSchema, RunResource, RunListResource
 from .stimulus import StimulusSchema, StimulusResource
-from .user import UserSchema, UserResource, UserPostResource
+from .user import UserSchema, UserRootResource
 from .task import TaskSchema, TaskResource, TaskListResource
 
 __all__ = [
     'AnalysisSchema',
     'AnalysisResource',
-    'AnalysisListResource',
-    'AnalysisPostResource',
+    'AnalysisRootResource',
+    'CloneAnalysisResource',
     'DatasetSchema',
     'DatasetResource',
     'DatasetListResource',
@@ -24,7 +25,6 @@ __all__ = [
     'PredictorSchema',
     'PredictorResource',
     'PredictorListResource',
-    'PredictorEventResource',
     'PredictorEventListResource',
     'ResultSchema',
     'ResultResource',
@@ -34,8 +34,7 @@ __all__ = [
     'StimulusSchema',
     'StimulusResource',
     'UserSchema',
-    'UserResource',
-    'UserPostResource',
+    'UserRootResource',
     'UserSchema',
     'TaskSchema',
     'TaskResource',
