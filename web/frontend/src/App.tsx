@@ -12,7 +12,7 @@ const { Footer, Content } = Layout;
 
 // const logo = require('./logo.svg');
 const domainRoot = 'http://localhost:80';
-const USERNAME = 'test2@test.com';
+const EMAIL = 'test2@test.com';
 const PASSWORD = 'password';
 
 // Create initialized app state (used in the constructor of the top-level App component)
@@ -50,7 +50,7 @@ const getJwt = () => new Promise((resolve, reject) => {
   else {
     fetch(domainRoot + '/api/auth', {
       method: 'post',
-      body: JSON.stringify({ username: USERNAME, password: PASSWORD }),
+      body: JSON.stringify({ email: EMAIL, password: PASSWORD }),
       headers: {
         'Content-type': 'application/json'
       }
