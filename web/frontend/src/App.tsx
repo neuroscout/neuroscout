@@ -86,7 +86,7 @@ const aFetch = (path: string, options?: object): Promise<any> => {
 
 // Normalize dataset object returned by /api/datasets
 const normalizeDataset = (d: ApiDataset): Dataset => {
-  const authors = d.description.Authors.join(', ');
+  const authors = d.description.Authors? d.description.Authors.join(', '): 'No authors listed';
   const description = d.description.Description;
   const url = d.description.URL;
   const {name, id} = d;
@@ -130,7 +130,7 @@ class App extends React.Component<{}, Store> {
       const updatedAnalysis: Analysis = value;
       if (updatedAnalysis.datasetId !== this.state.analysis.datasetId) {
         // If a new dataset is selected we need to fetch the associated runs
-        aFetch(`${domainRoot}/api/runs?dataset=${updatedAnalysis.datasetId}`)
+        aFetch(`${domainRoot}/api/runs?dataset_id=${updatedAnalysis.datasetId}`)
           .then(response => {
             response.json().then((data: Run[]) => {
               this.setState({ availableRuns: data });
@@ -159,7 +159,8 @@ class App extends React.Component<{}, Store> {
 
   render() {
     const { predictorsActive, transformationsActive, contrastsActive, modelingActive,
-      reviewActive, analysis, datasets, availableTasks, availableRuns, availablePredictors } = this.state;
+      reviewActive, analysis, datasets, availableTasks, availableRuns, 
+      selectedTaskId, availablePredictors } = this.state;
     return (
       <div className="App">
         <Layout>
@@ -184,6 +185,7 @@ class App extends React.Component<{}, Store> {
                       datasets={datasets}
                       availableTasks={availableTasks}
                       availableRuns={availableRuns}
+                      selectedTaskId={selectedTaskId}
                       updateAnalysis={this.updateState('analysis')}
                       updateSelectedTaskId={this.updateState('selectedTaskId')}                      
                     />

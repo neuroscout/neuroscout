@@ -18,6 +18,7 @@ interface OverviewTabProps {
   datasets: Dataset[];
   availableTasks: Task[];
   availableRuns: Run[];
+  selectedTaskId: string | null;
   updateAnalysis: (value) => void;
   updateSelectedTaskId: (value: string) => void;
 }
@@ -34,10 +35,10 @@ export class OverviewTab extends React.Component<OverviewTabProps, any>{
   }
 
   render() {
-    const { analysis, datasets, availableTasks, availableRuns } = this.props;
+    const { analysis, datasets, availableTasks, availableRuns, selectedTaskId } = this.props;
 
     const datasetColumns = [
-      { title: 'Name', dataIndex: 'name', width: 50 },
+      { title: 'Name', dataIndex: 'name', width: 60 },
       { title: 'Description', dataIndex: 'description', width: 300 },
       { title: 'Author(s)', dataIndex: 'authors', width: 100 },
       { title: 'URL', dataIndex: 'url', width: 100 }
@@ -65,7 +66,6 @@ export class OverviewTab extends React.Component<OverviewTabProps, any>{
 
     const runColumns = [
       { title: 'ID', dataIndex: 'id' },
-      { title: 'Task', dataIndex: 'task' },
       { title: 'Subject', dataIndex: 'subject' },
       { title: 'Session', dataIndex: 'session' }
     ];
@@ -73,7 +73,6 @@ export class OverviewTab extends React.Component<OverviewTabProps, any>{
     const runRowSelection: TableRowSelection<Run> = {
       type: 'checkbox',
       onSelect: (record, selected, selectedRows: any) => {
-        console.log('Selected rows = ', selectedRows);
         this.updateAnalysis('runIds')(selectedRows.map(x => x.id))
       },
       onSelectAll: (selected, selectedRows: any, changeRows) => {
@@ -114,31 +113,38 @@ export class OverviewTab extends React.Component<OverviewTabProps, any>{
             onSelect={this.updateAnalysis('datasetId')}
           />
         </FormItem>*/}
-        <p>Select a dataset:</p>
+        <p>Select a dataset:</p><br/>
         <DataTable
           columns={datasetColumns}
           rowKey="id"
+          size="small"
           dataSource={datasets}
           rowSelection={datasetRowSelection}
+          pagination={datasets.length > 20}
         />
         {availableRuns.length > 0 &&
           <div>
-            <p>Select a task:</p>
+            <p>Select a task:</p><br/>
             <DataTable
               columns={taskColumns}
               rowKey="id"
+              size="small"
               dataSource={availableTasks}
               rowSelection={taskRowSelection}
-            />
-            <p>Select runs:</p>
+              pagination={datasets.length > 20} />
+          </div>
+        }
+        {selectedTaskId &&
+          <div>
+            <p>Select runs:</p><br/>
             <DataTable
               columns={runColumns}
               rowKey="id"
-              pagination={false}
-              dataSource={availableRuns}
+              size="small"
+              dataSource={availableRuns.filter(r => r.task.id === selectedTaskId)}
+              pagination={datasets.length > 20}
               rowSelection={runRowSelection} />
-          </div>
-        }
+          </div>}
       </Form>
     </div>
   }
