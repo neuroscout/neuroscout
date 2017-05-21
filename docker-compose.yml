@@ -55,7 +55,7 @@ services:
 
   worker:
     build:
-      context: ./celery
+      context: ./celery_worker
       dockerfile: Dockerfile
     depends_on:
       - redis
@@ -64,7 +64,7 @@ services:
 
   monitor:
     build:
-      context: ./celery
+      context: ./celery_worker
       dockerfile: Dockerfile
     ports:
      - "5555:5555"
