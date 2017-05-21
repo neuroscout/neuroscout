@@ -4,8 +4,8 @@ export interface Analysis {
   analysisDescription: string;
   datasetId: number | null;  // ID of selected dataset
   runIds: string[];          // IDs of selected runs
-  predictions: string; 
-  predictorIds: Predictor[]; // IDs of selected predictors
+  predictions: string;
+  predictorIds: string[]; // IDs of selected predictors
 }
 
 // Normalized dataset object 
@@ -22,7 +22,7 @@ export interface Run {
   number: string;
   session: string | null;
   subject: string | null;
-  task: {id: string, name: string};
+  task: { id: string, name: string };
 }
 
 export interface Task {
@@ -51,6 +51,7 @@ export interface Store {
   availableRuns: Run[];
   selectedTaskId: string | null;
   availablePredictors: Predictor[];
+  selectedPredictors: Predictor[];
 }
 
 // Dataset object as returned by /api/datasets

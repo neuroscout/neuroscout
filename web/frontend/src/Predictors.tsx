@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Table, Input, Button } from 'antd';
+import { Table, Input, Button, Row, Col, Tag } from 'antd';
 import { TableProps, TableRowSelection } from 'antd/lib/table/Table';
 import { Analysis, Predictor } from './commontypes';
 
@@ -12,7 +12,8 @@ class PredictorTable extends React.Component<TableProps<any>, any> {
 interface PredictorTabProps {
   analysis: Analysis;
   availablePredictors: Predictor[];
-  updateAnalysis: (value: any) => void;
+  selectedPredictors: Predictor[];
+  updateSelectedPredictors: (newPredictors: Predictor[]) => void;
 }
 
 interface PredictorsTabState {
@@ -23,14 +24,15 @@ interface PredictorsTabState {
 export class PredictorsTab extends React.Component<PredictorTabProps, PredictorsTabState> {
   state = {
     searchText: '',
-    filteredPredictors: this.props.availablePredictors
+    filteredPredictors: this.props.availablePredictors,
+    selectedPredictors: this.props.availablePredictors.filter(p => p.id in this.props.analysis.predictorIds)
   };
 
   onInputChange = (e) => {
     const { availablePredictors } = this.props;
     const searchText: string = e.target.value;
     const searchRegex = new RegExp(searchText.trim(), 'i');
-    const newState: PredictorsTabState = { searchText, filteredPredictors: availablePredictors };
+    const newState = { searchText, filteredPredictors: availablePredictors };
     if (searchText.length > 2) {
       newState.filteredPredictors = availablePredictors.filter(
         p => searchRegex.test(p.name + (p.description || '')));
@@ -38,18 +40,13 @@ export class PredictorsTab extends React.Component<PredictorTabProps, Predictors
     this.setState(newState);
   }
 
-  updateAnalysis = (attrName: keyof Analysis) => (value: any) => {
-    let newAnalysis = { ...this.props.analysis };
-    newAnalysis[attrName] = value;
-    this.props.updateAnalysis(newAnalysis);
-  }
-
-  updateAnalysisFromEvent = (attrName: keyof Analysis) => (event: any) => {
-    this.updateAnalysis(attrName)(event.target.value);
+  removePredictor = (predictorId: string) => {
+    const newSelection = this.props.selectedPredictors.filter(p => p.id !== predictorId);
+    this.props.updateSelectedPredictors(newSelection);
   }
 
   render() {
-    const { availablePredictors } = this.props;
+    const { availablePredictors, selectedPredictors, updateSelectedPredictors } = this.props;
     const { filteredPredictors } = this.state;
     const columns = [
       { title: 'ID', dataIndex: 'id' },
@@ -59,33 +56,43 @@ export class PredictorsTab extends React.Component<PredictorTabProps, Predictors
 
     const rowSelection: TableRowSelection<Predictor> = {
       onSelect: (record, selected, selectedRows: Predictor[]) => {
-        this.updateAnalysis('predictorIds')(selectedRows.map(x => x.id));
+        updateSelectedPredictors(selectedRows);
       },
       onSelectAll: (selected, selectedRows: Predictor[], changeRows) => {
-        this.updateAnalysis('predictorIds')(selectedRows.map(x => x.id));
-      }
+        updateSelectedPredictors(selectedRows);
+      },
+      selectedRowKeys: this.props.analysis.predictorIds
     };
 
     return (
       <div>
-        <div>
-          <Input
-            placeholder="Search predictor name or description..."
-            value={this.state.searchText}
-            onChange={this.onInputChange}
-          /><br /><br />
-        </div>
-        <div>
-          <p>{`Select predictors (displaying ${filteredPredictors.length} 
+        <Row type="flex">
+          <Col span={16}>
+            <div>
+              <Input
+                placeholder="Search predictor name or description..."
+                value={this.state.searchText}
+                onChange={this.onInputChange}
+              /><br /><br />
+            </div>
+            <div>
+              <p>{`Select predictors (displaying ${filteredPredictors.length} 
             out of ${availablePredictors.length} total predictors):`}</p>
-          <PredictorTable
-            columns={columns}
-            rowKey="id"
-            pagination={false}
-            size="small"
-            dataSource={this.state.filteredPredictors}
-            rowSelection={rowSelection} />
-        </div>
+              <PredictorTable
+                columns={columns}
+                rowKey="id"
+                pagination={false}
+                size="small"
+                dataSource={this.state.filteredPredictors}
+                rowSelection={rowSelection} />
+            </div>
+          </Col>
+          <Col span={4}>
+            <p>Selected predictors:</p>
+            {selectedPredictors.map(p =>
+              <Tag closable onClose={ev => this.removePredictor(p.id)}>{p.name}</Tag>)}
+          </Col>
+        </Row>
       </div>
     );
   }

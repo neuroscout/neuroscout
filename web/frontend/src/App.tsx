@@ -36,7 +36,8 @@ const initializeStore = (): Store => ({
   availableTasks: [],
   availableRuns: [],
   selectedTaskId: null,
-  availablePredictors: []
+  availablePredictors: [],
+  selectedPredictors: []
 });
 
 const getJwt = () => new Promise((resolve, reject) => {
@@ -65,7 +66,6 @@ const getJwt = () => new Promise((resolve, reject) => {
         });
       })
       .catch(error => {
-        console.log('An error happened: ', error);
         message.error(error.toString());
       });
   }
@@ -86,11 +86,11 @@ const aFetch = (path: string, options?: object): Promise<any> => {
 
 // Normalize dataset object returned by /api/datasets
 const normalizeDataset = (d: ApiDataset): Dataset => {
-  const authors = d.description.Authors? d.description.Authors.join(', '): 'No authors listed';
+  const authors = d.description.Authors ? d.description.Authors.join(', ') : 'No authors listed';
   const description = d.description.Description;
   const url = d.description.URL;
-  const {name, id} = d;
-  return {id, name, authors, url, description};
+  const { name, id } = d;
+  return { id, name, authors, url, description };
 };
 
 
@@ -125,7 +125,7 @@ class App extends React.Component<{}, Store> {
      Main function to update application state. May split this up into
      smaller pieces of it gets too complex.
     */
-    let stateUpdate = {};
+    let stateUpdate: any = {};
     if (attrName === 'analysis') {
       const updatedAnalysis: Analysis = value;
       if (updatedAnalysis.datasetId !== this.state.analysis.datasetId) {
@@ -134,7 +134,7 @@ class App extends React.Component<{}, Store> {
           .then(response => {
             response.json().then((data: Run[]) => {
               this.setState({ availableRuns: data });
-              this.setState({ availableTasks: getTasks(data)});
+              this.setState({ availableTasks: getTasks(data) });
             });
           })
           .catch(error => { console.log(error); });
@@ -151,7 +151,11 @@ class App extends React.Component<{}, Store> {
           .catch(error => { console.log(error); });
       }
       // Enable predictors tab only if the number of selected runs is greater than zero
-      stateUpdate['predictorsActive'] = value.runIds.length > 0;
+      stateUpdate.predictorsActive = value.runIds.length > 0;
+    } else if (attrName === 'selectedPredictors') {
+      let newAnalysis = { ...this.state.analysis };
+      newAnalysis.predictorIds = value.map(p => p.id);
+      stateUpdate.analysis = newAnalysis;
     }
     stateUpdate[attrName] = value;
     this.setState(stateUpdate);
@@ -159,8 +163,8 @@ class App extends React.Component<{}, Store> {
 
   render() {
     const { predictorsActive, transformationsActive, contrastsActive, modelingActive,
-      reviewActive, analysis, datasets, availableTasks, availableRuns, 
-      selectedTaskId, availablePredictors } = this.state;
+      reviewActive, analysis, datasets, availableTasks, availableRuns,
+      selectedTaskId, availablePredictors, selectedPredictors } = this.state;
     return (
       <div className="App">
         <Layout>
@@ -187,14 +191,15 @@ class App extends React.Component<{}, Store> {
                       availableRuns={availableRuns}
                       selectedTaskId={selectedTaskId}
                       updateAnalysis={this.updateState('analysis')}
-                      updateSelectedTaskId={this.updateState('selectedTaskId')}                      
+                      updateSelectedTaskId={this.updateState('selectedTaskId')}
                     />
                   </TabPane>
                   <TabPane tab="Predictors" key="2" disabled={!predictorsActive}>
                     <PredictorsTab
                       analysis={analysis}
                       availablePredictors={availablePredictors}
-                      updateAnalysis={this.updateState('analysis')}
+                      selectedPredictors={selectedPredictors}
+                      updateSelectedPredictors={this.updateState('selectedPredictors')}
                     />
                   </TabPane>
                   <TabPane tab="Transformations" key="3" disabled={!transformationsActive} />
