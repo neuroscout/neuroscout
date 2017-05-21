@@ -50,5 +50,26 @@ services:
     ports:
       - '5000:8080'
 
+  redis:
+    image: redis
+
+  worker:
+    build:
+      context: ./celery
+      dockerfile: Dockerfile
+    depends_on:
+      - redis
+
+  monitor:
+    build:
+      context: ./celery
+      dockerfile: Dockerfile
+    ports:
+     - "5555:5555"
+    entrypoint: flower
+    command:  -A tasks --port=5555 --broker=redis://redis:6379/0
+    depends_on:
+      - redis
+
 volumes:
   migrations:

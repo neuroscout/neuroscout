@@ -2,6 +2,7 @@ apispec==0.21.0
 appdirs==1.4.3
 blinker==1.4
 click==6.7
+celery
 decorator==4.0.11
 Flask==0.12.1
 -e git+https://github.com/adelavega/flask-apispec.git#egg=flask-apispec
@@ -43,6 +44,7 @@ python-dateutil==2.6.0
 python-magic==0.4.13
 pytz==2017.2
 PyYAML==3.12
+redis
 requests==2.13.0
 scipy==0.19.0
 six==1.10.0
