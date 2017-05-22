@@ -3,7 +3,7 @@ import os
 from flask import Flask, render_template
 from database import db
 
-app = Flask(__name__)
+app = Flask(__name__, static_folder='/static')
 app.config.from_object(os.environ['APP_SETTINGS'])
 db.init_app(app)
 
@@ -67,9 +67,9 @@ import os
 from flask import Flask
 from flask import url_for
 
-@app.route('/add/<int:param1>/<int:param2>')
+@app.route('/make/<param1>/<param2>')
 def add(param1,param2):
-    task = celery_app.send_task('mytasks.add', args=[param1, param2], kwargs={})
+    task = celery_app.send_task('workflow.create', args=[param1, param2])
     return "<a href='{url}'>check status of {id} </a>".format(id=task.id,
                 url=url_for('check_task',id=task.id,_external=True))
 
