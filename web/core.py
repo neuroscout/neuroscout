@@ -44,6 +44,7 @@ route_factory(app, docs,
         ('AnalysisRootResource', 'analyses'),
         ('AnalysisResource', 'analyses/<analysis_id>'),
         ('CloneAnalysisResource', 'analyses/<analysis_id>/clone'),
+        ('AnalysisWorkflowResource', 'analyses/<analysis_id>/workflow'),
         ('ResultResource', 'results/<int:result_id>'),
         ('RunListResource', 'runs'),
         ('RunResource', 'runs/<int:run_id>'),
@@ -59,27 +60,6 @@ route_factory(app, docs,
 def index():
     ''' Serve SPA '''
     return render_template('default.html')
-
-from worker import celery_app
-import celery.states as states
-
-import os
-from flask import Flask
-from flask import url_for
-
-@app.route('/make/<param1>/<param2>')
-def add(param1,param2):
-    task = celery_app.send_task('workflow.create', args=[param1, param2])
-    return "<a href='{url}'>check status of {id} </a>".format(id=task.id,
-                url=url_for('check_task',id=task.id,_external=True))
-
-@app.route('/check/<string:id>')
-def check_task(id):
-    res = celery_app.AsyncResult(id)
-    if res.state==states.PENDING:
-        return res.state
-    else:
-        return str(res.result)
 
 if __name__ == '__main__':
     db.init_app(app)

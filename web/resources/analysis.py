@@ -2,10 +2,11 @@ from flask_apispec import MethodResource, marshal_with, use_kwargs, doc
 from flask_jwt import current_identity
 from marshmallow import Schema, fields, validates, ValidationError
 from database import db
-from db_utils import put_record
 from models import Analysis, Dataset
 from . import utils
 import datetime
+from worker import celery_app
+import celery.states as states
 
 class AnalysisSchema(Schema):
 	hash_id = fields.Str(dump_only=True, description='Hashed analysis id.')
@@ -60,9 +61,9 @@ class AnalysisRootResource(AnalysisBaseResource):
 	def get(self):
 		return Analysis.query.filter_by(private=False).all()
 
-	@marshal_with(AnalysisSchema, code='201')
-	@doc(summary='Add new analysis.')
+	@marshal_with(AnalysisSchema)
 	@use_kwargs(AnalysisSchema)
+	@doc(summary='Add new analysis!')
 	@utils.auth_required
 	def post(self, **kwargs):
 		new = Analysis(user_id = current_identity.id, **kwargs)
@@ -75,8 +76,8 @@ class AnalysisResource(AnalysisBaseResource):
 	def get(self, analysis_id):
 		return utils.first_or_404(Analysis.query.filter_by(hash_id=analysis_id))
 
-	@doc(summary='Edit analysis.')
 	@use_kwargs(AnalysisSchema)
+	@doc(summary='Edit analysis.')
 	@utils.auth_required
 	def put(self, analysis_id, **kwargs):
 		analysis = utils.first_or_404(
@@ -86,11 +87,16 @@ class AnalysisResource(AnalysisBaseResource):
 		else:
 			if kwargs['locked'] > analysis.locked:
 				kwargs['locked_at'] = datetime.datetime.utcnow()
+
+				task = celery_app.send_task(
+					'workflow.create', args=[analysis.id])
+				kwargs['task_id'] = task.id
+
 				### Add other triggers here
-			return put_record(db.session, kwargs, analysis)
+			return utils.put_record(db.session, kwargs, analysis)
 
 class CloneAnalysisResource(AnalysisBaseResource):
-	@marshal_with(AnalysisSchema, code='201')
+	@marshal_with(AnalysisSchema)
 	@doc(summary='Clone analysis.')
 	@utils.auth_required
 	def post(self, analysis_id):
@@ -103,3 +109,15 @@ class CloneAnalysisResource(AnalysisBaseResource):
 			db.session.add(cloned)
 			db.session.commit()
 			return cloned
+
+@doc(tags=['analysis'])
+class AnalysisWorkflowResource(MethodResource):
+	def get(self, analysis_id):
+		analysis = utils.first_or_404(
+			Analysis.query.filter_by(hash_id=analysis_id))
+
+		res = celery_app.AsyncResult(analysis.task_id)
+		if res.state==states.PENDING:
+		    return res.state
+		else:
+		    return str(res.result)

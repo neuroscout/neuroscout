@@ -30,6 +30,8 @@ class Analysis(db.Model):
     locked_at = db.Column(db.DateTime)
     private = db.Column(db.Boolean, default=True)
 
+    task_id = db.Column(db.Text) # Celery task id
+
     dataset_id = db.Column(db.Integer, db.ForeignKey('dataset.id'), nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     # If cloned, this is the parent analysis:

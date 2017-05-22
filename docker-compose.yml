@@ -10,11 +10,9 @@ services:
     volumes:
       - static:/usr/src/app/static
       - migrations:/migrations
-      # ADD OTHERS VOLUMES HERE
+      - /home/zorro/datasets:/datasets
     command: /usr/local/bin/gunicorn -w 2 -b :8000 core:app --log-level debu
-    env_file:
-      - '.env'
-
+    env_file: .env
   nginx:
     restart: always
     build: ./nginx/
@@ -60,10 +58,9 @@ services:
     depends_on:
       - redis
     entrypoint: celery -A tasks worker --loglevel=info
-    env_file:
-      - '.env'
     volumes:
       - static:/static
+    env_file: .env
 
   monitor:
     build:
@@ -75,9 +72,7 @@ services:
     command:  -A tasks --port=5555 --broker=redis://redis:6379/0
     depends_on:
       - redis
-    env_file:
-      - '.env'
-
+    env_file: .env
 volumes:
   migrations:
   static:

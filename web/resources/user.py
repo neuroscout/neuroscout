@@ -7,7 +7,6 @@ from models.auth import User
 from database import db
 from models import user_datastore
 from . import utils
-from db_utils import put_record
 from .utils import abort
 
 class BaseUserSchema(Schema):
@@ -69,4 +68,4 @@ class UserRootResource(MethodResource):
         if User.query.filter((User.email==kwargs['email']) \
                              & (User.id!=current_identity.id)).all():
             abort(422, 'Email already in use.')
-        return put_record(db.session, kwargs, current_identity)
+        return utils.put_record(db.session, kwargs, current_identity)
