@@ -30,7 +30,8 @@ def add_auth_to_swagger(spec):
                     "password": {
                       "type": "string"
                     }},
-                  "type": "object"
+                  "type": "object",
+                  "example" : { "email" : "user@example.com", "password" : "string" },
                 }
               }
             ],
