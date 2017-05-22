@@ -90,7 +90,7 @@ export class PredictorsTab extends React.Component<PredictorTabProps, Predictors
           <Col span={4}>
             <p>Selected predictors:</p>
             {selectedPredictors.map(p =>
-              <Tag closable onClose={ev => this.removePredictor(p.id)}>{p.name}</Tag>)}
+              <Tag closable onClose={ev => this.removePredictor(p.id)} key={p.id}>{p.name}</Tag>)}
           </Col>
         </Row>
       </div>

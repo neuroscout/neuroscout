@@ -40,6 +40,8 @@ const initializeStore = (): Store => ({
   selectedPredictors: []
 });
 
+const displayError = (error: Error) => message.error(error.toString());
+
 const getJwt = () => new Promise((resolve, reject) => {
   /* Returns an access token (JWT) as a promise, either straight from local 
      storage or by fetching from the server (/auth) with username/password and 
@@ -65,21 +67,20 @@ const getJwt = () => new Promise((resolve, reject) => {
           }
         });
       })
-      .catch(error => {
-        message.error(error.toString());
-      });
+      .catch(displayError);
   }
 });
 
 // Wrapper around 'fetch' to add JWT authorization header and authenticate first if necessary  
 const aFetch = (path: string, options?: object): Promise<any> => {
   return getJwt().then((jwt: string) => {
-    const newOptions = Object.assign({
+    const newOptions = {
+      ...options,
       headers: {
         'Content-type': 'application/json',
         'Authorization': 'JWT ' + jwt
       }
-    }, options);
+    };
     return fetch(path, newOptions);
   });
 };
@@ -92,7 +93,6 @@ const normalizeDataset = (d: ApiDataset): Dataset => {
   const { name, id } = d;
   return { id, name, authors, url, description };
 };
-
 
 // Get array of unique tasks from a list of runs, and count the number of runs associated with each
 const getTasks = (runs: Run[]): Task[] => {
@@ -123,35 +123,52 @@ class App extends React.Component<{}, Store> {
   updateState = (attrName: keyof Store) => (value: any) => {
     /* 
      Main function to update application state. May split this up into
-     smaller pieces of it gets too complex.
+     smaller pieces if it gets too complex.
     */
+    const { analysis, availableRuns } = this.state;
     let stateUpdate: any = {};
     if (attrName === 'analysis') {
       const updatedAnalysis: Analysis = value;
-      if (updatedAnalysis.datasetId !== this.state.analysis.datasetId) {
+      if (updatedAnalysis.datasetId !== analysis.datasetId) {
         // If a new dataset is selected we need to fetch the associated runs
         aFetch(`${domainRoot}/api/runs?dataset_id=${updatedAnalysis.datasetId}`)
           .then(response => {
             response.json().then((data: Run[]) => {
-              this.setState({ availableRuns: data });
-              this.setState({ availableTasks: getTasks(data) });
+              message.success(`Fetched ${data.length} runs associated with the selected dataset`);
+              this.setState({
+                availableRuns: data,
+                selectedTaskId: null,
+                availableTasks: getTasks(data),
+                availablePredictors: []
+              });
             });
           })
-          .catch(error => { console.log(error); });
+          .catch(displayError);
       }
-      if (updatedAnalysis.runIds.length !== this.state.analysis.runIds.length) {
+      if (updatedAnalysis.runIds.length !== analysis.runIds.length) {
         // If there was any change in selection of runs, fetch the associated predictors
         const runIds = updatedAnalysis.runIds.join(',');
-        aFetch(`${domainRoot}/api/predictors?runs=${runIds}`)
-          .then(response => {
-            response.json().then(data => {
-              this.setState({ availablePredictors: data });
-            });
-          })
-          .catch(error => { console.log(error); });
+        if (runIds) {
+          aFetch(`${domainRoot}/api/predictors?runs=${runIds}`)
+            .then(response => {
+              response.json().then(data => {
+                message.success(`Fetched ${data.length} predictors associated with the selected runs`);
+                this.setState({ availablePredictors: data });
+              });
+            })
+            .catch(displayError);
+        } else {
+          stateUpdate.availablePredictors = [];
+        }
       }
-      // Enable predictors tab only if the number of selected runs is greater than zero
+      // Enable predictors tab only if at least one run has been selected
       stateUpdate.predictorsActive = value.runIds.length > 0;
+    } else if (attrName === 'selectedTaskId') {
+      // When a different task is selected, autoselect all its associated run IDs
+      this.updateState('analysis')({
+        ...analysis,
+        runIds: availableRuns.filter(r => r.task.id === value).map(r => r.id)
+      });
     } else if (attrName === 'selectedPredictors') {
       let newAnalysis = { ...this.state.analysis };
       newAnalysis.predictorIds = value.map(p => p.id);
