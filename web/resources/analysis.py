@@ -112,9 +112,37 @@ class CloneAnalysisResource(AnalysisBaseResource):
 
 @doc(tags=['analysis'])
 class AnalysisWorkflowResource(MethodResource):
+	@doc(summary='Get analysis nipype workflow.',
+		 produces=["text/plain"],
+		 responses={"default": {
+			 "description" : "Nipype workflow python executable." }})
 	def get(self, analysis_id):
 		analysis = utils.first_or_404(
 			Analysis.query.filter_by(hash_id=analysis_id))
+
+		if analysis.locked is False:
+			utils.abort(
+				422, "Analysis must be locked, before workflow is accesible.")
+
+		res = celery_app.AsyncResult(analysis.task_id)
+		if res.state==states.PENDING:
+		    return res.state
+		else:
+		    return str(res.result)
+
+@doc(tags=['analysis'])
+class AnalysisGraphResource(MethodResource):
+	@doc(summary='Get analysis nipype workflow graph.',
+		 produces=["image/png"],
+		 responses={"default": {
+			 "description" : "Nipype workflow python executable." }})
+	def get(self, analysis_id):
+		analysis = utils.first_or_404(
+			Analysis.query.filter_by(hash_id=analysis_id))
+
+		if analysis.locked is False:
+			utils.abort(
+				422, "Analysis must be locked, before graph is accesible.")
 
 		res = celery_app.AsyncResult(analysis.task_id)
 		if res.state==states.PENDING:
