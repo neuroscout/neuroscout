@@ -114,6 +114,7 @@ export class OverviewTab extends React.Component<OverviewTabProps, any> {
             rowSelection={datasetRowSelection}
             pagination={datasets.length > 20}
           />
+          <br />
           {availableRuns.length > 0 &&
             <div>
               <p>Select a task:</p><br />
@@ -124,6 +125,7 @@ export class OverviewTab extends React.Component<OverviewTabProps, any> {
                 dataSource={availableTasks}
                 rowSelection={taskRowSelection}
                 pagination={datasets.length > 20} />
+              <br />
             </div>
           }
           {selectedTaskId &&
@@ -136,6 +138,7 @@ export class OverviewTab extends React.Component<OverviewTabProps, any> {
                 dataSource={availableRuns.filter(r => r.task.id === selectedTaskId)}
                 pagination={datasets.length > 20}
                 rowSelection={runRowSelection} />
+              <br />
             </div>}
         </Form>
       </div>
