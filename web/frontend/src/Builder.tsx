@@ -5,6 +5,7 @@ import { OverviewTab } from './Overview';
 import { PredictorsTab } from './Predictors';
 import { Home } from './Home';
 import { Store, Analysis, Dataset, Task, Run, ApiDataset } from './commontypes';
+import {displayError} from './utils';
 
 const { TabPane } = Tabs;
 const { Footer, Content } = Layout;
@@ -39,7 +40,6 @@ const initializeStore = (): Store => ({
   selectedPredictors: []
 });
 
-const displayError = (error: Error) => message.error(error.toString());
 
 const getJwt = () => new Promise((resolve, reject) => {
   /* Returns an access token (JWT) as a promise, either straight from local 
