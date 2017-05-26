@@ -23,6 +23,7 @@ interface AppState {
   openLogin: boolean;
   openSignup: boolean;
   email: string | null;
+  name: string | null;
   password: string | null;
   jwt: string | null;
   nextURL: string | null; // will probably remove this and find a better solution to login redirects
@@ -39,13 +40,14 @@ const Browse = () => (
 class App extends React.Component<{}, AppState>{
   constructor(props) {
     super(props);
-    window.localStorage.clear()
+    // window.localStorage.clear()
     const jwt = localStorage.getItem('jwt');
     this.state = {
       loggedIn: !!jwt,
       openLogin: false,
       openSignup: false,
       email: localStorage.getItem('email'),
+      name: null,
       jwt: jwt,
       password: '',
       nextURL: null
@@ -86,6 +88,30 @@ class App extends React.Component<{}, AppState>{
       .catch(displayError);
   }
 
+  signup = () => {
+    const { name, email, password, openSignup } = this.state;
+    fetch(DOMAINROOT + '/api/user', {
+      method: 'post',
+      body: JSON.stringify({ email: email, password: password, name: name }),
+      headers: {
+        'Content-type': 'application/json'
+      }
+    })
+      .then((response) => {
+        if (response.status !== 200) {
+          throw 'Sign up failed'
+        }
+        response.json().then((data: any) => {
+          message.success('Signup successful');
+          const { name, email, password } = data;
+          this.setState({ name, email, openSignup: false });
+          return this.authenticate();
+        });
+      })
+      .then(() => message.success('Logged in'))
+      .catch(displayError);
+  }
+
   logout = () => {
     localStorage.removeItem('jwt');
     localStorage.removeItem('email');
@@ -110,8 +136,8 @@ class App extends React.Component<{}, AppState>{
   // });
 
   render() {
-    const { loggedIn, email, openLogin, openSignup, password } = this.state;
-    const loginModal = (
+    const { loggedIn, email, name, openLogin, openSignup, password } = this.state;
+    const loginModal = () => (
       <Modal
         title="Log into Neuroscout"
         visible={openLogin}
@@ -146,10 +172,52 @@ class App extends React.Component<{}, AppState>{
         </Form>
       </Modal>
     );
+    const signupModal = () => (
+      <Modal
+        title="Sign up for a Neuroscout account"
+        visible={openSignup}
+        footer={null}
+        maskClosable={true}
+        onCancel={e => { this.setState({ openSignup: false }); }}
+      >
+        <Form>
+          <FormItem>
+            <Input placeholder="Full name"
+              size="large"
+              value={name}
+              onChange={(e: any) => this.setState({ name: e.target.value })}
+            />
+          </FormItem>
+          <FormItem>
+            <Input placeholder="Email"
+              type="email"
+              size="large"
+              value={email}
+              onChange={(e: any) => this.setState({ email: e.target.value })}
+            />
+          </FormItem>
+          <FormItem>
+            <Input placeholder="Password"
+              type="password"
+              value={password}
+              onChange={(e: any) => this.setState({ password: e.target.value })}
+            />
+          </FormItem>
+          <FormItem>
+            <Button
+              style={{ width: '100%' }}
+              type="primary"
+              onClick={e => { this.signup(); }}
+            >Sign up</Button>
+          </FormItem>
+        </Form>
+      </Modal>
+    );
     return (
       <Router>
         <div>
-          {openLogin && loginModal}
+          {openLogin && loginModal()}
+          {openSignup && signupModal()}
           <Layout>
             <Header style={{ background: '#fff', padding: 0 }}>
               <Row type="flex" justify="center">
@@ -161,7 +229,11 @@ class App extends React.Component<{}, AppState>{
                     <span>{`Logged in as ${email}`}
                       <Button onClick={e => this.logout()}>Log out</Button>
                     </span> :
-                    <Button onClick={e => this.setState({ openLogin: true })}>Log in</Button>}
+                    <span>
+                      <Button onClick={e => this.setState({ openLogin: true })}>Log in</Button>
+                      <Button onClick={e => this.setState({ openSignup: true })}>Sign up</Button>
+                    </span>
+                  }
                 </Col>
               </Row>
             </Header>
