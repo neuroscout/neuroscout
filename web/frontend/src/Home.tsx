@@ -1,33 +1,40 @@
 import * as React from 'react';
-import { Tabs, Row, Col, Layout, Button } from 'antd';
-import {displayError} from './utils';
+import { Tabs, Row, Col, Layout, Button, Card } from 'antd';
+import { displayError } from './utils';
+import { Link } from 'react-router-dom';
 
 const { Header, Footer, Content } = Layout;
 
 interface HomeProps {
-  ensureLoggedIn: () => Promise<{}>;
+  // loginAndNavigate: (string) => void;
+  // ensureLoggedIn: () => Promise<{}>;
 }
 
 export class Home extends React.Component<HomeProps, {}> {
-  launchBuilder = (e: any) => {
-    this.props.ensureLoggedIn()
-      .then(() => document.location.href = '/builder')
-      .catch(displayError);
-  }
-
   render() {
     return (
-      <Row type="flex" justify="center">
-        <Col span={16}>
-          <Button
-            type="primary"
-            onClick={this.launchBuilder}
-          >Create New Analysis</Button>
-          <Button
-            type="primary"
-          ><a href="/browse">Browse Public Analyses</a></Button>
-        </Col>
-      </Row>
+      <div>
+        <Row type="flex" justify="center">
+          <Col span={16}>
+            <Card title="">
+              <p>Marketing copy explaining Neuroscount...</p>
+            </Card>
+            <br />
+            {/*<Button type="primary"><Link to="/builder">Create New Analysis</Link></Button>
+            <Button type="primary"><Link to="/browse">Browse Public Analyses</Link></Button>*/}
+          </Col>
+        </Row>
+        <Row type="flex" justify="center">
+          <Col span={2}>
+          </Col>
+          <Col span={4}>
+            <Button type="primary"><Link to="/builder">Create New Analysis</Link></Button>
+          </Col>
+          <Col span={4}>
+            <Button type="primary"><Link to="/browse">Browse Public Analyses</Link></Button>
+          </Col>
+        </Row>
+      </div>
     );
   }
 }

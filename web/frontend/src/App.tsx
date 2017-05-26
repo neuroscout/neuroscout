@@ -3,13 +3,12 @@ import { Tabs, Row, Col, Layout, Button, Modal, Input, Form, message } from 'ant
 import { displayError } from './utils';
 
 const FormItem = Form.Item;
-
 const DOMAINROOT = 'http://localhost:80';
+const { localStorage } = window;
 
 import {
   BrowserRouter as Router,
-  Route,
-  Link
+  Route, Link, Redirect
 } from 'react-router-dom';
 
 import './App.css';
@@ -26,6 +25,7 @@ interface AppState {
   email: string | null;
   password: string | null;
   jwt: string | null;
+  nextURL: string | null; // will probably remove this and find a better solution to login redirects
 }
 
 const Browse = () => (
@@ -39,6 +39,7 @@ const Browse = () => (
 class App extends React.Component<{}, AppState>{
   constructor(props) {
     super(props);
+    window.localStorage.clear()
     const jwt = localStorage.getItem('jwt');
     this.state = {
       loggedIn: !!jwt,
@@ -46,7 +47,8 @@ class App extends React.Component<{}, AppState>{
       openSignup: false,
       email: localStorage.getItem('email'),
       jwt: jwt,
-      password: ''
+      password: '',
+      nextURL: null
     };
   }
 
@@ -66,7 +68,7 @@ class App extends React.Component<{}, AppState>{
             window.localStorage.setItem('jwt', data.access_token);
             resolve(data.access_token);
           } else {
-            reject('Authentication error!!!!!!!');
+            reject('Authentication failed');
           }
         });
       })
@@ -74,11 +76,12 @@ class App extends React.Component<{}, AppState>{
   });
 
   login = () => {
-    const { email, password, loggedIn, openLogin } = this.state;
+    const { email, password, loggedIn, openLogin, nextURL } = this.state;
     return this.authenticate()
       .then((jwt: string) => {
-        this.setState({ jwt: jwt, password: '', loggedIn: true, openLogin: false });
-        console.log(`Logged in with ${email} and ${password}`);
+        this.setState({
+          jwt: jwt, password: '', loggedIn: true, openLogin: false, nextURL: null
+        }, () => { if (nextURL) document.location.href = nextURL });
       })
       .catch(displayError);
   }
@@ -89,14 +92,22 @@ class App extends React.Component<{}, AppState>{
     this.setState({ loggedIn: false, email: null, jwt: null });
   }
 
-  ensureLoggedIn = () => new Promise((resolve, reject) => {
-    if (this.state.loggedIn) {
-      resolve();
-    } else {
-      this.setState({openLogin: true});
-      this.login().then(() => resolve()).catch(() => reject());
-    }
-  });
+  // loginAndNavigate = (nextURL: string) => {
+  //   if (this.state.loggedIn) {
+  //     document.location.href = nextURL;
+  //     return;
+  //   }
+  //   this.setState({ openLogin: true, nextURL });
+  // }
+
+  // ensureLoggedIn = () => new Promise((resolve, reject) => {
+  //   if (this.state.loggedIn) {
+  //     resolve();
+  //   } else {
+  //     this.setState({ openLogin: true });
+  //     this.login().then(() => resolve()).catch(() => reject());
+  //   }
+  // });
 
   render() {
     const { loggedIn, email, openLogin, openSignup, password } = this.state;
@@ -148,14 +159,14 @@ class App extends React.Component<{}, AppState>{
                 <Col span={4}>
                   {loggedIn ?
                     <span>{`Logged in as ${email}`}
-                      <Button onClick={(e) => { this.logout(); }}>Log out</Button>
+                      <Button onClick={e => this.logout()}>Log out</Button>
                     </span> :
-                    <Button onClick={e => this.setState({ openLogin: true }) }>Log in</Button>}
+                    <Button onClick={e => this.setState({ openLogin: true })}>Log in</Button>}
                 </Col>
               </Row>
             </Header>
             <Content style={{ background: '#fff' }}>
-              <Route exact path="/" render={(props) => <Home ensureLoggedIn={this.ensureLoggedIn} />}/>
+              <Route exact path="/" render={(props) => <Home />} />
               <Route path="/builder" render={(props) => <AnalysisBuilder />} />
               <Route exact path="/browse" component={Browse} />
             </Content>

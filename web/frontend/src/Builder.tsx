@@ -5,7 +5,7 @@ import { OverviewTab } from './Overview';
 import { PredictorsTab } from './Predictors';
 import { Home } from './Home';
 import { Store, Analysis, Dataset, Task, Run, ApiDataset } from './commontypes';
-import {displayError} from './utils';
+import {displayError, jwtFetch} from './utils';
 
 const { TabPane } = Tabs;
 const { Footer, Content } = Layout;
@@ -48,8 +48,7 @@ const getJwt = () => new Promise((resolve, reject) => {
   const jwt = window.localStorage.getItem('jwt');
   if (jwt) {
     resolve(jwt);
-  }
-  else {
+  } else {
     fetch(domainRoot + '/api/auth', {
       method: 'post',
       body: JSON.stringify({ email: EMAIL, password: PASSWORD }),
@@ -71,7 +70,7 @@ const getJwt = () => new Promise((resolve, reject) => {
 });
 
 // Wrapper around 'fetch' to add JWT authorization header and authenticate first if necessary  
-const aFetch = (path: string, options?: object): Promise<any> => {
+const authorizeAndFetch = (path: string, options?: object) => {
   return getJwt().then((jwt: string) => {
     const newOptions = {
       ...options,
@@ -110,7 +109,7 @@ export class AnalysisBuilder extends React.Component<{}, Store> {
   constructor(props) {
     super(props);
     this.state = initializeStore();
-    aFetch(domainRoot + '/api/datasets').then(response => {
+    jwtFetch(domainRoot + '/api/datasets').then(response => {
       response.json().then(data => {
         const datasets: Dataset[] = data.map(d => normalizeDataset(d));
         this.setState({ 'datasets': datasets });
@@ -130,7 +129,7 @@ export class AnalysisBuilder extends React.Component<{}, Store> {
       const updatedAnalysis: Analysis = value;
       if (updatedAnalysis.datasetId !== analysis.datasetId) {
         // If a new dataset is selected we need to fetch the associated runs
-        aFetch(`${domainRoot}/api/runs?dataset_id=${updatedAnalysis.datasetId}`)
+        jwtFetch(`${domainRoot}/api/runs?dataset_id=${updatedAnalysis.datasetId}`)
           .then(response => {
             response.json().then((data: Run[]) => {
               message.success(`Fetched ${data.length} runs associated with the selected dataset`);
@@ -148,7 +147,7 @@ export class AnalysisBuilder extends React.Component<{}, Store> {
         // If there was any change in selection of runs, fetch the associated predictors
         const runIds = updatedAnalysis.runIds.join(',');
         if (runIds) {
-          aFetch(`${domainRoot}/api/predictors?runs=${runIds}`)
+          jwtFetch(`${domainRoot}/api/predictors?runs=${runIds}`)
             .then(response => {
               response.json().then(data => {
                 message.success(`Fetched ${data.length} predictors associated with the selected runs`);
