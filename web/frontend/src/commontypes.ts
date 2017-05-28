@@ -1,7 +1,7 @@
 export interface Analysis {
   analysisId: number | null;
-  analysisName: string;
-  analysisDescription: string;
+  name: string;
+  description: string;
   datasetId: number | null;  // ID of selected dataset
   runIds: string[];          // IDs of selected runs
   predictions: string;

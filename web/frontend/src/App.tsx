@@ -42,14 +42,15 @@ class App extends React.Component<{}, AppState>{
     super(props);
     // window.localStorage.clear()
     const jwt = localStorage.getItem('jwt');
+    const email = localStorage.getItem('email');
     this.state = {
       loggedIn: !!jwt,
       openLogin: false,
       openSignup: false,
-      email: localStorage.getItem('email'),
+      email: email || 'test2@test.com',  // For development - remove test2@test.com later
       name: null,
       jwt: jwt,
-      password: '',
+      password: 'password', // For development - set to '' in production
       nextURL: null
     };
   }
@@ -67,7 +68,8 @@ class App extends React.Component<{}, AppState>{
         response.json().then((data: { access_token: string }) => {
           if (data.access_token) {
             message.success('Authentication successful');
-            window.localStorage.setItem('jwt', data.access_token);
+            localStorage.setItem('jwt', data.access_token);
+            localStorage.setItem('email', email!);
             resolve(data.access_token);
           } else {
             reject('Authentication failed');
@@ -83,7 +85,7 @@ class App extends React.Component<{}, AppState>{
       .then((jwt: string) => {
         this.setState({
           jwt: jwt, password: '', loggedIn: true, openLogin: false, nextURL: null
-        }, () => { if (nextURL) document.location.href = nextURL });
+        });
       })
       .catch(displayError);
   }

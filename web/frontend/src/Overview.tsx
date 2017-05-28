@@ -85,14 +85,14 @@ export class OverviewTab extends React.Component<OverviewTabProps, any> {
         <Form layout="vertical">
           <FormItem label="Analysis name:">
             <Input placeholder="Analysis name"
-              value={analysis.analysisName}
-              onChange={this.updateAnalysisFromEvent('analysisName')}
+              value={analysis.name}
+              onChange={this.updateAnalysisFromEvent('name')}
             />
           </FormItem>
           <FormItem label="Description:">
             <Input placeholder="Description of your analysis"
-              value={analysis.analysisDescription}
-              onChange={this.updateAnalysisFromEvent('analysisDescription')}
+              value={analysis.description}
+              onChange={this.updateAnalysisFromEvent('description')}
               type="textarea"
               autosize={{ minRows: 3, maxRows: 20 }}
             />

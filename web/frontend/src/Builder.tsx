@@ -1,11 +1,11 @@
 import * as React from 'react';
-import { Tabs, Row, Col, Layout, message } from 'antd';
+import { Tabs, Row, Col, Layout, Button, message } from 'antd';
 
 import { OverviewTab } from './Overview';
 import { PredictorsTab } from './Predictors';
 import { Home } from './Home';
 import { Store, Analysis, Dataset, Task, Run, ApiDataset } from './commontypes';
-import {displayError, jwtFetch} from './utils';
+import { displayError, jwtFetch } from './utils';
 
 const { TabPane } = Tabs;
 const { Footer, Content } = Layout;
@@ -25,8 +25,8 @@ const initializeStore = (): Store => ({
   reviewActive: true,
   analysis: {
     analysisId: null,
-    analysisName: 'Untitled',
-    analysisDescription: '',
+    name: 'Untitled',
+    description: '',
     datasetId: null,
     predictions: '',
     runIds: [],
@@ -97,10 +97,11 @@ const getTasks = (runs: Run[]): Task[] => {
   let taskMap: Map<string, Task> = new Map();
   for (let run of runs) {
     const key = run.task.id;
-    if (taskMap.has(key))
+    if (taskMap.has(key)) {
       taskMap.get(key)!.numRuns += 1;
-    else
+    } else {
       taskMap.set(key, { ...run.task, numRuns: 1 });
+    }
   }
   return Array.from(taskMap.values());
 }
@@ -118,11 +119,28 @@ export class AnalysisBuilder extends React.Component<{}, Store> {
       .catch(error => { message.error(error.toString()); });
   }
 
+  // Save analysis to server
+  saveAnalysis = () => {
+    const analysis = this.state.analysis;
+    const apiAnalysis = {
+      name: analysis.name,
+      description: analysis.description,
+      locked: false,
+      private: false,
+      dataset_id: analysis.datasetId,
+      runs: analysis.runIds.map(id => ({ id })),
+      predictors: analysis.predictorIds.map(id => ({ id })),
+      transformations: {}
+    };
+    jwtFetch(domainRoot + '/api/analyses', {method: 'post', body: JSON.stringify(apiAnalysis)})
+      .then(response => response.json())
+      .then(data => console.log('saved analysis...'))
+      .catch(displayError)
+  }
+
+  /* Main function to update application state. May split this up into
+   smaller pieces if it gets too complex. */
   updateState = (attrName: keyof Store) => (value: any) => {
-    /* 
-     Main function to update application state. May split this up into
-     smaller pieces if it gets too complex.
-    */
     const { analysis, availableRuns } = this.state;
     let stateUpdate: any = {};
     if (attrName === 'analysis') {
@@ -211,6 +229,7 @@ export class AnalysisBuilder extends React.Component<{}, Store> {
                 <p>
                   {JSON.stringify(analysis)}
                 </p>
+                <Button onClick={this.saveAnalysis}>Save as new analysis</Button>
               </TabPane>
             </Tabs>
           </Col>
