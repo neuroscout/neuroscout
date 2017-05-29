@@ -101,7 +101,7 @@ class App extends React.Component<{}, AppState>{
     })
       .then((response) => {
         if (response.status !== 200) {
-          throw 'Sign up failed'
+          throw 'Sign up failed';
         }
         response.json().then((data: any) => {
           message.success('Signup successful');
@@ -118,6 +118,12 @@ class App extends React.Component<{}, AppState>{
     localStorage.removeItem('jwt');
     localStorage.removeItem('email');
     this.setState({ loggedIn: false, email: null, jwt: null });
+  }
+
+  setStateFromInput = (name: keyof AppState) => (event: React.FormEvent<HTMLInputElement>) => {
+    const newState = {};
+    newState[name] = event.currentTarget.value;
+    this.setState(newState);
   }
 
   // loginAndNavigate = (nextURL: string) => {
@@ -154,14 +160,14 @@ class App extends React.Component<{}, AppState>{
               type="email"
               size="large"
               value={email}
-              onChange={(e: any) => this.setState({ email: e.target.value })}
+              onChange={this.setStateFromInput('email')}
             />
           </FormItem>
           <FormItem>
             <Input placeholder="Password"
               type="password"
               value={password}
-              onChange={(e: any) => this.setState({ password: e.target.value })}
+              onChange={this.setStateFromInput('password')}
             />
           </FormItem>
           <FormItem>
@@ -187,7 +193,7 @@ class App extends React.Component<{}, AppState>{
             <Input placeholder="Full name"
               size="large"
               value={name}
-              onChange={(e: any) => this.setState({ name: e.target.value })}
+              onChange={this.setStateFromInput('name')}
             />
           </FormItem>
           <FormItem>
@@ -195,14 +201,14 @@ class App extends React.Component<{}, AppState>{
               type="email"
               size="large"
               value={email}
-              onChange={(e: any) => this.setState({ email: e.target.value })}
+              onChange={this.setStateFromInput('email')}
             />
           </FormItem>
           <FormItem>
             <Input placeholder="Password"
               type="password"
               value={password}
-              onChange={(e: any) => this.setState({ password: e.target.value })}
+              onChange={this.setStateFromInput('password')}
             />
           </FormItem>
           <FormItem>
@@ -223,10 +229,10 @@ class App extends React.Component<{}, AppState>{
           <Layout>
             <Header style={{ background: '#fff', padding: 0 }}>
               <Row type="flex" justify="center">
-                <Col span={12}>
+                <Col span={10}>
                   <h1><a href="/">Neuroscout</a></h1>
                 </Col>
-                <Col span={4}>
+                <Col span={6}>
                   {loggedIn ?
                     <span>{`Logged in as ${email}`}
                       <Button onClick={e => this.logout()}>Log out</Button>

@@ -29,8 +29,8 @@ export class OverviewTab extends React.Component<OverviewTabProps, any> {
     this.props.updateAnalysis(newAnalysis);
   }
 
-  updateAnalysisFromEvent = (attrName: string) => (event: any) => {
-    this.updateAnalysis(attrName)(event.target.value);
+  updateAnalysisFromEvent = (attrName: string) => (event: React.FormEvent<HTMLInputElement>) => {
+    this.updateAnalysis(attrName)(event.currentTarget.value);
   }
 
   render() {

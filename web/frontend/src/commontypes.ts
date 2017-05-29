@@ -1,11 +1,13 @@
 export interface Analysis {
-  analysisId: number | null;
+  analysisId: string | null;
   name: string;
   description: string;
   datasetId: number | null;  // ID of selected dataset
   runIds: string[];          // IDs of selected runs
   predictions: string;
   predictorIds: string[]; // IDs of selected predictors
+  locked: boolean;
+  private: true;
 }
 
 // Normalized dataset object 
@@ -70,4 +72,16 @@ export interface ApiRun {
   number: string;
   session: string | null;
   subject: string | null;
+}
+
+export interface ApiAnalysis {
+  hash_id?: string;
+  name: string;
+  description: string;
+  locked: boolean;
+  private: boolean;
+  dataset_id: number;
+  runs: { id: string }[];
+  predictors: { id: string }[];
+  transformations: object;
 }

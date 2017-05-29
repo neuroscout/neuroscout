@@ -4,7 +4,7 @@ import { Tabs, Row, Col, Layout, Button, message } from 'antd';
 import { OverviewTab } from './Overview';
 import { PredictorsTab } from './Predictors';
 import { Home } from './Home';
-import { Store, Analysis, Dataset, Task, Run, ApiDataset } from './commontypes';
+import { Store, Analysis, Dataset, Task, Run, ApiDataset, ApiAnalysis } from './commontypes';
 import { displayError, jwtFetch } from './utils';
 
 const { TabPane } = Tabs;
@@ -30,7 +30,9 @@ const initializeStore = (): Store => ({
     datasetId: null,
     predictions: '',
     runIds: [],
-    predictorIds: []
+    predictorIds: [],
+    locked: false,
+    private: true
   },
   datasets: [],
   availableTasks: [],
@@ -107,7 +109,7 @@ const getTasks = (runs: Run[]): Task[] => {
 }
 
 export class AnalysisBuilder extends React.Component<{}, Store> {
-  constructor(props) {
+  constructor(props: {}) {
     super(props);
     this.state = initializeStore();
     jwtFetch(domainRoot + '/api/datasets').then(response => {
@@ -120,21 +122,30 @@ export class AnalysisBuilder extends React.Component<{}, Store> {
   }
 
   // Save analysis to server
-  saveAnalysis = () => {
+  saveAnalysis = (): void => {
     const analysis = this.state.analysis;
-    const apiAnalysis = {
+    if (analysis.datasetId === null) {
+      displayError(Error('Analysis cannot be saved without selecting a dataset'));
+      return;
+    }
+    const apiAnalysis: ApiAnalysis = {
       name: analysis.name,
       description: analysis.description,
-      locked: false,
-      private: false,
+      locked: analysis.locked,
+      private: analysis.private,
       dataset_id: analysis.datasetId,
       runs: analysis.runIds.map(id => ({ id })),
       predictors: analysis.predictorIds.map(id => ({ id })),
       transformations: {}
     };
-    jwtFetch(domainRoot + '/api/analyses', {method: 'post', body: JSON.stringify(apiAnalysis)})
+    console.log('Saving analysis:');
+    console.log(JSON.stringify(apiAnalysis));
+    jwtFetch(domainRoot + '/api/analyses', { method: 'post', body: JSON.stringify(apiAnalysis) })
       .then(response => response.json())
-      .then(data => console.log('saved analysis...'))
+      .then((data: ApiAnalysis) => {
+        message.success('New analysis saved');
+        this.setState({analysis: {...analysis, analysisId: data.hash_id}})
+      })
       .catch(displayError)
   }
 
