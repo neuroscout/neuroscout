@@ -24,7 +24,7 @@ def test_get_predictor(auth_client, add_dataset):
     # Test parameters
     ds = decode_json(
         auth_client.get('/api/datasets'))
-    run_id = str(ds[0]['runs'][0])
+    run_id = str(ds[0]['runs'][0]['id'])
     resp = auth_client.get('/api/predictors', params={'run_id' : run_id})
     assert resp.status_code == 200
     pred_select = decode_json(resp)
