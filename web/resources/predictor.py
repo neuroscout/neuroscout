@@ -5,7 +5,7 @@ from models import Predictor, PredictorEvent
 from . import utils
 
 class PredictorSchema(Schema):
-	id = fields.Str()
+	id = fields.Int()
 	name = fields.Str(description="Predictor name.")
 	description = fields.Str()
 	ef_id = fields.Int(description="Original extracted feature id.")
