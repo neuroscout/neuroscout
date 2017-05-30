@@ -1,5 +1,5 @@
 from tests.request_utils import decode_json
-from models import Analysis
+from models import Analysis, Run
 
 def test_get(session, auth_client, add_analysis):
 	# List of analyses
@@ -112,6 +112,23 @@ def test_put(auth_client, add_analysis):
 	assert resp.status_code == 200
 	new_analysis = decode_json(resp)
 	assert new_analysis['name'] == "NEW NAME!"
+
+	# Test adding a run_id
+	analysis_json['runs'] = [{'id' : Run.query.first().id }]
+
+	resp = auth_client.put('/api/analyses/{}'.format(analysis.hash_id),
+						data=analysis_json)
+	assert resp.status_code == 200
+	new_analysis = decode_json(resp)
+	assert new_analysis['runs'] == [{'id' :	Run.query.first().id }]
+
+	# Test adding an invalid run id
+	analysis_json['runs'] = [{'id' : 9999 }]
+
+	resp = auth_client.put('/api/analyses/{}'.format(analysis.hash_id),
+						data=analysis_json)
+	assert resp.status_code == 422
+	assert 'runs' in  decode_json(resp)['message']
 
 	# Test locking
 	new_analysis['locked'] = True
