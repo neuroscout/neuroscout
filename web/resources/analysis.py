@@ -108,11 +108,11 @@ class AnalysisResource(AnalysisBaseResource):
 			Analysis.query.filter_by(hash_id=analysis_id))
 		if analysis.locked is True:
 			utils.abort(422, "Analysis is not editable. Try cloning it.")
-		else:
+		elif 'locked' in kwargs:
 			if kwargs['locked'] > analysis.locked:
 				kwargs['locked_at'] = datetime.datetime.utcnow()
 				### Add other triggers here
-			return put_record(db.session, kwargs, analysis)
+		return put_record(db.session, kwargs, analysis)
 
 class CloneAnalysisResource(AnalysisBaseResource):
 	@marshal_with(AnalysisSchema, code='201')
