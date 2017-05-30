@@ -1,11 +1,12 @@
 from flask_apispec import MethodResource, marshal_with, use_kwargs, doc
 from flask_jwt import current_identity
-from marshmallow import Schema, fields, validates, ValidationError
+from marshmallow import Schema, fields, validates, ValidationError, post_load
 from database import db
 from db_utils import put_record
-from models import Analysis, Dataset
+from models import Analysis, Dataset, Run, Predictor
 from . import utils
 import datetime
+from sqlalchemy.orm.exc import NoResultFound
 
 class AnalysisSchema(Schema):
 	hash_id = fields.Str(dump_only=True, description='Hashed analysis id.')
@@ -29,14 +30,14 @@ class AnalysisSchema(Schema):
 
 
 	predictors = fields.Nested(
-		'PredictorSchema', many=True, only='id',
+		'PredictorSchema', many=True, only=['id'],
         description='Predictor id(s) associated with analysis')
 	runs = fields.Nested(
-		'RunSchema', many=True, only='id',
+		'RunSchema', many=True, only=['id'],
         description='Runs associated with analysis')
 
 	results = fields.Nested(
-		'ResultSchema', many=True, only='id', dump_only=True,
+		'ResultSchema', many=True, only=['id'], dump_only=True,
         description='Result id(s) associated with analysis')
 
 
@@ -44,6 +45,30 @@ class AnalysisSchema(Schema):
 	def validate_dsid(self, value):
 		if Dataset.query.filter_by(id=value).count() == 0:
 			raise ValidationError('Invalid dataset id.')
+
+	@validates('runs')
+	def validate_runs(self, value):
+		try:
+			[Run.query.filter_by(**r).one() for r in value]
+		except:
+			raise ValidationError('Invalid run id!')
+
+	@validates('predictors')
+	def validate_preds(self, value):
+		try:
+			[Predictor.query.filter_by(**r).one() for r in value]
+		except:
+			raise ValidationError('Invalid predictor id.')
+
+	@post_load
+	def nested_object(self, args):
+		if 'runs' in args:
+			args['runs'] = [Run.query.filter_by(**r).one() for r in args['runs']]
+
+		if 'predictors' in args:
+			args['predictors'] = [Predictor.query.filter_by(**r).one() for r in args['predictors']]
+
+		return args
 
 	class Meta:
 		strict = True
