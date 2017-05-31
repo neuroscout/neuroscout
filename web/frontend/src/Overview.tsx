@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Form, Input, AutoComplete, Table } from 'antd';
+import { Form, Input, AutoComplete, Table, Switch } from 'antd';
 import { TableProps, TableRowSelection } from 'antd/lib/table/Table';
 
 const FormItem = Form.Item;
@@ -87,6 +87,14 @@ export class OverviewTab extends React.Component<OverviewTabProps, any> {
             <Input placeholder="Analysis name"
               value={analysis.name}
               onChange={this.updateAnalysisFromEvent('name')}
+            />
+          </FormItem>
+          <FormItem label="Should this analysis be private (only visible to you) or public?">
+            <Switch
+              checked={analysis.private}
+              checkedChildren="Private"
+              unCheckedChildren="Public"
+              onChange={checked => this.updateAnalysis('private')(checked)}
             />
           </FormItem>
           <FormItem label="Description:">
