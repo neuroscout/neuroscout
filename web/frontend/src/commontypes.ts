@@ -54,6 +54,7 @@ export interface Store {
   selectedTaskId: string | null;
   availablePredictors: Predictor[];
   selectedPredictors: Predictor[];
+  unsavedChanges: boolean;
 }
 
 // Dataset object as returned by /api/datasets

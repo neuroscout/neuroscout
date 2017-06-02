@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Tabs, Row, Col, Layout, Button, message } from 'antd';
+import { Tabs, Row, Col, Layout, Button, Modal, message } from 'antd';
 
 import { OverviewTab } from './Overview';
 import { PredictorsTab } from './Predictors';
@@ -39,7 +39,8 @@ const initializeStore = (): Store => ({
   availableRuns: [],
   selectedTaskId: null,
   availablePredictors: [],
-  selectedPredictors: []
+  selectedPredictors: [],
+  unsavedChanges: false
 });
 
 
@@ -121,8 +122,12 @@ export class AnalysisBuilder extends React.Component<{}, Store> {
       .catch(error => { message.error(error.toString()); });
   }
 
-  // Save analysis to server
-  saveAnalysis = (): void => {
+  saveEnabled = (): boolean => this.state.unsavedChanges && !this.state.analysis.locked;
+  submitEnabled = (): boolean => !this.state.analysis.locked;
+  cloneEnabled = (): boolean => this.state.analysis.analysisId !== null && this.state.analysis.locked;
+
+  // Save analysis to server, either with lock=false (just save), or lock=true (save & submit)
+  saveAnalysis = ({ locked = false }) => (): void => {
     const analysis = this.state.analysis;
     if (analysis.datasetId === null) {
       displayError(Error('Analysis cannot be saved without selecting a dataset'));
@@ -131,22 +136,38 @@ export class AnalysisBuilder extends React.Component<{}, Store> {
     const apiAnalysis: ApiAnalysis = {
       name: analysis.name,
       description: analysis.description,
-      locked: analysis.locked,
+      locked: locked,
       private: analysis.private,
       dataset_id: analysis.datasetId,
       runs: analysis.runIds.map(id => ({ id })),
       predictors: analysis.predictorIds.map(id => ({ id })),
       transformations: {}
     };
-    console.log('Saving analysis:');
-    console.log(JSON.stringify(apiAnalysis));
-    jwtFetch(domainRoot + '/api/analyses', { method: 'post', body: JSON.stringify(apiAnalysis) })
+    const method = analysis.analysisId ? 'put' : 'post';
+    const url = analysis.analysisId ?
+      `${domainRoot}/api/analyses/${analysis.analysisId}` :
+      `${domainRoot}/api/analyses`;
+    jwtFetch(url, { method, body: JSON.stringify(apiAnalysis) })
       .then(response => response.json())
       .then((data: ApiAnalysis) => {
-        message.success('New analysis saved');
-        this.setState({analysis: {...analysis, analysisId: data.hash_id}})
+        message.success('Analysis saved');
+        this.setState({ analysis: { ...analysis, analysisId: data.hash_id, locked: data.locked } });
       })
-      .catch(displayError)
+      .catch(displayError);
+  }
+
+  confirmSubmission = () => {
+    const { saveAnalysis } = this;
+    Modal.confirm({
+      title: 'Are you sure you want to submit the analysis?',
+      content: `Once you submit an analysis you will no longer be able to mofidy it. 
+                You will, however, be able to make a clone a new analysis from it.`,
+      okText: 'Yes',
+      cancelText: 'No',
+      onOk() {
+        saveAnalysis({ locked: true })();
+      },
+    });
   }
 
   /* Main function to update application state. May split this up into
@@ -190,6 +211,7 @@ export class AnalysisBuilder extends React.Component<{}, Store> {
       }
       // Enable predictors tab only if at least one run has been selected
       stateUpdate.predictorsActive = value.runIds.length > 0;
+      stateUpdate.unsavedChanges = true;
     } else if (attrName === 'selectedTaskId') {
       // When a different task is selected, autoselect all its associated run IDs
       this.updateState('analysis')({
@@ -208,7 +230,7 @@ export class AnalysisBuilder extends React.Component<{}, Store> {
   render() {
     const { predictorsActive, transformationsActive, contrastsActive, modelingActive,
       reviewActive, analysis, datasets, availableTasks, availableRuns,
-      selectedTaskId, availablePredictors, selectedPredictors } = this.state;
+      selectedTaskId, availablePredictors, selectedPredictors, unsavedChanges } = this.state;
     return (
       <div className="App">
         <Row type="flex" justify="center">
@@ -240,7 +262,18 @@ export class AnalysisBuilder extends React.Component<{}, Store> {
                 <p>
                   {JSON.stringify(analysis)}
                 </p>
-                <Button onClick={this.saveAnalysis}>Save as new analysis</Button>
+                <Button
+                  onClick={this.saveAnalysis({ locked: false })}
+                  type={this.saveEnabled() ? 'primary' : 'dashed'}
+                >Save Analysis</Button>
+                <Button
+                  onClick={this.confirmSubmission}
+                  type={this.submitEnabled() ? 'primary' : 'dashed'}
+                >{unsavedChanges ? 'Save & Submit Analysis' : 'Submit Analysis'}</Button>
+                <Button
+                  onClick={() => displayError(Error('Not implemented'))}
+                  type={this.cloneEnabled() ? 'primary' : 'dashed'}
+                >Clone Analysis</Button>
               </TabPane>
             </Tabs>
           </Col>
