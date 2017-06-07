@@ -4,7 +4,7 @@ from models import Stimulus
 from . import utils
 
 class StimulusSchema(Schema):
-    id = fields.Str(dump_only=True)
+    id = fields.Int(dump_only=True)
     name = fields.Str(dump_only=True)
     mimetype = fields.Str(dump_only=True, description='modality/mimetype')
 
