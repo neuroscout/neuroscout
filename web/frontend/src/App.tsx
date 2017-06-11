@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { Tabs, Row, Col, Layout, Button, Modal, Input, Form, message } from 'antd';
-import { displayError } from './utils';
+import { displayError, jwtFetch } from './utils';
+import { ApiUser } from './commontypes';
 
 const FormItem = Form.Item;
 const DOMAINROOT = 'http://localhost:80';
@@ -27,6 +28,7 @@ interface AppState {
   password: string | null;
   jwt: string | null;
   nextURL: string | null; // will probably remove this and find a better solution to login redirects
+  analyses: { id: string, name: string }[];
 }
 
 const Browse = () => (
@@ -51,8 +53,21 @@ class App extends React.Component<{}, AppState>{
       name: null,
       jwt: jwt,
       password: 'password', // For development - set to '' in production
-      nextURL: null
+      nextURL: null,
+      analyses: [],
     };
+    this.loadAnalyses();
+  }
+
+  loadAnalyses = () => {
+    if (this.state.jwt) {
+      jwtFetch(`${DOMAINROOT}/api/user`)
+        .then(response => response.json())
+        .then((data: ApiUser) => {
+          this.setState({ analyses: data.analyses });
+        })
+        .catch(displayError);
+    }
   }
 
   authenticate = () => new Promise((resolve, reject) => {
@@ -64,17 +79,16 @@ class App extends React.Component<{}, AppState>{
         'Content-type': 'application/json'
       }
     })
-      .then((response) => {
-        response.json().then((data: { access_token: string }) => {
-          if (data.access_token) {
-            message.success('Authentication successful');
-            localStorage.setItem('jwt', data.access_token);
-            localStorage.setItem('email', email!);
-            resolve(data.access_token);
-          } else {
-            reject('Authentication failed');
-          }
-        });
+      .then(response => response.json())
+      .then((data: { access_token: string }) => {
+        if (data.access_token) {
+          message.success('Authentication successful');
+          localStorage.setItem('jwt', data.access_token);
+          localStorage.setItem('email', email!);
+          resolve(data.access_token);
+        } else {
+          reject('Authentication failed');
+        }
       })
       .catch(displayError);
   });
@@ -87,6 +101,7 @@ class App extends React.Component<{}, AppState>{
           jwt: jwt, password: '', loggedIn: true, openLogin: false, nextURL: null
         });
       })
+      .then(() => this.loadAnalyses())
       .catch(displayError);
   }
 
@@ -111,6 +126,7 @@ class App extends React.Component<{}, AppState>{
         });
       })
       .then(() => message.success('Logged in'))
+      .then(() => this.loadAnalyses())
       .catch(displayError);
   }
 
@@ -153,7 +169,7 @@ class App extends React.Component<{}, AppState>{
         maskClosable={true}
         onCancel={e => { this.setState({ openLogin: false }); }}
       >
-        <p>{"For development try 'test2@test.com' and 'password'"}</p><br />
+        <p>{'For development try "test2@test.com" and "password"'}</p><br />
         <Form>
           <FormItem>
             <Input placeholder="Email"

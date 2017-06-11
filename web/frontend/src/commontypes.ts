@@ -86,3 +86,9 @@ export interface ApiAnalysis {
   predictors: { id: string }[];
   transformations: object;
 }
+
+export interface ApiUser {
+  email: string;
+  name: string;
+  analyses: { id: string, name: string }[];
+}

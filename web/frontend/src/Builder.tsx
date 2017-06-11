@@ -156,7 +156,7 @@ export class AnalysisBuilder extends React.Component<{}, Store> {
       .catch(displayError);
   }
 
-  confirmSubmission = () => {
+  confirmSubmission = (): void => {
     const { saveAnalysis } = this;
     Modal.confirm({
       title: 'Are you sure you want to submit the analysis?',
@@ -235,6 +235,22 @@ export class AnalysisBuilder extends React.Component<{}, Store> {
       <div className="App">
         <Row type="flex" justify="center">
           <Col span={16}>
+            <Button
+              onClick={this.saveAnalysis({ locked: false })}
+              type={this.saveEnabled() ? 'primary' : 'dashed'}
+            >Save Analysis</Button>
+            <Button
+              onClick={this.confirmSubmission}
+              type={this.submitEnabled() ? 'primary' : 'dashed'}
+            >{unsavedChanges ? 'Save & Submit Analysis' : 'Submit Analysis'}</Button>
+            <Button
+              onClick={() => displayError(Error('Not implemented'))}
+              type={this.cloneEnabled() ? 'primary' : 'dashed'}
+            >Clone Analysis</Button>
+          </Col>
+        </Row>
+        <Row type="flex" justify="center">
+          <Col span={16}>
             <Tabs>
               <TabPane tab="Overview" key="1">
                 <OverviewTab
@@ -262,19 +278,8 @@ export class AnalysisBuilder extends React.Component<{}, Store> {
                 <p>
                   {JSON.stringify(analysis)}
                 </p>
-                <Button
-                  onClick={this.saveAnalysis({ locked: false })}
-                  type={this.saveEnabled() ? 'primary' : 'dashed'}
-                >Save Analysis</Button>
-                <Button
-                  onClick={this.confirmSubmission}
-                  type={this.submitEnabled() ? 'primary' : 'dashed'}
-                >{unsavedChanges ? 'Save & Submit Analysis' : 'Submit Analysis'}</Button>
-                <Button
-                  onClick={() => displayError(Error('Not implemented'))}
-                  type={this.cloneEnabled() ? 'primary' : 'dashed'}
-                >Clone Analysis</Button>
               </TabPane>
+              <TabPane tab="Status" key="7" disabled={false} />
             </Tabs>
           </Col>
         </Row>
