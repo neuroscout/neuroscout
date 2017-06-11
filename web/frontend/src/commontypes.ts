@@ -90,5 +90,5 @@ export interface ApiAnalysis {
 export interface ApiUser {
   email: string;
   name: string;
-  analyses: { id: string, name: string }[];
+  analyses: { hash_id: string, name: string }[];
 }

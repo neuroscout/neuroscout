@@ -64,7 +64,7 @@ class App extends React.Component<{}, AppState>{
       jwtFetch(`${DOMAINROOT}/api/user`)
         .then(response => response.json())
         .then((data: ApiUser) => {
-          this.setState({ analyses: data.analyses });
+          this.setState({ analyses: data.analyses.map(x => ({id: x.hash_id, name: x.name})) });
         })
         .catch(displayError);
     }
@@ -160,7 +160,7 @@ class App extends React.Component<{}, AppState>{
   // });
 
   render() {
-    const { loggedIn, email, name, openLogin, openSignup, password } = this.state;
+    const { loggedIn, email, name, openLogin, openSignup, password, analyses } = this.state;
     const loginModal = () => (
       <Modal
         title="Log into Neuroscout"
@@ -262,8 +262,10 @@ class App extends React.Component<{}, AppState>{
               </Row>
             </Header>
             <Content style={{ background: '#fff' }}>
-              <Route exact path="/" render={(props) => <Home />} />
+              <Route exact path="/" render={(props) => <Home analyses={analyses}/>} />
+              {/*<Route exact path="/" analyses={this.satte.analyses} />*/}
               <Route path="/builder" render={(props) => <AnalysisBuilder />} />
+              <Route path="/builder/:id" render={(props) => <AnalysisBuilder id={props.match.params.id}/>} />
               <Route exact path="/browse" component={Browse} />
             </Content>
             <Footer style={{ background: '#fff' }}>

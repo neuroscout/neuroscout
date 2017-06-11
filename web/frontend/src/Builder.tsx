@@ -109,17 +109,24 @@ const getTasks = (runs: Run[]): Task[] => {
   return Array.from(taskMap.values());
 }
 
-export class AnalysisBuilder extends React.Component<{}, Store> {
-  constructor(props: {}) {
+type BuilderProps = {id?: string}
+export class AnalysisBuilder extends React.Component<BuilderProps, Store> {
+  constructor(props: BuilderProps) {
     super(props);
+    if(!!props.id){
+      jwtFetch(`${domainRoot}/api/analyses/${props.id}`)
+      .then(response => response.json())
+      .then(data => console.log(data))
+      .catch(displayError);
+    }
     this.state = initializeStore();
-    jwtFetch(domainRoot + '/api/datasets').then(response => {
-      response.json().then(data => {
+    jwtFetch(domainRoot + '/api/datasets')
+      .then(response => response.json())
+      .then(data => {
         const datasets: Dataset[] = data.map(d => normalizeDataset(d));
         this.setState({ 'datasets': datasets });
-      });
-    })
-      .catch(error => { message.error(error.toString()); });
+      })
+      .catch(displayError);
   }
 
   saveEnabled = (): boolean => this.state.unsavedChanges && !this.state.analysis.locked;
