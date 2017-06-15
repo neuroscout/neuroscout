@@ -197,8 +197,15 @@ def add_dataset(session, bids_path, task, replace=False, verbose=True, **kwargs)
     return dataset_model.id
 
 def extract_features(session, bids_path, task, graph_spec, verbose=True, **kwargs):
-    from pliers.stimuli import load_stims
-    from pliers.graph import Graph
+    import imageio
+    try:
+        from pliers.stimuli import load_stims
+        from pliers.graph import Graph
+    except imageio.core.fetching.NeedDownloadError:
+        imageio.plugins.ffmpeg.download()
+        from pliers.stimuli import load_stims
+        from pliers.graph import Graph
+        
     # Try to add dataset, will skip if already in
     dataset_id = add_dataset(session, bids_path, task, verbose=True)
 
