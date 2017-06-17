@@ -43,11 +43,23 @@ export class OverviewTab extends React.Component<OverviewTabProps, any> {
       { title: 'URL', dataIndex: 'url', width: 100 }
     ];
 
+    const selectedDatasetId: string[] = analysis.datasetId ? [analysis.datasetId.toString()] : [];
+    // let datasetSelections: any = [];
+    // if (analysis.datasetId) {
+    //   datasetSelections = [{
+    //     key: analysis.datasetId.toString(),
+    //     text: 'Dataset Id',
+    //     onSelect: (keys) => {return;}
+    //   }]
+    // }
+    // console.log(`selected data set Id = ${selectedDatasetId}`);
     const datasetRowSelection: TableRowSelection<Dataset> = {
       type: 'radio',
       onSelect: (record, selected, selectedRows) => {
         this.updateAnalysis('datasetId')(record.id);
-      }
+      },
+      // selections: datasetSelections,
+      selectedRowKeys: selectedDatasetId,
     };
 
     const taskColumns = [
@@ -60,7 +72,8 @@ export class OverviewTab extends React.Component<OverviewTabProps, any> {
       type: 'radio',
       onSelect: (record, selected, selectedRows) => {
         this.props.updateSelectedTaskId(record.id);
-      }
+      },
+      selectedRowKeys: selectedTaskId ? [selectedTaskId] : [],
     };
 
     const runColumns = [
@@ -124,30 +137,32 @@ export class OverviewTab extends React.Component<OverviewTabProps, any> {
           />
           <br />
           {availableRuns.length > 0 &&
-            <div>
-              <p>Select a task:</p><br />
-              <DataTable
-                columns={taskColumns}
-                rowKey="id"
-                size="small"
-                dataSource={availableTasks}
-                rowSelection={taskRowSelection}
-                pagination={datasets.length > 20} />
-              <br />
-            </div>
+            (
+              <div>
+                <p>Select a task:</p><br />
+                <DataTable
+                  columns={taskColumns}
+                  rowKey="id"
+                  size="small"
+                  dataSource={availableTasks}
+                  rowSelection={taskRowSelection}
+                  pagination={datasets.length > 20} />
+                <br />
+              </div>)
           }
           {selectedTaskId &&
-            <div>
-              <p>Select runs:</p><br />
-              <DataTable
-                columns={runColumns}
-                rowKey="id"
-                size="small"
-                dataSource={availableRuns.filter(r => r.task.id === selectedTaskId)}
-                pagination={datasets.length > 20}
-                rowSelection={runRowSelection} />
-              <br />
-            </div>}
+            (
+              <div>
+                <p>Select runs:</p><br />
+                <DataTable
+                  columns={runColumns}
+                  rowKey="id"
+                  size="small"
+                  dataSource={availableRuns.filter(r => r.task.id === selectedTaskId)}
+                  pagination={datasets.length > 20}
+                  rowSelection={runRowSelection} />
+                <br />
+              </div>)}
         </Form>
       </div>
     );

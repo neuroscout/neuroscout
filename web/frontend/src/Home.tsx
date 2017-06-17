@@ -27,8 +27,7 @@ export class Home extends React.Component<HomeProps, {}> {
           </Col>
         </Row>
         <Row type="flex" justify="center">
-          <Col span={2}>
-          </Col>
+          <Col span={2} />
           <Col span={4}>
             <Button type="primary"><Link to="/builder">Create New Analysis</Link></Button>
           </Col>
@@ -38,11 +37,11 @@ export class Home extends React.Component<HomeProps, {}> {
         </Row>
         <Row type="flex" justify="center">
           <Col span={12}>
-          {analyses!.map(analysis => (
-            <div>
-              <Link to={`/builder/${analysis.id}`}>{ analysis.name}</Link><br/>
-            </div>
-          ))}
+            {analyses!.map(analysis => (
+              <div key={analysis.id}>
+                <Link to={`/builder/${analysis.id}`}>{analysis.name}</Link><br />
+              </div>
+            ))}
           </Col>
         </Row>
       </div>

@@ -5,7 +5,7 @@ import { OverviewTab } from './Overview';
 import { PredictorsTab } from './Predictors';
 import { Home } from './Home';
 import { Store, Analysis, Dataset, Task, Run, ApiDataset, ApiAnalysis } from './commontypes';
-import { displayError, jwtFetch } from './utils';
+import { displayError, jwtFetch, Space } from './utils';
 
 const { TabPane } = Tabs;
 const { Footer, Content } = Layout;
@@ -24,7 +24,7 @@ const initializeStore = (): Store => ({
   modelingActive: false,
   reviewActive: true,
   analysis: {
-    analysisId: null,
+    analysisId: undefined,
     name: 'Untitled',
     description: '',
     datasetId: null,
@@ -42,7 +42,6 @@ const initializeStore = (): Store => ({
   selectedPredictors: [],
   unsavedChanges: false
 });
-
 
 const getJwt = () => new Promise((resolve, reject) => {
   /* Returns an access token (JWT) as a promise, either straight from local 
@@ -91,7 +90,8 @@ const normalizeDataset = (d: ApiDataset): Dataset => {
   const authors = d.description.Authors ? d.description.Authors.join(', ') : 'No authors listed';
   const description = d.description.Description;
   const url = d.description.URL;
-  const { name, id } = d;
+  const id = d.id.toString();
+  const { name } = d;
   return { id, name, authors, url, description };
 };
 
@@ -109,17 +109,18 @@ const getTasks = (runs: Run[]): Task[] => {
   return Array.from(taskMap.values());
 }
 
-type BuilderProps = {id?: string}
+type BuilderProps = { id?: string }
 export class AnalysisBuilder extends React.Component<BuilderProps, Store> {
   constructor(props: BuilderProps) {
     super(props);
-    if(!!props.id){
-      jwtFetch(`${domainRoot}/api/analyses/${props.id}`)
-      .then(response => response.json())
-      .then(data => console.log(data))
-      .catch(displayError);
-    }
     this.state = initializeStore();
+    // Load analysis from server if an analysis id is specified in the props
+    if (!!props.id) {
+      jwtFetch(`${domainRoot}/api/analyses/${props.id}`)
+        .then(response => response.json() as Promise<ApiAnalysis>)
+        .then(data => this.loadAnalysis(data))
+        .catch(displayError);
+    }
     jwtFetch(domainRoot + '/api/datasets')
       .then(response => response.json())
       .then(data => {
@@ -158,9 +159,36 @@ export class AnalysisBuilder extends React.Component<BuilderProps, Store> {
       .then(response => response.json())
       .then((data: ApiAnalysis) => {
         message.success('Analysis saved');
-        this.setState({ analysis: { ...analysis, analysisId: data.hash_id, locked: data.locked } });
+        this.setState({
+          analysis: { ...analysis, analysisId: data.hash_id, locked: data.locked },
+          unsavedChanges: false,
+        });
       })
       .catch(displayError);
+  }
+
+  loadAnalysis = (data: ApiAnalysis): Promise<Analysis> => {
+    const analysis: Analysis = {
+      ...data,
+      analysisId: data.hash_id,
+      datasetId: data.dataset_id,
+      runIds: data.runs.map(({ id }) => id),
+      predictions: '', // TODO: remove this once predictions field is added to backend
+      predictorIds: data.predictors.map(({ id }) => id),
+    };
+    if (analysis.runIds.length > 0) {
+      jwtFetch(`${domainRoot}/api/runs/${analysis.runIds[0]}`)
+        .then(response => response.json() as Promise<Run>)
+        .then(data => {
+          this.setState({ selectedTaskId: data.task.id });
+          this.updateState('analysis')(analysis);
+        })
+        .catch(displayError);
+    } else {
+      this.updateState('analysis')(analysis);
+    }
+    this.setState({ unsavedChanges: false });
+    return Promise.resolve(analysis);
   }
 
   confirmSubmission = (): void => {
@@ -187,15 +215,13 @@ export class AnalysisBuilder extends React.Component<BuilderProps, Store> {
       if (updatedAnalysis.datasetId !== analysis.datasetId) {
         // If a new dataset is selected we need to fetch the associated runs
         jwtFetch(`${domainRoot}/api/runs?dataset_id=${updatedAnalysis.datasetId}`)
-          .then(response => {
-            response.json().then((data: Run[]) => {
-              message.success(`Fetched ${data.length} runs associated with the selected dataset`);
-              this.setState({
-                availableRuns: data,
-                selectedTaskId: null,
-                availableTasks: getTasks(data),
-                availablePredictors: []
-              });
+          .then(response => response.json())
+          .then((data: Run[]) => {
+            message.success(`Fetched ${data.length} runs associated with the selected dataset`);
+            this.setState({
+              availableRuns: data,
+              availableTasks: getTasks(data),
+              availablePredictors: []
             });
           })
           .catch(displayError);
@@ -245,15 +271,17 @@ export class AnalysisBuilder extends React.Component<BuilderProps, Store> {
             <Button
               onClick={this.saveAnalysis({ locked: false })}
               type={this.saveEnabled() ? 'primary' : 'dashed'}
-            >Save Analysis</Button>
+            >Save</Button>
+            <Space />
             <Button
               onClick={this.confirmSubmission}
               type={this.submitEnabled() ? 'primary' : 'dashed'}
-            >{unsavedChanges ? 'Save & Submit Analysis' : 'Submit Analysis'}</Button>
+            >{unsavedChanges ? 'Save & Generate' : 'Generate'}</Button>
+            <Space />
             <Button
               onClick={() => displayError(Error('Not implemented'))}
               type={this.cloneEnabled() ? 'primary' : 'dashed'}
-            >Clone Analysis</Button>
+            >Clone</Button>
           </Col>
         </Row>
         <Row type="flex" justify="center">

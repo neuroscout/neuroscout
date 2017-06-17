@@ -1,5 +1,5 @@
 export interface Analysis {
-  analysisId: string | null;
+  analysisId: string | undefined;
   name: string;
   description: string;
   datasetId: number | null;  // ID of selected dataset
@@ -7,13 +7,13 @@ export interface Analysis {
   predictions: string;
   predictorIds: string[]; // IDs of selected predictors
   locked: boolean;
-  private: true;
+  private: boolean;
 }
 
 // Normalized dataset object 
 export interface Dataset {
   name: string;
-  id: number;
+  id: string;
   authors: string;
   url: string;
   description: string;

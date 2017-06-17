@@ -64,7 +64,7 @@ class App extends React.Component<{}, AppState>{
       jwtFetch(`${DOMAINROOT}/api/user`)
         .then(response => response.json())
         .then((data: ApiUser) => {
-          this.setState({ analyses: data.analyses.map(x => ({id: x.hash_id, name: x.name})) });
+          this.setState({ analyses: data.analyses.map(x => ({ id: x.hash_id, name: x.name })) });
         })
         .catch(displayError);
     }
@@ -246,26 +246,30 @@ class App extends React.Component<{}, AppState>{
             <Header style={{ background: '#fff', padding: 0 }}>
               <Row type="flex" justify="center">
                 <Col span={10}>
-                  <h1><a href="/">Neuroscout</a></h1>
+                  <h1><Link to="/">Neuroscout</Link></h1>
                 </Col>
                 <Col span={6}>
                   {loggedIn ?
-                    <span>{`Logged in as ${email}`}
-                      <Button onClick={e => this.logout()}>Log out</Button>
-                    </span> :
-                    <span>
-                      <Button onClick={e => this.setState({ openLogin: true })}>Log in</Button>
-                      <Button onClick={e => this.setState({ openSignup: true })}>Sign up</Button>
-                    </span>
+                    (
+                      <span>{`Logged in as ${email}`}
+                        <Button onClick={e => this.logout()}>Log out</Button>
+                      </span>
+                    ) :
+                    (
+                      <span>
+                        <Button onClick={e => this.setState({ openLogin: true })}>Log in</Button>
+                        <Button onClick={e => this.setState({ openSignup: true })}>Sign up</Button>
+                      </span>
+                    )
                   }
                 </Col>
               </Row>
             </Header>
             <Content style={{ background: '#fff' }}>
-              <Route exact path="/" render={(props) => <Home analyses={analyses}/>} />
+              <Route exact path="/" render={(props) => <Home analyses={analyses} />} />
               {/*<Route exact path="/" analyses={this.satte.analyses} />*/}
-              <Route path="/builder" render={(props) => <AnalysisBuilder />} />
-              <Route path="/builder/:id" render={(props) => <AnalysisBuilder id={props.match.params.id}/>} />
+              <Route exact path="/builder" render={(props) => <AnalysisBuilder />} />
+              <Route path="/builder/:id" render={(props) => <AnalysisBuilder id={props.match.params.id} />} />
               <Route exact path="/browse" component={Browse} />
             </Content>
             <Footer style={{ background: '#fff' }}>
