@@ -4,7 +4,10 @@ import { Tabs, Row, Col, Layout, Button, Modal, message } from 'antd';
 import { OverviewTab } from './Overview';
 import { PredictorsTab } from './Predictors';
 import { Home } from './Home';
-import { Store, Analysis, Dataset, Task, Run, ApiDataset, ApiAnalysis } from './commontypes';
+import {
+  Store, Analysis, Dataset, Task, Run, Predictor,
+  ApiDataset, ApiAnalysis
+} from './commontypes';
 import { displayError, jwtFetch, Space } from './utils';
 
 const { TabPane } = Tabs;
@@ -208,7 +211,7 @@ export class AnalysisBuilder extends React.Component<BuilderProps, Store> {
   /* Main function to update application state. May split this up into
    smaller pieces if it gets too complex. */
   updateState = (attrName: keyof Store) => (value: any) => {
-    const { analysis, availableRuns } = this.state;
+    const { analysis, availableRuns, availablePredictors } = this.state;
     let stateUpdate: any = {};
     if (attrName === 'analysis') {
       const updatedAnalysis: Analysis = value;
@@ -221,7 +224,7 @@ export class AnalysisBuilder extends React.Component<BuilderProps, Store> {
             this.setState({
               availableRuns: data,
               availableTasks: getTasks(data),
-              availablePredictors: []
+              // availablePredictors: []
             });
           })
           .catch(displayError);
@@ -231,10 +234,12 @@ export class AnalysisBuilder extends React.Component<BuilderProps, Store> {
         const runIds = updatedAnalysis.runIds.join(',');
         if (runIds) {
           jwtFetch(`${domainRoot}/api/predictors?runs=${runIds}`)
-            .then(response => {
-              response.json().then(data => {
-                message.success(`Fetched ${data.length} predictors associated with the selected runs`);
-                this.setState({ availablePredictors: data });
+            .then(response => response.json())
+            .then((data: Predictor[]) => {
+              message.success(`Fetched ${data.length} predictors associated with the selected runs`);
+              this.setState({
+                availablePredictors: data,
+                selectedPredictors: data.filter(p => updatedAnalysis.predictorIds.indexOf(p.id) > -1)
               });
             })
             .catch(displayError);

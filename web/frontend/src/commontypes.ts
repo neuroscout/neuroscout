@@ -53,7 +53,9 @@ export interface Store {
   availableRuns: Run[];
   selectedTaskId: string | null;
   availablePredictors: Predictor[];
-  selectedPredictors: Predictor[];
+  // Technically selectedPredictors is redundant because we're also storing Analysis.predictorIds
+  // but store these separately for performance reasons
+  selectedPredictors: Predictor[]; 
   unsavedChanges: boolean;
 }
 
