@@ -1,5 +1,6 @@
 import * as React from 'react';
 import { Tabs, Row, Col, Layout, Button, Modal, message } from 'antd';
+import { Prompt } from 'react-router-dom';
 
 import { OverviewTab } from './Overview';
 import { PredictorsTab } from './Predictors';
@@ -184,13 +185,12 @@ export class AnalysisBuilder extends React.Component<BuilderProps, Store> {
         .then(response => response.json() as Promise<Run>)
         .then(data => {
           this.setState({ selectedTaskId: data.task.id });
-          this.updateState('analysis')(analysis);
+          this.updateState('analysis', true)(analysis);
         })
         .catch(displayError);
     } else {
-      this.updateState('analysis')(analysis);
+      this.updateState('analysis', true)(analysis);
     }
-    this.setState({ unsavedChanges: false });
     return Promise.resolve(analysis);
   }
 
@@ -199,7 +199,7 @@ export class AnalysisBuilder extends React.Component<BuilderProps, Store> {
     Modal.confirm({
       title: 'Are you sure you want to submit the analysis?',
       content: `Once you submit an analysis you will no longer be able to mofidy it. 
-                You will, however, be able to make a clone a new analysis from it.`,
+                You will, however, be able to clone it as a starting point for a new analysis.`,
       okText: 'Yes',
       cancelText: 'No',
       onOk() {
@@ -209,8 +209,13 @@ export class AnalysisBuilder extends React.Component<BuilderProps, Store> {
   }
 
   /* Main function to update application state. May split this up into
-   smaller pieces if it gets too complex. */
-  updateState = (attrName: keyof Store) => (value: any) => {
+   smaller pieces if it gets too complex. 
+   
+   When keepClean is true, don't set unsavedChanges to true. This is useful in situations
+   like loading a new analysis (loadAnalysis function) where updateState is called but
+   since state changes aren't really user edits we don't want to set unsavedChanges.
+   */
+  updateState = (attrName: keyof Store, keepClean = false) => (value: any) => {
     const { analysis, availableRuns, availablePredictors } = this.state;
     let stateUpdate: any = {};
     if (attrName === 'analysis') {
@@ -249,7 +254,6 @@ export class AnalysisBuilder extends React.Component<BuilderProps, Store> {
       }
       // Enable predictors tab only if at least one run has been selected
       stateUpdate.predictorsActive = value.runIds.length > 0;
-      stateUpdate.unsavedChanges = true;
     } else if (attrName === 'selectedTaskId') {
       // When a different task is selected, autoselect all its associated run IDs
       this.updateState('analysis')({
@@ -262,6 +266,7 @@ export class AnalysisBuilder extends React.Component<BuilderProps, Store> {
       stateUpdate.analysis = newAnalysis;
     }
     stateUpdate[attrName] = value;
+    if(!keepClean) stateUpdate.unsavedChanges = true;
     this.setState(stateUpdate);
   }
 
@@ -271,6 +276,10 @@ export class AnalysisBuilder extends React.Component<BuilderProps, Store> {
       selectedTaskId, availablePredictors, selectedPredictors, unsavedChanges } = this.state;
     return (
       <div className="App">
+        <Prompt
+          when={unsavedChanges}
+          message="You have unsaved changes. Are you sure you want leave this page?"
+        />
         <Row type="flex" justify="center">
           <Col span={16}>
             <Button
