@@ -21,6 +21,7 @@ class AnalysisSchema(Schema):
 	locked_at = fields.Time(description='Timestamp of when analysis was locked',
 							dump_only=True)
 	private = fields.Bool(description='Analysis private or discoverable?')
+	predictions = fields.Str(description='User apriori predictions.')
 
 	transformations = fields.Dict(description='Transformation json spec.')
 	description = fields.Str()

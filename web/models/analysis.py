@@ -29,6 +29,7 @@ class Analysis(db.Model):
     locked = db.Column(db.Boolean, default=False)
     locked_at = db.Column(db.DateTime)
     private = db.Column(db.Boolean, default=True)
+    predictions = db.Column(db.Text)
 
     dataset_id = db.Column(db.Integer, db.ForeignKey('dataset.id'), nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
