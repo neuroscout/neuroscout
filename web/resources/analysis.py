@@ -1,4 +1,5 @@
 from flask_apispec import MethodResource, marshal_with, use_kwargs, doc
+from flask.views import MethodView
 from flask_jwt import current_identity
 from marshmallow import Schema, fields, validates, ValidationError, post_load
 from database import db
@@ -126,3 +127,15 @@ class CloneAnalysisResource(AnalysisBaseResource):
 			db.session.add(cloned)
 			db.session.commit()
 			return cloned
+
+class CompiledAnalysisResource(MethodView):
+	@doc(tags=['analysis'], summary='Compile and lock analysis.')
+	def post(self, analysis_id):
+		analysis = utils.first_or_404(
+			Analysis.query.filter_by(hash_id=analysis_id))
+		analysis.status = 'PENDING'
+
+		## Add other triggers here
+		db.session.add(analysis)
+		db.session.commit()
+		return {'status': 'analysis compiling triggered'}
