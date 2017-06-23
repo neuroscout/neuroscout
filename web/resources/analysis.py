@@ -16,7 +16,7 @@ class AnalysisSchema(Schema):
 	user_id = fields.Int(dump_only=True)
 
 	status = fields.Str(
-		description='Analysis status. DRAFT, PENDING, or COMPILED.',
+		description='Analysis status. PASSED, FAILED, PENDING, or DRAFT.',
 		dump_only=True)
 
 	compiled_at = fields.Time(description='Timestamp of when analysis was compiled',
@@ -27,8 +27,7 @@ class AnalysisSchema(Schema):
 	transformations = fields.Dict(description='Transformation json spec.')
 	description = fields.Str()
 	data = fields.Dict()
-	parent_id = fields.Str(dump_only=True,
-                        description="Parent analysis, if cloned.")
+	parent_id = fields.Str(dump_only=True,description="Parent analysis, if cloned.")
 
 
 	predictors = fields.Nested(
@@ -112,6 +111,18 @@ class AnalysisResource(AnalysisBaseResource):
 			utils.abort(422, "Analysis is not editable. Try cloning it.")
 		return put_record(db.session, kwargs, analysis)
 
+	@doc(summary='Delete analysis.')
+	@utils.auth_required
+	def delete(self, analysis_id):
+		analysis = utils.first_or_404(
+			Analysis.query.filter_by(hash_id=analysis_id))
+		if analysis.status != 'DRAFT':
+			utils.abort(422, "Analysis is not editable, too bad!")
+		analysis.delete()
+		db.session.commit()
+
+		return {'message' : 'deleted!'}
+
 class CloneAnalysisResource(AnalysisBaseResource):
 	@marshal_with(AnalysisSchema, code='201')
 	@doc(summary='Clone analysis.')
@@ -119,7 +130,7 @@ class CloneAnalysisResource(AnalysisBaseResource):
 	def post(self, analysis_id):
 		original = utils.first_or_404(
 			Analysis.query.filter_by(hash_id=analysis_id))
-		if original.status != 'COMPILED':
+		if original.status != 'PASSED':
 			utils.abort(422, "Only locked analyses can be cloned")
 		else:
 			cloned = original.clone()

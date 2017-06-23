@@ -28,7 +28,7 @@ class Analysis(db.Model):
     saved_count = db.Column(db.Integer, default=0)
     status = db.Column(db.Text, default='DRAFT')
     __table_args__ = (
-    	db.CheckConstraint(status.in_(['DRAFT', 'PENDING', 'COMPILED'])), )
+    	db.CheckConstraint(status.in_(['PASSED', 'FAILED', 'PENDING', 'DRAFT'])), )
     compiled_at = db.Column(db.DateTime)
     private = db.Column(db.Boolean, default=True)
     predictions = db.Column(db.Text, default='')

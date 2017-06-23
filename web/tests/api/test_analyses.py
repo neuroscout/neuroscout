@@ -92,7 +92,7 @@ def test_clone(session, auth_client, add_dataset, add_analysis):
 	assert resp.status_code == 422
 
 	# Make uneditable and try again
-	analysis.status = 'COMPILED'
+	analysis.status = 'PASSED'
 	session.commit()
 
 	resp= auth_client.post('/api/analyses/{}/clone'.format(analysis.hash_id))
@@ -141,4 +141,8 @@ def test_put(auth_client, add_analysis):
 	locked_analysis['name'] = 'New name should not be allowed'
 	resp = auth_client.put('/api/analyses/{}'.format(analysis.hash_id),
 						data=locked_analysis)
+	assert resp.status_code == 422
+
+	# Try deleting locked anlaysis
+	resp = auth_client.delete('/api/analyses/{}'.format(analysis.hash_id))
 	assert resp.status_code == 422
