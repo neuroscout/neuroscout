@@ -282,7 +282,7 @@ export class AnalysisBuilder extends React.Component<BuilderProps, Store> {
 
   render() {
     const { predictorsActive, transformationsActive, contrastsActive, modelingActive,
-      reviewActive, analysis, datasets, availableTasks, availableRuns,
+      reviewActive, activeTab, analysis, datasets, availableTasks, availableRuns,
       selectedTaskId, availablePredictors, selectedPredictors, unsavedChanges } = this.state;
     return (
       <div className="App">
@@ -292,44 +292,50 @@ export class AnalysisBuilder extends React.Component<BuilderProps, Store> {
         />
         <Row type="flex" justify="center">
           <Col span={16}>
-          <h2>
-            {analysis.locked ?
-              <Icon type="lock" /> :
-              <Icon type="unlock" />
-            }
-            <Space />
-            <Button
-              onClick={this.saveAnalysis({ locked: false })}
-              type={this.saveEnabled() ? 'primary' : 'dashed'}
-            >Save</Button>
-            <Space />
-            <Button
-              onClick={this.confirmSubmission}
-              type={this.submitEnabled() ? 'primary' : 'dashed'}
-            >{unsavedChanges ? 'Save & Generate' : 'Generate'}</Button>
-            <Space />
-            <Button
-              onClick={() => displayError(Error('Not implemented'))}
-              type={this.cloneEnabled() ? 'primary' : 'dashed'}
-            >Clone</Button>
+            <h2>
+              {analysis.locked ?
+                <Icon type="lock" /> :
+                <Icon type="unlock" />
+              }
+              <Space />
+              <Button
+                onClick={this.saveAnalysis({ locked: false })}
+                type={this.saveEnabled() ? 'primary' : 'dashed'}
+              >Save</Button>
+              <Space />
+              <Button
+                onClick={this.confirmSubmission}
+                type={this.submitEnabled() ? 'primary' : 'dashed'}
+              >{unsavedChanges ? 'Save & Generate' : 'Generate'}</Button>
+              <Space />
+              <Button
+                onClick={() => displayError(Error('Not implemented'))}
+                type={this.cloneEnabled() ? 'primary' : 'dashed'}
+              >Clone</Button>
             </h2>
+            <br />
           </Col>
         </Row>
         <Row type="flex" justify="center">
           <Col span={16}>
-            <Tabs>
-              <TabPane tab="Overview" key="1">
+            <Tabs
+              activeKey={activeTab}
+              onTabClick={(newTab) => this.setState({ activeTab: newTab })}
+            >
+              <TabPane tab="Overview" key="overview">
                 <OverviewTab
                   analysis={analysis}
                   datasets={datasets}
                   availableTasks={availableTasks}
                   availableRuns={availableRuns}
                   selectedTaskId={selectedTaskId}
+                  predictorsActive={predictorsActive}
                   updateAnalysis={this.updateState('analysis')}
                   updateSelectedTaskId={this.updateState('selectedTaskId')}
+                  goToNextTab={() => this.setState({ activeTab: 'predictors' })}
                 />
               </TabPane>
-              <TabPane tab="Predictors" key="2" disabled={!predictorsActive}>
+              <TabPane tab="Predictors" key="predictors" disabled={!predictorsActive}>
                 <PredictorsTab
                   analysis={analysis}
                   availablePredictors={availablePredictors}
@@ -337,10 +343,10 @@ export class AnalysisBuilder extends React.Component<BuilderProps, Store> {
                   updateSelectedPredictors={this.updateState('selectedPredictors')}
                 />
               </TabPane>
-              <TabPane tab="Transformations" key="3" disabled={!transformationsActive} />
-              <TabPane tab="Contrasts" key="4" disabled={!contrastsActive} />
-              <TabPane tab="Modeling" key="5" disabled={!modelingActive} />
-              <TabPane tab="Review" key="6" disabled={!reviewActive}>
+              <TabPane tab="Transformations" key="transformations" disabled={!transformationsActive} />
+              <TabPane tab="Contrasts" key="contrasts" disabled={!contrastsActive} />
+              <TabPane tab="Modeling" key="modeling" disabled={!modelingActive} />
+              <TabPane tab="Review" key="review" disabled={!reviewActive}>
                 <p>
                   {JSON.stringify(analysis)}
                 </p>

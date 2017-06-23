@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Form, Input, AutoComplete, Table, Switch } from 'antd';
+import { Form, Input, AutoComplete, Table, Switch, Button } from 'antd';
 import { TableProps, TableRowSelection } from 'antd/lib/table/Table';
 
 const FormItem = Form.Item;
@@ -18,8 +18,10 @@ interface OverviewTabProps {
   availableTasks: Task[];
   availableRuns: Run[];
   selectedTaskId: string | null;
+  predictorsActive: boolean;
   updateAnalysis: (value: any) => void;
   updateSelectedTaskId: (value: string) => void;
+  goToNextTab: () => void;
 }
 
 export class OverviewTab extends React.Component<OverviewTabProps, any> {
@@ -34,7 +36,8 @@ export class OverviewTab extends React.Component<OverviewTabProps, any> {
   }
 
   render() {
-    const { analysis, datasets, availableTasks, availableRuns, selectedTaskId } = this.props;
+    const { analysis, datasets, availableTasks, availableRuns,
+      selectedTaskId, goToNextTab, predictorsActive } = this.props;
 
     const datasetColumns = [
       { title: 'Name', dataIndex: 'name', width: 60 },
@@ -164,6 +167,7 @@ export class OverviewTab extends React.Component<OverviewTabProps, any> {
                 <br />
               </div>)}
         </Form>
+        {predictorsActive && <Button type="primary" onClick={goToNextTab}>Next: Select Predictors</Button>}
       </div>
     );
   }
