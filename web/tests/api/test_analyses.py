@@ -92,7 +92,7 @@ def test_clone(session, auth_client, add_dataset, add_analysis):
 	assert resp.status_code == 422
 
 	# Make uneditable and try again
-	analysis.locked = True
+	analysis.status = 'COMPILED'
 	session.commit()
 
 	resp= auth_client.post('/api/analyses/{}/clone'.format(analysis.hash_id))
@@ -105,13 +105,13 @@ def test_put(auth_client, add_analysis):
 	analysis_json = decode_json(
 		auth_client.get('/api/analyses/{}'.format(analysis.hash_id)))
 
-	analysis_json['name'] = 'NEW NAME!'
+	analysis_json['name'] = 'NEW NAME!!'
 
 	resp = auth_client.put('/api/analyses/{}'.format(analysis.hash_id),
 						data=analysis_json)
 	assert resp.status_code == 200
 	new_analysis = decode_json(resp)
-	assert new_analysis['name'] == "NEW NAME!"
+	assert new_analysis['name'] == "NEW NAME"
 
 	# Test adding a run_id
 	analysis_json['runs'] = [{'id' : Run.query.first().id }]
@@ -131,13 +131,13 @@ def test_put(auth_client, add_analysis):
 	assert 'runs' in  decode_json(resp)['message']
 
 	# Test locking
-	new_analysis['locked'] = True
+	new_analysis['status'] = 'COMPILED'
 	resp = auth_client.put('/api/analyses/{}'.format(analysis.hash_id),
 						data=new_analysis)
 	assert resp.status_code == 200
 	locked_analysis = decode_json(resp)
-	assert locked_analysis['locked'] == True
-	assert locked_analysis['locked_at'] != ''
+	assert locked_analysis['status'] == 'COMPILED'
+	assert locked_analysis['compiled_at'] != ''
 
 	locked_analysis['name'] = 'New name should not be allowed'
 	resp = auth_client.put('/api/analyses/{}'.format(analysis.hash_id),

@@ -6,7 +6,6 @@ from db_utils import put_record
 from models import Analysis, Dataset, Run, Predictor
 from . import utils
 import datetime
-from sqlalchemy.orm.exc import NoResultFound
 
 class AnalysisSchema(Schema):
 	hash_id = fields.Str(dump_only=True, description='Hashed analysis id.')
@@ -16,9 +15,11 @@ class AnalysisSchema(Schema):
 	modified_at = fields.Time(dump_only=True)
 	user_id = fields.Int(dump_only=True)
 
-	locked = fields.Bool(
-		description='Is analysis finished and locked? Locking is irreversible.')
-	locked_at = fields.Time(description='Timestamp of when analysis was locked',
+	status = fields.Str(
+		description='Analysis status. DRAFT, PENDING, or COMPILED.',
+		dump_only=True)
+
+	compiled_at = fields.Time(description='Timestamp of when analysis was compiled',
 							dump_only=True)
 	private = fields.Bool(description='Analysis private or discoverable?')
 	predictions = fields.Str(description='User apriori predictions.')
@@ -107,12 +108,8 @@ class AnalysisResource(AnalysisBaseResource):
 	def put(self, analysis_id, **kwargs):
 		analysis = utils.first_or_404(
 			Analysis.query.filter_by(hash_id=analysis_id))
-		if analysis.locked is True:
+		if analysis.status == 'COMPILED':
 			utils.abort(422, "Analysis is not editable. Try cloning it.")
-		elif 'locked' in kwargs:
-			if kwargs['locked'] > analysis.locked:
-				kwargs['locked_at'] = datetime.datetime.utcnow()
-				### Add other triggers here
 		return put_record(db.session, kwargs, analysis)
 
 class CloneAnalysisResource(AnalysisBaseResource):
@@ -122,7 +119,7 @@ class CloneAnalysisResource(AnalysisBaseResource):
 	def post(self, analysis_id):
 		original = utils.first_or_404(
 			Analysis.query.filter_by(hash_id=analysis_id))
-		if original.locked is False:
+		if original.status != 'COMPILED':
 			utils.abort(422, "Only locked analyses can be cloned")
 		else:
 			cloned = original.clone()
