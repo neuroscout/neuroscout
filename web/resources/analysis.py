@@ -1,5 +1,4 @@
 from flask_apispec import MethodResource, marshal_with, use_kwargs, doc
-from flask.views import MethodView
 from flask_jwt import current_identity
 from marshmallow import Schema, fields, validates, ValidationError, post_load
 from database import db
@@ -109,7 +108,7 @@ class AnalysisResource(AnalysisBaseResource):
 	def put(self, analysis_id, **kwargs):
 		analysis = utils.first_or_404(
 			Analysis.query.filter_by(hash_id=analysis_id))
-		if analysis.status == 'COMPILED':
+		if analysis.status != 'DRAFT':
 			utils.abort(422, "Analysis is not editable. Try cloning it.")
 		return put_record(db.session, kwargs, analysis)
 
@@ -128,8 +127,9 @@ class CloneAnalysisResource(AnalysisBaseResource):
 			db.session.commit()
 			return cloned
 
-class CompiledAnalysisResource(MethodView):
-	@doc(tags=['analysis'], summary='Compile and lock analysis.')
+class CompileAnalysisResource(AnalysisBaseResource):
+	@doc(summary='Compile and lock analysis.')
+	@utils.auth_required
 	def post(self, analysis_id):
 		analysis = utils.first_or_404(
 			Analysis.query.filter_by(hash_id=analysis_id))
@@ -138,4 +138,4 @@ class CompiledAnalysisResource(MethodView):
 		## Add other triggers here
 		db.session.add(analysis)
 		db.session.commit()
-		return {'status': 'analysis compiling triggered'}
+		return analysis
