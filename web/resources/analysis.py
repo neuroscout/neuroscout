@@ -118,7 +118,7 @@ class AnalysisResource(AnalysisBaseResource):
 			Analysis.query.filter_by(hash_id=analysis_id))
 		if analysis.status != 'DRAFT':
 			utils.abort(422, "Analysis is not editable, too bad!")
-		analysis.delete()
+		db.session.delete(analysis)
 		db.session.commit()
 
 		return {'message' : 'deleted!'}
