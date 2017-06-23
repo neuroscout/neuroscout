@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Tabs, Row, Col, Layout, Button, Modal, message } from 'antd';
+import { Tabs, Row, Col, Layout, Button, Modal, Icon, message } from 'antd';
 import { Prompt } from 'react-router-dom';
 
 import { OverviewTab } from './Overview';
@@ -140,6 +140,9 @@ export class AnalysisBuilder extends React.Component<BuilderProps, Store> {
 
   // Save analysis to server, either with lock=false (just save), or lock=true (save & submit)
   saveAnalysis = ({ locked = false }) => (): void => {
+    if ((!locked && !this.saveEnabled()) || (locked && !this.submitEnabled())) {
+      return;
+    }
     const analysis = this.state.analysis;
     if (analysis.datasetId === null) {
       displayError(Error('Analysis cannot be saved without selecting a dataset'));
@@ -195,6 +198,9 @@ export class AnalysisBuilder extends React.Component<BuilderProps, Store> {
   }
 
   confirmSubmission = (): void => {
+    if (!this.submitEnabled()) {
+      return;
+    }
     const { saveAnalysis } = this;
     Modal.confirm({
       title: 'Are you sure you want to submit the analysis?',
@@ -217,6 +223,10 @@ export class AnalysisBuilder extends React.Component<BuilderProps, Store> {
    */
   updateState = (attrName: keyof Store, keepClean = false) => (value: any) => {
     const { analysis, availableRuns, availablePredictors } = this.state;
+    if (analysis.locked && !keepClean) {
+      message.warning('This analysis is locked and cannot be edited');
+      return;
+    }
     let stateUpdate: any = {};
     if (attrName === 'analysis') {
       const updatedAnalysis: Analysis = value;
@@ -266,7 +276,7 @@ export class AnalysisBuilder extends React.Component<BuilderProps, Store> {
       stateUpdate.analysis = newAnalysis;
     }
     stateUpdate[attrName] = value;
-    if(!keepClean) stateUpdate.unsavedChanges = true;
+    if (!keepClean) stateUpdate.unsavedChanges = true;
     this.setState(stateUpdate);
   }
 
@@ -282,6 +292,12 @@ export class AnalysisBuilder extends React.Component<BuilderProps, Store> {
         />
         <Row type="flex" justify="center">
           <Col span={16}>
+          <h2>
+            {analysis.locked ?
+              <Icon type="lock" /> :
+              <Icon type="unlock" />
+            }
+            <Space />
             <Button
               onClick={this.saveAnalysis({ locked: false })}
               type={this.saveEnabled() ? 'primary' : 'dashed'}
@@ -296,6 +312,7 @@ export class AnalysisBuilder extends React.Component<BuilderProps, Store> {
               onClick={() => displayError(Error('Not implemented'))}
               type={this.cloneEnabled() ? 'primary' : 'dashed'}
             >Clone</Button>
+            </h2>
           </Col>
         </Row>
         <Row type="flex" justify="center">

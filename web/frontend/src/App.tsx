@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { Tabs, Row, Col, Layout, Button, Modal, Input, Form, message } from 'antd';
-import { displayError, jwtFetch } from './utils';
+import { displayError, jwtFetch, Space } from './utils';
 import { ApiUser, ApiAnalysis } from './commontypes';
 
 const FormItem = Form.Item;
@@ -268,6 +268,7 @@ class App extends React.Component<{}, AppState>{
                   {loggedIn ?
                     (
                       <span>{`Logged in as ${email}`}
+                        <Space />
                         <Button onClick={e => this.logout()}>Log out</Button>
                       </span>
                     ) :

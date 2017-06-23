@@ -41,7 +41,7 @@ export interface Predictor {
 }
 
 export interface Store {
-  activeTab: 'overview' | 'predictors' | 'transformations' | 'contrasts' | 'modeling' | 'overview';
+  activeTab: 'overview' | 'predictors' | 'transformations' | 'contrasts' | 'modeling' | 'review' | 'status';
   predictorsActive: boolean;
   transformationsActive: boolean;
   contrastsActive: boolean;
