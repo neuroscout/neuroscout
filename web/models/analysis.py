@@ -31,7 +31,7 @@ class Analysis(db.Model):
     	db.CheckConstraint(status.in_(['DRAFT', 'PENDING', 'COMPILED'])), )
     compiled_at = db.Column(db.DateTime)
     private = db.Column(db.Boolean, default=True)
-    predictions = db.Column(db.Text)
+    predictions = db.Column(db.Text, default='')
 
     dataset_id = db.Column(db.Integer, db.ForeignKey('dataset.id'), nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
