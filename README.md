@@ -47,7 +47,7 @@ To run tests, after starting services, create a test database:
 
 and execute:
 
-    docker-compose run web python -m pytest tests/ --rm
+    docker-compose run --rm web python -m pytest tests/ 
 
 
 ## Populating the database
