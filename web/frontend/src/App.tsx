@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { Tabs, Row, Col, Layout, Button, Modal, Input, Form, message } from 'antd';
 import { displayError, jwtFetch } from './utils';
-import { ApiUser } from './commontypes';
+import { ApiUser, ApiAnalysis } from './commontypes';
 
 const FormItem = Form.Item;
 const DOMAINROOT = 'http://localhost:80';
@@ -142,6 +142,22 @@ class App extends React.Component<{}, AppState>{
     this.setState(newState);
   }
 
+  cloneAnalysis = (id): void => {
+    jwtFetch(`${DOMAINROOT}/api/analyses/${id}/clone`, { method: 'post' })
+      .then(response => {
+        if (response.status !== 200) {
+          throw 'Something went wrong - most likely the analysis is not locked. Will fix it later';
+        }
+        return response.json()
+      })
+      .then((data: ApiAnalysis) => {
+        const analysis = { id: data.hash_id!, name: data.name }
+        this.setState({ analyses: this.state.analyses.concat([analysis]) });
+      })
+      .catch(displayError);
+    return;
+  }
+
   // loginAndNavigate = (nextURL: string) => {
   //   if (this.state.loggedIn) {
   //     document.location.href = nextURL;
@@ -266,8 +282,8 @@ class App extends React.Component<{}, AppState>{
               </Row>
             </Header>
             <Content style={{ background: '#fff' }}>
-              <Route exact path="/" render={(props) => <Home analyses={analyses} />} />
-              {/*<Route exact path="/" analyses={this.satte.analyses} />*/}
+              <Route exact path="/" render={(props) =>
+                <Home analyses={analyses} cloneAnalysis={this.cloneAnalysis} />} />
               <Route exact path="/builder" render={(props) => <AnalysisBuilder />} />
               <Route path="/builder/:id" render={(props) => <AnalysisBuilder id={props.match.params.id} />} />
               <Route exact path="/browse" component={Browse} />
