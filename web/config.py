@@ -14,6 +14,7 @@ class Config(object):
     WTF_CSRF_ENABLED = False
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     JWT_EXPIRATION_DELTA = datetime.timedelta(days=7)
+    JWT_AUTH_URL_RULE = '/api/auth'
     MIGRATIONS_DIR = 'migrations'
     APISPEC_SWAGGER_UI_URL = None
     HASH_SALT = 'lksjdfkljsflkjdf'

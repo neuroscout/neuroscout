@@ -8,10 +8,10 @@ services:
     links:
       - postgres:postgres
     volumes:
-      - /usr/src/app/static
+      - /usr/src/app/frontend/build
       - migrations:/migrations
       # ADD OTHERS VOLUMES HERE
-    command: /usr/local/bin/gunicorn -w 2 -b :8000 core:app --log-level debu
+    command: /usr/local/bin/gunicorn -w 2 -b :8000 core:app --log-level debug
     environment:
       - APP_SETTINGS=config.DevelopmentConfig
 
