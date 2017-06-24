@@ -9,7 +9,7 @@ export interface Analysis {
   runIds: string[];          // IDs of selected runs
   predictions: string;
   predictorIds: string[]; // IDs of selected predictors
-  status?: AnalysisStatus;
+  status: AnalysisStatus;
   private?: boolean;
   modifiedAt?: string;
 }
@@ -86,7 +86,7 @@ export interface ApiAnalysis {
   name: string;
   description: string;
   predictions: string;
-  status?: AnalysisStatus;
+  status: AnalysisStatus;
   private?: boolean;
   dataset_id: number;
   runs?: { id: string }[];
@@ -105,6 +105,6 @@ export interface AppAnalysis {
   id: string; 
   name: string;
   description: string;
-  status?: AnalysisStatus; 
+  status: AnalysisStatus; 
   modifiedAt?: string;
 }

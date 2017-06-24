@@ -71,13 +71,18 @@ class App extends React.Component<{}, AppState>{
 
   loadAnalyses = () => {
     if (this.state.jwt) {
-      jwtFetch(`${DOMAINROOT}/api/user`)
+      return jwtFetch(`${DOMAINROOT}/api/user`)
         .then(response => response.json())
         .then((data: ApiUser) => {
-          this.setState({ analyses: data.analyses.map(x => ApiToAppAnalysis(x)) });
+          this.setState({
+            analyses: data.analyses
+              .filter(x => !!x.status)  // Ignore analyses with missing status
+              .map(x => ApiToAppAnalysis(x))
+          });
         })
         .catch(displayError);
     }
+    return Promise.reject('You are not logged in');
   }
 
   authenticate = () => new Promise((resolve, reject) => {
@@ -143,13 +148,44 @@ class App extends React.Component<{}, AppState>{
   logout = () => {
     localStorage.removeItem('jwt');
     localStorage.removeItem('email');
-    this.setState({ loggedIn: false, email: null, jwt: null });
+    this.setState({ loggedIn: false, email: null, jwt: null, analyses: [] });
   }
 
   setStateFromInput = (name: keyof AppState) => (event: React.FormEvent<HTMLInputElement>) => {
     const newState = {};
     newState[name] = event.currentTarget.value;
     this.setState(newState);
+  }
+
+  deleteAnalysis = (id): void => {
+    jwtFetch(`${DOMAINROOT}/api/analyses/${id}`, { method: 'delete' })
+      .then(response => {
+        if (response.status !== 200) {
+          throw 'Something went wrong - most likely the analysis is not locked. Will fix it later';
+        }
+        return response.json()
+      })
+      .then((data: ApiAnalysis) => {
+        this.setState({ analyses: this.state.analyses.filter(a => a.id !== id) });
+      })
+      .catch(displayError);
+  }
+
+  onDelete = (analysis: AppAnalysis) => {
+    const { deleteAnalysis } = this;
+    if (analysis.status && analysis.status !== 'DRAFT') {
+      message.warning('This analysis has already been submitted and cannot be deleted.');
+      return;
+    }
+    Modal.confirm({
+      title: 'Are you sure you want to delete this analysis?',
+      content: '',
+      okText: 'Yes',
+      cancelText: 'No',
+      onOk() {
+        deleteAnalysis(analysis.id);
+      },
+    });
   }
 
   cloneAnalysis = (id): void => {
@@ -165,7 +201,6 @@ class App extends React.Component<{}, AppState>{
         this.setState({ analyses: this.state.analyses.concat([analysis]) });
       })
       .catch(displayError);
-    return;
   }
 
   // loginAndNavigate = (nextURL: string) => {
@@ -184,6 +219,14 @@ class App extends React.Component<{}, AppState>{
   //     this.login().then(() => resolve()).catch(() => reject());
   //   }
   // });
+
+  componentWillMount() {
+    console.log('App component will mount');
+  }
+
+  componentWillUpdate() {
+    console.log('App component will update');
+  }
 
   render() {
     const { loggedIn, email, name, openLogin, openSignup, password, analyses } = this.state;
@@ -294,9 +337,17 @@ class App extends React.Component<{}, AppState>{
             </Header>
             <Content style={{ background: '#fff' }}>
               <Route exact path="/" render={(props) =>
-                <Home analyses={analyses} cloneAnalysis={this.cloneAnalysis} />} />
-              <Route exact path="/builder" render={(props) => <AnalysisBuilder />} />
-              <Route path="/builder/:id" render={(props) => <AnalysisBuilder id={props.match.params.id} />} />
+                <Home
+                  analyses={analyses}
+                  loggedIn={loggedIn}
+                  cloneAnalysis={this.cloneAnalysis}
+                  onDelete={this.onDelete}
+                />}
+              />
+              <Route exact path="/builder" render={(props) =>
+                <AnalysisBuilder updatedAnalysis={() => this.loadAnalyses()} />} />
+              <Route path="/builder/:id" render={(props) =>
+                <AnalysisBuilder id={props.match.params.id} updatedAnalysis={() => this.loadAnalyses()}/>} />
               <Route exact path="/browse" component={Browse} />
             </Content>
             <Footer style={{ background: '#fff' }}>
@@ -314,9 +365,4 @@ class App extends React.Component<{}, AppState>{
   }
 }
 
-const init = () => {
-  // window.localStorage.clear(); // Dev-only, will remove later once there is user/password prompt functionality
-};
-
-init();
 export default App;

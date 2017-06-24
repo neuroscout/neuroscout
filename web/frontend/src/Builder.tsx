@@ -113,7 +113,10 @@ const getTasks = (runs: Run[]): Task[] => {
   return Array.from(taskMap.values());
 }
 
-type BuilderProps = { id?: string }
+type BuilderProps = { 
+  id?: string;
+  updatedAnalysis: () => void;
+}
 export class AnalysisBuilder extends React.Component<BuilderProps, Store> {
   constructor(props: BuilderProps) {
     super(props);
@@ -153,6 +156,7 @@ export class AnalysisBuilder extends React.Component<BuilderProps, Store> {
       predictions: analysis.predictions,
       private: analysis.private,
       dataset_id: analysis.datasetId,
+      status: analysis.status,
       runs: analysis.runIds.map(id => ({ id })),
       predictors: analysis.predictorIds.map(id => ({ id })),
       transformations: {}
@@ -187,6 +191,7 @@ export class AnalysisBuilder extends React.Component<BuilderProps, Store> {
           },
           unsavedChanges: false,
         });
+        this.props.updatedAnalysis();
       })
       .catch(displayError);
   }

@@ -11,8 +11,7 @@ services:
       - /usr/src/app/frontend/build
       - migrations:/migrations
       # ADD OTHERS VOLUMES HERE
-      - /Users/pouya/projects/neuro/shared_data:/shared_data
-    command: /usr/local/bin/gunicorn -w 2 -b :8000 core:app --log-level debu
+    command: /usr/local/bin/gunicorn -w 2 -b :8000 core:app --log-level debug
     environment:
       - APP_SETTINGS=config.DevelopmentConfig
 
