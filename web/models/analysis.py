@@ -26,9 +26,12 @@ class Analysis(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.datetime.utcnow)
     modified_at = db.Column(db.DateTime, default=datetime.datetime.utcnow)
     saved_count = db.Column(db.Integer, default=0)
-    locked = db.Column(db.Boolean, default=False)
-    locked_at = db.Column(db.DateTime)
+    status = db.Column(db.Text, default='DRAFT')
+    __table_args__ = (
+    	db.CheckConstraint(status.in_(['PASSED', 'FAILED', 'PENDING', 'DRAFT'])), )
+    compiled_at = db.Column(db.DateTime)
     private = db.Column(db.Boolean, default=True)
+    predictions = db.Column(db.Text, default='')
 
     dataset_id = db.Column(db.Integer, db.ForeignKey('dataset.id'), nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
