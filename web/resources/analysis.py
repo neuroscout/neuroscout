@@ -97,24 +97,21 @@ class AnalysisRootResource(AnalysisBaseResource):
 
 class AnalysisResource(AnalysisBaseResource):
 	@doc(summary='Get analysis by id.')
-	def get(self, analysis_id):
-		return utils.first_or_404(Analysis.query.filter_by(hash_id=analysis_id))
+	@utils.fetch_analysis
+	def get(self, analysis):
+		return analysis
 
 	@doc(summary='Edit analysis.')
 	@use_kwargs(AnalysisSchema)
 	@utils.owner_required
-	def put(self, analysis_id, **kwargs):
-		analysis = utils.first_or_404(
-			Analysis.query.filter_by(hash_id=analysis_id))
+	def put(self, analysis, **kwargs):
 		if analysis.status != 'DRAFT':
 			utils.abort(422, "Analysis is not editable. Try cloning it.")
 		return put_record(db.session, kwargs, analysis)
 
 	@doc(summary='Delete analysis.')
 	@utils.owner_required
-	def delete(self, analysis_id):
-		analysis = utils.first_or_404(
-			Analysis.query.filter_by(hash_id=analysis_id))
+	def delete(self, analysis):
 		if analysis.status != 'DRAFT':
 			utils.abort(422, "Analysis is not editable, too bad!")
 		db.session.delete(analysis)
@@ -126,13 +123,12 @@ class CloneAnalysisResource(AnalysisBaseResource):
 	@marshal_with(AnalysisSchema, code='201')
 	@doc(summary='Clone analysis.')
 	@utils.auth_required
-	def post(self, analysis_id):
-		original = utils.first_or_404(
-			Analysis.query.filter_by(hash_id=analysis_id))
-		if original.status != 'PASSED':
+	@utils.fetch_analysis
+	def post(self, analysis):
+		if analysis.status != 'PASSED':
 			utils.abort(422, "Only locked analyses can be cloned")
 		else:
-			cloned = original.clone()
+			cloned = analysis.clone()
 			db.session.add(cloned)
 			db.session.commit()
 			return cloned
@@ -140,9 +136,7 @@ class CloneAnalysisResource(AnalysisBaseResource):
 class CompileAnalysisResource(AnalysisBaseResource):
 	@doc(summary='Compile and lock analysis.')
 	@utils.owner_required
-	def post(self, analysis_id):
-		analysis = utils.first_or_404(
-			Analysis.query.filter_by(hash_id=analysis_id))
+	def post(self, analysis):
 		analysis.status = 'PENDING'
 
 		## Add other triggers here
