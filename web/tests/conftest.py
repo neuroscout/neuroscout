@@ -13,12 +13,12 @@ Session / db managment tools
 def app():
     """Session-wide test `Flask` application."""
     if 'APP_SETTINGS' in os.environ:
-        if os.environ['APP_SETTINGS'] == 'config.DevelopmentConfig':
-            _app.config.from_object('config.DockerTestConfig')
-        elif os.environ['APP_SETTINGS'] != 'config.TravisConfig':
-            _app.config.from_object('config.TestingConfig')
+        if os.environ['APP_SETTINGS'] == 'config.config.DevelopmentConfig':
+            _app.config.from_object('config.config.DockerTestConfig')
+        elif os.environ['APP_SETTINGS'] != 'config.config.TravisConfig':
+            _app.config.from_object('config.config.TestingConfig')
     else:
-        _app.config.from_object('config.TestingConfig')
+        _app.config.from_object('config..config.TestingConfig')
 
     # Establish an application context before running the tests.
     ctx = _app.app_context()
