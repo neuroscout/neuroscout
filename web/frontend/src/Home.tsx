@@ -1,12 +1,13 @@
 import * as React from 'react';
 import { Tabs, Row, Col, Layout, Button, Card } from 'antd';
 import { displayError, Space } from './utils';
+import { AppAnalysis } from './commontypes';
 import { Link } from 'react-router-dom';
 
 const { Header, Footer, Content } = Layout;
 
 interface HomeProps {
-  analyses?: { id: string, name: string }[];
+  analyses?: AppAnalysis[];
   cloneAnalysis: (id: string) => void;
   // loginAndNavigate: (string) => void;
   // ensureLoggedIn: () => Promise<{}>;
@@ -42,8 +43,8 @@ export class Home extends React.Component<HomeProps, {}> {
                 <Row>
                   <Col span={8}>
                     <Link to={`/builder/${analysis.id}`}><h4>{analysis.name}</h4></Link>
-                    <p>Status: ????</p>
-                    <p>{'Placeholder for description....'}</p>
+                    <p>Status: {analysis.status}</p>
+                    <p>{analysis.description}</p>
                   </Col>
                   <Col span={6}>
                     <Button

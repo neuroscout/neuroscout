@@ -35,7 +35,7 @@ const initializeStore = (): Store => ({
     predictions: '',
     runIds: [],
     predictorIds: [],
-    locked: false,
+    status: 'DRAFT',
     private: true
   },
   datasets: [],
@@ -134,13 +134,12 @@ export class AnalysisBuilder extends React.Component<BuilderProps, Store> {
       .catch(displayError);
   }
 
-  saveEnabled = (): boolean => this.state.unsavedChanges && !this.state.analysis.locked;
-  submitEnabled = (): boolean => !this.state.analysis.locked;
-  cloneEnabled = (): boolean => this.state.analysis.analysisId !== null && this.state.analysis.locked;
+  saveEnabled = (): boolean => this.state.unsavedChanges && this.state.analysis.status === 'DRAFT';
+  submitEnabled = (): boolean => this.state.analysis.status === 'DRAFT';
 
   // Save analysis to server, either with lock=false (just save), or lock=true (save & submit)
-  saveAnalysis = ({ locked = false }) => (): void => {
-    if ((!locked && !this.saveEnabled()) || (locked && !this.submitEnabled())) {
+  saveAnalysis = ({ compile = false }) => (): void => {
+    if ((!compile && !this.saveEnabled()) || (compile && !this.submitEnabled())) {
       return;
     }
     const analysis = this.state.analysis;
@@ -151,23 +150,41 @@ export class AnalysisBuilder extends React.Component<BuilderProps, Store> {
     const apiAnalysis: ApiAnalysis = {
       name: analysis.name,
       description: analysis.description,
-      locked: locked,
+      predictions: analysis.predictions,
       private: analysis.private,
       dataset_id: analysis.datasetId,
       runs: analysis.runIds.map(id => ({ id })),
       predictors: analysis.predictorIds.map(id => ({ id })),
       transformations: {}
     };
-    const method = analysis.analysisId ? 'put' : 'post';
-    const url = analysis.analysisId ?
-      `${domainRoot}/api/analyses/${analysis.analysisId}` :
-      `${domainRoot}/api/analyses`;
+    // const method = analysis.analysisId ? 'put' : 'post';
+    let method: string;
+    let url: string;
+    if (compile && analysis.analysisId) { // Submit for compilation
+      url = `${domainRoot}/api/analyses/${analysis.analysisId}/compile`;
+      method = 'post';
+    } else if (!compile && analysis.analysisId) { // Save existing analysis
+      url = `${domainRoot}/api/analyses/${analysis.analysisId}`;
+      method = 'put';
+    } else if (!compile && !analysis.analysisId) { // Save new analysis
+      url = `${domainRoot}/api/analyses`;
+      method = 'post';
+    } else { // Wat?
+      const error = Error('Error saving or submitting analysis.');
+      displayError(error);
+      throw error;
+    }
     jwtFetch(url, { method, body: JSON.stringify(apiAnalysis) })
       .then(response => response.json())
       .then((data: ApiAnalysis) => {
         message.success('Analysis saved');
         this.setState({
-          analysis: { ...analysis, analysisId: data.hash_id, locked: data.locked },
+          analysis: {
+            ...analysis,
+            analysisId: data.hash_id,
+            status: data.status,
+            modifiedAt: data.modified_at,
+          },
           unsavedChanges: false,
         });
       })
@@ -179,9 +196,8 @@ export class AnalysisBuilder extends React.Component<BuilderProps, Store> {
       ...data,
       analysisId: data.hash_id,
       datasetId: data.dataset_id,
-      runIds: data.runs.map(({ id }) => id),
-      predictions: '', // TODO: remove this once predictions field is added to backend
-      predictorIds: data.predictors.map(({ id }) => id),
+      runIds: data.runs!.map(({ id }) => id),
+      predictorIds: data.predictors!.map(({ id }) => id),
     };
     if (analysis.runIds.length > 0) {
       jwtFetch(`${domainRoot}/api/runs/${analysis.runIds[0]}`)
@@ -209,7 +225,7 @@ export class AnalysisBuilder extends React.Component<BuilderProps, Store> {
       okText: 'Yes',
       cancelText: 'No',
       onOk() {
-        saveAnalysis({ locked: true })();
+        saveAnalysis({ compile: true })();
       },
     });
   }
@@ -223,7 +239,7 @@ export class AnalysisBuilder extends React.Component<BuilderProps, Store> {
    */
   updateState = (attrName: keyof Store, keepClean = false) => (value: any) => {
     const { analysis, availableRuns, availablePredictors } = this.state;
-    if (analysis.locked && !keepClean) {
+    if (analysis.status !== 'DRAFT' && !keepClean) {
       message.warning('This analysis is locked and cannot be edited');
       return;
     }
@@ -293,13 +309,13 @@ export class AnalysisBuilder extends React.Component<BuilderProps, Store> {
         <Row type="flex" justify="center">
           <Col span={16}>
             <h2>
-              {analysis.locked ?
+              {analysis.status !== 'DRAFT' ?
                 <Icon type="lock" /> :
                 <Icon type="unlock" />
               }
               <Space />
               <Button
-                onClick={this.saveAnalysis({ locked: false })}
+                onClick={this.saveAnalysis({ compile: false })}
                 type={this.saveEnabled() ? 'primary' : 'dashed'}
               >Save</Button>
               <Space />
@@ -308,10 +324,6 @@ export class AnalysisBuilder extends React.Component<BuilderProps, Store> {
                 type={this.submitEnabled() ? 'primary' : 'dashed'}
               >{unsavedChanges ? 'Save & Generate' : 'Generate'}</Button>
               <Space />
-              <Button
-                onClick={() => displayError(Error('Not implemented'))}
-                type={this.cloneEnabled() ? 'primary' : 'dashed'}
-              >Clone</Button>
             </h2>
             <br />
           </Col>

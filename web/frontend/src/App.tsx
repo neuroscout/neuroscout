@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { Tabs, Row, Col, Layout, Button, Modal, Input, Form, message } from 'antd';
 import { displayError, jwtFetch, Space } from './utils';
-import { ApiUser, ApiAnalysis } from './commontypes';
+import { ApiUser, ApiAnalysis, AppAnalysis } from './commontypes';
 
 const FormItem = Form.Item;
 const DOMAINROOT = 'http://localhost:80';
@@ -28,8 +28,18 @@ interface AppState {
   password: string | null;
   jwt: string | null;
   nextURL: string | null; // will probably remove this and find a better solution to login redirects
-  analyses: { id: string, name: string }[];
+  analyses: AppAnalysis[];
 }
+
+const ApiToAppAnalysis = (data: ApiAnalysis): AppAnalysis => (
+  {
+    id: data.hash_id!,
+    name: data.name,
+    description: data.description,
+    status: data.status,
+    modifiedAt: data.modified_at
+  }
+);
 
 const Browse = () => (
   <Row type="flex" justify="center">
@@ -64,7 +74,7 @@ class App extends React.Component<{}, AppState>{
       jwtFetch(`${DOMAINROOT}/api/user`)
         .then(response => response.json())
         .then((data: ApiUser) => {
-          this.setState({ analyses: data.analyses.map(x => ({ id: x.hash_id, name: x.name })) });
+          this.setState({ analyses: data.analyses.map(x => ApiToAppAnalysis(x)) });
         })
         .catch(displayError);
     }
@@ -151,7 +161,7 @@ class App extends React.Component<{}, AppState>{
         return response.json()
       })
       .then((data: ApiAnalysis) => {
-        const analysis = { id: data.hash_id!, name: data.name }
+        const analysis = ApiToAppAnalysis(data)
         this.setState({ analyses: this.state.analyses.concat([analysis]) });
       })
       .catch(displayError);

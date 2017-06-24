@@ -1,4 +1,7 @@
-export interface Analysis {
+type AnalysisStatus = 'DRAFT' | 'PENDING' | 'PASSED' | 'FAILED';
+
+// Analysis type in Analysis Builder
+export interface Analysis {  
   analysisId: string | undefined;
   name: string;
   description: string;
@@ -6,11 +9,12 @@ export interface Analysis {
   runIds: string[];          // IDs of selected runs
   predictions: string;
   predictorIds: string[]; // IDs of selected predictors
-  locked: boolean;
-  private: boolean;
+  status?: AnalysisStatus;
+  private?: boolean;
+  modifiedAt?: string;
 }
 
-// Normalized dataset object 
+// Normalized dataset object  in Analysis Builder
 export interface Dataset {
   name: string;
   id: string;
@@ -81,16 +85,26 @@ export interface ApiAnalysis {
   hash_id?: string;
   name: string;
   description: string;
-  locked: boolean;
-  private: boolean;
+  predictions: string;
+  status?: AnalysisStatus;
+  private?: boolean;
   dataset_id: number;
-  runs: { id: string }[];
-  predictors: { id: string }[];
-  transformations: object;
+  runs?: { id: string }[];
+  predictors?: { id: string }[];
+  transformations?: object;
+  modified_at?: string;
 }
 
 export interface ApiUser {
   email: string;
   name: string;
-  analyses: { hash_id: string, name: string }[];
+  analyses: ApiAnalysis[];
+}
+
+export interface AppAnalysis {
+  id: string; 
+  name: string;
+  description: string;
+  status?: AnalysisStatus; 
+  modifiedAt?: string;
 }
