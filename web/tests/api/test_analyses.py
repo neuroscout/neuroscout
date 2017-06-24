@@ -162,3 +162,10 @@ def test_put(auth_client, add_analysis, add_dataset):
 	assert delresp.status_code == 200
 
 	assert Analysis.query.filter_by(hash_id=decode_json(resp)['hash_id']).count() == 0
+
+def test_auth_id(auth_client, add_analysis_user2):
+	# Try deleting analysis you are not owner of
+	analysis  = Analysis.query.filter_by(id=add_analysis_user2).first()
+	resp = auth_client.delete('/api/analyses/{}'.format(analysis.hash_id))
+
+	assert resp.status_code == 401

@@ -5,7 +5,6 @@ from database import db
 from db_utils import put_record
 from models import Analysis, Dataset, Run, Predictor
 from . import utils
-import datetime
 
 class AnalysisSchema(Schema):
 	hash_id = fields.Str(dump_only=True, description='Hashed analysis id.')
@@ -103,7 +102,7 @@ class AnalysisResource(AnalysisBaseResource):
 
 	@doc(summary='Edit analysis.')
 	@use_kwargs(AnalysisSchema)
-	@utils.auth_required
+	@utils.owner_required
 	def put(self, analysis_id, **kwargs):
 		analysis = utils.first_or_404(
 			Analysis.query.filter_by(hash_id=analysis_id))
@@ -112,7 +111,7 @@ class AnalysisResource(AnalysisBaseResource):
 		return put_record(db.session, kwargs, analysis)
 
 	@doc(summary='Delete analysis.')
-	@utils.auth_required
+	@utils.owner_required
 	def delete(self, analysis_id):
 		analysis = utils.first_or_404(
 			Analysis.query.filter_by(hash_id=analysis_id))
@@ -140,7 +139,7 @@ class CloneAnalysisResource(AnalysisBaseResource):
 
 class CompileAnalysisResource(AnalysisBaseResource):
 	@doc(summary='Compile and lock analysis.')
-	@utils.auth_required
+	@utils.owner_required
 	def post(self, analysis_id):
 		analysis = utils.first_or_404(
 			Analysis.query.filter_by(hash_id=analysis_id))
