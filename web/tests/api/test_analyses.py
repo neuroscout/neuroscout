@@ -92,26 +92,26 @@ def test_clone(session, auth_client, add_dataset, add_analysis):
 	assert resp.status_code == 422
 
 	# Make uneditable and try again
-	analysis.locked = True
+	analysis.status = 'PASSED'
 	session.commit()
 
 	resp= auth_client.post('/api/analyses/{}/clone'.format(analysis.hash_id))
 	clone_json = decode_json(resp)
 	assert clone_json['hash_id'] != analysis.hash_id
 
-def test_put(auth_client, add_analysis):
+def test_put(auth_client, add_analysis, add_dataset):
 	# Get analysis to edit
 	analysis  = Analysis.query.filter_by(id=add_analysis).first()
 	analysis_json = decode_json(
 		auth_client.get('/api/analyses/{}'.format(analysis.hash_id)))
 
-	analysis_json['name'] = 'NEW NAME!'
+	analysis_json['name'] = 'NEW NAME'
 
 	resp = auth_client.put('/api/analyses/{}'.format(analysis.hash_id),
 						data=analysis_json)
 	assert resp.status_code == 200
 	new_analysis = decode_json(resp)
-	assert new_analysis['name'] == "NEW NAME!"
+	assert new_analysis['name'] == "NEW NAME"
 
 	# Test adding a run_id
 	analysis_json['runs'] = [{'id' : Run.query.first().id }]
@@ -131,15 +131,41 @@ def test_put(auth_client, add_analysis):
 	assert 'runs' in  decode_json(resp)['message']
 
 	# Test locking
-	new_analysis['locked'] = True
-	resp = auth_client.put('/api/analyses/{}'.format(analysis.hash_id),
-						data=new_analysis)
+	resp = auth_client.post('/api/analyses/{}/compile'.format(analysis.hash_id))
 	assert resp.status_code == 200
 	locked_analysis = decode_json(resp)
-	assert locked_analysis['locked'] == True
-	assert locked_analysis['locked_at'] != ''
+	# Need to add route for locking
+	assert locked_analysis['status'] == 'PENDING'
+	assert locked_analysis['compiled_at'] != ''
 
 	locked_analysis['name'] = 'New name should not be allowed'
 	resp = auth_client.put('/api/analyses/{}'.format(analysis.hash_id),
 						data=locked_analysis)
 	assert resp.status_code == 422
+
+	# Try deleting locked anlaysis
+	resp = auth_client.delete('/api/analyses/{}'.format(analysis.hash_id))
+	assert resp.status_code == 422
+
+	# Add and delete analysis
+	## Add analysis
+	test_analysis = {
+	"dataset_id" : add_dataset,
+	"name" : "some analysis",
+	"description" : "pretty damn innovative"
+	}
+
+	resp = auth_client.post('/api/analyses', data = test_analysis)
+
+	# Try deleting locked anlaysis
+	delresp = auth_client.delete('/api/analyses/{}'.format(decode_json(resp)['hash_id']))
+	assert delresp.status_code == 200
+
+	assert Analysis.query.filter_by(hash_id=decode_json(resp)['hash_id']).count() == 0
+
+def test_auth_id(auth_client, add_analysis_user2):
+	# Try deleting analysis you are not owner of
+	analysis  = Analysis.query.filter_by(id=add_analysis_user2).first()
+	resp = auth_client.delete('/api/analyses/{}'.format(analysis.hash_id))
+
+	assert resp.status_code == 401

@@ -41,7 +41,8 @@ class UserCreationSchema(BaseUserSchema):
 class UserSchema(BaseUserSchema):
     password = fields.Str(load_only=True,
                           description='Password. Minimum 6 characters.')
-    analyses = fields.Nested('AnalysisSchema', only=['hash_id', 'name'],
+    analyses = fields.Nested('AnalysisSchema', only=['hash_id', 'name', 'status',
+                                                     'description', 'modified_at'],
                              many=True, dump_only=True)
 
 

@@ -1,4 +1,4 @@
-# neuroscout ⚜
+# neuroscout 
 
 [![Build Status](https://travis-ci.com/PsychoinformaticsLab/neuroscout.svg?token=mytABRBRnBitJJpBpMxh&branch=master)](https://travis-ci.com/PsychoinformaticsLab/neuroscout)
 
@@ -47,7 +47,7 @@ To run tests, after starting services, create a test database:
 
 and execute:
 
-    docker-compose exec web python -m pytest tests/
+    docker-compose run --rm web python -m pytest tests/ 
 
 
 ## Populating the database

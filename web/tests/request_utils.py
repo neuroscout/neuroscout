@@ -1,4 +1,5 @@
 import json
+from functools import partialmethod
 
 class Client(object):
     def __init__(self, test_client=None, prepend='', email=None, password=None):
@@ -24,7 +25,7 @@ class Client(object):
         else:
             return None
 
-    def _make_request(self, request, route, params, data, headers):
+    def _make_request(self, request, route, params=None, data=None, headers=None):
         """ Generic request handler """
         request_function = getattr(self.client, request)
         headers = headers or self._get_headers()
@@ -49,14 +50,11 @@ class Client(object):
         else:
             self.token = rv.json()['access_token']
 
-    def get(self, route, params=None, data=None, headers=None):
-        return self._make_request('get', route, params, data, headers)
+    get = partialmethod(_make_request, 'get')
+    post = partialmethod(_make_request, 'post')
+    put = partialmethod(_make_request, 'put')
+    delete = partialmethod(_make_request, 'delete')
 
-    def post(self, route, params=None, data=None, headers=None):
-        return self._make_request('post', route, params, data, headers)
-
-    def put(self, route, params=None, data=None, headers=None):
-        return self._make_request('put', route, params, data, headers)
 
 def decode_json(rv):
     return json.loads(rv.data.decode())
