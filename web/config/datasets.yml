@@ -1,0 +1,5 @@
+studyforrest_phase2:
+  path: https://github.com/psychoinformatics-de/studyforrest-data-phase2.git
+  tasks:
+    objectcategories:
+      - default.json

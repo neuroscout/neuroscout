@@ -4,6 +4,8 @@ from core import app, db
 import os
 import requests
 import populate
+import yaml
+from pathlib import Path
 
 app.config.from_object(os.environ['APP_SETTINGS'])
 
@@ -44,6 +46,20 @@ def add_dataset(bids_path, task, replace=False, **kwargs):
 def extract_features(bids_path, task, graph_spec, **kwargs):
 	populate.extract_features(db.session, bids_path, task, graph_spec,
 							  verbose=True, **kwargs)
+
+## Need to modify or create new function for updating dataset
+## e.g. dealing w/ IncompleteResultsError if cloning into existing dir
+@manager.command
+def config_from_yaml(config_file):
+	""" Configure datasets and extracted features from a YAML config file """
+	datasets = yaml.load(open(config_file, 'r'))
+
+	for name, items in datasets.items():
+		for task, graphs in items['tasks'].items():
+		    populate.add_dataset(db.session, items['path'], task, replace=False,
+								verbose=True,
+								install_path=str((Path(
+									app.config['DATASET_DIR']) / name).absolute()))
 
 if __name__ == '__main__':
     manager.run()

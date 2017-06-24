@@ -10,10 +10,11 @@ services:
     volumes:
       - /usr/src/app/static
       - migrations:/migrations
+      - file-data:/file-data
       # ADD OTHERS VOLUMES HERE
     command: /usr/local/bin/gunicorn -w 2 -b :8000 core:app --log-level debu
     environment:
-      - APP_SETTINGS=config.DevelopmentConfig
+      - APP_SETTINGS=config.config.DevelopmentConfig
 
   nginx:
     restart: always
@@ -52,3 +53,4 @@ services:
 
 volumes:
   migrations:
+  file-data:

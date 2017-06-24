@@ -3,6 +3,8 @@ appdirs==1.4.3
 blinker==1.4
 click==6.7
 decorator==4.0.11
+datalad==0.6.0
+duecredit==0.6.1
 Flask==0.12.1
 -e git+https://github.com/adelavega/flask-apispec.git#egg=flask-apispec
 Flask-cors==3.0.2
@@ -35,7 +37,7 @@ Pillow==4.1.1
 -e git+https://github.com/tyarkoni/pliers.git#egg=pliers
 psycopg2==2.7.1
 py==1.4.33
--e git+https://github.com/INCF/pybids.git@transformer#egg=pybids
+-e git+https://github.com/INCF/pybids.git@6f8aee0#egg=pybids
 PyJWT==1.4.2
 pyparsing==2.2.0
 pytest==3.0.7
@@ -51,3 +53,4 @@ tqdm==4.11.2
 webargs==1.6.0
 Werkzeug==0.12.1
 WTForms==2.1
+ipython
