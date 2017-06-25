@@ -58,7 +58,7 @@ class App extends React.Component<{}, AppState>{
       analyses: [],
       publicAnalyses: [],
     };
-    this.loadAnalyses();
+    if (jwt) this.loadAnalyses();
     this.loadPublicAnalyses();
   }
 
@@ -78,7 +78,7 @@ class App extends React.Component<{}, AppState>{
     return Promise.reject('You are not logged in');
   }
 
-  loadPublicAnalyses = () => jwtFetch(`${DOMAINROOT}/api/analyses`)
+  loadPublicAnalyses = () => fetch(`${DOMAINROOT}/api/analyses`)
     .then(response => response.json())
     .then((data: ApiAnalysis[]) => {
       this.setState({

@@ -1,7 +1,6 @@
 import * as React from 'react';
 import { Tabs, Row, Col, Layout, Button, Modal, Icon, message } from 'antd';
 import { Prompt } from 'react-router-dom';
-
 import { OverviewTab } from './Overview';
 import { PredictorsTab } from './Predictors';
 import {
@@ -9,6 +8,7 @@ import {
   ApiDataset, ApiAnalysis
 } from './commontypes';
 import { displayError, jwtFetch, Space } from './utils';
+import Status from './Status';
 
 const { TabPane } = Tabs;
 const { Footer, Content } = Layout;
@@ -112,7 +112,7 @@ const getTasks = (runs: Run[]): Task[] => {
   return Array.from(taskMap.values());
 }
 
-type BuilderProps = { 
+type BuilderProps = {
   id?: string;
   updatedAnalysis: () => void;
 }
@@ -180,7 +180,7 @@ export default class AnalysisBuilder extends React.Component<BuilderProps, Store
     jwtFetch(url, { method, body: JSON.stringify(apiAnalysis) })
       .then(response => response.json())
       .then((data: ApiAnalysis) => {
-        message.success('Analysis saved');
+        message.success(compile ? 'Analysis submitted for generation' : 'Analysis saved');
         this.setState({
           analysis: {
             ...analysis,
@@ -304,6 +304,11 @@ export default class AnalysisBuilder extends React.Component<BuilderProps, Store
     const { predictorsActive, transformationsActive, contrastsActive, modelingActive,
       reviewActive, activeTab, analysis, datasets, availableTasks, availableRuns,
       selectedTaskId, availablePredictors, selectedPredictors, unsavedChanges } = this.state;
+    const statusText: string = {
+      DRAFT: 'This analysis has not yet been generated.',
+      PENDING: 'This analysis has been submitted for generation and is being processed.',
+      COMPILED: 'This analysis has been successfully generated',
+    }[analysis.status]
     return (
       <div className="App">
         <Prompt
@@ -367,7 +372,12 @@ export default class AnalysisBuilder extends React.Component<BuilderProps, Store
                   {JSON.stringify(analysis)}
                 </p>
               </TabPane>
-              <TabPane tab="Status" key="7" disabled={false} />
+              <TabPane tab="Status" key="status" disabled={false}>
+                <Status status={analysis.status} />
+                <br />
+                <br />
+                <p>{statusText}</p>
+              </TabPane>
             </Tabs>
           </Col>
         </Row>

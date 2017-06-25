@@ -2,6 +2,7 @@ import * as React from 'react';
 import { Tabs, Row, Col, Button, Card, Tag, Icon, message } from 'antd';
 import { displayError, Space } from './utils';
 import { AppAnalysis } from './commontypes';
+import Status from './Status';
 import { Link } from 'react-router-dom';
 
 export interface AnalysisListProps {
@@ -12,37 +13,19 @@ export interface AnalysisListProps {
   onDelete?: (analysis: AppAnalysis) => void;
 }
 
-const Status = (props: { status: string }) => {
-  const { status } = props;
-  const color: string = {
-    DRAFT: 'blue',
-    PENDING: 'orange',
-    COMPILED: 'green',
-  }[status]
-  return (<span>
-    <Tag color={color}>{status === 'DRAFT' ?
-      <Icon type="unlock" /> :
-      <Icon type="lock" />
-    }{' ' + status}</Tag>
-  </span>);
-}
-
 const AnalysisList = (props: AnalysisListProps) => {
   const { analyses, publicList, cloneAnalysis, onDelete } = props;
   return (
     <Row type="flex" justify="center">
       <Col span={16}>
         {analyses!.map(analysis => (
-          <div>
+          <div key={analysis.id}>
             <Card
-              key={analysis.id}
               title={analysis.name}
               extra={<Status status={analysis.status} />}
             >
               <Row>
                 <Col span={16}>
-                  {/*<Link to={`/builder/${analysis.id}`}><h4>{analysis.name}</h4></Link>
-                  <Status status={analysis.status} />*/}
                   <p><strong>Description: </strong>{analysis.description || 'N/A'}</p>
                   <p><strong>Last modified: </strong>{analysis.modifiedAt}</p>
                   <br/>
