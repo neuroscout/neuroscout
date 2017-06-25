@@ -2,20 +2,18 @@ import * as React from 'react';
 import { Tabs, Row, Col, Layout, Button, Modal, Input, Form, message } from 'antd';
 import { displayError, jwtFetch, Space } from './utils';
 import { ApiUser, ApiAnalysis, AppAnalysis } from './commontypes';
-
-const FormItem = Form.Item;
-const DOMAINROOT = 'http://localhost:80';
-const { localStorage } = window;
-
+import Home from './Home';
+import AnalysisBuilder from './Builder';
+import Browse from './Browse';
 import {
   BrowserRouter as Router,
   Route, Link, Redirect
 } from 'react-router-dom';
-
 import './App.css';
 
-import { Home } from './Home';
-import { AnalysisBuilder } from './Builder';
+const FormItem = Form.Item;
+const DOMAINROOT = 'http://localhost:80';
+const { localStorage } = window;
 
 const { Footer, Content, Header } = Layout;
 
@@ -29,6 +27,7 @@ interface AppState {
   jwt: string | null;
   nextURL: string | null; // will probably remove this and find a better solution to login redirects
   analyses: AppAnalysis[];
+  publicAnalyses: AppAnalysis[];
 }
 
 const ApiToAppAnalysis = (data: ApiAnalysis): AppAnalysis => (
@@ -39,14 +38,6 @@ const ApiToAppAnalysis = (data: ApiAnalysis): AppAnalysis => (
     status: data.status,
     modifiedAt: data.modified_at
   }
-);
-
-const Browse = () => (
-  <Row type="flex" justify="center">
-    <Col span={16}>
-      <h2>Browser Public Analyses</h2>
-    </Col>
-  </Row>
 );
 
 class App extends React.Component<{}, AppState>{
@@ -65,8 +56,10 @@ class App extends React.Component<{}, AppState>{
       password: 'password', // For development - set to '' in production
       nextURL: null,
       analyses: [],
+      publicAnalyses: [],
     };
     this.loadAnalyses();
+    this.loadPublicAnalyses();
   }
 
   loadAnalyses = () => {
@@ -84,6 +77,17 @@ class App extends React.Component<{}, AppState>{
     }
     return Promise.reject('You are not logged in');
   }
+
+  loadPublicAnalyses = () => jwtFetch(`${DOMAINROOT}/api/analyses`)
+    .then(response => response.json())
+    .then((data: ApiAnalysis[]) => {
+      this.setState({
+        publicAnalyses: data
+          .filter(x => !!x.status)  // Ignore analyses with missing status
+          .map(x => ApiToAppAnalysis(x))
+      });
+    })
+    .catch(displayError);
 
   authenticate = () => new Promise((resolve, reject) => {
     const { email, password } = this.state;
@@ -220,16 +224,8 @@ class App extends React.Component<{}, AppState>{
   //   }
   // });
 
-  componentWillMount() {
-    console.log('App component will mount');
-  }
-
-  componentWillUpdate() {
-    console.log('App component will update');
-  }
-
   render() {
-    const { loggedIn, email, name, openLogin, openSignup, password, analyses } = this.state;
+    const { loggedIn, email, name, openLogin, openSignup, password, analyses, publicAnalyses } = this.state;
     const loginModal = () => (
       <Modal
         title="Log into Neuroscout"
@@ -347,8 +343,14 @@ class App extends React.Component<{}, AppState>{
               <Route exact path="/builder" render={(props) =>
                 <AnalysisBuilder updatedAnalysis={() => this.loadAnalyses()} />} />
               <Route path="/builder/:id" render={(props) =>
-                <AnalysisBuilder id={props.match.params.id} updatedAnalysis={() => this.loadAnalyses()}/>} />
-              <Route exact path="/browse" component={Browse} />
+                <AnalysisBuilder id={props.match.params.id} updatedAnalysis={() => this.loadAnalyses()} />} />
+              <Route exact path="/browse" render={
+                (props) => <Browse
+                  analyses={publicAnalyses}
+                  cloneAnalysis={this.cloneAnalysis}
+                />
+              }
+              />
             </Content>
             <Footer style={{ background: '#fff' }}>
               <Row type="flex" justify="center">

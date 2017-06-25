@@ -4,7 +4,6 @@ import { Prompt } from 'react-router-dom';
 
 import { OverviewTab } from './Overview';
 import { PredictorsTab } from './Predictors';
-import { Home } from './Home';
 import {
   Store, Analysis, Dataset, Task, Run, Predictor,
   ApiDataset, ApiAnalysis
@@ -117,7 +116,7 @@ type BuilderProps = {
   id?: string;
   updatedAnalysis: () => void;
 }
-export class AnalysisBuilder extends React.Component<BuilderProps, Store> {
+export default class AnalysisBuilder extends React.Component<BuilderProps, Store> {
   constructor(props: BuilderProps) {
     super(props);
     this.state = initializeStore();
