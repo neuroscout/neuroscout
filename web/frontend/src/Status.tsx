@@ -7,13 +7,16 @@ const Status = (props: { status: string }) => {
     DRAFT: 'blue',
     PENDING: 'orange',
     COMPILED: 'green',
-  }[status]
-  return (<span>
-    <Tag color={color}>{status === 'DRAFT' ?
-      <Icon type="unlock" /> :
-      <Icon type="lock" />
-    }{' ' + status}</Tag>
-  </span>);
-}
+  }[status];
+  return (
+    <span>
+      <Tag color={color}>
+        {status === 'DRAFT' ?
+          <Icon type="unlock" /> :
+          <Icon type="lock" />
+        }{' ' + status}</Tag>
+    </span>
+  );
+};
 
 export default Status;

@@ -1,7 +1,13 @@
 import * as React from 'react';
 import { message } from 'antd';
 
-export const displayError = (error: Error) => message.error(error.toString(), 5);
+export const displayError = (error: Error) => {
+  try {
+    message.error(error.toString(), 5);
+  } catch (e) {
+    console.error(error);
+  }
+};
 
 export const jwtFetch = (path: string, options?: object) => {
   const jwt = window.localStorage.getItem('jwt');

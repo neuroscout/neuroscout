@@ -17,6 +17,7 @@
     "react-router-dom": "^4.1.1"
   },
   "devDependencies": {
+    "@types/enzyme": "^2.8.1",
     "react-scripts-ts": "^2.3.2"
   },
   "scripts": {
