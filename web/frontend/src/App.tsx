@@ -21,6 +21,8 @@ interface AppState {
   loggedIn: boolean;
   openLogin: boolean;
   openSignup: boolean;
+  loginError: string;
+  signupError: string;
   email: string | null;
   name: string | null;
   password: string | null;
@@ -40,7 +42,7 @@ const ApiToAppAnalysis = (data: ApiAnalysis): AppAnalysis => (
   }
 );
 
-class App extends React.Component<{}, AppState>{
+class App extends React.Component<{}, AppState> {
   constructor(props) {
     super(props);
     // window.localStorage.clear()
@@ -50,6 +52,8 @@ class App extends React.Component<{}, AppState>{
       loggedIn: !!jwt,
       openLogin: false,
       openSignup: false,
+      loginError: '',
+      signupError: '',
       email: email || 'test2@test.com',  // For development - remove test2@test.com later
       name: null,
       jwt: jwt,
@@ -99,13 +103,20 @@ class App extends React.Component<{}, AppState>{
       }
     })
       .then(response => response.json())
-      .then((data: { access_token: string }) => {
+      // .then(response => {
+      //   if (response.status === 401) {
+      //     throw new Error('Bad credentials');
+      //   }
+      //   return response.json();
+      // })
+      .then((data: { status_code: number, access_token?: string, description?: string }) => {
         if (data.access_token) {
           message.success('Authentication successful');
           localStorage.setItem('jwt', data.access_token);
           localStorage.setItem('email', email!);
           resolve(data.access_token);
-        } else {
+        } else if (data.status_code === 401) {
+          this.setState({ loginError: data.description || '' });
           reject('Authentication failed');
         }
       })
@@ -117,7 +128,12 @@ class App extends React.Component<{}, AppState>{
     return this.authenticate()
       .then((jwt: string) => {
         this.setState({
-          jwt: jwt, password: '', loggedIn: true, openLogin: false, nextURL: null
+          jwt: jwt,
+          password: '',
+          loggedIn: true,
+          openLogin: false,
+          nextURL: null,
+          loginError: ''
         });
       })
       .then(() => this.loadAnalyses())
@@ -167,7 +183,7 @@ class App extends React.Component<{}, AppState>{
         if (response.status !== 200) {
           throw 'Something went wrong - most likely the analysis is not locked. Will fix it later';
         }
-        return response.json()
+        return response.json();
       })
       .then((data: ApiAnalysis) => {
         this.setState({ analyses: this.state.analyses.filter(a => a.id !== id) });
@@ -198,10 +214,10 @@ class App extends React.Component<{}, AppState>{
         if (response.status !== 200) {
           throw 'Something went wrong - most likely the analysis is not locked. Will fix it later';
         }
-        return response.json()
+        return response.json();
       })
       .then((data: ApiAnalysis) => {
-        const analysis = ApiToAppAnalysis(data)
+        const analysis = ApiToAppAnalysis(data);
         this.setState({ analyses: this.state.analyses.concat([analysis]) });
       })
       .catch(displayError);
@@ -225,7 +241,8 @@ class App extends React.Component<{}, AppState>{
   // });
 
   render() {
-    const { loggedIn, email, name, openLogin, openSignup, password, analyses, publicAnalyses } = this.state;
+    const { loggedIn, email, name, openLogin, openSignup, loginError, signupError,
+      password, analyses, publicAnalyses } = this.state;
     const loginModal = () => (
       <Modal
         title="Log into Neuroscout"
@@ -234,10 +251,16 @@ class App extends React.Component<{}, AppState>{
         maskClosable={true}
         onCancel={e => { this.setState({ openLogin: false }); }}
       >
-        <p>{'For development try "test2@test.com" and "password"'}</p><br />
-        <Form>
+        <p>{loginError ? loginError : 'For development try "test2@test.com" and "password"'}</p><br />
+        <Form onSubmit={
+          e => {
+            e.preventDefault();
+            this.login();
+          }
+        }>
           <FormItem>
-            <Input placeholder="Email"
+            <Input
+              placeholder="Email"
               type="email"
               size="large"
               value={email}
@@ -245,7 +268,8 @@ class App extends React.Component<{}, AppState>{
             />
           </FormItem>
           <FormItem>
-            <Input placeholder="Password"
+            <Input
+              placeholder="Password"
               type="password"
               value={password}
               onChange={this.setStateFromInput('password')}
@@ -254,9 +278,11 @@ class App extends React.Component<{}, AppState>{
           <FormItem>
             <Button
               style={{ width: '100%' }}
+              htmlType="submit"
               type="primary"
               onClick={e => { this.login(); }}
-            >Log in</Button>
+            >Log in
+            </Button>
           </FormItem>
         </Form>
       </Modal>
@@ -271,14 +297,16 @@ class App extends React.Component<{}, AppState>{
       >
         <Form>
           <FormItem>
-            <Input placeholder="Full name"
+            <Input
+              placeholder="Full name"
               size="large"
               value={name}
               onChange={this.setStateFromInput('name')}
             />
           </FormItem>
           <FormItem>
-            <Input placeholder="Email"
+            <Input
+              placeholder="Email"
               type="email"
               size="large"
               value={email}
@@ -286,7 +314,8 @@ class App extends React.Component<{}, AppState>{
             />
           </FormItem>
           <FormItem>
-            <Input placeholder="Password"
+            <Input
+              placeholder="Password"
               type="password"
               value={password}
               onChange={this.setStateFromInput('password')}
@@ -297,7 +326,8 @@ class App extends React.Component<{}, AppState>{
               style={{ width: '100%' }}
               type="primary"
               onClick={e => { this.signup(); }}
-            >Sign up</Button>
+            >Sign up
+            </Button>
           </FormItem>
         </Form>
       </Modal>
@@ -324,6 +354,7 @@ class App extends React.Component<{}, AppState>{
                     (
                       <span>
                         <Button onClick={e => this.setState({ openLogin: true })}>Log in</Button>
+                        <Space />
                         <Button onClick={e => this.setState({ openSignup: true })}>Sign up</Button>
                       </span>
                     )
@@ -341,9 +372,11 @@ class App extends React.Component<{}, AppState>{
                 />}
               />
               <Route exact path="/builder" render={(props) =>
-                <AnalysisBuilder updatedAnalysis={() => this.loadAnalyses()} />} />
+                <AnalysisBuilder updatedAnalysis={() => this.loadAnalyses()} />}
+              />
               <Route path="/builder/:id" render={(props) =>
-                <AnalysisBuilder id={props.match.params.id} updatedAnalysis={() => this.loadAnalyses()} />} />
+                <AnalysisBuilder id={props.match.params.id} updatedAnalysis={() => this.loadAnalyses()} />}
+              />
               <Route exact path="/browse" render={
                 (props) => <Browse
                   analyses={publicAnalyses}

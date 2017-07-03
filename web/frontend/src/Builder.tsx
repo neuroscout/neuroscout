@@ -313,7 +313,7 @@ export default class AnalysisBuilder extends React.Component<BuilderProps, Store
       <div className="App">
         <Prompt
           when={unsavedChanges}
-          message="You have unsaved changes. Are you sure you want leave this page?"
+          message={'You have unsaved changes. Are you sure you want leave this page?'}
         />
         <Row type="flex" justify="center">
           <Col span={16}>
