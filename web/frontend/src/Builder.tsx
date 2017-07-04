@@ -3,9 +3,10 @@ import { Tabs, Row, Col, Layout, Button, Modal, Icon, message } from 'antd';
 import { Prompt } from 'react-router-dom';
 import { OverviewTab } from './Overview';
 import { PredictorsTab } from './Predictors';
+import OptionsTab from './Options';
 import {
   Store, Analysis, Dataset, Task, Run, Predictor,
-  ApiDataset, ApiAnalysis
+  ApiDataset, ApiAnalysis, AnalysisConfig
 } from './commontypes';
 import { displayError, jwtFetch, Space } from './utils';
 import Status from './Status';
@@ -17,6 +18,7 @@ const { Footer, Content } = Layout;
 const domainRoot = 'http://localhost:80';
 const EMAIL = 'test2@test.com';
 const PASSWORD = 'password';
+const DEFAULT_SMOOTHING = 50;
 
 // Create initialized app state (used in the constructor of the top-level App component)
 const initializeStore = (): Store => ({
@@ -24,7 +26,7 @@ const initializeStore = (): Store => ({
   predictorsActive: false,
   transformationsActive: false,
   contrastsActive: false,
-  modelingActive: false,
+  modelingActive: true,
   reviewActive: true,
   analysis: {
     analysisId: undefined,
@@ -35,7 +37,8 @@ const initializeStore = (): Store => ({
     runIds: [],
     predictorIds: [],
     status: 'DRAFT',
-    private: true
+    private: true,
+    config: { smoothing: DEFAULT_SMOOTHING, predictorConfigs: {} }
   },
   datasets: [],
   availableTasks: [],
@@ -112,6 +115,25 @@ const getTasks = (runs: Run[]): Task[] => {
   return Array.from(taskMap.values());
 }
 
+// Given an updated list of predictor IDs, create an updated version of analysis config. 
+// preserving the existing predictor configs, and adding/removing new/old ones as necessary
+const getUpdatedConfig = (config: AnalysisConfig, predictorIds: string[]): AnalysisConfig => {
+  let newConfig = {...config};
+  let newPredictorConfigs = {...config.predictorConfigs}
+  predictorIds.forEach((id) => {
+    if(!newPredictorConfigs.hasOwnProperty(id)){
+      newPredictorConfigs[id] = {
+        convolution: 'Gamma',
+        temporalDerivative: true,
+        orthogonalize: false,
+      };
+    }
+  });
+  // TODO: remove unnecessary predictorConfigs
+  newConfig.predictorConfigs = newPredictorConfigs;
+  return newConfig;
+}
+
 type BuilderProps = {
   id?: string;
   updatedAnalysis: () => void;
@@ -158,7 +180,8 @@ export default class AnalysisBuilder extends React.Component<BuilderProps, Store
       status: analysis.status,
       runs: analysis.runIds.map(id => ({ id })),
       predictors: analysis.predictorIds.map(id => ({ id })),
-      transformations: {}
+      transformations: {},
+      config: analysis.config,
     };
     // const method = analysis.analysisId ? 'put' : 'post';
     let method: string;
@@ -202,6 +225,7 @@ export default class AnalysisBuilder extends React.Component<BuilderProps, Store
       datasetId: data.dataset_id,
       runIds: data.runs!.map(({ id }) => id),
       predictorIds: data.predictors!.map(({ id }) => id),
+      config: {smoothing: 10, predictorConfigs: {}}, // TODO: update this once API is updated
     };
     if (analysis.runIds.length > 0) {
       jwtFetch(`${domainRoot}/api/runs/${analysis.runIds[0]}`)
@@ -234,6 +258,12 @@ export default class AnalysisBuilder extends React.Component<BuilderProps, Store
     });
   }
 
+  updateConfig = (newConfig: AnalysisConfig): void => {
+    const newAnalysis = {...this.state.analysis};
+    newAnalysis.config = newConfig;
+    this.setState({analysis: newAnalysis, unsavedChanges: true});
+  }
+  
   /* Main function to update application state. May split this up into
    smaller pieces if it gets too complex. 
    
@@ -272,10 +302,12 @@ export default class AnalysisBuilder extends React.Component<BuilderProps, Store
             .then(response => response.json())
             .then((data: Predictor[]) => {
               message.success(`Fetched ${data.length} predictors associated with the selected runs`);
+              const selectedPredictors = data.filter(p => updatedAnalysis.predictorIds.indexOf(p.id) > -1);
               this.setState({
                 availablePredictors: data,
-                selectedPredictors: data.filter(p => updatedAnalysis.predictorIds.indexOf(p.id) > -1)
+                selectedPredictors
               });
+              updatedAnalysis.config = getUpdatedConfig(updatedAnalysis.config, selectedPredictors.map(p => p.id));
             })
             .catch(displayError);
         } else {
@@ -292,7 +324,8 @@ export default class AnalysisBuilder extends React.Component<BuilderProps, Store
       });
     } else if (attrName === 'selectedPredictors') {
       let newAnalysis = { ...this.state.analysis };
-      newAnalysis.predictorIds = value.map(p => p.id);
+      newAnalysis.predictorIds = (value as Predictor[]).map(p => p.id);
+      newAnalysis.config = getUpdatedConfig(newAnalysis.config, newAnalysis.predictorIds);
       stateUpdate.analysis = newAnalysis;
     }
     stateUpdate[attrName] = value;
@@ -303,7 +336,8 @@ export default class AnalysisBuilder extends React.Component<BuilderProps, Store
   render() {
     const { predictorsActive, transformationsActive, contrastsActive, modelingActive,
       reviewActive, activeTab, analysis, datasets, availableTasks, availableRuns,
-      selectedTaskId, availablePredictors, selectedPredictors, unsavedChanges } = this.state;
+      selectedTaskId, availablePredictors, selectedPredictors, unsavedChanges,
+     } = this.state;
     const statusText: string = {
       DRAFT: 'This analysis has not yet been generated.',
       PENDING: 'This analysis has been submitted for generation and is being processed.',
@@ -366,7 +400,13 @@ export default class AnalysisBuilder extends React.Component<BuilderProps, Store
               </TabPane>
               <TabPane tab="Transformations" key="transformations" disabled={!transformationsActive} />
               <TabPane tab="Contrasts" key="contrasts" disabled={!contrastsActive} />
-              <TabPane tab="Modeling" key="modeling" disabled={!modelingActive} />
+              <TabPane tab="Options" key="modeling" disabled={!modelingActive}>
+                <OptionsTab 
+                analysis={analysis}
+                selectedPredictors={selectedPredictors}
+                updateConfig={this.updateConfig}
+                />
+              </TabPane>
               <TabPane tab="Review" key="review" disabled={!reviewActive}>
                 <p>
                   {JSON.stringify(analysis)}

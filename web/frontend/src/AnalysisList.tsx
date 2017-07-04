@@ -28,7 +28,7 @@ const AnalysisList = (props: AnalysisListProps) => {
                 <Col span={16}>
                   <p><strong>Description: </strong>{analysis.description || 'N/A'}</p>
                   <p><strong>Last modified: </strong>{analysis.modifiedAt}</p>
-                  <br/>
+                  <br />
                 </Col>
               </Row>
               <Row>
@@ -37,27 +37,31 @@ const AnalysisList = (props: AnalysisListProps) => {
                     type="primary"
                     ghost={true}
                     onClick={() => message.warning('Analysis viewer not implemented yet. Try the Edit button to open analysis in Builder')}
-                  >View</Button>
+                  >View
+                  </Button>
                   <Space />
                   {!publicList &&
                     <Button
                       type="primary"
                       ghost={true}
-                    ><Link to={`/builder/${analysis.id}`}>Edit</Link></Button>
+                    ><Link to={`/builder/${analysis.id}`}>Edit</Link>
+                    </Button>
                   }
                   <Space />
                   <Button
                     type="primary"
                     ghost={true}
                     onClick={() => cloneAnalysis(analysis.id)}
-                  >Clone</Button>
+                  >Clone
+                  </Button>
                   <Space />
                   {analysis.status === 'DRAFT' && !publicList &&
                     <Button
                       type="danger"
                       ghost={true}
                       onClick={() => onDelete!(analysis)}
-                    >Delete</Button>
+                    >Delete
+                    </Button>
                   }
                 </Col>
               </Row>
@@ -67,7 +71,7 @@ const AnalysisList = (props: AnalysisListProps) => {
         ))}
       </Col>
     </Row>
-  )
+  );
 };
 
 export default AnalysisList;

@@ -100,7 +100,8 @@ export class OverviewTab extends React.Component<OverviewTabProps, any> {
       <div>
         <Form layout="vertical">
           <FormItem label="Analysis name:">
-            <Input placeholder="Analysis name"
+            <Input
+              placeholder="Analysis name"
               value={analysis.name}
               onChange={this.updateAnalysisFromEvent('name')}
             />
@@ -114,7 +115,8 @@ export class OverviewTab extends React.Component<OverviewTabProps, any> {
             />
           </FormItem>
           <FormItem label="Description:">
-            <Input placeholder="Description of your analysis"
+            <Input
+              placeholder="Description of your analysis"
               value={analysis.description}
               onChange={this.updateAnalysisFromEvent('description')}
               type="textarea"
@@ -122,7 +124,8 @@ export class OverviewTab extends React.Component<OverviewTabProps, any> {
             />
           </FormItem>
           <FormItem label="Predictions:">
-            <Input placeholder="Enter your preditions about what you expect the results to look like"
+            <Input
+              placeholder="Enter your preditions about what you expect the results to look like"
               value={analysis.predictions}
               onChange={this.updateAnalysisFromEvent('predictions')}
               type="textarea"
@@ -149,7 +152,8 @@ export class OverviewTab extends React.Component<OverviewTabProps, any> {
                   size="small"
                   dataSource={availableTasks}
                   rowSelection={taskRowSelection}
-                  pagination={datasets.length > 20} />
+                  pagination={datasets.length > 20}
+                />
                 <br />
               </div>)
           }
@@ -163,7 +167,8 @@ export class OverviewTab extends React.Component<OverviewTabProps, any> {
                   size="small"
                   dataSource={availableRuns.filter(r => r.task.id === selectedTaskId)}
                   pagination={datasets.length > 20}
-                  rowSelection={runRowSelection} />
+                  rowSelection={runRowSelection}
+                />
                 <br />
               </div>)}
         </Form>
