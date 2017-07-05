@@ -85,19 +85,22 @@ def test_post(auth_client, add_dataset):
 	assert resp.status_code == 422
 	assert decode_json(resp)['message']['name'][0] == 'Missing data for required field.'
 
-def test_clone(session, auth_client, add_dataset, add_analysis):
+def test_clone(session, auth_client, add_dataset, add_analysis, add_users):
+	(id1, id2), _ = add_users
 	analysis  = Analysis.query.filter_by(id=add_analysis).first()
 	# Clone analysis by id
 	resp= auth_client.post('/api/analyses/{}/clone'.format(analysis.hash_id))
-	assert resp.status_code == 422
-
-	# Make uneditable and try again
-	analysis.status = 'PASSED'
-	session.commit()
-
-	resp= auth_client.post('/api/analyses/{}/clone'.format(analysis.hash_id))
 	clone_json = decode_json(resp)
 	assert clone_json['hash_id'] != analysis.hash_id
+
+	# Change user ID to someone else's and try again
+	analysis.status = 'DRAFT'
+	analysis.user_id = id2
+	session.commit()
+
+	resp = auth_client.post('/api/analyses/{}/clone'.format(analysis.hash_id))
+	assert resp.status_code == 422
+
 
 def test_put(auth_client, add_analysis, add_dataset):
 	# Get analysis to edit
