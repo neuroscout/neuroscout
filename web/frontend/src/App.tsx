@@ -103,12 +103,6 @@ class App extends React.Component<{}, AppState> {
       }
     })
       .then(response => response.json())
-      // .then(response => {
-      //   if (response.status === 401) {
-      //     throw new Error('Bad credentials');
-      //   }
-      //   return response.json();
-      // })
       .then((data: { status_code: number, access_token?: string, description?: string }) => {
         if (data.access_token) {
           message.success('Authentication successful');
@@ -149,26 +143,30 @@ class App extends React.Component<{}, AppState> {
         'Content-type': 'application/json'
       }
     })
-      .then((response) => {
-        if (response.status !== 200) {
-          throw 'Sign up failed';
+      .then(response => response.json().then(json => ({ ...json, status: response.status })))
+      .then((data: any) => {
+        if (data.status !== 200) {
+          let errorMessage = '';
+          Object.keys(data.message).forEach((key) => {
+            errorMessage += data.message[key];
+          });
+          this.setState({
+            signupError: errorMessage,
+          });
+          throw new Error("Signup failed!");
         }
-        response.json().then((data: any) => {
-          message.success('Signup successful');
-          const { name, email, password } = data;
-          this.setState({ name, email, openSignup: false });
-          return this.authenticate();
-        });
+        message.success('Signup successful');
+        const { name, email, password } = data;
+        this.setState({ name, email, openSignup: false, signupError: '' });
       })
-      .then(() => message.success('Logged in'))
-      .then(() => this.loadAnalyses())
+      .then(() => this.login())
       .catch(displayError);
   }
 
   logout = () => {
     localStorage.removeItem('jwt');
     localStorage.removeItem('email');
-    this.setState({ loggedIn: false, email: null, jwt: null, analyses: [] });
+    this.setState({ loggedIn: false, name: null, email: null, jwt: null, analyses: [] });
   }
 
   setStateFromInput = (name: keyof AppState) => (event: React.FormEvent<HTMLInputElement>) => {
@@ -252,12 +250,7 @@ class App extends React.Component<{}, AppState> {
         onCancel={e => { this.setState({ openLogin: false }); }}
       >
         <p>{loginError ? loginError : 'For development try "test2@test.com" and "password"'}</p><br />
-        <Form onSubmit={
-          e => {
-            e.preventDefault();
-            this.login();
-          }
-        }>
+        <Form onSubmit={e => { e.preventDefault(); this.login(); }}>
           <FormItem>
             <Input
               placeholder="Email"
@@ -280,7 +273,6 @@ class App extends React.Component<{}, AppState> {
               style={{ width: '100%' }}
               htmlType="submit"
               type="primary"
-              onClick={e => { this.login(); }}
             >Log in
             </Button>
           </FormItem>
@@ -295,7 +287,8 @@ class App extends React.Component<{}, AppState> {
         maskClosable={true}
         onCancel={e => { this.setState({ openSignup: false }); }}
       >
-        <Form>
+        <p>{signupError}</p><br />
+        <Form onSubmit={e => { e.preventDefault(); this.signup(); }}>
           <FormItem>
             <Input
               placeholder="Full name"
@@ -325,7 +318,7 @@ class App extends React.Component<{}, AppState> {
             <Button
               style={{ width: '100%' }}
               type="primary"
-              onClick={e => { this.signup(); }}
+              htmlType="submit"
             >Sign up
             </Button>
           </FormItem>
@@ -363,13 +356,14 @@ class App extends React.Component<{}, AppState> {
               </Row>
             </Header>
             <Content style={{ background: '#fff' }}>
-              <Route exact path="/" render={(props) =>
+              <Route exact path="/" render={props =>
                 <Home
                   analyses={analyses}
                   loggedIn={loggedIn}
                   cloneAnalysis={this.cloneAnalysis}
                   onDelete={this.onDelete}
-                />}
+                />
+              }
               />
               <Route exact path="/builder" render={(props) =>
                 <AnalysisBuilder updatedAnalysis={() => this.loadAnalyses()} />}

@@ -248,7 +248,7 @@ export default class AnalysisBuilder extends React.Component<BuilderProps, Store
     const { saveAnalysis } = this;
     Modal.confirm({
       title: 'Are you sure you want to submit the analysis?',
-      content: `Once you submit an analysis you will no longer be able to mofidy it. 
+      content: `Once you submit an analysis you will no longer be able to modify it. 
                 You will, however, be able to clone it as a starting point for a new analysis.`,
       okText: 'Yes',
       cancelText: 'No',

@@ -84,7 +84,8 @@ export class PredictorsTab extends React.Component<PredictorTabProps, Predictors
                 pagination={false}
                 size="small"
                 dataSource={this.state.filteredPredictors}
-                rowSelection={rowSelection} />
+                rowSelection={rowSelection}
+              />
             </div>
           </Col>
           <Col span={4}>
