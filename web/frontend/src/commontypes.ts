@@ -12,6 +12,7 @@ export interface Analysis {
   status: AnalysisStatus;
   private?: boolean;
   modifiedAt?: string;
+  config: AnalysisConfig;
 }
 
 // Normalized dataset object  in Analysis Builder
@@ -42,6 +43,17 @@ export interface Predictor {
   id: string;
   name: string;
   description: string | null;
+}
+
+export interface AnalysisConfig {
+  smoothing: number;
+  predictorConfigs: {[id: string]: PredictorConfig};
+}
+
+export interface PredictorConfig {
+  convolution: 'Gamma' | 'Beta' | 'Alpha';
+  temporalDerivative: boolean;
+  orthogonalize: boolean;
 }
 
 export interface Store {
@@ -92,6 +104,7 @@ export interface ApiAnalysis {
   runs?: { id: string }[];
   predictors?: { id: string }[];
   transformations?: object;
+  config?: object;
   modified_at?: string;
 }
 

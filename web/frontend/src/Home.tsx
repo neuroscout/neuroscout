@@ -3,21 +3,18 @@ import { Tabs, Row, Col, Layout, Button, Card } from 'antd';
 import { displayError, Space } from './utils';
 import { AppAnalysis } from './commontypes';
 import { Link } from 'react-router-dom';
+import AnalysisList, { AnalysisListProps } from './AnalysisList';
 
 const { Header, Footer, Content } = Layout;
 
-interface HomeProps {
-  analyses?: AppAnalysis[];
+interface HomeProps extends AnalysisListProps {
   loggedIn: boolean;
-  cloneAnalysis: (id: string) => void;
-  onDelete: (analysis: AppAnalysis) => void;
-  // loginAndNavigate: (string) => void;
-  // ensureLoggedIn: () => Promise<{}>;
 }
 
-export class Home extends React.Component<HomeProps, {}> {
+class Home extends React.Component<HomeProps, {}> {
   render() {
-    const { analyses, cloneAnalysis, onDelete, loggedIn } = this.props;
+    const { analyses, cloneAnalysis, onDelete, loggedIn, publicList } = this.props;
+    const listProps: AnalysisListProps = { ...this.props, publicList: false };
     return (
       <div>
         <Row type="flex" justify="center">
@@ -38,54 +35,18 @@ export class Home extends React.Component<HomeProps, {}> {
           </Col>
         </Row>
         {loggedIn &&
-          <Row type="flex" justify="center">
-            <Col span={16}>
-              {analyses !== undefined && <div><br /><h2>Your saved analyses:</h2><br /></div>}
-              {analyses!.map(analysis => (
-                <div key={analysis.id} title={analysis.name}>
-                  <Row>
-                    <Col span={8}>
-                      <Link to={`/builder/${analysis.id}`}><h4>{analysis.name}</h4></Link>
-                      <p>Status: {analysis.status}</p>
-                      <p>{analysis.description}</p>
-                    </Col>
-                    <Col span={6}>
-                      <Button
-                        type="primary"
-                        ghost={true}
-                        onClick={() => cloneAnalysis(analysis.id)}
-                      >Clone</Button>
-                      <Space />
-                      {analysis.status === 'DRAFT' &&
-                        <Button
-                          type="danger"
-                          ghost={true}
-                          onClick={() => onDelete(analysis)}
-                        >Delete</Button>
-                      }
-                    </Col>
-                  </Row>
-                  <br />
-                </div>
-              ))}
-            </Col>
-          </Row>
+          <div>
+            <Row type="flex" justify="center">
+              <Col span={16}>
+                {analyses !== undefined && <div><br /><h2>Your saved analyses:</h2><br /></div>}
+              </Col>
+            </Row>
+            <AnalysisList {...listProps} />
+          </div>
         }
       </div>
     );
   }
 }
 
-/*export const Home = (props: HomeProps) => (
-  <Row type="flex" justify="center">
-    <Col span={16}>
-      <Button
-        type="primary"
-        onClick={(ev) => { document.location.href = '/builder' }}
-      >Create New Analysis</Button>
-      <Button
-        type="primary"
-      ><a href="/browse">Browse Public Analyses</a></Button>
-    </Col>
-  </Row>
-);*/
+export default Home;
