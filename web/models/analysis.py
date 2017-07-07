@@ -44,14 +44,14 @@ class Analysis(db.Model):
                                  secondary=analysis_predictor,
                                  backref='analysis')
     runs = db.relationship('Run',
-                            secondary='analysis_run',
-                            backref='analysis')
+                            secondary='analysis_run')
 
-    def clone(self):
+    def clone(self, user):
         """ Make copy of analysis, with new id, and linking to parent """
         clone_row = copy_row(Analysis, self, ignored_columns='analysis.id')
         clone_row.hash_id = None
         clone_row.parent_id = self.hash_id
+        clone_row.user_id = user.id
         return clone_row
 
 @listens_for(Analysis, "after_insert")

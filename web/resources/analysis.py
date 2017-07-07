@@ -125,13 +125,15 @@ class CloneAnalysisResource(AnalysisBaseResource):
 	@utils.auth_required
 	@utils.fetch_analysis
 	def post(self, analysis):
-		if analysis.status != 'PASSED':
-			utils.abort(422, "Only locked analyses can be cloned")
-		else:
-			cloned = analysis.clone()
-			db.session.add(cloned)
-			db.session.commit()
-			return cloned
+		if analysis.user_id != current_identity.id:
+			if analysis.status != 'PASSED':
+				utils.abort(422, "You can only clone somebody else's analysis"
+								  " if they have been compiled.")
+
+		cloned = analysis.clone(current_identity)
+		db.session.add(cloned)
+		db.session.commit()
+		return cloned
 
 class CompileAnalysisResource(AnalysisBaseResource):
 	@doc(summary='Compile and lock analysis.')

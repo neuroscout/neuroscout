@@ -25,7 +25,6 @@ class Run(db.Model):
                                         lazy='dynamic')
     analyses = db.relationship('Analysis',
                             secondary='analysis_run',
-                            backref='run',
                             lazy='dynamic')
     stimuli = db.relationship('Stimulus',
                             secondary='run_stimulus',
