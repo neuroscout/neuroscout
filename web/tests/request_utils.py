@@ -42,7 +42,7 @@ class Client(object):
             self.email = email
             self.password = password
 
-        rv = self.post('/auth',
+        rv = self.post('/api/auth',
                         data={'email': self.email, 'password': self.password})
 
         if self.client_flask:
