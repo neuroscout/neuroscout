@@ -44,8 +44,7 @@ class Analysis(db.Model):
                                  secondary=analysis_predictor,
                                  backref='analysis')
     runs = db.relationship('Run',
-                            secondary='analysis_run',
-                            backref='analysis')
+                            secondary='analysis_run')
 
     def clone(self, user):
         """ Make copy of analysis, with new id, and linking to parent """
