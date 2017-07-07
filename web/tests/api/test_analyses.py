@@ -102,7 +102,7 @@ def test_clone(session, auth_client, add_dataset, add_analysis, add_users):
 	assert resp.status_code == 422
 
 
-def test_put(auth_client, add_analysis, add_dataset):
+def test_put(auth_client, add_analysis, add_dataset, session):
 	# Get analysis to edit
 	analysis  = Analysis.query.filter_by(id=add_analysis).first()
 	analysis_json = decode_json(
@@ -159,9 +159,17 @@ def test_put(auth_client, add_analysis, add_dataset):
 	}
 
 	resp = auth_client.post('/api/analyses', data = test_analysis)
+	analysis_json = decode_json(resp)
 
-	# Try deleting locked anlaysis
-	delresp = auth_client.delete('/api/analyses/{}'.format(decode_json(resp)['hash_id']))
+	# Test adding a run_id
+	analysis_json['runs'] = [{'id' : Run.query.first().id }]
+
+	resp = auth_client.put('/api/analyses/{}'.format(analysis_json['hash_id']),
+						data=analysis_json)
+	assert resp.status_code == 200
+
+	# Try deleting anlaysis
+	delresp = auth_client.delete('/api/analyses/{}'.format(analysis_json['hash_id']))
 	assert delresp.status_code == 200
 
 	assert Analysis.query.filter_by(hash_id=decode_json(resp)['hash_id']).count() == 0
