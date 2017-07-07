@@ -104,7 +104,8 @@ def test_analysis(session, add_analysis, add_predictor):
 	session.rollback()
 
 	# Try cloning analysis
-	clone = first_analysis.clone()
+	user = User.query.filter_by(id=first_analysis.user_id).one()
+	clone = first_analysis.clone(user)
 	session.add(clone)
 	session.commit()
 
