@@ -55,11 +55,17 @@ def config_from_yaml(config_file):
 	datasets = yaml.load(open(config_file, 'r'))
 
 	for name, items in datasets.items():
-		for task, graphs in items['tasks'].items():
-		    populate.add_dataset(db.session, items['path'], task, replace=False,
-								verbose=True,
-								install_path=str((Path(
-									app.config['DATASET_DIR']) / name).absolute()))
+		for task, options in items['tasks'].items():
+			if 'filters' in options:
+				filters = options['filters']
+			else:
+				filters = {}
+			for graph in options['features']:
+				populate.add_dataset(db.session, items['path'], task,
+									replace=False, verbose=True,
+									install_path=str((Path(
+										app.config['DATASET_DIR']) / name).absolute()),
+									**filters)
 
 if __name__ == '__main__':
     manager.run()
