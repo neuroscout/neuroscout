@@ -1,7 +1,7 @@
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import { shallow, mount } from 'enzyme';
-import { Analysis, Dataset } from './commontypes';
+import { Analysis, Dataset } from './coretypes';
 import { OverviewTab } from './Overview';
 import AnalysisBuilder from './Builder';
 import App from './App';

@@ -4,7 +4,7 @@ import { TableProps, TableRowSelection } from 'antd/lib/table/Table';
 
 const FormItem = Form.Item;
 
-import { Analysis, Dataset, Run, Task } from './commontypes';
+import { Analysis, Dataset, Run, Task } from './coretypes';
 
 class DataTable extends React.Component<TableProps<any>, any> {
   render() {

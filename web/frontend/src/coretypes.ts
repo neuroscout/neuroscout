@@ -1,7 +1,7 @@
 type AnalysisStatus = 'DRAFT' | 'PENDING' | 'PASSED' | 'FAILED';
 
 // Analysis type in Analysis Builder
-export interface Analysis {  
+export interface Analysis {
   analysisId: string | undefined;
   name: string;
   description: string;
@@ -47,13 +47,27 @@ export interface Predictor {
 
 export interface AnalysisConfig {
   smoothing: number;
-  predictorConfigs: {[id: string]: PredictorConfig};
+  predictorConfigs: { [id: string]: PredictorConfig };
 }
 
 export interface PredictorConfig {
   convolution: 'Gamma' | 'Beta' | 'Alpha';
   temporalDerivative: boolean;
   orthogonalize: boolean;
+}
+
+export type TransformName = 'standardize' | 'orthogonalize';
+
+export interface Transformation {
+  name: TransformName;
+  inputs?: string[]; // predictor IDs
+  parameters: object;
+}
+
+export interface Contrast {
+  predictors: Predictor[];
+  weights: number[];
+  contrastType: 'T' | 'F';
 }
 
 export interface Store {
@@ -71,7 +85,7 @@ export interface Store {
   availablePredictors: Predictor[];
   // Technically selectedPredictors is redundant because we're also storing Analysis.predictorIds
   // but store these separately for performance reasons
-  selectedPredictors: Predictor[]; 
+  selectedPredictors: Predictor[];
   unsavedChanges: boolean;
 }
 
@@ -115,9 +129,9 @@ export interface ApiUser {
 }
 
 export interface AppAnalysis {
-  id: string; 
+  id: string;
   name: string;
   description: string;
-  status: AnalysisStatus; 
+  status: AnalysisStatus;
   modifiedAt?: string;
 }

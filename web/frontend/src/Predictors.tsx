@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { Table, Input, Button, Row, Col, Tag } from 'antd';
 import { TableProps, TableRowSelection } from 'antd/lib/table/Table';
-import { Analysis, Predictor } from './commontypes';
+import { Analysis, Predictor } from './coretypes';
 
 class PredictorTable extends React.Component<TableProps<any>, any> {
   render() {

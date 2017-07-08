@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { Form, Table, Input, Button, Row, Col, Slider, InputNumber, Collapse, Checkbox, Select } from 'antd';
 import { TableProps, TableRowSelection } from 'antd/lib/table/Table';
-import { Analysis, AnalysisConfig, Predictor, PredictorConfig } from './commontypes';
+import { Analysis, AnalysisConfig, Predictor, PredictorConfig } from './coretypes';
 const FormItem = Form.Item;
 const Panel = Collapse.Panel;
 const Option = Select.Option;

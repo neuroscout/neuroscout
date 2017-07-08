@@ -3,11 +3,12 @@ import { Tabs, Row, Col, Layout, Button, Modal, Icon, message } from 'antd';
 import { Prompt } from 'react-router-dom';
 import { OverviewTab } from './Overview';
 import { PredictorsTab } from './Predictors';
+import { XformsTab } from './Transformations';
 import OptionsTab from './Options';
 import {
   Store, Analysis, Dataset, Task, Run, Predictor,
-  ApiDataset, ApiAnalysis, AnalysisConfig
-} from './commontypes';
+  ApiDataset, ApiAnalysis, AnalysisConfig, Transformation
+} from './coretypes';
 import { displayError, jwtFetch, Space } from './utils';
 import Status from './Status';
 
@@ -118,10 +119,10 @@ const getTasks = (runs: Run[]): Task[] => {
 // Given an updated list of predictor IDs, create an updated version of analysis config. 
 // preserving the existing predictor configs, and adding/removing new/old ones as necessary
 const getUpdatedConfig = (config: AnalysisConfig, predictorIds: string[]): AnalysisConfig => {
-  let newConfig = {...config};
-  let newPredictorConfigs = {...config.predictorConfigs}
+  let newConfig = { ...config };
+  let newPredictorConfigs = { ...config.predictorConfigs }
   predictorIds.forEach((id) => {
-    if(!newPredictorConfigs.hasOwnProperty(id)){
+    if (!newPredictorConfigs.hasOwnProperty(id)) {
       newPredictorConfigs[id] = {
         convolution: 'Gamma',
         temporalDerivative: true,
@@ -225,7 +226,7 @@ export default class AnalysisBuilder extends React.Component<BuilderProps, Store
       datasetId: data.dataset_id,
       runIds: data.runs!.map(({ id }) => id),
       predictorIds: data.predictors!.map(({ id }) => id),
-      config: {smoothing: 10, predictorConfigs: {}}, // TODO: update this once API is updated
+      config: { smoothing: 10, predictorConfigs: {} }, // TODO: update this once API is updated
     };
     if (analysis.runIds.length > 0) {
       jwtFetch(`${domainRoot}/api/runs/${analysis.runIds[0]}`)
@@ -259,11 +260,18 @@ export default class AnalysisBuilder extends React.Component<BuilderProps, Store
   }
 
   updateConfig = (newConfig: AnalysisConfig): void => {
-    const newAnalysis = {...this.state.analysis};
+    const newAnalysis = { ...this.state.analysis };
     newAnalysis.config = newConfig;
-    this.setState({analysis: newAnalysis, unsavedChanges: true});
+    this.setState({ analysis: newAnalysis, unsavedChanges: true });
   }
-  
+
+  updateTransformations = (xforms: Transformation[]): void => {
+    this.setState({
+      analysis: { ...this.state.analysis, transformations: xforms },
+      unsavedChanges: true,
+    });
+  }
+
   /* Main function to update application state. May split this up into
    smaller pieces if it gets too complex. 
    
@@ -316,6 +324,7 @@ export default class AnalysisBuilder extends React.Component<BuilderProps, Store
       }
       // Enable predictors tab only if at least one run has been selected
       stateUpdate.predictorsActive = value.runIds.length > 0;
+      stateUpdate.transformationsActive = value.predictorIds.length > 0;
     } else if (attrName === 'selectedTaskId') {
       // When a different task is selected, autoselect all its associated run IDs
       this.updateState('analysis')({
@@ -327,6 +336,7 @@ export default class AnalysisBuilder extends React.Component<BuilderProps, Store
       newAnalysis.predictorIds = (value as Predictor[]).map(p => p.id);
       newAnalysis.config = getUpdatedConfig(newAnalysis.config, newAnalysis.predictorIds);
       stateUpdate.analysis = newAnalysis;
+      stateUpdate.transformationsActive = newAnalysis.predictorIds.length > 0;
     }
     stateUpdate[attrName] = value;
     if (!keepClean) stateUpdate.unsavedChanges = true;
@@ -359,12 +369,14 @@ export default class AnalysisBuilder extends React.Component<BuilderProps, Store
               <Space />
               <Button
                 onClick={this.saveAnalysis({ compile: false })}
-                type={this.saveEnabled() ? 'primary' : 'dashed'}
+                disabled={!this.saveEnabled()}
+                type={'primary'}
               >Save</Button>
               <Space />
               <Button
                 onClick={this.confirmSubmission}
-                type={this.submitEnabled() ? 'primary' : 'dashed'}
+                type={'primary'}
+                disabled={!this.submitEnabled()}
               >{unsavedChanges ? 'Save & Generate' : 'Generate'}</Button>
               <Space />
             </h2>
@@ -398,13 +410,19 @@ export default class AnalysisBuilder extends React.Component<BuilderProps, Store
                   updateSelectedPredictors={this.updateState('selectedPredictors')}
                 />
               </TabPane>
-              <TabPane tab="Transformations" key="transformations" disabled={!transformationsActive} />
+              <TabPane tab="Transformations" key="transformations" disabled={!transformationsActive} >
+                <XformsTab
+                  predictors={selectedPredictors}
+                  xforms={[]}
+                  onSave={xforms => this.updateTransformations(xforms)}
+                />
+              </TabPane>
               <TabPane tab="Contrasts" key="contrasts" disabled={!contrastsActive} />
               <TabPane tab="Options" key="modeling" disabled={!modelingActive}>
-                <OptionsTab 
-                analysis={analysis}
-                selectedPredictors={selectedPredictors}
-                updateConfig={this.updateConfig}
+                <OptionsTab
+                  analysis={analysis}
+                  selectedPredictors={selectedPredictors}
+                  updateConfig={this.updateConfig}
                 />
               </TabPane>
               <TabPane tab="Review" key="review" disabled={!reviewActive}>
