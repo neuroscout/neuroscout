@@ -22,7 +22,8 @@ class Analysis(db.Model):
     description = db.Column(db.Text)
     data = db.Column(JSONB, default={})
     filters = db.Column(JSONB) # List of filters used to select runs
-    transformations = db.Column(JSONB, default={})
+    transformations = db.Column(JSONB, default=[])
+    config = db.Column(JSONB, default={}) # fMRI analysis parameters
     created_at = db.Column(db.DateTime, default=datetime.datetime.utcnow)
     modified_at = db.Column(db.DateTime, default=datetime.datetime.utcnow)
     saved_count = db.Column(db.Integer, default=0)

@@ -23,12 +23,16 @@ class AnalysisSchema(Schema):
 	private = fields.Bool(description='Analysis private or discoverable?')
 	predictions = fields.Str(description='User apriori predictions.')
 
-	transformations = fields.Dict(description='Transformation json spec.')
+	config = fields.Dict(description='fMRI analysis configuration parameters.')
 	description = fields.Str()
 	data = fields.Dict()
 	parent_id = fields.Str(dump_only=True,description="Parent analysis, if cloned.")
 
 
+	transformations = fields.Nested(
+		'TransformationSchema', many=True,
+		description='Array of transformations'
+	)
 	predictors = fields.Nested(
 		'PredictorSchema', many=True, only=['id'],
         description='Predictor id(s) associated with analysis')
@@ -72,6 +76,16 @@ class AnalysisSchema(Schema):
 
 	class Meta:
 		strict = True
+
+class TransformationSchema(Schema):
+	name = fields.Str(description='Transformation name.')
+	inputs = fields.List(fields.Str(), description='Array of input predictors')
+	parameters = fields.Nested('ParameterSchema', many=True, description='Array of parameters.')
+
+class ParameterSchema(Schema):
+	name = fields.Str(description='Parameter name.')
+	kind = fields.Str(description='Parameter type (boolean or predictor).')
+	value = fields.Str(description='Parameter value')
 
 @doc(tags=['analysis'])
 @marshal_with(AnalysisSchema)
