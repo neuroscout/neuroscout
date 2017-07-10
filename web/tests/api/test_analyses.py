@@ -44,7 +44,16 @@ def test_post(auth_client, add_dataset):
 	test_analysis = {
 	"dataset_id" : add_dataset,
 	"name" : "some analysis",
-	"description" : "pretty damn innovative"
+	"description" : "pretty damn innovative",
+	"transformations" : [{
+		"name" : "scale",
+		"inputs" : ["predictor_1"],
+		"parameters" : [
+			{
+				"kind" : "boolean",
+				"name" : "demean",
+				"value" : "true"
+			}]}]
 	}
 
 	resp= auth_client.post('/api/analyses', data = test_analysis)
@@ -78,12 +87,16 @@ def test_post(auth_client, add_dataset):
 
 	bad_post_2 = {
 	"dataset_id" : dataset_id,
-	"description" : "pretty damn innovative"
-	}
+	"description" : "pretty damn innovative",
+	"name" : "analysis_name",
+	"transformations" : [{
+		"inputs" : ["predictor_1"]
+	}]}
 
 	resp= auth_client.post('/api/analyses', data = bad_post_2)
 	assert resp.status_code == 422
-	assert decode_json(resp)['message']['name'][0] == 'Missing data for required field.'
+	assert decode_json(resp)['message']['transformations']['0']['name'][0] \
+			== 'Missing data for required field.' ## Test missing trans. name
 
 def test_clone(session, auth_client, add_dataset, add_analysis, add_users):
 	(id1, id2), _ = add_users

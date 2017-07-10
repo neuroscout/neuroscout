@@ -78,14 +78,15 @@ class AnalysisSchema(Schema):
 		strict = True
 
 class TransformationSchema(Schema):
-	name = fields.Str(description='Transformation name.')
-	inputs = fields.List(fields.Str(), description='Array of input predictors')
+	name = fields.Str(description='Transformation name.', required=True)
+	inputs = fields.List(fields.Str(), required=True, description='Array of input predictors')
 	parameters = fields.Nested('ParameterSchema', many=True, description='Array of parameters.')
 
 class ParameterSchema(Schema):
-	name = fields.Str(description='Parameter name.')
-	kind = fields.Str(description='Parameter type (boolean or predictor).')
-	value = fields.Str(description='Parameter value')
+	name = fields.Str(description='Parameter name.', required=True)
+	kind = fields.Str(description='Parameter type (boolean or predictor).',
+					  required=True)
+	value = fields.Str(description='Parameter value', required=True)
 
 @doc(tags=['analysis'])
 @marshal_with(AnalysisSchema)
