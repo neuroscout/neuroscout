@@ -166,7 +166,7 @@ export class OverviewTab extends React.Component<OverviewTabProps, any> {
                   rowKey="id"
                   size="small"
                   dataSource={availableRuns.filter(r => r.task.id === selectedTaskId)}
-                  pagination={datasets.length > 20}
+                  pagination={availableRuns.length > 20}
                   rowSelection={runRowSelection}
                 />
                 <br />

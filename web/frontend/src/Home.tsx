@@ -18,7 +18,7 @@ class Home extends React.Component<HomeProps, {}> {
     return (
       <div>
         <Row type="flex" justify="center">
-          <Col span={16}>
+          <Col span={18}>
             <Card title="">
               <p>Marketing copy explaining Neuroscout...</p>
             </Card>
@@ -26,7 +26,6 @@ class Home extends React.Component<HomeProps, {}> {
           </Col>
         </Row>
         <Row type="flex" justify="center">
-          <Col span={2} />
           <Col span={4}>
             <Button type="primary" size="large"><Link to="/builder">Create New Analysis</Link></Button>
           </Col>
@@ -37,7 +36,7 @@ class Home extends React.Component<HomeProps, {}> {
         {loggedIn &&
           <div>
             <Row type="flex" justify="center">
-              <Col span={16}>
+              <Col span={18}>
                 {analyses !== undefined && <div><br /><h2>Your saved analyses:</h2><br /></div>}
               </Col>
             </Row>

@@ -69,7 +69,7 @@ class App extends React.Component<{}, AppState> {
   loadAnalyses = () => {
     if (this.state.jwt) {
       return jwtFetch(`${DOMAINROOT}/api/user`)
-        .then(response => response.json())
+        // .then(response => response.json())
         .then((data: ApiUser) => {
           this.setState({
             analyses: data.analyses
@@ -143,9 +143,9 @@ class App extends React.Component<{}, AppState> {
         'Content-type': 'application/json'
       }
     })
-      .then(response => response.json().then(json => ({ ...json, status: response.status })))
+      .then(response => response.json().then(json => ({ ...json, statusCode: response.status })))
       .then((data: any) => {
-        if (data.status !== 200) {
+        if (data.statusCode !== 200) {
           let errorMessage = '';
           Object.keys(data.message).forEach((key) => {
             errorMessage += data.message[key];
@@ -177,12 +177,12 @@ class App extends React.Component<{}, AppState> {
 
   deleteAnalysis = (id): void => {
     jwtFetch(`${DOMAINROOT}/api/analyses/${id}`, { method: 'delete' })
-      .then(response => {
-        if (response.status !== 200) {
-          throw 'Something went wrong - most likely the analysis is not locked. Will fix it later';
-        }
-        return response.json();
-      })
+      // .then(response => {
+      //   if (response.status !== 200) {
+      //     throw 'Something went wrong - most likely the analysis is not locked. Will fix it later';
+      //   }
+      //   return response.json();
+      // })
       .then((data: ApiAnalysis) => {
         this.setState({ analyses: this.state.analyses.filter(a => a.id !== id) });
       })
@@ -208,12 +208,12 @@ class App extends React.Component<{}, AppState> {
 
   cloneAnalysis = (id): void => {
     jwtFetch(`${DOMAINROOT}/api/analyses/${id}/clone`, { method: 'post' })
-      .then(response => {
-        if (response.status !== 200) {
-          throw 'Something went wrong - most likely the analysis is not locked. Will fix it later';
-        }
-        return response.json();
-      })
+      // .then(response => {
+      //   if (response.status !== 200) {
+      //     throw 'Something went wrong - most likely the analysis is not locked. Will fix it later';
+      //   }
+      //   return response.json();
+      // })
       .then((data: ApiAnalysis) => {
         const analysis = ApiToAppAnalysis(data);
         this.setState({ analyses: this.state.analyses.concat([analysis]) });
@@ -333,25 +333,29 @@ class App extends React.Component<{}, AppState> {
           <Layout>
             <Header style={{ background: '#fff', padding: 0 }}>
               <Row type="flex" justify="center">
-                <Col span={10}>
-                  <h1><Link to="/">Neuroscout</Link></h1>
-                </Col>
-                <Col span={6}>
-                  {loggedIn ?
-                    (
-                      <span>{`Logged in as ${email}`}
-                        <Space />
-                        <Button onClick={e => this.logout()}>Log out</Button>
-                      </span>
-                    ) :
-                    (
-                      <span>
-                        <Button onClick={e => this.setState({ openLogin: true })}>Log in</Button>
-                        <Space />
-                        <Button onClick={e => this.setState({ openSignup: true })}>Sign up</Button>
-                      </span>
-                    )
-                  }
+                <Col span={18}>
+                  <Row type="flex" justify="space-between">
+                    <Col span={12}>
+                      <h1><Link to="/">Neuroscout</Link></h1>
+                    </Col>
+                    <Col span={6}>
+                      {loggedIn ?
+                        (
+                          <span>{`Logged in as ${email}`}
+                            <Space />
+                            <Button onClick={e => this.logout()}>Log out</Button>
+                          </span>
+                        ) :
+                        (
+                          <span>
+                            <Button onClick={e => this.setState({ openLogin: true })}>Log in</Button>
+                            <Space />
+                            <Button onClick={e => this.setState({ openSignup: true })}>Sign up</Button>
+                          </span>
+                        )
+                      }
+                    </Col>
+                  </Row>
                 </Col>
               </Row>
             </Header>

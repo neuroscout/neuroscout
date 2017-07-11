@@ -2,7 +2,7 @@ import * as React from 'react';
 import { Tabs, Row, Col, Layout, Button, Modal, Icon, message } from 'antd';
 import { Prompt } from 'react-router-dom';
 import { OverviewTab } from './Overview';
-import { PredictorsTab } from './Predictors';
+import { PredictorSelector } from './Predictors';
 import { XformsTab } from './Transformations';
 import OptionsTab from './Options';
 import {
@@ -39,7 +39,8 @@ const initializeStore = (): Store => ({
     predictorIds: [],
     status: 'DRAFT',
     private: true,
-    config: { smoothing: DEFAULT_SMOOTHING, predictorConfigs: {} }
+    config: { smoothing: DEFAULT_SMOOTHING, predictorConfigs: {} },
+    transformations: [],
   },
   datasets: [],
   availableTasks: [],
@@ -146,12 +147,12 @@ export default class AnalysisBuilder extends React.Component<BuilderProps, Store
     // Load analysis from server if an analysis id is specified in the props
     if (!!props.id) {
       jwtFetch(`${domainRoot}/api/analyses/${props.id}`)
-        .then(response => response.json() as Promise<ApiAnalysis>)
-        .then(data => this.loadAnalysis(data))
+        // .then(response => response.json() as Promise<ApiAnalysis>)
+        .then((data: ApiAnalysis) => this.loadAnalysis(data))
         .catch(displayError);
     }
     jwtFetch(domainRoot + '/api/datasets')
-      .then(response => response.json())
+      // .then(response => response.json())
       .then(data => {
         const datasets: Dataset[] = data.map(d => normalizeDataset(d));
         this.setState({ 'datasets': datasets });
@@ -181,7 +182,7 @@ export default class AnalysisBuilder extends React.Component<BuilderProps, Store
       status: analysis.status,
       runs: analysis.runIds.map(id => ({ id })),
       predictors: analysis.predictorIds.map(id => ({ id })),
-      transformations: {},
+      transformations: analysis.transformations,
       config: analysis.config,
     };
     // const method = analysis.analysisId ? 'put' : 'post';
@@ -202,8 +203,9 @@ export default class AnalysisBuilder extends React.Component<BuilderProps, Store
       throw error;
     }
     jwtFetch(url, { method, body: JSON.stringify(apiAnalysis) })
-      .then(response => response.json())
-      .then((data: ApiAnalysis) => {
+      // .then(response => response.json())
+      .then((data: ApiAnalysis & {statusCode: number}) => {
+        if(data.statusCode !== 200) throw new Error('Oops...something went wrong. Analysis was not saved.')
         message.success(compile ? 'Analysis submitted for generation' : 'Analysis saved');
         this.setState({
           analysis: {
@@ -220,6 +222,9 @@ export default class AnalysisBuilder extends React.Component<BuilderProps, Store
   }
 
   loadAnalysis = (data: ApiAnalysis): Promise<Analysis> => {
+    if(!data.transformations){
+      return Promise.reject('Data returned by server is missing transformations array.');
+    }
     const analysis: Analysis = {
       ...data,
       analysisId: data.hash_id,
@@ -227,10 +232,11 @@ export default class AnalysisBuilder extends React.Component<BuilderProps, Store
       runIds: data.runs!.map(({ id }) => id),
       predictorIds: data.predictors!.map(({ id }) => id),
       config: { smoothing: 10, predictorConfigs: {} }, // TODO: update this once API is updated
+      transformations: 'length' in data.transformations ? data.transformations : [],
     };
     if (analysis.runIds.length > 0) {
       jwtFetch(`${domainRoot}/api/runs/${analysis.runIds[0]}`)
-        .then(response => response.json() as Promise<Run>)
+        // .then(response => response.json() as Promise<Run>)
         .then(data => {
           this.setState({ selectedTaskId: data.task.id });
           this.updateState('analysis', true)(analysis);
@@ -243,9 +249,7 @@ export default class AnalysisBuilder extends React.Component<BuilderProps, Store
   }
 
   confirmSubmission = (): void => {
-    if (!this.submitEnabled()) {
-      return;
-    }
+    if (!this.submitEnabled()) return;
     const { saveAnalysis } = this;
     Modal.confirm({
       title: 'Are you sure you want to submit the analysis?',
@@ -291,7 +295,7 @@ export default class AnalysisBuilder extends React.Component<BuilderProps, Store
       if (updatedAnalysis.datasetId !== analysis.datasetId) {
         // If a new dataset is selected we need to fetch the associated runs
         jwtFetch(`${domainRoot}/api/runs?dataset_id=${updatedAnalysis.datasetId}`)
-          .then(response => response.json())
+          // .then(response => response.json())
           .then((data: Run[]) => {
             message.success(`Fetched ${data.length} runs associated with the selected dataset`);
             this.setState({
@@ -307,7 +311,7 @@ export default class AnalysisBuilder extends React.Component<BuilderProps, Store
         const runIds = updatedAnalysis.runIds.join(',');
         if (runIds) {
           jwtFetch(`${domainRoot}/api/predictors?runs=${runIds}`)
-            .then(response => response.json())
+            // .then(response => response.json())
             .then((data: Predictor[]) => {
               message.success(`Fetched ${data.length} predictors associated with the selected runs`);
               const selectedPredictors = data.filter(p => updatedAnalysis.predictorIds.indexOf(p.id) > -1);
@@ -360,7 +364,7 @@ export default class AnalysisBuilder extends React.Component<BuilderProps, Store
           message={'You have unsaved changes. Are you sure you want leave this page?'}
         />
         <Row type="flex" justify="center">
-          <Col span={16}>
+          <Col span={18}>
             <h2>
               {analysis.status !== 'DRAFT' ?
                 <Icon type="lock" /> :
@@ -384,7 +388,7 @@ export default class AnalysisBuilder extends React.Component<BuilderProps, Store
           </Col>
         </Row>
         <Row type="flex" justify="center">
-          <Col span={16}>
+          <Col span={18}>
             <Tabs
               activeKey={activeTab}
               onTabClick={(newTab) => this.setState({ activeTab: newTab })}
@@ -403,17 +407,16 @@ export default class AnalysisBuilder extends React.Component<BuilderProps, Store
                 />
               </TabPane>
               <TabPane tab="Predictors" key="predictors" disabled={!predictorsActive}>
-                <PredictorsTab
-                  analysis={analysis}
+                <PredictorSelector
                   availablePredictors={availablePredictors}
                   selectedPredictors={selectedPredictors}
-                  updateSelectedPredictors={this.updateState('selectedPredictors')}
+                  updateSelection={this.updateState('selectedPredictors')}
                 />
               </TabPane>
               <TabPane tab="Transformations" key="transformations" disabled={!transformationsActive} >
                 <XformsTab
                   predictors={selectedPredictors}
-                  xforms={[]}
+                  xforms={analysis.transformations}
                   onSave={xforms => this.updateTransformations(xforms)}
                 />
               </TabPane>

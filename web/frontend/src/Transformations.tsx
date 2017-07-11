@@ -1,14 +1,15 @@
 import * as React from 'react';
 import { Table, Input, Button, Row, Col, Form, Select, Checkbox } from 'antd';
 import { TableProps, TableRowSelection } from 'antd/lib/table/Table';
-import { Analysis, Predictor, Transformation, TransformName } from './coretypes';
-import { displayError } from './utils';
+import {
+  Analysis, Predictor, Parameter,
+  Transformation, TransformName, XformRules
+} from './coretypes';
+import { displayError, Space } from './utils';
+import { PredictorSelector } from './Predictors';
 import transformDefinititions from './transforms';
 const Option = Select.Option;
 
-interface XformRules {
-  [name: string]: Transformation;
-}
 
 let xformRules: XformRules = {};
 for (const item of transformDefinititions) {
@@ -16,6 +17,23 @@ for (const item of transformDefinititions) {
 }
 
 const FormItem = Form.Item;
+
+const XformDisplay = (props: { xform: Transformation }) => {
+  const xform = props.xform;
+  return (
+    <div>
+      <h3>{xform.name}</h3>
+      <p>{`Inputs: ${xform.inputs!.join(', ')}`}</p>
+      <p>Parameters:</p>
+      <ul>
+        {xform.parameters.map(param =>
+          <li>{param.name + ': ' + param.value}</li>
+        )}
+      </ul>
+      <br />
+    </div>
+  );
+}
 
 interface XformsTabProps {
   predictors: Predictor[];
@@ -33,8 +51,8 @@ export class XformsTab extends React.Component<XformsTabProps, XformsTabState>{
     this.state = { mode: 'view' };
   }
 
-  onAddXform(xform: Transformation) {
-    const newXforms = this.props.xforms.concat([xform]);
+  onAddXform = (xform: Transformation) => {
+    const newXforms = [...this.props.xforms, ...[xform]];
     this.props.onSave(newXforms);
     this.setState({ mode: 'view' });
   }
@@ -42,20 +60,39 @@ export class XformsTab extends React.Component<XformsTabProps, XformsTabState>{
   render() {
     const { xforms, predictors } = this.props;
     const { mode } = this.state;
-    return (
+    const AddMode = () => (
+      <div>
+        <h2>{'Add a new transformation:'}</h2>
+        <XformEditor
+          xformRules={xformRules}
+          onSave={xform => this.onAddXform(xform)}
+          onCancel={() => this.setState({ mode: 'view' })}
+          availableInputs={predictors}
+        />
+      </div>
+    )
+
+    const ViewMode = () => (
       <div>
         <h2>{'Transformations'}</h2>
-        {xforms.map(xform =>
-          <p>{xform.name}</p>
-        )}
-        <Button onClick={() => this.setState({ mode: 'add' })}>Add new transformation</Button>
-        {mode === 'add' &&
-          <XformEditor
-            xformRules={xformRules}
-            onSave={xform => this.onAddXform(xform)}
-            availableInputs={predictors}
-          />
+        <br />
+        {xforms.length ?
+          xforms.map(xform => <XformDisplay xform={xform} />) :
+          <p>{"You haven't created any transformations"}</p>
         }
+        <br />
+        <Button
+          type="primary"
+          onClick={() => this.setState({ mode: 'add' })}
+        >Add new transformation
+        </Button>
+      </div>
+    )
+
+    return (
+      <div>
+        {mode === 'view' && ViewMode()}
+        {mode === 'add' && AddMode()}
       </div>
     );
   }
@@ -64,6 +101,7 @@ export class XformsTab extends React.Component<XformsTabProps, XformsTabState>{
 interface XformEditorProps {
   xformRules: XformRules;
   onSave: (xform: Transformation) => void;
+  onCancel: () => void;
   availableInputs: Predictor[];
   xform?: Transformation;
 }
@@ -71,26 +109,56 @@ interface XformEditorProps {
 interface XformEditorState {
   inputs: Predictor[];
   name: TransformName | '';
-  parameters: object;
+  parameters: Parameter[];
 }
 
 class XformEditor extends React.Component<XformEditorProps, XformEditorState>{
   updateParameter = (name: string, value: any) => {
-    const newParameters = { ...this.state.parameters, name: value };
-    this.setState({ parameters: newParameters });
+    const { parameters } = this.state;
+    // let newParameters: Parameter[];
+    // let index = parameters.map(p => p.name).indexOf(name);
+    // if (index < 0) {
+    //   const newParam = { name, value } as Parameter;
+    //   newParameters = parameters.concat([newParam]);
+    // } else {
+    //   newParameters = parameters.map(param => param.name === name ? { ...param, value } : param);
+    // }
+    // this.setState({ parameters: newParameters });
+    this.setState({ parameters: parameters.map(param => param.name === name ? { ...param, value } : param) });
   }
 
   constructor(props: XformEditorProps) {
     super();
     const { xform, availableInputs } = props;
     this.state = {
-      inputs: availableInputs,
+      inputs: [],
       name: xform ? xform.name : '',
-      parameters: xform ? xform.parameters : {},
+      parameters: xform ? xform.parameters : [],
     };
   }
 
-  onSave() {
+  updateInputs = (inputs: Predictor[]) => {
+    // In the special case of the orthogonalize transformation if new inputs are selected
+    // we need to make sure we remove them from the 'wrt' parameter if they've already been added there
+    const { name, parameters } = this.state;
+    const inputIds = new Set(inputs.map(x => x.id));
+    const newParameters = (name === 'orthogonalize') ?
+      parameters.map(param =>
+        param.kind === 'predictors' ?
+          { ...param, value: param.value.filter(x => !inputIds.has(x)) } :
+          param
+      ) :
+      parameters;
+    this.setState({ inputs, parameters: newParameters });
+  }
+
+  updateXformType = (name: TransformName) => {
+    const { xformRules } = this.props;
+    const parameters = [...xformRules[name].parameters];
+    this.setState({ name, parameters });
+  }
+
+  onSave = () => {
     const { xform } = this.props;
     const { name, inputs, parameters } = this.state;
     if (!name) {
@@ -105,35 +173,61 @@ class XformEditor extends React.Component<XformEditorProps, XformEditorState>{
   }
 
   render() {
-    const { xform, xformRules } = this.props;
-    const { name, parameters } = this.state;
+    const { xform, xformRules, availableInputs } = this.props;
+    const { name, parameters, inputs } = this.state;
     const editMode = !!xform;
     const allowedXformNames = Object.keys(xformRules);
-    const customParameters = name ? xformRules[name].parameters : undefined;
+    const availableParameters = name ? xformRules[name].parameters : undefined;
     return (
       <div>
-        <Form layout="vertical">
+        <Form layout="horizontal">
           <FormItem label="Transformation:">
             <Select
               style={{ width: 120 }}
-              value={''}
-              onChange={(value: TransformName) => this.setState({ name: value })}
+              value={name}
+              onChange={this.updateXformType}
             >
               {allowedXformNames.map(x => <Option value={x} key={x}>{x}</Option>)}
             </Select>
-            <p>Parameters:</p>
-            {customParameters && Object.keys(customParameters).map(p =>
-              <ParameterField
-                name={p}
-                kind={customParameters[p]}
-                onChange={value => this.updateParameter(p, value)}
-              />)}
           </FormItem>
-          <Button
-            type="primary"
-            onClick={this.onSave}
-          >Save
-          </Button>
+          {name &&
+            <div>
+              <p>Select inputs:</p>
+              <PredictorSelector
+                availablePredictors={availableInputs}
+                selectedPredictors={inputs}
+                updateSelection={inputs => this.updateInputs(inputs)}
+              />
+              <br />
+              {availableParameters && availableParameters.map(param => {
+                let options: Predictor[] = [];
+                if (param.name === 'wrt') {
+                  // Special case for wrt parameter: in 'options' exclude predictors 
+                  // that were selected for 'inputs'
+                  const inputIds = new Set(inputs.map(x => x.id));
+                  options = availableInputs.filter(x => !inputIds.has(x.id));
+                }
+                return (
+                  <div>
+                    {(param.name !== 'wrt' || inputs.length > 0) &&
+                      <ParameterField
+                        name={param.name}
+                        value={parameters.filter(x => x.name === param.name)[0].value}
+                        kind={param.kind}
+                        options={options}
+                        onChange={value => this.updateParameter(param.name, value)}
+                      />
+                    }
+                  </div>
+                )
+              })
+              }
+              <br />
+            </div>
+          }
+          <Button type="primary" onClick={this.onSave} >OK </Button>
+          <Space />
+          <Button onClick={this.props.onCancel} >Cancel </Button>
         </Form>
       </div>
     )
@@ -143,29 +237,50 @@ class XformEditor extends React.Component<XformEditorProps, XformEditorState>{
 interface ParameterFieldProps {
   name: string;
   kind: string;
+  options?: Object[];
   value?: any;
   onChange: (value: any) => void;
 }
 class ParameterField extends React.Component<ParameterFieldProps>{
-  BooleanField() {
+  BooleanField = () => {
     const { name, value, onChange } = this.props;
     return (
-      <FormItem>
+      <div>
         <Checkbox
           checked={value}
-          onChange={() => onChange(!!value)}
+          onChange={() => onChange(!value)}
         >{name}
         </Checkbox>
-      </FormItem>
+        <br />
+      </div>
+    );
+  }
+
+  WrtField = () => {
+    const { name, onChange, value, options } = this.props;
+    // const selectedPredictors = (options as Predictor[] || []).filter(p => value.indexOf(p.id) > -1);
+    const wrtSet = new Set(value as string[]);
+    const selectedPredictors = (options as Predictor[] || []).filter(p => wrtSet.has(p.id));
+    return (
+      <div>
+        <p>{"Select predictors you'd like to orthogonzlie against:"}</p>
+        <PredictorSelector
+          availablePredictors={options as Predictor[]}
+          selectedPredictors={selectedPredictors}
+          updateSelection={predictors => onChange(predictors.map(x => x.id))}
+        />
+        <br />
+      </div>
     );
   }
 
   render() {
     const { kind } = this.props;
     return (
-      <div>
+      <span>
         {kind === 'boolean' && this.BooleanField()}
-      </div>
+        {kind === 'predictors' && this.WrtField()}
+      </span>
     );
   }
 }

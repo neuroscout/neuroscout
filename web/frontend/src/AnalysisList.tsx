@@ -17,7 +17,7 @@ const AnalysisList = (props: AnalysisListProps) => {
   const { analyses, publicList, cloneAnalysis, onDelete } = props;
   return (
     <Row type="flex" justify="center">
-      <Col span={16}>
+      <Col span={18}>
         {analyses!.map(analysis => (
           <div key={analysis.id}>
             <Card
@@ -25,14 +25,14 @@ const AnalysisList = (props: AnalysisListProps) => {
               extra={<Status status={analysis.status} />}
             >
               <Row>
-                <Col span={16}>
+                <Col span={18}>
                   <p><strong>Description: </strong>{analysis.description || 'N/A'}</p>
                   <p><strong>Last modified: </strong>{analysis.modifiedAt}</p>
                   <br />
                 </Col>
               </Row>
               <Row>
-                <Col span={16}>
+                <Col span={18}>
                   <Button
                     type="primary"
                     ghost={true}

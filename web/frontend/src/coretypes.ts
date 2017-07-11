@@ -13,6 +13,7 @@ export interface Analysis {
   private?: boolean;
   modifiedAt?: string;
   config: AnalysisConfig;
+  transformations: Transformation[];
 }
 
 // Normalized dataset object  in Analysis Builder
@@ -56,12 +57,30 @@ export interface PredictorConfig {
   orthogonalize: boolean;
 }
 
+interface BooleanParam {
+  kind: 'boolean';
+  name: string;
+  value: boolean;
+}
+
+interface PredictorsParam {
+  kind: 'predictors';
+  name: string;
+  value: string[];
+}
+
+export type Parameter = BooleanParam | PredictorsParam;
+
 export type TransformName = 'standardize' | 'orthogonalize';
 
 export interface Transformation {
   name: TransformName;
   inputs?: string[]; // predictor IDs
-  parameters: object;
+  parameters: Parameter[];
+}
+
+export interface XformRules {
+  [name: string]: Transformation;
 }
 
 export interface Contrast {
@@ -117,7 +136,7 @@ export interface ApiAnalysis {
   dataset_id: number;
   runs?: { id: string }[];
   predictors?: { id: string }[];
-  transformations?: object;
+  transformations?: Transformation[];
   config?: object;
   modified_at?: string;
 }

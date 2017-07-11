@@ -16,6 +16,8 @@ it('Overview tab renders without errors', () => {
     datasetId: null,
     predictorIds: [],
     status: 'DRAFT',
+    config: {smoothing: 10, predictorConfigs: {}},
+    transformations: [],
   };
   const tab = mount(<OverviewTab
     analysis={analysis}
