@@ -31,7 +31,7 @@ const initializeStore = (): Store => ({
   reviewActive: true,
   analysis: {
     analysisId: undefined,
-    name: 'Untitled',
+    name: '',
     description: '',
     datasetId: null,
     predictions: '',
@@ -171,6 +171,10 @@ export default class AnalysisBuilder extends React.Component<BuilderProps, Store
     const analysis = this.state.analysis;
     if (analysis.datasetId === null) {
       displayError(Error('Analysis cannot be saved without selecting a dataset'));
+      return;
+    }
+    if (!analysis.name) {
+      displayError(Error('Analysis cannot be saved without a name'));
       return;
     }
     const apiAnalysis: ApiAnalysis = {

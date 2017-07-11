@@ -18,8 +18,12 @@ for (const item of transformDefinititions) {
 
 const FormItem = Form.Item;
 
-const XformDisplay = (props: { xform: Transformation }) => {
-  const xform = props.xform;
+interface XformDisplayProps {
+  xform: Transformation;
+  onDelete: (name: TransformName) => void;
+}
+const XformDisplay = (props: XformDisplayProps) => {
+  const { xform, onDelete } = props;
   return (
     <div>
       <h3>{xform.name}</h3>
@@ -30,6 +34,7 @@ const XformDisplay = (props: { xform: Transformation }) => {
           <li>{param.name + ': ' + param.value}</li>
         )}
       </ul>
+      <Button onClick={() => onDelete(xform.name)}>Delete</Button>
       <br />
     </div>
   );
@@ -57,6 +62,11 @@ export class XformsTab extends React.Component<XformsTabProps, XformsTabState>{
     this.setState({ mode: 'view' });
   }
 
+  onDeleteXform = (name: TransformName) => {
+    const newXforms = this.props.xforms.filter(x => x.name !== name);
+    this.props.onSave(newXforms);
+  }
+
   render() {
     const { xforms, predictors } = this.props;
     const { mode } = this.state;
@@ -77,7 +87,7 @@ export class XformsTab extends React.Component<XformsTabProps, XformsTabState>{
         <h2>{'Transformations'}</h2>
         <br />
         {xforms.length ?
-          xforms.map(xform => <XformDisplay xform={xform} />) :
+          xforms.map(xform => <XformDisplay xform={xform} onDelete={this.onDeleteXform}/>) :
           <p>{"You haven't created any transformations"}</p>
         }
         <br />
