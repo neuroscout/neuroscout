@@ -82,6 +82,13 @@ class TransformationSchema(Schema):
 	inputs = fields.List(fields.Str(), required=True, description='Array of input predictors')
 	parameters = fields.Nested('ParameterSchema', many=True, description='Array of parameters.')
 
+	@validates('inputs')
+	def validate_preds(self, value):
+		try:
+			[Predictor.query.filter_by(id=int(r)).one() for r in value]
+		except:
+			raise ValidationError('Invalid predictor id in transformation input.')
+
 class ParameterSchema(Schema):
 	name = fields.Str(description='Parameter name.', required=True)
 	kind = fields.Str(description='Parameter type (boolean or predictor).',

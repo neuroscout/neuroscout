@@ -39,7 +39,7 @@ def test_get(session, auth_client, add_analysis):
 	assert resp.status_code == 404
 	# assert 'requested URL was not found' in decode_json(resp)['message']
 
-def test_post(auth_client, add_dataset):
+def test_post(auth_client, add_dataset, add_predictor):
 	## Add analysis
 	test_analysis = {
 	"dataset_id" : add_dataset,
@@ -47,7 +47,7 @@ def test_post(auth_client, add_dataset):
 	"description" : "pretty damn innovative",
 	"transformations" : [{
 		"name" : "scale",
-		"inputs" : ["predictor_1"],
+		"inputs" : [str(add_predictor)],
 		"parameters" : [
 			{
 				"kind" : "boolean",
