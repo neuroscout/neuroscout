@@ -29,10 +29,8 @@ class AnalysisSchema(Schema):
 	parent_id = fields.Str(dump_only=True,description="Parent analysis, if cloned.")
 
 
-	transformations = fields.Nested(
-		'TransformationSchema', many=True,
-		description='Array of transformations'
-	)
+	transformations = fields.List(fields.Dict(),
+								  description='Array of transformation objects')
 	predictors = fields.Nested(
 		'PredictorSchema', many=True, only=['id'],
         description='Predictor id(s) associated with analysis')
@@ -77,30 +75,6 @@ class AnalysisSchema(Schema):
 	class Meta:
 		strict = True
 
-class TransformationSchema(Schema):
-	name = fields.Str(description='Transformation name.', required=True)
-	inputs = fields.List(fields.Int(), required=True, description='Array of input predictors')
-	parameters = fields.Nested('ParameterSchema', many=True, description='Array of parameters.')
-
-	@validates('inputs')
-	def validate_preds(self, value):
-		try:
-			[Predictor.query.filter_by(id=r).one() for r in value]
-		except:
-			raise ValidationError('Invalid predictor id in transformation input.')
-
-class Value(fields.Field):
-	def _serialize(self, value, attr, obj):
-		if value['kind'] == 'boolean':
-		    return bool(value['value'])
-		elif value['kind'] == 'predictor':
-			return int(value['value'])
-		else:
-			raise ValidationError('Invalid value type')
-
-class ParameterSchema(Schema):
-	name = fields.Str(description='Parameter name.', required=True)
-	value = Value(description='Parameter kind and value (in dictionary)', required=True)
 
 @doc(tags=['analysis'])
 @marshal_with(AnalysisSchema)
