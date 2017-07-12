@@ -47,12 +47,11 @@ def test_post(auth_client, add_dataset, add_predictor):
 	"description" : "pretty damn innovative",
 	"transformations" : [{
 		"name" : "scale",
-		"inputs" : [str(add_predictor)],
+		"inputs" : [add_predictor],
 		"parameters" : [
 			{
-				"kind" : "boolean",
 				"name" : "demean",
-				"value" : "true"
+				"value" : {"kind" : "boolean", "value" : True}
 			}]}]
 	}
 
@@ -90,7 +89,7 @@ def test_post(auth_client, add_dataset, add_predictor):
 	"description" : "pretty damn innovative",
 	"name" : "analysis_name",
 	"transformations" : [{
-		"inputs" : ["predictor_1"]
+		"inputs" : [add_predictor]
 	}]}
 
 	resp= auth_client.post('/api/analyses', data = bad_post_2)

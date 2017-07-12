@@ -79,21 +79,28 @@ class AnalysisSchema(Schema):
 
 class TransformationSchema(Schema):
 	name = fields.Str(description='Transformation name.', required=True)
-	inputs = fields.List(fields.Str(), required=True, description='Array of input predictors')
+	inputs = fields.List(fields.Int(), required=True, description='Array of input predictors')
 	parameters = fields.Nested('ParameterSchema', many=True, description='Array of parameters.')
 
 	@validates('inputs')
 	def validate_preds(self, value):
 		try:
-			[Predictor.query.filter_by(id=int(r)).one() for r in value]
+			[Predictor.query.filter_by(id=r).one() for r in value]
 		except:
 			raise ValidationError('Invalid predictor id in transformation input.')
 
+class Value(fields.Field):
+	def _serialize(self, value, attr, obj):
+		if value['kind'] == 'boolean':
+		    return bool(value['value'])
+		elif value['kind'] == 'predictor':
+			return int(value['value'])
+		else:
+			raise ValidationError('Invalid value type')
+
 class ParameterSchema(Schema):
 	name = fields.Str(description='Parameter name.', required=True)
-	kind = fields.Str(description='Parameter type (boolean or predictor).',
-					  required=True)
-	value = fields.Str(description='Parameter value', required=True)
+	value = Value(description='Parameter kind and value (in dictionary)', required=True)
 
 @doc(tags=['analysis'])
 @marshal_with(AnalysisSchema)
