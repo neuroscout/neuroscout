@@ -39,12 +39,20 @@ def test_get(session, auth_client, add_analysis):
 	assert resp.status_code == 404
 	# assert 'requested URL was not found' in decode_json(resp)['message']
 
-def test_post(auth_client, add_dataset):
+def test_post(auth_client, add_dataset, add_predictor):
 	## Add analysis
 	test_analysis = {
 	"dataset_id" : add_dataset,
 	"name" : "some analysis",
-	"description" : "pretty damn innovative"
+	"description" : "pretty damn innovative",
+	"transformations" : [{
+		"name" : "scale",
+		"inputs" : [add_predictor],
+		"parameters" : [
+			{
+				"name" : "demean",
+				"value" : {"kind" : "boolean", "value" : True}
+			}]}]
 	}
 
 	resp= auth_client.post('/api/analyses', data = test_analysis)
@@ -83,7 +91,8 @@ def test_post(auth_client, add_dataset):
 
 	resp= auth_client.post('/api/analyses', data = bad_post_2)
 	assert resp.status_code == 422
-	assert decode_json(resp)['message']['name'][0] == 'Missing data for required field.'
+	assert decode_json(resp)['message']['name'][0] == \
+			'Missing data for required field.'		
 
 def test_clone(session, auth_client, add_dataset, add_analysis, add_users):
 	(id1, id2), _ = add_users
