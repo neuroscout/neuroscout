@@ -23,12 +23,14 @@ class AnalysisSchema(Schema):
 	private = fields.Bool(description='Analysis private or discoverable?')
 	predictions = fields.Str(description='User apriori predictions.')
 
-	transformations = fields.Dict(description='Transformation json spec.')
+	config = fields.Dict(description='fMRI analysis configuration parameters.')
 	description = fields.Str()
 	data = fields.Dict()
 	parent_id = fields.Str(dump_only=True,description="Parent analysis, if cloned.")
 
 
+	transformations = fields.List(fields.Dict(),
+								  description='Array of transformation objects')
 	predictors = fields.Nested(
 		'PredictorSchema', many=True, only=['id'],
         description='Predictor id(s) associated with analysis')
@@ -72,6 +74,7 @@ class AnalysisSchema(Schema):
 
 	class Meta:
 		strict = True
+
 
 @doc(tags=['analysis'])
 @marshal_with(AnalysisSchema)
@@ -125,13 +128,15 @@ class CloneAnalysisResource(AnalysisBaseResource):
 	@utils.auth_required
 	@utils.fetch_analysis
 	def post(self, analysis):
-		if analysis.status != 'PASSED':
-			utils.abort(422, "Only locked analyses can be cloned")
-		else:
-			cloned = analysis.clone()
-			db.session.add(cloned)
-			db.session.commit()
-			return cloned
+		if analysis.user_id != current_identity.id:
+			if analysis.status != 'PASSED':
+				utils.abort(422, "You can only clone somebody else's analysis"
+								  " if they have been compiled.")
+
+		cloned = analysis.clone(current_identity)
+		db.session.add(cloned)
+		db.session.commit()
+		return cloned
 
 class CompileAnalysisResource(AnalysisBaseResource):
 	@doc(summary='Compile and lock analysis.')

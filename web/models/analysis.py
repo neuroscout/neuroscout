@@ -22,7 +22,8 @@ class Analysis(db.Model):
     description = db.Column(db.Text)
     data = db.Column(JSONB, default={})
     filters = db.Column(JSONB) # List of filters used to select runs
-    transformations = db.Column(JSONB, default={})
+    transformations = db.Column(JSONB, default=[])
+    config = db.Column(JSONB, default={}) # fMRI analysis parameters
     created_at = db.Column(db.DateTime, default=datetime.datetime.utcnow)
     modified_at = db.Column(db.DateTime, default=datetime.datetime.utcnow)
     saved_count = db.Column(db.Integer, default=0)
@@ -44,14 +45,14 @@ class Analysis(db.Model):
                                  secondary=analysis_predictor,
                                  backref='analysis')
     runs = db.relationship('Run',
-                            secondary='analysis_run',
-                            backref='analysis')
+                            secondary='analysis_run')
 
-    def clone(self):
+    def clone(self, user):
         """ Make copy of analysis, with new id, and linking to parent """
         clone_row = copy_row(Analysis, self, ignored_columns='analysis.id')
         clone_row.hash_id = None
         clone_row.parent_id = self.hash_id
+        clone_row.user_id = user.id
         return clone_row
 
 @listens_for(Analysis, "after_insert")
