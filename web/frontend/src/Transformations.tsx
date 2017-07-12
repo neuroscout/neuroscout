@@ -1,11 +1,12 @@
 import * as React from 'react';
-import { Table, Input, Button, Row, Col, Form, Select, Checkbox } from 'antd';
+import { Table, Input, Button, Row, Col, Form, Select, Checkbox, Icon } from 'antd';
 import { TableProps, TableRowSelection } from 'antd/lib/table/Table';
 import {
   Analysis, Predictor, Parameter,
   Transformation, TransformName, XformRules
 } from './coretypes';
-import { displayError, Space } from './utils';
+import { displayError, moveItem } from './utils';
+import { Space } from './HelperComponents';
 import { PredictorSelector } from './Predictors';
 import transformDefinititions from './transforms';
 const Option = Select.Option;
@@ -19,14 +20,18 @@ for (const item of transformDefinititions) {
 const FormItem = Form.Item;
 
 interface XformDisplayProps {
+  index: number,
   xform: Transformation;
   onDelete: (name: TransformName) => void;
+  enableUp: boolean;
+  enableDown: boolean;
+  onMove: (index: number, direction: 'up' | 'down') => void;
 }
 const XformDisplay = (props: XformDisplayProps) => {
-  const { xform, onDelete } = props;
+  const { xform, index, onDelete, onMove, enableUp, enableDown } = props;
   return (
     <div>
-      <h3>{xform.name}</h3>
+      <h3>{`${index + 1}: ${xform.name}`}</h3>
       <p>{`Inputs: ${xform.inputs!.join(', ')}`}</p>
       <p>Parameters:</p>
       <ul>
@@ -34,7 +39,10 @@ const XformDisplay = (props: XformDisplayProps) => {
           <li>{param.name + ': ' + param.value}</li>
         )}
       </ul>
-      <Button onClick={() => onDelete(xform.name)}>Delete</Button>
+      {enableUp && <Button onClick={() => onMove(index, 'up')}><Icon type="arrow-up" /></Button>}
+      {enableDown && <Button onClick={() => onMove(index, 'down')}><Icon type="arrow-down" /></Button>}
+      <Button type="danger" onClick={() => onDelete(xform.name)}><Icon type="delete" /></Button>
+      <br />
       <br />
     </div>
   );
@@ -67,6 +75,11 @@ export class XformsTab extends React.Component<XformsTabProps, XformsTabState>{
     this.props.onSave(newXforms);
   }
 
+  onMoveXform = (index: number, direction: 'up' | 'down') => {
+    const newXforms = moveItem(this.props.xforms, index, direction);
+    this.props.onSave(newXforms);
+  }
+
   render() {
     const { xforms, predictors } = this.props;
     const { mode } = this.state;
@@ -87,7 +100,16 @@ export class XformsTab extends React.Component<XformsTabProps, XformsTabState>{
         <h2>{'Transformations'}</h2>
         <br />
         {xforms.length ?
-          xforms.map(xform => <XformDisplay xform={xform} onDelete={this.onDeleteXform}/>) :
+          xforms.map((xform, index) => <XformDisplay
+            key={index}
+            index={index}
+            xform={xform}
+            onDelete={this.onDeleteXform}
+            onMove={this.onMoveXform}
+            enableUp={index > 0}
+            enableDown={index < xforms.length - 1}
+          />
+          ) :
           <p>{"You haven't created any transformations"}</p>
         }
         <br />

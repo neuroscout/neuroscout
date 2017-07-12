@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { Tabs, Row, Col, Layout, Button, Modal, Input, Form, message } from 'antd';
-import { displayError, jwtFetch, Space } from './utils';
+import { displayError, jwtFetch } from './utils';
+import { Space } from './HelperComponents';
 import { ApiUser, ApiAnalysis, AppAnalysis } from './coretypes';
 import Home from './Home';
 import AnalysisBuilder from './Builder';

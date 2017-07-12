@@ -1,4 +1,3 @@
-import * as React from 'react';
 import { message } from 'antd';
 
 export const displayError = (error: Error) => {
@@ -6,10 +5,29 @@ export const displayError = (error: Error) => {
     message.error(error.toString(), 5);
   } catch (e) { // to make jsdom tests work
     return;
-  } finally{
+  } finally {
     console.error(error);
   }
 };
+
+// moveItem moves an item in a given array up (toward index zero) or down (toward the last index),
+// returning a new array
+export type MoveItem<T> = (array: Array<T>, index: number, direction: 'up' | 'down') => Array<T>;
+export const moveItem: MoveItem<any> = (array, index, direction) => {
+  let newArray = [...array];
+  if (direction === 'up') {
+    if (index === 0) return newArray;
+    newArray[index - 1] = array[index];
+    newArray[index] = array[index - 1];
+  } else if (direction === 'down') {
+    if (index >= array.length - 1) return newArray;
+    newArray[index + 1] = array[index];
+    newArray[index] = array[index + 1];
+  } else {
+    throw new Error('Invalid direction');
+  }
+  return newArray;
+}
 
 export const jwtFetch = (path: string, options?: object) => {
   const jwt = window.localStorage.getItem('jwt');
@@ -42,5 +60,3 @@ export const jwtFetch = (path: string, options?: object) => {
     });
 
 };
-
-export const Space = (props: {}) => <span>{' '}</span>;

@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { Tabs, Row, Col, Button, Card, Tag, Icon, message } from 'antd';
-import { displayError, Space } from './utils';
+import { displayError } from './utils';
+import { Space } from './HelperComponents';
 import { AppAnalysis } from './coretypes';
 import Status from './Status';
 import { Link } from 'react-router-dom';

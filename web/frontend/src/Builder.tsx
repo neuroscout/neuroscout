@@ -9,7 +9,8 @@ import {
   Store, Analysis, Dataset, Task, Run, Predictor,
   ApiDataset, ApiAnalysis, AnalysisConfig, Transformation
 } from './coretypes';
-import { displayError, jwtFetch, Space } from './utils';
+import { displayError, jwtFetch } from './utils';
+import { Space } from './HelperComponents';
 import Status from './Status';
 
 const { TabPane } = Tabs;
