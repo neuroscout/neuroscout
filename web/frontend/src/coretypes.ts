@@ -137,7 +137,7 @@ export interface ApiAnalysis {
   runs?: { id: string }[];
   predictors?: { id: string }[];
   transformations?: Transformation[];
-  config?: object;
+  config: AnalysisConfig;
   modified_at?: string;
 }
 

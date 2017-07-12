@@ -29,10 +29,11 @@ interface XformDisplayProps {
 }
 const XformDisplay = (props: XformDisplayProps) => {
   const { xform, index, onDelete, onMove, enableUp, enableDown } = props;
+  const inputs = xform.inputs || [];
   return (
     <div>
       <h3>{`${index + 1}: ${xform.name}`}</h3>
-      <p>{`Inputs: ${xform.inputs!.join(', ')}`}</p>
+      <p>{`Inputs: ${inputs!.join(', ')}`}</p>
       <p>Parameters:</p>
       <ul>
         {xform.parameters.map(param =>
