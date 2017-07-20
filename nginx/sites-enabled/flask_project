@@ -4,7 +4,7 @@ server {
     server_name example.org;
     charset utf-8;
 
-    root /usr/src/app/frontend/build;
+    root /build;
 
     location /static/ {
     }

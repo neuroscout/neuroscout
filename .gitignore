@@ -102,3 +102,6 @@ web/migrations
 
 # IDEs
 .vscode/
+
+# Ignore web build
+/web/frontend/build
