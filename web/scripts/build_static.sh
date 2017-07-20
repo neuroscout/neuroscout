@@ -1,1 +1,3 @@
-cp -r frontend/build /build
+cd frontend
+yarn install
+yarn build
