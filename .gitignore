@@ -104,4 +104,4 @@ web/migrations
 .vscode/
 
 # Ignore web build
-/web/frontend/build
+web/frontend/build
