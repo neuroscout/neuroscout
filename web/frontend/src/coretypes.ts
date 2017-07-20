@@ -1,7 +1,7 @@
 type AnalysisStatus = 'DRAFT' | 'PENDING' | 'PASSED' | 'FAILED';
 
 // Analysis type in Analysis Builder
-export interface Analysis {  
+export interface Analysis {
   analysisId: string | undefined;
   name: string;
   description: string;
@@ -12,6 +12,8 @@ export interface Analysis {
   status: AnalysisStatus;
   private?: boolean;
   modifiedAt?: string;
+  config: AnalysisConfig;
+  transformations: Transformation[];
 }
 
 // Normalized dataset object  in Analysis Builder
@@ -44,6 +46,49 @@ export interface Predictor {
   description: string | null;
 }
 
+export interface AnalysisConfig {
+  smoothing: number;
+  predictorConfigs: { [id: string]: PredictorConfig };
+}
+
+export interface PredictorConfig {
+  convolution: 'Gamma' | 'Beta' | 'Alpha';
+  temporalDerivative: boolean;
+  orthogonalize: boolean;
+}
+
+interface BooleanParam {
+  kind: 'boolean';
+  name: string;
+  value: boolean;
+}
+
+interface PredictorsParam {
+  kind: 'predictors';
+  name: string;
+  value: string[];
+}
+
+export type Parameter = BooleanParam | PredictorsParam;
+
+export type TransformName = 'standardize' | 'orthogonalize';
+
+export interface Transformation {
+  name: TransformName;
+  inputs?: string[]; // predictor IDs
+  parameters: Parameter[];
+}
+
+export interface XformRules {
+  [name: string]: Transformation;
+}
+
+export interface Contrast {
+  predictors: Predictor[];
+  weights: number[];
+  contrastType: 'T' | 'F';
+}
+
 export interface Store {
   activeTab: 'overview' | 'predictors' | 'transformations' | 'contrasts' | 'modeling' | 'review' | 'status';
   predictorsActive: boolean;
@@ -59,7 +104,7 @@ export interface Store {
   availablePredictors: Predictor[];
   // Technically selectedPredictors is redundant because we're also storing Analysis.predictorIds
   // but store these separately for performance reasons
-  selectedPredictors: Predictor[]; 
+  selectedPredictors: Predictor[];
   unsavedChanges: boolean;
 }
 
@@ -91,7 +136,8 @@ export interface ApiAnalysis {
   dataset_id: number;
   runs?: { id: string }[];
   predictors?: { id: string }[];
-  transformations?: object;
+  transformations?: Transformation[];
+  config: AnalysisConfig;
   modified_at?: string;
 }
 
@@ -102,9 +148,9 @@ export interface ApiUser {
 }
 
 export interface AppAnalysis {
-  id: string; 
+  id: string;
   name: string;
   description: string;
-  status: AnalysisStatus; 
+  status: AnalysisStatus;
   modifiedAt?: string;
 }

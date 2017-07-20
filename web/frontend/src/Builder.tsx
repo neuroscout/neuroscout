@@ -1,15 +1,17 @@
 import * as React from 'react';
 import { Tabs, Row, Col, Layout, Button, Modal, Icon, message } from 'antd';
 import { Prompt } from 'react-router-dom';
-
 import { OverviewTab } from './Overview';
-import { PredictorsTab } from './Predictors';
-import { Home } from './Home';
+import { PredictorSelector } from './Predictors';
+import { XformsTab } from './Transformations';
+import OptionsTab from './Options';
 import {
   Store, Analysis, Dataset, Task, Run, Predictor,
-  ApiDataset, ApiAnalysis
-} from './commontypes';
-import { displayError, jwtFetch, Space } from './utils';
+  ApiDataset, ApiAnalysis, AnalysisConfig, Transformation
+} from './coretypes';
+import { displayError, jwtFetch } from './utils';
+import { Space } from './HelperComponents';
+import Status from './Status';
 
 const { TabPane } = Tabs;
 const { Footer, Content } = Layout;
@@ -18,6 +20,7 @@ const { Footer, Content } = Layout;
 const domainRoot = 'http://localhost:80';
 const EMAIL = 'test2@test.com';
 const PASSWORD = 'password';
+const DEFAULT_SMOOTHING = 50;
 
 // Create initialized app state (used in the constructor of the top-level App component)
 const initializeStore = (): Store => ({
@@ -25,18 +28,20 @@ const initializeStore = (): Store => ({
   predictorsActive: false,
   transformationsActive: false,
   contrastsActive: false,
-  modelingActive: false,
+  modelingActive: true,
   reviewActive: true,
   analysis: {
     analysisId: undefined,
-    name: 'Untitled',
+    name: '',
     description: '',
     datasetId: null,
     predictions: '',
     runIds: [],
     predictorIds: [],
     status: 'DRAFT',
-    private: true
+    private: true,
+    config: { smoothing: DEFAULT_SMOOTHING, predictorConfigs: {} },
+    transformations: [],
   },
   datasets: [],
   availableTasks: [],
@@ -113,23 +118,42 @@ const getTasks = (runs: Run[]): Task[] => {
   return Array.from(taskMap.values());
 }
 
-type BuilderProps = { 
+// Given an updated list of predictor IDs, create an updated version of analysis config. 
+// preserving the existing predictor configs, and adding/removing new/old ones as necessary
+const getUpdatedConfig = (config: AnalysisConfig, predictorIds: string[]): AnalysisConfig => {
+  let newConfig = { ...config };
+  let newPredictorConfigs = { ...config.predictorConfigs }
+  predictorIds.forEach((id) => {
+    if (!newPredictorConfigs.hasOwnProperty(id)) {
+      newPredictorConfigs[id] = {
+        convolution: 'Gamma',
+        temporalDerivative: true,
+        orthogonalize: false,
+      };
+    }
+  });
+  // TODO: remove unnecessary predictorConfigs
+  newConfig.predictorConfigs = newPredictorConfigs;
+  return newConfig;
+}
+
+type BuilderProps = {
   id?: string;
   updatedAnalysis: () => void;
 }
-export class AnalysisBuilder extends React.Component<BuilderProps, Store> {
+export default class AnalysisBuilder extends React.Component<BuilderProps, Store> {
   constructor(props: BuilderProps) {
     super(props);
     this.state = initializeStore();
     // Load analysis from server if an analysis id is specified in the props
     if (!!props.id) {
       jwtFetch(`${domainRoot}/api/analyses/${props.id}`)
-        .then(response => response.json() as Promise<ApiAnalysis>)
-        .then(data => this.loadAnalysis(data))
+        // .then(response => response.json() as Promise<ApiAnalysis>)
+        .then((data: ApiAnalysis) => this.loadAnalysis(data))
         .catch(displayError);
     }
     jwtFetch(domainRoot + '/api/datasets')
-      .then(response => response.json())
+      // .then(response => response.json())
       .then(data => {
         const datasets: Dataset[] = data.map(d => normalizeDataset(d));
         this.setState({ 'datasets': datasets });
@@ -150,6 +174,10 @@ export class AnalysisBuilder extends React.Component<BuilderProps, Store> {
       displayError(Error('Analysis cannot be saved without selecting a dataset'));
       return;
     }
+    if (!analysis.name) {
+      displayError(Error('Analysis cannot be saved without a name'));
+      return;
+    }
     const apiAnalysis: ApiAnalysis = {
       name: analysis.name,
       description: analysis.description,
@@ -159,7 +187,8 @@ export class AnalysisBuilder extends React.Component<BuilderProps, Store> {
       status: analysis.status,
       runs: analysis.runIds.map(id => ({ id })),
       predictors: analysis.predictorIds.map(id => ({ id })),
-      transformations: {}
+      transformations: analysis.transformations,
+      config: analysis.config,
     };
     // const method = analysis.analysisId ? 'put' : 'post';
     let method: string;
@@ -179,9 +208,10 @@ export class AnalysisBuilder extends React.Component<BuilderProps, Store> {
       throw error;
     }
     jwtFetch(url, { method, body: JSON.stringify(apiAnalysis) })
-      .then(response => response.json())
-      .then((data: ApiAnalysis) => {
-        message.success('Analysis saved');
+      // .then(response => response.json())
+      .then((data: ApiAnalysis & {statusCode: number}) => {
+        if(data.statusCode !== 200) throw new Error('Oops...something went wrong. Analysis was not saved.')
+        message.success(compile ? 'Analysis submitted for generation' : 'Analysis saved');
         this.setState({
           analysis: {
             ...analysis,
@@ -197,16 +227,21 @@ export class AnalysisBuilder extends React.Component<BuilderProps, Store> {
   }
 
   loadAnalysis = (data: ApiAnalysis): Promise<Analysis> => {
+    if(!data.transformations){
+      return Promise.reject('Data returned by server is missing transformations array.');
+    }
     const analysis: Analysis = {
       ...data,
       analysisId: data.hash_id,
       datasetId: data.dataset_id,
       runIds: data.runs!.map(({ id }) => id),
       predictorIds: data.predictors!.map(({ id }) => id),
+      config: data.config, 
+      transformations: data.transformations.filter(xform => xform.name), // TODO: remove the filter once this issue is fixed: https://github.com/PsychoinformaticsLab/neuroscout/issues/99
     };
     if (analysis.runIds.length > 0) {
       jwtFetch(`${domainRoot}/api/runs/${analysis.runIds[0]}`)
-        .then(response => response.json() as Promise<Run>)
+        // .then(response => response.json() as Promise<Run>)
         .then(data => {
           this.setState({ selectedTaskId: data.task.id });
           this.updateState('analysis', true)(analysis);
@@ -219,19 +254,30 @@ export class AnalysisBuilder extends React.Component<BuilderProps, Store> {
   }
 
   confirmSubmission = (): void => {
-    if (!this.submitEnabled()) {
-      return;
-    }
+    if (!this.submitEnabled()) return;
     const { saveAnalysis } = this;
     Modal.confirm({
       title: 'Are you sure you want to submit the analysis?',
-      content: `Once you submit an analysis you will no longer be able to mofidy it. 
+      content: `Once you submit an analysis you will no longer be able to modify it. 
                 You will, however, be able to clone it as a starting point for a new analysis.`,
       okText: 'Yes',
       cancelText: 'No',
       onOk() {
         saveAnalysis({ compile: true })();
       },
+    });
+  }
+
+  updateConfig = (newConfig: AnalysisConfig): void => {
+    const newAnalysis = { ...this.state.analysis };
+    newAnalysis.config = newConfig;
+    this.setState({ analysis: newAnalysis, unsavedChanges: true });
+  }
+
+  updateTransformations = (xforms: Transformation[]): void => {
+    this.setState({
+      analysis: { ...this.state.analysis, transformations: xforms },
+      unsavedChanges: true,
     });
   }
 
@@ -254,7 +300,7 @@ export class AnalysisBuilder extends React.Component<BuilderProps, Store> {
       if (updatedAnalysis.datasetId !== analysis.datasetId) {
         // If a new dataset is selected we need to fetch the associated runs
         jwtFetch(`${domainRoot}/api/runs?dataset_id=${updatedAnalysis.datasetId}`)
-          .then(response => response.json())
+          // .then(response => response.json())
           .then((data: Run[]) => {
             message.success(`Fetched ${data.length} runs associated with the selected dataset`);
             this.setState({
@@ -270,13 +316,15 @@ export class AnalysisBuilder extends React.Component<BuilderProps, Store> {
         const runIds = updatedAnalysis.runIds.join(',');
         if (runIds) {
           jwtFetch(`${domainRoot}/api/predictors?runs=${runIds}`)
-            .then(response => response.json())
+            // .then(response => response.json())
             .then((data: Predictor[]) => {
               message.success(`Fetched ${data.length} predictors associated with the selected runs`);
+              const selectedPredictors = data.filter(p => updatedAnalysis.predictorIds.indexOf(p.id) > -1);
               this.setState({
                 availablePredictors: data,
-                selectedPredictors: data.filter(p => updatedAnalysis.predictorIds.indexOf(p.id) > -1)
+                selectedPredictors
               });
+              updatedAnalysis.config = getUpdatedConfig(updatedAnalysis.config, selectedPredictors.map(p => p.id));
             })
             .catch(displayError);
         } else {
@@ -285,6 +333,7 @@ export class AnalysisBuilder extends React.Component<BuilderProps, Store> {
       }
       // Enable predictors tab only if at least one run has been selected
       stateUpdate.predictorsActive = value.runIds.length > 0;
+      stateUpdate.transformationsActive = value.predictorIds.length > 0;
     } else if (attrName === 'selectedTaskId') {
       // When a different task is selected, autoselect all its associated run IDs
       this.updateState('analysis')({
@@ -293,8 +342,10 @@ export class AnalysisBuilder extends React.Component<BuilderProps, Store> {
       });
     } else if (attrName === 'selectedPredictors') {
       let newAnalysis = { ...this.state.analysis };
-      newAnalysis.predictorIds = value.map(p => p.id);
+      newAnalysis.predictorIds = (value as Predictor[]).map(p => p.id);
+      newAnalysis.config = getUpdatedConfig(newAnalysis.config, newAnalysis.predictorIds);
       stateUpdate.analysis = newAnalysis;
+      stateUpdate.transformationsActive = newAnalysis.predictorIds.length > 0;
     }
     stateUpdate[attrName] = value;
     if (!keepClean) stateUpdate.unsavedChanges = true;
@@ -304,15 +355,21 @@ export class AnalysisBuilder extends React.Component<BuilderProps, Store> {
   render() {
     const { predictorsActive, transformationsActive, contrastsActive, modelingActive,
       reviewActive, activeTab, analysis, datasets, availableTasks, availableRuns,
-      selectedTaskId, availablePredictors, selectedPredictors, unsavedChanges } = this.state;
+      selectedTaskId, availablePredictors, selectedPredictors, unsavedChanges,
+     } = this.state;
+    const statusText: string = {
+      DRAFT: 'This analysis has not yet been generated.',
+      PENDING: 'This analysis has been submitted for generation and is being processed.',
+      COMPILED: 'This analysis has been successfully generated',
+    }[analysis.status]
     return (
       <div className="App">
         <Prompt
           when={unsavedChanges}
-          message="You have unsaved changes. Are you sure you want leave this page?"
+          message={'You have unsaved changes. Are you sure you want leave this page?'}
         />
         <Row type="flex" justify="center">
-          <Col span={16}>
+          <Col span={18}>
             <h2>
               {analysis.status !== 'DRAFT' ?
                 <Icon type="lock" /> :
@@ -321,12 +378,14 @@ export class AnalysisBuilder extends React.Component<BuilderProps, Store> {
               <Space />
               <Button
                 onClick={this.saveAnalysis({ compile: false })}
-                type={this.saveEnabled() ? 'primary' : 'dashed'}
+                disabled={!this.saveEnabled()}
+                type={'primary'}
               >Save</Button>
               <Space />
               <Button
                 onClick={this.confirmSubmission}
-                type={this.submitEnabled() ? 'primary' : 'dashed'}
+                type={'primary'}
+                disabled={!this.submitEnabled()}
               >{unsavedChanges ? 'Save & Generate' : 'Generate'}</Button>
               <Space />
             </h2>
@@ -334,7 +393,7 @@ export class AnalysisBuilder extends React.Component<BuilderProps, Store> {
           </Col>
         </Row>
         <Row type="flex" justify="center">
-          <Col span={16}>
+          <Col span={18}>
             <Tabs
               activeKey={activeTab}
               onTabClick={(newTab) => this.setState({ activeTab: newTab })}
@@ -353,22 +412,38 @@ export class AnalysisBuilder extends React.Component<BuilderProps, Store> {
                 />
               </TabPane>
               <TabPane tab="Predictors" key="predictors" disabled={!predictorsActive}>
-                <PredictorsTab
-                  analysis={analysis}
+                <PredictorSelector
                   availablePredictors={availablePredictors}
                   selectedPredictors={selectedPredictors}
-                  updateSelectedPredictors={this.updateState('selectedPredictors')}
+                  updateSelection={this.updateState('selectedPredictors')}
                 />
               </TabPane>
-              <TabPane tab="Transformations" key="transformations" disabled={!transformationsActive} />
+              <TabPane tab="Transformations" key="transformations" disabled={!transformationsActive} >
+                <XformsTab
+                  predictors={selectedPredictors}
+                  xforms={analysis.transformations}
+                  onSave={xforms => this.updateTransformations(xforms)}
+                />
+              </TabPane>
               <TabPane tab="Contrasts" key="contrasts" disabled={!contrastsActive} />
-              <TabPane tab="Modeling" key="modeling" disabled={!modelingActive} />
+              <TabPane tab="Options" key="modeling" disabled={!modelingActive}>
+                <OptionsTab
+                  analysis={analysis}
+                  selectedPredictors={selectedPredictors}
+                  updateConfig={this.updateConfig}
+                />
+              </TabPane>
               <TabPane tab="Review" key="review" disabled={!reviewActive}>
                 <p>
                   {JSON.stringify(analysis)}
                 </p>
               </TabPane>
-              <TabPane tab="Status" key="7" disabled={false} />
+              <TabPane tab="Status" key="status" disabled={false}>
+                <Status status={analysis.status} />
+                <br />
+                <br />
+                <p>{statusText}</p>
+              </TabPane>
             </Tabs>
           </Col>
         </Row>
