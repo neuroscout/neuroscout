@@ -2,6 +2,7 @@
 
 from .analysis import (AnalysisSchema, AnalysisResource,
                        AnalysisRootResource, CloneAnalysisResource,
+                       CompileAnalysisResource
                        )
 from .dataset import DatasetSchema, DatasetResource, DatasetListResource
 from .predictor import (PredictorEventSchema, PredictorSchema,
@@ -18,6 +19,7 @@ __all__ = [
     'AnalysisResource',
     'AnalysisRootResource',
     'CloneAnalysisResource',
+    'CompileAnalysisResource',
     'DatasetSchema',
     'DatasetResource',
     'DatasetListResource',

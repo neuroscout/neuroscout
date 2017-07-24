@@ -4,8 +4,9 @@ server {
     server_name example.org;
     charset utf-8;
 
-    location /static {
-        alias /usr/src/app/static;
+    root /web/frontend/build;
+
+    location /static/ {
     }
 
     location / {

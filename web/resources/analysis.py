@@ -5,8 +5,6 @@ from database import db
 from db_utils import put_record
 from models import Analysis, Dataset, Run, Predictor
 from . import utils
-import datetime
-from sqlalchemy.orm.exc import NoResultFound
 
 class AnalysisSchema(Schema):
 	hash_id = fields.Str(dump_only=True, description='Hashed analysis id.')
@@ -16,19 +14,23 @@ class AnalysisSchema(Schema):
 	modified_at = fields.Time(dump_only=True)
 	user_id = fields.Int(dump_only=True)
 
-	locked = fields.Bool(
-		description='Is analysis finished and locked? Locking is irreversible.')
-	locked_at = fields.Time(description='Timestamp of when analysis was locked',
+	status = fields.Str(
+		description='Analysis status. PASSED, FAILED, PENDING, or DRAFT.',
+		dump_only=True)
+
+	compiled_at = fields.Time(description='Timestamp of when analysis was compiled',
 							dump_only=True)
 	private = fields.Bool(description='Analysis private or discoverable?')
+	predictions = fields.Str(description='User apriori predictions.')
 
-	transformations = fields.Dict(description='Transformation json spec.')
+	config = fields.Dict(description='fMRI analysis configuration parameters.')
 	description = fields.Str()
 	data = fields.Dict()
-	parent_id = fields.Str(dump_only=True,
-                        description="Parent analysis, if cloned.")
+	parent_id = fields.Str(dump_only=True,description="Parent analysis, if cloned.")
 
 
+	transformations = fields.List(fields.Dict(),
+								  description='Array of transformation objects')
 	predictors = fields.Nested(
 		'PredictorSchema', many=True, only=['id'],
         description='Predictor id(s) associated with analysis')
@@ -73,6 +75,7 @@ class AnalysisSchema(Schema):
 	class Meta:
 		strict = True
 
+
 @doc(tags=['analysis'])
 @marshal_with(AnalysisSchema)
 class AnalysisBaseResource(MethodResource):
@@ -97,34 +100,51 @@ class AnalysisRootResource(AnalysisBaseResource):
 
 class AnalysisResource(AnalysisBaseResource):
 	@doc(summary='Get analysis by id.')
-	def get(self, analysis_id):
-		return utils.first_or_404(Analysis.query.filter_by(hash_id=analysis_id))
+	@utils.fetch_analysis
+	def get(self, analysis):
+		return analysis
 
 	@doc(summary='Edit analysis.')
 	@use_kwargs(AnalysisSchema)
-	@utils.auth_required
-	def put(self, analysis_id, **kwargs):
-		analysis = utils.first_or_404(
-			Analysis.query.filter_by(hash_id=analysis_id))
-		if analysis.locked is True:
+	@utils.owner_required
+	def put(self, analysis, **kwargs):
+		if analysis.status != 'DRAFT':
 			utils.abort(422, "Analysis is not editable. Try cloning it.")
-		elif 'locked' in kwargs:
-			if kwargs['locked'] > analysis.locked:
-				kwargs['locked_at'] = datetime.datetime.utcnow()
-				### Add other triggers here
 		return put_record(db.session, kwargs, analysis)
+
+	@doc(summary='Delete analysis.')
+	@utils.owner_required
+	def delete(self, analysis):
+		if analysis.status != 'DRAFT':
+			utils.abort(422, "Analysis is not editable, too bad!")
+		db.session.delete(analysis)
+		db.session.commit()
+
+		return {'message' : 'deleted!'}
 
 class CloneAnalysisResource(AnalysisBaseResource):
 	@marshal_with(AnalysisSchema, code='201')
 	@doc(summary='Clone analysis.')
 	@utils.auth_required
-	def post(self, analysis_id):
-		original = utils.first_or_404(
-			Analysis.query.filter_by(hash_id=analysis_id))
-		if original.locked is False:
-			utils.abort(422, "Only locked analyses can be cloned")
-		else:
-			cloned = original.clone()
-			db.session.add(cloned)
-			db.session.commit()
-			return cloned
+	@utils.fetch_analysis
+	def post(self, analysis):
+		if analysis.user_id != current_identity.id:
+			if analysis.status != 'PASSED':
+				utils.abort(422, "You can only clone somebody else's analysis"
+								  " if they have been compiled.")
+
+		cloned = analysis.clone(current_identity)
+		db.session.add(cloned)
+		db.session.commit()
+		return cloned
+
+class CompileAnalysisResource(AnalysisBaseResource):
+	@doc(summary='Compile and lock analysis.')
+	@utils.owner_required
+	def post(self, analysis):
+		analysis.status = 'PENDING'
+
+		## Add other triggers here
+		db.session.add(analysis)
+		db.session.commit()
+		return analysis

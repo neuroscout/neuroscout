@@ -8,11 +8,9 @@ services:
     links:
       - postgres:postgres
     volumes:
-      - /usr/src/app/static
       - migrations:/migrations
-      - file-data:/file-data
-      # ADD OTHERS VOLUMES HERE
-    command: /usr/local/bin/gunicorn -w 2 -b :8000 core:app --log-level debu
+      - ./web/:/web
+    command: /usr/local/bin/gunicorn -w 2 -b :8000 core:app --log-level debug --chdir /web
     environment:
       - APP_SETTINGS=config.config.DevelopmentConfig
 
@@ -21,8 +19,6 @@ services:
     build: ./nginx/
     ports:
       - "80:80"
-    volumes:
-      - /www/static
     volumes_from:
       - web
     links:
@@ -53,4 +49,3 @@ services:
 
 volumes:
   migrations:
-  file-data:

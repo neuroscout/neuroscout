@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 import os
-from flask import Flask, render_template
+from flask import Flask, send_file
 from database import db
 
 app = Flask(__name__)
@@ -19,7 +19,6 @@ jwt = JWT(app, authenticate, load_user)
 # Enable CORS
 from flask_cors import CORS
 cors = CORS(app, resources={r"/api/*": {"origins": "*"},
-                            r"/auth": {"origins": "*"},
                             r"/swagger/": {"origins": "*"}})
 
 # Setup API
@@ -44,6 +43,7 @@ route_factory(app, docs,
         ('AnalysisRootResource', 'analyses'),
         ('AnalysisResource', 'analyses/<analysis_id>'),
         ('CloneAnalysisResource', 'analyses/<analysis_id>/clone'),
+        ('CompileAnalysisResource', 'analyses/<analysis_id>/compile'),
         ('ResultResource', 'results/<int:result_id>'),
         ('RunListResource', 'runs'),
         ('RunResource', 'runs/<int:run_id>'),
@@ -57,8 +57,8 @@ route_factory(app, docs,
 
 @app.route('/')
 def index():
-    ''' Serve SPA '''
-    return render_template('default.html')
+    ''' Serve index '''
+    return send_file("frontend/build/index.html")
 
 if __name__ == '__main__':
     db.init_app(app)
