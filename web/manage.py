@@ -4,8 +4,7 @@ from core import app, db
 import os
 import requests
 import populate
-import yaml
-from pathlib import Path
+
 
 app.config.from_object(os.environ['APP_SETTINGS'])
 
@@ -52,24 +51,8 @@ def extract_features(bids_path, task, graph_spec, **kwargs):
 @manager.command
 def config_from_yaml(config_file):
 	""" Configure datasets and extracted features from a YAML config file """
-	datasets = yaml.load(open(config_file, 'r'))
+	populate.config_from_yaml(db.session, config_file, app.config['DATASET_DIR'])
 
-	for name, items in datasets.items():
-		for task, options in items['tasks'].items():
-			if 'filters' in options:
-				filters = options['filters']
-			else:
-				filters = {}
-			new_path = str((Path(
-				app.config['DATASET_DIR']) / name).absolute())
-			populate.add_dataset(db.session, items['path'], task,
-								replace=False, verbose=True,
-								install_path=new_path,
-								**filters)
-
-			for graph in options['features']:
-				populate.extract_features(db.session, new_path, task,
-					graph, **filters)
 
 if __name__ == '__main__':
     manager.run()

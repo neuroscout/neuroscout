@@ -61,8 +61,32 @@ def test_dataset_ingestion(session, add_dataset):
 	assert gpv.count() == 2
 	assert 'F' in [v.value for v in gpv]
 
+def test_remote_dataset(session, add_dataset_remote):
+	# Number of entries
+	assert Dataset.query.count() == 1
+	dataset_model = Dataset.query.filter_by(id=add_dataset_remote).one()
 
-def test_extracted_features(extract_features):
+	# Test mimetypes
+	assert 'image/jpeg' in dataset_model.mimetypes
+	assert 'bidstest' == dataset_model.tasks[0].name
+
+	# Test properties of Run
+	assert Run.query.count() == dataset_model.runs.count() == 1
+	run_model =  dataset_model.runs.first()
+
+	assert run_model.predictor_events.count() == 16
+
+	predictor = Predictor.query.filter_by(name='rt').first()
+	assert predictor.predictor_events.count() == 4
+
+	# Test that Stimiuli were extracted
+	assert Stimulus.query.count() == 4
+
+	# Test participants.tsv ingestion
+	assert GroupPredictor.query.count() == 3
+
+def test_extracted_features(add_dataset_remote):
+	""" This tests feature extraction from a remote dataset"""
 	assert ExtractedFeature.query.count() == 2
 
 	extractor_names = [ee.extractor_name for ee in ExtractedFeature.query.all()]

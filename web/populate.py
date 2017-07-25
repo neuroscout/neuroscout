@@ -243,7 +243,7 @@ def add_dataset(db_session, bids_path, task, replace=False, verbose=True,
     return dataset_model.id
 
 def extract_features(db_session, bids_path, task, graph_spec, verbose=True,
-                     auto_io=False, **kwargs):
+                     auto_io=False, datalad_unlock=False, **kwargs):
     """ Extract features using pliers for a dataset/task
         Args:
             db_session - db db_session
@@ -276,13 +276,19 @@ def extract_features(db_session, bids_path, task, graph_spec, verbose=True,
 
     # Filter to only get stim files
     stim_pattern = 'stim_file/(.*)'
-    stims = [re.findall(stim_pattern, col)[0]
+    stim_paths = [os.path.join(bids_path, 'stimuli',
+                          re.findall(stim_pattern, col)[0])
      for col in collection.columns
      if re.match(stim_pattern, col)]
 
+    # Monkey-patched auto doesn't work, so get and unlock manually
+    if datalad_unlock:
+        from datalad import api as da
+        da.get(stim_paths)
+        da.unlock(stim_paths)
+
     # Get absolute path and load
-    stims = load_stims(
-        [os.path.join(bids_path, 'stimuli', s) for s in stims])
+    stims = load_stims([s for s in stim_paths])
 
     # Construct and run the graph
     graph = Graph(spec=graph_spec)
@@ -360,3 +366,30 @@ def extract_features(db_session, bids_path, task, graph_spec, verbose=True,
                           onsets, durations, values, ef_id = ef_id)
 
     return ef_model_ids
+
+import yaml
+def config_from_yaml(db_session, config_file, dataset_dir):
+    datasets = yaml.load(open(config_file, 'r'))
+
+    dataset_ids = []
+    for name, items in datasets.items():
+    	for task, options in items['tasks'].items():
+            if 'filters' in options:
+            	filters = options['filters']
+            else:
+            	filters = {}
+            new_path = str((Path(
+            	dataset_dir) / name).absolute())
+            dataset_ids.append(add_dataset(db_session, items['path'], task,
+            					replace=False, verbose=True,
+            					install_path=new_path,
+            					**filters))
+
+            datalad_unlock = bool(re.match('(///|git+|http)',  items['path']))
+
+            for graph in options['features']:
+            	extract_features(db_session, new_path, task,
+            		graph, datalad_unlock=datalad_unlock, **filters)
+
+
+    return dataset_ids
