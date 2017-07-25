@@ -60,12 +60,16 @@ def config_from_yaml(config_file):
 				filters = options['filters']
 			else:
 				filters = {}
+			new_path = str((Path(
+				app.config['DATASET_DIR']) / name).absolute())
+			populate.add_dataset(db.session, items['path'], task,
+								replace=False, verbose=True,
+								install_path=new_path,
+								**filters)
+
 			for graph in options['features']:
-				populate.add_dataset(db.session, items['path'], task,
-									replace=False, verbose=True,
-									install_path=str((Path(
-										app.config['DATASET_DIR']) / name).absolute()),
-									**filters)
+				populate.extract_features(db.session, new_path, task,
+					graph, **filters)
 
 if __name__ == '__main__':
     manager.run()

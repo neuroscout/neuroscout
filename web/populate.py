@@ -75,12 +75,16 @@ def add_dataset(db_session, bids_path, task, replace=False, verbose=True,
             dataset model id
      """
 
-    if re.match('(///|git+|http)', bids_path):
+    automagic = False
+    if re.match('(///|git+|http)', bids_path) and \
+            open.__module__ != 'datalad.auto':
         from datalad import api as dl
-        from datalad.auto import AutomagicIO
         bids_path = dl.install(source=bids_path,
                                path=install_path).path
-        AutomagicIO().activate()
+
+        from datalad.auto import AutomagicIO
+        automagic = AutomagicIO()
+        automagic.activate()
 
     layout = BIDSLayout(bids_path)
     if task not in layout.get_tasks():
@@ -113,14 +117,15 @@ def add_dataset(db_session, bids_path, task, replace=False, verbose=True,
         db_session.commit()
     else:
         if not replace:
-            print("Task already in db.")
+            if automagic:
+                automagic.deactivate()
             return dataset_model.id
 
     """ Parse every Run """
     for run_events in layout.get(task=task, type='events', **kwargs):
         if verbose:
-            print("Processing subject {}, run {}".format(
-                run_events.subject, run_events.run))
+            print("Processing task {} subject {}, run {}".format(
+                run_events.task, run_events.subject, run_events.run))
 
         # Get entities
         entities = {entity : getattr(run_events, entity)
@@ -171,10 +176,7 @@ def add_dataset(db_session, bids_path, task, replace=False, verbose=True,
         """ Ingest Stimuli """
         for i, val in stims.items():
             if val != 'n/a':
-                if not val.startswith('stimuli/'):
-                    base_path = 'stimuli/{}'.format(val)
-                else:
-                    base_path = val
+                base_path = 'stimuli/{}'.format(val)
                 path = os.path.join(bids_path, base_path)
                 name = os.path.basename(path)
                 try:
@@ -235,6 +237,8 @@ def add_dataset(db_session, bids_path, task, replace=False, verbose=True,
                     gpv.value = str(val)
                     db_session.commit()
 
+    if automagic:
+        automagic.deactivate()
 
     return dataset_model.id
 
@@ -247,16 +251,12 @@ def extract_features(db_session, bids_path, task, graph_spec, verbose=True,
             task - task name
             graph_spec - pliers graph json spec location
             verbose - verbose output
-            auto_io - enable datalad autoio? needed for incomplete datasets
             kwargs - additional identifiers for runs
 
         Output:
             list of db ids of extracted features
     """
 
-    if auto_io:
-        from datalad.auto import AutomagicIO
-        AutomagicIO().activate()
 
     import imageio
     try:
@@ -268,11 +268,11 @@ def extract_features(db_session, bids_path, task, graph_spec, verbose=True,
         from pliers.graph import Graph
 
     # Try to add dataset, will skip if already in
-    dataset_id = add_dataset(db_session, bids_path, task, verbose=True)
+    dataset_id = add_dataset(db_session, bids_path, task, **kwargs)
 
     # Load event files
     collection = BIDSEventCollection(bids_path)
-    collection.read(**kwargs)
+    collection.read(task=task, **kwargs)
 
     # Filter to only get stim files
     stim_pattern = 'stim_file/(.*)'
