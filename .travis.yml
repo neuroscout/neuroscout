@@ -11,4 +11,4 @@ before_script:
   - psql -c 'create database travis_ci_test;' -U postgres
 before_install:
   - bash <(wget -q -O- http://neuro.debian.net/_files/neurodebian-travis.sh)
-  - sudo apt-get install -yq git-annex
+  - sudo apt-get install -yq git-annex-standalone
