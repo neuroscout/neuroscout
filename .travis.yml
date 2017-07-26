@@ -5,11 +5,10 @@ install: "pip install -r web/requirements.txt"
 script: PYTHONPATH="web/" python -m pytest web/
 env:
 - APP_SETTINGS=config.config.TravisConfig
-- DEBIAN_FRONTEND=noninteractive
-
 addons:
   postgresql: "9.4"
 before_script:
   - psql -c 'create database travis_ci_test;' -U postgres
 before_install:
+  - bash <(wget -q -O- http://neuro.debian.net/_files/neurodebian-travis.sh)
   - sudo apt-get install -yq git-annex
