@@ -5,9 +5,14 @@ install: "pip install -r web/requirements.txt"
 script: PYTHONPATH="web/" python -m pytest web/
 env:
 - APP_SETTINGS=config.config.TravisConfig
+- DEBIAN_FRONTEND=noninteractive
+
 addons:
   postgresql: "9.4"
 before_script:
   - psql -c 'create database travis_ci_test;' -U postgres
 before_install:
+  - wget -O- http://neuro.debian.net/lists/jessie.us-nh.full | tee /etc/apt/sources.list.d/neurodebian.sources.list
+  - sudo apt-key adv --recv-keys --keyserver hkp://keyserver.ubuntu.com:80 0xA5D32F012649A5A9
+  - apt-get update
   - sudo apt-get install -yq datalad
