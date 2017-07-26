@@ -5,6 +5,7 @@ import os
 import requests
 import populate
 
+
 app.config.from_object(os.environ['APP_SETTINGS'])
 
 migrate = Migrate(app, db, directory=app.config['MIGRATIONS_DIR'])
@@ -44,6 +45,14 @@ def add_dataset(bids_path, task, replace=False, **kwargs):
 def extract_features(bids_path, task, graph_spec, **kwargs):
 	populate.extract_features(db.session, bids_path, task, graph_spec,
 							  verbose=True, **kwargs)
+
+## Need to modify or create new function for updating dataset
+## e.g. dealing w/ IncompleteResultsError if cloning into existing dir
+@manager.command
+def config_from_yaml(config_file):
+	""" Configure datasets and extracted features from a YAML config file """
+	populate.config_from_yaml(db.session, config_file, app.config['DATASET_DIR'])
+
 
 if __name__ == '__main__':
     manager.run()

@@ -25,6 +25,7 @@ class DevelopmentConfig(Config):
     SQLALCHEMY_DATABASE_URI = 'postgres://postgres@postgres:5432/neuroscout'
     PROPAGATE_EXCEPTIONS = True
     MIGRATIONS_DIR = '/migrations/migrations'
+    DATASET_DIR = '/file-data'
 
 class DockerTestConfig(Config):
     SQLALCHEMY_DATABASE_URI = 'postgres://postgres@postgres:5432/scout_test'
@@ -33,10 +34,12 @@ class DockerTestConfig(Config):
 class TestingConfig(Config):
     SQLALCHEMY_DATABASE_URI = 'postgresql://zorro:dbpass@localhost:5432/scout_test'
     TESTING = True
+    DATASET_DIR = '/tmp/file-data'
 
 class TravisConfig(Config):
     SQLALCHEMY_DATABASE_URI = "postgresql://postgres@localhost/travis_ci_test"
     TESTING = True
+    DATASET_DIR = '/tmp/file-data'
 
 class HomeConfig(Config):
     SQLALCHEMY_DATABASE_URI = 'postgresql://zorro:dbpass@localhost:5432/neuroscout'

@@ -3,6 +3,8 @@ appdirs==1.4.3
 blinker==1.4
 click==6.7
 decorator==4.0.11
+datalad==0.6.0
+duecredit==0.6.1
 Flask==0.12.1
 -e git+https://github.com/adelavega/flask-apispec.git#egg=flask-apispec
 Flask-cors==3.0.2
