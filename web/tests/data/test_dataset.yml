@@ -3,7 +3,7 @@ bids_test:
   tasks:
     bidstest:
       features:
-        - tests/data/test_pliers.json
+        - test_pliers.json
       filters:
         subject: "01"
         run: 1

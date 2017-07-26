@@ -371,6 +371,8 @@ import yaml
 def config_from_yaml(db_session, config_file, dataset_dir):
     datasets = yaml.load(open(config_file, 'r'))
 
+    base_path = os.path.dirname(os.path.realpath(config_file))
+
     dataset_ids = []
     for name, items in datasets.items():
     	for task, options in items['tasks'].items():
@@ -389,7 +391,7 @@ def config_from_yaml(db_session, config_file, dataset_dir):
 
             for graph in options['features']:
             	extract_features(db_session, new_path, task,
-            		graph, datalad_unlock=datalad_unlock, **filters)
+            		os.path.join(base_path, graph), datalad_unlock=datalad_unlock, **filters)
 
 
     return dataset_ids
