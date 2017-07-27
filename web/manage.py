@@ -37,9 +37,9 @@ def add_user(email, password):
     db.session.commit()
 
 @manager.command
-def add_dataset(bids_path, task, replace=False, **kwargs):
-	populate.add_dataset(db.session, bids_path, task, replace=False,
-						 verbose=True, **kwargs)
+def add_dataset(bids_path, task, replace=False, automagic=False, **kwargs):
+	populate.add_dataset(db.session, bids_path, task, replace=replace,
+						 verbose=True, automagic=automagic, **kwargs)
 
 @manager.command
 def extract_features(bids_path, task, graph_spec, **kwargs):

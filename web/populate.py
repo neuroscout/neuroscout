@@ -59,7 +59,7 @@ def add_predictor(db_session, predictor_name, dataset_id, run_id,
     return predictor.id
 
 def add_dataset(db_session, bids_path, task, replace=False, verbose=True,
-                install_path='.', **kwargs):
+                install_path='.', automagic=False, **kwargs):
     """ Adds a BIDS dataset task to the database.
         Args:
             db_session - sqlalchemy db db_session
@@ -71,17 +71,19 @@ def add_dataset(db_session, bids_path, task, replace=False, verbose=True,
             install_path - if remote dataset, where to install.
                            current directory if none.
             kwargs - arguments to filter runs by
+            automagic - enable automagic?
         Output:
             dataset model id
      """
 
-    automagic = False
     if re.match('(///|git+|http)', bids_path) and \
             open.__module__ != 'datalad.auto':
         from datalad import api as dl
         bids_path = dl.install(source=bids_path,
                                path=install_path).path
+        automagic = True
 
+    if automagic:
         from datalad.auto import AutomagicIO
         automagic = AutomagicIO()
         automagic.activate()
@@ -174,36 +176,36 @@ def add_dataset(db_session, bids_path, task, replace=False, verbose=True,
                           onsets, durations, tsv[predictor].tolist())
 
         """ Ingest Stimuli """
-        for i, val in stims.items():
-            if val != 'n/a':
-                base_path = 'stimuli/{}'.format(val)
-                path = os.path.join(bids_path, base_path)
-                name = os.path.basename(path)
-                try:
-                    _ = open(path)
-                    stim_hash = hash_file(path)
-                    mimetype = magic.from_file(os.path.realpath(path), mime=True)
-                except FileNotFoundError:
-                    if verbose:
-                        print('Stimulus: {} not found. Skipping.'.format(val))
-                    continue
+        print("Ingesting stimuli...")
+        for i, val in stims[stims!="n/a"].items():
+            base_path = 'stimuli/{}'.format(val)
+            path = os.path.join(bids_path, base_path)
+            name = os.path.basename(path)
+            try:
+                _ = open(path)
+                stim_hash = hash_file(path)
+                mimetype = magic.from_file(os.path.realpath(path), mime=True)
+            except FileNotFoundError:
+                if verbose:
+                    print('Stimulus: {} not found. Skipping.'.format(val))
+                continue
 
-                # Get or create stimulus model
-                stimulus_model, _ = db_utils.get_or_create(db_session, Stimulus,
-                                                           commit=False,
-                                                           sha1_hash=stim_hash)
-                stimulus_model.name=name
-                stimulus_model.path=base_path
-                stimulus_model.mimetype=mimetype
-                db_session.commit()
+            # Get or create stimulus model
+            stimulus_model, _ = db_utils.get_or_create(db_session, Stimulus,
+                                                       commit=False,
+                                                       sha1_hash=stim_hash)
+            stimulus_model.name=name
+            stimulus_model.path=base_path
+            stimulus_model.mimetype=mimetype
+            db_session.commit()
 
-                # Get or create Run Stimulus association
-                runstim, _ = db_utils.get_or_create(db_session, RunStimulus,
-                                                    commit=False,
-                                                    stimulus_id=stimulus_model.id,
-                                                    run_id=run_model.id)
-                runstim.onset=onsets[i]
-                db_session.commit()
+            # Get or create Run Stimulus association
+            runstim, _ = db_utils.get_or_create(db_session, RunStimulus,
+                                                commit=False,
+                                                stimulus_id=stimulus_model.id,
+                                                run_id=run_model.id)
+            runstim.onset=onsets[i]
+            db_session.commit()
 
     db_session.commit()
 
