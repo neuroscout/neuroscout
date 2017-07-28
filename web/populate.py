@@ -59,7 +59,7 @@ def add_predictor(db_session, predictor_name, dataset_id, run_id,
     return predictor.id
 
 def add_dataset(db_session, bids_path, task, replace=False, verbose=True,
-                install_path='.', automagic=False, **kwargs):
+                install_path='.', automagic=False, skip_predictors=False, **kwargs):
     """ Adds a BIDS dataset task to the database.
         Args:
             db_session - sqlalchemy db db_session
@@ -71,7 +71,8 @@ def add_dataset(db_session, bids_path, task, replace=False, verbose=True,
             install_path - if remote dataset, where to install.
                            current directory if none.
             kwargs - arguments to filter runs by
-            automagic - enable automagic?
+            automagic - force enable DataLad automagic
+            skip_predictors - skip ingesting original predictors
         Output:
             dataset model id
      """
@@ -170,13 +171,13 @@ def add_dataset(db_session, bids_path, task, replace=False, verbose=True,
         durations = tsv.pop('duration').tolist()
         stims = tsv.pop('stim_file')
 
-        # Parse event columns and insert as Predictors
-        for predictor in tsv.keys():
-            add_predictor(db_session, predictor, dataset_model.id, run_model.id,
-                          onsets, durations, tsv[predictor].tolist())
+        if skip_predictors is False:
+            # Parse event columns and insert as Predictors
+            for predictor in tsv.keys():
+                add_predictor(db_session, predictor, dataset_model.id, run_model.id,
+                              onsets, durations, tsv[predictor].tolist())
 
         """ Ingest Stimuli """
-        print("Ingesting stimuli...")
         for i, val in stims[stims!="n/a"].items():
             base_path = 'stimuli/{}'.format(val)
             path = os.path.join(bids_path, base_path)
@@ -245,7 +246,7 @@ def add_dataset(db_session, bids_path, task, replace=False, verbose=True,
     return dataset_model.id
 
 def extract_features(db_session, bids_path, task, graph_spec, verbose=True,
-                     auto_io=False, datalad_unlock=False, **kwargs):
+                     auto_io=False, datalad_unlock=False, **filters):
     """ Extract features using pliers for a dataset/task
         Args:
             db_session - db db_session
@@ -253,7 +254,7 @@ def extract_features(db_session, bids_path, task, graph_spec, verbose=True,
             task - task name
             graph_spec - pliers graph json spec location
             verbose - verbose output
-            kwargs - additional identifiers for runs
+            filters - additional identifiers for runs
 
         Output:
             list of db ids of extracted features
@@ -270,11 +271,11 @@ def extract_features(db_session, bids_path, task, graph_spec, verbose=True,
         from pliers.graph import Graph
 
     # Try to add dataset, will skip if already in
-    dataset_id = add_dataset(db_session, bids_path, task, **kwargs)
+    dataset_id = add_dataset(db_session, bids_path, task, **filters)
 
     # Load event files
     collection = BIDSEventCollection(bids_path)
-    collection.read(task=task, **kwargs)
+    collection.read(task=task, **filters)
 
     # Filter to only get stim files
     stim_pattern = 'stim_file/(.*)'
@@ -370,7 +371,8 @@ def extract_features(db_session, bids_path, task, graph_spec, verbose=True,
     return ef_model_ids
 
 import yaml
-def config_from_yaml(db_session, config_file, dataset_dir):
+def config_from_yaml(db_session, config_file, dataset_dir, automagic=False,
+                     replace=False):
     datasets = yaml.load(open(config_file, 'r'))
 
     base_path = os.path.dirname(os.path.realpath(config_file))
@@ -385,8 +387,8 @@ def config_from_yaml(db_session, config_file, dataset_dir):
             new_path = str((Path(
             	dataset_dir) / name).absolute())
             dataset_ids.append(add_dataset(db_session, items['path'], task,
-            					replace=False, verbose=True,
-            					install_path=new_path,
+            					replace=replace, automagic=automagic,
+                                verbose=True, install_path=new_path,
             					**filters))
 
             datalad_unlock = bool(re.match('(///|git+|http)',  items['path']))

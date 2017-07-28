@@ -4,7 +4,7 @@ from core import app, db
 import os
 import requests
 import populate
-
+import json
 
 app.config.from_object(os.environ['APP_SETTINGS'])
 
@@ -37,20 +37,40 @@ def add_user(email, password):
     db.session.commit()
 
 @manager.command
-def add_dataset(bids_path, task, replace=False, automagic=False, **kwargs):
-	populate.add_dataset(db.session, bids_path, task, replace=replace,
-						 verbose=True, automagic=automagic, **kwargs)
+def add_dataset(bids_path, task, replace=False, automagic=False,
+		skip_predictors=False, filters='{}'):
+		""" Add BIDS dataset to database.
+		bids_path - Path to bids directory
+		task - Task name
+		replace - If dataset is already in db, re-ingest?
+		automagic - Enable datalad automagic
+		skip_predictors - Skip original Predictors
+		filters - string JSON object with optional run filters
+		"""
+		populate.add_dataset(db.session, bids_path, task, replace=replace,
+				 verbose=True, skip_predictors=skip_predictors,
+				 automagic=automagic, **json.loads(filters))
 
 @manager.command
-def extract_features(bids_path, task, graph_spec, **kwargs):
+def extract_features(bids_path, task, graph_spec, filters='{}'):
+	""" Extract features from a BIDS dataset.
+	bids_path - Path to bids directory
+	task - Task name
+	graph_spec - Path to JSON pliers graph spec
+	filters - string JSON object with optional run filters
+	"""
 	populate.extract_features(db.session, bids_path, task, graph_spec,
-							  verbose=True, **kwargs)
+		verbose=True, **json.loads(filters))
 
 ## Need to modify or create new function for updating dataset
 ## e.g. dealing w/ IncompleteResultsError if cloning into existing dir
 @manager.command
-def config_from_yaml(config_file):
-	""" Configure datasets and extracted features from a YAML config file """
+def ingest_from_yaml(config_file, replace=False, automagic=False):
+	""" Ingest/update datasets and extracted features from a YAML config file.
+	config_file - YAML config file detailing datasets and pliers graph_json
+	replace - If dataset is already in db, re-ingest?
+	automagic - Enable datalad automagic
+	"""
 	populate.config_from_yaml(db.session, config_file, app.config['DATASET_DIR'])
 
 

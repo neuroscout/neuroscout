@@ -10,6 +10,7 @@ services:
     volumes:
       - migrations:/migrations
       - ./web/:/web
+      - /home/zorro/datasets:/datasets
     command: /usr/local/bin/gunicorn -w 2 -b :8000 core:app --log-level debug --chdir /web
     environment:
       - APP_SETTINGS=config.config.DevelopmentConfig
