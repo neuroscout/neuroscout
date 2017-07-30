@@ -31,6 +31,9 @@ class AnalysisSchema(Schema):
 
 	transformations = fields.List(fields.Dict(),
 								  description='Array of transformation objects')
+	contrasts = fields.List(fields.Dict(),
+								  description='Array of contrasts')
+
 	predictors = fields.Nested(
 		'PredictorSchema', many=True, only=['id'],
         description='Predictor id(s) associated with analysis')

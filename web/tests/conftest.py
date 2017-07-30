@@ -13,12 +13,12 @@ Session / db managment tools
 def app():
     """Session-wide test `Flask` application."""
     if 'APP_SETTINGS' in os.environ:
-        if os.environ['APP_SETTINGS'] == 'config.DevelopmentConfig':
-            _app.config.from_object('config.DockerTestConfig')
-        elif os.environ['APP_SETTINGS'] != 'config.TravisConfig':
-            _app.config.from_object('config.TestingConfig')
+        if os.environ['APP_SETTINGS'] == 'config.config.DevelopmentConfig':
+            _app.config.from_object('config.config.DockerTestConfig')
+        elif os.environ['APP_SETTINGS'] != 'config.config.TravisConfig':
+            _app.config.from_object('config.config.TestingConfig')
     else:
-        _app.config.from_object('config.TestingConfig')
+        _app.config.from_object('config..config.TestingConfig')
 
     # Establish an application context before running the tests.
     ctx = _app.app_context()
@@ -85,8 +85,9 @@ import populate
 
 DATASET_PATH = os.path.join(
     os.path.dirname(os.path.realpath(__file__)), 'data/datasets/bids_test')
-SPEC_PATH = os.path.join(
-    os.path.dirname(os.path.realpath(__file__)), 'data/test_pliers.json')
+YML_PATH = os.path.join(
+    os.path.dirname(os.path.realpath(__file__)), 'data/test_dataset.yml')
+
 
 @pytest.fixture(scope="function")
 def add_users(app, db, session):
@@ -114,16 +115,16 @@ def add_users(app, db, session):
 
 @pytest.fixture(scope="function")
 def add_dataset(session):
-    """ Add a dataset (only first run) with two subjects """
+    """ Add a dataset with two subjects """
     return populate.add_dataset(session, DATASET_PATH, 'bidstest',
                                 verbose=False)
 
+
 @pytest.fixture(scope="function")
-def extract_features(session, add_dataset):
-    """ Extract features from a dataset """
-    return populate.extract_features(session, DATASET_PATH, 'bidstest',
-                                     SPEC_PATH,
-                                     verbose=False, run='01')
+def add_dataset_remote(session):
+    """ Add a dataset with two subjects """
+    return populate.config_from_yaml(session, YML_PATH,
+                                     _app.config['DATASET_DIR'])[0]
 
 @pytest.fixture(scope="function")
 def add_analysis(session, add_users, add_dataset):

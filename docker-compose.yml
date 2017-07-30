@@ -12,7 +12,7 @@ services:
       - ./web/:/web
     command: /usr/local/bin/gunicorn -w 2 -b :8000 core:app --log-level debug --chdir /web
     environment:
-      - APP_SETTINGS=config.DevelopmentConfig
+      - APP_SETTINGS=config.config.DevelopmentConfig
 
   nginx:
     restart: always

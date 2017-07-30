@@ -1,0 +1,9 @@
+bids_test:
+  path: https://github.com/adelavega/bids_test.git
+  tasks:
+    bidstest:
+      features:
+        - test_pliers.json
+      filters:
+        subject: "01"
+        run: 1
