@@ -43,7 +43,7 @@ def add_dataset(bids_path, task, replace=False, automagic=False,
 		bids_path - Path to bids directory
 		task - Task name
 		replace - If dataset is already in db, re-ingest?
-		automagic - Enable datalad automagic
+		automagic - Force enable datalad automagic
 		skip_predictors - Skip original Predictors
 		filters - string JSON object with optional run filters
 		"""
@@ -69,9 +69,10 @@ def ingest_from_yaml(config_file, replace=False, automagic=False):
 	""" Ingest/update datasets and extracted features from a YAML config file.
 	config_file - YAML config file detailing datasets and pliers graph_json
 	replace - If dataset is already in db, re-ingest?
-	automagic - Enable datalad automagic
+	automagic - Force enable datalad automagic
 	"""
-	populate.config_from_yaml(db.session, config_file, app.config['DATASET_DIR'])
+	populate.ingest_from_yaml(db.session, config_file, app.config['DATASET_DIR'],
+		replace=replace, automagic=automagic)
 
 
 if __name__ == '__main__':
