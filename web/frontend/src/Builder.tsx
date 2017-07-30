@@ -3,11 +3,12 @@ import { Tabs, Row, Col, Layout, Button, Modal, Icon, message } from 'antd';
 import { Prompt } from 'react-router-dom';
 import { OverviewTab } from './Overview';
 import { PredictorSelector } from './Predictors';
+import { ContrastsTab } from './Contrasts';
 import { XformsTab } from './Transformations';
 import OptionsTab from './Options';
 import {
   Store, Analysis, Dataset, Task, Run, Predictor,
-  ApiDataset, ApiAnalysis, AnalysisConfig, Transformation
+  ApiDataset, ApiAnalysis, AnalysisConfig, Transformation, Contrast
 } from './coretypes';
 import { displayError, jwtFetch } from './utils';
 import { Space } from './HelperComponents';
@@ -42,6 +43,7 @@ const initializeStore = (): Store => ({
     private: true,
     config: { smoothing: DEFAULT_SMOOTHING, predictorConfigs: {} },
     transformations: [],
+    contrasts: [],
   },
   datasets: [],
   availableTasks: [],
@@ -122,7 +124,7 @@ const getTasks = (runs: Run[]): Task[] => {
 // preserving the existing predictor configs, and adding/removing new/old ones as necessary
 const getUpdatedConfig = (config: AnalysisConfig, predictorIds: string[]): AnalysisConfig => {
   let newConfig = { ...config };
-  let newPredictorConfigs = { ...config.predictorConfigs }
+  let newPredictorConfigs = { ...config.predictorConfigs };
   predictorIds.forEach((id) => {
     if (!newPredictorConfigs.hasOwnProperty(id)) {
       newPredictorConfigs[id] = {
@@ -210,7 +212,7 @@ export default class AnalysisBuilder extends React.Component<BuilderProps, Store
     jwtFetch(url, { method, body: JSON.stringify(apiAnalysis) })
       // .then(response => response.json())
       .then((data: ApiAnalysis & {statusCode: number}) => {
-        if(data.statusCode !== 200) throw new Error('Oops...something went wrong. Analysis was not saved.')
+        if (data.statusCode !== 200) throw new Error('Oops...something went wrong. Analysis was not saved.');
         message.success(compile ? 'Analysis submitted for generation' : 'Analysis saved');
         this.setState({
           analysis: {
@@ -231,13 +233,17 @@ export default class AnalysisBuilder extends React.Component<BuilderProps, Store
       return Promise.reject('Data returned by server is missing transformations array.');
     }
     const analysis: Analysis = {
-      ...data,
+      name: data.name,
+      description: data.description,
+      predictions: data.predictions,
+      status: data.status,
       analysisId: data.hash_id,
       datasetId: data.dataset_id,
       runIds: data.runs!.map(({ id }) => id),
       predictorIds: data.predictors!.map(({ id }) => id),
       config: data.config, 
       transformations: data.transformations.filter(xform => xform.name), // TODO: remove the filter once this issue is fixed: https://github.com/PsychoinformaticsLab/neuroscout/issues/99
+      contrasts: data.contrasts || [],
     };
     if (analysis.runIds.length > 0) {
       jwtFetch(`${domainRoot}/api/runs/${analysis.runIds[0]}`)
@@ -278,6 +284,13 @@ export default class AnalysisBuilder extends React.Component<BuilderProps, Store
     this.setState({
       analysis: { ...this.state.analysis, transformations: xforms },
       unsavedChanges: true,
+    });
+  }
+
+  updateContrasts = (contrasts: Contrast[]): void => {
+    this.setState({
+      analysis: {...this.state.analysis, contrasts},
+      unsavedChanges: true
     });
   }
 
@@ -355,7 +368,7 @@ export default class AnalysisBuilder extends React.Component<BuilderProps, Store
   render() {
     const { predictorsActive, transformationsActive, contrastsActive, modelingActive,
       reviewActive, activeTab, analysis, datasets, availableTasks, availableRuns,
-      selectedTaskId, availablePredictors, selectedPredictors, unsavedChanges,
+      selectedTaskId, availablePredictors, selectedPredictors, unsavedChanges
      } = this.state;
     const statusText: string = {
       DRAFT: 'This analysis has not yet been generated.',
@@ -425,7 +438,13 @@ export default class AnalysisBuilder extends React.Component<BuilderProps, Store
                   onSave={xforms => this.updateTransformations(xforms)}
                 />
               </TabPane>
-              <TabPane tab="Contrasts" key="contrasts" disabled={!contrastsActive} />
+              <TabPane tab="Contrasts" key="contrasts" disabled={!transformationsActive} >
+              <ContrastsTab
+              contrasts={analysis.contrasts}
+              predictors={selectedPredictors}
+              onSave={this.updateContrasts}
+              />
+              </TabPane>
               <TabPane tab="Options" key="modeling" disabled={!modelingActive}>
                 <OptionsTab
                   analysis={analysis}

@@ -14,9 +14,10 @@ export interface Analysis {
   modifiedAt?: string;
   config: AnalysisConfig;
   transformations: Transformation[];
+  contrasts: Contrast[];
 }
 
-// Normalized dataset object  in Analysis Builder
+// Normalized dataset object in Analysis Builder
 export interface Dataset {
   name: string;
   id: string;
@@ -79,11 +80,13 @@ export interface Transformation {
   parameters: Parameter[];
 }
 
+// Lookup hash of available transformations (as specified in transforms.ts) by their name
 export interface XformRules {
   [name: string]: Transformation;
 }
 
 export interface Contrast {
+  name: string;   // short name/description of contrast
   predictors: Predictor[];
   weights: number[];
   contrastType: 'T' | 'F';
@@ -126,6 +129,7 @@ export interface ApiRun {
   subject: string | null;
 }
 
+// Shape of Analysis object as consumed/produced by the backend API
 export interface ApiAnalysis {
   hash_id?: string;
   name: string;
@@ -137,16 +141,20 @@ export interface ApiAnalysis {
   runs?: { id: string }[];
   predictors?: { id: string }[];
   transformations?: Transformation[];
+  contrasts?: Contrast[];
   config: AnalysisConfig;
   modified_at?: string;
 }
 
+// Shape of User object as consumed/produced by the backend API
 export interface ApiUser {
   email: string;
   name: string;
   analyses: ApiAnalysis[];
 }
 
+// The more condensed version of analysis object as returned by the user route
+// and displayed as list of analyses on the homepage
 export interface AppAnalysis {
   id: string;
   name: string;

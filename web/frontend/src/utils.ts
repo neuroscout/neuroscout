@@ -3,7 +3,8 @@ import { message } from 'antd';
 export const displayError = (error: Error) => {
   try {
     message.error(error.toString(), 5);
-  } catch (e) { // to make jsdom tests work
+  } catch (e) {
+    // to make jsdom tests work
     return;
   } finally {
     console.error(error);
@@ -12,7 +13,11 @@ export const displayError = (error: Error) => {
 
 // moveItem moves an item in a given array up (toward index zero) or down (toward the last index),
 // returning a new array
-export type MoveItem<T> = (array: Array<T>, index: number, direction: 'up' | 'down') => Array<T>;
+export type MoveItem<T> = (
+  array: Array<T>,
+  index: number,
+  direction: 'up' | 'down'
+) => Array<T>;
 export const moveItem: MoveItem<any> = (array, index, direction) => {
   let newArray = [...array];
   if (direction === 'up') {
@@ -27,7 +32,7 @@ export const moveItem: MoveItem<any> = (array, index, direction) => {
     throw new Error('Invalid direction');
   }
   return newArray;
-}
+};
 
 export const jwtFetch = (path: string, options?: object) => {
   const jwt = window.localStorage.getItem('jwt');
@@ -39,24 +44,24 @@ export const jwtFetch = (path: string, options?: object) => {
     ...options,
     headers: {
       'Content-type': 'application/json',
-      'Authorization': 'JWT ' + jwt
+      Authorization: 'JWT ' + jwt
     }
   };
-  return fetch(path, newOptions)
-    .then(response => {
-      if (response.status !== 200) displayError(new Error(`HTTP ${response.status} on ${path}`));
-      return response.json().then(json => {
-        // Always add statusCode to the data object or array returned by response.json()
-        let copy: any;
-        if ('length' in json) { // array
-          copy = [...json];
-          (copy as any).statusCode = response.status;
-        } else { // object
-          copy = { ...json, statusCode: response.status }
-        }
-        return copy;
+  return fetch(path, newOptions).then(response => {
+    if (response.status !== 200)
+      displayError(new Error(`HTTP ${response.status} on ${path}`));
+    return response.json().then(json => {
+      // Always add statusCode to the data object or array returned by response.json()
+      let copy: any;
+      if ('length' in json) {
+        // array
+        copy = [...json];
+        (copy as any).statusCode = response.status;
+      } else {
+        // object
+        copy = { ...json, statusCode: response.status };
       }
-      );
+      return copy;
     });
-
+  });
 };

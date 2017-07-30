@@ -62,14 +62,14 @@
         ],
         "quotemark": [true, "single", "jsx-double"],
         "radix": true,
-        "semicolon": [true, "always"],
+        "semicolon": [true, "always", "ignore-bound-class-methods"],
         "switch-default": true,
 
         "trailing-comma": false,
 
         "triple-equals": [ true, "allow-null-check" ],
         "typedef": [
-            true,
+            false,
             "parameter",
             "property-declaration"
         ],
@@ -83,7 +83,7 @@
                 "variable-declaration": "nospace"
             }
         ],
-        "variable-name": [true, "ban-keywords", "check-format", "allow-leading-underscore", "allow-pascal-case"],
+        "variable-name": [false, "ban-keywords", "check-format", "allow-leading-underscore", "allow-pascal-case"],
         "whitespace": [
             true,
             "check-branch",
