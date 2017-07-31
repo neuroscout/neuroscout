@@ -14,6 +14,7 @@ class Config(object):
     WTF_CSRF_ENABLED = False
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     JWT_EXPIRATION_DELTA = datetime.timedelta(days=7)
+    JWT_AUTH_URL_RULE = '/api/auth'
     MIGRATIONS_DIR = 'migrations'
     APISPEC_SWAGGER_UI_URL = None
     HASH_SALT = 'lksjdfkljsflkjdf'
@@ -25,6 +26,7 @@ class DevelopmentConfig(Config):
     SQLALCHEMY_DATABASE_URI = 'postgres://postgres@postgres:5432/neuroscout'
     PROPAGATE_EXCEPTIONS = True
     MIGRATIONS_DIR = '/migrations/migrations'
+    DATASET_DIR = '/file-data'
 
 class DockerTestConfig(Config):
     SQLALCHEMY_DATABASE_URI = 'postgres://postgres@postgres:5432/scout_test'
@@ -33,10 +35,12 @@ class DockerTestConfig(Config):
 class TestingConfig(Config):
     SQLALCHEMY_DATABASE_URI = 'postgresql://zorro:dbpass@localhost:5432/scout_test'
     TESTING = True
+    DATASET_DIR = '/tmp/file-data'
 
 class TravisConfig(Config):
     SQLALCHEMY_DATABASE_URI = "postgresql://postgres@localhost/travis_ci_test"
     TESTING = True
+    DATASET_DIR = '/tmp/file-data'
 
 class HomeConfig(Config):
     SQLALCHEMY_DATABASE_URI = 'postgresql://zorro:dbpass@localhost:5432/neuroscout'

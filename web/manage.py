@@ -5,6 +5,7 @@ import os
 import requests
 import populate
 
+
 app.config.from_object(os.environ['APP_SETTINGS'])
 
 migrate = Migrate(app, db, directory=app.config['MIGRATIONS_DIR'])
@@ -16,7 +17,7 @@ def _make_context():
 	import resources
 
 	try:
-		client = Client(requests, 'http://127.0.0.1:5001',
+		client = Client(requests, 'http://127.0.0.1:80',
 			username='test2@test.com', password='password')
 	except:
 		client = None
@@ -36,14 +37,22 @@ def add_user(email, password):
     db.session.commit()
 
 @manager.command
-def add_dataset(bids_path, task, replace=False, **kwargs):
-	populate.add_dataset(db.session, bids_path, task, replace=False,
-						 verbose=True, **kwargs)
+def add_dataset(bids_path, task, replace=False, automagic=False, **kwargs):
+	populate.add_dataset(db.session, bids_path, task, replace=replace,
+						 verbose=True, automagic=automagic, **kwargs)
 
 @manager.command
 def extract_features(bids_path, task, graph_spec, **kwargs):
 	populate.extract_features(db.session, bids_path, task, graph_spec,
 							  verbose=True, **kwargs)
+
+## Need to modify or create new function for updating dataset
+## e.g. dealing w/ IncompleteResultsError if cloning into existing dir
+@manager.command
+def config_from_yaml(config_file):
+	""" Configure datasets and extracted features from a YAML config file """
+	populate.config_from_yaml(db.session, config_file, app.config['DATASET_DIR'])
+
 
 if __name__ == '__main__':
     manager.run()

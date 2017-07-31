@@ -8,18 +8,16 @@ services:
     links:
       - postgres:postgres
     volumes:
-      - static:/usr/src/app/static
       - migrations:/migrations
-      - /home/zorro/datasets:/datasets
-    command: /usr/local/bin/gunicorn -w 2 -b :8000 core:app --log-level debu
+      - ./web/:/web
+    command: /usr/local/bin/gunicorn -w 2 -b :8000 core:app --log-level debug --chdir /web
     env_file: .env
+
   nginx:
     restart: always
     build: ./nginx/
     ports:
       - "80:80"
-    volumes:
-      - /www/static
     volumes_from:
       - web
     links:

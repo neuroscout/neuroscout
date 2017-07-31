@@ -9,7 +9,7 @@ def test_auth(auth_client):
 	assert resp.status_code == 404
 
 	# Get auth token with invalid credentials
-	auth_resp = auth_client.post('/auth',
+	auth_resp = auth_client.post('/api/auth',
 						data={'username': 'not', 'password': 'existing'},
 						headers=None)
 	assert auth_resp.status_code == 401

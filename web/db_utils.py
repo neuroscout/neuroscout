@@ -1,4 +1,6 @@
 from flask import abort
+from sqlalchemy.exc import SQLAlchemyError
+from flask import current_app
 
 def copy_row(model, row, ignored_columns=[]):
     copy = model()
@@ -13,25 +15,37 @@ def copy_row(model, row, ignored_columns=[]):
 
     return copy
 
-def get_or_create(session, model, commit=True, **kwargs):
+def put_record(db_session, updated_values, instance):
+    try:
+        for key, value in updated_values.items():
+            setattr(instance, key, value)
+            db_session.commit()
+        return instance
+
+    except SQLAlchemyError:
+        current_app.logger.error(e)
+        db_session.rollback()
+        abort(400, "Error updating field")
+
+def get_or_create(db_session, model, commit=True, **kwargs):
     """ Checks to see if instance of model is in db.
     If not add and commit. If true, return all matches.
     Args:
-    session: db session
+    db_session: db session
     model: Model class
     **kwargs: columns to filter by
 
     Returns:
     (all matching or created instances, if instance is new)
     """
-    instance = session.query(model).filter_by(**kwargs).first()
+    instance = db_session.query(model).filter_by(**kwargs).first()
     if instance:
         return instance, False
     else:
         instance = model(**kwargs)
-        session.add(instance)
+        db_session.add(instance)
 
         if commit is True:
-            session.commit()
+            db_session.commit()
 
         return instance, True

@@ -13,12 +13,12 @@ Session / db managment tools
 def app():
     """Session-wide test `Flask` application."""
     if 'APP_SETTINGS' in os.environ:
-        if os.environ['APP_SETTINGS'] == 'config.DevelopmentConfig':
-            _app.config.from_object('config.DockerTestConfig')
-        elif os.environ['APP_SETTINGS'] != 'config.TravisConfig':
-            _app.config.from_object('config.TestingConfig')
+        if os.environ['APP_SETTINGS'] == 'config.config.DevelopmentConfig':
+            _app.config.from_object('config.config.DockerTestConfig')
+        elif os.environ['APP_SETTINGS'] != 'config.config.TravisConfig':
+            _app.config.from_object('config.config.TestingConfig')
     else:
-        _app.config.from_object('config.TestingConfig')
+        _app.config.from_object('config..config.TestingConfig')
 
     # Establish an application context before running the tests.
     ctx = _app.app_context()
@@ -73,7 +73,7 @@ def auth_client(add_users):
     """ Return authorized client wrapper """
     from tests.request_utils import Client
 
-    _ , (email, password) = add_users
+    _ , ((email, password), _) = add_users
     client = Client(email=email, password=password)
     return client
 
@@ -85,8 +85,9 @@ import populate
 
 DATASET_PATH = os.path.join(
     os.path.dirname(os.path.realpath(__file__)), 'data/datasets/bids_test')
-SPEC_PATH = os.path.join(
-    os.path.dirname(os.path.realpath(__file__)), 'data/test_pliers.json')
+YML_PATH = os.path.join(
+    os.path.dirname(os.path.realpath(__file__)), 'data/test_dataset.yml')
+
 
 @pytest.fixture(scope="function")
 def add_users(app, db, session):
@@ -98,28 +99,32 @@ def add_users(app, db, session):
     user1 = 'test1@gmail.com'
     pass1 = 'test1'
 
+    user2 = 'test2@gmail.com'
+    pass2 = 'test2'
+
     user_datastore.create_user(email=user1, password=encrypt_password(pass1))
     session.commit()
     id_1 = user_datastore.find_user(email=user1).id
 
-    user_datastore.create_user(email='test2@gmail.com', password=encrypt_password('test2'))
+    user_datastore.create_user(email=user2, password=encrypt_password(pass2))
     session.commit()
-    id_2 = user_datastore.find_user(email='test2@gmail.com').id
+    id_2 = user_datastore.find_user(email=user2).id
 
-    yield (id_1, id_2), (user1, pass1)
+    yield (id_1, id_2), ((user1, pass1), (user2, pass2))
+
 
 @pytest.fixture(scope="function")
 def add_dataset(session):
-    """ Add a dataset (only first run) with two subjects """
+    """ Add a dataset with two subjects """
     return populate.add_dataset(session, DATASET_PATH, 'bidstest',
                                 verbose=False)
 
+
 @pytest.fixture(scope="function")
-def extract_features(session, add_dataset):
-    """ Extract features from a dataset """
-    return populate.extract_features(session, DATASET_PATH, 'bidstest',
-                                     SPEC_PATH,
-                                     verbose=False, run='01')
+def add_dataset_remote(session):
+    """ Add a dataset with two subjects """
+    return populate.config_from_yaml(session, YML_PATH,
+                                     _app.config['DATASET_DIR'])[0]
 
 @pytest.fixture(scope="function")
 def add_analysis(session, add_users, add_dataset):
@@ -131,6 +136,18 @@ def add_analysis(session, add_users, add_dataset):
     session.commit()
 
     return analysis.id
+
+@pytest.fixture(scope="function")
+def add_analysis_user2(session, add_users, add_dataset):
+    analysis = Analysis(dataset_id = add_dataset, user_id = add_users[0][1],
+        name = "My first fMRI analysis!", description = "Ground breaking")
+
+
+    session.add(analysis)
+    session.commit()
+
+    return analysis.id
+
 
 @pytest.fixture(scope="function")
 def add_predictor(session, add_dataset):

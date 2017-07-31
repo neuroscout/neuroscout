@@ -14,7 +14,7 @@ def load_user(payload):
 
 def add_auth_to_swagger(spec):
     spec.add_path(
-        path='/auth',
+        path='/api/auth',
         operations=dict(
             post=dict(
                 parameters=[

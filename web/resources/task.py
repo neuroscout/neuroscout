@@ -5,7 +5,7 @@ import webargs as wa
 from . import utils
 
 class TaskSchema(Schema):
-    id = fields.Str()
+    id = fields.Int()
     name = fields.Str()
     description = fields.Dict(description='BIDS task description')
 

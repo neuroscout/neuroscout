@@ -1,5 +1,5 @@
 from tests.request_utils import decode_json
-from models import Analysis
+from models import Analysis, Run
 
 def test_get(session, auth_client, add_analysis):
 	# List of analyses
@@ -39,12 +39,20 @@ def test_get(session, auth_client, add_analysis):
 	assert resp.status_code == 404
 	# assert 'requested URL was not found' in decode_json(resp)['message']
 
-def test_post(auth_client, add_dataset):
+def test_post(auth_client, add_dataset, add_predictor):
 	## Add analysis
 	test_analysis = {
 	"dataset_id" : add_dataset,
 	"name" : "some analysis",
-	"description" : "pretty damn innovative"
+	"description" : "pretty damn innovative",
+	"transformations" : [{
+		"name" : "scale",
+		"inputs" : [add_predictor],
+		"parameters" : [
+			{
+				"name" : "demean",
+				"value" : {"kind" : "boolean", "value" : True}
+			}]}]
 	}
 
 	resp= auth_client.post('/api/analyses', data = test_analysis)
@@ -83,46 +91,101 @@ def test_post(auth_client, add_dataset):
 
 	resp= auth_client.post('/api/analyses', data = bad_post_2)
 	assert resp.status_code == 422
-	assert decode_json(resp)['message']['name'][0] == 'Missing data for required field.'
+	assert decode_json(resp)['message']['name'][0] == \
+			'Missing data for required field.'		
 
-def test_clone(session, auth_client, add_dataset, add_analysis):
+def test_clone(session, auth_client, add_dataset, add_analysis, add_users):
+	(id1, id2), _ = add_users
 	analysis  = Analysis.query.filter_by(id=add_analysis).first()
 	# Clone analysis by id
-	resp= auth_client.post('/api/analyses/{}/clone'.format(analysis.hash_id))
-	assert resp.status_code == 422
-
-	# Make uneditable and try again
-	analysis.locked = True
-	session.commit()
-
 	resp= auth_client.post('/api/analyses/{}/clone'.format(analysis.hash_id))
 	clone_json = decode_json(resp)
 	assert clone_json['hash_id'] != analysis.hash_id
 
-def test_put(auth_client, add_analysis):
+	# Change user ID to someone else's and try again
+	analysis.status = 'DRAFT'
+	analysis.user_id = id2
+	session.commit()
+
+	resp = auth_client.post('/api/analyses/{}/clone'.format(analysis.hash_id))
+	assert resp.status_code == 422
+
+
+def test_put(auth_client, add_analysis, add_dataset, session):
 	# Get analysis to edit
 	analysis  = Analysis.query.filter_by(id=add_analysis).first()
 	analysis_json = decode_json(
 		auth_client.get('/api/analyses/{}'.format(analysis.hash_id)))
 
-	analysis_json['name'] = 'NEW NAME!'
+	analysis_json['name'] = 'NEW NAME'
 
 	resp = auth_client.put('/api/analyses/{}'.format(analysis.hash_id),
 						data=analysis_json)
 	assert resp.status_code == 200
 	new_analysis = decode_json(resp)
-	assert new_analysis['name'] == "NEW NAME!"
+	assert new_analysis['name'] == "NEW NAME"
+
+	# Test adding a run_id
+	analysis_json['runs'] = [{'id' : Run.query.first().id }]
+
+	resp = auth_client.put('/api/analyses/{}'.format(analysis.hash_id),
+						data=analysis_json)
+	assert resp.status_code == 200
+	new_analysis = decode_json(resp)
+	assert new_analysis['runs'] == [{'id' :	Run.query.first().id }]
+
+	# Test adding an invalid run id
+	analysis_json['runs'] = [{'id' : 9999 }]
+
+	resp = auth_client.put('/api/analyses/{}'.format(analysis.hash_id),
+						data=analysis_json)
+	assert resp.status_code == 422
+	assert 'runs' in  decode_json(resp)['message']
 
 	# Test locking
-	new_analysis['locked'] = True
-	resp = auth_client.put('/api/analyses/{}'.format(analysis.hash_id),
-						data=new_analysis)
+	resp = auth_client.post('/api/analyses/{}/compile'.format(analysis.hash_id))
 	assert resp.status_code == 200
 	locked_analysis = decode_json(resp)
-	assert locked_analysis['locked'] == True
-	assert locked_analysis['locked_at'] != ''
+	# Need to add route for locking
+	assert locked_analysis['status'] == 'PENDING'
+	assert locked_analysis['compiled_at'] != ''
 
 	locked_analysis['name'] = 'New name should not be allowed'
 	resp = auth_client.put('/api/analyses/{}'.format(analysis.hash_id),
 						data=locked_analysis)
 	assert resp.status_code == 422
+
+	# Try deleting locked anlaysis
+	resp = auth_client.delete('/api/analyses/{}'.format(analysis.hash_id))
+	assert resp.status_code == 422
+
+	# Add and delete analysis
+	## Add analysis
+	test_analysis = {
+	"dataset_id" : add_dataset,
+	"name" : "some analysis",
+	"description" : "pretty damn innovative"
+	}
+
+	resp = auth_client.post('/api/analyses', data = test_analysis)
+	analysis_json = decode_json(resp)
+
+	# Test adding a run_id
+	analysis_json['runs'] = [{'id' : Run.query.first().id }]
+
+	resp = auth_client.put('/api/analyses/{}'.format(analysis_json['hash_id']),
+						data=analysis_json)
+	assert resp.status_code == 200
+
+	# Try deleting anlaysis
+	delresp = auth_client.delete('/api/analyses/{}'.format(analysis_json['hash_id']))
+	assert delresp.status_code == 200
+
+	assert Analysis.query.filter_by(hash_id=decode_json(resp)['hash_id']).count() == 0
+
+def test_auth_id(auth_client, add_analysis_user2):
+	# Try deleting analysis you are not owner of
+	analysis  = Analysis.query.filter_by(id=add_analysis_user2).first()
+	resp = auth_client.delete('/api/analyses/{}'.format(analysis.hash_id))
+
+	assert resp.status_code == 401

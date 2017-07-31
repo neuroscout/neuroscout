@@ -4,7 +4,7 @@ from models import Result
 from . import utils
 
 class ResultSchema(Schema):
-    id = fields.Str(dump_only=True)
+    id = fields.Int(dump_only=True)
     analysis_id = fields.Int(dump_only=True)
 
 class ResultResource(MethodResource):

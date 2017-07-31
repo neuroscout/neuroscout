@@ -1,10 +1,10 @@
 from flask_apispec import MethodResource, marshal_with, use_kwargs, doc
 from flask_jwt import current_identity
-from marshmallow import Schema, fields, validates, ValidationError
+from marshmallow import Schema, fields, validates, ValidationError, post_load
 from database import db
-from models import Analysis, Dataset
+from db_utils import put_record
+from models import Analysis, Dataset, Run, Predictor
 from . import utils
-import datetime
 from worker import celery_app
 import celery.states as states
 
@@ -16,28 +16,35 @@ class AnalysisSchema(Schema):
 	modified_at = fields.Time(dump_only=True)
 	user_id = fields.Int(dump_only=True)
 
-	locked = fields.Bool(
-		description='Is analysis finished and locked? Locking is irreversible.')
-	locked_at = fields.Time(description='Timestamp of when analysis was locked',
+	status = fields.Str(
+		description='Analysis status. PASSED, FAILED, PENDING, or DRAFT.',
+		dump_only=True)
+
+	compiled_at = fields.Time(description='Timestamp of when analysis was compiled',
 							dump_only=True)
 	private = fields.Bool(description='Analysis private or discoverable?')
+	predictions = fields.Str(description='User apriori predictions.')
 
-	transformations = fields.Dict(description='Transformation json spec.')
+	config = fields.Dict(description='fMRI analysis configuration parameters.')
 	description = fields.Str()
 	data = fields.Dict()
-	parent_id = fields.Str(dump_only=True,
-                        description="Parent analysis, if cloned.")
+	parent_id = fields.Str(dump_only=True,description="Parent analysis, if cloned.")
 
+
+	transformations = fields.List(fields.Dict(),
+								  description='Array of transformation objects')
+	contrasts = fields.List(fields.Dict(),
+								  description='Array of contrasts')
 
 	predictors = fields.Nested(
-		'PredictorSchema', many=True, only='id',
+		'PredictorSchema', many=True, only=['id'],
         description='Predictor id(s) associated with analysis')
 	runs = fields.Nested(
-		'RunSchema', many=True, only='id',
+		'RunSchema', many=True, only=['id'],
         description='Runs associated with analysis')
 
 	results = fields.Nested(
-		'ResultSchema', many=True, only='id', dump_only=True,
+		'ResultSchema', many=True, only=['id'], dump_only=True,
         description='Result id(s) associated with analysis')
 
 
@@ -46,8 +53,33 @@ class AnalysisSchema(Schema):
 		if Dataset.query.filter_by(id=value).count() == 0:
 			raise ValidationError('Invalid dataset id.')
 
+	@validates('runs')
+	def validate_runs(self, value):
+		try:
+			[Run.query.filter_by(**r).one() for r in value]
+		except:
+			raise ValidationError('Invalid run id!')
+
+	@validates('predictors')
+	def validate_preds(self, value):
+		try:
+			[Predictor.query.filter_by(**r).one() for r in value]
+		except:
+			raise ValidationError('Invalid predictor id.')
+
+	@post_load
+	def nested_object(self, args):
+		if 'runs' in args:
+			args['runs'] = [Run.query.filter_by(**r).one() for r in args['runs']]
+
+		if 'predictors' in args:
+			args['predictors'] = [Predictor.query.filter_by(**r).one() for r in args['predictors']]
+
+		return args
+
 	class Meta:
 		strict = True
+
 
 @doc(tags=['analysis'])
 @marshal_with(AnalysisSchema)
@@ -73,42 +105,54 @@ class AnalysisRootResource(AnalysisBaseResource):
 
 class AnalysisResource(AnalysisBaseResource):
 	@doc(summary='Get analysis by id.')
-	def get(self, analysis_id):
-		return utils.first_or_404(Analysis.query.filter_by(hash_id=analysis_id))
+	@utils.fetch_analysis
+	def get(self, analysis):
+		return analysis
 
-	@use_kwargs(AnalysisSchema)
 	@doc(summary='Edit analysis.')
-	@utils.auth_required
-	def put(self, analysis_id, **kwargs):
-		analysis = utils.first_or_404(
-			Analysis.query.filter_by(hash_id=analysis_id))
-		if analysis.locked is True:
+	@use_kwargs(AnalysisSchema)
+	@utils.owner_required
+	def put(self, analysis, **kwargs):
+		if analysis.status != 'DRAFT':
 			utils.abort(422, "Analysis is not editable. Try cloning it.")
-		else:
-			if kwargs['locked'] > analysis.locked:
-				kwargs['locked_at'] = datetime.datetime.utcnow()
+		return put_record(db.session, kwargs, analysis)
 
-				task = celery_app.send_task(
-					'workflow.create', args=[analysis.id])
-				kwargs['task_id'] = task.id
+	@doc(summary='Delete analysis.')
+	@utils.owner_required
+	def delete(self, analysis):
+		if analysis.status != 'DRAFT':
+			utils.abort(422, "Analysis is not editable, too bad!")
+		db.session.delete(analysis)
+		db.session.commit()
 
-				### Add other triggers here
-			return utils.put_record(db.session, kwargs, analysis)
+		return {'message' : 'deleted!'}
 
 class CloneAnalysisResource(AnalysisBaseResource):
 	@marshal_with(AnalysisSchema)
 	@doc(summary='Clone analysis.')
 	@utils.auth_required
-	def post(self, analysis_id):
-		original = utils.first_or_404(
-			Analysis.query.filter_by(hash_id=analysis_id))
-		if original.locked is False:
-			utils.abort(422, "Only locked analyses can be cloned")
-		else:
-			cloned = original.clone()
-			db.session.add(cloned)
-			db.session.commit()
-			return cloned
+	@utils.fetch_analysis
+	def post(self, analysis):
+		if analysis.user_id != current_identity.id:
+			if analysis.status != 'PASSED':
+				utils.abort(422, "You can only clone somebody else's analysis"
+								  " if they have been compiled.")
+
+		cloned = analysis.clone(current_identity)
+		db.session.add(cloned)
+		db.session.commit()
+		return cloned
+
+class CompileAnalysisResource(AnalysisBaseResource):
+	@doc(summary='Compile and lock analysis.')
+	@utils.owner_required
+	def post(self, analysis):
+		analysis.status = 'PENDING'
+
+		## Add other triggers here
+		db.session.add(analysis)
+		db.session.commit()
+		return analysis
 
 @doc(tags=['analysis'])
 class AnalysisWorkflowResource(MethodResource):

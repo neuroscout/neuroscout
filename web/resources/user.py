@@ -7,6 +7,7 @@ from models.auth import User
 from database import db
 from models import user_datastore
 from . import utils
+import db_utils
 from .utils import abort
 
 class BaseUserSchema(Schema):
@@ -40,7 +41,8 @@ class UserCreationSchema(BaseUserSchema):
 class UserSchema(BaseUserSchema):
     password = fields.Str(load_only=True,
                           description='Password. Minimum 6 characters.')
-    analyses = fields.Nested('AnalysisSchema', only='id',
+    analyses = fields.Nested('AnalysisSchema', only=['hash_id', 'name', 'status',
+                                                     'description', 'modified_at'],
                              many=True, dump_only=True)
 
 
@@ -68,4 +70,4 @@ class UserRootResource(MethodResource):
         if User.query.filter((User.email==kwargs['email']) \
                              & (User.id!=current_identity.id)).all():
             abort(422, 'Email already in use.')
-        return utils.put_record(db.session, kwargs, current_identity)
+        return db_utils.put_record(db.session, kwargs, current_identity)
