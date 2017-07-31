@@ -9,7 +9,7 @@ import db_utils
 from utils import hash_file, hash_str
 
 from bids.grabbids import BIDSLayout
-from bids.transform import BIDSEventCollection
+from bids.events import BIDSEventCollection
 
 from models import (Dataset, Run, Predictor, PredictorEvent, PredictorRun,
                     Stimulus, RunStimulus, ExtractedFeature, ExtractedEvent,
@@ -59,7 +59,7 @@ def add_predictor(db_session, predictor_name, dataset_id, run_id,
     return predictor.id
 
 def add_dataset(db_session, bids_path, task, replace=False, verbose=True,
-                install_path='.', automagic=False, **kwargs):
+                install_path='.', automagic=False, skip_predictors=False, **kwargs):
     """ Adds a BIDS dataset task to the database.
         Args:
             db_session - sqlalchemy db db_session
@@ -69,15 +69,14 @@ def add_dataset(db_session, bids_path, task, replace=False, verbose=True,
             replace - if dataset/task already exists, skip or replace?
             verbose - verbose output
             install_path - if remote dataset, where to install.
-                           current directory if none.
             kwargs - arguments to filter runs by
-            automagic - enable automagic?
+            automagic - force enable DataLad automagic
+            skip_predictors - skip ingesting original predictors
         Output:
             dataset model id
      """
 
-    if re.match('(///|git+|http)', bids_path) and \
-            open.__module__ != 'datalad.auto':
+    if re.match('(///|git+|http)', bids_path):
         from datalad import api as dl
         bids_path = dl.install(source=bids_path,
                                path=install_path).path
@@ -90,7 +89,8 @@ def add_dataset(db_session, bids_path, task, replace=False, verbose=True,
 
     layout = BIDSLayout(bids_path)
     if task not in layout.get_tasks():
-        raise ValueError("No such task exists in BIDS dataset.")
+        raise ValueError("Task {} not found in dataset {}".format(
+            task, bids_path))
 
     # Extract BIDS dataset info and store in dictionary
     description = json.load(open(
@@ -122,6 +122,9 @@ def add_dataset(db_session, bids_path, task, replace=False, verbose=True,
             if automagic:
                 automagic.deactivate()
             return dataset_model.id
+
+    # List of stimuli already processed
+    stims_processed = {}
 
     """ Parse every Run """
     for run_events in layout.get(task=task, type='events', **kwargs):
@@ -170,33 +173,44 @@ def add_dataset(db_session, bids_path, task, replace=False, verbose=True,
         durations = tsv.pop('duration').tolist()
         stims = tsv.pop('stim_file')
 
-        # Parse event columns and insert as Predictors
-        for predictor in tsv.keys():
-            add_predictor(db_session, predictor, dataset_model.id, run_model.id,
-                          onsets, durations, tsv[predictor].tolist())
+        if skip_predictors is False:
+            # Parse event columns and insert as Predictors
+            for predictor in tsv.keys():
+                add_predictor(db_session, predictor, dataset_model.id, run_model.id,
+                              onsets, durations, tsv[predictor].tolist())
 
         """ Ingest Stimuli """
-        print("Ingesting stimuli...")
         for i, val in stims[stims!="n/a"].items():
             base_path = 'stimuli/{}'.format(val)
             path = os.path.join(bids_path, base_path)
             name = os.path.basename(path)
-            try:
-                _ = open(path)
-                stim_hash = hash_file(path)
-                mimetype = magic.from_file(os.path.realpath(path), mime=True)
-            except FileNotFoundError:
-                if verbose:
-                    print('Stimulus: {} not found. Skipping.'.format(val))
-                continue
 
-            # Get or create stimulus model
-            stimulus_model, _ = db_utils.get_or_create(db_session, Stimulus,
-                                                       commit=False,
-                                                       sha1_hash=stim_hash)
-            stimulus_model.name=name
-            stimulus_model.path=base_path
-            stimulus_model.mimetype=mimetype
+            # If stim has already been processed, skip adding it
+            if val not in stims_processed:
+                try:
+                    _ = open(path)
+                    stim_hash = hash_file(path)
+                    mimetype = magic.from_file(os.path.realpath(path), mime=True)
+                except FileNotFoundError:
+                    if verbose:
+                        print('Stimulus: {} not found. Skipping.'.format(val))
+                    continue
+
+                # Get or create stimulus model
+                stimulus_model, _ = db_utils.get_or_create(db_session, Stimulus,
+                                                           commit=False,
+                                                           sha1_hash=stim_hash)
+                stimulus_model.name=name
+                stimulus_model.path=base_path
+                stimulus_model.mimetype=mimetype
+
+                stims_processed[val] = stim_hash
+            else:
+                # Get or create stimulus model
+                stimulus_model, _ = db_utils.get_or_create(db_session, Stimulus,
+                                                           commit=False,
+                                                           sha1_hash=stims_processed[val])
+
             db_session.commit()
 
             # Get or create Run Stimulus association
@@ -205,7 +219,6 @@ def add_dataset(db_session, bids_path, task, replace=False, verbose=True,
                                                 stimulus_id=stimulus_model.id,
                                                 run_id=run_model.id)
             runstim.onset=onsets[i]
-            db_session.commit()
 
     db_session.commit()
 
@@ -245,7 +258,7 @@ def add_dataset(db_session, bids_path, task, replace=False, verbose=True,
     return dataset_model.id
 
 def extract_features(db_session, bids_path, task, graph_spec, verbose=True,
-                     auto_io=False, datalad_unlock=False, **kwargs):
+                     automagic=False, **filters):
     """ Extract features using pliers for a dataset/task
         Args:
             db_session - db db_session
@@ -253,13 +266,11 @@ def extract_features(db_session, bids_path, task, graph_spec, verbose=True,
             task - task name
             graph_spec - pliers graph json spec location
             verbose - verbose output
-            kwargs - additional identifiers for runs
-
+            filters - additional identifiers for runs
+            autoamgic - enable automagic and unlock stimuli with datalad
         Output:
             list of db ids of extracted features
     """
-
-
     import imageio
     try:
         from pliers.stimuli import load_stims
@@ -270,11 +281,12 @@ def extract_features(db_session, bids_path, task, graph_spec, verbose=True,
         from pliers.graph import Graph
 
     # Try to add dataset, will skip if already in
-    dataset_id = add_dataset(db_session, bids_path, task, **kwargs)
+    dataset_id = add_dataset(db_session, bids_path, task, **filters)
+
 
     # Load event files
     collection = BIDSEventCollection(bids_path)
-    collection.read(task=task, **kwargs)
+    collection.read(task=task, **filters)
 
     # Filter to only get stim files
     stim_pattern = 'stim_file/(.*)'
@@ -284,64 +296,77 @@ def extract_features(db_session, bids_path, task, graph_spec, verbose=True,
      if re.match(stim_pattern, col)]
 
     # Monkey-patched auto doesn't work, so get and unlock manually
-    if datalad_unlock:
+    if automagic:
         from datalad import api as da
         da.get(stim_paths)
         da.unlock(stim_paths)
 
     # Get absolute path and load
-    stims = load_stims([s for s in stim_paths])
+    stims = load_stims([os.path.realpath(s) for s in stim_paths])
+
 
     # Construct and run the graph
     graph = Graph(spec=graph_spec)
     results = graph.run(stims, merge=False)
 
-    ef_model_ids = []
+    extracted_features = {}
     for res in results:
         """" Add new ExtractedFeature """
         extractor = res.extractor
         # Hash extractor name + feature name
         ef_hash = hash_str(str(extractor.__hash__()) + res.features[0])
-        tr_attrs = [getattr(res, attr) for attr in extractor._log_attributes]
-        ef_params = str(dict(
-            zip(extractor._log_attributes, tr_attrs)))
 
-        # Get or create feature
-        ef_model, ef_new = db_utils.get_or_create(db_session,
-                                             ExtractedFeature,
-                                             commit=False,
-                                             extractor_name=extractor.name,
-                                             extractor_parameters=ef_params,
-                                             feature_name=res.features[0])
-        if ef_new:
+        # If we haven't already added this feature
+        if ef_hash not in extracted_features:
+            tr_attrs = [getattr(res, attr) for attr in extractor._log_attributes]
+            ef_params = str(dict(
+                zip(extractor._log_attributes, tr_attrs)))
+
+            # Get or create feature
+            ef_model, ef_new = db_utils.get_or_create(db_session,
+                                                 ExtractedFeature,
+                                                 commit=False,
+                                                 extractor_name=extractor.name,
+                                                 extractor_parameters=ef_params,
+                                                 feature_name=res.features[0])
             ef_model.sha1_hash=ef_hash
             db_session.commit()
 
-        ef_model_ids.append(ef_model.id)
+            extracted_features[ef_hash] = ef_model.id
 
         """" Add ExtractedEvents """
         # Get associated stimulus record
-        stim_hash = hash_file(res.stim.filename)
+        filename = res.stim.history.source_file \
+                    if res.stim.history \
+                    else res.stim.filename
+        stim_hash = hash_file(filename)
         stimulus = db_session.query(Stimulus).filter_by(sha1_hash=stim_hash).one()
 
-        if not stimulus:
-            raise Exception("Stimulus not found in database, have you added"
-                            "this dataset to the database?")
-
         # Set onset for event
-        onset = None if pd.isnull(res.onsets) else res.onsets[0]
+        if pd.isnull(res.onsets):
+            onset = None
+        elif isinstance(res.onsets, float):
+            onset = res.onsets
+        else:
+            onset = res.onsets[0]
+
         # Get or create ExtractedEvent
         ee_model, ee_new = db_utils.get_or_create(db_session,
                                                ExtractedEvent,
                                                commit=False,
                                                onset=onset,
                                                stimulus_id=stimulus.id,
-                                               ef_id=ef_model.id)
+                                               ef_id=extracted_features[ef_hash])
 
         # Add data to it (whether or not its new, as we may want to update)
         ee_model.value = res.data[0][0]
-        if not pd.isnull(res.durations):
+        if pd.isnull(res.durations):
+            ee_model.duration = None
+        elif isinstance(res.durations, float):
+            ee_model.duration = res.durations
+        else:
             ee_model.duration = res.durations[0]
+
         ee_model.history = res.history.string
 
         db_session.commit()
@@ -352,7 +377,7 @@ def extract_features(db_session, bids_path, task, graph_spec, verbose=True,
         Run).filter(Run.dataset_id == dataset_id and Run.task.name==task).all()
     for rs in task_runstimuli:
         # For every feature extracted
-        for ef_id in ef_model_ids:
+        for ef, ef_id in extracted_features.items():
             ef = ExtractedFeature.query.filter_by(id = ef_id).one()
             # Get ExtractedEvents associated with stimulus
             ees = ef.extracted_events.filter_by(
@@ -367,33 +392,55 @@ def extract_features(db_session, bids_path, task, graph_spec, verbose=True,
             add_predictor(db_session, predictor_name, dataset_id, rs.run_id,
                           onsets, durations, values, ef_id = ef_id)
 
-    return ef_model_ids
+    return list(extracted_features.values())
 
 import yaml
-def config_from_yaml(db_session, config_file, dataset_dir):
+def ingest_from_yaml(db_session, config_file, install_path=None, automagic=False,
+                     replace=False):
     datasets = yaml.load(open(config_file, 'r'))
 
     base_path = os.path.dirname(os.path.realpath(config_file))
 
+    # Add each dataset in config file to db
     dataset_ids = []
     for name, items in datasets.items():
     	for task, options in items['tasks'].items():
+            remote = bool(re.match('(///|git+|http)',  items['path']))
+
             if 'filters' in options:
             	filters = options['filters']
             else:
             	filters = {}
-            new_path = str((Path(
-            	dataset_dir) / name).absolute())
+
+            if 'dataset_parameters' in options:
+                dp = options['add_parameters']
+            else:
+                dp = {}
+
+            # If dataset is remote link, set path where to install
+            if remote:
+                new_path = str((Path(
+                	install_path) / name).absolute())
+            else:
+                new_path = items['path']
+
             dataset_ids.append(add_dataset(db_session, items['path'], task,
-            					replace=False, verbose=True,
-            					install_path=new_path,
-            					**filters))
+            					replace=replace, automagic=automagic,
+                                verbose=True, install_path=new_path,
+            					**dict(filters.items() | dp.items())))
 
-            datalad_unlock = bool(re.match('(///|git+|http)',  items['path']))
+            if 'extract_parameters' in options:
+                ep = options['extract_parameters']
+            else:
+                ep = {}
 
-            for graph in options['features']:
-            	extract_features(db_session, new_path, task,
-            		os.path.join(base_path, graph), datalad_unlock=datalad_unlock, **filters)
+            # Extract features if pliers graphs are provided
+            if 'features' in options:
+                for graph in options['features']:
+                	extract_features(db_session, new_path, task,
+                		os.path.join(base_path, graph),
+                        automagic=remote or automagic,
+                        **dict(filters.items() | ep.items()))
 
 
     return dataset_ids

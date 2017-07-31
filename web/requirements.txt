@@ -32,12 +32,13 @@ numpy==1.12.0
 olefile==0.44
 packaging==16.8
 pandas==0.19.2
+patsy
 passlib==1.7.1
 Pillow==4.1.1
--e git+https://github.com/tyarkoni/pliers.git#egg=pliers
+-e git+https://github.com/adelavega/pliers.git@bw_fix#egg=pliers
 psycopg2==2.7.1
 py==1.4.33
--e git+https://github.com/INCF/pybids.git@6f8aee0#egg=pybids
+-e git+https://github.com/adelavega/pybids.git@transformer#egg=pybids
 PyJWT==1.4.2
 pyparsing==2.2.0
 pytest==3.0.7
