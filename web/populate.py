@@ -211,6 +211,8 @@ def add_dataset(db_session, bids_path, task, replace=False, verbose=True,
                                                            commit=False,
                                                            sha1_hash=stims_processed[val])
 
+            db_session.commit()
+
             # Get or create Run Stimulus association
             runstim, _ = db_utils.get_or_create(db_session, RunStimulus,
                                                 commit=False,
@@ -334,7 +336,10 @@ def extract_features(db_session, bids_path, task, graph_spec, verbose=True,
 
         """" Add ExtractedEvents """
         # Get associated stimulus record
-        stim_hash = hash_file(res.stim.history.source_file)
+        filename = res.stim.history.source_file \
+                    if res.stim.history \
+                    else res.stim.filename
+        stim_hash = hash_file(filename)
         stimulus = db_session.query(Stimulus).filter_by(sha1_hash=stim_hash).one()
 
         # Set onset for event
@@ -361,7 +366,7 @@ def extract_features(db_session, bids_path, task, graph_spec, verbose=True,
             ee_model.duration = res.durations
         else:
             ee_model.duration = res.durations[0]
-            
+
         ee_model.history = res.history.string
 
         db_session.commit()
