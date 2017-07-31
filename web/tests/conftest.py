@@ -123,7 +123,7 @@ def add_dataset(session):
 @pytest.fixture(scope="function")
 def add_dataset_remote(session):
     """ Add a dataset with two subjects """
-    return populate.config_from_yaml(session, YML_PATH,
+    return populate.ingest_from_yaml(session, YML_PATH,
                                      _app.config['DATASET_DIR'])[0]
 
 @pytest.fixture(scope="function")

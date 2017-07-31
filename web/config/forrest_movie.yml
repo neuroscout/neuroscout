@@ -1,12 +1,6 @@
 studyforrest_phase2:
   path: /datasets/studyforrest-data-phase2/
   tasks:
-    objectcategories:
-      features:
-        - default.json
-      filters:
-        subject: "01"
-        run: 1
     movie:
       filters:
         subject: "01"
