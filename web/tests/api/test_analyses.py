@@ -1,5 +1,7 @@
 from tests.request_utils import decode_json
 from models import Analysis, Run
+import pytest
+import os
 
 def test_get(session, auth_client, add_analysis):
 	# List of analyses
@@ -92,7 +94,7 @@ def test_post(auth_client, add_dataset, add_predictor):
 	resp= auth_client.post('/api/analyses', data = bad_post_2)
 	assert resp.status_code == 422
 	assert decode_json(resp)['message']['name'][0] == \
-			'Missing data for required field.'		
+			'Missing data for required field.'
 
 def test_clone(session, auth_client, add_dataset, add_analysis, add_users):
 	(id1, id2), _ = add_users
@@ -142,23 +144,6 @@ def test_put(auth_client, add_analysis, add_dataset, session):
 	assert resp.status_code == 422
 	assert 'runs' in  decode_json(resp)['message']
 
-	# Test locking
-	resp = auth_client.post('/api/analyses/{}/compile'.format(analysis.hash_id))
-	assert resp.status_code == 200
-	locked_analysis = decode_json(resp)
-	# Need to add route for locking
-	assert locked_analysis['status'] == 'PENDING'
-	assert locked_analysis['compiled_at'] != ''
-
-	locked_analysis['name'] = 'New name should not be allowed'
-	resp = auth_client.put('/api/analyses/{}'.format(analysis.hash_id),
-						data=locked_analysis)
-	assert resp.status_code == 422
-
-	# Try deleting locked anlaysis
-	resp = auth_client.delete('/api/analyses/{}'.format(analysis.hash_id))
-	assert resp.status_code == 422
-
 	# Add and delete analysis
 	## Add analysis
 	test_analysis = {
@@ -182,6 +167,28 @@ def test_put(auth_client, add_analysis, add_dataset, session):
 	assert delresp.status_code == 200
 
 	assert Analysis.query.filter_by(hash_id=decode_json(resp)['hash_id']).count() == 0
+
+@pytest.mark.skipif('CELERY_BROKER_URL' not in os.environ,
+                    reason="requires redis")
+def test_compile(auth_client, add_analysis):
+	analysis  = Analysis.query.filter_by(id=add_analysis).first()
+
+	# Test compiling
+	resp = auth_client.post('/api/analyses/{}/compile'.format(analysis.hash_id))
+	assert resp.status_code == 200
+	locked_analysis = decode_json(resp)
+	# Need to add route for locking
+	assert locked_analysis['status'] == 'PENDING'
+	assert locked_analysis['compiled_at'] != ''
+
+	locked_analysis['name'] = 'New name should not be allowed'
+	resp = auth_client.put('/api/analyses/{}'.format(analysis.hash_id),
+						data=locked_analysis)
+	assert resp.status_code == 422
+
+	# Try deleting locked anlaysis
+	resp = auth_client.delete('/api/analyses/{}'.format(analysis.hash_id))
+	assert resp.status_code == 422
 
 def test_auth_id(auth_client, add_analysis_user2):
 	# Try deleting analysis you are not owner of

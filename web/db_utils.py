@@ -22,7 +22,7 @@ def put_record(db_session, updated_values, instance):
             db_session.commit()
         return instance
 
-    except SQLAlchemyError:
+    except SQLAlchemyError as e:
         current_app.logger.error(e)
         db_session.rollback()
         abort(400, "Error updating field")
