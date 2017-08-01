@@ -56,6 +56,7 @@ class Analysis(db.Model):
         clone_row.hash_id = None
         clone_row.parent_id = self.hash_id
         clone_row.user_id = user.id
+        clone_row.status = "DRAFT"
         return clone_row
 
 @listens_for(Analysis, "after_insert")
