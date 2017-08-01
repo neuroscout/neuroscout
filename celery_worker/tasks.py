@@ -7,7 +7,7 @@ def create(x):
     time.sleep(10) # lets sleep for a while before doing the gigantic addition task!
     filename = "workflow_{}.py".format(x)
     try:
-        os.mknod("/static/{}".format(filename))
+        os.mknod("/file-data/workflows/{}".format(filename))
     except:
         pass
     return filename

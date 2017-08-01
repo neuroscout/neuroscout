@@ -4,6 +4,10 @@ from webargs.flaskparser import parser
 from flask import jsonify
 from models import Analysis
 
+import celery.states as states
+from worker import celery_app
+from database import db
+
 def abort(code, message=''):
     from flask import abort, make_response
     abort(make_response(jsonify(message=message), code))
@@ -16,12 +20,28 @@ def first_or_404(query):
     else:
         abort(404, 'Resource not found')
 
+def update_analysis_status(analysis, commit=True):
+    """ Checks celery for updates to analysis status and results """
+    if analysis.status != "DRAFT":
+    	res = celery_app.AsyncResult(analysis.task_id)
+    	if res.state == states.FAILURE:
+    		analysis.status = "FAILED"
+    	elif res.state != states.SUCCESS:
+    		analysis.status = "PENDING"
+    	elif res.state == states.SUCCESS:
+    		analysis.status = "PASSED"
+    		analysis.workflow = res.result
+
+    if commit:
+        db.session.commit()
+    return analysis
+
 def fetch_analysis(function):
     """ Given kwarg analysis_id, fetch analysis model and insert as kwargs """
     def wrapper(*args, **kwargs):
         analysis = first_or_404(
             Analysis.query.filter_by(hash_id=kwargs.pop('analysis_id')))
-
+        analysis = update_analysis_status(analysis)
         kwargs['analysis'] = analysis
         return function(*args, **kwargs)
     return wrapper

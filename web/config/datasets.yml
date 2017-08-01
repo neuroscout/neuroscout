@@ -7,12 +7,3 @@ studyforrest_phase2:
       filters:
         subject: "01"
         run: 1
-    movie:
-      filters:
-        subject: "01"
-        run: 1
-        session: "movie"
-      features:
-        - movie.json
-      parameters:
-        skip_predictors: True

@@ -165,6 +165,8 @@ def add_dataset(db_session, bids_path, task, replace=False, verbose=True,
             pass
         db_session.commit()
 
+        if verbose:
+            print("Extracting predictors")
         """ Extract Predictors"""
         # Read event file and extract information
         tsv = pd.read_csv(open(run_events.filename, 'r'), delimiter='\t')
@@ -179,6 +181,8 @@ def add_dataset(db_session, bids_path, task, replace=False, verbose=True,
                 add_predictor(db_session, predictor, dataset_model.id, run_model.id,
                               onsets, durations, tsv[predictor].tolist())
 
+        if verbose:
+            print("Ingesting stimuli")
         """ Ingest Stimuli """
         for i, val in stims[stims!="n/a"].items():
             base_path = 'stimuli/{}'.format(val)
@@ -222,6 +226,8 @@ def add_dataset(db_session, bids_path, task, replace=False, verbose=True,
 
     db_session.commit()
 
+    if verbose:
+        print("Adding group predictors")
     """ Add GroupPredictors """
     # Participants
     participants_path = os.path.join(bids_path, 'participants.tsv')

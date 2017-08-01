@@ -59,7 +59,7 @@ services:
       - redis
     entrypoint: celery -A tasks worker --loglevel=info
     volumes:
-      - static:/static
+      - file-data:/file-data
     env_file: .env
 
   monitor:
@@ -73,6 +73,7 @@ services:
     depends_on:
       - redis
     env_file: .env
+
 volumes:
   migrations:
   file-data:

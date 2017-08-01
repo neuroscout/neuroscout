@@ -1,3 +1,4 @@
+from flask import current_app
 from flask_apispec import MethodResource, marshal_with, use_kwargs, doc
 from flask_jwt import current_identity
 from marshmallow import Schema, fields, validates, ValidationError, post_load
@@ -6,7 +7,7 @@ from db_utils import put_record
 from models import Analysis, Dataset, Run, Predictor
 from . import utils
 from worker import celery_app
-import celery.states as states
+
 
 class AnalysisSchema(Schema):
 	hash_id = fields.Str(dump_only=True, description='Hashed analysis id.')
@@ -46,6 +47,7 @@ class AnalysisSchema(Schema):
 	results = fields.Nested(
 		'ResultSchema', many=True, only=['id'], dump_only=True,
         description='Result id(s) associated with analysis')
+
 
 
 	@validates('dataset_id')
@@ -147,9 +149,10 @@ class CompileAnalysisResource(AnalysisBaseResource):
 	@doc(summary='Compile and lock analysis.')
 	@utils.owner_required
 	def post(self, analysis):
+		task = celery_app.send_task('workflow.create', args=[analysis.id])
+		current_app.logger.info(task)
 		analysis.status = 'PENDING'
-
-		## Add other triggers here
+		analysis.task_id = task.id
 		db.session.add(analysis)
 		db.session.commit()
 		return analysis
@@ -160,19 +163,13 @@ class AnalysisWorkflowResource(MethodResource):
 		 produces=["text/plain"],
 		 responses={"default": {
 			 "description" : "Nipype workflow python executable." }})
-	def get(self, analysis_id):
-		analysis = utils.first_or_404(
-			Analysis.query.filter_by(hash_id=analysis_id))
-
-		if analysis.locked is False:
-			utils.abort(
-				422, "Analysis must be locked, before workflow is accesible.")
-
-		res = celery_app.AsyncResult(analysis.task_id)
-		if res.state==states.PENDING:
-		    return res.state
-		else:
-		    return str(res.result)
+	@utils.auth_required
+	@utils.fetch_analysis
+	def get(self, analysis):
+		db.session.commit()
+		if analysis.status != "PASSED":
+			utils.abort(404, "Analysis not yet compiled")
+		return analysis.workflow
 
 @doc(tags=['analysis'])
 class AnalysisGraphResource(MethodResource):
@@ -180,16 +177,9 @@ class AnalysisGraphResource(MethodResource):
 		 produces=["image/png"],
 		 responses={"default": {
 			 "description" : "Nipype workflow python executable." }})
-	def get(self, analysis_id):
-		analysis = utils.first_or_404(
-			Analysis.query.filter_by(hash_id=analysis_id))
-
-		if analysis.locked is False:
-			utils.abort(
-				422, "Analysis must be locked, before graph is accesible.")
-
-		res = celery_app.AsyncResult(analysis.task_id)
-		if res.state==states.PENDING:
-		    return res.state
-		else:
-		    return str(res.result)
+	@utils.auth_required
+	@utils.fetch_analysis
+	def get(self, analysis):
+		if analysis.status != "PASSED":
+			utils.abort(404, "Analysis not yet compiled")
+		return analysis.workflow
