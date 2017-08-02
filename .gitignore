@@ -107,3 +107,5 @@ web/migrations
 web/frontend/build
 
 bids_test_annex
+
+jest_0
