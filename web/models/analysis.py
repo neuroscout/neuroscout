@@ -35,7 +35,7 @@ class Analysis(db.Model):
     private = db.Column(db.Boolean, default=True)
     predictions = db.Column(db.Text, default='')
 
-    task_id = db.Column(db.Text) # Celery task id
+    celery_id = db.Column(db.Text) # Celery task id
 
     dataset_id = db.Column(db.Integer, db.ForeignKey('dataset.id'), nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)

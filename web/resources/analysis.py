@@ -152,7 +152,7 @@ class CompileAnalysisResource(AnalysisBaseResource):
 		task = celery_app.send_task('workflow.create', args=[analysis.id])
 		current_app.logger.info(task)
 		analysis.status = 'PENDING'
-		analysis.task_id = task.id
+		analysis.celery_id = task.id
 		db.session.add(analysis)
 		db.session.commit()
 		return analysis
