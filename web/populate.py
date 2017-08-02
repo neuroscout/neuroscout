@@ -58,8 +58,9 @@ def add_predictor(db_session, predictor_name, dataset_id, run_id,
 
     return predictor.id
 
-def add_dataset(db_session, bids_path, task, replace=False, verbose=True,
-                install_path='.', automagic=False, skip_predictors=False, **kwargs):
+def add_dataset(db_session, task, replace=False, verbose=True,
+                install_path='.', automagic=False, skip_predictors=False,
+                address=None, bids_path=None, **kwargs):
     """ Adds a BIDS dataset task to the database.
         Args:
             db_session - sqlalchemy db db_session
@@ -76,9 +77,9 @@ def add_dataset(db_session, bids_path, task, replace=False, verbose=True,
             dataset model id
      """
 
-    if re.match('(///|git+|http)', bids_path):
+    if address is not None and bids_path is None:
         from datalad import api as dl
-        bids_path = dl.install(source=bids_path,
+        bids_path = dl.install(source=address,
                                path=install_path).path
         automagic = True
 
@@ -107,6 +108,7 @@ def add_dataset(db_session, bids_path, task, replace=False, verbose=True,
 
     if new_ds:
         dataset_model.description = description
+        dataset_model.address = address
         db_session.commit()
 
     # Get or create task
@@ -287,7 +289,7 @@ def extract_features(db_session, bids_path, task, graph_spec, verbose=True,
         from pliers.graph import Graph
 
     # Try to add dataset, will skip if already in
-    dataset_id = add_dataset(db_session, bids_path, task, **filters)
+    dataset_id = add_dataset(db_session, task, bids_path=bids_path, **filters)
 
 
     # Load event files
@@ -401,7 +403,7 @@ def extract_features(db_session, bids_path, task, graph_spec, verbose=True,
     return list(extracted_features.values())
 
 import yaml
-def ingest_from_yaml(db_session, config_file, install_path=None, automagic=False,
+def ingest_from_yaml(db_session, config_file, install_path='/file-data', automagic=False,
                      replace=False):
     datasets = yaml.load(open(config_file, 'r'))
 
@@ -410,42 +412,36 @@ def ingest_from_yaml(db_session, config_file, install_path=None, automagic=False
     # Add each dataset in config file to db
     dataset_ids = []
     for name, items in datasets.items():
-    	for task, options in items['tasks'].items():
-            remote = bool(re.match('(///|git+|http)',  items['path']))
+        address = items.get('address')
+        path = items.get('path')
+        if not (path or address):
+            raise Exception("Must provide path or remote address")
 
-            if 'filters' in options:
-            	filters = options['filters']
-            else:
-            	filters = {}
+        # If dataset is remote link, set path where to install
+        if path is None:
+            new_path = str((Path(install_path) / name).absolute())
+        else:
+            new_path = items['path']
 
-            if 'dataset_parameters' in options:
-                dp = options['add_parameters']
-            else:
-                dp = {}
+        for task, options in items['tasks'].items():
+            filters = options.get('filters', {})
 
-            # If dataset is remote link, set path where to install
-            if remote:
-                new_path = str((Path(
-                	install_path) / name).absolute())
-            else:
-                new_path = items['path']
+            dp = options.get('dataset_parameters', {})
 
-            dataset_ids.append(add_dataset(db_session, items['path'], task,
+            dataset_ids.append(add_dataset(db_session, task,
+                                bids_path=path, address=address,
             					replace=replace, automagic=automagic,
                                 verbose=True, install_path=new_path,
             					**dict(filters.items() | dp.items())))
 
-            if 'extract_parameters' in options:
-                ep = options['extract_parameters']
-            else:
-                ep = {}
+            ep = options.get('extract_parameters',{})
 
             # Extract features if pliers graphs are provided
             if 'features' in options:
                 for graph in options['features']:
                 	extract_features(db_session, new_path, task,
                 		os.path.join(base_path, graph),
-                        automagic=remote or automagic,
+                        automagic=path is None or automagic,
                         **dict(filters.items() | ep.items()))
 
 
