@@ -69,10 +69,6 @@ def test_remote_dataset(session, add_dataset_remote):
 	# Test properties of Run
 	assert Run.query.filter_by(dataset_id=add_dataset_remote).count() \
 			== dataset_model.runs.count() == 1
-	run_model =  dataset_model.runs.first()
-
-	assert run_model.predictor_events.count() == 16
-
 	predictor = Predictor.query.filter_by(name='rt').first()
 	assert predictor.predictor_events.count() == 4
 
