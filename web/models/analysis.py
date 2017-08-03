@@ -49,6 +49,7 @@ class Analysis(db.Model):
                                  backref='analysis')
     runs = db.relationship('Run',
                             secondary='analysis_run')
+
     workflow = db.Column(db.Text) # Path to workflow
 
     def clone(self, user):

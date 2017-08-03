@@ -76,7 +76,7 @@ def test_remote_dataset(session, add_dataset_remote):
 	assert Stimulus.query.count() == 4
 
 	# Test participants.tsv ingestion
-	assert GroupPredictor.query.count() == 3
+	assert GroupPredictor.filter_by(dataset_id=add_dataset_remote).query.count() == 3
 
 def test_extracted_features(add_dataset_remote):
 	""" This tests feature extraction from a remote dataset"""
