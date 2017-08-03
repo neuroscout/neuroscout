@@ -190,6 +190,7 @@ export default class AnalysisBuilder extends React.Component<BuilderProps, Store
       runs: analysis.runIds.map(id => ({ id })),
       predictors: analysis.predictorIds.map(id => ({ id })),
       transformations: analysis.transformations,
+      contrasts: analysis.contrasts,
       config: analysis.config,
     };
     // const method = analysis.analysisId ? 'put' : 'post';

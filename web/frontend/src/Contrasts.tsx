@@ -128,6 +128,7 @@ const ContrastDisplay = (props: ContrastDisplayProps) => {
           </li>
         )}
       </ul>
+      <p>{`Contrast type: ${contrast.contrastType}`}</p>
       {enableUp &&
         <Button onClick={() => onMove(index, 'up')}>
           <Icon type="arrow-up" />

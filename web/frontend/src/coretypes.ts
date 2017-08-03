@@ -5,8 +5,8 @@ export interface Analysis {
   analysisId: string | undefined;
   name: string;
   description: string;
-  datasetId: number | null;  // ID of selected dataset
-  runIds: string[];          // IDs of selected runs
+  datasetId: number | null; // ID of selected dataset
+  runIds: string[]; // IDs of selected runs
   predictions: string;
   predictorIds: string[]; // IDs of selected predictors
   status: AnalysisStatus;
@@ -31,7 +31,7 @@ export interface Run {
   number: string;
   session: string | null;
   subject: string | null;
-  task: { id: string, name: string };
+  task: { id: string; name: string };
 }
 
 export interface Task {
@@ -86,14 +86,24 @@ export interface XformRules {
 }
 
 export interface Contrast {
-  name: string;   // short name/description of contrast
-  predictors: Predictor[];
+  // short name/description of contrast
+  name: string; 
+  // For simplicilty for now store entire predictor object as opposed to just the ID. 
+  // TODO: change this to just the predictor IDs
+  predictors: Predictor[]; 
   weights: number[];
   contrastType: 'T' | 'F';
 }
 
 export interface Store {
-  activeTab: 'overview' | 'predictors' | 'transformations' | 'contrasts' | 'modeling' | 'review' | 'status';
+  activeTab:
+    | 'overview'
+    | 'predictors'
+    | 'transformations'
+    | 'contrasts'
+    | 'modeling'
+    | 'review'
+    | 'status';
   predictorsActive: boolean;
   transformationsActive: boolean;
   contrastsActive: boolean;
