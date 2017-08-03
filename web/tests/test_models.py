@@ -67,7 +67,8 @@ def test_remote_dataset(session, add_dataset_remote):
 	assert 'bidstest' == dataset_model.tasks[0].name
 
 	# Test properties of Run
-	assert Run.query.count() == dataset_model.runs.count() == 1
+	assert Run.query.filter_by(dataset_id=add_dataset_remote).count() \
+			== dataset_model.runs.count() == 1
 	run_model =  dataset_model.runs.first()
 
 	assert run_model.predictor_events.count() == 16
