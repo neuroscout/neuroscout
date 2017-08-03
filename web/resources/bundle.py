@@ -2,17 +2,18 @@ from flask_apispec import MethodResource, doc
 from marshmallow import Schema, fields
 from . import utils
 from models import PredictorEvent
-from resources import Run
+from .run import RunSchema
 
-class RunBundle(Run):
+class RunBundle(RunSchema):
 	predictor_events = fields.Nested(
 		'PredictorEventSchema', many=True, description='Predictor events',
-		exclude=['id', 'predictor_id'])
+		exclude=['id', 'run_id', 'predictor_id'])
 
 class AnalysisBundleSchema(Schema):
 	hash_id = fields.Str(dump_only=True, description='Hashed analysis id.')
 	name = fields.Str(required=True, description='Analysis name.')
-	dataset = fields.Nested('DatasetSchema', only='address')
+	dataset_address = fields.Nested('DatasetSchema', only='address',
+									load_from='dataset')
 	config = fields.Dict(description='fMRI analysis configuration parameters.')
 
 	transformations = fields.List(fields.Dict(),
@@ -38,7 +39,7 @@ class AnalysisBundleResource(MethodResource):
 		pred_ids = [p.id for p in analysis.predictors]
 
 		for r in analysis.runs:
-			r.predictor_events = PredictorEvent.query.filter(
+			r = PredictorEvent.query.filter(
 			    (PredictorEvent.predictor_id.in_(pred_ids)) & \
 			    (PredictorEvent.run_id == r.id)).all()
 		analysis.task_name = analysis.runs[0].task.name
