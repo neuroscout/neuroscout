@@ -1,4 +1,4 @@
-""""
+ """"
 Usage:
     fmri_bids_first run [options] <bids_dir> <model> <out_dir>
     fmri_bids_first make [options] <bids_dir> <model> [<out_dir>]
