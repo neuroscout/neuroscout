@@ -4,8 +4,6 @@ from models import (Analysis, User, Dataset, Predictor, Stimulus, Run,
 					GroupPredictor, GroupPredictorValue)
 
 def test_dataset_ingestion(session, add_dataset):
-	# Number of entries
-	assert Dataset.query.count() == 1
 	dataset_model = Dataset.query.filter_by(id=add_dataset).one()
 
 	# Test mimetypes
@@ -27,7 +25,7 @@ def test_dataset_ingestion(session, add_dataset):
 	assert run_model.task.description['RepetitionTime'] == 2.0
 
 	assert run_model.duration is None
-	assert run_model.path is None
+	assert run_model.func_path is None
 
 	# Test properties of first run's predictor events
 	assert run_model.predictor_events.count() == 8
@@ -62,8 +60,6 @@ def test_dataset_ingestion(session, add_dataset):
 	assert 'F' in [v.value for v in gpv]
 
 def test_remote_dataset(session, add_dataset_remote):
-	# Number of entries
-	assert Dataset.query.count() == 1
 	dataset_model = Dataset.query.filter_by(id=add_dataset_remote).one()
 
 	# Test mimetypes

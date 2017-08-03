@@ -116,7 +116,7 @@ def add_users(app, db, session):
 @pytest.fixture(scope="function")
 def add_dataset(session):
     """ Add a dataset with two subjects """
-    return populate.add_dataset(session, DATASET_PATH, 'bidstest',
+    return populate.add_dataset(session, 'bidstest', bids_path=DATASET_PATH,
                                 verbose=False)
 
 

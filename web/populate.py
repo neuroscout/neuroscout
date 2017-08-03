@@ -39,8 +39,7 @@ def add_predictor(db_session, predictor_name, dataset_id, run_id,
                                           name=predictor_name,
                                           dataset_id=dataset_id,
                                           **kwargs)
-    if isinstance(values, str):
-        values = pd.Series(values, dtype='object')
+    values = pd.Series(values, dtype='object')
     # Insert each row of Predictor as PredictorEvent
     for i, val in enumerate(values[values!='n/a']):
         pe, _ = db_utils.get_or_create(db_session, PredictorEvent,
@@ -83,6 +82,7 @@ def add_dataset(db_session, task, replace=False, verbose=True,
         bids_path = dl.install(source=address,
                                path=install_path).path
         automagic = True
+
 
     if automagic:
         from datalad.auto import AutomagicIO
