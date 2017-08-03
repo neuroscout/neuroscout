@@ -5,6 +5,7 @@ from .analysis import (AnalysisSchema, AnalysisResource,
                        AnalysisWorkflowResource,
                        AnalysisGraphResource,
                        CompileAnalysisResource)
+from .bundle import AnalysisBundleResource
 from .dataset import DatasetSchema, DatasetResource, DatasetListResource
 from .predictor import (PredictorEventSchema, PredictorSchema,
                         PredictorListResource, PredictorResource,
@@ -23,6 +24,7 @@ __all__ = [
     'AnalysisWorkflowResource',
     'AnalysisGraphResource',
     'CompileAnalysisResource',
+    'AnalysisBundleResource',
     'DatasetSchema',
     'DatasetResource',
     'DatasetListResource',

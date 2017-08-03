@@ -14,6 +14,7 @@ class DatasetSchema(Schema):
                      description='Tasks in dataset runs.')
 	runs = fields.Nested('RunSchema', many=True, only=['id'])
 	tasks = fields.Nested('TaskSchema', many=True, only=['id', 'name'])
+	address = fields.Str(description='Dataset internet address')
 
 
 class DatasetResource(MethodResource):

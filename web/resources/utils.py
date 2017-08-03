@@ -23,7 +23,7 @@ def first_or_404(query):
 def update_analysis_status(analysis, commit=True):
     """ Checks celery for updates to analysis status and results """
     if analysis.status != "DRAFT":
-    	res = celery_app.AsyncResult(analysis.task_id)
+    	res = celery_app.AsyncResult(analysis.celery_id)
     	if res.state == states.FAILURE:
     		analysis.status = "FAILED"
     	elif res.state != states.SUCCESS:

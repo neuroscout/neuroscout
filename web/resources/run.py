@@ -19,7 +19,7 @@ class RunResource(MethodResource):
     @marshal_with(RunSchema)
     def get(self, run_id):
         return utils.first_or_404(Run.query.filter_by(id=run_id))
-		
+
 class RunListResource(MethodResource):
     @doc(tags=['run'], summary='Returns list of runs.')
     @use_kwargs({

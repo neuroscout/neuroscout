@@ -15,7 +15,10 @@ class Dataset(db.Model):
 	                             lazy='dynamic')
 
 	tasks = db.relationship('Task', backref='dataset')
-
+	analyses = db.relationship('Analysis', backref='dataset',
+	                            lazy='dynamic')
+	address = db.Column(db.Text)
+	
 	@hybrid_property
 	def mimetypes(self):
 		""" List of mimetypes of stimuli in dataset """
