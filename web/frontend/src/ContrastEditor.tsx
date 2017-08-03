@@ -35,7 +35,7 @@ export default class ContrastEditor extends React.Component<
       predictors: [],
       name: contrast ? contrast.name : '',
       weights: contrast ? contrast.weights : [],
-      contrastType: 'T',
+      contrastType: 't',
       errors: []
     };
   }
@@ -97,8 +97,8 @@ export default class ContrastEditor extends React.Component<
               closable={true}
               message={
                 <ul>
-                  {errors.map(x =>
-                    <li>
+                  {errors.map((x, i) =>
+                    <li key={i}>
                       {x}
                     </li>
                   )}
@@ -143,11 +143,11 @@ export default class ContrastEditor extends React.Component<
               />
             </FormItem>
           )}
-          <FormItem>
+          <FormItem label={'Contrast type:'}>
             <RadioGroup
               value={contrastType}
               onChange={(event: any) =>
-                this.setState({ contrastType: event.target.value as 'T' | 'F' })}
+                this.setState({ contrastType: event.target.value as 't' | 'F' })}
             >
               {CONTRAST_TYPE_OPTIONS.map(x =>
                 <Radio key={x} value={x}>

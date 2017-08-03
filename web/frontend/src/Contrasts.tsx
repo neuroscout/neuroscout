@@ -119,8 +119,7 @@ const ContrastDisplay = (props: ContrastDisplayProps) => {
   return (
     <div>
       <h3>{`${index + 1}: ${contrast.name}`}</h3>
-      <p>{`Inputs: ${inputs!.join(', ')}`}</p>
-      <p>Parameters:</p>
+      <p>Weights:</p>
       <ul>
         {contrast.predictors.map((predictor, i) =>
           <li key={predictor.id}>

@@ -92,7 +92,7 @@ export interface Contrast {
   // TODO: change this to just the predictor IDs
   predictors: Predictor[]; 
   weights: number[];
-  contrastType: 'T' | 'F';
+  contrastType: 't' | 'F';
 }
 
 export interface Store {

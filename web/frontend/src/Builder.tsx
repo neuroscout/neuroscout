@@ -23,6 +23,8 @@ const EMAIL = 'test2@test.com';
 const PASSWORD = 'password';
 const DEFAULT_SMOOTHING = 50;
 
+const defaultConfig: AnalysisConfig = { smoothing: DEFAULT_SMOOTHING, predictorConfigs: {} };
+
 // Create initialized app state (used in the constructor of the top-level App component)
 const initializeStore = (): Store => ({
   activeTab: 'overview',
@@ -41,7 +43,7 @@ const initializeStore = (): Store => ({
     predictorIds: [],
     status: 'DRAFT',
     private: true,
-    config: { smoothing: DEFAULT_SMOOTHING, predictorConfigs: {} },
+    config: defaultConfig,
     transformations: [],
     contrasts: [],
   },
@@ -242,7 +244,7 @@ export default class AnalysisBuilder extends React.Component<BuilderProps, Store
       datasetId: data.dataset_id,
       runIds: data.runs!.map(({ id }) => id),
       predictorIds: data.predictors!.map(({ id }) => id),
-      config: data.config, 
+      config: data.config || defaultConfig, 
       transformations: data.transformations.filter(xform => xform.name), // TODO: remove the filter once this issue is fixed: https://github.com/PsychoinformaticsLab/neuroscout/issues/99
       contrasts: data.contrasts || [],
     };
