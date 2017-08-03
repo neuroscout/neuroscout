@@ -17,9 +17,10 @@ class PredictorEventSchema(Schema):
 	id = fields.Str()
 	onset = fields.Number(description="Onset in seconds.")
 	duration = fields.Number(description="Duration in seconds.")
-	value = fields.Number(description="Value, or amplitude.")
+	value = fields.Str(description="Value, or amplitude.")
 	run_id = fields.Int()
 	predictor_id = fields.Int()
+	predictor = fields.Nested('PredictorSchema', only='id')
 
 class PredictorRunSchema(Schema):
 	run_id = fields.Int()
@@ -56,7 +57,7 @@ class PredictorListResource(MethodResource):
 
 class PredictorEventListResource(MethodResource):
 	@doc(tags=['predictors'], summary='Get events for predictor(s)',)
-	@marshal_with(PredictorEventSchema(many=True))
+	@marshal_with(PredictorEventSchema(many=True, exclude=['predictor']))
 	@use_kwargs({
 	    'run_id': wa.fields.DelimitedList(fields.Int(),
 	                                      description="Run id(s)"),

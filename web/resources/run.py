@@ -12,11 +12,14 @@ class RunSchema(Schema):
 	duration = fields.Number(description='Total run duration in seconds.')
 	dataset_id = fields.Int(description='Dataset run belongs to.')
 	task = fields.Nested('TaskSchema', only=['id', 'name'],
-                        description="Task id and name")
+	                    description="Task id and name")
+	func_path = fields.Str(description='Path of functional file')
+	mask_path = fields.Str(description='Path of brain mask')
 
+exclude = ['func_path', 'mask_path']
 class RunResource(MethodResource):
     @doc(tags=['run'], summary='Get run by id.')
-    @marshal_with(RunSchema)
+    @marshal_with(RunSchema(exclude=exclude))
     def get(self, run_id):
         return utils.first_or_404(Run.query.filter_by(id=run_id))
 
@@ -33,7 +36,7 @@ class RunListResource(MethodResource):
                                            description='Subject id(s).'),
         'dataset_id': wa.fields.Int(description='Dataset id.'),
     }, locations=['query'])
-    @marshal_with(RunSchema(many=True))
+    @marshal_with(RunSchema(many=True, exclude=exclude))
     def get(self, **kwargs):
         try:
             dataset = kwargs.pop('dataset_id')

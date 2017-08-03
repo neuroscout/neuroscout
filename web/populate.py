@@ -39,9 +39,10 @@ def add_predictor(db_session, predictor_name, dataset_id, run_id,
                                           name=predictor_name,
                                           dataset_id=dataset_id,
                                           **kwargs)
-
+    if isinstance(values, str):
+        values = pd.Series(values, dtype='object')
     # Insert each row of Predictor as PredictorEvent
-    for i, val in enumerate(values):
+    for i, val in enumerate(values[values!='n/a']):
         pe, _ = db_utils.get_or_create(db_session, PredictorEvent,
                                        commit=False,
                                        onset=onsets[i],
@@ -60,7 +61,7 @@ def add_predictor(db_session, predictor_name, dataset_id, run_id,
 
 def add_dataset(db_session, task, replace=False, verbose=True,
                 install_path='.', automagic=False, skip_predictors=False,
-                address=None, bids_path=None, **kwargs):
+                address=None, bids_path=None, name=None, **kwargs):
     """ Adds a BIDS dataset task to the database.
         Args:
             db_session - sqlalchemy db db_session
@@ -100,7 +101,10 @@ def add_dataset(db_session, task, replace=False, verbose=True,
     task_description = json.load(open(
         os.path.join(bids_path, 'task-{}_bold.json'.format(task)), 'r'))
 
-    dataset_name = description['Name']
+    if name is not None:
+        dataset_name = name
+    else:
+        dataset_name = description['Name']
 
     # Get or create dataset model from mandatory arguments
     dataset_model, new_ds = db_utils.get_or_create(db_session, Dataset,
@@ -157,14 +161,21 @@ def add_dataset(db_session, task, replace=False, verbose=True,
             print("Error loading BOLD file, duration not loaded.")
 
         preprocs = layout.get(type='preproc', return_type='file', **entities)
-
+        masks = layout.get(type='brainmask', return_type='file', **entities)
         try: # Try to get path of preprocessed data
-            mni = [re.findall('derivatives.*MNI152.*', pre)
+            func = [re.findall('derivatives.*MNI152.*', pre)
                        for pre in preprocs
                        if re.findall('derivatives.*MNI152.*', pre)]
-            run_model.path = [item for sublist in mni for item in sublist][0]
+
+            mask = [re.findall('derivatives.*MNI152.*', pre)
+                       for pre in masks
+                       if re.findall('derivatives.*MNI152.*', pre)]
+
+            run_model.func_path = [item for sublist in func for item in sublist][0]
+            run_model.mask_path = [item for sublist in mask for item in sublist][0]
         except IndexError:
             pass
+
         db_session.commit()
 
         if verbose:
@@ -181,7 +192,7 @@ def add_dataset(db_session, task, replace=False, verbose=True,
             # Parse event columns and insert as Predictors
             for predictor in tsv.keys():
                 add_predictor(db_session, predictor, dataset_model.id, run_model.id,
-                              onsets, durations, tsv[predictor].tolist())
+                              onsets, durations, tsv[predictor])
 
         if verbose:
             print("Ingesting stimuli")
@@ -432,6 +443,7 @@ def ingest_from_yaml(db_session, config_file, install_path='/file-data', automag
                                 bids_path=path, address=address,
             					replace=replace, automagic=automagic,
                                 verbose=True, install_path=new_path,
+                                name=name,
             					**dict(filters.items() | dp.items())))
 
             ep = options.get('extract_parameters',{})

@@ -16,7 +16,8 @@ class Run(db.Model):
     number = db.Column(db.Text)
 
     duration = db.Column(db.Float)
-    path = db.Column(db.Text) # Relative to BIDS root
+    func_path = db.Column(db.Text) # Relative to BIDS root
+    mask_path = db.Column(db.Text)
 
     task_id = db.Column(db.Integer, db.ForeignKey('task.id'),
                            nullable=False)

@@ -3,13 +3,6 @@ from marshmallow import Schema, fields
 from . import utils
 from models import PredictorEvent
 
-class PredictorEventSchemaBundle(Schema):
-	onset = fields.Number(description="Onset in seconds.")
-	duration = fields.Number(description="Duration in seconds.")
-	value = fields.Number(description="Value, or amplitude.")
-	run_id = fields.Int()
-	predictor = fields.Nested('PredictorSchema', only='id')
-
 class AnalysisBundleSchema(Schema):
 	hash_id = fields.Str(dump_only=True, description='Hashed analysis id.')
 	name = fields.Str(required=True, description='Analysis name.')
@@ -25,7 +18,8 @@ class AnalysisBundleSchema(Schema):
 	predictors = fields.Nested('PredictorSchema', many=True, only=['id', 'name'])
 
 	predictor_events = fields.Nested(
-		PredictorEventSchemaBundle, many=True, description='Predictor events')
+		'PredictorEventSchema', many=True, description='Predictor events',
+		exclude=['id', 'predictor_id'])
 	runs = fields.Nested(
 		'RunSchema', many=True, description='Runs associated with analysis',
 	    only=['id', 'subject', 'session', 'number'])
