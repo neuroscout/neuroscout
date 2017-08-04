@@ -20,7 +20,6 @@ class PredictorEventSchema(Schema):
 	value = fields.Str(description="Value, or amplitude.")
 	run_id = fields.Int()
 	predictor_id = fields.Int()
-	predictor = fields.Nested('PredictorSchema', only='id')
 
 class PredictorRunSchema(Schema):
 	run_id = fields.Int()
