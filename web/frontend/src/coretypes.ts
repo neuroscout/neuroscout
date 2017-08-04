@@ -87,10 +87,10 @@ export interface XformRules {
 
 export interface Contrast {
   // short name/description of contrast
-  name: string; 
-  // For simplicilty for now store entire predictor object as opposed to just the ID. 
+  name: string;
+  // For simplicilty for now store entire predictor object as opposed to just the ID.
   // TODO: change this to just the predictor IDs
-  predictors: Predictor[]; 
+  predictors: Predictor[];
   weights: number[];
   contrastType: 't' | 'F';
 }

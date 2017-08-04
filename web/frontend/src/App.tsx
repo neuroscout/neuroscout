@@ -6,10 +6,7 @@ import { ApiUser, ApiAnalysis, AppAnalysis } from './coretypes';
 import Home from './Home';
 import AnalysisBuilder from './Builder';
 import Browse from './Browse';
-import {
-  BrowserRouter as Router,
-  Route, Link, Redirect
-} from 'react-router-dom';
+import { BrowserRouter as Router, Route, Link, Redirect } from 'react-router-dom';
 import './App.css';
 
 const FormItem = Form.Item;
@@ -33,15 +30,13 @@ interface AppState {
   publicAnalyses: AppAnalysis[];
 }
 
-const ApiToAppAnalysis = (data: ApiAnalysis): AppAnalysis => (
-  {
-    id: data.hash_id!,
-    name: data.name,
-    description: data.description,
-    status: data.status,
-    modifiedAt: data.modified_at
-  }
-);
+const ApiToAppAnalysis = (data: ApiAnalysis): AppAnalysis => ({
+  id: data.hash_id!,
+  name: data.name,
+  description: data.description,
+  status: data.status,
+  modifiedAt: data.modified_at
+});
 
 class App extends React.Component<{}, AppState> {
   constructor(props) {
@@ -55,13 +50,13 @@ class App extends React.Component<{}, AppState> {
       openSignup: false,
       loginError: '',
       signupError: '',
-      email: email || 'test2@test.com',  // For development - remove test2@test.com later
+      email: email || 'test2@test.com', // For development - remove test2@test.com later
       name: null,
       jwt: jwt,
       password: 'password', // For development - set to '' in production
       nextURL: null,
       analyses: [],
-      publicAnalyses: [],
+      publicAnalyses: []
     };
     if (jwt) this.loadAnalyses();
     this.loadPublicAnalyses();
@@ -69,54 +64,58 @@ class App extends React.Component<{}, AppState> {
 
   loadAnalyses = () => {
     if (this.state.jwt) {
-      return jwtFetch(`${DOMAINROOT}/api/user`)
-        // .then(response => response.json())
-        .then((data: ApiUser) => {
-          this.setState({
-            analyses: (data.analyses || [])
-              .filter(x => !!x.status)  // Ignore analyses with missing status
-              .map(x => ApiToAppAnalysis(x))
-          });
-        })
-        .catch(displayError);
+      return (
+        jwtFetch(`${DOMAINROOT}/api/user`)
+          // .then(response => response.json())
+          .then((data: ApiUser) => {
+            this.setState({
+              analyses: (data.analyses || [])
+                .filter(x => !!x.status) // Ignore analyses with missing status
+                .map(x => ApiToAppAnalysis(x))
+            });
+          })
+          .catch(displayError)
+      );
     }
     return Promise.reject('You are not logged in');
-  }
+  };
 
-  loadPublicAnalyses = () => fetch(`${DOMAINROOT}/api/analyses`)
-    .then(response => response.json())
-    .then((data: ApiAnalysis[]) => {
-      this.setState({
-        publicAnalyses: data
-          .filter(x => !!x.status)  // Ignore analyses with missing status
-          .map(x => ApiToAppAnalysis(x))
-      });
-    })
-    .catch(displayError);
-
-  authenticate = () => new Promise((resolve, reject) => {
-    const { email, password } = this.state;
-    fetch(DOMAINROOT + '/api/auth', {
-      method: 'post',
-      body: JSON.stringify({ email: email, password: password }),
-      headers: {
-        'Content-type': 'application/json'
-      }
-    })
+  loadPublicAnalyses = () =>
+    fetch(`${DOMAINROOT}/api/analyses`)
       .then(response => response.json())
-      .then((data: { status_code: number, access_token?: string, description?: string }) => {
-        if (data.access_token) {
-          message.success('Authentication successful');
-          localStorage.setItem('jwt', data.access_token);
-          localStorage.setItem('email', email!);
-          resolve(data.access_token);
-        } else if (data.status_code === 401) {
-          this.setState({ loginError: data.description || '' });
-          reject('Authentication failed');
-        }
+      .then((data: ApiAnalysis[]) => {
+        this.setState({
+          publicAnalyses: data
+            .filter(x => !!x.status) // Ignore analyses with missing status
+            .map(x => ApiToAppAnalysis(x))
+        });
       })
       .catch(displayError);
-  });
+
+  authenticate = () =>
+    new Promise((resolve, reject) => {
+      const { email, password } = this.state;
+      fetch(DOMAINROOT + '/api/auth', {
+        method: 'post',
+        body: JSON.stringify({ email: email, password: password }),
+        headers: {
+          'Content-type': 'application/json'
+        }
+      })
+        .then(response => response.json())
+        .then((data: { status_code: number; access_token?: string; description?: string }) => {
+          if (data.access_token) {
+            message.success('Authentication successful');
+            localStorage.setItem('jwt', data.access_token);
+            localStorage.setItem('email', email!);
+            resolve(data.access_token);
+          } else if (data.status_code === 401) {
+            this.setState({ loginError: data.description || '' });
+            reject('Authentication failed');
+          }
+        })
+        .catch(displayError);
+    });
 
   login = () => {
     const { email, password, loggedIn, openLogin, nextURL } = this.state;
@@ -133,7 +132,7 @@ class App extends React.Component<{}, AppState> {
       })
       .then(() => this.loadAnalyses())
       .catch(displayError);
-  }
+  };
 
   signup = () => {
     const { name, email, password, openSignup } = this.state;
@@ -148,13 +147,13 @@ class App extends React.Component<{}, AppState> {
       .then((data: any) => {
         if (data.statusCode !== 200) {
           let errorMessage = '';
-          Object.keys(data.message).forEach((key) => {
+          Object.keys(data.message).forEach(key => {
             errorMessage += data.message[key];
           });
           this.setState({
-            signupError: errorMessage,
+            signupError: errorMessage
           });
-          throw new Error("Signup failed!");
+          throw new Error('Signup failed!');
         }
         message.success('Signup successful');
         const { name, email, password } = data;
@@ -162,19 +161,19 @@ class App extends React.Component<{}, AppState> {
       })
       .then(() => this.login())
       .catch(displayError);
-  }
+  };
 
   logout = () => {
     localStorage.removeItem('jwt');
     localStorage.removeItem('email');
     this.setState({ loggedIn: false, name: null, email: null, jwt: null, analyses: [] });
-  }
+  };
 
   setStateFromInput = (name: keyof AppState) => (event: React.FormEvent<HTMLInputElement>) => {
     const newState = {};
     newState[name] = event.currentTarget.value;
     this.setState(newState);
-  }
+  };
 
   deleteAnalysis = (id): void => {
     jwtFetch(`${DOMAINROOT}/api/analyses/${id}`, { method: 'delete' })
@@ -188,7 +187,7 @@ class App extends React.Component<{}, AppState> {
         this.setState({ analyses: this.state.analyses.filter(a => a.id !== id) });
       })
       .catch(displayError);
-  }
+  };
 
   onDelete = (analysis: AppAnalysis) => {
     const { deleteAnalysis } = this;
@@ -203,9 +202,9 @@ class App extends React.Component<{}, AppState> {
       cancelText: 'No',
       onOk() {
         deleteAnalysis(analysis.id);
-      },
+      }
     });
-  }
+  };
 
   cloneAnalysis = (id): void => {
     jwtFetch(`${DOMAINROOT}/api/analyses/${id}/clone`, { method: 'post' })
@@ -220,7 +219,7 @@ class App extends React.Component<{}, AppState> {
         this.setState({ analyses: this.state.analyses.concat([analysis]) });
       })
       .catch(displayError);
-  }
+  };
 
   // loginAndNavigate = (nextURL: string) => {
   //   if (this.state.loggedIn) {
@@ -240,18 +239,38 @@ class App extends React.Component<{}, AppState> {
   // });
 
   render() {
-    const { loggedIn, email, name, openLogin, openSignup, loginError, signupError,
-      password, analyses, publicAnalyses } = this.state;
-    const loginModal = () => (
+    const {
+      loggedIn,
+      email,
+      name,
+      openLogin,
+      openSignup,
+      loginError,
+      signupError,
+      password,
+      analyses,
+      publicAnalyses
+    } = this.state;
+    const loginModal = () =>
       <Modal
         title="Log into Neuroscout"
         visible={openLogin}
         footer={null}
         maskClosable={true}
-        onCancel={e => { this.setState({ openLogin: false }); }}
+        onCancel={e => {
+          this.setState({ openLogin: false });
+        }}
       >
-        <p>{loginError ? loginError : 'For development try "test2@test.com" and "password"'}</p><br />
-        <Form onSubmit={e => { e.preventDefault(); this.login(); }}>
+        <p>
+          {loginError ? loginError : 'For development try "test2@test.com" and "password"'}
+        </p>
+        <br />
+        <Form
+          onSubmit={e => {
+            e.preventDefault();
+            this.login();
+          }}
+        >
           <FormItem>
             <Input
               placeholder="Email"
@@ -270,26 +289,32 @@ class App extends React.Component<{}, AppState> {
             />
           </FormItem>
           <FormItem>
-            <Button
-              style={{ width: '100%' }}
-              htmlType="submit"
-              type="primary"
-            >Log in
+            <Button style={{ width: '100%' }} htmlType="submit" type="primary">
+              Log in
             </Button>
           </FormItem>
         </Form>
-      </Modal>
-    );
-    const signupModal = () => (
+      </Modal>;
+    const signupModal = () =>
       <Modal
         title="Sign up for a Neuroscout account"
         visible={openSignup}
         footer={null}
         maskClosable={true}
-        onCancel={e => { this.setState({ openSignup: false }); }}
+        onCancel={e => {
+          this.setState({ openSignup: false });
+        }}
       >
-        <p>{signupError}</p><br />
-        <Form onSubmit={e => { e.preventDefault(); this.signup(); }}>
+        <p>
+          {signupError}
+        </p>
+        <br />
+        <Form
+          onSubmit={e => {
+            e.preventDefault();
+            this.signup();
+          }}
+        >
           <FormItem>
             <Input
               placeholder="Full name"
@@ -316,16 +341,12 @@ class App extends React.Component<{}, AppState> {
             />
           </FormItem>
           <FormItem>
-            <Button
-              style={{ width: '100%' }}
-              type="primary"
-              htmlType="submit"
-            >Sign up
+            <Button style={{ width: '100%' }} type="primary" htmlType="submit">
+              Sign up
             </Button>
           </FormItem>
         </Form>
-      </Modal>
-    );
+      </Modal>;
     return (
       <Router>
         <div>
@@ -337,51 +358,61 @@ class App extends React.Component<{}, AppState> {
                 <Col span={18}>
                   <Row type="flex" justify="space-between">
                     <Col span={12}>
-                      <h1><Link to="/">Neuroscout</Link></h1>
+                      <h1>
+                        <Link to="/">Neuroscout</Link>
+                      </h1>
                     </Col>
                     <Col span={6}>
-                      {loggedIn ?
-                        (
-                          <span>{`Logged in as ${email}`}
+                      {loggedIn
+                        ? <span>
+                            {`Logged in as ${email}`}
                             <Space />
                             <Button onClick={e => this.logout()}>Log out</Button>
                           </span>
-                        ) :
-                        (
-                          <span>
-                            <Button onClick={e => this.setState({ openLogin: true })}>Log in</Button>
+                        : <span>
+                            <Button onClick={e => this.setState({ openLogin: true })}>
+                              Log in
+                            </Button>
                             <Space />
-                            <Button onClick={e => this.setState({ openSignup: true })}>Sign up</Button>
-                          </span>
-                        )
-                      }
+                            <Button onClick={e => this.setState({ openSignup: true })}>
+                              Sign up
+                            </Button>
+                          </span>}
                     </Col>
                   </Row>
                 </Col>
               </Row>
             </Header>
             <Content style={{ background: '#fff' }}>
-              <Route exact path="/" render={props =>
-                <Home
-                  analyses={analyses}
-                  loggedIn={loggedIn}
-                  cloneAnalysis={this.cloneAnalysis}
-                  onDelete={this.onDelete}
-                />
-              }
+              <Route
+                exact
+                path="/"
+                render={props =>
+                  <Home
+                    analyses={analyses}
+                    loggedIn={loggedIn}
+                    cloneAnalysis={this.cloneAnalysis}
+                    onDelete={this.onDelete}
+                  />}
               />
-              <Route exact path="/builder" render={(props) =>
-                <AnalysisBuilder updatedAnalysis={() => this.loadAnalyses()} />}
+              <Route
+                exact
+                path="/builder"
+                render={props => <AnalysisBuilder updatedAnalysis={() => this.loadAnalyses()} />}
               />
-              <Route path="/builder/:id" render={(props) =>
-                <AnalysisBuilder id={props.match.params.id} updatedAnalysis={() => this.loadAnalyses()} />}
+              <Route
+                path="/builder/:id"
+                render={props =>
+                  <AnalysisBuilder
+                    id={props.match.params.id}
+                    updatedAnalysis={() => this.loadAnalyses()}
+                  />}
               />
-              <Route exact path="/browse" render={
-                (props) => <Browse
-                  analyses={publicAnalyses}
-                  cloneAnalysis={this.cloneAnalysis}
-                />
-              }
+              <Route
+                exact
+                path="/browse"
+                render={props =>
+                  <Browse analyses={publicAnalyses} cloneAnalysis={this.cloneAnalysis} />}
               />
             </Content>
             <Footer style={{ background: '#fff' }}>
@@ -394,7 +425,7 @@ class App extends React.Component<{}, AppState> {
             </Footer>
           </Layout>
         </div>
-      </Router >
+      </Router>
     );
   }
 }

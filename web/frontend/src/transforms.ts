@@ -13,17 +13,13 @@ const trasnformationSchema = {
           name: { type: 'string' },
           kind: { type: 'boolean' },
           value: {
-            anyOf: [
-              { type: 'boolean' },
-              { type: 'array' },
-            ]
+            anyOf: [{ type: 'boolean' }, { type: 'array' }]
           }
         }
       }
-
     }
   }
-}
+};
 
 const transformDefinitions: Transformation[] = [
   {
@@ -32,12 +28,12 @@ const transformDefinitions: Transformation[] = [
       {
         name: 'demean',
         kind: 'boolean',
-        value: false, // default value
+        value: false // default value
       },
       {
         name: 'scale',
         kind: 'boolean',
-        value: true, // default value
+        value: true // default value
       }
     ]
   },
@@ -47,7 +43,7 @@ const transformDefinitions: Transformation[] = [
       {
         name: 'wrt',
         kind: 'predictors',
-        value: [],
+        value: []
       }
     ]
   }

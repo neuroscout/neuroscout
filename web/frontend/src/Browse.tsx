@@ -8,7 +8,9 @@ const Browse = (props: AnalysisListProps) => {
     <div>
       <Row type="flex" justify="center">
         <Col span={16}>
-          <h2>{'Public Analyses'}</h2>
+          <h2>
+            {'Public Analyses'}
+          </h2>
           <br />
         </Col>
       </Row>

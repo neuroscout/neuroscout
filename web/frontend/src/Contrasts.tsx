@@ -1,15 +1,5 @@
 import * as React from 'react';
-import {
-  Table,
-  Input,
-  Button,
-  Row,
-  Col,
-  Form,
-  Select,
-  Checkbox,
-  Icon
-} from 'antd';
+import { Table, Input, Button, Row, Col, Form, Select, Checkbox, Icon } from 'antd';
 import { TableProps, TableRowSelection } from 'antd/lib/table/Table';
 import { Predictor, Contrast } from './coretypes';
 import { displayError, moveItem } from './utils';
@@ -28,10 +18,7 @@ interface ContrastsTabState {
   mode: 'add' | 'edit' | 'view';
 }
 
-export class ContrastsTab extends React.Component<
-  ContrastsTabProps,
-  ContrastsTabState
-> {
+export class ContrastsTab extends React.Component<ContrastsTabProps, ContrastsTabState> {
   constructor(props: ContrastsTabProps) {
     super();
     this.state = { mode: 'view' };

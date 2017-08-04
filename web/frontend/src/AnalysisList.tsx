@@ -19,16 +19,19 @@ const AnalysisList = (props: AnalysisListProps) => {
   return (
     <Row type="flex" justify="center">
       <Col span={18}>
-        {analyses!.map(analysis => (
+        {analyses!.map(analysis =>
           <div key={analysis.id}>
-            <Card
-              title={analysis.name}
-              extra={<Status status={analysis.status} />}
-            >
+            <Card title={analysis.name} extra={<Status status={analysis.status} />}>
               <Row>
                 <Col span={18}>
-                  <p><strong>Description: </strong>{analysis.description || 'N/A'}</p>
-                  <p><strong>Last modified: </strong>{analysis.modifiedAt}</p>
+                  <p>
+                    <strong>Description: </strong>
+                    {analysis.description || 'N/A'}
+                  </p>
+                  <p>
+                    <strong>Last modified: </strong>
+                    {analysis.modifiedAt}
+                  </p>
                   <br />
                 </Col>
               </Row>
@@ -37,39 +40,34 @@ const AnalysisList = (props: AnalysisListProps) => {
                   <Button
                     type="primary"
                     ghost={true}
-                    onClick={() => message.warning('Analysis viewer not implemented yet. Try the Edit button to open analysis in Builder')}
-                  >View
+                    onClick={() =>
+                      message.warning(
+                        'Analysis viewer not implemented yet. Try the Edit button to open analysis in Builder'
+                      )}
+                  >
+                    View
                   </Button>
                   <Space />
                   {!publicList &&
-                    <Button
-                      type="primary"
-                      ghost={true}
-                    ><Link to={`/builder/${analysis.id}`}>Edit</Link>
-                    </Button>
-                  }
+                    <Button type="primary" ghost={true}>
+                      <Link to={`/builder/${analysis.id}`}>Edit</Link>
+                    </Button>}
                   <Space />
-                  <Button
-                    type="primary"
-                    ghost={true}
-                    onClick={() => cloneAnalysis(analysis.id)}
-                  >Clone
+                  <Button type="primary" ghost={true} onClick={() => cloneAnalysis(analysis.id)}>
+                    Clone
                   </Button>
                   <Space />
-                  {analysis.status === 'DRAFT' && !publicList &&
-                    <Button
-                      type="danger"
-                      ghost={true}
-                      onClick={() => onDelete!(analysis)}
-                    >Delete
-                    </Button>
-                  }
+                  {analysis.status === 'DRAFT' &&
+                    !publicList &&
+                    <Button type="danger" ghost={true} onClick={() => onDelete!(analysis)}>
+                      Delete
+                    </Button>}
                 </Col>
               </Row>
             </Card>
             <br />
           </div>
-        ))}
+        )}
       </Col>
     </Row>
   );
