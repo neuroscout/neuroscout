@@ -1,5 +1,17 @@
 import * as React from 'react';
-import { Form, Table, Input, Button, Row, Col, Slider, InputNumber, Collapse, Checkbox, Select } from 'antd';
+import {
+  Form,
+  Table,
+  Input,
+  Button,
+  Row,
+  Col,
+  Slider,
+  InputNumber,
+  Collapse,
+  Checkbox,
+  Select
+} from 'antd';
 import { TableProps, TableRowSelection } from 'antd/lib/table/Table';
 import { Analysis, AnalysisConfig, Predictor, PredictorConfig } from './coretypes';
 const FormItem = Form.Item;
@@ -15,19 +27,17 @@ interface OptionsTabProps {
   updateConfig: (newConfig: AnalysisConfig) => void;
 }
 
-interface OptionsTabState {
-}
+interface OptionsTabState {}
 
 export default class OptionsTab extends React.Component<OptionsTabProps, OptionsTabState> {
-  state = {
-  };
+  state = {};
 
   updateGlobalConfig = (key: keyof AnalysisConfig) => (value: any) => {
     const { analysis, updateConfig } = this.props;
     const newConfig: AnalysisConfig = { ...analysis.config };
     newConfig[key] = value;
     updateConfig(newConfig);
-  }
+  };
 
   updatePredictorConfig = (id: string, key: keyof PredictorConfig, value: any) => {
     const { analysis, updateConfig } = this.props;
@@ -36,7 +46,7 @@ export default class OptionsTab extends React.Component<OptionsTabProps, Options
     newPredictorConfig[id][key] = value;
     newConfig.predictorConfigs = newPredictorConfig;
     updateConfig(newConfig);
-  }
+  };
 
   render() {
     const { analysis, selectedPredictors } = this.props;
@@ -80,25 +90,31 @@ export default class OptionsTab extends React.Component<OptionsTabProps, Options
                     <Select
                       style={{ width: 120 }}
                       value={convolution}
-                      onChange={(value) => this.updatePredictorConfig(id, 'convolution', value)}
+                      onChange={value => this.updatePredictorConfig(id, 'convolution', value)}
                     >
-                      {['Gamma', 'Alpha', 'Beta'].map(conv => <Option value={conv} key={conv}>{conv}</Option>)}
+                      {['Gamma', 'Alpha', 'Beta'].map(conv =>
+                        <Option value={conv} key={conv}>
+                          {conv}
+                        </Option>
+                      )}
                     </Select>
                   </FormItem>
                   <Checkbox
                     checked={temporalDerivative}
-                    onChange={() => this.updatePredictorConfig(id, 'temporalDerivative', !temporalDerivative)}
-                  >{'Temporal Derivative'}
+                    onChange={() =>
+                      this.updatePredictorConfig(id, 'temporalDerivative', !temporalDerivative)}
+                  >
+                    {'Temporal Derivative'}
                   </Checkbox>
                   <Checkbox
                     checked={orthogonalize}
                     onChange={() => this.updatePredictorConfig(id, 'orthogonalize', !orthogonalize)}
-                  >{'Orthogonalize'}
+                  >
+                    {'Orthogonalize'}
                   </Checkbox>
                 </Panel>
               );
-            }
-            )}
+            })}
           </Collapse>
         </Form>
       </div>

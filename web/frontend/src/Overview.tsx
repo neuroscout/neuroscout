@@ -29,15 +29,22 @@ export class OverviewTab extends React.Component<OverviewTabProps, any> {
     let newAnalysis = { ...this.props.analysis };
     newAnalysis[attrName] = value;
     this.props.updateAnalysis(newAnalysis);
-  }
+  };
 
   updateAnalysisFromEvent = (attrName: string) => (event: React.FormEvent<HTMLInputElement>) => {
     this.updateAnalysis(attrName)(event.currentTarget.value);
-  }
+  };
 
   render() {
-    const { analysis, datasets, availableTasks, availableRuns,
-      selectedTaskId, goToNextTab, predictorsActive } = this.props;
+    const {
+      analysis,
+      datasets,
+      availableTasks,
+      availableRuns,
+      selectedTaskId,
+      goToNextTab,
+      predictorsActive
+    } = this.props;
 
     const datasetColumns = [
       { title: 'Name', dataIndex: 'name', width: 60 },
@@ -62,7 +69,7 @@ export class OverviewTab extends React.Component<OverviewTabProps, any> {
         this.updateAnalysis('datasetId')(record.id);
       },
       // selections: datasetSelections,
-      selectedRowKeys: selectedDatasetId,
+      selectedRowKeys: selectedDatasetId
     };
 
     const taskColumns = [
@@ -76,7 +83,7 @@ export class OverviewTab extends React.Component<OverviewTabProps, any> {
       onSelect: (record, selected, selectedRows) => {
         this.props.updateSelectedTaskId(record.id);
       },
-      selectedRowKeys: selectedTaskId ? [selectedTaskId] : [],
+      selectedRowKeys: selectedTaskId ? [selectedTaskId] : []
     };
 
     const runColumns = [
@@ -132,7 +139,8 @@ export class OverviewTab extends React.Component<OverviewTabProps, any> {
               autosize={{ minRows: 3, maxRows: 20 }}
             />
           </FormItem>
-          <p>Select a dataset:</p><br />
+          <p>Select a dataset:</p>
+          <br />
           <DataTable
             columns={datasetColumns}
             rowKey="id"
@@ -143,36 +151,38 @@ export class OverviewTab extends React.Component<OverviewTabProps, any> {
           />
           <br />
           {availableRuns.length > 0 &&
-            (
-              <div>
-                <p>Select a task:</p><br />
-                <DataTable
-                  columns={taskColumns}
-                  rowKey="id"
-                  size="small"
-                  dataSource={availableTasks}
-                  rowSelection={taskRowSelection}
-                  pagination={datasets.length > 20}
-                />
-                <br />
-              </div>)
-          }
+            <div>
+              <p>Select a task:</p>
+              <br />
+              <DataTable
+                columns={taskColumns}
+                rowKey="id"
+                size="small"
+                dataSource={availableTasks}
+                rowSelection={taskRowSelection}
+                pagination={datasets.length > 20}
+              />
+              <br />
+            </div>}
           {selectedTaskId &&
-            (
-              <div>
-                <p>Select runs:</p><br />
-                <DataTable
-                  columns={runColumns}
-                  rowKey="id"
-                  size="small"
-                  dataSource={availableRuns.filter(r => r.task.id === selectedTaskId)}
-                  pagination={availableRuns.length > 20}
-                  rowSelection={runRowSelection}
-                />
-                <br />
-              </div>)}
+            <div>
+              <p>Select runs:</p>
+              <br />
+              <DataTable
+                columns={runColumns}
+                rowKey="id"
+                size="small"
+                dataSource={availableRuns.filter(r => r.task.id === selectedTaskId)}
+                pagination={availableRuns.length > 20}
+                rowSelection={runRowSelection}
+              />
+              <br />
+            </div>}
         </Form>
-        {predictorsActive && <Button type="primary" onClick={goToNextTab}>Next: Select Predictors</Button>}
+        {predictorsActive &&
+          <Button type="primary" onClick={goToNextTab}>
+            Next: Select Predictors
+          </Button>}
       </div>
     );
   }

@@ -28,22 +28,30 @@ class Home extends React.Component<HomeProps, {}> {
         </Row>
         <Row type="flex" justify="center">
           <Col span={4}>
-            <Button type="primary" size="large"><Link to="/builder">Create New Analysis</Link></Button>
+            <Button type="primary" size="large">
+              <Link to="/builder">Create New Analysis</Link>
+            </Button>
           </Col>
           <Col span={4}>
-            <Button type="primary" size="large"><Link to="/browse">Browse Public Analyses</Link></Button>
+            <Button type="primary" size="large">
+              <Link to="/browse">Browse Public Analyses</Link>
+            </Button>
           </Col>
         </Row>
         {loggedIn &&
           <div>
             <Row type="flex" justify="center">
               <Col span={18}>
-                {analyses !== undefined && <div><br /><h2>Your saved analyses:</h2><br /></div>}
+                {analyses !== undefined &&
+                  <div>
+                    <br />
+                    <h2>Your saved analyses:</h2>
+                    <br />
+                  </div>}
               </Col>
             </Row>
             <AnalysisList {...listProps} />
-          </div>
-        }
+          </div>}
       </div>
     );
   }

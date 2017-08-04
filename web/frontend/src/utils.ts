@@ -13,11 +13,7 @@ export const displayError = (error: Error) => {
 
 // moveItem moves an item in a given array up (toward index zero) or down (toward the last index),
 // returning a new array
-export type MoveItem<T> = (
-  array: Array<T>,
-  index: number,
-  direction: 'up' | 'down'
-) => Array<T>;
+export type MoveItem<T> = (array: Array<T>, index: number, direction: 'up' | 'down') => Array<T>;
 export const moveItem: MoveItem<any> = (array, index, direction) => {
   let newArray = [...array];
   if (direction === 'up') {
@@ -48,8 +44,7 @@ export const jwtFetch = (path: string, options?: object) => {
     }
   };
   return fetch(path, newOptions).then(response => {
-    if (response.status !== 200)
-      displayError(new Error(`HTTP ${response.status} on ${path}`));
+    if (response.status !== 200) displayError(new Error(`HTTP ${response.status} on ${path}`));
     return response.json().then(json => {
       // Always add statusCode to the data object or array returned by response.json()
       let copy: any;

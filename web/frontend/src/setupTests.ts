@@ -2,13 +2,15 @@
 Jest (the test runner) runs this file first before running any of the test suites.
 Create mock matchMedia and localStorage for the tests to work.
 */
-window.matchMedia = window.matchMedia || function () {
-  return {
-    matches: false,
-    addListener: function () { },
-    removeListener: function () { }
+window.matchMedia =
+  window.matchMedia ||
+  function() {
+    return {
+      matches: false,
+      addListener: function() {},
+      removeListener: function() {}
+    };
   };
-};
 
 class LocalStorageMock {
   store = {};
@@ -31,6 +33,6 @@ class LocalStorageMock {
   removeItem(key) {
     delete this.store[key];
   }
-};
+}
 
-window.localStorage = new LocalStorageMock;
+window.localStorage = new LocalStorageMock();
