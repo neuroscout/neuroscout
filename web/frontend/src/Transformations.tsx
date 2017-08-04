@@ -11,7 +11,6 @@ import { PredictorSelector } from './Predictors';
 import transformDefinititions from './transforms';
 const Option = Select.Option;
 
-
 let xformRules: XformRules = {};
 for (const item of transformDefinititions) {
   xformRules[item.name] = item;
@@ -37,7 +36,7 @@ const XformDisplay = (props: XformDisplayProps) => {
       <p>Parameters:</p>
       <ul>
         {xform.parameters.map(param =>
-          <li>{param.name + ': ' + param.value}</li>
+          <li key={param.name}>{param.name + ': ' + param.value}</li>
         )}
       </ul>
       {enableUp && <Button onClick={() => onMove(index, 'up')}><Icon type="arrow-up" /></Button>}
@@ -60,7 +59,7 @@ interface XformsTabState {
 }
 
 export class XformsTab extends React.Component<XformsTabProps, XformsTabState>{
-  constructor(props: XformEditorProps) {
+  constructor(props: XformsTabProps) {
     super();
     this.state = { mode: 'view' };
   }

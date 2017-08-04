@@ -73,7 +73,7 @@ class App extends React.Component<{}, AppState> {
         // .then(response => response.json())
         .then((data: ApiUser) => {
           this.setState({
-            analyses: data.analyses
+            analyses: (data.analyses || [])
               .filter(x => !!x.status)  // Ignore analyses with missing status
               .map(x => ApiToAppAnalysis(x))
           });
