@@ -8,6 +8,17 @@ See these links for more details:
 https://github.com/facebookincubator/create-react-app
 https://github.com/wmonk/create-react-app-typescript
 
+## Dependencies
+
+Major external libraries used in the frontend app, apart from what comes by default with create-react-app:
+
+- React Router v4 (routing library): https://github.com/ReactTraining/react-router
+- Antd (UI component library for React): https://ant.design/docs/react/introduce
+
+Development dependencies:
+
+- Prettier (for autoformatting all ts/tsx/js/jsx files): https://github.com/prettier/prettier
+
 ## Setting up the development server 
 
 Install dependencies:
@@ -27,4 +38,8 @@ This should automatically open a browser page at localhost:3000
 
 To build:
 `yarn build`
+
+To run the test suite:
+`yarn test`
+
 
