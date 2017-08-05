@@ -1,18 +1,18 @@
 version: "2"
 services:
-  web:
+  neuroscout:
     restart: always
-    build: ./web
+    build: ./neuroscout
     expose:
       - "8000"
     links:
       - postgres:postgres
     volumes:
       - migrations:/migrations
-      - ./web/:/web
+      - ./neuroscout/:/neuroscout
       - /home/zorro/datasets:/datasets
       - file-data:/file-data
-    command: /usr/local/bin/gunicorn -w 2 -b :8000 core:app --log-level debug --chdir /web
+    command: /usr/local/bin/gunicorn -w 2 -b :8000 core:app --log-level debug --chdir /neuroscout
     env_file: .env
 
   nginx:
@@ -21,9 +21,9 @@ services:
     ports:
       - "80:80"
     volumes_from:
-      - web
+      - neuroscout
     links:
-      - web:web
+      - neuroscout:neuroscout
 
   data:
     image: postgres:latest

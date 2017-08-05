@@ -7,7 +7,7 @@ decorator==4.0.11
 datalad==0.6.0
 duecredit==0.6.1
 Flask==0.12.1
--e git+https://github.com/adelavega/flask-apispec.git#egg=flask-apispec
+flask-apispec
 Flask-cors==3.0.2
 Flask-JWT==0.3.2
 Flask-Login==0.3.2
@@ -36,7 +36,7 @@ pandas==0.19.2
 patsy
 passlib==1.7.1
 Pillow==4.1.1
--e git+https://github.com/adelavega/pliers.git@bw_fix#egg=pliers
+pliers
 psycopg2==2.7.1
 py==1.4.33
 -e git+https://github.com/adelavega/pybids.git@transformer#egg=pybids
