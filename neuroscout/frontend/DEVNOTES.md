@@ -8,13 +8,13 @@ See these links for more details:
 https://github.com/facebookincubator/create-react-app
 https://github.com/wmonk/create-react-app-typescript
 
-## Setting up the development server 
+## Setting up the development server
 
 Install dependencies:
 Linux: `sudo apt-get update && sudo apt-get install yarn`
 Mac: `brew install yarn`
 
-Navigate to web/frontend:
+Navigate to neuroscout/frontend:
 `cd frontend`
 
 Build frontend dev environment:
@@ -27,4 +27,3 @@ This should automatically open a browser page at localhost:3000
 
 To build:
 `yarn build`
-

@@ -1,7 +1,7 @@
 from nipype.pipeline.engine import Workflow, Node
 import nipype.algorithms.modelgen as model
 import nipype.algorithms.events as events
-from nipype.interfaces.io import DataGrabber, DataSink
+from nipype.interfaces.io import DataSink
 
 from nipype.interfaces.utility import Function, IdentityInterface
 from nipype.workflows.fmri.fsl import (create_modelfit_workflow,
@@ -15,8 +15,13 @@ def create_first_level(bids_dir, work_dir, task, subjects, runs, contrasts, conf
     Set up workflow
     """
     wf = Workflow(name='first_level')
-    if work_dir:
-        wf.base_dir = work_dir
+    wf.base_dir = work_dir
+
+    """
+    Perform transformations and save out new event files
+    """
+
+    # Transfomer
 
     """
     Subject iterator
@@ -25,16 +30,18 @@ def create_first_level(bids_dir, work_dir, task, subjects, runs, contrasts, conf
                       name="infosource")
     infosource.iterables = ('subject_id', subjects)
 
-    """
-    Grab data for each subject
+    """"
+    Data source
     """
 
-    datasource = Node(DataGrabber(infields=['subject_id'],
-                                  outfields=['func']),
-                      name='datasource')
-    datasource.inputs.base_directory = in_dir
-    datasource.inputs.template = '*'
-    datasource.inputs.sort_filelist = True
+
+    ### For each subject, select func, brainmask and event files (from folder output by transformer)
+    ### Add a custom function that given the run, subject_id, and event folder
+    ### produces correct outputs
+
+    datasource = None
+
+    wf.connect([(infosource, datasource, [('subject_id', 'subject_id')])])
 
     """
     Specify model, apply transformations and specify fMRI model
@@ -52,9 +59,8 @@ def create_first_level(bids_dir, work_dir, task, subjects, runs, contrasts, conf
     modelspec.inputs.time_repetition = TR
     modelspec.inputs.high_pass_filter_cutoff = 100.
 
-    wf.connect([(infosource, datasource, [('subject_id', 'subject_id')]),
-                (datasource, modelspec, [('func', 'functional_runs')]),
-                (eventspec, modelspec, [('subject_info', 'subject_info')])])
+    wf.connect([(eventspec, modelspec, [('subject_info', 'subject_info')]),
+                (datasource, modelspec, [('func', 'functional_runs')])])
 
     """
     Fit model to each run
@@ -76,8 +82,8 @@ def create_first_level(bids_dir, work_dir, task, subjects, runs, contrasts, conf
 
     fixed_fx = create_fixed_effects_flow()
 
-    if mask is not None:
-        fixed_fx.inputs.flameo.mask_file = mask
+    ### Connect subject mask to
+    ### fixed_fx.inputs.flameo.mask_file
 
     def sort_copes(copes, varcopes, contrasts):
         import numpy as np

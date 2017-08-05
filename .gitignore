@@ -97,13 +97,13 @@ ENV/
 virtualenv/
 
 # Temporarily ignore migration files
-web/migrations
+neuroscout/migrations
 
 # IDEs
 .vscode/
 
 # Ignore web build
-web/frontend/build
+neuroscout/frontend/build
 
 bids_test_annex
 
