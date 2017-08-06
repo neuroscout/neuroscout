@@ -42,15 +42,16 @@ class Home extends React.Component<HomeProps, {}> {
           <div>
             <Row type="flex" justify="center">
               <Col span={18}>
-                {analyses !== undefined &&
+                {!!analyses &&
+                  analyses.length > 0 &&
                   <div>
                     <br />
                     <h2>Your saved analyses:</h2>
                     <br />
+                    <AnalysisList {...listProps} />
                   </div>}
               </Col>
             </Row>
-            <AnalysisList {...listProps} />
           </div>}
       </div>
     );

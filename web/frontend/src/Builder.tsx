@@ -422,6 +422,7 @@ export default class AnalysisBuilder extends React.Component<BuilderProps, Store
           <Col span={18}>
             <h2>
               {analysis.status !== 'DRAFT' ? <Icon type="lock" /> : <Icon type="unlock" />}
+              {`Analysis ID: ${analysis.analysisId || 'Not assigned (new analysis)'}`}
               <Space />
               <Button
                 onClick={this.saveAnalysis({ compile: false })}
