@@ -1,3 +1,6 @@
+/*
+ OverviewTab component
+*/
 import * as React from 'react';
 import { Form, Input, AutoComplete, Table, Switch, Button } from 'antd';
 import { TableProps, TableRowSelection } from 'antd/lib/table/Table';

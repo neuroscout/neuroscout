@@ -1,3 +1,7 @@
+/*
+ Top-level AnalysisBuilder component which contains all of the necessary state for editing
+ an analysis. 
+*/
 import * as React from 'react';
 import { Tabs, Row, Col, Layout, Button, Modal, Icon, message } from 'antd';
 import { Prompt } from 'react-router-dom';
@@ -246,6 +250,8 @@ export default class AnalysisBuilder extends React.Component<BuilderProps, Store
       .catch(displayError);
   };
 
+  // Decode data returned by '/api/analyses/<id>' (ApiAnalysis) to convert it to the right shape (Analysis)
+  // and fetch the associated runs
   loadAnalysis = (data: ApiAnalysis): Promise<Analysis> => {
     if (!data.transformations) {
       return Promise.reject('Data returned by server is missing transformations array.');

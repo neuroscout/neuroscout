@@ -1,3 +1,9 @@
+/* 
+Top-level App component containing AppState. The App component is currently responsible for:
+- Authentication (signup, login and logout)
+- Routing
+- Managing user's saved analyses (list display, clone and delete)
+*/
 import * as React from 'react';
 import { Tabs, Row, Col, Layout, Button, Modal, Input, Form, message } from 'antd';
 import { displayError, jwtFetch } from './utils';
@@ -26,11 +32,12 @@ interface AppState {
   password: string | null;
   jwt: string | null;
   nextURL: string | null; // will probably remove this and find a better solution to login redirects
-  analyses: AppAnalysis[];
-  publicAnalyses: AppAnalysis[];
+  analyses: AppAnalysis[]; // List of analyses belonging to the user
+  publicAnalyses: AppAnalysis[]; // List of public analyses
   loggingOut: boolean; // flag set on logout to know to redirect after logout
 }
 
+// Convert analyses returned by API to the shape expected by the frontend
 const ApiToAppAnalysis = (data: ApiAnalysis): AppAnalysis => ({
   id: data.hash_id!,
   name: data.name,
@@ -39,10 +46,10 @@ const ApiToAppAnalysis = (data: ApiAnalysis): AppAnalysis => ({
   modifiedAt: data.modified_at
 });
 
+// Top-level App component
 class App extends React.Component<{}, AppState> {
   constructor(props) {
     super(props);
-    // window.localStorage.clear()
     const jwt = localStorage.getItem('jwt');
     const email = localStorage.getItem('email');
     this.state = {
@@ -64,24 +71,23 @@ class App extends React.Component<{}, AppState> {
     this.loadPublicAnalyses();
   }
 
+  // Load user's saved analyses from the server
   loadAnalyses = () => {
     if (this.state.jwt) {
-      return (
-        jwtFetch(`${DOMAINROOT}/api/user`)
-          // .then(response => response.json())
-          .then((data: ApiUser) => {
-            this.setState({
-              analyses: (data.analyses || [])
-                .filter(x => !!x.status) // Ignore analyses with missing status
-                .map(x => ApiToAppAnalysis(x))
-            });
-          })
-          .catch(displayError)
-      );
+      return jwtFetch(`${DOMAINROOT}/api/user`)
+        .then((data: ApiUser) => {
+          this.setState({
+            analyses: (data.analyses || [])
+              .filter(x => !!x.status) // Ignore analyses with missing status
+              .map(x => ApiToAppAnalysis(x))
+          });
+        })
+        .catch(displayError);
     }
     return Promise.reject('You are not logged in');
   };
 
+  // Load public analyses from the server
   loadPublicAnalyses = () =>
     fetch(`${DOMAINROOT}/api/analyses`)
       .then(response => response.json())
@@ -94,6 +100,7 @@ class App extends React.Component<{}, AppState> {
       })
       .catch(displayError);
 
+  // Authenticate the user with the server. This function is called from login()
   authenticate = () =>
     new Promise((resolve, reject) => {
       const { email, password } = this.state;
@@ -119,6 +126,7 @@ class App extends React.Component<{}, AppState> {
         .catch(displayError);
     });
 
+  // Log user in
   login = () => {
     const { email, password, loggedIn, openLogin, nextURL } = this.state;
     return this.authenticate()
@@ -136,6 +144,7 @@ class App extends React.Component<{}, AppState> {
       .catch(displayError);
   };
 
+  // Sign up for a new account and if successful, immediately log the user in
   signup = () => {
     const { name, email, password, openSignup } = this.state;
     fetch(DOMAINROOT + '/api/user', {
@@ -165,6 +174,7 @@ class App extends React.Component<{}, AppState> {
       .catch(displayError);
   };
 
+  // Log user out
   logout = () => {
     localStorage.removeItem('jwt');
     localStorage.removeItem('email');
@@ -178,6 +188,7 @@ class App extends React.Component<{}, AppState> {
     });
   };
 
+  // Display modal to confirm logout
   confirmLogout = (): void => {
     const that = this;
     Modal.confirm({
@@ -197,20 +208,16 @@ class App extends React.Component<{}, AppState> {
     this.setState(newState);
   };
 
+  // Actually delete existing analysis given its hash ID, called from onDelete()
   deleteAnalysis = (id): void => {
     jwtFetch(`${DOMAINROOT}/api/analyses/${id}`, { method: 'delete' })
-      // .then(response => {
-      //   if (response.status !== 200) {
-      //     throw 'Something went wrong - most likely the analysis is not locked. Will fix it later';
-      //   }
-      //   return response.json();
-      // })
       .then((data: ApiAnalysis) => {
         this.setState({ analyses: this.state.analyses.filter(a => a.id !== id) });
       })
       .catch(displayError);
   };
 
+  // Delete analysis if the necessary conditions are met
   onDelete = (analysis: AppAnalysis) => {
     const { deleteAnalysis } = this;
     if (analysis.status && analysis.status !== 'DRAFT') {
@@ -228,37 +235,15 @@ class App extends React.Component<{}, AppState> {
     });
   };
 
+  // Clone existing analysis
   cloneAnalysis = (id): void => {
     jwtFetch(`${DOMAINROOT}/api/analyses/${id}/clone`, { method: 'post' })
-      // .then(response => {
-      //   if (response.status !== 200) {
-      //     throw 'Something went wrong - most likely the analysis is not locked. Will fix it later';
-      //   }
-      //   return response.json();
-      // })
       .then((data: ApiAnalysis) => {
         const analysis = ApiToAppAnalysis(data);
         this.setState({ analyses: this.state.analyses.concat([analysis]) });
       })
       .catch(displayError);
   };
-
-  // loginAndNavigate = (nextURL: string) => {
-  //   if (this.state.loggedIn) {
-  //     document.location.href = nextURL;
-  //     return;
-  //   }
-  //   this.setState({ openLogin: true, nextURL });
-  // }
-
-  // ensureLoggedIn = () => new Promise((resolve, reject) => {
-  //   if (this.state.loggedIn) {
-  //     resolve();
-  //   } else {
-  //     this.setState({ openLogin: true });
-  //     this.login().then(() => resolve()).catch(() => reject());
-  //   }
-  // });
 
   render() {
     const {
@@ -469,6 +454,7 @@ class App extends React.Component<{}, AppState> {
   }
 
   componentDidUpdate() {
+    // Need to do this so logout redirect only happens once, otherwise it'd be an infinite loop
     if (this.state.loggingOut) this.setState({ loggingOut: false });
   }
 }

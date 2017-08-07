@@ -1,3 +1,6 @@
+/*
+ ContrastEditor module for adding/editing a contrast (used in the Contrasts tab)
+*/
 import * as React from 'react';
 import { Form, Input, Button, Radio, message, Modal, Alert } from 'antd';
 import { TableProps, TableRowSelection } from 'antd/lib/table/Table';

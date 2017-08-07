@@ -1,12 +1,13 @@
+/*
+ Home component for the homepage
+*/
 import * as React from 'react';
-import { Tabs, Row, Col, Layout, Button, Card } from 'antd';
+import { Tabs, Row, Col, Button, Card } from 'antd';
 import { displayError } from './utils';
 import { Space } from './HelperComponents';
 import { AppAnalysis } from './coretypes';
 import { Link } from 'react-router-dom';
 import AnalysisList, { AnalysisListProps } from './AnalysisList';
-
-const { Header, Footer, Content } = Layout;
 
 interface HomeProps extends AnalysisListProps {
   loggedIn: boolean;

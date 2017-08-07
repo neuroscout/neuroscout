@@ -1,3 +1,9 @@
+/*
+ This module includes the following components:
+ 
+ - ContrastsTab: parent component for the contrast tab of the analysis builder
+ - ContrastDisplay: component to display a single contrast
+*/
 import * as React from 'react';
 import { Table, Input, Button, Row, Col, Form, Select, Checkbox, Icon } from 'antd';
 import { TableProps, TableRowSelection } from 'antd/lib/table/Table';
