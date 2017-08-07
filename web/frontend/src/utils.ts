@@ -1,5 +1,6 @@
 import { message } from 'antd';
 
+// Display error to user as a UI notification and log it to console
 export const displayError = (error: Error) => {
   try {
     message.error(error.toString(), 5);
@@ -30,6 +31,9 @@ export const moveItem: MoveItem<any> = (array, index, direction) => {
   return newArray;
 };
 
+// Wrapper around the standard 'fetch' that takes care of:
+// - Adding jwt to request header
+// - Decoding JSON response and adding the response status code to decoded JSON object
 export const jwtFetch = (path: string, options?: object) => {
   const jwt = window.localStorage.getItem('jwt');
   if (jwt === null) {

@@ -1,3 +1,6 @@
+/*
+ Main frontend test suite
+*/
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import { shallow, mount } from 'enzyme';

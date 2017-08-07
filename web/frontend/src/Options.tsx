@@ -1,3 +1,6 @@
+/*
+ Options tab of the analysis builder
+*/
 import * as React from 'react';
 import {
   Form,

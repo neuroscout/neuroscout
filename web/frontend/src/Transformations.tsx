@@ -1,3 +1,9 @@
+/*
+This module comtains the following components:
+ - XformsTab: parent component implementing the transformation tab of the analysis builder.
+ - XformDisplay: component to display a single transformation
+ - XformEditor: component to add/edit a transformtion
+*/
 import * as React from 'react';
 import { Table, Input, Button, Row, Col, Form, Select, Checkbox, Icon } from 'antd';
 import { TableProps, TableRowSelection } from 'antd/lib/table/Table';
