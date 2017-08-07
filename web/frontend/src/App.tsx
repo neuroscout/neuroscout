@@ -28,7 +28,7 @@ interface AppState {
   nextURL: string | null; // will probably remove this and find a better solution to login redirects
   analyses: AppAnalysis[];
   publicAnalyses: AppAnalysis[];
-  loggingOut: boolean; // flag to set on log out to know that we need to redirect
+  loggingOut: boolean; // flag set on logout to know to redirect after logout
 }
 
 const ApiToAppAnalysis = (data: ApiAnalysis): AppAnalysis => ({
@@ -175,6 +175,19 @@ class App extends React.Component<{}, AppState> {
       jwt: null,
       analyses: [],
       loggingOut: true
+    });
+  };
+
+  confirmLogout = (): void => {
+    const that = this;
+    Modal.confirm({
+      title: 'Are you sure you want to log out?',
+      content: 'If you have any unsaved changes they will be discarded.',
+      okText: 'Yes',
+      cancelText: 'No',
+      onOk() {
+        that.logout();
+      }
     });
   };
 
@@ -383,7 +396,7 @@ class App extends React.Component<{}, AppState> {
                         ? <span>
                             {`Logged in as ${email}`}
                             <Space />
-                            <Button onClick={e => this.logout()}>Log out</Button>
+                            <Button onClick={e => this.confirmLogout()}>Log out</Button>
                           </span>
                         : <span>
                             <Button onClick={e => this.setState({ openLogin: true })}>
@@ -415,9 +428,9 @@ class App extends React.Component<{}, AppState> {
                 exact
                 path="/builder"
                 render={props => {
-                  // This is a temporary solution to prevent non logged-in users from entering the builder. 
-                  // Longer term to automatically redirect the user to the target URL after login we 
-                  // need to implement something like the auth workflow example here: 
+                  // This is a temporary solution to prevent non logged-in users from entering the builder.
+                  // Longer term to automatically redirect the user to the target URL after login we
+                  // need to implement something like the auth workflow example here:
                   // https://reacttraining.com/react-router/web/example/auth-workflow
                   if (loggedIn) {
                     return <AnalysisBuilder updatedAnalysis={() => this.loadAnalyses()} />;
