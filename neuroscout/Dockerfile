@@ -7,5 +7,5 @@ RUN apt-get install -y nodejs
 RUN npm install -g yarn
 RUN apt-get install -yq datalad
 RUN apt-get install -yq python-nipype
-RUN cd frontend; yarn build
+RUN cd /neuroscout/frontend; yarn build
 RUN pip install git+https://github.com/qmac/nipype --user
