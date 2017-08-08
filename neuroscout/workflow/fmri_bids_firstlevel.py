@@ -14,12 +14,10 @@ Usage:
 from docopt import docopt
 import json
 import os
+import tempfile
 from base import create_first_level
 from bids.grabbids import BIDSLayout
 import pandas as pd
-
-import tempfile
-
 
 
 class FirstLevel(object):
@@ -76,6 +74,8 @@ class FirstLevel(object):
         else:
             bids_dir = bundle['dataset_address']
 
+        self.args['bids_dir'] = bids_dir
+
         ## Disable datalad to use full BIDS dataset
         if not args['--disable-datalad']:
             from datalad import api as dl
@@ -98,12 +98,16 @@ class FirstLevel(object):
         pes = pd.DataFrame(bundle.pop('predictor_events')).rename(
             columns={'predictor_id' : 'trial_type'})
 
+        out_path = os.path.join(self.args['work_dir'], 'events')
+        if not os.path.exists(out_path):
+            os.mkdir(out_path)
+
         for r in bundle['runs']:
             ## Write out event files for each run_id
             run_events = pes[pes.run_id==r['id']].drop('run_id', axis=1)
             ses = 'ses-{}_'.format(r['session']) if r['session'] else ''
 
-            events_fname = os.path.join(self.args['work_dir'],
+            events_fname = os.path.join(out_path,
                                         'sub-{}_{}task-{}_run-{}_events.tsv'.format(
                 r['subject'], ses, bundle['task_name'], r['number']))
 
@@ -114,6 +118,8 @@ class FirstLevel(object):
                                task=bundle['task_name'])) < 1:
                 raise Exception("BIDS directory does not contain"
                                 "preprocessed data for run {}".format(r['id']))
+
+        self.args['runs'] = bundle['runs']
 
         """ Set TR """
         self.args['TR'] = json.load(open(

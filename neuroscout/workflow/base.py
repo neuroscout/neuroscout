@@ -1,6 +1,6 @@
 from nipype.pipeline.engine import Workflow, Node
 import nipype.algorithms.modelgen as model
-import nipype.algorithms.events as events
+from nipype.algorithms.transformer import TransformEvents
 from nipype.interfaces.io import DataSink
 
 from nipype.interfaces.utility import Function, IdentityInterface
@@ -10,7 +10,7 @@ from nipype.workflows.fmri.fsl import (create_modelfit_workflow,
 import os
 
 def create_first_level(bids_dir, work_dir, task, subjects, runs, contrasts, config=None,
-                       out_dir=None, transformations=None, TR=1):
+                       out_dir=None, transformations={}, TR=2):
     """
     Set up workflow
     """
@@ -20,8 +20,14 @@ def create_first_level(bids_dir, work_dir, task, subjects, runs, contrasts, conf
     """
     Perform transformations and save out new event files
     """
-
-    # Transfomer
+    transformer = Node(interface=TransformEvents(), name="transformer")
+    transformer.inputs.time_repetition = TR
+    # transformer.inputs.transformation_spec = transformations
+    transformer.inputs.event_files_dir = os.path.join(work_dir, "events")
+    transformer.inputs.amplitude_column = 'value'
+    transformer.inputs.bids_directory = bids_dir
+    # transformer.inputs.columns = ['onset', 'duration', 'amplitude']
+    transformer.inputs.header = False
 
     """
     Subject iterator
@@ -34,33 +40,45 @@ def create_first_level(bids_dir, work_dir, task, subjects, runs, contrasts, conf
     Data source
     """
 
+    ### TODO fix subject num handling in pybids
+    #### TODO fix OAD order in pybids (or reorder), and remove condition column
+    ##### Wait to see what tal does but in the meantime could fix this is transformer
 
-    ### For each subject, select func, brainmask and event files (from folder output by transformer)
-    ### Add a custom function that given the run, subject_id, and event folder
-    ### produces correct outputs
+    def get_data(bids_dir, subject_id, event_files_dir, runs):
+        from bids.grabbids import BIDSLayout
+        import os
+        events = BIDSLayout(event_files_dir).get(
+            subject=subject_id, return_type='file')
+        func = [r['func_path'] for r in runs if r['subject'] == subject_id]
+        func = [os.path.join(bids_dir, f) for f in func]
+        bm = [r['mask_path'] for r in runs if r['subject'] == subject_id]
+        bm = [os.path.join(bids_dir, b) for b in bm]
 
-    datasource = None
+        return func, bm, events
 
-    wf.connect([(infosource, datasource, [('subject_id', 'subject_id')])])
+
+    datasource = Node(Function(input_names=['bids_dir', 'subject_id',
+                                            'event_files_dir', 'runs'],
+                                output_names=['func', 'brainmask',
+                                              'event_files'],
+                                function=get_data),
+                       name='datasource')
+    datasource.inputs.runs = runs
+    datasource.inputs.bids_dir = bids_dir
+    wf.connect([(transformer, datasource, [('event_files_dir', 'event_files_dir')]),
+                ((infosource, datasource, [('subject_id', 'subject_id')]))])
 
     """
     Specify model, apply transformations and specify fMRI model
     """
 
-    eventspec = Node(interface=events.SpecifyEvents(), name="eventspec")
     modelspec = Node(interface=model.SpecifyModel(), name="modelspec")
-
-    eventspec.inputs.input_units = 'secs'
-    eventspec.inputs.time_repetition = TR
-    if transformations is not None:
-        eventspec.inputs.transformations = transformations
-
     modelspec.inputs.input_units = 'secs'
     modelspec.inputs.time_repetition = TR
     modelspec.inputs.high_pass_filter_cutoff = 100.
 
-    wf.connect([(eventspec, modelspec, [('subject_info', 'subject_info')]),
-                (datasource, modelspec, [('func', 'functional_runs')])])
+    wf.connect(datasource, 'event_files', modelspec, 'event_files')
+    wf.connect(datasource, 'func', modelspec, 'functional_runs')
 
     """
     Fit model to each run
@@ -81,9 +99,7 @@ def create_first_level(bids_dir, work_dir, task, subjects, runs, contrasts, conf
     """
 
     fixed_fx = create_fixed_effects_flow()
-
-    ### Connect subject mask to
-    ### fixed_fx.inputs.flameo.mask_file
+    wf.connect(datasource, 'brainmask', fixed_fx, 'flameo.mask_file')
 
     def sort_copes(copes, varcopes, contrasts):
         import numpy as np
