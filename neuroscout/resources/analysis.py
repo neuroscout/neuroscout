@@ -149,7 +149,7 @@ class CompileAnalysisResource(AnalysisBaseResource):
 	@doc(summary='Compile and lock analysis.')
 	@utils.owner_required
 	def post(self, analysis):
-		task = celery_app.send_task('workflow.create', args=[analysis.id])
+		task = celery_app.send_task('workflow.compile', args=[analysis.id])
 		current_app.logger.info(task)
 		analysis.status = 'PENDING'
 		analysis.celery_id = task.id
