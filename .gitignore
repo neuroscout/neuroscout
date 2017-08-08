@@ -106,5 +106,5 @@ neuroscout/migrations
 neuroscout/frontend/build
 
 bids_test_annex
-
+neuroscout/src
 jest_0
