@@ -108,3 +108,5 @@ neuroscout/frontend/build
 bids_test_annex
 
 jest_0
+
+src/
