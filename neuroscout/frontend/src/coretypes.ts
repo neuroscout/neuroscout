@@ -1,3 +1,8 @@
+/*
+ Type definitinos for key models, such as analysis, run, predictor, contrast, transformation, etc.
+ The data models below are largely UI agonstic. This module is a good starting point to understand the
+ shape of the data in the frontend app. All resusable type definitions should go into this module.
+*/
 type AnalysisStatus = 'DRAFT' | 'PENDING' | 'PASSED' | 'FAILED';
 
 // Analysis type in Analysis Builder
@@ -5,8 +10,8 @@ export interface Analysis {
   analysisId: string | undefined;
   name: string;
   description: string;
-  datasetId: number | null;  // ID of selected dataset
-  runIds: string[];          // IDs of selected runs
+  datasetId: number | null; // ID of selected dataset
+  runIds: string[]; // IDs of selected runs
   predictions: string;
   predictorIds: string[]; // IDs of selected predictors
   status: AnalysisStatus;
@@ -14,9 +19,10 @@ export interface Analysis {
   modifiedAt?: string;
   config: AnalysisConfig;
   transformations: Transformation[];
+  contrasts: Contrast[];
 }
 
-// Normalized dataset object  in Analysis Builder
+// Normalized dataset object in Analysis Builder
 export interface Dataset {
   name: string;
   id: string;
@@ -30,7 +36,7 @@ export interface Run {
   number: string;
   session: string | null;
   subject: string | null;
-  task: { id: string, name: string };
+  task: { id: string; name: string };
 }
 
 export interface Task {
@@ -79,18 +85,30 @@ export interface Transformation {
   parameters: Parameter[];
 }
 
+// Lookup hash of available transformations (as specified in transforms.ts) by their name
 export interface XformRules {
   [name: string]: Transformation;
 }
 
 export interface Contrast {
+  // short name/description of contrast
+  name: string;
+  // For simplicilty for now store entire predictor object as opposed to just the ID.
+  // TODO: change this to just the predictor IDs
   predictors: Predictor[];
   weights: number[];
-  contrastType: 'T' | 'F';
+  contrastType: 't' | 'F';
 }
 
 export interface Store {
-  activeTab: 'overview' | 'predictors' | 'transformations' | 'contrasts' | 'modeling' | 'review' | 'status';
+  activeTab:
+    | 'overview'
+    | 'predictors'
+    | 'transformations'
+    | 'contrasts'
+    | 'modeling'
+    | 'review'
+    | 'status';
   predictorsActive: boolean;
   transformationsActive: boolean;
   contrastsActive: boolean;
@@ -126,6 +144,7 @@ export interface ApiRun {
   subject: string | null;
 }
 
+// Shape of Analysis object as consumed/produced by the backend API
 export interface ApiAnalysis {
   hash_id?: string;
   name: string;
@@ -137,16 +156,20 @@ export interface ApiAnalysis {
   runs?: { id: string }[];
   predictors?: { id: string }[];
   transformations?: Transformation[];
+  contrasts?: Contrast[];
   config: AnalysisConfig;
   modified_at?: string;
 }
 
+// Shape of User object as consumed/produced by the backend API
 export interface ApiUser {
   email: string;
   name: string;
   analyses: ApiAnalysis[];
 }
 
+// The more condensed version of analysis object as returned by the user route
+// and displayed as list of analyses on the homepage
 export interface AppAnalysis {
   id: string;
   name: string;

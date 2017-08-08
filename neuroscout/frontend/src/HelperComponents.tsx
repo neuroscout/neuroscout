@@ -1,2 +1,3 @@
 import * as React from 'react';
-export const Space = (props: {}) => <span>{' '}</span>;
+// Simple space component to seperate buttons, etc.
+export const Space = (props: {}) => <span> </span>;

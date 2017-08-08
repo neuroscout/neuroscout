@@ -1,3 +1,6 @@
+/*
+ Main frontend test suite
+*/
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import { shallow, mount } from 'enzyme';
@@ -9,10 +12,20 @@ import App from './App';
 
 describe('Test moveItem', () => {
   it('Move up', () => {
-    expect(moveItem(['zero', 'one', 'two', 'three'], 2, 'up')).toEqual(['zero', 'two', 'one', 'three']);
+    expect(moveItem(['zero', 'one', 'two', 'three'], 2, 'up')).toEqual([
+      'zero',
+      'two',
+      'one',
+      'three'
+    ]);
   });
   it('Move down', () => {
-    expect(moveItem(['zero', 'one', 'two', 'three'], 2, 'down')).toEqual(['zero', 'one', 'three', 'two']);
+    expect(moveItem(['zero', 'one', 'two', 'three'], 2, 'down')).toEqual([
+      'zero',
+      'one',
+      'three',
+      'two'
+    ]);
   });
 });
 
@@ -28,24 +41,25 @@ it('Overview tab renders without errors', () => {
     status: 'DRAFT',
     config: { smoothing: 10, predictorConfigs: {} },
     transformations: [],
+    contrasts: []
   };
-  const tab = mount(<OverviewTab
-    analysis={analysis}
-    datasets={[]}
-    availableTasks={[]}
-    availableRuns={[]}
-    selectedTaskId={null}
-    predictorsActive={true}
-    updateAnalysis={() => { }}
-    updateSelectedTaskId={() => { }}
-    goToNextTab={() => { }}
-  />);
+  const tab = mount(
+    <OverviewTab
+      analysis={analysis}
+      datasets={[]}
+      availableTasks={[]}
+      availableRuns={[]}
+      selectedTaskId={null}
+      predictorsActive={true}
+      updateAnalysis={() => {}}
+      updateSelectedTaskId={() => {}}
+      goToNextTab={() => {}}
+    />
+  );
 });
 
 it('Analysis builder renders without errors', () => {
-  const wrapper = mount(<AnalysisBuilder
-    updatedAnalysis={() => { }}
-  />);
+  const wrapper = mount(<AnalysisBuilder updatedAnalysis={() => {}} />);
   // Expect 7 tabs
   expect(wrapper.find('div[role="tab"]').length).toBe(7);
 });
