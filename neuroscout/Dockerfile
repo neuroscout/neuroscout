@@ -6,4 +6,6 @@ RUN curl -sL https://deb.nodesource.com/setup_6.x | bash -
 RUN apt-get install -y nodejs
 RUN npm install -g yarn
 RUN apt-get install -yq datalad
+RUN apt-get install -yq python-nipype
 RUN cd frontend; yarn build
+RUN pip install git+https://github.com/qmac/nipype --user
