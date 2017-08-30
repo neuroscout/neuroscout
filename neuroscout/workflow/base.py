@@ -1,6 +1,6 @@
 from nipype.pipeline.engine import Workflow, Node
 import nipype.algorithms.modelgen as model
-from nipype.algorithms.transformer import TransformEvents
+from nipype.algorithms.bids import TransformEvents
 from nipype.interfaces.io import DataSink
 
 from nipype.interfaces.utility import Function, IdentityInterface
@@ -23,9 +23,8 @@ def create_first_level(bids_dir, work_dir, task, subjects, runs, contrasts, conf
     transformer = Node(interface=TransformEvents(), name="transformer")
     transformer.inputs.time_repetition = TR
     # transformer.inputs.transformation_spec = transformations
-    transformer.inputs.event_files_dir = os.path.join(work_dir, "events")
-    transformer.inputs.amplitude_column = 'value'
-    transformer.inputs.bids_directory = bids_dir
+    transformer.inputs.files_directory = os.path.join(work_dir, "events")
+    transformer.inputs.base_dir = bids_dir
     # transformer.inputs.columns = ['onset', 'duration', 'amplitude']
     transformer.inputs.header = False
 
