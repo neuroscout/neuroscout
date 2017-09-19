@@ -276,7 +276,7 @@ def add_dataset(db_session, task, replace=False, verbose=True,
 
     return dataset_model.id
 
-def extract_features(db_session, bids_path, task, graph_spec, verbose=True,
+def extract_features(db_session, bids_path, name, task, graph_spec, verbose=True,
                      automagic=False, **filters):
     """ Extract features using pliers for a dataset/task
         Args:
@@ -299,8 +299,9 @@ def extract_features(db_session, bids_path, task, graph_spec, verbose=True,
         from pliers.stimuli import load_stims
         from pliers.graph import Graph
 
-    # Try to add dataset, will skip if already in
-    dataset_id = add_dataset(db_session, task, bids_path=bids_path, **filters)
+    # ### CHANGE THIS TO LOOK UP ONLY. FAIL IF DS NOT FOUND
+    dataset_id = add_dataset(db_session, task, bids_path=bids_path,
+                             name=name, **filters)
 
 
     # Load event files
@@ -451,7 +452,7 @@ def ingest_from_yaml(db_session, config_file, install_path='/file-data', automag
             # Extract features if pliers graphs are provided
             if 'features' in options:
                 for graph in options['features']:
-                	extract_features(db_session, new_path, task,
+                	extract_features(db_session, new_path, name, task,
                 		os.path.join(base_path, graph),
                         automagic=path is None or automagic,
                         **dict(filters.items() | ep.items()))
