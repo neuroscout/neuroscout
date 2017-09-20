@@ -1,6 +1,6 @@
 /*
  Top-level AnalysisBuilder component which contains all of the necessary state for editing
- an analysis. 
+ an analysis.
 */
 import * as React from 'react';
 import { Tabs, Row, Col, Layout, Button, Modal, Icon, message } from 'antd';
@@ -32,8 +32,8 @@ const { Footer, Content } = Layout;
 
 // const logo = require('./logo.svg');
 const domainRoot = 'http://localhost:80';
-const EMAIL = 'test2@test.com';
-const PASSWORD = 'password';
+const EMAIL = 'user@example.com';
+const PASSWORD = 'string';
 const DEFAULT_SMOOTHING = 50;
 
 const defaultConfig: AnalysisConfig = { smoothing: DEFAULT_SMOOTHING, predictorConfigs: {} };
@@ -71,8 +71,8 @@ const initializeStore = (): Store => ({
 
 const getJwt = () =>
   new Promise((resolve, reject) => {
-    /* Returns an access token (JWT) as a promise, either straight from local 
-     storage or by fetching from the server (/auth) with username/password and 
+    /* Returns an access token (JWT) as a promise, either straight from local
+     storage or by fetching from the server (/auth) with username/password and
      caching it to local storage. */
     const jwt = window.localStorage.getItem('jwt');
     if (jwt) {
@@ -288,7 +288,7 @@ export default class AnalysisBuilder extends React.Component<BuilderProps, Store
     const { saveAnalysis } = this;
     Modal.confirm({
       title: 'Are you sure you want to submit the analysis?',
-      content: `Once you submit an analysis you will no longer be able to modify it. 
+      content: `Once you submit an analysis you will no longer be able to modify it.
                 You will, however, be able to clone it as a starting point for a new analysis.`,
       okText: 'Yes',
       cancelText: 'No',
@@ -319,8 +319,8 @@ export default class AnalysisBuilder extends React.Component<BuilderProps, Store
   };
 
   /* Main function to update application state. May split this up into
-   smaller pieces if it gets too complex. 
-   
+   smaller pieces if it gets too complex.
+
    When keepClean is true, don't set unsavedChanges to true. This is useful in situations
    like loading a new analysis (loadAnalysis function) where updateState is called but
    since state changes aren't really user edits we don't want to set unsavedChanges.

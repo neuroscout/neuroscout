@@ -1,4 +1,4 @@
-/* 
+/*
 Top-level App component containing AppState. The App component is currently responsible for:
 - Authentication (signup, login and logout)
 - Routing
@@ -58,10 +58,10 @@ class App extends React.Component<{}, AppState> {
       openSignup: false,
       loginError: '',
       signupError: '',
-      email: email || 'test2@test.com', // For development - remove test2@test.com later
+      email: email || 'user@example.com', // For development - remove test2@test.com later
       name: null,
       jwt: jwt,
-      password: 'password', // For development - set to '' in production
+      password: 'string', // For development - set to '' in production
       nextURL: null,
       analyses: [],
       publicAnalyses: [],
