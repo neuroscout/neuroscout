@@ -12,7 +12,7 @@ services:
       - ./neuroscout/:/neuroscout
       - /home/zorro/datasets:/datasets
       - file-data:/file-data
-    command: /usr/local/bin/gunicorn -w 2 -b :8000 core:app --log-level debug --chdir /neuroscout
+    command: /usr/local/bin/gunicorn -w 2 -b :8000 core:app --log-level debug
     env_file: .env
 
   nginx:
@@ -60,6 +60,10 @@ services:
     entrypoint: celery -A tasks worker --loglevel=info
     volumes:
       - file-data:/file-data
+      - /home/zorro/datasets:/datasets
+      - ./neuroscout/:/neuroscout
+      - ./celery_worker/:/celery_worker
+
     env_file: .env
 
   monitor:

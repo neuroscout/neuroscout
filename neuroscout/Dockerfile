@@ -14,3 +14,4 @@ RUN PATH=${FSLDIR}/bin:${PATH}
 RUN export FSLDIR PATH
 RUN cd /neuroscout/frontend; yarn build
 RUN pip install git+https://github.com/qmac/nipype --user
+WORKDIR /neuroscout
