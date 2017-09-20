@@ -7,7 +7,7 @@ from db_utils import put_record
 from models import Analysis, Dataset, Run, Predictor
 from . import utils
 from worker import celery_app
-
+from .bundle import get_json_bundle
 
 class AnalysisSchema(Schema):
 	hash_id = fields.Str(dump_only=True, description='Hashed analysis id.')
@@ -149,7 +149,10 @@ class CompileAnalysisResource(AnalysisBaseResource):
 	@doc(summary='Compile and lock analysis.')
 	@utils.owner_required
 	def post(self, analysis):
-		task = celery_app.send_task('workflow.compile', args=[analysis.id])
+		json = get_json_bundle(analysis)
+		## What else do you we need? Local dataset path
+		task = celery_app.send_task('workflow.compile',
+				args=[json, analysis.dataset.local_path])
 		current_app.logger.info(task)
 		analysis.status = 'PENDING'
 		analysis.celery_id = task.id

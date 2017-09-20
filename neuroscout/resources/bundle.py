@@ -26,6 +26,17 @@ class AnalysisBundleSchema(Schema):
 		'RunSchema', many=True, description='Runs associated with analysis',
 	    exclude=['duration', 'dataset_id', 'task'])
 
+def get_json_bundle(analysis):
+	pred_ids = [p.id for p in analysis.predictors]
+	run_ids = [r.id for r in analysis.runs]
+	analysis.predictor_events = PredictorEvent.query.filter(
+	    (PredictorEvent.predictor_id.in_(pred_ids)) & \
+	    (PredictorEvent.run_id.in_(run_ids))).all()
+
+	analysis.task_name = analysis.runs[0].task.name
+
+
+	return AnalysisBundleSchema().dump(analysis)
 
 @doc(tags=['analysis'])
 class AnalysisBundleResource(MethodResource):
@@ -34,13 +45,5 @@ class AnalysisBundleResource(MethodResource):
 	def get(self, analysis):
 		if analysis.status != "PASSED":
 			utils.abort(404, "Analysis not yet compiled")
-		pred_ids = [p.id for p in analysis.predictors]
-		run_ids = [r.id for r in analysis.runs]
-		analysis.predictor_events = PredictorEvent.query.filter(
-		    (PredictorEvent.predictor_id.in_(pred_ids)) & \
-		    (PredictorEvent.run_id.in_(run_ids))).all()
 
-		analysis.task_name = analysis.runs[0].task.name
-
-
-		return AnalysisBundleSchema().dump(analysis)
+		return get_json_bundle(analysis)

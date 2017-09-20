@@ -18,7 +18,9 @@ class Dataset(db.Model):
 	analyses = db.relationship('Analysis', backref='dataset',
 	                            lazy='dynamic')
 	address = db.Column(db.Text)
-	
+
+	local_path = db.Column(db.Text)
+
 	@hybrid_property
 	def mimetypes(self):
 		""" List of mimetypes of stimuli in dataset """

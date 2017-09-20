@@ -3,6 +3,7 @@ from flask_apispec import doc
 from webargs.flaskparser import parser
 from flask import jsonify
 from models import Analysis
+from flask import current_app
 
 import celery.states as states
 from worker import celery_app
@@ -22,15 +23,15 @@ def first_or_404(query):
 
 def update_analysis_status(analysis, commit=True):
     """ Checks celery for updates to analysis status and results """
-    if analysis.status != "DRAFT":
+    if not analysis.status in ["DRAFT", "PASSED"]:
     	res = celery_app.AsyncResult(analysis.celery_id)
     	if res.state == states.FAILURE:
     		analysis.status = "FAILED"
     	elif res.state != states.SUCCESS:
     		analysis.status = "PENDING"
     	elif res.state == states.SUCCESS:
-    		analysis.status = "PASSED"
-    		analysis.workflow = res.result
+            analysis.status = "PASSED"
+            current_app.logger.info(res.result)
 
     if commit:
         db.session.commit()

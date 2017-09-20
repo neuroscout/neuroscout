@@ -1,3 +1,7 @@
 celery
 flower
 redis
+docopt
+pybids
+duecredit
+pandas

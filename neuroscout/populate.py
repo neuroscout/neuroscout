@@ -58,21 +58,22 @@ def add_predictor(db_session, predictor_name, dataset_id, run_id,
 
     return predictor.id
 
-def add_dataset(db_session, task, replace=False, verbose=True,
-                install_path='.', automagic=False, skip_predictors=False,
-                address=None, bids_path=None, name=None, **kwargs):
+def add_dataset(db_session, task, bids_path=None, address=None,
+                install_path='.', automagic=False, replace=False, verbose=True,
+                skip_predictors=False,name=None, **kwargs):
     """ Adds a BIDS dataset task to the database.
         Args:
             db_session - sqlalchemy db db_session
-            bids_path - path to local or remote bids directory.
-                        remote paths must begin with "///" or be github link.
             task - task to add
+            bids_path - path to local dataset.
+            address - remote address of dataset.
+            install_path - if remote with no local path, where to install.
+            automagic - force enable DataLad automagic
             replace - if dataset/task already exists, skip or replace?
             verbose - verbose output
-            install_path - if remote dataset, where to install.
-            kwargs - arguments to filter runs by
-            automagic - force enable DataLad automagic
             skip_predictors - skip ingesting original predictors
+            name - overide dataset name
+            kwargs - arguments to filter runs by
         Output:
             dataset model id
      """
@@ -113,6 +114,7 @@ def add_dataset(db_session, task, replace=False, verbose=True,
     if new_ds:
         dataset_model.description = description
         dataset_model.address = address
+        dataset_model.local_path = bids_path
         db_session.commit()
 
     # Get or create task

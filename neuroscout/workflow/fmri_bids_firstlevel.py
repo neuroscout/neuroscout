@@ -8,7 +8,7 @@ Usage:
 -w <work_dir>           Working directory.
 -c                      Stop on first crash.
 --jobs=<n>              Number of parallel jobs [default: 1].
---disable-datalad       Don't attempt to use datalad to fetch datasets
+--disable-datalad       Don't attempt to use datalad to fetch data
 """
 
 from docopt import docopt
@@ -59,7 +59,9 @@ class FirstLevel(object):
         args.pop('make')
 
         """ Process bundle arguments """
-        bundle = json.load(open(args.pop('<bundle>'), 'r'))
+        bundle = args.pop('<bundle>')
+        if not isinstance(bundle, dict):
+            bundle = json.load(open(bundle, 'r'))
         self.args['subjects'] = list(pd.DataFrame(
             bundle['runs']).subject.unique())
         self.args['config'] = bundle['config']
