@@ -12,7 +12,7 @@ services:
       - ./neuroscout/:/neuroscout
       - /home/zorro/datasets:/datasets
       - file-data:/file-data
-    command: /usr/local/bin/gunicorn -w 2 -b :8000 core:app --log-level debug
+    command: /usr/local/bin/gunicorn -w 2 -b :8000 core:app --log-level debug --chdir /neuroscout
     env_file: .env
 
   nginx:
