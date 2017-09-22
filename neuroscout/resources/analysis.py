@@ -149,11 +149,9 @@ class CompileAnalysisResource(AnalysisBaseResource):
 	@doc(summary='Compile and lock analysis.')
 	@utils.owner_required
 	def post(self, analysis):
-		json = get_json_bundle(analysis)
-		## What else do you we need? Local dataset path
+		json = get_json_bundle(analysis).data
 		task = celery_app.send_task('workflow.compile',
 				args=[json, analysis.dataset.local_path])
-		current_app.logger.info(task)
 		analysis.status = 'PENDING'
 		analysis.celery_id = task.id
 		db.session.add(analysis)

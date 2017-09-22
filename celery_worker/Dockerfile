@@ -11,5 +11,4 @@ RUN apt-get install -yq fsl
 ENV FSLDIR="/usr/share/fsl/5.0"
 ENV PATH="${FSLDIR}/bin:${PATH}"
 RUN . /usr/share/fsl/5.0/etc/fslconf/fsl.sh
-RUN pip install git+https://github.com/qmac/nipype --user
 WORKDIR /celery_worker

@@ -29,6 +29,7 @@ class Analysis(db.Model):
     modified_at = db.Column(db.DateTime, default=datetime.datetime.utcnow)
     saved_count = db.Column(db.Integer, default=0)
     status = db.Column(db.Text, default='DRAFT')
+    celery_result = db.Column(db.Text)
     __table_args__ = (
     	db.CheckConstraint(status.in_(['PASSED', 'FAILED', 'PENDING', 'DRAFT'])), )
     compiled_at = db.Column(db.DateTime)

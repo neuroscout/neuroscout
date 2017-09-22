@@ -24,14 +24,15 @@ def first_or_404(query):
 def update_analysis_status(analysis, commit=True):
     """ Checks celery for updates to analysis status and results """
     if not analysis.status in ["DRAFT", "PASSED"]:
-    	res = celery_app.AsyncResult(analysis.celery_id)
-    	if res.state == states.FAILURE:
-    		analysis.status = "FAILED"
-    	elif res.state != states.SUCCESS:
-    		analysis.status = "PENDING"
-    	elif res.state == states.SUCCESS:
+        res = celery_app.AsyncResult(analysis.celery_id)
+        if res.state == states.FAILURE:
+            analysis.status = "FAILED"
+        elif res.state != states.SUCCESS:
+            analysis.status = "PENDING"
+        elif res.state == states.SUCCESS:
             analysis.status = "PASSED"
-            current_app.logger.info(res.result)
+
+        analysis.celery_result = str(res.result)
 
     if commit:
         db.session.commit()
