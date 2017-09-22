@@ -2,6 +2,7 @@ from tests.request_utils import decode_json
 from models import Analysis, Run
 import pytest
 import os
+import time
 
 def test_get(session, auth_client, add_analysis):
 	# List of analyses
@@ -170,8 +171,24 @@ def test_put(auth_client, add_analysis, add_dataset, session):
 
 @pytest.mark.skipif('CELERY_BROKER_URL' not in os.environ,
                     reason="requires redis")
-def test_compile(auth_client, add_analysis):
+def test_compile(auth_client, add_analysis, add_analysis_fail):
 	analysis  = Analysis.query.filter_by(id=add_analysis).first()
+	analysis_bad = Analysis.query.filter_by(id=add_analysis_fail).first()
+
+	# Test analysis from user 2 - should fail compilation
+	resp = auth_client.post('/api/analyses/{}/compile'.format(analysis_bad.hash_id))
+	assert resp.status_code == 200
+	locked_analysis = decode_json(resp)
+
+	# Test status after some time
+	resp = auth_client.get('/api/analyses/{}'.format(analysis_bad.hash_id))
+	timeout = time.time() + 60*1   # 1 minute timeout
+	while decode_json(resp)['status'] == 'PENDING':
+		resp = auth_client.get('/api/analyses/{}'.format(analysis_bad.hash_id))
+		if decode_json(resp)['status'] == 'FAILED' or time.time() > timeout:
+			assert 1
+			break
+		time.sleep(0.2)
 
 	# Test compiling
 	resp = auth_client.post('/api/analyses/{}/compile'.format(analysis.hash_id))
@@ -187,12 +204,19 @@ def test_compile(auth_client, add_analysis):
 	assert resp.status_code == 422
 
 	# Test status after some time
-	resp = auth_client.post('/api/analyses/{}/compile'.format(analysis.hash_id))
-	assert decode_json(resp)['status'] == 'PASSED'
+	resp = auth_client.get('/api/analyses/{}'.format(analysis.hash_id))
+	timeout = time.time() + 60*1   # 1 minute timeout
+	while decode_json(resp)['status'] == 'PENDING':
+		resp = auth_client.get('/api/analyses/{}'.format(analysis.hash_id))
+		if decode_json(resp)['status'] == 'PASSED' or time.time() > timeout:
+			assert 1
+			break
+		time.sleep(0.2)
 
-	# Try deleting locked anlaysis
+	# Try deleting locked analysis
 	resp = auth_client.delete('/api/analyses/{}'.format(analysis.hash_id))
 	assert resp.status_code == 422
+
 
 def test_auth_id(auth_client, add_analysis_user2):
 	# Try deleting analysis you are not owner of

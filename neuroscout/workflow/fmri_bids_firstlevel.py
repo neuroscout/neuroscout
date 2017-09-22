@@ -94,8 +94,6 @@ class FirstLevel(object):
             automagic = AutomagicIO()
             automagic.activate()
 
-        project = BIDSLayout(bids_dir)
-
         """ Write out event files """
         pes = pd.DataFrame(bundle.pop('predictor_events')).rename(
             columns={'predictor_id' : 'trial_type'})
@@ -114,12 +112,6 @@ class FirstLevel(object):
                 r['subject'], ses, bundle['task_name'], r['number']))
 
             run_events.to_csv(events_fname, sep='\t', index=False)
-
-            ## Check there are functional preprocessed files for each run_events
-            if len(project.get(type='preproc', extensions='.nii.gz',
-                               task=bundle['task_name'])) < 1:
-                raise Exception("BIDS directory does not contain"
-                                "preprocessed data for run {}".format(r['id']))
 
         self.args['runs'] = bundle['runs']
 

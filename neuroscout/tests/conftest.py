@@ -80,7 +80,8 @@ def auth_client(add_users):
 """
 Data population fixtures
 """
-from models import Analysis, Result, Predictor, User, Role
+from models import (Analysis, Result, Predictor,
+                    PredictorEvent, User, Role, Dataset)
 import populate
 
 DATASET_PATH = os.path.join(
@@ -128,9 +129,34 @@ def add_dataset_remote(session):
 
 @pytest.fixture(scope="function")
 def add_analysis(session, add_users, add_dataset):
-    analysis = Analysis(dataset_id = add_dataset, user_id = add_users[0][0],
-        name = "My first fMRI analysis!", description = "Ground breaking")
+    dataset = Dataset.query.filter_by(id=add_dataset).first()
 
+    analysis = Analysis(dataset_id = add_dataset, user_id = add_users[0][0],
+        name = "My first fMRI analysis!", description = "Ground breaking",
+        runs=dataset.runs.all())
+
+    run_id = [r.id for r in dataset.runs.all()]
+    pred_id = PredictorEvent.query.filter(
+        PredictorEvent.run_id.in_(run_id)).distinct(
+            'predictor_id').with_entities('predictor_id').all()
+
+    analysis.predictors = Predictor.query.filter(Predictor.id.in_(pred_id)).all()
+
+    analysis.contrasts = {}
+    analysis.transformations = {}
+
+    session.add(analysis)
+    session.commit()
+
+    return analysis.id
+
+@pytest.fixture(scope="function")
+def add_analysis_fail(session, add_users, add_dataset):
+    """ This analysis is from user 2 and also should fail compilation """
+    dataset = Dataset.query.filter_by(id=add_dataset).first()
+    analysis = Analysis(dataset_id = add_dataset, user_id = add_users[0][0],
+        name = "A bad analysis!", description = "Bad!",
+        runs=dataset.runs.all())
 
     session.add(analysis)
     session.commit()
@@ -139,9 +165,11 @@ def add_analysis(session, add_users, add_dataset):
 
 @pytest.fixture(scope="function")
 def add_analysis_user2(session, add_users, add_dataset):
+    """ This analysis is from user 2 and also should fail compilation """
+    dataset = Dataset.query.filter_by(id=add_dataset).first()
     analysis = Analysis(dataset_id = add_dataset, user_id = add_users[0][1],
-        name = "My first fMRI analysis!", description = "Ground breaking")
-
+        name = "My first fMRI analysis!", description = "Ground breaking",
+        runs=dataset.runs.all())
 
     session.add(analysis)
     session.commit()
