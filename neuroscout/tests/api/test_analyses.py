@@ -177,7 +177,7 @@ def test_compile(auth_client, add_analysis):
 	resp = auth_client.post('/api/analyses/{}/compile'.format(analysis.hash_id))
 	assert resp.status_code == 200
 	locked_analysis = decode_json(resp)
-	# Need to add route for locking
+
 	assert locked_analysis['status'] == 'PENDING'
 	assert locked_analysis['compiled_at'] != ''
 
@@ -185,6 +185,10 @@ def test_compile(auth_client, add_analysis):
 	resp = auth_client.put('/api/analyses/{}'.format(analysis.hash_id),
 						data=locked_analysis)
 	assert resp.status_code == 422
+
+	# Test status after some time
+	resp = auth_client.post('/api/analyses/{}/compile'.format(analysis.hash_id))
+	assert decode_json(resp)['status'] == 'PASSED'
 
 	# Try deleting locked anlaysis
 	resp = auth_client.delete('/api/analyses/{}'.format(analysis.hash_id))
