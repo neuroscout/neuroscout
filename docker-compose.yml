@@ -1,20 +1,19 @@
 version: "2"
 services:
-  web:
+  neuroscout:
     restart: always
-    build: ./web
+    build: ./neuroscout
     expose:
       - "8000"
     links:
       - postgres:postgres
     volumes:
       - migrations:/migrations
-      - ./web/:/web
+      - ./neuroscout/:/neuroscout
       - /home/zorro/datasets:/datasets
       - file-data:/file-data
-    command: /usr/local/bin/gunicorn -w 2 -b :8000 core:app --log-level debug --chdir /web
-    environment:
-      - APP_SETTINGS=config.config.DevelopmentConfig
+    command: /usr/local/bin/gunicorn -w 2 -b :8000 core:app --log-level debug
+    env_file: .env
 
   nginx:
     restart: always
@@ -22,9 +21,9 @@ services:
     ports:
       - "80:80"
     volumes_from:
-      - web
+      - neuroscout
     links:
-      - web:web
+      - neuroscout:neuroscout
 
   data:
     image: postgres:latest
@@ -48,6 +47,36 @@ services:
       - "API_URL=http://localhost/swagger/"
     ports:
       - '5000:8080'
+
+  redis:
+    image: redis
+
+  worker:
+    build:
+      context: ./celery_worker
+      dockerfile: Dockerfile
+    depends_on:
+      - redis
+    entrypoint: celery -A tasks worker --loglevel=info
+    volumes:
+      - file-data:/file-data
+      - /home/zorro/datasets:/datasets
+      - ./neuroscout/:/neuroscout
+      - ./celery_worker/:/celery_worker
+
+    env_file: .env
+
+  monitor:
+    build:
+      context: ./celery_worker
+      dockerfile: Dockerfile
+    ports:
+     - "5555:5555"
+    entrypoint: flower
+    command:  -A tasks --port=5555 --broker=redis://redis:6379/0
+    depends_on:
+      - redis
+    env_file: .env
 
 volumes:
   migrations:

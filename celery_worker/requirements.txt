@@ -1,0 +1,10 @@
+celery
+flower
+redis
+docopt
+-e git+https://github.com/incf/pybids@transformer#egg=pybids
+duecredit
+pandas
+patsy
+networkx==1.9
+-e git+https://github.com/qmac/nipype@events-interface#egg=nipype

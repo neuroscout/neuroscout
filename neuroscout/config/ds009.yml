@@ -1,0 +1,9 @@
+self-control:
+  path: /datasets/ds009
+  tasks:
+    emotionalregulation:
+      features:
+        - default.json
+      filters:
+        subject: "0[0-9]"
+        run: 1
