@@ -58,7 +58,25 @@ def add_predictor(db_session, predictor_name, dataset_id, run_id,
 
     return predictor.id
 
-# def delete_task()
+def delete_task(db_session, dataset, task):
+    """ Deletes BIDS dataset task from the database, and *all* associated
+    data in other tables.
+        Args:
+            db_session - sqlalchemy db db_session
+            dataset - name of dataset
+            task - name of task
+    """
+    dataset_model = Dataset.query.filter_by(name=dataset).one_or_none()
+    if not dataset_model:
+        raise ValueError("Dataset not found, cannot delete task.")
+
+    task_model = Task.query.filter_by(name=task,
+                                         dataset_id=dataset_model.id).one_or_none()
+    if not task_model:
+        raise ValueError("Task not found, cannot delete.")
+
+    db_session.delete(task_model)
+    db_session.commit()
 
 def add_task(db_session, task, bids_path=None, address=None,
                 install_path='.', automagic=False, replace=False, verbose=True,

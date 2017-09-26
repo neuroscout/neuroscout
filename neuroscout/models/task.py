@@ -14,7 +14,7 @@ class Task(db.Model):
     dataset_id = db.Column(db.Integer, db.ForeignKey('dataset.id'),
                            nullable=False)
 
-    runs = db.relationship('Run', backref='task')
+    runs = db.relationship('Run', backref='task', cascade="delete")
 
     @hybrid_property
     def num_runs(self):

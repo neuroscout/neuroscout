@@ -22,15 +22,13 @@ class Run(db.Model):
     task_id = db.Column(db.Integer, db.ForeignKey('task.id'),
                            nullable=False)
     dataset_id = db.Column(db.Integer, db.ForeignKey('dataset.id'), nullable=False)
+
+    prs = db.relationship('PredictorRun',
+                          cascade='delete')
+    gpv = db.relationship('GroupPredictorValue',
+                          cascade='delete')
     predictor_events = db.relationship('PredictorEvent', backref='run',
-                                        lazy='dynamic')
+                                        lazy='dynamic', cascade='delete')
     analyses = db.relationship('Analysis',
                             secondary='analysis_run',
                             lazy='dynamic')
-    stimuli = db.relationship('Stimulus',
-                            secondary='run_stimulus',
-                            backref='run',
-                            lazy='dynamic')
-
-
-    # Anything else that a nipype interface needs to work with that run?

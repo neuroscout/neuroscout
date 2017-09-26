@@ -1,5 +1,4 @@
 from database import db
-from sqlalchemy.ext.hybrid import hybrid_property
 import statistics
 
 class Predictor(db.Model):

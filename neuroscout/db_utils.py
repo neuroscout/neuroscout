@@ -36,7 +36,7 @@ def get_or_create(db_session, model, commit=True, **kwargs):
     **kwargs: columns to filter by
 
     Returns:
-    (all matching or created instances, if instance is new)
+    (first matching or created instance, if instance is new)
     """
     instance = db_session.query(model).filter_by(**kwargs).first()
     if instance:
