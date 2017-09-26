@@ -59,3 +59,4 @@ def test_get_predictor_data(auth_client, add_task):
     assert resp.status_code == 200
     pe_list_filt = decode_json(resp)
     assert len(pe_list_filt) == 4
+    assert pe_list_filt[0]['duration'] == 5

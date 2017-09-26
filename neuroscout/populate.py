@@ -258,6 +258,7 @@ def add_task(db_session, task, bids_path=None, address=None,
                                                 stimulus_id=stimulus_model.id,
                                                 run_id=run_model.id)
             runstim.onset=onsets[i]
+            runstim.duration=durations[i]
 
     db_session.commit()
 
@@ -428,6 +429,12 @@ def extract_features(db_session, bids_path, name, task, graph_spec, verbose=True
             onsets = [ee.onset + rs.onset if ee.onset else rs.onset
                       for ee in ees]
             durations = [ee.duration for ee in ees]
+
+            # If only a single value was extracted, and there is no duration
+            # Set to stimulus duration
+            if (len(durations) == 1) and (durations[0] is None):
+                durations[0] = rs.duration
+
             values = [ee.value for ee in ees if ee.value]
 
             predictor_name = '{}.{}'.format(ef.extractor_name, ef.feature_name)
