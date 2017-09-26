@@ -58,7 +58,9 @@ def add_predictor(db_session, predictor_name, dataset_id, run_id,
 
     return predictor.id
 
-def add_dataset(db_session, task, bids_path=None, address=None,
+# def delete_task()
+
+def add_task(db_session, task, bids_path=None, address=None,
                 install_path='.', automagic=False, replace=False, verbose=True,
                 skip_predictors=False,name=None, **kwargs):
     """ Adds a BIDS dataset task to the database.
@@ -302,7 +304,7 @@ def extract_features(db_session, bids_path, name, task, graph_spec, verbose=True
         from pliers.graph import Graph
 
     # ### CHANGE THIS TO LOOK UP ONLY. FAIL IF DS NOT FOUND
-    dataset_id = add_dataset(db_session, task, bids_path=bids_path,
+    dataset_id = add_task(db_session, task, bids_path=bids_path,
                              name=name, **filters)
 
 
@@ -442,7 +444,7 @@ def ingest_from_yaml(db_session, config_file, install_path='/file-data', automag
 
             dp = options.get('dataset_parameters', {})
 
-            dataset_ids.append(add_dataset(db_session, task,
+            dataset_ids.append(add_task(db_session, task,
                                 bids_path=path, address=address,
             					replace=replace, automagic=automagic,
                                 verbose=True, install_path=new_path,

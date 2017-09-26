@@ -1,5 +1,5 @@
 from tests.request_utils import decode_json
-def test_get_predictor(auth_client, add_dataset):
+def test_get_predictor(auth_client, add_task):
     # List of predictors
     resp = auth_client.get('/api/predictors')
     assert resp.status_code == 200
@@ -43,7 +43,7 @@ def test_get_predictor(auth_client, add_dataset):
     pred_p = decode_json(resp)
     assert len(pred_p) == 1
 
-def test_get_predictor_data(auth_client, add_dataset):
+def test_get_predictor_data(auth_client, add_task):
     # List of predictors
     resp = auth_client.get('/api/predictor-events')
     assert resp.status_code == 200

@@ -42,10 +42,10 @@ def test_get(session, auth_client, add_analysis):
 	assert resp.status_code == 404
 	# assert 'requested URL was not found' in decode_json(resp)['message']
 
-def test_post(auth_client, add_dataset, add_predictor):
+def test_post(auth_client, add_task, add_predictor):
 	## Add analysis
 	test_analysis = {
-	"dataset_id" : add_dataset,
+	"dataset_id" : add_task,
 	"name" : "some analysis",
 	"description" : "pretty damn innovative",
 	"transformations" : [{
@@ -97,7 +97,7 @@ def test_post(auth_client, add_dataset, add_predictor):
 	assert decode_json(resp)['message']['name'][0] == \
 			'Missing data for required field.'
 
-def test_clone(session, auth_client, add_dataset, add_analysis, add_users):
+def test_clone(session, auth_client, add_task, add_analysis, add_users):
 	(id1, id2), _ = add_users
 	analysis  = Analysis.query.filter_by(id=add_analysis).first()
 	# Clone analysis by id
@@ -114,7 +114,7 @@ def test_clone(session, auth_client, add_dataset, add_analysis, add_users):
 	assert resp.status_code == 422
 
 
-def test_put(auth_client, add_analysis, add_dataset, session):
+def test_put(auth_client, add_analysis, add_task, session):
 	# Get analysis to edit
 	analysis  = Analysis.query.filter_by(id=add_analysis).first()
 	analysis_json = decode_json(
@@ -148,7 +148,7 @@ def test_put(auth_client, add_analysis, add_dataset, session):
 	# Add and delete analysis
 	## Add analysis
 	test_analysis = {
-	"dataset_id" : add_dataset,
+	"dataset_id" : add_task,
 	"name" : "some analysis",
 	"description" : "pretty damn innovative"
 	}
