@@ -202,10 +202,19 @@ def test_compile(auth_client, add_analysis, add_analysis_fail):
 	assert locked_analysis['status'] == 'PENDING'
 	assert locked_analysis['compiled_at'] != ''
 
-	locked_analysis['name'] = 'New name should not be allowed'
+	# Test editing locked
+	resp = auth_client.put('/api/analyses/{}'.format(analysis.hash_id),
+						data={'name' : "New name should not be allowed"})
+	assert resp.status_code == 422
+
+	# Test editing status
+	locked_analysis['private'] = False
+	locked_analysis['new_name'] = "Should not change to this"
 	resp = auth_client.put('/api/analyses/{}'.format(analysis.hash_id),
 						data=locked_analysis)
-	assert resp.status_code == 422
+	assert resp.status_code == 200
+	assert decode_json(resp)['private'] == False
+	assert decode_json(resp)['name'] != "Should not change to this"
 
 	# Test status after some time
 	resp = auth_client.get('/api/analyses/{}'.format(analysis.hash_id))
