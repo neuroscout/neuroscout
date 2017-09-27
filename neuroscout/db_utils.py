@@ -2,17 +2,17 @@ from flask import abort
 from sqlalchemy.exc import SQLAlchemyError
 from flask import current_app
 
-def copy_row(model, row, ignored_columns=[]):
+def copy_row(model, row, ignored_columns=[], ignored_relationships=[]):
     copy = model()
 
     for col in row.__table__.columns:
         if col.name not in ignored_columns:
-            try:
-                copy.__setattr__(col.name, getattr(row, col.name))
-            except Exception as e:
-                print(e)
-                continue
+            copy.__setattr__(col.name, getattr(row, col.name))
 
+    # Copy relationships:
+    for r in row.__mapper__.relationships:
+        if r.key not in ignored_relationships:
+            copy.__setattr__(r.key, getattr(row, r.key))
     return copy
 
 def put_record(db_session, updated_values, instance):
@@ -36,7 +36,7 @@ def get_or_create(db_session, model, commit=True, **kwargs):
     **kwargs: columns to filter by
 
     Returns:
-    (all matching or created instances, if instance is new)
+    (first matching or created instance, if instance is new)
     """
     instance = db_session.query(model).filter_by(**kwargs).first()
     if instance:

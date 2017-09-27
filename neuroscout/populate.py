@@ -58,7 +58,27 @@ def add_predictor(db_session, predictor_name, dataset_id, run_id,
 
     return predictor.id
 
-def add_dataset(db_session, task, bids_path=None, address=None,
+def delete_task(db_session, dataset, task):
+    """ Deletes BIDS dataset task from the database, and *all* associated
+    data in other tables.
+        Args:
+            db_session - sqlalchemy db db_session
+            dataset - name of dataset
+            task - name of task
+    """
+    dataset_model = Dataset.query.filter_by(name=dataset).one_or_none()
+    if not dataset_model:
+        raise ValueError("Dataset not found, cannot delete task.")
+
+    task_model = Task.query.filter_by(name=task,
+                                         dataset_id=dataset_model.id).one_or_none()
+    if not task_model:
+        raise ValueError("Task not found, cannot delete.")
+
+    db_session.delete(task_model)
+    db_session.commit()
+
+def add_task(db_session, task, bids_path=None, address=None,
                 install_path='.', automagic=False, replace=False, verbose=True,
                 skip_predictors=False,name=None, **kwargs):
     """ Adds a BIDS dataset task to the database.
@@ -238,6 +258,7 @@ def add_dataset(db_session, task, bids_path=None, address=None,
                                                 stimulus_id=stimulus_model.id,
                                                 run_id=run_model.id)
             runstim.onset=onsets[i]
+            runstim.duration=durations[i]
 
     db_session.commit()
 
@@ -302,7 +323,7 @@ def extract_features(db_session, bids_path, name, task, graph_spec, verbose=True
         from pliers.graph import Graph
 
     # ### CHANGE THIS TO LOOK UP ONLY. FAIL IF DS NOT FOUND
-    dataset_id = add_dataset(db_session, task, bids_path=bids_path,
+    dataset_id = add_task(db_session, task, bids_path=bids_path,
                              name=name, **filters)
 
 
@@ -408,6 +429,12 @@ def extract_features(db_session, bids_path, name, task, graph_spec, verbose=True
             onsets = [ee.onset + rs.onset if ee.onset else rs.onset
                       for ee in ees]
             durations = [ee.duration for ee in ees]
+
+            # If only a single value was extracted, and there is no duration
+            # Set to stimulus duration
+            if (len(durations) == 1) and (durations[0] is None):
+                durations[0] = rs.duration
+
             values = [ee.value for ee in ees if ee.value]
 
             predictor_name = '{}.{}'.format(ef.extractor_name, ef.feature_name)
@@ -442,7 +469,7 @@ def ingest_from_yaml(db_session, config_file, install_path='/file-data', automag
 
             dp = options.get('dataset_parameters', {})
 
-            dataset_ids.append(add_dataset(db_session, task,
+            dataset_ids.append(add_task(db_session, task,
                                 bids_path=path, address=address,
             					replace=replace, automagic=automagic,
                                 verbose=True, install_path=new_path,

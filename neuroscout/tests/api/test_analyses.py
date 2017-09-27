@@ -42,10 +42,10 @@ def test_get(session, auth_client, add_analysis):
 	assert resp.status_code == 404
 	# assert 'requested URL was not found' in decode_json(resp)['message']
 
-def test_post(auth_client, add_dataset, add_predictor):
+def test_post(auth_client, add_task, add_predictor):
 	## Add analysis
 	test_analysis = {
-	"dataset_id" : add_dataset,
+	"dataset_id" : add_task,
 	"name" : "some analysis",
 	"description" : "pretty damn innovative",
 	"transformations" : [{
@@ -97,13 +97,17 @@ def test_post(auth_client, add_dataset, add_predictor):
 	assert decode_json(resp)['message']['name'][0] == \
 			'Missing data for required field.'
 
-def test_clone(session, auth_client, add_dataset, add_analysis, add_users):
+def test_clone(session, auth_client, add_task, add_analysis, add_users):
 	(id1, id2), _ = add_users
 	analysis  = Analysis.query.filter_by(id=add_analysis).first()
 	# Clone analysis by id
 	resp= auth_client.post('/api/analyses/{}/clone'.format(analysis.hash_id))
 	clone_json = decode_json(resp)
 	assert clone_json['hash_id'] != analysis.hash_id
+
+	# Check that runs and predictors have been copied
+	assert len(clone_json['runs']) == len(analysis.runs)
+	assert len(clone_json['predictors']) == len(analysis.predictors)
 
 	# Change user ID to someone else's and try again
 	analysis.status = 'DRAFT'
@@ -114,7 +118,7 @@ def test_clone(session, auth_client, add_dataset, add_analysis, add_users):
 	assert resp.status_code == 422
 
 
-def test_put(auth_client, add_analysis, add_dataset, session):
+def test_put(auth_client, add_analysis, add_task, session):
 	# Get analysis to edit
 	analysis  = Analysis.query.filter_by(id=add_analysis).first()
 	analysis_json = decode_json(
@@ -148,7 +152,7 @@ def test_put(auth_client, add_analysis, add_dataset, session):
 	# Add and delete analysis
 	## Add analysis
 	test_analysis = {
-	"dataset_id" : add_dataset,
+	"dataset_id" : add_task,
 	"name" : "some analysis",
 	"description" : "pretty damn innovative"
 	}
@@ -198,10 +202,19 @@ def test_compile(auth_client, add_analysis, add_analysis_fail):
 	assert locked_analysis['status'] == 'PENDING'
 	assert locked_analysis['compiled_at'] != ''
 
-	locked_analysis['name'] = 'New name should not be allowed'
+	# Test editing locked
+	resp = auth_client.put('/api/analyses/{}'.format(analysis.hash_id),
+						data={'name' : "New name should not be allowed"})
+	assert resp.status_code == 422
+
+	# Test editing status
+	locked_analysis['private'] = False
+	locked_analysis['new_name'] = "Should not change to this"
 	resp = auth_client.put('/api/analyses/{}'.format(analysis.hash_id),
 						data=locked_analysis)
-	assert resp.status_code == 422
+	assert resp.status_code == 200
+	assert decode_json(resp)['private'] == False
+	assert decode_json(resp)['name'] != "Should not change to this"
 
 	# Test status after some time
 	resp = auth_client.get('/api/analyses/{}'.format(analysis.hash_id))

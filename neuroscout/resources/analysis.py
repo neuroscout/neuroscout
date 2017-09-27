@@ -116,7 +116,10 @@ class AnalysisResource(AnalysisBaseResource):
 	@utils.owner_required
 	def put(self, analysis, **kwargs):
 		if analysis.status != 'DRAFT':
-			utils.abort(422, "Analysis is not editable. Try cloning it.")
+			exceptions = ['private']
+			kwargs = {k: v for k, v in kwargs.items() if k in exceptions}
+			if not kwargs:
+				utils.abort(422, "Analysis is not editable. Try cloning it.")
 		return put_record(db.session, kwargs, analysis)
 
 	@doc(summary='Delete analysis.')

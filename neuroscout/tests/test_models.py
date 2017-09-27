@@ -3,8 +3,8 @@ from models import (Analysis, User, Dataset, Predictor, Stimulus, Run,
 					RunStimulus, Result, ExtractedFeature,
 					GroupPredictor, GroupPredictorValue)
 
-def test_dataset_ingestion(session, add_dataset):
-	dataset_model = Dataset.query.filter_by(id=add_dataset).one()
+def test_dataset_ingestion(session, add_task):
+	dataset_model = Dataset.query.filter_by(id=add_task).one()
 
 	# Test mimetypes
 	assert 'image/jpeg' in dataset_model.mimetypes
@@ -59,15 +59,15 @@ def test_dataset_ingestion(session, add_dataset):
 	assert gpv.count() == 2
 	assert 'F' in [v.value for v in gpv]
 
-def test_remote_dataset(session, add_dataset_remote):
-	dataset_model = Dataset.query.filter_by(id=add_dataset_remote).one()
+def test_remote_dataset(session, add_task_remote):
+	dataset_model = Dataset.query.filter_by(id=add_task_remote).one()
 
 	# Test mimetypes
 	assert 'image/jpeg' in dataset_model.mimetypes
 	assert 'bidstest' == dataset_model.tasks[0].name
 
 	# Test properties of Run
-	assert Run.query.filter_by(dataset_id=add_dataset_remote).count() \
+	assert Run.query.filter_by(dataset_id=add_task_remote).count() \
 			== dataset_model.runs.count() == 1
 	predictor = Predictor.query.filter_by(name='rt').first()
 	assert predictor.predictor_events.count() == 4
@@ -77,9 +77,9 @@ def test_remote_dataset(session, add_dataset_remote):
 
 	# Test participants.tsv ingestion
 	assert GroupPredictor.query.filter_by(
-			dataset_id=add_dataset_remote).count() == 3
+			dataset_id=add_task_remote).count() == 3
 
-def test_extracted_features(add_dataset_remote):
+def test_extracted_features(add_task_remote):
 	""" This tests feature extraction from a remote dataset"""
 	assert ExtractedFeature.query.count() == 2
 

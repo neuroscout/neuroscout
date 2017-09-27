@@ -37,7 +37,7 @@ def add_user(email, password):
     db.session.commit()
 
 @manager.command
-def add_dataset(bids_path, task, replace=False, automagic=False,
+def add_task(bids_path, task, replace=False, automagic=False,
 		skip_predictors=False, filters='{}'):
 		""" Add BIDS dataset to database.
 		bids_path - Path to bids directory
@@ -47,7 +47,7 @@ def add_dataset(bids_path, task, replace=False, automagic=False,
 		skip_predictors - Skip original Predictors
 		filters - string JSON object with optional run filters
 		"""
-		populate.add_dataset(db.session, bids_path, task, replace=replace,
+		populate.add_task(db.session, bids_path, task, replace=replace,
 				 verbose=True, skip_predictors=skip_predictors,
 				 automagic=automagic, **json.loads(filters))
 

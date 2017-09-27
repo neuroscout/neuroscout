@@ -115,23 +115,23 @@ def add_users(app, db, session):
 
 
 @pytest.fixture(scope="function")
-def add_dataset(session):
+def add_task(session):
     """ Add a dataset with two subjects """
-    return populate.add_dataset(session, 'bidstest', bids_path=DATASET_PATH,
+    return populate.add_task(session, 'bidstest', bids_path=DATASET_PATH,
                                 verbose=False)
 
 
 @pytest.fixture(scope="function")
-def add_dataset_remote(session):
+def add_task_remote(session):
     """ Add a dataset with two subjects """
     return populate.ingest_from_yaml(session, YML_PATH,
                                      _app.config['DATASET_DIR'])[0]
 
 @pytest.fixture(scope="function")
-def add_analysis(session, add_users, add_dataset):
-    dataset = Dataset.query.filter_by(id=add_dataset).first()
+def add_analysis(session, add_users, add_task):
+    dataset = Dataset.query.filter_by(id=add_task).first()
 
-    analysis = Analysis(dataset_id = add_dataset, user_id = add_users[0][0],
+    analysis = Analysis(dataset_id = add_task, user_id = add_users[0][0],
         name = "My first fMRI analysis!", description = "Ground breaking",
         runs=dataset.runs.all())
 
@@ -151,10 +151,10 @@ def add_analysis(session, add_users, add_dataset):
     return analysis.id
 
 @pytest.fixture(scope="function")
-def add_analysis_fail(session, add_users, add_dataset):
+def add_analysis_fail(session, add_users, add_task):
     """ This analysis is from user 2 and also should fail compilation """
-    dataset = Dataset.query.filter_by(id=add_dataset).first()
-    analysis = Analysis(dataset_id = add_dataset, user_id = add_users[0][0],
+    dataset = Dataset.query.filter_by(id=add_task).first()
+    analysis = Analysis(dataset_id = add_task, user_id = add_users[0][0],
         name = "A bad analysis!", description = "Bad!",
         runs=dataset.runs.all())
 
@@ -164,10 +164,10 @@ def add_analysis_fail(session, add_users, add_dataset):
     return analysis.id
 
 @pytest.fixture(scope="function")
-def add_analysis_user2(session, add_users, add_dataset):
+def add_analysis_user2(session, add_users, add_task):
     """ This analysis is from user 2 and also should fail compilation """
-    dataset = Dataset.query.filter_by(id=add_dataset).first()
-    analysis = Analysis(dataset_id = add_dataset, user_id = add_users[0][1],
+    dataset = Dataset.query.filter_by(id=add_task).first()
+    analysis = Analysis(dataset_id = add_task, user_id = add_users[0][1],
         name = "My first fMRI analysis!", description = "Ground breaking",
         runs=dataset.runs.all())
 
@@ -178,8 +178,8 @@ def add_analysis_user2(session, add_users, add_dataset):
 
 
 @pytest.fixture(scope="function")
-def add_predictor(session, add_dataset):
-    pred = Predictor(dataset_id = add_dataset,
+def add_predictor(session, add_task):
+    pred = Predictor(dataset_id = add_task,
         name = "RT")
 
     session.add(pred)

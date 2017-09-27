@@ -47,11 +47,11 @@ To run tests, after starting services, create a test database:
 
 and execute:
 
-    docker-compose run -w /neuroscout neuroscout python -m pytest
+    docker-compose run --rm -w /neuroscout neuroscout python -m pytest
 
 To run frontend tests run:
 
-docker-compose run -w /neuroscout/frontend neuroscout npm test
+docker-compose run --rm -w /neuroscout/frontend neuroscout npm test
 
 
 
@@ -65,11 +65,11 @@ To add users:
 
 To add BIDS datasets
 
-    python manage.py add_dataset bids_directory_path task_name
+    python manage.py add_task bids_directory_path task_name
 
 For example for dataset ds009
 
-    python manage.py add_dataset /datasets/ds009 emotionalregulation
+    python manage.py add_task /datasets/ds009 emotionalregulation
 
 Finally, once having added a dataset to the database, you can extract features
   using pliers into the database as follows:
