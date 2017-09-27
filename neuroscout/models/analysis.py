@@ -55,12 +55,14 @@ class Analysis(db.Model):
 
     def clone(self, user):
         """ Make copy of analysis, with new id, and linking to parent """
-        clone_row = copy_row(Analysis, self, ignored_columns='analysis.id')
-        clone_row.hash_id = None
+        clone_row = copy_row(Analysis, self,
+                             ignored_columns=['id', 'hash_id'])
         clone_row.parent_id = self.hash_id
         clone_row.user_id = user.id
         clone_row.status = "DRAFT"
+        clone_row.hash_id = None
         clone_row.workflow = None
+        ## Copy relationships
         return clone_row
 
 @listens_for(Analysis, "after_insert")
