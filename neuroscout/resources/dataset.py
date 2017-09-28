@@ -14,8 +14,8 @@ class DatasetSchema(Schema):
                      description='Tasks in dataset runs.')
 	runs = fields.Nested('RunSchema', many=True, only=['id'])
 	tasks = fields.Nested('TaskSchema', many=True, only=['id', 'name'])
-	address = fields.Str(description='Dataset internet address')
-
+	dataset_address = fields.Str(description='BIDS Dataset remote address')
+	preproc_address = fields.Str(description='Preprocessed data remote address')
 
 class DatasetResource(MethodResource):
     @doc(tags=['dataset'], summary='Get dataset by id.')

@@ -7,17 +7,14 @@ from models import PredictorEvent
 class AnalysisBundleSchema(Schema):
 	hash_id = fields.Str(dump_only=True, description='Hashed analysis id.')
 	name = fields.Str(required=True, description='Analysis name.')
-	dataset_address = fields.Nested('DatasetSchema', only='address',
-									load_from='dataset')
-	config = fields.Dict(description='fMRI analysis configuration parameters.')
+	preproc_address = fields.Nested('DatasetSchema', only='preproc_address')
 
-	transformations = fields.List(fields.Dict(),
-							      description='Array of transformation objects')
+	config = fields.Dict(description='fMRI analysis configuration parameters.')
 	contrasts = fields.List(fields.Dict(),
 						    description='Array of contrasts')
-
 	task_name = fields.Str(description='Task name')
 
+	## Change this to send JSON rep of design matrix
 	predictor_events = fields.Nested(
 		'PredictorEventSchema', many=True, description='Predictor events',
 		exclude=['id'])

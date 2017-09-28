@@ -1,5 +1,5 @@
 bids_test:
-  address: https://github.com/adelavega/bids_test.git
+  dataset_address: https://github.com/adelavega/bids_test.git
   tasks:
     bidstest:
       features:

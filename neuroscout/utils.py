@@ -1,3 +1,6 @@
+import requests
+import urllib.parse
+
 def hash_file(f, blocksize=65536):
     import hashlib
     hasher = hashlib.sha1()
@@ -29,3 +32,18 @@ def generate_id(n=6):
 
     return ''.join(random.SystemRandom().choice(
         string.ascii_uppercase + string.digits) for _ in range(n))
+
+def remote_resource_exists(base_address, resource, raise_exception=False,
+                 content_type='binary/octet-stream'):
+    address = urllib.parse.urljoin(base_address, resource)
+    r = requests.head(address)
+    if not r.ok or r.headers.get('Content-Type') != content_type:
+        msg = "Remote resource {} not found".format(address)
+        if raise_exception:
+            raise ValueError(msg)
+        else:
+            import warnings
+            warnings.warn(msg)
+            return False
+
+    return True

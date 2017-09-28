@@ -17,8 +17,8 @@ class Dataset(db.Model):
 	tasks = db.relationship('Task', backref='dataset')
 	analyses = db.relationship('Analysis', backref='dataset',
 	                            lazy='dynamic')
-	address = db.Column(db.Text)
-
+	dataset_address = db.Column(db.Text)
+	preproc_address = db.Column(db.Text)
 	local_path = db.Column(db.Text)
 
 	@hybrid_property
