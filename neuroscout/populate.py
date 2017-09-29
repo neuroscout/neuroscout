@@ -59,25 +59,47 @@ def add_predictor(db_session, predictor_name, dataset_id, run_id,
 
     return predictor.id
 
-def delete_task(db_session, dataset, task):
-    """ Deletes BIDS dataset task from the database, and *all* associated
-    data in other tables.
-        Args:
-            db_session - sqlalchemy db db_session
-            dataset - name of dataset
-            task - name of task
+def add_group_predictors(db_session, participants, dataset_id):
+    """ Adds group predictors using participants.tsv
+    Args:
+        participants - path to participants tsv, or pandas file
+        dataset_id - Dataset model id
+        subjects - subject ids to processed
+    Output:
+        Ids of group predictors added
     """
-    dataset_model = Dataset.query.filter_by(name=dataset).one_or_none()
-    if not dataset_model:
-        raise ValueError("Dataset not found, cannot delete task.")
+    gpv_ids = []
+    if isinstance(participants, str):
+        try:
+            participants = pd.read_csv(open(participants, 'r'), delimiter='\t')
+        except FileNotFoundError:
+            return []
 
-    task_model = Task.query.filter_by(name=task,
-                                         dataset_id=dataset_model.id).one_or_none()
-    if not task_model:
-        raise ValueError("Task not found, cannot delete.")
+    participants = dict(participants.iteritems())
+    subs = participants.pop('participant_id')
 
-    db_session.delete(task_model)
-    db_session.commit()
+    # Parse participant columns and insert as GroupPredictors
+    for col in participants.keys():
+        gp, _ = db_utils.get_or_create(db_session, GroupPredictor,
+                                              name=col,
+                                              dataset_id=dataset_id,
+                                              level='subject')
+
+        for i, val in participants[col].items():
+            sub_id = subs[i].split('-')[1]
+            subject_runs = Run.query.filter_by(dataset_id=dataset_id,
+                                               subject=sub_id)
+            for run in subject_runs:
+                gpv, _ = db_utils.get_or_create(db_session,
+                                                GroupPredictorValue,
+                                                commit=False,
+                                                gp_id=gp.id,
+                                                run_id = run.id,
+                                                level_id=sub_id)
+                gpv.value = str(val)
+                gpv_ids.append(gpv.id)
+                db_session.commit()
+    return gpv_ids
 
 def add_task(db_session, task, name=None, local_path=None, dataset_address=None,
              preproc_address=None, install_path='.', automagic=False,
@@ -106,7 +128,6 @@ def add_task(db_session, task, name=None, local_path=None, dataset_address=None,
                                path=install_path).path
         automagic = True
 
-
     if automagic:
         from datalad.auto import AutomagicIO
         automagic = AutomagicIO()
@@ -119,14 +140,11 @@ def add_task(db_session, task, name=None, local_path=None, dataset_address=None,
 
     dataset_description = json.load(open(
         os.path.join(local_path, 'dataset_description.json'), 'r'))
-    if name is not None:
-        dataset_name = name
-    else:
-        dataset_name = dataset_description['Name']
+    dataset_name = name if name is not None else dataset_description['Name']
 
     # Get or create dataset model from mandatory arguments
-    dataset_model, new_ds = db_utils.get_or_create(db_session, Dataset,
-                                                name=dataset_name)
+    dataset_model, new_ds = db_utils.get_or_create(
+        db_session, Dataset, name=dataset_name)
 
     if new_ds or replace:
         dataset_model.description = dataset_description
@@ -136,9 +154,9 @@ def add_task(db_session, task, name=None, local_path=None, dataset_address=None,
         db_session.commit()
 
     # Get or create task
-    task_model, new_task = db_utils.get_or_create(db_session, Task,
-                                                name=task,
-                                                dataset_id=dataset_model.id)
+    task_model, new_task = db_utils.get_or_create(
+        db_session, Task, name=task, dataset_id=dataset_model.id)
+
     if new_task:
         task_model.description = json.load(open(
             os.path.join(local_path, 'task-{}_bold.json'.format(task)), 'r'))
@@ -148,9 +166,6 @@ def add_task(db_session, task, name=None, local_path=None, dataset_address=None,
             if automagic:
                 automagic.deactivate()
             return dataset_model.id
-
-    # List of stimuli already processed
-    stims_processed = {}
 
     """ Parse every Run """
     for run_events in layout.get(task=task, type='events', **kwargs):
@@ -221,6 +236,8 @@ def add_task(db_session, task, name=None, local_path=None, dataset_address=None,
         """ Ingest Stimuli """
         if verbose:
             print("Ingesting stimuli")
+
+        stims_processed = {}
         for i, val in stims[stims!="n/a"].items():
             base_path = 'stimuli/{}'.format(val)
             path = os.path.join(local_path, base_path)
@@ -236,23 +253,17 @@ def add_task(db_session, task, name=None, local_path=None, dataset_address=None,
                     if verbose:
                         print('Stimulus: {} not found. Skipping.'.format(val))
                     continue
+                stims_processed[val] = stim_hash
+            else:
+                stim_hash = stims_processed[val]
 
-                # Get or create stimulus model
-                stimulus_model, _ = db_utils.get_or_create(db_session, Stimulus,
-                                                           commit=False,
-                                                           sha1_hash=stim_hash)
+            # Get or create stimulus model
+            stimulus_model, new_stim = db_utils.get_or_create(
+                db_session, Stimulus, commit=False, sha1_hash=stim_hash)
+            if new_stim:
                 stimulus_model.name=name
                 stimulus_model.path=local_path
                 stimulus_model.mimetype=mimetype
-
-                stims_processed[val] = stim_hash
-            else:
-                # Get or create stimulus model
-                stimulus_model, _ = db_utils.get_or_create(db_session, Stimulus,
-                                                           commit=False,
-                                                           sha1_hash=stims_processed[val])
-
-            db_session.commit()
 
             # Get or create Run Stimulus association
             runstim, _ = db_utils.get_or_create(db_session, RunStimulus,
@@ -261,40 +272,14 @@ def add_task(db_session, task, name=None, local_path=None, dataset_address=None,
                                                 run_id=run_model.id)
             runstim.onset=onsets[i]
             runstim.duration=durations[i]
+            db_session.commit()
 
     db_session.commit()
 
     """ Add GroupPredictors """
     if verbose:
         print("Adding group predictors")
-    # Participants
-    participants_path = os.path.join(local_path, 'participants.tsv')
-    if os.path.exists(participants_path):
-        if verbose:
-            print("Processing participants.tsv")
-        participants = pd.read_csv(open(participants_path, 'r'), delimiter='\t')
-        participants = dict(participants.iteritems())
-        subs = participants.pop('participant_id')
-
-        # Parse participant columns and insert as GroupPredictors
-        for col in participants.keys():
-            gp, _ = db_utils.get_or_create(db_session, GroupPredictor,
-                                                  name=col,
-                                                  dataset_id=dataset_model.id,
-                                                  level='subject')
-
-            for i, val in participants[col].items():
-                sub_id = subs[i].split('-')[1]
-                subject_runs = Run.query.filter_by(dataset_id=dataset_model.id,
-                                                   subject=sub_id)
-                for run in subject_runs:
-                    gpv, _ = db_utils.get_or_create(db_session, GroupPredictorValue,
-                                                   commit=False,
-                                                   gp_id=gp.id,
-                                                   run_id = run_model.id,
-                                                   level_id=sub_id)
-                    gpv.value = str(val)
-                    db_session.commit()
+    add_group_predictors(db_session, os.path.join(local_path, 'participants.tsv'))
 
     if automagic:
         automagic.deactivate()
@@ -491,3 +476,23 @@ def ingest_from_yaml(db_session, config_file, install_path='/file-data',
                         **dict(filters.items() | ep.items()))
 
     return dataset_ids
+
+def delete_task(db_session, dataset, task):
+    """ Deletes BIDS dataset task from the database, and *all* associated
+    data in other tables.
+        Args:
+            db_session - sqlalchemy db db_session
+            dataset - name of dataset
+            task - name of task
+    """
+    dataset_model = Dataset.query.filter_by(name=dataset).one_or_none()
+    if not dataset_model:
+        raise ValueError("Dataset not found, cannot delete task.")
+
+    task_model = Task.query.filter_by(name=task,
+                                         dataset_id=dataset_model.id).one_or_none()
+    if not task_model:
+        raise ValueError("Task not found, cannot delete.")
+
+    db_session.delete(task_model)
+    db_session.commit()
