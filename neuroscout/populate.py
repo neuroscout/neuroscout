@@ -283,7 +283,7 @@ def extract_features(db_session, local_path, name, task, graph_spec,
             graph_spec - pliers graph json spec location
             verbose - verbose output
             filters - additional identifiers for runs
-            autoamgic - enable automagic and unlock stimuli with datalad
+            automagic - enable automagic and unlock stimuli with datalad
         Output:
             list of db ids of extracted features
     """

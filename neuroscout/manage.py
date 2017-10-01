@@ -47,8 +47,8 @@ def add_task(local_path, task, replace=False, automagic=False,
 		skip_predictors - Skip original Predictors
 		filters - string JSON object with optional run filters
 		"""
-		populate.add_task(db.session, local_path, task, replace=replace,
-				 verbose=True, skip_predictors=skip_predictors,
+		populate.add_task(db.session, task, local_path=local_path,
+				 replace=replace, verbose=True, skip_predictors=skip_predictors,
 				 automagic=automagic, **json.loads(filters))
 
 @manager.command
