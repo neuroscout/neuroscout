@@ -47,3 +47,15 @@ def remote_resource_exists(base_address, resource, raise_exception=False,
             return False
 
     return True
+
+def format_preproc(subject, task, run, session=None,
+                   space="MNI152NLin2009cAsym", suffix="preproc"):
+    """ Format relative fmri_prep paths """
+    subject_f = "sub-{}/".format(subject)
+    session_f = "ses-{}/".format(session) if session else ""
+
+    return "{}{}func/{}{}task-{}_run-{}_bold_space-{}_{}.nii.gz".format(
+    subject_f, session_f,
+    subject_f.replace("/", "_"), session_f.replace("/", "_"),
+    task, run, space, suffix
+)

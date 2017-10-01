@@ -7,7 +7,7 @@ import pandas as pd
 from pathlib import Path
 
 import db_utils
-from utils import hash_file, hash_str, remote_resource_exists
+from utils import hash_file, hash_str, remote_resource_exists, format_preproc
 
 from bids.grabbids import BIDSLayout
 from bids.events import BIDSEventCollection
@@ -194,19 +194,6 @@ def add_task(db_session, task, name=None, local_path=None, dataset_address=None,
             run_model.duration = img.shape[3] * img.header.get_zooms()[-1] / 1000
         except (nib.filebasedimages.ImageFileError, IndexError) as e:
             print("Error loading BOLD file, duration not loaded.")
-
-
-        def format_preproc(subject, task, run, session=None,
-                           space="MNI152NLin2009cAsym", suffix="preproc"):
-            """ Format relative fmri_prep paths """
-            subject_f = "sub-{}/".format(subject)
-            session_f = "ses-{}/".format(session) if session else ""
-
-            return "{}{}func/{}{}task-{}_run-{}_bold_space-{}_{}.nii.gz".format(
-            subject_f, session_f,
-            subject_f.replace("/", "_"), session_f.replace("/", "_"),
-            task, run, space, suffix
-        )
 
         run_model.func_path = format_preproc(suffix="preproc", **entities)
         run_model.mask_path = format_preproc(suffix="brainmask", **entities)
