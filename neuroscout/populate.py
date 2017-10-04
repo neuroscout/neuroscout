@@ -59,7 +59,7 @@ def add_predictor(db_session, predictor_name, dataset_id, run_id,
 
     return predictor.id
 
-def add_group_predictors(db_session, participants, dataset_id):
+def add_group_predictors(db_session, dataset_id, participants):
     """ Adds group predictors using participants.tsv
     Args:
         participants - path to participants tsv, or pandas file
@@ -68,7 +68,7 @@ def add_group_predictors(db_session, participants, dataset_id):
     Output:
         Ids of group predictors added
     """
-    gpv_ids = []
+    gp_ids = []
     if isinstance(participants, str):
         try:
             participants = pd.read_csv(open(participants, 'r'), delimiter='\t')
@@ -97,9 +97,10 @@ def add_group_predictors(db_session, participants, dataset_id):
                                                 run_id = run.id,
                                                 level_id=sub_id)
                 gpv.value = str(val)
-                gpv_ids.append(gpv.id)
-                db_session.commit()
-    return gpv_ids
+        db_session.commit()
+        gp_ids.append(gp.id)
+
+    return gp_ids
 
 def add_task(db_session, task, name=None, local_path=None, dataset_address=None,
              preproc_address=None, install_path='.', automagic=False,
@@ -251,6 +252,7 @@ def add_task(db_session, task, name=None, local_path=None, dataset_address=None,
                 stimulus_model.name=name
                 stimulus_model.path=local_path
                 stimulus_model.mimetype=mimetype
+            db_session.commit()
 
             # Get or create Run Stimulus association
             runstim, _ = db_utils.get_or_create(db_session, RunStimulus,
@@ -266,7 +268,8 @@ def add_task(db_session, task, name=None, local_path=None, dataset_address=None,
     """ Add GroupPredictors """
     if verbose:
         print("Adding group predictors")
-    add_group_predictors(db_session, os.path.join(local_path, 'participants.tsv'))
+    add_group_predictors(db_session, dataset_model.id,
+                         os.path.join(local_path, 'participants.tsv'))
 
     if automagic:
         automagic.deactivate()
