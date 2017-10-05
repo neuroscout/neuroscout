@@ -1,9 +1,8 @@
 ''' Resources. '''
 
-from .analysis import (AnalysisSchema, AnalysisResource,
-                       AnalysisRootResource, CloneAnalysisResource,
-                       CompileAnalysisResource)
-from .bundle import AnalysisBundleResource, AnalysisBundleSchema
+from .analysis import (AnalysisSchema, AnalysisResource, AnalysisRootResource,
+                       CloneAnalysisResource, CompileAnalysisResource,
+                       AnalysisBundleResource, AnalysisBundleSchema)
 from .dataset import DatasetSchema, DatasetResource, DatasetListResource
 from .predictor import (PredictorEventSchema, PredictorSchema,
                         PredictorListResource, PredictorResource,

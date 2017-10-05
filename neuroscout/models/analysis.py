@@ -60,6 +60,10 @@ class Analysis(db.Model):
     def task_name(self):
         return self.runs[0].task.name if self.runs else None
 
+    @hybrid_property
+    def TR(self):
+        return self.runs[0].task.TR if self.runs else None
+
     def clone(self, user):
         """ Make copy of analysis, with new id, and linking to parent """
         clone_row = copy_row(Analysis, self,

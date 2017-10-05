@@ -161,6 +161,7 @@ def add_task(db_session, task, name=None, local_path=None, dataset_address=None,
     if new_task:
         task_model.description = json.load(open(
             os.path.join(local_path, 'task-{}_bold.json'.format(task)), 'r'))
+        task_model.TR = task_model.description['RepetitionTime']
         db_session.commit()
     else:
         if not replace:
