@@ -44,9 +44,9 @@ services:
   swagger-ui:
     image: swaggerapi/swagger-ui
     environment:
-      - "API_URL=http://localhost/swagger/"
+      - "API_URL=/swagger"
     ports:
-      - '5000:8080'
+      - '8080:8080'
 
   redis:
     image: redis
