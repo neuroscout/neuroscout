@@ -7,4 +7,5 @@ duecredit
 pandas
 patsy
 networkx==1.9
--e git+https://github.com/qmac/nipype@events-interface#egg=nipype
+-e git+http://github.com/qmac/nipype@events-interface#egg=nipype
+-e git+http://github.com/PsychoinformaticsLab/neuroscout-cli.git@package#egg=neuroscout-cli

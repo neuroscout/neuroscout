@@ -12,6 +12,7 @@ class TaskSchema(Schema):
     dataset_id = fields.Int()
     runs = fields.Nested('RunSchema', only=['id'])
     num_runs = fields.Int(description='Number of runs.')
+    TR = fields.Number()
 
 class TaskResource(MethodResource):
     @doc(tags=['run'], summary='Get task by id.')

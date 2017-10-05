@@ -8,6 +8,7 @@ from flask import current_app
 import celery.states as states
 from worker import celery_app
 from database import db
+from db_utils import put_record
 
 def abort(code, message=''):
     from flask import abort, make_response
@@ -27,12 +28,13 @@ def update_analysis_status(analysis, commit=True):
         res = celery_app.AsyncResult(analysis.celery_id)
         if res.state == states.FAILURE:
             analysis.status = "FAILED"
-        elif res.state != states.SUCCESS:
-            analysis.status = "PENDING"
+            analysis.celery_error = str(res.result)
         elif res.state == states.SUCCESS:
+            analysis = put_record(db.session, res.result, analysis,
+                                  commit=commit)
             analysis.status = "PASSED"
-
-        analysis.celery_result = str(res.result)
+        else:
+            analysis.status = "PENDING"
 
     if commit:
         db.session.commit()

@@ -1,11 +1,8 @@
 ''' Resources. '''
 
-from .analysis import (AnalysisSchema, AnalysisResource,
-                       AnalysisRootResource, CloneAnalysisResource,
-                       AnalysisWorkflowResource,
-                       AnalysisGraphResource,
-                       CompileAnalysisResource)
-from .bundle import AnalysisBundleResource
+from .analysis import (AnalysisSchema, AnalysisResource, AnalysisRootResource,
+                       CloneAnalysisResource, CompileAnalysisResource,
+                       AnalysisBundleResource, AnalysisBundleSchema)
 from .dataset import DatasetSchema, DatasetResource, DatasetListResource
 from .predictor import (PredictorEventSchema, PredictorSchema,
                         PredictorListResource, PredictorResource,
@@ -18,11 +15,10 @@ from .task import TaskSchema, TaskResource, TaskListResource
 
 __all__ = [
     'AnalysisSchema',
+    'AnalysisBundleSchema',
     'AnalysisResource',
     'AnalysisRootResource',
     'CloneAnalysisResource',
-    'AnalysisWorkflowResource',
-    'AnalysisGraphResource',
     'CompileAnalysisResource',
     'AnalysisBundleResource',
     'DatasetSchema',

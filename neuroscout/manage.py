@@ -37,29 +37,29 @@ def add_user(email, password):
     db.session.commit()
 
 @manager.command
-def add_task(bids_path, task, replace=False, automagic=False,
+def add_task(local_path, task, replace=False, automagic=False,
 		skip_predictors=False, filters='{}'):
 		""" Add BIDS dataset to database.
-		bids_path - Path to bids directory
+		local_path - Path to local_path directory
 		task - Task name
 		replace - If dataset is already in db, re-ingest?
 		automagic - Force enable datalad automagic
 		skip_predictors - Skip original Predictors
 		filters - string JSON object with optional run filters
 		"""
-		populate.add_task(db.session, task, bids_path=bids_path, replace=replace,
-				 verbose=True, skip_predictors=skip_predictors,
+		populate.add_task(db.session, task, local_path=local_path,
+				 replace=replace, verbose=True, skip_predictors=skip_predictors,
 				 automagic=automagic, **json.loads(filters))
 
 @manager.command
-def extract_features(bids_path, task, graph_spec, filters='{}'):
+def extract_features(local_path, task, graph_spec, filters='{}'):
 	""" Extract features from a BIDS dataset.
-	bids_path - Path to bids directory
+	local_path - Path to bids directory
 	task - Task name
 	graph_spec - Path to JSON pliers graph spec
 	filters - string JSON object with optional run filters
 	"""
-	populate.extract_features(db.session, bids_path, task, graph_spec,
+	populate.extract_features(db.session, local_path, task, graph_spec,
 		verbose=True, **json.loads(filters))
 
 ## Need to modify or create new function for updating dataset

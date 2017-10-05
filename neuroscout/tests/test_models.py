@@ -19,13 +19,13 @@ def test_dataset_ingestion(session, add_task):
 
 	# Test properties of Run
 	assert Run.query.count() == dataset_model.runs.count() == 4
-	run_model =  dataset_model.runs.first()
+	run_model =  dataset_model.runs.filter_by(number='01', subject='01').first()
 	assert run_model.dataset_id == dataset_model.id
 	assert 'TaskName' in run_model.task.description
 	assert run_model.task.description['RepetitionTime'] == 2.0
 
 	assert run_model.duration is None
-	assert run_model.func_path is None
+	assert run_model.func_path == 'sub-01/func/sub-01_task-bidstest_run-01_bold_space-MNI152NLin2009cAsym_preproc.nii.gz'
 
 	# Test properties of first run's predictor events
 	assert run_model.predictor_events.count() == 8
@@ -56,7 +56,7 @@ def test_dataset_ingestion(session, add_task):
 	assert GroupPredictor.query.filter_by(name='sex').count() == 1
 
 	gpv = GroupPredictor.query.filter_by(name='sex').one().values
-	assert gpv.count() == 2
+	assert gpv.count() == 4
 	assert 'F' in [v.value for v in gpv]
 
 def test_remote_dataset(session, add_task_remote):

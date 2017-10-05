@@ -1,6 +1,6 @@
 studyforrest_phase2:
   path: /datasets/studyforrest-data-phase2/
-  address: https://github.com/adelavega/studyforrest-data-phase2.git
+  dataset_address: https://github.com/adelavega/studyforrest-data-phase2.git
   tasks:
     objectcategories:
       features:

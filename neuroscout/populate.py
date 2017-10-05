@@ -2,11 +2,12 @@
 import os
 import re
 import json
+import yaml
 import pandas as pd
 from pathlib import Path
 
 import db_utils
-from utils import hash_file, hash_str
+from utils import hash_file, hash_str, remote_resource_exists, format_preproc
 
 from bids.grabbids import BIDSLayout
 from bids.events import BIDSEventCollection
@@ -58,101 +59,115 @@ def add_predictor(db_session, predictor_name, dataset_id, run_id,
 
     return predictor.id
 
-def delete_task(db_session, dataset, task):
-    """ Deletes BIDS dataset task from the database, and *all* associated
-    data in other tables.
-        Args:
-            db_session - sqlalchemy db db_session
-            dataset - name of dataset
-            task - name of task
+def add_group_predictors(db_session, dataset_id, participants):
+    """ Adds group predictors using participants.tsv
+    Args:
+        participants - path to participants tsv, or pandas file
+        dataset_id - Dataset model id
+        subjects - subject ids to processed
+    Output:
+        Ids of group predictors added
     """
-    dataset_model = Dataset.query.filter_by(name=dataset).one_or_none()
-    if not dataset_model:
-        raise ValueError("Dataset not found, cannot delete task.")
+    gp_ids = []
+    if isinstance(participants, str):
+        try:
+            participants = pd.read_csv(open(participants, 'r'), delimiter='\t')
+        except FileNotFoundError:
+            return []
 
-    task_model = Task.query.filter_by(name=task,
-                                         dataset_id=dataset_model.id).one_or_none()
-    if not task_model:
-        raise ValueError("Task not found, cannot delete.")
+    participants = dict(participants.iteritems())
+    subs = participants.pop('participant_id')
 
-    db_session.delete(task_model)
-    db_session.commit()
+    # Parse participant columns and insert as GroupPredictors
+    for col in participants.keys():
+        gp, _ = db_utils.get_or_create(db_session, GroupPredictor,
+                                              name=col,
+                                              dataset_id=dataset_id,
+                                              level='subject')
 
-def add_task(db_session, task, bids_path=None, address=None,
-                install_path='.', automagic=False, replace=False, verbose=True,
-                skip_predictors=False,name=None, **kwargs):
+        for i, val in participants[col].items():
+            sub_id = subs[i].split('-')[1]
+            subject_runs = Run.query.filter_by(dataset_id=dataset_id,
+                                               subject=sub_id)
+            for run in subject_runs:
+                gpv, _ = db_utils.get_or_create(db_session,
+                                                GroupPredictorValue,
+                                                commit=False,
+                                                gp_id=gp.id,
+                                                run_id = run.id,
+                                                level_id=sub_id)
+                gpv.value = str(val)
+        db_session.commit()
+        gp_ids.append(gp.id)
+
+    return gp_ids
+
+def add_task(db_session, task, name=None, local_path=None, dataset_address=None,
+             preproc_address=None, install_path='.', automagic=False,
+             replace=False, verbose=True, skip_predictors=False, **kwargs):
     """ Adds a BIDS dataset task to the database.
         Args:
             db_session - sqlalchemy db db_session
             task - task to add
-            bids_path - path to local dataset.
-            address - remote address of dataset.
+            name - overide dataset name
+            local_path - path to local bids dataset.
+            dataset_address - remote address of BIDS dataset.
+            preproc_address - remote address of preprocessed files.
             install_path - if remote with no local path, where to install.
             automagic - force enable DataLad automagic
             replace - if dataset/task already exists, skip or replace?
             verbose - verbose output
             skip_predictors - skip ingesting original predictors
-            name - overide dataset name
             kwargs - arguments to filter runs by
         Output:
             dataset model id
      """
 
-    if address is not None and bids_path is None:
+    if dataset_address is not None and local_path is None:
         from datalad import api as dl
-        bids_path = dl.install(source=address,
+        local_path = dl.install(source=dataset_address,
                                path=install_path).path
         automagic = True
-
 
     if automagic:
         from datalad.auto import AutomagicIO
         automagic = AutomagicIO()
         automagic.activate()
 
-    layout = BIDSLayout(bids_path)
+    layout = BIDSLayout(local_path)
     if task not in layout.get_tasks():
         raise ValueError("Task {} not found in dataset {}".format(
-            task, bids_path))
+            task, local_path))
 
-    # Extract BIDS dataset info and store in dictionary
-    description = json.load(open(
-        os.path.join(bids_path, 'dataset_description.json'), 'r'))
-    description['URL'] = ''
-    task_description = json.load(open(
-        os.path.join(bids_path, 'task-{}_bold.json'.format(task)), 'r'))
-
-    if name is not None:
-        dataset_name = name
-    else:
-        dataset_name = description['Name']
+    dataset_description = json.load(open(
+        os.path.join(local_path, 'dataset_description.json'), 'r'))
+    dataset_name = name if name is not None else dataset_description['Name']
 
     # Get or create dataset model from mandatory arguments
-    dataset_model, new_ds = db_utils.get_or_create(db_session, Dataset,
-                                                name=dataset_name)
+    dataset_model, new_ds = db_utils.get_or_create(
+        db_session, Dataset, name=dataset_name)
 
-    if new_ds:
-        dataset_model.description = description
-        dataset_model.address = address
-        dataset_model.local_path = bids_path
+    if new_ds or replace:
+        dataset_model.description = dataset_description
+        dataset_model.dataset_address = dataset_address
+        dataset_model.preproc_address = preproc_address
+        dataset_model.local_path = local_path
         db_session.commit()
 
     # Get or create task
-    task_model, new_task = db_utils.get_or_create(db_session, Task,
-                                                name=task,
-                                                dataset_id=dataset_model.id,
-                                                description=task_description)
+    task_model, new_task = db_utils.get_or_create(
+        db_session, Task, name=task, dataset_id=dataset_model.id)
+
     if new_task:
-        task_model.description = task_description
+        task_model.description = json.load(open(
+            os.path.join(local_path, 'task-{}_bold.json'.format(task)), 'r'))
+        task_model.TR = task_model.description['RepetitionTime']
         db_session.commit()
     else:
         if not replace:
             if automagic:
                 automagic.deactivate()
             return dataset_model.id
-
-    # List of stimuli already processed
-    stims_processed = {}
 
     """ Parse every Run """
     for run_events in layout.get(task=task, type='events', **kwargs):
@@ -162,7 +177,7 @@ def add_task(db_session, task, bids_path=None, address=None,
 
         # Get entities
         entities = {entity : getattr(run_events, entity)
-                    for entity in ['db_session', 'subject']
+                    for entity in ['subject', 'session']
                     if entity in run_events._fields}
 
         """ Extract Run information """
@@ -174,7 +189,7 @@ def add_task(db_session, task, bids_path=None, address=None,
         entities['run'] = run_events.run
         entities['task'] = task_model.name
 
-        # Get BOLD
+        # Get duration (helps w/ transformations)
         try:
             img = nib.load(layout.get(type='bold', extensions='.nii.gz',
                               return_type='file', **entities)[0])
@@ -182,27 +197,18 @@ def add_task(db_session, task, bids_path=None, address=None,
         except (nib.filebasedimages.ImageFileError, IndexError) as e:
             print("Error loading BOLD file, duration not loaded.")
 
-        preprocs = layout.get(type='preproc', return_type='file', **entities)
-        masks = layout.get(type='brainmask', return_type='file', **entities)
-        try: # Try to get path of preprocessed data
-            func = [re.findall('derivatives.*MNI152.*', pre)
-                       for pre in preprocs
-                       if re.findall('derivatives.*MNI152.*', pre)]
-
-            mask = [re.findall('derivatives.*MNI152.*', pre)
-                       for pre in masks
-                       if re.findall('derivatives.*MNI152.*', pre)]
-
-            run_model.func_path = [item for sublist in func for item in sublist][0]
-            run_model.mask_path = [item for sublist in mask for item in sublist][0]
-        except IndexError:
-            pass
-
+        run_model.func_path = format_preproc(suffix="preproc", **entities)
+        run_model.mask_path = format_preproc(suffix="brainmask", **entities)
         db_session.commit()
 
+        # Confirm remote address exists:
+        if dataset_model.preproc_address is not None:
+            remote_resource_exists(dataset_model.preproc_address, run_model.func_path)
+            remote_resource_exists(dataset_model.preproc_address, run_model.mask_path)
+
+        """ Extract Predictors"""
         if verbose:
             print("Extracting predictors")
-        """ Extract Predictors"""
         # Read event file and extract information
         tsv = pd.read_csv(open(run_events.filename, 'r'), delimiter='\t')
         tsv = dict(tsv.iteritems())
@@ -216,12 +222,14 @@ def add_task(db_session, task, bids_path=None, address=None,
                 add_predictor(db_session, predictor, dataset_model.id, run_model.id,
                               onsets, durations, tsv[predictor])
 
+        """ Ingest Stimuli """
         if verbose:
             print("Ingesting stimuli")
-        """ Ingest Stimuli """
+
+        stims_processed = {}
         for i, val in stims[stims!="n/a"].items():
             base_path = 'stimuli/{}'.format(val)
-            path = os.path.join(bids_path, base_path)
+            path = os.path.join(local_path, base_path)
             name = os.path.basename(path)
 
             # If stim has already been processed, skip adding it
@@ -234,22 +242,17 @@ def add_task(db_session, task, bids_path=None, address=None,
                     if verbose:
                         print('Stimulus: {} not found. Skipping.'.format(val))
                     continue
-
-                # Get or create stimulus model
-                stimulus_model, _ = db_utils.get_or_create(db_session, Stimulus,
-                                                           commit=False,
-                                                           sha1_hash=stim_hash)
-                stimulus_model.name=name
-                stimulus_model.path=base_path
-                stimulus_model.mimetype=mimetype
-
                 stims_processed[val] = stim_hash
             else:
-                # Get or create stimulus model
-                stimulus_model, _ = db_utils.get_or_create(db_session, Stimulus,
-                                                           commit=False,
-                                                           sha1_hash=stims_processed[val])
+                stim_hash = stims_processed[val]
 
+            # Get or create stimulus model
+            stimulus_model, new_stim = db_utils.get_or_create(
+                db_session, Stimulus, commit=False, sha1_hash=stim_hash)
+            if new_stim:
+                stimulus_model.name=name
+                stimulus_model.path=local_path
+                stimulus_model.mimetype=mimetype
             db_session.commit()
 
             # Get or create Run Stimulus association
@@ -259,57 +262,32 @@ def add_task(db_session, task, bids_path=None, address=None,
                                                 run_id=run_model.id)
             runstim.onset=onsets[i]
             runstim.duration=durations[i]
+            db_session.commit()
 
     db_session.commit()
 
+    """ Add GroupPredictors """
     if verbose:
         print("Adding group predictors")
-    """ Add GroupPredictors """
-    # Participants
-    participants_path = os.path.join(bids_path, 'participants.tsv')
-    if os.path.exists(participants_path):
-        if verbose:
-            print("Processing participants.tsv")
-        participants = pd.read_csv(open(participants_path, 'r'), delimiter='\t')
-        participants = dict(participants.iteritems())
-        subs = participants.pop('participant_id')
-
-        # Parse participant columns and insert as GroupPredictors
-        for col in participants.keys():
-            gp, _ = db_utils.get_or_create(db_session, GroupPredictor,
-                                                  name=col,
-                                                  dataset_id=dataset_model.id,
-                                                  level='subject')
-
-            for i, val in participants[col].items():
-                sub_id = subs[i].split('-')[1]
-                subject_runs = Run.query.filter_by(dataset_id=dataset_model.id,
-                                                   subject=sub_id)
-                for run in subject_runs:
-                    gpv, _ = db_utils.get_or_create(db_session, GroupPredictorValue,
-                                                   commit=False,
-                                                   gp_id=gp.id,
-                                                   run_id = run_model.id,
-                                                   level_id=sub_id)
-                    gpv.value = str(val)
-                    db_session.commit()
+    add_group_predictors(db_session, dataset_model.id,
+                         os.path.join(local_path, 'participants.tsv'))
 
     if automagic:
         automagic.deactivate()
 
     return dataset_model.id
 
-def extract_features(db_session, bids_path, name, task, graph_spec, verbose=True,
-                     automagic=False, **filters):
+def extract_features(db_session, local_path, name, task, graph_spec,
+                     automagic=False, verbose=True, **filters):
     """ Extract features using pliers for a dataset/task
         Args:
             db_session - db db_session
-            bids_path - bids dataset directory
+            local_path - bids dataset directory
             task - task name
             graph_spec - pliers graph json spec location
             verbose - verbose output
             filters - additional identifiers for runs
-            autoamgic - enable automagic and unlock stimuli with datalad
+            automagic - enable automagic and unlock stimuli with datalad
         Output:
             list of db ids of extracted features
     """
@@ -323,17 +301,17 @@ def extract_features(db_session, bids_path, name, task, graph_spec, verbose=True
         from pliers.graph import Graph
 
     # ### CHANGE THIS TO LOOK UP ONLY. FAIL IF DS NOT FOUND
-    dataset_id = add_task(db_session, task, bids_path=bids_path,
+    dataset_id = add_task(db_session, task, local_path=local_path,
                              name=name, **filters)
 
 
     # Load event files
-    collection = BIDSEventCollection(bids_path)
+    collection = BIDSEventCollection(local_path)
     collection.read(task=task, **filters)
 
     # Filter to only get stim files
     stim_pattern = 'stim_file/(.*)'
-    stim_paths = [os.path.join(bids_path, 'stimuli',
+    stim_paths = [os.path.join(local_path, 'stimuli',
                           re.findall(stim_pattern, col)[0])
      for col in collection.columns
      if re.match(stim_pattern, col)]
@@ -443,48 +421,69 @@ def extract_features(db_session, bids_path, name, task, graph_spec, verbose=True
 
     return list(extracted_features.values())
 
-import yaml
-def ingest_from_yaml(db_session, config_file, install_path='/file-data', automagic=False,
-                     replace=False):
-    datasets = yaml.load(open(config_file, 'r'))
+def ingest_from_yaml(db_session, config_file, install_path='/file-data',
+                     automagic=False, replace=False):
+    dataset_config = yaml.load(open(config_file, 'r'))
+    config_path = os.path.dirname(os.path.realpath(config_file))
 
-    base_path = os.path.dirname(os.path.realpath(config_file))
-
-    # Add each dataset in config file to db
+    """ Loop over each dataset in config file """
     dataset_ids = []
-    for name, items in datasets.items():
-        address = items.get('address')
-        path = items.get('path')
-        if not (path or address):
-            raise Exception("Must provide path or remote address")
+    for name, items in dataset_config.items():
+        dataset_address = items.get('dataset_address')
+        preproc_address = items.get('preproc_address')
+        local_path = items.get('path')
+        if not (local_path or dataset_address):
+            raise Exception("Must provide path or remote address to dataset.")
 
-        # If dataset is remote link, set path where to install
-        if path is None:
+        # If dataset is remote link, set install path
+        if local_path is None:
             new_path = str((Path(install_path) / name).absolute())
         else:
-            new_path = items['path']
+            new_path = local_path
 
         for task, options in items['tasks'].items():
+            # Add each task to database
             filters = options.get('filters', {})
-
             dp = options.get('dataset_parameters', {})
 
-            dataset_ids.append(add_task(db_session, task,
-                                bids_path=path, address=address,
-            					replace=replace, automagic=automagic,
-                                verbose=True, install_path=new_path,
-                                name=name,
-            					**dict(filters.items() | dp.items())))
-
-            ep = options.get('extract_parameters',{})
+            dataset_id = add_task(db_session, task,
+                                  local_path=local_path,
+                                  dataset_address=dataset_address,
+                                  replace=replace, automagic=automagic,
+                                  verbose=True, install_path=new_path,
+                                  preproc_address=preproc_address,
+                                  name=name,
+            					  **dict(filters.items() | dp.items()))
+            dataset_ids.append(dataset_id)
 
             # Extract features if pliers graphs are provided
+            ep = options.get('extract_parameters',{})
+
             if 'features' in options:
-                for graph in options['features']:
+                for graph_spec in options['features']:
                 	extract_features(db_session, new_path, name, task,
-                		os.path.join(base_path, graph),
-                        automagic=path is None or automagic,
+                		os.path.join(config_path, graph_spec),
+                        automagic=local_path is None or automagic,
                         **dict(filters.items() | ep.items()))
 
-
     return dataset_ids
+
+def delete_task(db_session, dataset, task):
+    """ Deletes BIDS dataset task from the database, and *all* associated
+    data in other tables.
+        Args:
+            db_session - sqlalchemy db db_session
+            dataset - name of dataset
+            task - name of task
+    """
+    dataset_model = Dataset.query.filter_by(name=dataset).one_or_none()
+    if not dataset_model:
+        raise ValueError("Dataset not found, cannot delete task.")
+
+    task_model = Task.query.filter_by(name=task,
+                                         dataset_id=dataset_model.id).one_or_none()
+    if not task_model:
+        raise ValueError("Task not found, cannot delete.")
+
+    db_session.delete(task_model)
+    db_session.commit()

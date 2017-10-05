@@ -1,3 +1,6 @@
+import requests
+import urllib.parse
+
 def hash_file(f, blocksize=65536):
     import hashlib
     hasher = hashlib.sha1()
@@ -29,3 +32,30 @@ def generate_id(n=6):
 
     return ''.join(random.SystemRandom().choice(
         string.ascii_uppercase + string.digits) for _ in range(n))
+
+def remote_resource_exists(base_address, resource, raise_exception=False,
+                 content_type='binary/octet-stream'):
+    address = urllib.parse.urljoin(base_address, resource)
+    r = requests.head(address)
+    if not r.ok or r.headers.get('Content-Type') != content_type:
+        msg = "Remote resource {} not found".format(address)
+        if raise_exception:
+            raise ValueError(msg)
+        else:
+            import warnings
+            warnings.warn(msg)
+            return False
+
+    return True
+
+def format_preproc(subject, task, run, session=None,
+                   space="MNI152NLin2009cAsym", suffix="preproc"):
+    """ Format relative fmri_prep paths """
+    subject_f = "sub-{}/".format(subject)
+    session_f = "ses-{}/".format(session) if session else ""
+
+    return "{}{}func/{}{}task-{}_run-{}_bold_space-{}_{}.nii.gz".format(
+    subject_f, session_f,
+    subject_f.replace("/", "_"), session_f.replace("/", "_"),
+    task, run, space, suffix
+)
