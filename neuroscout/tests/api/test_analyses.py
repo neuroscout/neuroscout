@@ -188,11 +188,16 @@ def test_compile(auth_client, add_analysis, add_analysis_fail):
 	resp = auth_client.get('/api/analyses/{}'.format(analysis_bad.hash_id))
 	timeout = time.time() + 60*1   # 1 minute timeout
 	while decode_json(resp)['status'] == 'PENDING':
+		time.sleep(0.2)
 		resp = auth_client.get('/api/analyses/{}'.format(analysis_bad.hash_id))
-		if decode_json(resp)['status'] == 'FAILED' or time.time() > timeout:
+		new_analysis = decode_json(resp)
+		if new_analysis['status'] == 'PASSED':
+			assert new_analysis['design_matrix'] is not None
+			break
+		elif new_analysis['status'] == 'FAILED' or time.time() > timeout:
 			assert 1
 			break
-		time.sleep(0.2)
+
 
 	# Test compiling
 	resp = auth_client.post('/api/analyses/{}/compile'.format(analysis.hash_id))
