@@ -2,8 +2,6 @@
 
 from .analysis import (AnalysisSchema, AnalysisResource,
                        AnalysisRootResource, CloneAnalysisResource,
-                       AnalysisWorkflowResource,
-                       AnalysisGraphResource,
                        CompileAnalysisResource)
 from .bundle import AnalysisBundleResource
 from .dataset import DatasetSchema, DatasetResource, DatasetListResource
@@ -21,8 +19,6 @@ __all__ = [
     'AnalysisResource',
     'AnalysisRootResource',
     'CloneAnalysisResource',
-    'AnalysisWorkflowResource',
-    'AnalysisGraphResource',
     'CompileAnalysisResource',
     'AnalysisBundleResource',
     'DatasetSchema',
