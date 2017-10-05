@@ -1,11 +1,14 @@
+from flask import current_app
+
+from sqlalchemy.dialects.postgresql import JSONB
+from sqlalchemy.ext.hybrid import hybrid_property
+from sqlalchemy.event import listens_for
+
 from database import db
 from db_utils import copy_row
-from sqlalchemy.dialects.postgresql import JSONB
-import datetime
 
-from sqlalchemy.event import listens_for
 from hashids import Hashids
-from flask import current_app
+import datetime
 
 # Association table between analysis and predictor.
 analysis_predictor = db.Table('analysis_predictor',
@@ -29,7 +32,7 @@ class Analysis(db.Model):
     modified_at = db.Column(db.DateTime, default=datetime.datetime.utcnow)
     saved_count = db.Column(db.Integer, default=0)
     status = db.Column(db.Text, default='DRAFT')
-    celery_result = db.Column(db.Text)
+    celery_error = db.Column(db.Text)
     __table_args__ = (
     	db.CheckConstraint(status.in_(['PASSED', 'FAILED', 'PENDING', 'DRAFT'])), )
     compiled_at = db.Column(db.DateTime)
@@ -52,6 +55,10 @@ class Analysis(db.Model):
                             secondary='analysis_run')
 
     design_matrix = db.Column(JSONB)
+
+    @hybrid_property
+    def task_name(self):
+        return self.runs[0].task.name if self.runs else None
 
     def clone(self, user):
         """ Make copy of analysis, with new id, and linking to parent """

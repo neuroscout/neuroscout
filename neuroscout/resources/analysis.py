@@ -1,17 +1,25 @@
 from flask import current_app
 from flask_apispec import MethodResource, marshal_with, use_kwargs, doc
 from flask_jwt import current_identity
+from worker import celery_app
 from marshmallow import Schema, fields, validates, ValidationError, post_load
 from database import db
 from db_utils import put_record
-from models import Analysis, Dataset, Run, Predictor
+from models import Analysis, Dataset, Run, Predictor, PredictorEvent
 from . import utils
-from worker import celery_app
-from .bundle import get_json_bundle
+from .predictor import PredictorEventSchema
 
 class AnalysisSchema(Schema):
 	hash_id = fields.Str(dump_only=True, description='Hashed analysis id.')
 	name = fields.Str(required=True, description='Analysis name.')
+	preproc_address = fields.Nested('DatasetSchema', only='preproc_address')
+
+	config = fields.Dict(description='fMRI analysis configuration parameters.')
+	contrasts = fields.List(fields.Dict(),
+						    description='Array of contrasts')
+	transformations = fields.List(fields.Dict(),
+								  description='Array of transformation objects')
+
 	dataset_id = fields.Int(required=True)
 	created_at = fields.Time(dump_only=True)
 	modified_at = fields.Time(dump_only=True)
@@ -26,20 +34,14 @@ class AnalysisSchema(Schema):
 	private = fields.Bool(description='Analysis private or discoverable?')
 	predictions = fields.Str(description='User apriori predictions.')
 
-	config = fields.Dict(description='fMRI analysis configuration parameters.')
 	description = fields.Str()
 	data = fields.Dict()
 	parent_id = fields.Str(dump_only=True,description="Parent analysis, if cloned.")
 
-
-	transformations = fields.List(fields.Dict(),
-								  description='Array of transformation objects')
-	contrasts = fields.List(fields.Dict(),
-								  description='Array of contrasts')
-
 	predictors = fields.Nested(
 		'PredictorSchema', many=True, only=['id'],
         description='Predictor id(s) associated with analysis')
+
 	runs = fields.Nested(
 		'RunSchema', many=True, only=['id'],
         description='Runs associated with analysis')
@@ -47,8 +49,6 @@ class AnalysisSchema(Schema):
 	results = fields.Nested(
 		'ResultSchema', many=True, only=['id'], dump_only=True,
         description='Result id(s) associated with analysis')
-
-
 
 	@validates('dataset_id')
 	def validate_dsid(self, value):
@@ -82,6 +82,13 @@ class AnalysisSchema(Schema):
 	class Meta:
 		strict = True
 
+class AnalysisBundleSchema(AnalysisSchema):
+	design_matrix = fields.Dict(dump_only=True,
+								description="Design matrix for all runs.")
+	task_name = fields.Str(description='Task name', dump_only=True)
+	runs = fields.Nested(
+		'RunSchema', many=True, description='Runs associated with analysis',
+	    exclude=['duration', 'dataset_id', 'task'], dump_only=True)
 
 @doc(tags=['analysis'])
 @marshal_with(AnalysisSchema)
@@ -148,32 +155,32 @@ class CloneAnalysisResource(AnalysisBaseResource):
 		db.session.commit()
 		return cloned
 
+def get_predictor_events(analysis):
+	pred_ids = [p.id for p in analysis.predictors]
+	run_ids = [r.id for r in analysis.runs]
+	return PredictorEvent.query.filter(
+	    (PredictorEvent.predictor_id.in_(pred_ids)) & \
+	    (PredictorEvent.run_id.in_(run_ids))).all()
+
 class CompileAnalysisResource(AnalysisBaseResource):
+	@marshal_with(AnalysisSchema)
 	@doc(summary='Compile and lock analysis.')
 	@utils.owner_required
 	def post(self, analysis):
-		json = get_json_bundle(analysis).data
-		task = celery_app.send_task('workflow.compile',
-				args=[json, analysis.dataset.local_path])
 		analysis.status = 'PENDING'
+		analysis_json = AnalysisBundleSchema().dump(analysis)[0]
+		pes_json = PredictorEventSchema(many=True, exclude=['id']).dump(
+			get_predictor_events(analysis))[0]
+
+		task = celery_app.send_task('workflow.compile',
+				args=[analysis_json, pes_json,
+				analysis.dataset.local_path])
 		analysis.celery_id = task.id
+
 		db.session.add(analysis)
 		db.session.commit()
+		current_app.logger
 		return analysis
-
-@doc(tags=['analysis'])
-class AnalysisWorkflowResource(MethodResource):
-	@doc(summary='Get analysis nipype workflow.',
-		 produces=["text/plain"],
-		 responses={"default": {
-			 "description" : "Nipype workflow python executable." }})
-	@utils.auth_required
-	@utils.fetch_analysis
-	def get(self, analysis):
-		db.session.commit()
-		if analysis.status != "PASSED":
-			utils.abort(404, "Analysis not yet compiled")
-		return analysis.workflow
 
 @doc(tags=['analysis'])
 class AnalysisGraphResource(MethodResource):

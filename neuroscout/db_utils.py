@@ -1,6 +1,5 @@
-from flask import abort
+from flask import abort, current_app
 from sqlalchemy.exc import SQLAlchemyError
-from flask import current_app
 
 def copy_row(model, row, ignored_columns=[], ignored_relationships=[]):
     copy = model()
@@ -15,11 +14,13 @@ def copy_row(model, row, ignored_columns=[], ignored_relationships=[]):
             copy.__setattr__(r.key, getattr(row, r.key))
     return copy
 
-def put_record(db_session, updated_values, instance):
+def put_record(db_session, updated_values, instance, commit=True):
     try:
         for key, value in updated_values.items():
+            current_app.logger.info(key)
             setattr(instance, key, value)
-            db_session.commit()
+            if commit is True:
+                db_session.commit()
         return instance
 
     except SQLAlchemyError as e:
