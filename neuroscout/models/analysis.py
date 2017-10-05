@@ -51,7 +51,7 @@ class Analysis(db.Model):
     runs = db.relationship('Run',
                             secondary='analysis_run')
 
-    workflow = db.Column(db.Text) # Path to workflow
+    design_matrix = db.Column(JSONB)
 
     def clone(self, user):
         """ Make copy of analysis, with new id, and linking to parent """
@@ -60,8 +60,6 @@ class Analysis(db.Model):
         clone_row.parent_id = self.hash_id
         clone_row.user_id = user.id
         clone_row.status = "DRAFT"
-        clone_row.hash_id = None
-        clone_row.workflow = None
         ## Copy relationships
         return clone_row
 
