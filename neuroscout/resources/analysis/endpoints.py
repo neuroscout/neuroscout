@@ -116,7 +116,7 @@ class AnalysisGraphResource(MethodResource):
 		return analysis.workflow
 
 @marshal_with(AnalysisBundleSchema(
-	only=['task_name', 'design_matrix', 'preproc_address', 'config',
+	only=['task_name', 'design_matrix', 'dataset', 'config',
 	      'contrasts', 'runs']))
 @doc(tags=['analysis'])
 class AnalysisBundleResource(MethodResource):

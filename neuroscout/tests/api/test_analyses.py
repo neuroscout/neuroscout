@@ -198,6 +198,9 @@ def test_compile(auth_client, add_analysis, add_analysis_fail):
 			assert 1
 			break
 
+	# Test getting bundle prior to compiling
+	resp = auth_client.get('/api/analyses/{}/bundle'.format(analysis.hash_id))
+	assert resp.status_code == 404
 
 	# Test compiling
 	resp = auth_client.post('/api/analyses/{}/compile'.format(analysis.hash_id))
@@ -235,6 +238,13 @@ def test_compile(auth_client, add_analysis, add_analysis_fail):
 	resp = auth_client.delete('/api/analyses/{}'.format(analysis.hash_id))
 	assert resp.status_code == 422
 
+	# Test bundle
+	resp = auth_client.get('/api/analyses/{}/bundle'.format(analysis.hash_id))
+	assert resp.status_code == 200
+	bundle = decode_json(resp)
+	assert 'dataset' in bundle
+	assert 'design_matrix' in bundle
+	assert 'amplitude' in bundle['design_matrix'][0]
 
 def test_auth_id(auth_client, add_analysis_user2):
 	# Try deleting analysis you are not owner of

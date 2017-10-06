@@ -142,8 +142,21 @@ def add_analysis(session, add_users, add_task):
 
     analysis.predictors = Predictor.query.filter(Predictor.id.in_(pred_id)).all()
 
-    analysis.contrasts = {}
-    analysis.transformations = {}
+    rt_pred = Predictor.query.filter_by(name='rt').first()
+    analysis.contrasts = [
+        {
+          "contrastType": "T",
+          "name": "test",
+          "predictors": [ analysis.predictors[0].id, analysis.predictors[1].id ],
+          "weights": [1,-1]
+        }]
+
+    analysis.transformations = [
+        { "input": [ rt_pred.id ],
+         "name": "scale",
+         "parameters": [
+             { "kind": "boolean", "name": "demean", "value": False },
+             { "kind": "boolean", "name": "rescale", "value": True } ] } ]
 
     session.add(analysis)
     session.commit()
