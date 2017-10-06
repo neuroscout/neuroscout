@@ -5,7 +5,6 @@ class AnalysisSchema(Schema):
 	""" Primary analysis schema """
 	hash_id = fields.Str(dump_only=True, description='Hashed analysis id.')
 	name = fields.Str(required=True, description='Analysis name.')
-	preproc_address = fields.Nested('DatasetSchema', only='preproc_address')
 
 	config = fields.Dict(description='fMRI analysis configuration parameters.')
 	contrasts = fields.List(fields.Dict(),
@@ -77,6 +76,8 @@ class AnalysisSchema(Schema):
 
 class AnalysisBundleSchema(AnalysisSchema):
 	""" Bundle schema, with additional fields """
+	dataset = fields.Nested('DatasetSchema',
+		only=['name', 'preproc_address', 'dataset_address'])
 	design_matrix = fields.Dict(dump_only=True,
 								description="Design matrix for all runs.")
 	task_name = fields.Str(description='Task name', dump_only=True)
