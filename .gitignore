@@ -109,3 +109,4 @@ bids_test_annex
 neuroscout/src
 neuroscout/workflow/src
 jest_0
+.my-env
