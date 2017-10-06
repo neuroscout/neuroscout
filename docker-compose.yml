@@ -10,7 +10,7 @@ services:
     volumes:
       - migrations:/migrations
       - ./neuroscout/:/neuroscout
-      - /home/zorro/datasets:/datasets
+      - $DATASET_DIR:/datasets
       - file-data:/file-data
     command: /usr/local/bin/gunicorn -w 2 -b :8000 core:app --log-level debug
     env_file: .env
@@ -60,7 +60,7 @@ services:
     entrypoint: celery -A tasks worker --loglevel=info
     volumes:
       - file-data:/file-data
-      - /home/zorro/datasets:/datasets
+      - $DATASET_DIR:/datasets
       - ./neuroscout/:/neuroscout
       - ./celery_worker/:/celery_worker
 
