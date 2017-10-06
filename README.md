@@ -3,14 +3,17 @@
 [![Build Status](https://travis-ci.com/PsychoinformaticsLab/neuroscout.svg?token=mytABRBRnBitJJpBpMxh&branch=master)](https://travis-ci.com/PsychoinformaticsLab/neuroscout)
 
 To set up docker, ensure docker and docker-compose are installed.
-Next, edit docker-compose.yml to configure mounting of data volumes.
+First, set up your mounted volumes (such as /datasets), by exporting environment variables:
+
+    DATASET_DIR=/home/myuser/datasets
+    export DATASET_DIR
 
 Build the containers and start the services:
 
     docker-compose build
     docker-compose up -d
 
-The server should now be running at http://localhost:80/
+The server should now be running at http://localhost/
 
 Next, initialize, migrate and upgrade the database migrations. This script will
 also add a test user.
@@ -20,9 +23,9 @@ also add a test user.
 
 ## Maintaining docker image and db
 
-If you make a change to /neuroscout but don't want your db to be nuked, reload like this:
+If you make a change to /neuroscout, you shoudl be able to simply restart the server.
 
-    docker-compose up -d --no-deps --build neuroscout
+    docker-compose restart neuroscout
 
 If you need to upgrade the db:
 
@@ -31,14 +34,7 @@ If you need to upgrade the db:
 
 To inspect the database using psql:
 
-    psql -h localhost -p 5432 -U postgres --password
-
-If you want to reset the database to an empty state then rebuild and restart
-all services:
-
-    docker-compose down
-
-and run the original initialization commands above.
+    docker-compose run postgres psql -U postgres -h postgres
 
 ## Running tests
 To run tests, after starting services, create a test database:
@@ -51,7 +47,7 @@ and execute:
 
 To run frontend tests run:
 
-docker-compose run --rm -w /neuroscout/frontend neuroscout npm test
+    docker-compose run --rm -w /neuroscout/frontend neuroscout npm test
 
 
 
@@ -78,7 +74,13 @@ Finally, once having added a dataset to the database, you can extract features
 
 For example:
 
-    python manage.py extract_features /datsets/ds009 emotionalregulation graph.json
+    python manage.py extract_features /datasets/ds009 emotionalregulation graph.json
+
+
+Even easier, is to use a preconfigured dataset config file, such as:
+
+    docker-compose exec neuroscout python manage.py ingest_from_yaml /neuroscout/config/ds009.yml
+
 
 
 ## API
@@ -86,14 +88,14 @@ Once the server is up and running, you can access the API however you'd like.
 
 The API is document using Swagger UI at:
 
-    http://localhost:5000/
+    http://localhost/swagger-ui
 
 ### Authorization
 To authorize API requests, we use JSON Web Tokens using Flask-JWT. Simply navigate to localhost:5000/auth and post the following
 
     {
-        "username": "joe",
-        "password": "pass"
+        "username": "user@example.com",
+        "password": "string"
     }
 
 You will receive an authorization token in return, such as:
@@ -107,4 +109,4 @@ You can then insert this token into the header to authorize API requests:
     GET /protected HTTP/1.1
     Authorization: JWT eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZGVudGl0eSI6MSwiaWF0IjoxNDQ0OTE3NjQwLCJuYmYiOjE0NDQ5MTc2NDAsImV4cCI6MTQ0NDkxNzk0MH0.KPmI6WSjRjlpzecPvs3q_T3cJQvAgJvaQAPtk1abC_E
 
-Tokens expire, so you'll probably need to get a new one soon. To facitate this, I've wrapped a Flask Client that auto authenticates and inserts the token into the header in neuroscout/tests/request_utils.py. You can use this more easily by entering into Shell mode: `python manage.py shell`. A client object will be preloaded (given the username in the file), that can be used to make requests to Flask. Make sure Flask server is also running on localhost.
+Tokens expire, so you'll probably need to get a new one soon. To facilitate this, I've wrapped a Flask Client that auto authenticates and inserts the token into the header in neuroscout/tests/request_utils.py. You can use this more easily by entering into Shell mode: `python manage.py shell`. A client object will be preloaded (given the username in the file), that can be used to make requests to Flask. Make sure Flask server is also running on localhost.
