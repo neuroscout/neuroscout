@@ -8,7 +8,8 @@ from models import Analysis, PredictorEvent
 
 from .. import utils
 from ..predictor import PredictorEventSchema
-from .schemas import AnalysisSchema, AnalysisBundleSchema
+from .schemas import (AnalysisSchema, AnalysisFullSchema,
+					 AnalysisResourcesSchema, DesignEventsSchema)
 
 @doc(tags=['analysis'])
 @marshal_with(AnalysisSchema)
@@ -22,7 +23,6 @@ class AnalysisRootResource(AnalysisBaseResource):
 	def get(self):
 		return Analysis.query.filter_by(private=False).all()
 
-	@marshal_with(AnalysisSchema)
 	@use_kwargs(AnalysisSchema)
 	@doc(summary='Add new analysis!')
 	@utils.auth_required
@@ -60,7 +60,6 @@ class AnalysisResource(AnalysisBaseResource):
 		return {'message' : 'deleted!'}
 
 class CloneAnalysisResource(AnalysisBaseResource):
-	@marshal_with(AnalysisSchema)
 	@doc(summary='Clone analysis.')
 	@utils.auth_required
 	@utils.fetch_analysis
@@ -75,22 +74,22 @@ class CloneAnalysisResource(AnalysisBaseResource):
 		db.session.commit()
 		return cloned
 
-def get_predictor_events(analysis):
-	pred_ids = [p.id for p in analysis.predictors]
-	run_ids = [r.id for r in analysis.runs]
-	return PredictorEvent.query.filter(
-	    (PredictorEvent.predictor_id.in_(pred_ids)) & \
-	    (PredictorEvent.run_id.in_(run_ids))).all()
-
 class CompileAnalysisResource(AnalysisBaseResource):
-	@marshal_with(AnalysisSchema)
+	@staticmethod
+	def get_predictor_events(analysis):
+		pred_ids = [p.id for p in analysis.predictors]
+		run_ids = [r.id for r in analysis.runs]
+		return PredictorEvent.query.filter(
+		    (PredictorEvent.predictor_id.in_(pred_ids)) & \
+		    (PredictorEvent.run_id.in_(run_ids))).all()
+
 	@doc(summary='Compile and lock analysis.')
 	@utils.owner_required
 	def post(self, analysis):
 		analysis.status = 'PENDING'
-		analysis_json = AnalysisBundleSchema().dump(analysis)[0]
+		analysis_json = AnalysisFullSchema().dump(analysis)[0]
 		pes_json = PredictorEventSchema(many=True, exclude=['id']).dump(
-			get_predictor_events(analysis))[0]
+			self.get_predictor_events(analysis))[0]
 
 		task = celery_app.send_task('workflow.compile',
 				args=[analysis_json, pes_json,
@@ -102,27 +101,42 @@ class CompileAnalysisResource(AnalysisBaseResource):
 		current_app.logger
 		return analysis
 
-@doc(tags=['analysis'])
-class AnalysisGraphResource(MethodResource):
-	@doc(summary='Get analysis nipype workflow graph.',
-		 produces=["image/png"],
-		 responses={"default": {
-			 "description" : "Nipype workflow python executable." }})
-	@utils.auth_required
+class AnalysisFullResource(AnalysisBaseResource):
+	@marshal_with(AnalysisFullSchema)
+	@doc(summary='Get analysis (including nested fields).')
 	@utils.fetch_analysis
 	def get(self, analysis):
-		if analysis.status != "PASSED":
-			utils.abort(404, "Analysis not yet compiled")
-		return analysis.workflow
-
-@marshal_with(AnalysisBundleSchema(
-	only=['task_name', 'design_matrix', 'dataset', 'config',
-	      'contrasts', 'runs']))
-@doc(tags=['analysis'])
-class AnalysisBundleResource(MethodResource):
-	@doc(summary='Get complete analysis bundled as JSON.')
-	@utils.fetch_analysis
-	def get(self, analysis):
-		if analysis.status != "PASSED":
-			utils.abort(404, "Analysis not yet compiled")
 		return analysis
+
+class AnalysisResourcesResource(AnalysisBaseResource):
+	@marshal_with(AnalysisResourcesSchema)
+	@doc(summary='Get analysis resources.')
+	@utils.fetch_analysis
+	def get(self, analysis):
+		return analysis
+
+class AnalysisBundleResource(MethodResource):
+	@doc(tags=['analysis'], summary='Get analysis tarball bundle.')
+	@utils.fetch_analysis
+	def get(self, analysis):
+		if analysis.status != "PASSED":
+			utils.abort(404, "Analysis not yet compiled")
+		return analysis.bundle_path
+
+class DesignEventsResource(MethodResource):
+	@marshal_with(DesignEventsSchema(many=True))
+	@doc(tags=['analysis'], summary='Get analysis events design as JSON.')
+	@utils.fetch_analysis
+	def get(self, analysis):
+		if analysis.status != "PASSED":
+			utils.abort(404, "Analysis not yet compiled")
+		return analysis.design_matrix
+
+# @doc(tags=['analysis'])
+# class DesignEventsTSVResource(MethodResource):
+# 	@doc(summary='Get complete analysis bundled as JSON.')
+# 	@utils.fetch_analysis
+# 	def get(self, analysis):
+# 		if analysis.status != "PASSED":
+# 			utils.abort(404, "Analysis not yet compiled")
+# 		return analysis

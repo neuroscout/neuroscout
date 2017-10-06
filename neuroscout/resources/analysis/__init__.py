@@ -2,17 +2,16 @@
 
 from .endpoints import (AnalysisResource, AnalysisRootResource,
                        AnalysisBundleResource, CloneAnalysisResource,
-                       CompileAnalysisResource)
-from .schemas import AnalysisSchema, AnalysisBundleSchema
-
+                       CompileAnalysisResource, AnalysisFullResource,
+                       AnalysisResourcesResource, DesignEventsResource)
 
 __all__ = [
-    'AnalysisSchema',
     'AnalysisResource',
     'AnalysisRootResource',
+    'AnalysisFullResource',
+    'AnalysisResourcesResource',
     'AnalysisBundleResource',
     'CloneAnalysisResource',
     'CompileAnalysisResource',
-    'AnalysisSchema',
-    'AnalysisBundleSchema'
+    'DesignEventsResource'
     ]
