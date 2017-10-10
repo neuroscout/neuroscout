@@ -81,7 +81,7 @@ export type TransformName = 'standardize' | 'orthogonalize';
 
 export interface Transformation {
   name: TransformName;
-  inputs?: string[]; // predictor IDs
+  input?: string[]; // predictor IDs
   parameters: Parameter[];
 }
 
