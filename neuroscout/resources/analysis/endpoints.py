@@ -120,7 +120,7 @@ class AnalysisResourcesResource(AnalysisBaseResource):
 class AnalysisBundleResource(MethodResource):
 	@doc(tags=['analysis'], summary='Get analysis tarball bundle.',
 	responses={"200": {
-		"description": "gzip tarbal', including analysis, resources and events.",
+		"description": "gzip tarball, including analysis, resources and events.",
 		"type": "application/gzip"}})
 	@utils.fetch_analysis
 	def get(self, analysis):
