@@ -43,7 +43,7 @@ def test_get(session, auth_client, add_analysis):
 	# assert 'requested URL was not found' in decode_json(resp)['message']
 
 	# Test getting resources
-	resp = auth_client.delete('/api/analyses/{}/resources'.format(first_analysis_id))
+	resp = auth_client.get('/api/analyses/{}/resources'.format(first_analysis_id))
 	assert resp.status_code == 200
 	assert 'dataset_address' in decode_json(resp)
 	assert 'mask_paths' in decode_json(resp)
