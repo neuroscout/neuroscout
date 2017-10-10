@@ -55,6 +55,8 @@ class Analysis(db.Model):
                             secondary='analysis_run')
 
     design_matrix = db.Column(JSONB)
+    design_matrix_tsv = db.Column(db.Text) # Path to TSV
+    bundle_path = db.Column(db.Text)
 
     @hybrid_property
     def task_name(self):

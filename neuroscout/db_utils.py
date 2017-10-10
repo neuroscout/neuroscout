@@ -17,7 +17,6 @@ def copy_row(model, row, ignored_columns=[], ignored_relationships=[]):
 def put_record(db_session, updated_values, instance, commit=True):
     try:
         for key, value in updated_values.items():
-            current_app.logger.info(key)
             setattr(instance, key, value)
             if commit is True:
                 db_session.commit()

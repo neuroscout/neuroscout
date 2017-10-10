@@ -42,6 +42,13 @@ def test_get(session, auth_client, add_analysis):
 	assert resp.status_code == 404
 	# assert 'requested URL was not found' in decode_json(resp)['message']
 
+	# Test getting resources
+	resp = auth_client.get('/api/analyses/{}/resources'.format(first_analysis_id))
+	assert resp.status_code == 200
+	assert 'dataset_address' in decode_json(resp)
+	assert 'mask_paths' in decode_json(resp)
+	assert 'preproc_address' in decode_json(resp)
+
 def test_post(auth_client, add_task, add_predictor):
 	## Add analysis
 	test_analysis = {
@@ -238,13 +245,15 @@ def test_compile(auth_client, add_analysis, add_analysis_fail):
 	resp = auth_client.delete('/api/analyses/{}'.format(analysis.hash_id))
 	assert resp.status_code == 422
 
-	# Test bundle
+	# Test bundle is tarfile
 	resp = auth_client.get('/api/analyses/{}/bundle'.format(analysis.hash_id))
 	assert resp.status_code == 200
-	bundle = decode_json(resp)
-	assert 'dataset' in bundle
-	assert 'design_matrix' in bundle
-	assert 'amplitude' in bundle['design_matrix'][0]
+	assert resp.mimetype == 'application/x-tar'
+
+	# Test getting event files
+	resp = auth_client.get('/api/analyses/{}/design/events'.format(analysis.hash_id))
+	assert resp.status_code == 200
+	assert len(decode_json(resp)) == 32
 
 def test_auth_id(auth_client, add_analysis_user2):
 	# Try deleting analysis you are not owner of
