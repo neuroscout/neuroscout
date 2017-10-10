@@ -121,7 +121,7 @@ class AnalysisBundleResource(MethodResource):
 	@doc(tags=['analysis'], summary='Get analysis tarball bundle.',
 	responses={"200": {
 		"description": "gzip tarball, including analysis, resources and events.",
-		"type": "application/gzip"}})
+		"type": "application/x-tar"}})
 	@utils.fetch_analysis
 	def get(self, analysis):
 		if (analysis.status != "PASSED" or analysis.bundle_path is None or \
