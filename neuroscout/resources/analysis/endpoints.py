@@ -43,7 +43,7 @@ class AnalysisResource(AnalysisBaseResource):
 	@use_kwargs(AnalysisSchema)
 	@utils.owner_required
 	def put(self, analysis, **kwargs):
-		if analysis.status != 'DRAFT':
+		if analysis.status not in ['DRAFT', 'FAILED']:
 			exceptions = ['private']
 			kwargs = {k: v for k, v in kwargs.items() if k in exceptions}
 			if not kwargs:
