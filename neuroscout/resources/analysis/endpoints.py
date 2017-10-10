@@ -1,10 +1,11 @@
-from flask import current_app
+from flask import current_app, send_file
 from flask_apispec import MethodResource, marshal_with, use_kwargs, doc
 from flask_jwt import current_identity
 from worker import celery_app
 from database import db
 from db_utils import put_record
 from models import Analysis, PredictorEvent
+from os.path import exists
 
 from .. import utils
 from ..predictor import PredictorEventSchema
@@ -90,9 +91,10 @@ class CompileAnalysisResource(AnalysisBaseResource):
 		analysis_json = AnalysisFullSchema().dump(analysis)[0]
 		pes_json = PredictorEventSchema(many=True, exclude=['id']).dump(
 			self.get_predictor_events(analysis))[0]
+		resources_json = AnalysisResourcesSchema().dump(analysis)[0]
 
 		task = celery_app.send_task('workflow.compile',
-				args=[analysis_json, pes_json,
+				args=[analysis_json, resources_json, pes_json,
 				analysis.dataset.local_path])
 		analysis.celery_id = task.id
 
@@ -116,12 +118,17 @@ class AnalysisResourcesResource(AnalysisBaseResource):
 		return analysis
 
 class AnalysisBundleResource(MethodResource):
-	@doc(tags=['analysis'], summary='Get analysis tarball bundle.')
+	@doc(tags=['analysis'], summary='Get analysis tarball bundle.',
+	responses={"200": {
+		"description": "gzip tarbal', including analysis, resources and events.",
+		"type": "application/gzip"}})
 	@utils.fetch_analysis
 	def get(self, analysis):
-		if analysis.status != "PASSED":
-			utils.abort(404, "Analysis not yet compiled")
-		return analysis.bundle_path
+		if (analysis.status != "PASSED" or analysis.bundle_path is None or \
+		not exists(analysis.bundle_path)):
+			msg = "Analysis bundle not available. Try compiling."
+			utils.abort(404, msg)
+		return send_file(analysis.bundle_path, as_attachment=True)
 
 class DesignEventsResource(MethodResource):
 	@marshal_with(DesignEventsSchema(many=True))
