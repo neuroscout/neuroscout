@@ -45,10 +45,13 @@ def compile(analysis, resources, predictor_events, bids_dir):
     collection = BIDSEventCollection(base_dir=bids_dir)
     collection.read(file_directory=files_dir)
 
+    # Change collection name keys to integers, because inputs come from JSON
+    # as such. Could change keys to names to deal with this.
+    collection.columns = {int(k):v for k,v in collection.columns.items()}
+
     for t in analysis['transformations']:
         args = {a['name']:a['value'] for a in t['parameters']}
-        collection.apply(t['name'], [str(i) for i in t['input']],
-                               **args)
+        collection.apply(t['name'], t['input'], **args)
 
     # Save out and add to update dictionary
     all_path = join(files_dir, 'all_subjects.tsv')
