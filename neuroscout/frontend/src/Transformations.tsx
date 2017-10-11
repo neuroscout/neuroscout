@@ -261,7 +261,7 @@ class XformEditor extends React.Component<XformEditorProps, XformEditorState> {
               {availableParameters &&
                 availableParameters.map(param => {
                   let options: Predictor[] = [];
-                  if (param.name === 'wrt') {
+                  if (param.name === 'other') {
                     // Special case for wrt parameter: in 'options' exclude predictors
                     // that were selected for 'inputs'
                     const inputIds = new Set(input.map(x => x.id));
@@ -269,7 +269,7 @@ class XformEditor extends React.Component<XformEditorProps, XformEditorState> {
                   }
                   return (
                     <div>
-                      {(param.name !== 'wrt' || input.length > 0) &&
+                      {(param.name !== 'other' || input.length > 0) &&
                         <ParameterField
                           name={param.name}
                           value={parameters.filter(x => x.name === param.name)[0].value}
@@ -321,7 +321,7 @@ class ParameterField extends React.Component<ParameterFieldProps> {
     return (
       <div>
         <p>
-          {"Select predictors you'd like to orthogonzlie against:"}
+          {"Select predictors you'd like to orthogonalize against:"}
         </p>
         <PredictorSelector
           availablePredictors={options as Predictor[]}
