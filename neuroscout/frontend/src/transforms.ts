@@ -1,12 +1,21 @@
 import { Transformation } from './coretypes';
 
-const trasnformationSchema = {
+// Todo: Add more transformations, from pybids
+// At first, only allow transformations that occur in place
+// Include: scale, orthogonalize, threshold
+
+
+// Later: allow transformations w/ predictable names,
+// but need to implement detecting new column names and making them available
+// for subsequent transformations.
+
+const transformationSchema = {
   title: 'Transformation Schema',
   type: 'array',
   items: {
     type: 'object',
     properties: {
-      name: { enum: ['standardize', 'orthogonalize'] },
+      name: { enum: ['scale', 'orthogonalize'] },
       parameters: {
         type: 'array',
         items: {
@@ -23,7 +32,7 @@ const trasnformationSchema = {
 
 const transformDefinitions: Transformation[] = [
   {
-    name: 'standardize',
+    name: 'scale',
     parameters: [
       {
         name: 'demean',
@@ -31,7 +40,7 @@ const transformDefinitions: Transformation[] = [
         value: false // default value
       },
       {
-        name: 'scale',
+        name: 'rescale',
         kind: 'boolean',
         value: true // default value
       }
@@ -41,7 +50,7 @@ const transformDefinitions: Transformation[] = [
     name: 'orthogonalize',
     parameters: [
       {
-        name: 'wrt',
+        name: 'other',
         kind: 'predictors',
         value: []
       }

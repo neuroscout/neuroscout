@@ -77,11 +77,11 @@ interface PredictorsParam {
 
 export type Parameter = BooleanParam | PredictorsParam;
 
-export type TransformName = 'standardize' | 'orthogonalize';
+export type TransformName = 'scale' | 'orthogonalize';
 
 export interface Transformation {
   name: TransformName;
-  inputs?: string[]; // predictor IDs
+  input?: string[]; // predictor IDs
   parameters: Parameter[];
 }
 

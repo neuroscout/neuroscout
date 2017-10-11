@@ -38,11 +38,11 @@ interface XformDisplayProps {
 }
 const XformDisplay = (props: XformDisplayProps) => {
   const { xform, index, onDelete, onMove, enableUp, enableDown } = props;
-  const inputs = xform.inputs || [];
+  const input = xform.input || [];
   return (
     <div>
       <h3>{`${index + 1}: ${xform.name}`}</h3>
-      <p>{`Inputs: ${inputs!.join(', ')}`}</p>
+      <p>{`Inputs: ${input!.join(', ')}`}</p>
       <p>Parameters:</p>
       <ul>
         {xform.parameters.map(param =>
@@ -161,7 +161,7 @@ interface XformEditorProps {
 }
 
 interface XformEditorState {
-  inputs: Predictor[];
+  input: Predictor[];
   name: TransformName | '';
   parameters: Parameter[];
 }
@@ -187,17 +187,17 @@ class XformEditor extends React.Component<XformEditorProps, XformEditorState> {
     super();
     const { xform, availableInputs } = props;
     this.state = {
-      inputs: [],
+      input: [],
       name: xform ? xform.name : '',
       parameters: xform ? xform.parameters : []
     };
   }
 
-  updateInputs = (inputs: Predictor[]) => {
+  updateInputs = (input: Predictor[]) => {
     // In the special case of the orthogonalize transformation if new inputs are selected
     // we need to make sure we remove them from the 'wrt' parameter if they've already been added there
     const { name, parameters } = this.state;
-    const inputIds = new Set(inputs.map(x => x.id));
+    const inputIds = new Set(input.map(x => x.id));
     const newParameters =
       name === 'orthogonalize'
         ? parameters.map(
@@ -207,7 +207,7 @@ class XformEditor extends React.Component<XformEditorProps, XformEditorState> {
                 : param
           )
         : parameters;
-    this.setState({ inputs, parameters: newParameters });
+    this.setState({ input, parameters: newParameters });
   };
 
   updateXformType = (name: TransformName) => {
@@ -218,7 +218,7 @@ class XformEditor extends React.Component<XformEditorProps, XformEditorState> {
 
   onSave = () => {
     const { xform } = this.props;
-    const { name, inputs, parameters } = this.state;
+    const { name, input, parameters } = this.state;
     if (!name) {
       displayError(new Error('Please select a transformation'));
       return;
@@ -226,14 +226,14 @@ class XformEditor extends React.Component<XformEditorProps, XformEditorState> {
     const newXform: Transformation = {
       name,
       parameters,
-      inputs: inputs.map(p => p.id)
+      input: input.map(p => p.id)
     };
     this.props.onSave(newXform);
   };
 
   render() {
     const { xform, xformRules, availableInputs } = this.props;
-    const { name, parameters, inputs } = this.state;
+    const { name, parameters, input } = this.state;
     const editMode = !!xform;
     const allowedXformNames = Object.keys(xformRules);
     const availableParameters = name ? xformRules[name].parameters : undefined;
@@ -254,22 +254,22 @@ class XformEditor extends React.Component<XformEditorProps, XformEditorState> {
               <p>Select inputs:</p>
               <PredictorSelector
                 availablePredictors={availableInputs}
-                selectedPredictors={inputs}
-                updateSelection={inputs => this.updateInputs(inputs)}
+                selectedPredictors={input}
+                updateSelection={input => this.updateInputs(input)}
               />
               <br />
               {availableParameters &&
                 availableParameters.map(param => {
                   let options: Predictor[] = [];
-                  if (param.name === 'wrt') {
+                  if (param.name === 'other') {
                     // Special case for wrt parameter: in 'options' exclude predictors
                     // that were selected for 'inputs'
-                    const inputIds = new Set(inputs.map(x => x.id));
+                    const inputIds = new Set(input.map(x => x.id));
                     options = availableInputs.filter(x => !inputIds.has(x.id));
                   }
                   return (
                     <div>
-                      {(param.name !== 'wrt' || inputs.length > 0) &&
+                      {(param.name !== 'other' || input.length > 0) &&
                         <ParameterField
                           name={param.name}
                           value={parameters.filter(x => x.name === param.name)[0].value}
@@ -321,7 +321,7 @@ class ParameterField extends React.Component<ParameterFieldProps> {
     return (
       <div>
         <p>
-          {"Select predictors you'd like to orthogonzlie against:"}
+          {"Select predictors you'd like to orthogonalize against:"}
         </p>
         <PredictorSelector
           availablePredictors={options as Predictor[]}
