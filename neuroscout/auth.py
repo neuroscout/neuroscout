@@ -1,18 +1,47 @@
 from models.auth import user_datastore
 from flask_security.utils import verify_password
+from flask_security.confirmable import generate_confirmation_token
+from flask import current_app, url_for
+from mail import send_confirm_mail
+
+def generate_confirmation_link(user):
+    """ For a given user, generates confirmation link and token
+    Stand-in for flask_security function that requires enabling other
+    non-RESTFul confirmation routes """
+    # Use generate_confirmation_token to create token
+    token = generate_confirmation_token(user)
+    return url_for('confirm', token=token, _external=True), token
+
+
+def register_user(**kwargs):
+    """ Register new user and password """
+    confirmation_link, token = None, None
+    user = user_datastore.create_user(**kwargs)
+    user_datastore.commit()
+
+    if current_app.config['CONFIRM_USERS']:
+        confirmation_link, token = generate_confirmation_link(user)
+
+    if current_app.config['SEND_REGISTER_EMAIL']:
+        send_confirm_mail(user.email, confirmation_link=confirmation_link)
+
+    return user
 
 # JWT Token authentication
 def authenticate(username, password):
+    """ Authenticate user and password combination """
     user = user_datastore.find_user(email=username)
     if user and username == user.email and verify_password(password, user.password):
         return user
     return None
 
 def load_user(payload):
+    """ Load_user function for flask jwt """
     user = user_datastore.find_user(id=payload['identity'])
     return user
 
 def add_auth_to_swagger(spec):
+    """ Document auth paths using swagger """
     spec.add_path(
         path='/api/auth',
         operations=dict(

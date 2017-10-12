@@ -1,14 +1,17 @@
 # -*- coding: utf-8 -*-
 import os
-from flask import Flask, send_file
+from flask import Flask, send_file, render_template
+from flask_mail import Mail
 from database import db
 
 app = Flask(__name__, static_folder='/static')
 app.config.from_object(os.environ['APP_SETTINGS'])
+mail = Mail(app)
 db.init_app(app)
 
 from flask_jwt import JWT
 from flask_security import Security
+from flask_security.confirmable import confirm_email_token_status, confirm_user
 from auth import authenticate, load_user, add_auth_to_swagger
 from models import *
 
@@ -48,7 +51,7 @@ route_factory(app, docs,
         ('AnalysisResourcesResource', 'analyses/<analysis_id>/resources'),
         ('AnalysisBundleResource', 'analyses/<analysis_id>/bundle'),
         ('DesignEventsResource', 'analyses/<analysis_id>/design/events'),
-        # ('DesignEventsResource', 'analyses/<analysis_id>/design/events/tsv'),        
+        # ('DesignEventsResource', 'analyses/<analysis_id>/design/events/tsv'),
         ('ResultResource', 'results/<int:result_id>'),
         ('RunListResource', 'runs'),
         ('RunResource', 'runs/<int:run_id>'),
@@ -64,6 +67,17 @@ route_factory(app, docs,
 def index():
     ''' Serve index '''
     return send_file("frontend/build/index.html")
+
+@app.route('/confirm/<token>')
+def confirm(token):
+    ''' Serve confirmaton page '''
+    expired, invalid, user = confirm_email_token_status(token)
+    if not expired and not invalid:
+        confirmed = confirm_user(user)
+        db.session.commit()
+    return render_template('confirm.html',
+                           confirmed=confirmed, expired=expired, invalid=invalid,
+                           email=user.email)
 
 if __name__ == '__main__':
     db.init_app(app)

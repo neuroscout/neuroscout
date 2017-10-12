@@ -19,9 +19,7 @@ class User(db.Model, UserMixin):
     roles = db.relationship('Role', secondary=roles_users,
                             backref=db.backref('users', lazy='dynamic'))
     last_login_at = db.Column(db.DateTime())
-    current_login_at = db.Column(db.DateTime())
     last_login_ip = db.Column(db.String(255))
-    current_login_ip = db.Column(db.String(255))
     login_count = db.Column(db.Integer)
 
     analyses = db.relationship('Analysis', backref='user',
