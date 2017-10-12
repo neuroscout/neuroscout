@@ -1,0 +1,8 @@
+<!doctype html>
+<title>Confimation</title>
+{% if status=='CONFIRMED' %}
+  <h1>User confirmed</h1>
+{% elif status=='FAILED' %}
+  <h1>User could not be confirmed</h1>
+
+{% endif %}
