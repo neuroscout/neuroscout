@@ -1,13 +1,14 @@
 # -*- coding: utf-8 -*-
 import os
 from flask import Flask, send_file, render_template
-from flask_mail import Mail
 from database import db
 
 app = Flask(__name__, static_folder='/static')
 app.config.from_object(os.environ['APP_SETTINGS'])
-mail = Mail(app)
 db.init_app(app)
+
+from flask_mail import Mail
+mail = Mail(app)
 
 from flask_jwt import JWT
 from flask_security import Security

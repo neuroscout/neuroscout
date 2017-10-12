@@ -5,14 +5,21 @@ from flask_apispec import MethodResource, marshal_with, use_kwargs, doc
 from marshmallow import Schema, fields, validates, ValidationError, post_load
 from models.auth import User
 from database import db
+from auth import register_user
 from models import user_datastore
 from . import utils
 import db_utils
 from .utils import abort
 
-class BaseUserSchema(Schema):
+class UserSchema(Schema):
     email = fields.Email(required=True)
     name = fields.Str(required=True, description='User full name')
+    password = fields.Str(load_only=True,
+                          description='Password. Minimum 6 characters.')
+
+    analyses = fields.Nested('AnalysisSchema', only=['hash_id', 'name', 'status',
+                                                     'description', 'modified_at'],
+                             many=True, dump_only=True)
 
     @validates('password')
     def validate_pass(self, value):
@@ -28,7 +35,7 @@ class BaseUserSchema(Schema):
     class Meta:
         strict = True
 
-class UserCreationSchema(BaseUserSchema):
+class UserCreationSchema(UserSchema):
     password = fields.Str(load_only=True, required=True,
                           description='Password. Minimum 6 characters.')
 
@@ -38,34 +45,23 @@ class UserCreationSchema(BaseUserSchema):
     		raise ValidationError('Email already in use.')
 
 
-class UserSchema(BaseUserSchema):
-    password = fields.Str(load_only=True,
-                          description='Password. Minimum 6 characters.')
-    analyses = fields.Nested('AnalysisSchema', only=['hash_id', 'name', 'status',
-                                                     'description', 'modified_at'],
-                             many=True, dump_only=True)
-
 
 @doc(tags=['auth'])
+@marshal_with(UserSchema)
 class UserRootResource(MethodResource):
     @doc(summary='Get current user information.')
     @utils.auth_required
-    @marshal_with(UserSchema)
     def get(self):
     	return current_identity
 
     @doc(summary='Add a new user.')
     @use_kwargs(UserCreationSchema)
-    @marshal_with(UserSchema)
     def post(self, **kwargs):
-        user = user_datastore.create_user(**kwargs)
-        db.session.commit()
-        return user
+        return register_user(**kwargs)
 
     @doc(summary='Edit user information.')
     @use_kwargs(UserSchema)
     @utils.auth_required
-    @marshal_with(UserSchema)
     def put(self, **kwargs):
         if User.query.filter((User.email==kwargs['email']) \
                              & (User.id!=current_identity.id)).all():
