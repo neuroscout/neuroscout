@@ -20,8 +20,8 @@ def reset_password(email):
     """
     user = User.query.filter_by(email=email).first()
     token = generate_reset_password_token(user) if user else None
-
-    send_reset_mail(email, token)
+    name = user.name if user else None
+    send_reset_mail(email, token, name)
 
 def register_user(**kwargs):
     """ Register new user and password """
@@ -33,7 +33,7 @@ def register_user(**kwargs):
         confirmation_link, token = generate_confirmation_link(user)
 
     if current_app.config['SEND_REGISTER_EMAIL']:
-        send_confirm_mail(user.email, confirmation_link)
+        send_confirm_mail(user.email, user.name, confirmation_link)
 
     return user
 
