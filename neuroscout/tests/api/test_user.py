@@ -42,17 +42,34 @@ def test_put(auth_client):
 	assert resp.status_code == 422
 	assert 'email' in decode_json(resp)['message']
 
-	# Make a new user:
-	resp = auth_client.post('/api/user',
-		data = {'name' : 'me', 'email' : 'fake@gmail.com', 'password' : 'something'})
-
 	# Testing changing name to same email
 	values = decode_json(auth_client.get('/api/user'))
-	values['email'] = 'fake@gmail.com'
+	values['email'] = 'test2@gmail.com'
 	resp = auth_client.put('/api/user', data=values)
 	assert resp.status_code == 422
 	assert 'Email already in use' in decode_json(resp)['message']
 
+from flask_security.confirmable import confirm_user
+from models.auth import User
+def test_create_new(auth_client, session):
+	# Make a new user and authorize
+	resp = auth_client.post('/api/user',
+		data = {'name' : 'me', 'email' : 'fake@gmail.com', 'password' : 'something'})
+
+	auth_client.authorize(email="fake@gmail.com", password="something")
+	### Try getting route without confirming, should fail
+	resp = auth_client.get('/api/user')
+	assert resp.status_code == 401
+	### Confirm new user manually
+
+	user = User.query.filter_by(email="fake@gmail.com").one()
+	confirm_user(user)
+	session.commit()
+
+	## Now should work
+	resp = auth_client.get('/api/user')
+	assert resp.status_code == 200
+	assert decode_json(resp)['email'] == 'fake@gmail.com'
 
 def test_post(auth_client):
 	# Make incomplete post

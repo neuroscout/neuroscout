@@ -3,7 +3,7 @@ import pytest
 from flask_security.utils import encrypt_password
 from core import app as _app
 from database import db as _db
-
+import datetime
 import sqlalchemy as sa
 
 """
@@ -12,13 +12,8 @@ Session / db managment tools
 @pytest.fixture(scope='session')
 def app():
     """Session-wide test `Flask` application."""
-    if 'APP_SETTINGS' in os.environ:
-        if os.environ['APP_SETTINGS'] == 'config.config.DevelopmentConfig':
-            _app.config.from_object('config.config.DockerTestConfig')
-        elif os.environ['APP_SETTINGS'] != 'config.config.TravisConfig':
-            _app.config.from_object('config.config.TestingConfig')
-    else:
-        _app.config.from_object('config..config.TestingConfig')
+    if 'APP_SETTINGS' not in os.environ:
+        _app.config.from_object('config.config.TestingConfig')
 
     # Establish an application context before running the tests.
     ctx = _app.app_context()
@@ -103,11 +98,13 @@ def add_users(app, db, session):
     user2 = 'test2@gmail.com'
     pass2 = 'test2'
 
-    user_datastore.create_user(email=user1, password=encrypt_password(pass1))
+    user_datastore.create_user(email=user1, password=encrypt_password(pass1),
+                               confirmed_at = datetime.datetime.now())
     session.commit()
     id_1 = user_datastore.find_user(email=user1).id
 
-    user_datastore.create_user(email=user2, password=encrypt_password(pass2))
+    user_datastore.create_user(email=user2, password=encrypt_password(pass2),
+                               confirmed_at = datetime.datetime.now())
     session.commit()
     id_2 = user_datastore.find_user(email=user2).id
 
@@ -125,7 +122,7 @@ def add_task(session):
 def add_task_remote(session):
     """ Add a dataset with two subjects """
     return populate.ingest_from_yaml(session, YML_PATH,
-                                     _app.config['DATASET_DIR'])[0]
+                                     '/tmp/datasets')[0]
 
 @pytest.fixture(scope="function")
 def add_analysis(session, add_users, add_task):

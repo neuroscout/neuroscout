@@ -6,7 +6,6 @@ from marshmallow import Schema, fields, validates, ValidationError, post_load
 from models.auth import User
 from database import db
 from auth import register_user
-from models import user_datastore
 from . import utils
 import db_utils
 from .utils import abort

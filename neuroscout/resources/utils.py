@@ -1,9 +1,8 @@
+from flask import jsonify
 from flask_jwt import jwt_required, current_identity
 from flask_apispec import doc
 from webargs.flaskparser import parser
-from flask import jsonify
 from models import Analysis
-from flask import current_app
 
 import celery.states as states
 from worker import celery_app
@@ -60,6 +59,9 @@ def auth_required(function):
         if current_identity.active is False:
             return abort(
                 401, {"message" : "Your account has been disabled."})
+        elif current_identity.confirmed_at is None:
+            return abort(
+                401, {"message" : "Your account has not been confirmed."})
         return function(*args, **kwargs)
     return wrapper
 
@@ -73,11 +75,11 @@ def owner_required(function):
         if current_identity.id != kwargs['analysis'].user_id:
             return abort(
                 401, {"message" : "You are not the owner of this analysis."})
-
         return function(*args, **kwargs)
     return wrapper
 
 @parser.error_handler
 def handle_request_parsing_error(err):
-	code, msg = getattr(err, 'status_code', 400), getattr(err, 'messages', 'Invalid Request')
-	abort(code, msg)
+    code = getattr(err, 'status_code', 400)
+    msg = getattr(err, 'messages', 'Invalid Request')
+    abort(code, msg)
