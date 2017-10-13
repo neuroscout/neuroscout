@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """ Core Neuroscout App """
 import os
-from flask import Flask, send_file, render_template
+from flask import Flask, send_file, render_template, url_for
 from database import db
 
 app = Flask(__name__, static_folder='/static')
@@ -76,12 +76,15 @@ def index():
 def confirm(token):
     ''' Serve confirmaton page '''
     expired, invalid, user = confirm_email_token_status(token)
+    name = user.name if user else None
     if not expired and not invalid:
         confirmed = confirm_user(user)
         db.session.commit()
+    app.logger.info(confirmed)
     return render_template('confirm.html',
-                           confirmed=confirmed, expired=expired, invalid=invalid,
-                           email=user.email)
+                           confirmed=confirmed, expired=expired,
+                           invalid=invalid, name=name,
+                           action_url=url_for('index', _external=True))
 
 if __name__ == '__main__':
     db.init_app(app)
