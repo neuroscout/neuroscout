@@ -1,4 +1,5 @@
 import json
+import datetime
 
 def decode_json(resp):
 	return json.loads(resp.data.decode())
@@ -22,10 +23,14 @@ def test_auth(auth_client):
 	assert decode_json(resp)['description'] == 'Request does not contain an access token'
 
 def test_get(auth_client):
+	time = datetime.datetime.now()
 	resp = auth_client.get('/api/user')
 	assert resp.status_code == 200
-
 	assert 'email' in decode_json(resp)
+
+	user = User.query.filter_by(email=decode_json(resp)['email']).one()
+	assert user.last_activity_at > time
+	assert user.last_activity_ip is not None
 
 def test_put(auth_client):
 	# Testing changing name

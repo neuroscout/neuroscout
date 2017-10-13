@@ -1,6 +1,7 @@
-from flask import jsonify
+from flask import jsonify, request
 from flask_jwt import jwt_required, current_identity
 from flask_apispec import doc
+import datetime
 from webargs.flaskparser import parser
 from models import Analysis
 
@@ -10,6 +11,7 @@ from database import db
 from db_utils import put_record
 
 def abort(code, message=''):
+    """ JSONified abort """
     from flask import abort, make_response
     abort(make_response(jsonify(message=message), code))
 
@@ -56,6 +58,9 @@ def auth_required(function):
     "description": "Format:  JWT {authorization_token}"}})
     @jwt_required()
     def wrapper(*args, **kwargs):
+        current_identity.last_activity_at = datetime.datetime.now()
+        current_identity.last_activity_ip = request.remote_addr
+        db.session.commit()
         if current_identity.active is False:
             return abort(
                 401, {"message" : "Your account has been disabled."})

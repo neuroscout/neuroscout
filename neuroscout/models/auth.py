@@ -18,9 +18,8 @@ class User(db.Model, UserMixin):
     confirmed_at = db.Column(db.DateTime())
     roles = db.relationship('Role', secondary=roles_users,
                             backref=db.backref('users', lazy='dynamic'))
-    last_login_at = db.Column(db.DateTime())
-    last_login_ip = db.Column(db.String(255))
-    login_count = db.Column(db.Integer)
+    last_activity_at = db.Column(db.DateTime())
+    last_activity_ip = db.Column(db.String(255))
 
     analyses = db.relationship('Analysis', backref='user',
                             lazy='dynamic')
