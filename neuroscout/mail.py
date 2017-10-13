@@ -1,3 +1,6 @@
+"""
+    Mail sending functionality using flask_mail.
+"""
 from flask_mail import Message
 from core import mail
 def send_confirm_mail(recipient, confirmation_link):

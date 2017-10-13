@@ -1,4 +1,6 @@
-""" Functions to populate database from datasets and extracted features """
+"""
+    Functions to populate database from datasets and extracted features.
+"""
 import os
 import re
 import json

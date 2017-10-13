@@ -58,15 +58,18 @@ def auth_required(function):
     "description": "Format:  JWT {authorization_token}"}})
     @jwt_required()
     def wrapper(*args, **kwargs):
+        # Record activity time and IP
         current_identity.last_activity_at = datetime.datetime.now()
         current_identity.last_activity_ip = request.remote_addr
         db.session.commit()
+
         if current_identity.active is False:
             return abort(
                 401, {"message" : "Your account has been disabled."})
         elif current_identity.confirmed_at is None:
             return abort(
                 401, {"message" : "Your account has not been confirmed."})
+
         return function(*args, **kwargs)
     return wrapper
 

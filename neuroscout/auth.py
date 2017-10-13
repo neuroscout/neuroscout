@@ -1,3 +1,4 @@
+""" Auth related functions """
 from models.auth import user_datastore
 from flask_security.utils import verify_password
 from flask_security.confirmable import generate_confirmation_token

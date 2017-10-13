@@ -1,3 +1,6 @@
+"""
+    Misc. utilities useful across package.
+"""
 import requests
 import urllib.parse
 

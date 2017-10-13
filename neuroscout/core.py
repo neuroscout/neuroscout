@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+""" Core Neuroscout App """
 import os
 from flask import Flask, send_file, render_template
 from database import db
