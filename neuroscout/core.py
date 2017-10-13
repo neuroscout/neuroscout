@@ -61,6 +61,8 @@ route_factory(app, docs,
         ('PredictorResource', 'predictors/<int:predictor_id>'),
         ('PredictorEventListResource', 'predictor-events'),
         ('UserRootResource', 'user'),
+        ('UserTriggerResetResource', 'user/reset_password'),
+        ('UserResetSubmitResource', 'user/submit_token'),
         ('TaskResource', 'tasks/<int:task_id>'),
         ('TaskListResource', 'tasks')
     ])
