@@ -1,3 +1,6 @@
+"""
+    Misc utils related to database functions.
+"""
 from flask import abort, current_app
 from sqlalchemy.exc import SQLAlchemyError
 

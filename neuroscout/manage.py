@@ -1,3 +1,7 @@
+"""
+    Command line management tools.
+"""
+
 from flask_script import Manager, Shell
 from flask_migrate import Migrate, MigrateCommand
 from core import app, db
@@ -30,26 +34,30 @@ manager.add_command("shell", Shell(make_context=_make_context))
 
 @manager.command
 def add_user(email, password):
-    from models import user_datastore
-    from flask_security.utils import encrypt_password
+	""" Add a user to the database.
+	email - A valid email address (primary login key)
+	password - Any string
+	"""
+	from models import user_datastore
+	from flask_security.utils import encrypt_password
 
-    user_datastore.create_user(email=email, password=encrypt_password(password))
-    db.session.commit()
+	user_datastore.create_user(email=email, password=encrypt_password(password))
+	db.session.commit()
 
 @manager.command
 def add_task(local_path, task, replace=False, automagic=False,
-		skip_predictors=False, filters='{}'):
-		""" Add BIDS dataset to database.
-		local_path - Path to local_path directory
-		task - Task name
-		replace - If dataset is already in db, re-ingest?
-		automagic - Force enable datalad automagic
-		skip_predictors - Skip original Predictors
-		filters - string JSON object with optional run filters
-		"""
-		populate.add_task(db.session, task, local_path=local_path,
-				 replace=replace, verbose=True, skip_predictors=skip_predictors,
-				 automagic=automagic, **json.loads(filters))
+	skip_predictors=False, filters='{}'):
+	""" Add BIDS dataset to database.
+	local_path - Path to local_path directory
+	task - Task name
+	replace - If dataset is already in db, re-ingest?
+	automagic - Force enable datalad automagic
+	skip_predictors - Skip original Predictors
+	filters - string JSON object with optional run filters
+	"""
+	populate.add_task(db.session, task, local_path=local_path,
+			 replace=replace, verbose=True, skip_predictors=skip_predictors,
+			 automagic=automagic, **json.loads(filters))
 
 @manager.command
 def extract_features(local_path, task, graph_spec, filters='{}'):

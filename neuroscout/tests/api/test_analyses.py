@@ -253,7 +253,7 @@ def test_compile(auth_client, add_analysis, add_analysis_fail):
 	# Test getting event files
 	resp = auth_client.get('/api/analyses/{}/design/events'.format(analysis.hash_id))
 	assert resp.status_code == 200
-	assert len(decode_json(resp)) == 32
+	assert len(decode_json(resp)) == 48
 
 def test_auth_id(auth_client, add_analysis_user2):
 	# Try deleting analysis you are not owner of

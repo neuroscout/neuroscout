@@ -1,7 +1,11 @@
+"""
+    Misc. utilities useful across package.
+"""
 import requests
 import urllib.parse
 
 def hash_file(f, blocksize=65536):
+    """ Hash a file, given a file name string """
     import hashlib
     hasher = hashlib.sha1()
     with open(f, 'rb') as afile:
@@ -12,6 +16,7 @@ def hash_file(f, blocksize=65536):
     return hasher.hexdigest()
 
 def hash_str(string, blocksize=65536):
+    """" Hash a string """
     import hashlib
     hasher = hashlib.sha1()
     hasher.update(string.encode('utf-8'))
@@ -19,6 +24,7 @@ def hash_str(string, blocksize=65536):
     return hasher.hexdigest()
 
 def route_factory(app, docs, pairings, prepend='/api/'):
+    """ Create API routes and add to app """
     import resources
     for res_name, route in pairings:
         res = getattr(resources, res_name)
@@ -26,15 +32,9 @@ def route_factory(app, docs, pairings, prepend='/api/'):
                          view_func=res.as_view(res_name.lower()))
         docs.register(res)
 
-def generate_id(n=6):
-    import random
-    import string
-
-    return ''.join(random.SystemRandom().choice(
-        string.ascii_uppercase + string.digits) for _ in range(n))
-
 def remote_resource_exists(base_address, resource, raise_exception=False,
                  content_type='binary/octet-stream'):
+    """ Check if a remote address exists and content_type matches """
     address = urllib.parse.urljoin(base_address, resource)
     r = requests.head(address)
     if not r.ok or r.headers.get('Content-Type') != content_type:

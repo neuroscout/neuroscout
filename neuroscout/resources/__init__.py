@@ -11,7 +11,8 @@ from .predictor import (PredictorEventSchema, PredictorSchema,
 from .result import ResultSchema, ResultResource
 from .run import RunSchema, RunResource, RunListResource
 from .stimulus import StimulusSchema, StimulusResource
-from .user import UserSchema, UserRootResource
+from .user import (UserSchema, UserRootResource, UserTriggerResetResource,
+                   UserResetSubmitResource)
 from .task import TaskSchema, TaskResource, TaskListResource
 
 __all__ = [
@@ -41,6 +42,8 @@ __all__ = [
     'UserSchema',
     'UserRootResource',
     'UserSchema',
+    'UserTriggerResetResource',
+    'UserResetSubmitResource',
     'TaskSchema',
     'TaskResource',
     'TaskListResource'
