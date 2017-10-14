@@ -5,7 +5,7 @@ class Config(object):
     TESTING = False
     CSRF_ENABLED = True
     SECRET_KEY = 'A_SECRET!'
-    SECURITY_PASSWORD_HASH = 'dfdfd'
+    SECURITY_PASSWORD_HASH = 'pbkdf2_sha512'
     SECURITY_PASSWORD_SALT = 'A_SECRET'
     WTF_CSRF_ENABLED = False
     JWT_EXPIRATION_DELTA = datetime.timedelta(days=7)
