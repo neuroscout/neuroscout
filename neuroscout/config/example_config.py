@@ -16,9 +16,9 @@ class Config(object):
     MIGRATIONS_DIR = 'A_SECRET'
     APISPEC_SWAGGER_UI_URL = None
 
-    MAIL_SERVER = ''
-    MAIL_USERNAME = ''
-    MAIL_PASSWORD = ''
+    MAIL_SERVER = 'smtp.mailgun.com'
+    MAIL_USERNAME = 'myuser'
+    MAIL_PASSWORD = 'mypass'
     MAIL_DEFAULT_SENDER = 'no-reply@neuroscout.org'
     SECURITY_EMAIL_SENDER = 'no-reply@neuroscout.org'
 
