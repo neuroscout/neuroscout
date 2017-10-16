@@ -63,6 +63,7 @@ route_factory(app, docs,
         ('UserRootResource', 'user'),
         ('UserTriggerResetResource', 'user/reset_password'),
         ('UserResetSubmitResource', 'user/submit_token'),
+        ('UserResendConfirm', 'user/resend_confirmation'),
         ('TaskResource', 'tasks/<int:task_id>'),
         ('TaskListResource', 'tasks')
     ])

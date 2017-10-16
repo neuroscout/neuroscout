@@ -12,7 +12,7 @@ from .result import ResultSchema, ResultResource
 from .run import RunSchema, RunResource, RunListResource
 from .stimulus import StimulusSchema, StimulusResource
 from .user import (UserSchema, UserRootResource, UserTriggerResetResource,
-                   UserResetSubmitResource)
+                   UserResetSubmitResource, UserResendConfirm)
 from .task import TaskSchema, TaskResource, TaskListResource
 
 __all__ = [
@@ -44,6 +44,7 @@ __all__ = [
     'UserSchema',
     'UserTriggerResetResource',
     'UserResetSubmitResource',
+    'UserResendConfirm',
     'TaskSchema',
     'TaskResource',
     'TaskListResource'
