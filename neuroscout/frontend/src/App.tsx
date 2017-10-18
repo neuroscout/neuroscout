@@ -104,6 +104,7 @@ class App extends React.Component<{}, AppState> {
   authenticate = () =>
     new Promise((resolve, reject) => {
       const { email, password } = this.state;
+      const { accountconfirmError } = this;
       fetch(DOMAINROOT + '/api/auth', {
         method: 'post',
         body: JSON.stringify({ email: email, password: password }),
@@ -128,15 +129,18 @@ class App extends React.Component<{}, AppState> {
             })
             .then((response) => {
               if (response.status === 401) {
-                this.setState({ loginError: 'You have not confirmed your email address.' });
+                response.json().then((data: {message: string}) => {
+                  if (data.message === "Your account has not been confirmed.") {
+                    accountconfirmError(token)
+                  }
                 reject('Authentication failed');
+                })
+
               }
               else {
-                message.success(response.status);
+                message.success("Logged in.");
                 localStorage.setItem('jwt', token);
                 localStorage.setItem('email', email!);
-                console.log(response)
-                console.log("WTF")
                 resolve(token);
               }
             })
@@ -223,6 +227,28 @@ class App extends React.Component<{}, AppState> {
       onOk() {
         that.logout();
       }
+    });
+  };
+
+  // Display modal to resend confirmation link
+  accountconfirmError = (jwt): void => {
+    const that = this;
+    Modal.confirm({
+      title: 'Account is not confirmed!',
+      content: 'Your account has not been confirmed. \
+        To continue, please follow the instructions sent to your email address.',
+      okText: 'Resend confirmation',
+      cancelText: 'Close',
+      onOk() {
+        fetch(DOMAINROOT + '/api/user/resend_confirmation', {
+          method: 'post',
+          headers: {
+            'Content-type': 'application/json',
+            'authorization': 'JWT ' + jwt
+          }
+        })
+        .catch(displayError);
+      },
     });
   };
 
