@@ -113,18 +113,38 @@ class App extends React.Component<{}, AppState> {
       })
         .then(response => response.json())
         .then((data: { status_code: number; access_token?: string; description?: string }) => {
-          if (data.access_token) {
-            message.success('Authentication successful');
-            localStorage.setItem('jwt', data.access_token);
-            localStorage.setItem('email', email!);
-            resolve(data.access_token);
-          } else if (data.status_code === 401) {
+          if (data.status_code === 401) {
             this.setState({ loginError: data.description || '' });
             reject('Authentication failed');
           }
-        })
-        .catch(displayError);
-    });
+          else if (data.access_token) {
+            const token = data.access_token
+            fetch(DOMAINROOT + '/api/user', {
+              method: 'get',
+              headers: {
+                'Content-type': 'application/json',
+                'authorization': 'JWT ' + data.access_token
+              }
+            })
+            .then((response) => {
+              if (response.status === 401) {
+                this.setState({ loginError: 'You have not confirmed your email address.' });
+                reject('Authentication failed');
+              }
+              else {
+                message.success(response.status);
+                localStorage.setItem('jwt', token);
+                localStorage.setItem('email', email!);
+                console.log(response)
+                console.log("WTF")
+                resolve(token);
+              }
+            })
+            .catch(displayError);;
+          }}
+        )
+      .catch(displayError);}
+      );
 
   // Log user in
   login = () => {
@@ -144,7 +164,7 @@ class App extends React.Component<{}, AppState> {
       .catch(displayError);
   };
 
-  // Sign up for a new account and if successful, immediately log the user in
+  // Sign up for a new account
   signup = () => {
     const { name, email, password, openSignup } = this.state;
     fetch(DOMAINROOT + '/api/user', {
@@ -166,11 +186,15 @@ class App extends React.Component<{}, AppState> {
           });
           throw new Error('Signup failed!');
         }
-        message.success('Signup successful');
-        const { name, email, password } = data;
         this.setState({ name, email, openSignup: false, signupError: '' });
+        Modal.success({
+          title: 'Account created!',
+          content: 'Your account has been sucessfully created. \
+          You will receive a confirmation email shortly. Please follow the instructions to activate your account\
+          and start using Neurosynth. ',
+          okText: 'Okay',
+        });
       })
-      .then(() => this.login())
       .catch(displayError);
   };
 
