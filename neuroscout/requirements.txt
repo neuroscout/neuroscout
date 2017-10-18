@@ -23,6 +23,7 @@ grabbit==0.0.6
 gunicorn==19.7.1
 hashids==1.2.0
 imageio==2.1.2
+ipython==6.2.1
 itsdangerous==0.24
 Jinja2==2.9.6
 MarkupSafe==1.0

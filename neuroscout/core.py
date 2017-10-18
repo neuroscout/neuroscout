@@ -77,11 +77,15 @@ def index():
 def confirm(token):
     ''' Serve confirmaton page '''
     expired, invalid, user = confirm_email_token_status(token)
-    name = user.name if user else None
-    if not expired and not invalid:
-        confirmed = confirm_user(user)
-        db.session.commit()
-    app.logger.info(confirmed)
+    name = None
+    confirmed = None
+    if user:
+        if not expired and not invalid:
+            confirmed = confirm_user(user)
+            db.session.commit()
+        name = user.name
+    else:
+        confirmed = None
     return render_template('confirm.html',
                            confirmed=confirmed, expired=expired,
                            invalid=invalid, name=name,
