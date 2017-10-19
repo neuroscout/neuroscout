@@ -29,6 +29,7 @@ interface AppState {
   openEnterResetToken: boolean;
   loginError: string;
   signupError: string;
+  resetError: string;
   email: string | null;
   name: string | null;
   password: string | null;
@@ -63,6 +64,7 @@ class App extends React.Component<{}, AppState> {
       openEnterResetToken: false,
       loginError: '',
       signupError: '',
+      resetError: '',
       email: email,
       name: null,
       jwt: jwt,
@@ -276,6 +278,7 @@ class App extends React.Component<{}, AppState> {
   // NEED TO ADD ERROR HANDLER FOR WRONG TOKEN PASSWORD ETC
   submitToken = (): void => {
     const { token, password } = this.state;
+    const that = this;
     fetch(DOMAINROOT + '/api/user/submit_token', {
       method: 'post',
       body: JSON.stringify({ token: token, password: password}),
@@ -283,8 +286,23 @@ class App extends React.Component<{}, AppState> {
         'Content-type': 'application/json'
       }
     })
-    .catch(displayError)
-    .then(() =>  {this.setState({ openEnterResetToken: false });});
+    .then((response) =>  {
+      if (response.ok) {
+        this.setState({ openEnterResetToken: false})
+        this.login();
+      }
+      else {
+        response.json().then(json => ({ ... json }))
+        .then((data: any) => {
+          let errorMessage = '';
+          Object.keys(data.message).forEach(key => {
+            errorMessage += data.message[key];
+          });
+          that.setState({resetError: errorMessage});
+      })
+    }
+  })
+    .catch(displayError);
   };
 
   setStateFromInput = (name: keyof AppState) => (event: React.FormEvent<HTMLInputElement>) => {
@@ -340,6 +358,7 @@ class App extends React.Component<{}, AppState> {
       openSignup,
       openReset,
       openEnterResetToken,
+      resetError,
       loginError,
       signupError,
       password,
@@ -365,7 +384,7 @@ class App extends React.Component<{}, AppState> {
         }}
       >
       <p>
-       Please enter an email address to send a reset link to
+       Please enter an email address to send reset instructions
      </p>
       <Form
         onSubmit={e => {
@@ -402,7 +421,7 @@ class App extends React.Component<{}, AppState> {
         }}
       >
       <p>
-       We have sent a reset token to the email address you provided. <br/>
+       We have sent a reset token to {email} <br/>
        Please enter the token below, along with a new password for the account.
      </p>
       <Form
@@ -435,6 +454,10 @@ class App extends React.Component<{}, AppState> {
           </Button>
         </FormItem>
       </Form>
+      <p>
+        {resetError}
+      </p>
+      <br />
     </Modal>;
 
     const loginModal = () =>
