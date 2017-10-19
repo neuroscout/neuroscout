@@ -5,7 +5,7 @@ Top-level App component containing AppState. The App component is currently resp
 - Managing user's saved analyses (list display, clone and delete)
 */
 import * as React from 'react';
-import { Tabs, Row, Col, Layout, Button, Modal, Input, Form, message } from 'antd';
+import { Tabs, Row, Col, Layout, Button, Modal, Icon, Input, Form, message } from 'antd';
 import { displayError, jwtFetch } from './utils';
 import { Space } from './HelperComponents';
 import { ApiUser, ApiAnalysis, AppAnalysis } from './coretypes';
@@ -25,11 +25,14 @@ interface AppState {
   loggedIn: boolean;
   openLogin: boolean;
   openSignup: boolean;
+  openReset: boolean;
+  openEnterResetToken: boolean;
   loginError: string;
   signupError: string;
   email: string | null;
   name: string | null;
   password: string | null;
+  token: string | null;
   jwt: string | null;
   nextURL: string | null; // will probably remove this and find a better solution to login redirects
   analyses: AppAnalysis[]; // List of analyses belonging to the user
@@ -56,16 +59,19 @@ class App extends React.Component<{}, AppState> {
       loggedIn: !!jwt,
       openLogin: false,
       openSignup: false,
+      openReset: false,
+      openEnterResetToken: false,
       loginError: '',
       signupError: '',
-      email: email || 'user@example.com', // For development - remove test2@test.com later
+      email: email,
       name: null,
       jwt: jwt,
-      password: 'string', // For development - set to '' in production
+      password: '',
       nextURL: null,
       analyses: [],
       publicAnalyses: [],
-      loggingOut: false
+      loggingOut: false,
+      token: null
     };
     if (jwt) this.loadAnalyses();
     this.loadPublicAnalyses();
@@ -252,6 +258,35 @@ class App extends React.Component<{}, AppState> {
     });
   };
 
+  // Reset password function
+  resetPassword = (): void => {
+    const { email } = this.state;
+    fetch(DOMAINROOT + '/api/user/reset_password', {
+      method: 'post',
+      body: JSON.stringify({ email: email}),
+      headers: {
+        'Content-type': 'application/json'
+      }
+    })
+    .catch(displayError)
+    .then(() =>  {this.setState({ openEnterResetToken: true, openReset: false });});
+  };
+
+  // Reset password function
+  // NEED TO ADD ERROR HANDLER FOR WRONG TOKEN PASSWORD ETC
+  submitToken = (): void => {
+    const { token, password } = this.state;
+    fetch(DOMAINROOT + '/api/user/submit_token', {
+      method: 'post',
+      body: JSON.stringify({ token: token, password: password}),
+      headers: {
+        'Content-type': 'application/json'
+      }
+    })
+    .catch(displayError)
+    .then(() =>  {this.setState({ openEnterResetToken: false });});
+  };
+
   setStateFromInput = (name: keyof AppState) => (event: React.FormEvent<HTMLInputElement>) => {
     const newState = {};
     newState[name] = event.currentTarget.value;
@@ -300,8 +335,11 @@ class App extends React.Component<{}, AppState> {
       loggedIn,
       email,
       name,
+      token,
       openLogin,
       openSignup,
+      openReset,
+      openEnterResetToken,
       loginError,
       signupError,
       password,
@@ -315,6 +353,90 @@ class App extends React.Component<{}, AppState> {
           <Redirect to="/" />
         </Router>
       );
+
+    const resetPasswordModal = () =>
+      <Modal
+        title="Reset password"
+        visible={openReset}
+        footer={null}
+        maskClosable={true}
+        onCancel={e => {
+          this.setState({ openReset: false });
+        }}
+      >
+      <p>
+       Please enter an email address to send a reset link to
+     </p>
+      <Form
+        onSubmit={e => {
+          e.preventDefault();
+          this.resetPassword();
+        }}
+      >
+        <FormItem>
+          <Input
+            prefix={<Icon type="mail" style={{ fontSize: 13 }}/>}
+            placeholder="Email"
+            type="email"
+            size="large"
+            value={email}
+            onChange={this.setStateFromInput('email')}
+          />
+        </FormItem>
+        <FormItem>
+          <Button style={{ width: '100%' }} htmlType="submit" type="primary">
+            Reset password
+          </Button>
+        </FormItem>
+      </Form>
+    </Modal>;
+
+    const enterResetTokenModal = () =>
+      <Modal
+        title="Change password"
+        visible={openEnterResetToken}
+        footer={null}
+        maskClosable={true}
+        onCancel={e => {
+          this.setState({ openEnterResetToken: false });
+        }}
+      >
+      <p>
+       We have sent a reset token to the email address you provided. <br/>
+       Please enter the token below, along with a new password for the account.
+     </p>
+      <Form
+        onSubmit={e => {
+          e.preventDefault();
+          this.submitToken();
+        }}
+      >
+        <FormItem>
+          <Input
+            prefix={<Icon type="tags" style={{ fontSize: 13 }}/>}
+            placeholder="Token"
+            type="token"
+            size="large"
+            onChange={this.setStateFromInput('token')}
+          />
+        </FormItem>
+        <FormItem>
+          <Input
+            prefix={<Icon type="lock" style={{ fontSize: 13 }}/>}
+            placeholder="Password"
+            type="password"
+            size="large"
+            onChange={this.setStateFromInput('password')}
+          />
+        </FormItem>
+        <FormItem>
+          <Button style={{ width: '100%' }} htmlType="submit" type="primary">
+            Submit
+          </Button>
+        </FormItem>
+      </Form>
+    </Modal>;
+
     const loginModal = () =>
       <Modal
         title="Log into Neuroscout"
@@ -326,7 +448,7 @@ class App extends React.Component<{}, AppState> {
         }}
       >
         <p>
-          {loginError ? loginError : 'For development try "test2@test.com" and "password"'}
+          {loginError ? loginError : 'For development try "user@example.com" and "string"'}
         </p>
         <br />
         <Form
@@ -337,6 +459,7 @@ class App extends React.Component<{}, AppState> {
         >
           <FormItem>
             <Input
+              prefix={<Icon type="mail" style={{ fontSize: 13 }}/>}
               placeholder="Email"
               type="email"
               size="large"
@@ -346,6 +469,7 @@ class App extends React.Component<{}, AppState> {
           </FormItem>
           <FormItem>
             <Input
+              prefix={<Icon type="lock" style={{ fontSize: 13 }}/>}
               placeholder="Password"
               type="password"
               value={password}
@@ -353,6 +477,7 @@ class App extends React.Component<{}, AppState> {
             />
           </FormItem>
           <FormItem>
+           <a onClick={e => {this.setState({ openLogin:false, openReset: true });}}>Forgot password</a><br/>
             <Button style={{ width: '100%' }} htmlType="submit" type="primary">
               Log in
             </Button>
@@ -415,7 +540,9 @@ class App extends React.Component<{}, AppState> {
       <Router>
         <div>
           {openLogin && loginModal()}
+          {openReset && resetPasswordModal()}
           {openSignup && signupModal()}
+          {openEnterResetToken && enterResetTokenModal()}
           <Layout>
             <Header style={{ background: '#fff', padding: 0 }}>
               <Row type="flex" justify="center">
