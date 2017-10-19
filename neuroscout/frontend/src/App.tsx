@@ -275,7 +275,6 @@ class App extends React.Component<{}, AppState> {
   };
 
   // Reset password function
-  // NEED TO ADD ERROR HANDLER FOR WRONG TOKEN PASSWORD ETC
   submitToken = (): void => {
     const { token, password } = this.state;
     const that = this;
