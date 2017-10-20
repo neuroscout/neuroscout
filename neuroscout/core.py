@@ -68,11 +68,6 @@ route_factory(app, docs,
         ('TaskListResource', 'tasks')
     ])
 
-@app.route('/')
-def index():
-    ''' Serve index '''
-    return send_file("frontend/build/index.html")
-
 @app.route('/confirm/<token>')
 def confirm(token):
     ''' Serve confirmaton page '''
@@ -91,6 +86,12 @@ def confirm(token):
                            invalid=invalid, name=name,
                            action_url=url_for('index', _external=True))
 
+@app.route('/', defaults={'path': ''})
+@app.route('/<path:path>')
+def index(path):
+    ''' Serve index '''
+    return send_file("frontend/build/index.html")
+    
 if __name__ == '__main__':
     db.init_app(app)
     app.run(debug=app.config['DEBUG'], port=5001)
