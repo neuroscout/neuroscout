@@ -1,7 +1,7 @@
 """
     Mail sending functionality using flask_mail.
 """
-from flask import render_template
+from flask import render_template, current_app
 from flask_mail import Message
 from core import mail
 
@@ -13,6 +13,7 @@ def send_confirm_mail(recipient, name, confirmation_link):
 
     msg = Message("Welcome to Neuroscout!",
                   recipients=[recipient])
+    current_app.logger.info(confirmation_link)
     msg.html = render_template('welcome_email.html',
                                action_url=confirmation_link,
                                name=name,

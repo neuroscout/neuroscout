@@ -23,17 +23,26 @@ def reset_password(email):
     name = user.name if user else None
     send_reset_mail(email, token, name)
 
+def send_confirmation(user):
+    """Attempts to send confirmation email to user. Returns True if performed.
+    """
+    if current_app.config['SEND_REGISTER_EMAIL'] and \
+        user.confirmed_at is None:
+        confirmation_link, token = generate_confirmation_link(user)
+        send_confirm_mail(user.email, user.name, confirmation_link)
+
+        return True
+    else:
+        return False
+
+
 def register_user(**kwargs):
     """ Register new user and password """
     confirmation_link, token = None, None
     user = user_datastore.create_user(**kwargs)
     user_datastore.commit()
 
-    if current_app.config['CONFIRM_USERS']:
-        confirmation_link, token = generate_confirmation_link(user)
-
-    if current_app.config['SEND_REGISTER_EMAIL']:
-        send_confirm_mail(user.email, user.name, confirmation_link)
+    _  = send_confirmation(user)
 
     return user
 

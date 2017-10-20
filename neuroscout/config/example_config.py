@@ -1,6 +1,7 @@
 import datetime
 
 class Config(object):
+    SERVER_NAME = 'external_host'
     DEBUG = False
     TESTING = False
     CSRF_ENABLED = True

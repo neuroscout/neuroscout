@@ -4,7 +4,8 @@ blinker==1.4
 click==6.7
 celery
 decorator==4.0.11
-datalad==0.6.0
+pyld==0.7.3
+datalad==0.9.1
 docopt==0.6.2
 duecredit==0.6.1
 Flask==0.12.1
@@ -23,6 +24,7 @@ grabbit==0.0.6
 gunicorn==19.7.1
 hashids==1.2.0
 imageio==2.1.2
+ipython==6.2.1
 itsdangerous==0.24
 Jinja2==2.9.6
 MarkupSafe==1.0

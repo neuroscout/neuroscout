@@ -22,7 +22,7 @@ class Home extends React.Component<HomeProps, {}> {
         <Row type="flex" justify="center">
           <Col span={18}>
             <Card title="">
-              <p>Marketing copy explaining Neuroscout...</p>
+              <p>Welcome to Neuroscout!</p>
             </Card>
             <br />
           </Col>

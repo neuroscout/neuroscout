@@ -5,7 +5,7 @@ Top-level App component containing AppState. The App component is currently resp
 - Managing user's saved analyses (list display, clone and delete)
 */
 import * as React from 'react';
-import { Tabs, Row, Col, Layout, Button, Modal, Input, Form, message } from 'antd';
+import { Tabs, Row, Col, Layout, Button, Modal, Icon, Input, Form, message } from 'antd';
 import { displayError, jwtFetch } from './utils';
 import { Space } from './HelperComponents';
 import { ApiUser, ApiAnalysis, AppAnalysis } from './coretypes';
@@ -25,11 +25,15 @@ interface AppState {
   loggedIn: boolean;
   openLogin: boolean;
   openSignup: boolean;
+  openReset: boolean;
+  openEnterResetToken: boolean;
   loginError: string;
   signupError: string;
+  resetError: string;
   email: string | null;
   name: string | null;
   password: string | null;
+  token: string | null;
   jwt: string | null;
   nextURL: string | null; // will probably remove this and find a better solution to login redirects
   analyses: AppAnalysis[]; // List of analyses belonging to the user
@@ -56,16 +60,20 @@ class App extends React.Component<{}, AppState> {
       loggedIn: !!jwt,
       openLogin: false,
       openSignup: false,
+      openReset: false,
+      openEnterResetToken: false,
       loginError: '',
       signupError: '',
-      email: email || 'user@example.com', // For development - remove test2@test.com later
+      resetError: '',
+      email: email,
       name: null,
       jwt: jwt,
-      password: 'string', // For development - set to '' in production
+      password: '',
       nextURL: null,
       analyses: [],
       publicAnalyses: [],
-      loggingOut: false
+      loggingOut: false,
+      token: null
     };
     if (jwt) this.loadAnalyses();
     this.loadPublicAnalyses();
@@ -104,6 +112,7 @@ class App extends React.Component<{}, AppState> {
   authenticate = () =>
     new Promise((resolve, reject) => {
       const { email, password } = this.state;
+      const { accountconfirmError } = this;
       fetch(DOMAINROOT + '/api/auth', {
         method: 'post',
         body: JSON.stringify({ email: email, password: password }),
@@ -113,18 +122,41 @@ class App extends React.Component<{}, AppState> {
       })
         .then(response => response.json())
         .then((data: { status_code: number; access_token?: string; description?: string }) => {
-          if (data.access_token) {
-            message.success('Authentication successful');
-            localStorage.setItem('jwt', data.access_token);
-            localStorage.setItem('email', email!);
-            resolve(data.access_token);
-          } else if (data.status_code === 401) {
+          if (data.status_code === 401) {
             this.setState({ loginError: data.description || '' });
             reject('Authentication failed');
           }
-        })
-        .catch(displayError);
-    });
+          else if (data.access_token) {
+            const token = data.access_token
+            fetch(DOMAINROOT + '/api/user', {
+              method: 'get',
+              headers: {
+                'Content-type': 'application/json',
+                'authorization': 'JWT ' + data.access_token
+              }
+            })
+            .then((response) => {
+              if (response.status === 401) {
+                response.json().then((data: {message: string}) => {
+                  if (data.message === "Your account has not been confirmed.") {
+                    accountconfirmError(token)
+                  }
+                reject('Authentication failed');
+                })
+
+              }
+              else {
+                message.success("Logged in.");
+                localStorage.setItem('jwt', token);
+                localStorage.setItem('email', email!);
+                resolve(token);
+              }
+            })
+            .catch(displayError);;
+          }}
+        )
+      .catch(displayError);}
+      );
 
   // Log user in
   login = () => {
@@ -144,7 +176,7 @@ class App extends React.Component<{}, AppState> {
       .catch(displayError);
   };
 
-  // Sign up for a new account and if successful, immediately log the user in
+  // Sign up for a new account
   signup = () => {
     const { name, email, password, openSignup } = this.state;
     fetch(DOMAINROOT + '/api/user', {
@@ -166,11 +198,15 @@ class App extends React.Component<{}, AppState> {
           });
           throw new Error('Signup failed!');
         }
-        message.success('Signup successful');
-        const { name, email, password } = data;
         this.setState({ name, email, openSignup: false, signupError: '' });
+        Modal.success({
+          title: 'Account created!',
+          content: 'Your account has been sucessfully created. \
+          You will receive a confirmation email shortly. Please follow the instructions to activate your account\
+          and start using Neurosynth. ',
+          okText: 'Okay',
+        });
       })
-      .then(() => this.login())
       .catch(displayError);
   };
 
@@ -200,6 +236,72 @@ class App extends React.Component<{}, AppState> {
         that.logout();
       }
     });
+  };
+
+  // Display modal to resend confirmation link
+  accountconfirmError = (jwt): void => {
+    const that = this;
+    Modal.confirm({
+      title: 'Account is not confirmed!',
+      content: 'Your account has not been confirmed. \
+        To continue, please follow the instructions sent to your email address.',
+      okText: 'Resend confirmation',
+      cancelText: 'Close',
+      onOk() {
+        fetch(DOMAINROOT + '/api/user/resend_confirmation', {
+          method: 'post',
+          headers: {
+            'Content-type': 'application/json',
+            'authorization': 'JWT ' + jwt
+          }
+        })
+        .catch(displayError);
+      },
+    });
+  };
+
+  // Reset password function
+  resetPassword = (): void => {
+    const { email } = this.state;
+    fetch(DOMAINROOT + '/api/user/reset_password', {
+      method: 'post',
+      body: JSON.stringify({ email: email}),
+      headers: {
+        'Content-type': 'application/json'
+      }
+    })
+    .catch(displayError)
+    .then(() =>  {this.setState({ openEnterResetToken: true, openReset: false });});
+  };
+
+  // Reset password function
+  submitToken = (): void => {
+    const { token, password } = this.state;
+    const that = this;
+    fetch(DOMAINROOT + '/api/user/submit_token', {
+      method: 'post',
+      body: JSON.stringify({ token: token, password: password}),
+      headers: {
+        'Content-type': 'application/json'
+      }
+    })
+    .then((response) =>  {
+      if (response.ok) {
+        this.setState({ openEnterResetToken: false})
+        this.login();
+      }
+      else {
+        response.json().then(json => ({ ... json }))
+        .then((data: any) => {
+          let errorMessage = '';
+          Object.keys(data.message).forEach(key => {
+            errorMessage += data.message[key];
+          });
+          that.setState({resetError: errorMessage});
+      })
+    }
+  })
+    .catch(displayError);
   };
 
   setStateFromInput = (name: keyof AppState) => (event: React.FormEvent<HTMLInputElement>) => {
@@ -250,8 +352,12 @@ class App extends React.Component<{}, AppState> {
       loggedIn,
       email,
       name,
+      token,
       openLogin,
       openSignup,
+      openReset,
+      openEnterResetToken,
+      resetError,
       loginError,
       signupError,
       password,
@@ -265,6 +371,94 @@ class App extends React.Component<{}, AppState> {
           <Redirect to="/" />
         </Router>
       );
+
+    const resetPasswordModal = () =>
+      <Modal
+        title="Reset password"
+        visible={openReset}
+        footer={null}
+        maskClosable={true}
+        onCancel={e => {
+          this.setState({ openReset: false });
+        }}
+      >
+      <p>
+       Please enter an email address to send reset instructions
+     </p>
+      <Form
+        onSubmit={e => {
+          e.preventDefault();
+          this.resetPassword();
+        }}
+      >
+        <FormItem>
+          <Input
+            prefix={<Icon type="mail" style={{ fontSize: 13 }}/>}
+            placeholder="Email"
+            type="email"
+            size="large"
+            value={email}
+            onChange={this.setStateFromInput('email')}
+          />
+        </FormItem>
+        <FormItem>
+          <Button style={{ width: '100%' }} htmlType="submit" type="primary">
+            Reset password
+          </Button>
+        </FormItem>
+      </Form>
+    </Modal>;
+
+    const enterResetTokenModal = () =>
+      <Modal
+        title="Change password"
+        visible={openEnterResetToken}
+        footer={null}
+        maskClosable={true}
+        onCancel={e => {
+          this.setState({ openEnterResetToken: false });
+        }}
+      >
+      <p>
+       We have sent a reset token to {email} <br/>
+       Please enter the token below, along with a new password for the account.
+     </p>
+      <Form
+        onSubmit={e => {
+          e.preventDefault();
+          this.submitToken();
+        }}
+      >
+        <FormItem>
+          <Input
+            prefix={<Icon type="tags" style={{ fontSize: 13 }}/>}
+            placeholder="Token"
+            type="token"
+            size="large"
+            onChange={this.setStateFromInput('token')}
+          />
+        </FormItem>
+        <FormItem>
+          <Input
+            prefix={<Icon type="lock" style={{ fontSize: 13 }}/>}
+            placeholder="Password"
+            type="password"
+            size="large"
+            onChange={this.setStateFromInput('password')}
+          />
+        </FormItem>
+        <FormItem>
+          <Button style={{ width: '100%' }} htmlType="submit" type="primary">
+            Submit
+          </Button>
+        </FormItem>
+      </Form>
+      <p>
+        {resetError}
+      </p>
+      <br />
+    </Modal>;
+
     const loginModal = () =>
       <Modal
         title="Log into Neuroscout"
@@ -276,7 +470,7 @@ class App extends React.Component<{}, AppState> {
         }}
       >
         <p>
-          {loginError ? loginError : 'For development try "test2@test.com" and "password"'}
+          {loginError ? loginError : 'For development try "user@example.com" and "string"'}
         </p>
         <br />
         <Form
@@ -287,6 +481,7 @@ class App extends React.Component<{}, AppState> {
         >
           <FormItem>
             <Input
+              prefix={<Icon type="mail" style={{ fontSize: 13 }}/>}
               placeholder="Email"
               type="email"
               size="large"
@@ -296,6 +491,7 @@ class App extends React.Component<{}, AppState> {
           </FormItem>
           <FormItem>
             <Input
+              prefix={<Icon type="lock" style={{ fontSize: 13 }}/>}
               placeholder="Password"
               type="password"
               value={password}
@@ -303,6 +499,7 @@ class App extends React.Component<{}, AppState> {
             />
           </FormItem>
           <FormItem>
+           <a onClick={e => {this.setState({ openLogin:false, openReset: true });}}>Forgot password</a><br/>
             <Button style={{ width: '100%' }} htmlType="submit" type="primary">
               Log in
             </Button>
@@ -365,7 +562,9 @@ class App extends React.Component<{}, AppState> {
       <Router>
         <div>
           {openLogin && loginModal()}
+          {openReset && resetPasswordModal()}
           {openSignup && signupModal()}
+          {openEnterResetToken && enterResetTokenModal()}
           <Layout>
             <Header style={{ background: '#fff', padding: 0 }}>
               <Row type="flex" justify="center">

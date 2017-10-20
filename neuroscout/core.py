@@ -63,29 +63,35 @@ route_factory(app, docs,
         ('UserRootResource', 'user'),
         ('UserTriggerResetResource', 'user/reset_password'),
         ('UserResetSubmitResource', 'user/submit_token'),
+        ('UserResendConfirm', 'user/resend_confirmation'),
         ('TaskResource', 'tasks/<int:task_id>'),
         ('TaskListResource', 'tasks')
     ])
-
-@app.route('/')
-def index():
-    ''' Serve index '''
-    return send_file("frontend/build/index.html")
 
 @app.route('/confirm/<token>')
 def confirm(token):
     ''' Serve confirmaton page '''
     expired, invalid, user = confirm_email_token_status(token)
-    name = user.name if user else None
-    if not expired and not invalid:
-        confirmed = confirm_user(user)
-        db.session.commit()
-    app.logger.info(confirmed)
+    name = None
+    confirmed = None
+    if user:
+        if not expired and not invalid:
+            confirmed = confirm_user(user)
+            db.session.commit()
+        name = user.name
+    else:
+        confirmed = None
     return render_template('confirm.html',
                            confirmed=confirmed, expired=expired,
                            invalid=invalid, name=name,
                            action_url=url_for('index', _external=True))
 
+@app.route('/', defaults={'path': ''})
+@app.route('/<path:path>')
+def index(path):
+    ''' Serve index '''
+    return send_file("frontend/build/index.html")
+    
 if __name__ == '__main__':
     db.init_app(app)
     app.run(debug=app.config['DEBUG'], port=5001)

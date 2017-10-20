@@ -65,10 +65,10 @@ def auth_required(function):
 
         if current_identity.active is False:
             return abort(
-                401, {"message" : "Your account has been disabled."})
+                401, "Your account has been disabled.")
         elif current_identity.confirmed_at is None:
             return abort(
-                401, {"message" : "Your account has not been confirmed."})
+                401, "Your account has not been confirmed.")
 
         return function(*args, **kwargs)
     return wrapper
