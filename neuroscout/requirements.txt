@@ -4,6 +4,7 @@ blinker==1.4
 click==6.7
 celery
 decorator==4.0.11
+pyld==0.7.4
 datalad==0.9.1
 docopt==0.6.2
 duecredit==0.6.1
