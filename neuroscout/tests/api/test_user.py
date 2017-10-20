@@ -5,10 +5,6 @@ def decode_json(resp):
 	return json.loads(resp.data.decode())
 
 def test_auth(auth_client):
-	# Test bad URL with correct auth
-	resp = auth_client.get('/api/v1/hello')
-	assert resp.status_code == 404
-
 	# Get auth token with invalid credentials
 	auth_resp = auth_client.post('/api/auth',
 						data={'username': 'not', 'password': 'existing'},
