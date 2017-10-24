@@ -326,10 +326,11 @@ def extract_features(db_session, local_path, name, task, graph_spec,
     # Get absolute path and load
     stims = load_stims([os.path.realpath(s) for s in stim_paths])
 
-
     # Construct and run the graph
     graph = Graph(spec=graph_spec)
     results = graph.run(stims, merge=False)
+
+    assert 0
 
     extracted_features = {}
     for res in results:

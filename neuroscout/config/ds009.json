@@ -6,7 +6,7 @@
     "tasks": {
       "emotionalregulation": {
         "features": [
-          "default.json"
+          "image_current.json"
         ],
         "filters": {
           "run": 1,
