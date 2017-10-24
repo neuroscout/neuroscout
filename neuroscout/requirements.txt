@@ -34,6 +34,7 @@ nibabel==2.1.0
 nltk==3.2.2
 numpy==1.12.0
 olefile==0.44
+opencv-python
 packaging==16.8
 pandas==0.19.2
 patsy
