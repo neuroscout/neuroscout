@@ -20,6 +20,8 @@ from models import (Dataset, Run, Predictor, PredictorEvent, PredictorRun,
 import magic
 import nibabel as nib
 
+from flask import current_app
+
 def add_predictor(db_session, predictor_name, dataset_id, run_id,
                   onsets, durations, values, **kwargs):
     """" Adds a new Predictor to a run given a set of values
@@ -278,6 +280,40 @@ def add_task(db_session, task, name=None, local_path=None, dataset_address=None,
 
     return dataset_model.id
 
+class FeatureSerializer(object):
+    def __init__(self, schema=None):
+        if schema is None:
+            dir_path = os.path.dirname(os.path.realpath(__file__))
+            schema = os.path.join(
+                dir_path, 'config', current_app.config['FEATURE_SCHEMA'])
+        self.schema = json.load(open(schema, 'r'))
+
+    def load(self, ext_res):
+        """" Serialize pliers ExtractorResult to dictonaries.
+             Annotate with values from feature schema if present
+        """
+        # Load names
+        extractor_name = ext_res.extractor.name
+        original_name = ext_res.features[0]
+
+        ## Look up feature in schema, set to None if not found
+        feature_schema = self.schema.get(
+            extractor_name, {}).get(original_name, {})
+
+        unique = {}
+        tr_attrs = [getattr(ext_res, a) for a in ext_res.extractor._log_attributes]
+        unique['extractor_parameters'] = str(dict(
+            zip(ext_res.extractor._log_attributes, tr_attrs)))
+        unique['extractor_name'] = extractor_name
+        unique['feature_name'] = feature_schema.get('rename', original_name)
+
+        extra = {}
+        extra['description'] = feature_schema.get('description')
+        extra['active'] = feature_schema.get('active', True)
+
+        return unique, extra
+
+
 def extract_features(db_session, local_path, name, task, graph_spec,
                      automagic=False, verbose=True, **filters):
     """ Extract features using pliers for a dataset/task
@@ -330,30 +366,27 @@ def extract_features(db_session, local_path, name, task, graph_spec,
     graph = Graph(spec=graph_spec)
     results = graph.run(stims, merge=False)
 
+    serializer = FeatureSerializer()
 
     extracted_features = {}
     for res in results:
         """" Add new ExtractedFeature """
-        extractor = res.extractor
         # Hash extractor name + feature name
-        ef_hash = hash_str(str(extractor.__hash__()) + res.features[0])
+        ef_hash = hash_str(str(res.extractor.__hash__()) + res.features[0])
 
-        # If we haven't already added this feature
+        # If we haven't already added this feature from this extractor + params
         if ef_hash not in extracted_features:
-            tr_attrs = [getattr(res, attr) for attr in extractor._log_attributes]
-            ef_params = str(dict(
-                zip(extractor._log_attributes, tr_attrs)))
-
-            # Get or create feature
-            ef_model, ef_new = db_utils.get_or_create(db_session,
+            unique, extra = serializer.load(res)
+            # Create/get feature
+            ef_model, _ = db_utils.get_or_create(db_session,
                                                  ExtractedFeature,
-                                                 commit=False,
-                                                 extractor_name=extractor.name,
-                                                 extractor_parameters=ef_params,
-                                                 feature_name=res.features[0])
-            ef_model.sha1_hash=ef_hash
-            db_session.commit()
+                                                 commit=False, **unique)
 
+            # Add non identifying information and commit
+            ef_model.sha1_hash = ef_hash
+            for key, value in extra.items():
+                setattr(ef_model, key, value)
+            db_session.commit()
             extracted_features[ef_hash] = ef_model.id
 
         """" Add ExtractedEvents """

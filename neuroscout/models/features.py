@@ -12,6 +12,8 @@ class ExtractedFeature(db.Model):
 	extractor_name = db.Column(db.String)
 	extractor_parameters = db.Column(db.Text)
 	feature_name = db.Column(db.String)
+	description = db.Column(db.String)
+	active = db.Column(db.Boolean)
 
 	extracted_events = db.relationship('ExtractedEvent', backref='extracted_feature',
                                 		lazy='dynamic')

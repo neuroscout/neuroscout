@@ -1,0 +1,25 @@
+{
+  "roots": [
+    {
+      "transformer": "ClarifaiAPIExtractor"
+    },
+    {
+      "transformer": "IndicoAPITextExtractor"
+    },
+    {
+      "transformer": "GoogleVisionAPILabelExtractor"
+    },
+    {
+      "transformer": "GoogleVisionAPIFaceExtractor"
+    },
+    {
+      "transformer": "BrightnessExtractor"
+    },
+    {
+      "transformer": "VibranceExtractor"
+    },
+    {
+      "transformer": "SharpnessExtractor"
+    }
+  ]
+}
