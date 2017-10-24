@@ -1,0 +1,18 @@
+{
+  "self-control": {
+    "dataset_address": "///openfmri/ds000009",
+    "preproc_address": "https://s3.amazonaws.com/openneuro.outputs/187286264df2b39732a243296cc0ed70/8480141e-9638-4e24-be53-f97fb8ac755d/fmriprep/",
+    "path": "/datasets/ds009",
+    "tasks": {
+      "emotionalregulation": {
+        "features": [
+          "default.json"
+        ],
+        "filters": {
+          "run": 1,
+          "subject": "0[0-4]"
+        }
+      }
+    }
+  }
+}

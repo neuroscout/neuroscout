@@ -1,0 +1,30 @@
+{
+  "studyforrest_phase2": {
+    "dataset_address": "https://github.com/adelavega/studyforrest-data-phase2.git",
+    "path": "/datasets/studyforrest-data-phase2/",
+    "tasks": {
+      "movie": {
+        "features": [
+          "movie.json"
+        ],
+        "filters": {
+          "run": 1,
+          "session": "movie",
+          "subject": "01"
+        },
+        "parameters": {
+          "skip_predictors": true
+        }
+      },
+      "objectcategories": {
+        "features": [
+          "default.json"
+        ],
+        "filters": {
+          "run": 1,
+          "subject": "0[1-2]"
+        }
+      }
+    }
+  }
+}
