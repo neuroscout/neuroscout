@@ -4,7 +4,6 @@
 import os
 import re
 import json
-import yaml
 import pandas as pd
 from pathlib import Path
 
@@ -423,9 +422,9 @@ def extract_features(db_session, local_path, name, task, graph_spec,
 
     return list(extracted_features.values())
 
-def ingest_from_yaml(db_session, config_file, install_path='/file-data',
+def ingest_from_json(db_session, config_file, install_path='/file-data',
                      automagic=False, replace=False):
-    dataset_config = yaml.load(open(config_file, 'r'))
+    dataset_config = json.load(open(config_file, 'r'))
     config_path = os.path.dirname(os.path.realpath(config_file))
 
     """ Loop over each dataset in config file """

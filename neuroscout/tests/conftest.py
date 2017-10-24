@@ -82,7 +82,7 @@ import populate
 DATASET_PATH = os.path.join(
     os.path.dirname(os.path.realpath(__file__)), 'data/datasets/bids_test')
 YML_PATH = os.path.join(
-    os.path.dirname(os.path.realpath(__file__)), 'data/test_dataset.yml')
+    os.path.dirname(os.path.realpath(__file__)), 'data/test_dataset.json')
 
 
 @pytest.fixture(scope="function")
