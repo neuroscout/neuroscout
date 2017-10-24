@@ -330,7 +330,6 @@ def extract_features(db_session, local_path, name, task, graph_spec,
     graph = Graph(spec=graph_spec)
     results = graph.run(stims, merge=False)
 
-    assert 0
 
     extracted_features = {}
     for res in results:
