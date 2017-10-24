@@ -6,12 +6,12 @@ script:
   - PYTHONPATH="neuroscout/" python -m pytest neuroscout/
   - cd neuroscout/frontend && npm test
 env:
-- APP_SETTINGS=config.config.TravisConfig
+- APP_SETTINGS=config.app.TravisConfig
 addons:
   postgresql: "9.4"
 cache: yarn
 before_script:
-  - cp neuroscout/config/example_config.py neuroscout/config/config.py
+  - cp neuroscout/config/example_app.py neuroscout/config/app.py
   - psql -c 'create database travis_ci_test;' -U postgres
   - CI=""; cd neuroscout/frontend && yarn install --concurrency=1 && yarn build --concurrency=1
   - CI="true"; cd ../../
