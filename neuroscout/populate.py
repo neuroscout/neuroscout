@@ -23,7 +23,7 @@ import nibabel as nib
 from flask import current_app
 
 def add_predictor(db_session, predictor_name, dataset_id, run_id,
-                  onsets, durations, values, **kwargs):
+                  onsets, durations, values, description=None, **kwargs):
     """" Adds a new Predictor to a run given a set of values
     If Predictor already exist, use that one
     Args:
@@ -40,9 +40,13 @@ def add_predictor(db_session, predictor_name, dataset_id, run_id,
 
     """
     predictor, _ = db_utils.get_or_create(db_session, Predictor,
+                                          commit=False,
                                           name=predictor_name,
                                           dataset_id=dataset_id,
                                           **kwargs)
+    predictor.description=description
+    db_session.commit()
+
     values = pd.Series(values, dtype='object')
     # Insert each row of Predictor as PredictorEvent
     for i, val in enumerate(values[values!='n/a']):
@@ -387,7 +391,7 @@ def extract_features(db_session, local_path, name, task, graph_spec,
             for key, value in extra.items():
                 setattr(ef_model, key, value)
             db_session.commit()
-            extracted_features[ef_hash] = ef_model.id
+            extracted_features[ef_hash] = (ef_model.id, ef_model.active)
 
         """" Add ExtractedEvents """
         # Get associated stimulus record
@@ -411,7 +415,7 @@ def extract_features(db_session, local_path, name, task, graph_spec,
                                                commit=False,
                                                onset=onset,
                                                stimulus_id=stimulus.id,
-                                               ef_id=extracted_features[ef_hash])
+                                               ef_id=extracted_features[ef_hash][0])
 
         # Add data to it (whether or not its new, as we may want to update)
         ee_model.value = res.data[0][0]
@@ -432,26 +436,30 @@ def extract_features(db_session, local_path, name, task, graph_spec,
         Run).filter(Run.dataset_id == dataset_id and Run.task.name==task).all()
     for rs in task_runstimuli:
         # For every feature extracted
-        for ef, ef_id in extracted_features.items():
-            ef = ExtractedFeature.query.filter_by(id = ef_id).one()
-            # Get ExtractedEvents associated with stimulus
-            ees = ef.extracted_events.filter_by(
-                stimulus_id = rs.stimulus_id).all()
+        for ef, (ef_id, active) in extracted_features.items():
+            if active:
+                ### Abstract some of this logic out for when we later create derived features
+                ef = ExtractedFeature.query.filter_by(id = ef_id).one()
+                # Get ExtractedEvents associated with stimulus
+                ees = ef.extracted_events.filter_by(
+                    stimulus_id = rs.stimulus_id).all()
 
-            onsets = [ee.onset + rs.onset if ee.onset else rs.onset
-                      for ee in ees]
-            durations = [ee.duration for ee in ees]
+                onsets = [ee.onset + rs.onset if ee.onset else rs.onset
+                          for ee in ees]
+                durations = [ee.duration for ee in ees]
 
-            # If only a single value was extracted, and there is no duration
-            # Set to stimulus duration
-            if (len(durations) == 1) and (durations[0] is None):
-                durations[0] = rs.duration
+                # If only a single value was extracted, and there is no duration
+                # Set to stimulus duration
+                if (len(durations) == 1) and (durations[0] is None):
+                    durations[0] = rs.duration
 
-            values = [ee.value for ee in ees if ee.value]
+                values = [ee.value for ee in ees if ee.value]
 
-            predictor_name = '{}.{}'.format(ef.extractor_name, ef.feature_name)
-            add_predictor(db_session, predictor_name, dataset_id, rs.run_id,
-                          onsets, durations, values, ef_id = ef_id)
+                predictor_name = '{}.{}'.format(ef.extractor_name, ef.feature_name)
+                
+                add_predictor(db_session, predictor_name, dataset_id, rs.run_id,
+                              onsets, durations, values, ef_id = ef_id,
+                              description=ef.description)
 
     return list(extracted_features.values())
 
