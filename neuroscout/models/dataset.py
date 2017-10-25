@@ -30,3 +30,6 @@ class Dataset(db.Model):
 						dataset_id=self.id).distinct('mimetype')]
 
 	# Meta-data, such as preprocessed history, etc...
+
+	def __repr__(self):
+	    return '<models.Dataset[name=%s]>' % self.name

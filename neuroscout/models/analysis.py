@@ -76,6 +76,9 @@ class Analysis(db.Model):
         ## Copy relationships
         return clone_row
 
+    def __repr__(self):
+        return '<models.Analysis[hash_id=%s]>' % self.hash_id
+
 @listens_for(Analysis, "after_insert")
 def update_hash(mapper, connection, target):
     analysis_table = mapper.local_table

@@ -16,8 +16,11 @@ class Task(db.Model):
 
     runs = db.relationship('Run', backref='task', cascade="delete")
     TR = db.Column(db.Float)
-    
+
     @hybrid_property
     def num_runs(self):
     	""" List of mimetypes of stimuli in dataset """
     	return len(self.runs)
+
+    def __repr__(self):
+        return '<models.Task[name={}]>'.format(self.name)
