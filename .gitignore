@@ -110,4 +110,9 @@ neuroscout/src
 neuroscout/workflow/src
 jest_0
 .my-env
+<<<<<<< Updated upstream
 config.py
+=======
+app.py
+.aws
+>>>>>>> Stashed changes

@@ -13,7 +13,7 @@ Session / db managment tools
 def app():
     """Session-wide test `Flask` application."""
     if 'APP_SETTINGS' not in os.environ:
-        _app.config.from_object('config.config.TestingConfig')
+        _app.config.from_object('config.app.TestingConfig')
 
     # Establish an application context before running the tests.
     ctx = _app.app_context()
