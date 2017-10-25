@@ -289,7 +289,7 @@ class FeatureSerializer(object):
         if schema is None:
             dir_path = os.path.dirname(os.path.realpath(__file__))
             schema = os.path.join(
-                dir_path, 'config', current_app.config['FEATURE_SCHEMA'])
+                dir_path, current_app.config['FEATURE_SCHEMA'])
         self.schema = json.load(open(schema, 'r'))
 
     def load(self, ext_res):
@@ -316,7 +316,6 @@ class FeatureSerializer(object):
         extra['active'] = feature_schema.get('active', True)
 
         return unique, extra
-
 
 def extract_features(db_session, local_path, name, task, graph_spec,
                      automagic=False, verbose=True, **filters):
@@ -456,7 +455,7 @@ def extract_features(db_session, local_path, name, task, graph_spec,
                 values = [ee.value for ee in ees if ee.value]
 
                 predictor_name = '{}.{}'.format(ef.extractor_name, ef.feature_name)
-                
+
                 add_predictor(db_session, predictor_name, dataset_id, rs.run_id,
                               onsets, durations, values, ef_id = ef_id,
                               description=ef.description)

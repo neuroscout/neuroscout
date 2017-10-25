@@ -2,7 +2,6 @@
   "BrightnessExtractor" : {
     "brightness" : {
       "rename": "brightness",
-      "active": false,
       "description": "Brightness of an image."
     }
   },
