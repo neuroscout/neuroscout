@@ -79,7 +79,7 @@ For example:
 
 Even easier, is to use a preconfigured dataset config file, such as:
 
-    docker-compose exec neuroscout python manage.py ingest_from_yaml /neuroscout/config/ds009.yml
+    docker-compose exec neuroscout python manage.py ingest_from_json /neuroscout/config/ds009.json
 
 
 

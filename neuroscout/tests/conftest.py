@@ -81,8 +81,8 @@ import populate
 
 DATASET_PATH = os.path.join(
     os.path.dirname(os.path.realpath(__file__)), 'data/datasets/bids_test')
-YML_PATH = os.path.join(
-    os.path.dirname(os.path.realpath(__file__)), 'data/test_dataset.yml')
+JSON_PATH = os.path.join(
+    os.path.dirname(os.path.realpath(__file__)), 'data/test_dataset.json')
 
 
 @pytest.fixture(scope="function")
@@ -121,7 +121,7 @@ def add_task(session):
 @pytest.fixture(scope="function")
 def add_task_remote(session):
     """ Add a dataset with two subjects """
-    return populate.ingest_from_yaml(session, YML_PATH,
+    return populate.ingest_from_json(session, JSON_PATH,
                                      '/tmp/datasets')[0]
 
 @pytest.fixture(scope="function")

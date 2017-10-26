@@ -12,12 +12,16 @@ class ExtractedFeature(db.Model):
 	extractor_name = db.Column(db.String)
 	extractor_parameters = db.Column(db.Text)
 	feature_name = db.Column(db.String)
+	description = db.Column(db.String)
+	active = db.Column(db.Boolean)
 
 	extracted_events = db.relationship('ExtractedEvent', backref='extracted_feature',
-                                		lazy='dynamic')
+	                            		lazy='dynamic')
 	generated_predictors = db.relationship('Predictor',
 											backref='extracted_feature')
 
+	def __repr__(self):
+	    return '<models.ExtractedFeature[feature_name=%s]>' % self.feature_name
 
 class ExtractedEvent(db.Model):
 	""" Events extracted from a Stimuli"""

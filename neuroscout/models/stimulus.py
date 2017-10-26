@@ -15,6 +15,10 @@ class Stimulus(db.Model):
 	                        secondary='run_stimulus',
 	                        backref='stimulus')
 
+	def __repr__(self):
+	    return '<models.Stimulus[name={}]>'.format(self.name)
+
+
 class RunStimulus(db.Model):
 	""" Run Stimulus association table """
 	stimulus_id = db.Column(db.Integer, db.ForeignKey('stimulus.id'), primary_key=True)

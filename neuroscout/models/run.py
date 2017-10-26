@@ -32,3 +32,5 @@ class Run(db.Model):
     analyses = db.relationship('Analysis',
                             secondary='analysis_run',
                             lazy='dynamic')
+    def __repr__(self):
+        return '<models.Run[task={} number={}]>'.format(self.task, self.number)

@@ -19,6 +19,9 @@ class Predictor(db.Model):
 
 	run_statistics = db.relationship('PredictorRun')
 
+	def __repr__(self):
+	    return '<models.Predictor[name=%s]>' % self.name
+
 class PredictorEvent(db.Model):
 	""" An event within a Predictor. Onset is relative to run. """
 	__table_args__ = (

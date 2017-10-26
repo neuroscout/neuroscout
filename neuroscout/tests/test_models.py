@@ -86,19 +86,24 @@ def test_extracted_features(add_task_remote):
 	extractor_names = [ee.extractor_name for ee in ExtractedFeature.query.all()]
 	assert ['BrightnessExtractor', 'VibranceExtractor'] == extractor_names
 
-	ef = ExtractedFeature.query.first()
+	ef_b = ExtractedFeature.query.filter_by(extractor_name='BrightnessExtractor').one()
 	# Check that the number of features extracted is the same as Stimuli
-	assert ef.extracted_events.count() == Stimulus.query.count()
+	assert ef_b.extracted_events.count() == Stimulus.query.count()
 
 	# And that a sensical value was extracted
-	assert ef.extracted_events.first().value < 1
+	assert ef_b.extracted_events.first().value < 1
 
 	# Test that Predictors were created from EF
-	pred = Predictor.query.filter_by(ef_id=ef.id).one()
+	pred = Predictor.query.filter_by(ef_id=ef_b.id).one()
 	assert pred.predictor_events.first().onset == 1.0
 
-	# Add a test checking that values correspond from Predictors to EFs?
+	# Test that Predictors have description and name propgated down
+	assert pred.description == "Brightness of an image."
+	assert pred.name == "BrightnessExtractor.Brightness"
 
+	# Test that a Predictor was not made for vibrance (hidden)
+	ef_v = ExtractedFeature.query.filter_by(extractor_name='VibranceExtractor').one()
+	assert Predictor.query.filter_by(ef_id=ef_v.id).count() == 0
 
 def test_analysis(session, add_analysis, add_predictor):
 	# Number of entries
