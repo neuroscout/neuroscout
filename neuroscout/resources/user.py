@@ -9,7 +9,6 @@ from database import db
 from auth import register_user, reset_password, send_confirmation
 from . import utils
 import db_utils
-from .utils import abort
 
 class UserSchema(Schema):
     email = fields.Email(required=True)
@@ -66,7 +65,7 @@ class UserRootResource(MethodResource):
     def put(self, **kwargs):
         if User.query.filter((User.email==kwargs['email']) \
                              & (User.id!=current_identity.id)).all():
-            abort(422, 'Email already in use.')
+            utils.abort(422, 'Email already in use.')
         return db_utils.put_record(db.session, kwargs, current_identity)
 
 @doc(tags=['auth'])
