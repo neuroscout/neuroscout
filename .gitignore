@@ -108,6 +108,6 @@ neuroscout/frontend/build
 bids_test_annex
 neuroscout/src
 neuroscout/workflow/src
+neuroscout/config/app.py
 jest_0
 .my-env
-config.py
