@@ -33,7 +33,7 @@ services:
 
   postgres:
     restart: always
-    image: postgres:latest
+    build: ./postgres
     volumes_from:
       - data
     ports:
