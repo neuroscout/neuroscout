@@ -1,5 +1,5 @@
 from tests.request_utils import decode_json
-def test_get_predictor(auth_client, add_task):
+def test_get_predictor(auth_client, add_task_remote):
     # List of predictors
     resp = auth_client.get('/api/predictors')
     assert resp.status_code == 200
@@ -42,6 +42,15 @@ def test_get_predictor(auth_client, add_task):
     assert resp.status_code == 200
     pred_p = decode_json(resp)
     assert len(pred_p) == 1
+    assert 'extracted_feature' not in pred_p[0]
+
+    # Test extracted_feature
+    resp = auth_client.get('/api/predictors', params={'name': 'BrightnessExtractor.Brightness',
+        'run_id': run_id})
+    assert resp.status_code == 200
+    pred_p = decode_json(resp)
+    assert 'extracted_feature' in pred_p[0]
+    assert pred_p[0]['extracted_feature']['description'] == 'Brightness of an image.'
 
 def test_get_predictor_data(auth_client, add_task):
     # List of predictors

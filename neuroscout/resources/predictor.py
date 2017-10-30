@@ -1,14 +1,25 @@
-from marshmallow import Schema, fields
+from marshmallow import Schema, fields, post_dump
 import webargs as wa
 from flask_apispec import MethodResource, marshal_with, use_kwargs, doc
 from models import Predictor, PredictorEvent
 from . import utils
 
+class ExtractedFeatureSchema(Schema):
+	extractor_parameters = fields.Str(description="Extractor parameters.")
+	description = fields.Str(description="Feature description.")
+	created_at = fields.Str(description="Extraction timestamp.")
+
 class PredictorSchema(Schema):
 	id = fields.Int()
 	name = fields.Str(description="Predictor name.")
 	description = fields.Str()
-	ef_id = fields.Int(description="Original extracted feature id.")
+	extracted_feature = fields.Nested('ExtractedFeatureSchema', skip_if=None)
+
+	@post_dump
+	def remove_null_values(self, data):
+		if data.get('extracted_feature', True) is None:
+			data.pop('extracted_feature')
+		return data
 
 class PredictorSingleSchema(PredictorSchema):
 	run_statistics = fields.Nested('PredictorRunSchema', many=True)

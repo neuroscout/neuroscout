@@ -40,7 +40,7 @@ pandas==0.19.2
 patsy
 passlib==1.7.1
 Pillow==4.1.1
--e git+https://github.com/tyarkoni/pliers.git#egg=pliers
+-e git+https://github.com/tyarkoni/pliers.git@versioning#egg=pliers
 psycopg2==2.7.1
 py==1.4.33
 -e git+https://github.com/adelavega/pybids.git@transformer#egg=pybids

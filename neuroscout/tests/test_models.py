@@ -88,6 +88,8 @@ def test_extracted_features(add_task_remote):
 
 	ef_b = ExtractedFeature.query.filter_by(extractor_name='BrightnessExtractor').one()
 	assert ef_b.extractor_version is not None
+	assert ef_b.description == "Brightness of an image."
+
 	# Check that the number of features extracted is the same as Stimuli
 	assert ef_b.extracted_events.count() == Stimulus.query.count()
 
@@ -99,7 +101,6 @@ def test_extracted_features(add_task_remote):
 	assert pred.predictor_events.first().onset == 1.0
 
 	# Test that Predictors have description and name propgated down
-	assert pred.description == "Brightness of an image."
 	assert pred.name == "BrightnessExtractor.Brightness"
 
 	# Test that a Predictor was not made for vibrance (hidden)
