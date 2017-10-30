@@ -1,4 +1,5 @@
 from database import db
+import datetime
 
 class ExtractedFeature(db.Model):
 	""" Events extracted from a Stimulus using an Extractor"""
@@ -14,6 +15,10 @@ class ExtractedFeature(db.Model):
 	feature_name = db.Column(db.String)
 	description = db.Column(db.String)
 	active = db.Column(db.Boolean)
+
+	created_at = db.Column(db.DateTime, default=datetime.datetime.utcnow)
+	extactor_version = db.Column(db.Float)
+	result_version = db.Column(db.Float)
 
 	extracted_events = db.relationship('ExtractedEvent', backref='extracted_feature',
 	                            		lazy='dynamic')
