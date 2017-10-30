@@ -22,7 +22,7 @@ from models import (Dataset, Task, Run, Predictor, PredictorEvent, PredictorRun,
 import populate
 
 def ingest_from_json(db_session, config_file, install_path='/file-data',
-                     automagic=False, replace=False):
+                     automagic=False):
     dataset_config = json.load(open(config_file, 'r'))
     config_path = dirname(realpath(config_file))
 
@@ -49,7 +49,7 @@ def ingest_from_json(db_session, config_file, install_path='/file-data',
             dataset_id = add_task(db_session, task,
                                   local_path=local_path,
                                   dataset_address=dataset_address,
-                                  replace=replace, automagic=automagic,
+                                  automagic=automagic,
                                   verbose=True, install_path=new_path,
                                   preproc_address=preproc_address,
                                   name=name,
@@ -69,7 +69,7 @@ def ingest_from_json(db_session, config_file, install_path='/file-data',
     return dataset_ids
 
 def add_predictor(db_session, predictor_name, dataset_id, run_id,
-                  onsets, durations, values, description=None, **kwargs):
+                  onsets, durations, values, **kwargs):
     """" Adds a new Predictor to a run given a set of values
     If Predictor already exist, use that one
     Args:
@@ -86,12 +86,9 @@ def add_predictor(db_session, predictor_name, dataset_id, run_id,
 
     """
     predictor, _ = db_utils.get_or_create(db_session, Predictor,
-                                          commit=False,
                                           name=predictor_name,
                                           dataset_id=dataset_id,
                                           **kwargs)
-    predictor.description=description
-    db_session.commit()
 
     values = pd.Series(values, dtype='object')
     # Insert each row of Predictor as PredictorEvent
@@ -157,7 +154,7 @@ def add_group_predictors(db_session, dataset_id, participants):
 
 def add_task(db_session, task, name=None, local_path=None, dataset_address=None,
              preproc_address=None, install_path='.', automagic=False,
-             replace=False, verbose=True, skip_predictors=False, **kwargs):
+             verbose=True, skip_predictors=False, **kwargs):
     """ Adds a BIDS dataset task to the database.
         Args:
             db_session - sqlalchemy db db_session
@@ -168,7 +165,6 @@ def add_task(db_session, task, name=None, local_path=None, dataset_address=None,
             preproc_address - remote address of preprocessed files.
             install_path - if remote with no local path, where to install.
             automagic - force enable DataLad automagic
-            replace - if dataset/task already exists, skip or replace?
             verbose - verbose output
             skip_predictors - skip ingesting original predictors
             kwargs - arguments to filter runs by
@@ -198,12 +194,16 @@ def add_task(db_session, task, name=None, local_path=None, dataset_address=None,
     dataset_model, new_ds = db_utils.get_or_create(
         db_session, Dataset, name=dataset_name)
 
-    if new_ds or replace:
+    if new_ds:
         dataset_model.description = dataset_description
         dataset_model.dataset_address = dataset_address
         dataset_model.preproc_address = preproc_address
         dataset_model.local_path = local_path
         db_session.commit()
+    else:
+        if automagic:
+            automagic.deactivate()
+        return dataset_model.id
 
     # Get or create task
     task_model, new_task = db_utils.get_or_create(
@@ -214,11 +214,7 @@ def add_task(db_session, task, name=None, local_path=None, dataset_address=None,
             join(local_path, 'task-{}_bold.json'.format(task)), 'r'))
         task_model.TR = task_model.description['RepetitionTime']
         db_session.commit()
-    else:
-        if not replace:
-            if automagic:
-                automagic.deactivate()
-            return dataset_model.id
+
 
     """ Parse every Run """
     for run_events in layout.get(task=task, type='events', **kwargs):

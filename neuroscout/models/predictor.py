@@ -4,9 +4,6 @@ import statistics
 class Predictor(db.Model):
 	""" Instantiation of a predictor in a dataset.
 		A collection of PredictorEvents. """
-	__table_args__ = (
-		db.UniqueConstraint('name', 'dataset_id'),
-	)
 	id = db.Column(db.Integer, primary_key=True)
 	name = db.Column(db.Text, nullable=False)
 
