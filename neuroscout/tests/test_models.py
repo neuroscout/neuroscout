@@ -87,6 +87,7 @@ def test_extracted_features(add_task_remote):
 	assert ['BrightnessExtractor', 'VibranceExtractor'] == extractor_names
 
 	ef_b = ExtractedFeature.query.filter_by(extractor_name='BrightnessExtractor').one()
+	assert ef_b.extractor_version is not None
 	# Check that the number of features extracted is the same as Stimuli
 	assert ef_b.extracted_events.count() == Stimulus.query.count()
 

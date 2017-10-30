@@ -31,23 +31,25 @@ class FeatureSerializer(object):
 
     def load(self, ext_res):
         """" Load a single pliers feature result to dictionaries.
+
         Output is split into uniquely identifying attributes, and additional
         attributes.
         """
         # Load names
         extractor_name = ext_res.extractor.name
-        original_name = ext_res.features[0]
+        feature_name = ext_res.features[0]
 
         ## Look up feature in schema, set to None if not found
         feature_schema = self.schema.get(
-            extractor_name, {}).get(original_name, {})
+            extractor_name, {}).get(feature_name, {})
 
         unique = {}
         tr_attrs = [getattr(ext_res, a) for a in ext_res.extractor._log_attributes]
         unique['extractor_parameters'] = str(dict(
             zip(ext_res.extractor._log_attributes, tr_attrs)))
         unique['extractor_name'] = extractor_name
-        unique['feature_name'] = feature_schema.get('rename', original_name)
+        unique['feature_name'] = feature_schema.get('rename', feature_name)
+        unique['extractor_version'] = ext_res.extractor.VERSION
 
         extra = {}
         extra['description'] = feature_schema.get('description')
