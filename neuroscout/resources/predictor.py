@@ -3,6 +3,8 @@ import webargs as wa
 from flask_apispec import MethodResource, marshal_with, use_kwargs, doc
 from models import Predictor, PredictorEvent
 from . import utils
+from sqlalchemy import func
+from database import db
 
 class ExtractedFeatureSchema(Schema):
 	extractor_parameters = fields.Str(description="Extractor parameters.")
@@ -50,7 +52,11 @@ class PredictorListResource(MethodResource):
 	    'run_id': wa.fields.DelimitedList(fields.Int(),
 	                                      description="Run id(s)"),
 	    'name': wa.fields.DelimitedList(fields.Str(),
-	                                    description="Predictor name(s)"),	}, locations=['query'])
+	                                    description="Predictor name(s)"),
+		'newest': wa.fields.Boolean(default=True,
+					description="Return only newest Predictor by name")
+        },
+		locations=['query'])
 	def get(self, **kwargs):
 		# Get Predictors that match up to specified runs
 		if 'run_id' in kwargs:
@@ -60,8 +66,17 @@ class PredictorListResource(MethodResource):
 					'predictor_id').with_entities('predictor_id').all()
 
 		query = Predictor.query
+
+		# Only return latest Predictor by name -- assumes no repetitions!
+		if kwargs.pop('newest'):
+			query = query.filter(
+				Predictor.id.in_(
+					db.session.query(
+						func.max(Predictor.id)).group_by(Predictor.name)))
+
 		for param in kwargs:
 			query = query.filter(getattr(Predictor, param).in_(kwargs[param]))
+
 
 		return query.all()
 
