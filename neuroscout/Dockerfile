@@ -13,4 +13,6 @@ ENV PATH="${FSLDIR}/bin:${PATH}"
 RUN . /usr/share/fsl/5.0/etc/fslconf/fsl.sh
 RUN pip install git+https://github.com/qmac/nipype@events-interface#egg=nipype
 RUN apt-get install -yq python-opencv
+RUN git config --global user.name "Neuroscout"
+RUN git config --global  user.email "delavega@utexas.edu"
 WORKDIR /neuroscout

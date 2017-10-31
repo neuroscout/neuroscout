@@ -28,7 +28,7 @@ def ingest_from_json(db_session, config_file, install_path='/file-data',
 
     """ Loop over each dataset in config file """
     dataset_ids = []
-    for name, items in dataset_config.items():
+    for dataset_name, items in dataset_config.items():
         dataset_address = items.get('dataset_address')
         preproc_address = items.get('preproc_address')
         local_path = items.get('path')
@@ -37,22 +37,22 @@ def ingest_from_json(db_session, config_file, install_path='/file-data',
 
         # If dataset is remote link, set install path
         if local_path is None:
-            new_path = str((Path(install_path) / name).absolute())
+            new_path = str((Path(install_path) / dataset_name).absolute())
         else:
             new_path = local_path
 
-        for task, options in items['tasks'].items():
+        for task_name, options in items['tasks'].items():
             # Add each task to database
             filters = options.get('filters', {})
             dp = options.get('dataset_parameters', {})
 
-            dataset_id = add_task(db_session, task,
+            dataset_id = add_task(db_session, task_name,
+                                  dataset_name=dataset_name,
                                   local_path=local_path,
                                   dataset_address=dataset_address,
                                   automagic=automagic,
                                   verbose=True, install_path=new_path,
                                   preproc_address=preproc_address,
-                                  name=name,
             					  **dict(filters.items() | dp.items()))
             dataset_ids.append(dataset_id)
 
@@ -61,7 +61,7 @@ def ingest_from_json(db_session, config_file, install_path='/file-data',
 
             if 'features' in options:
                 for graph_spec in options['features']:
-                	populate.extract_features(db_session, new_path, name, task,
+                	populate.extract_features(db_session, dataset_name, task_name,
                 		join(config_path, graph_spec),
                         automagic=local_path is None or automagic,
                         **dict(filters.items() | ep.items()))
@@ -152,14 +152,14 @@ def add_group_predictors(db_session, dataset_id, participants):
 
     return gp_ids
 
-def add_task(db_session, task, name=None, local_path=None, dataset_address=None,
+def add_task(db_session, task_name, dataset_name=None, local_path=None, dataset_address=None,
              preproc_address=None, install_path='.', automagic=False,
              verbose=True, skip_predictors=False, **kwargs):
     """ Adds a BIDS dataset task to the database.
         Args:
             db_session - sqlalchemy db db_session
-            task - task to add
-            name - overide dataset name
+            task_name - task to add
+            dataset_namename - overide dataset name
             local_path - path to local bids dataset.
             dataset_address - remote address of BIDS dataset.
             preproc_address - remote address of preprocessed files.
@@ -182,13 +182,13 @@ def add_task(db_session, task, name=None, local_path=None, dataset_address=None,
         automagic.activate()
 
     layout = BIDSLayout(local_path)
-    if task not in layout.get_tasks():
+    if task_name not in layout.get_tasks():
         raise ValueError("Task {} not found in dataset {}".format(
-            task, local_path))
+            task_name, local_path))
 
     dataset_description = json.load(open(
         join(local_path, 'dataset_description.json'), 'r'))
-    dataset_name = name if name is not None else dataset_description['Name']
+    dataset_name = dataset_name if dataset_name is not None else dataset_description['Name']
 
     # Get or create dataset model from mandatory arguments
     dataset_model, new_ds = db_utils.get_or_create(
@@ -207,17 +207,17 @@ def add_task(db_session, task, name=None, local_path=None, dataset_address=None,
 
     # Get or create task
     task_model, new_task = db_utils.get_or_create(
-        db_session, Task, name=task, dataset_id=dataset_model.id)
+        db_session, Task, name=task_name, dataset_id=dataset_model.id)
 
     if new_task:
         task_model.description = json.load(open(
-            join(local_path, 'task-{}_bold.json'.format(task)), 'r'))
+            join(local_path, 'task-{}_bold.json'.format(task_name)), 'r'))
         task_model.TR = task_model.description['RepetitionTime']
         db_session.commit()
 
 
     """ Parse every Run """
-    for run_events in layout.get(task=task, type='events', **kwargs):
+    for run_events in layout.get(task=task_name, type='events', **kwargs):
         if verbose:
             print("Processing task {} subject {}, run {}".format(
                 run_events.task, run_events.subject, run_events.run))

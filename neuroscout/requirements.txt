@@ -6,6 +6,7 @@ celery
 decorator==4.0.11
 pyld==0.7.3
 datalad==0.9.1
+-e git+https://github.com/adelavega/datalad.git#egg=datalad
 docopt==0.6.2
 duecredit==0.6.1
 Flask==0.12.1
