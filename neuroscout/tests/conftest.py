@@ -120,7 +120,7 @@ def add_task(session):
 
 @pytest.fixture(scope="function")
 def add_task_remote(session):
-    """ Add a dataset with two subjects """
+    """ Add a dataset with two subjects. """
     return populate.ingest_from_json(session, JSON_PATH,
                                      '/tmp/datasets')[0]
 

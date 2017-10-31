@@ -53,7 +53,7 @@ class PredictorListResource(MethodResource):
 	                                      description="Run id(s)"),
 	    'name': wa.fields.DelimitedList(fields.Str(),
 	                                    description="Predictor name(s)"),
-		'newest': wa.fields.Boolean(default=True,
+		'newest': wa.fields.Boolean(missing=True,
 					description="Return only newest Predictor by name")
         },
 		locations=['query'])
@@ -68,7 +68,7 @@ class PredictorListResource(MethodResource):
 		query = Predictor.query
 
 		# Only return latest Predictor by name -- assumes no repetitions!
-		if kwargs.pop('newest'):
+		if  kwargs.pop('newest'):
 			query = query.filter(
 				Predictor.id.in_(
 					db.session.query(

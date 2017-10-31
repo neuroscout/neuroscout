@@ -54,6 +54,7 @@ class FeatureSerializer(object):
 
         return properties
 
+## To-do: refactor to be able to give dataset and task name, or none which would re-extract all
 def extract_features(db_session, local_path, name, task, graph_spec,
                      automagic=False, verbose=True, **filters):
     """ Extract features using pliers for a dataset/task
