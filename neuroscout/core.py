@@ -54,7 +54,6 @@ route_factory(app, docs,
         ('AnalysisBundleResource', 'analyses/<analysis_id>/bundle'),
         ('DesignEventsResource', 'analyses/<analysis_id>/design/events'),
         # ('DesignEventsResource', 'analyses/<analysis_id>/design/events/tsv'),
-        ('ResultResource', 'results/<int:result_id>'),
         ('RunListResource', 'runs'),
         ('RunResource', 'runs/<int:run_id>'),
         ('PredictorListResource', 'predictors'),
@@ -91,7 +90,3 @@ def confirm(token):
 def index(path):
     ''' Serve index '''
     return send_file("frontend/build/index.html")
-    
-if __name__ == '__main__':
-    db.init_app(app)
-    app.run(debug=app.config['DEBUG'], port=5001)

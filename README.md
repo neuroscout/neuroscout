@@ -1,6 +1,7 @@
 # neuroscout
 
 [![Build Status](https://travis-ci.com/PsychoinformaticsLab/neuroscout.svg?token=mytABRBRnBitJJpBpMxh&branch=master)](https://travis-ci.com/PsychoinformaticsLab/neuroscout)
+[![codecov](https://codecov.io/gh/PsychoinformaticsLab/neuroscout/branch/master/graph/badge.svg)](https://codecov.io/gh/PsychoinformaticsLab/neuroscout)
 
 To set up docker, ensure docker and docker-compose are installed.
 First, set up your mounted volumes (such as /datasets), by exporting environment variables:
