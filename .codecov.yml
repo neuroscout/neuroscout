@@ -1,4 +1,2 @@
-coverage:
-  ignore:
-    - "neuroscout/tests/*"
-
+ignore:
+  - "neuroscout/tests/*"
