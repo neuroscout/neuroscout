@@ -83,7 +83,8 @@ DATASET_PATH = os.path.join(
     os.path.dirname(os.path.realpath(__file__)), 'data/datasets/bids_test')
 JSON_PATH = os.path.join(
     os.path.dirname(os.path.realpath(__file__)), 'data/test_dataset.json')
-
+PLIERS_PATH = os.path.join(
+    os.path.dirname(os.path.realpath(__file__)), 'data/test_pliers.json')
 
 @pytest.fixture(scope="function")
 def add_users(app, db, session):
@@ -123,6 +124,12 @@ def add_task_remote(session):
     """ Add a dataset with two subjects. """
     return populate.ingest_from_json(session, JSON_PATH,
                                      '/tmp/datasets')[0]
+
+@pytest.fixture(scope="function")
+def rextract(session, add_task_remote):
+    return populate.extract_features(session, 'bids_test', 'bidstest',
+                                     PLIERS_PATH, automagic=True,
+                                     run='01', subject='01')
 
 @pytest.fixture(scope="function")
 def add_analysis(session, add_users, add_task):
