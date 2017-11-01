@@ -1,9 +1,11 @@
 language: python
 python:
   - "3.5"
-install: "pip install -r neuroscout/requirements.txt"
+install:
+  - pip install -r neuroscout/requirements.txt
+  - pip install pytest-cov
 script:
-  - PYTHONPATH="neuroscout/" python -m pytest neuroscout/
+  - PYTHONPATH="neuroscout/" python -m pytest neuroscout/ --cov=./
   - cd neuroscout/frontend && npm test
 env:
 - APP_SETTINGS=config.app.TravisConfig
@@ -24,3 +26,5 @@ apt:
       key_url: 'https://dl.yarnpkg.com/debian/pubkey.gpg'
   packages:
     - yarn
+after_success:
+  - bash <(curl -s https://codecov.io/bash)
