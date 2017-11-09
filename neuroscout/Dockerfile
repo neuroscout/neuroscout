@@ -16,4 +16,6 @@ RUN apt-get install -yq python-opencv
 RUN git config --global user.name "Neuroscout"
 RUN git config --global  user.email "delavega@utexas.edu"
 RUN python -c "import imageio; imageio.plugins.ffmpeg.download()"
+RUN crontab /neuroscout/update.txt
+RUN service cron start
 WORKDIR /neuroscout
