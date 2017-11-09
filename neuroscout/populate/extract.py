@@ -59,10 +59,17 @@ def extract_features(db_session, dataset_name, task_name, graph_spec,
                      automagic=False, verbose=True, **filters):
     """ Extract features using pliers for a dataset/task
         Args:
+<<<<<<< Updated upstream
             db_session - database session object
             dataset_name - dataset name
             task_name - task name
             graph_spec - pliers graph json spec location
+=======
+            db_session - db db_session
+            local_path - bids dataset directory
+            task - task name
+            graph_spec - pliers graph json spec location, or dictionary
+>>>>>>> Stashed changes
             verbose - verbose output
             filters - additional identifiers for runs
             automagic - enable automagic and unlock stimuli with datalad
@@ -105,7 +112,11 @@ def extract_features(db_session, dataset_name, task_name, graph_spec,
     stims = load_stims([realpath(s) for s in stim_paths])
 
     # Construct and run the graph
-    graph = Graph(spec=graph_spec)
+    if isinstance(graph_spec, str):
+        graph = Graph(spec=graph_spec)
+    else:
+        graph = Graph(nodes=graph_spec)
+        
     results = graph.run(stims, merge=False)
 
     serializer = FeatureSerializer()

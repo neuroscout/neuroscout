@@ -1,8 +1,9 @@
 """ Dataset ingestion
 Tools to populate database from BIDS datasets
 """
-
-from os.path import dirname, realpath, join, basename
+from flask import current_app
+from os.path import dirname, realpath, join, basename, splitext
+from os import makedirs
 import json
 from pathlib import Path
 import magic
@@ -21,10 +22,21 @@ from models import (Dataset, Task, Run, Predictor, PredictorEvent, PredictorRun,
 
 import populate
 
+from pliers.updater import check_updates
+
 def ingest_from_json(db_session, config_file, install_path='/file-data',
+<<<<<<< Updated upstream
                      automagic=False):
+=======
+                     automagic=False, replace=False, update=False):
+>>>>>>> Stashed changes
     dataset_config = json.load(open(config_file, 'r'))
     config_path = dirname(realpath(config_file))
+
+    if update is True:
+        ft_path = current_app.config['FEATURE_TRACKING_DIR']
+        makedirs(ft_path, exist_ok=True)
+        updated_graphs = {}
 
     """ Loop over each dataset in config file """
     dataset_ids = []
@@ -61,10 +73,29 @@ def ingest_from_json(db_session, config_file, install_path='/file-data',
 
             if 'features' in options:
                 for graph_spec in options['features']:
+<<<<<<< Updated upstream
                 	populate.extract_features(db_session, dataset_name, task_name,
                 		join(config_path, graph_spec),
                         automagic=local_path is None or automagic,
                         **dict(filters.items() | ep.items()))
+=======
+                    graph = join(config_path, graph_spec)
+                    graph_name = splitext(graph_spec)[0]
+
+                    if update is True:
+                        if graph_name in updated_graphs:
+                            graph = updated_graphs[graph_name]
+                        else:
+                            graph = check_updates(
+                                graph,
+                                join(ft_path, name + ".csv"))['difference_graph']
+                            updated_graphs[graph_name] = graph
+                            
+                    if graph:
+                        populate.extract_features(db_session, new_path, name, task,
+                            graph, automagic=local_path is None or automagic,
+                            **dict(filters.items() | ep.items()))
+>>>>>>> Stashed changes
 
     return dataset_ids
 
