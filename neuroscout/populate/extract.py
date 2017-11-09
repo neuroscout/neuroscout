@@ -8,6 +8,9 @@ import re
 import pandas as pd
 import imageio
 
+from pliers.stimuli import load_stims
+from pliers.graph import Graph
+
 from datalad import api as da
 from datalad.auto import AutomagicIO
 
@@ -69,14 +72,6 @@ def extract_features(db_session, dataset_name, task_name, graph_spec,
         Output:
             list of db ids of extracted features
     """
-    try:
-        from pliers.stimuli import load_stims
-        from pliers.graph import Graph
-    except imageio.core.fetching.NeedDownloadError:
-        imageio.plugins.ffmpeg.download()
-        from pliers.stimuli import load_stims
-        from pliers.graph import Graph
-
     dataset = Dataset.query.filter_by(name=dataset_name).one()
     dataset_id = dataset.id
     local_path = dataset.local_path
