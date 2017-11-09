@@ -1,4 +1,5 @@
 import pytest
+import os
 from models import (Analysis, User, Dataset, Predictor, Stimulus, Run,
 					RunStimulus, Result, ExtractedFeature,
 					GroupPredictor, GroupPredictorValue)
@@ -59,6 +60,7 @@ def test_dataset_ingestion(session, add_task):
 	assert gpv.count() == 4
 	assert 'F' in [v.value for v in gpv]
 
+@pytest.mark.skipif(os.environ.get("TRAVIS") == "true", "Skipping this test on Travis CI.")
 def test_remote_dataset(session, add_task_remote):
 	dataset_model = Dataset.query.filter_by(id=add_task_remote).one()
 
