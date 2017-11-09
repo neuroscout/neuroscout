@@ -118,7 +118,6 @@ def add_task(session):
     return populate.add_task(session, 'bidstest', local_path=DATASET_PATH,
                                 verbose=False)
 
-
 @pytest.fixture(scope="function")
 def add_task_remote(session):
     """ Add a dataset with two subjects. """
@@ -126,9 +125,14 @@ def add_task_remote(session):
                                      '/tmp/datasets')[0]
 
 @pytest.fixture(scope="function")
-def rextract(session, add_task_remote):
-    return populate.extract_features(session, 'bids_test', 'bidstest',
-                                     PLIERS_PATH, automagic=True,
+def extract_features(session, add_task):
+    return populate.extract_features(session, 'Test Dataset', 'bidstest',
+                                     PLIERS_PATH,
+                                     run='01', subject='01')
+@pytest.fixture(scope="function")
+def reextract(session, extract_features):
+    return populate.extract_features(session, 'Test Dataset', 'bidstest',
+                                     PLIERS_PATH,
                                      run='01', subject='01')
 
 @pytest.fixture(scope="function")
