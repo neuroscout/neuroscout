@@ -6,7 +6,6 @@ from os.path import realpath, join
 import json
 import re
 import pandas as pd
-import imageio
 
 from pliers.stimuli import load_stims
 from pliers.graph import Graph

@@ -1,5 +1,5 @@
 from tests.request_utils import decode_json
-def test_get_predictor(auth_client, add_task_remote, rextract):
+def test_get_predictor(auth_client):
     # List of predictors
     resp = auth_client.get('/api/predictors')
     assert resp.status_code == 200
