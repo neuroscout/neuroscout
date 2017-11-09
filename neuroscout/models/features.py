@@ -1,19 +1,19 @@
 from database import db
+import datetime
 
 class ExtractedFeature(db.Model):
 	""" Events extracted from a Stimulus using an Extractor"""
-	__table_args__ = (
-	    db.UniqueConstraint('extractor_name', 'extractor_parameters', 'feature_name'),
-	)
-
 	id = db.Column(db.Integer, primary_key=True)
 	# Hash of next three variables
-	sha1_hash = db.Column(db.Text, nullable=False, unique=True)
+	sha1_hash = db.Column(db.Text, nullable=False)
 	extractor_name = db.Column(db.String)
 	extractor_parameters = db.Column(db.Text)
 	feature_name = db.Column(db.String)
 	description = db.Column(db.String)
 	active = db.Column(db.Boolean)
+
+	created_at = db.Column(db.DateTime, default=datetime.datetime.utcnow)
+	extractor_version = db.Column(db.Float, default=0.1)
 
 	extracted_events = db.relationship('ExtractedEvent', backref='extracted_feature',
 	                            		lazy='dynamic')
