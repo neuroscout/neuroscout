@@ -58,14 +58,11 @@ def compile(analysis, resources, predictor_events, bids_dir):
     collection.write(file=all_path)
     design_matrix = pd.read_csv(all_path, sep='\t').drop('task', axis=1)
 
-    design_matrix.fillna(0, inplace=True)
+    design_matrix.fillna('n/a', inplace=True)
 
     tsv_path = join(files_dir, 'events.tsv')
     paths.append(tsv_path)
     design_matrix.to_csv(tsv_path, sep='\t', index=False)
-
-
-    ### Replace NANs with 0!
 
     analysis_update['design_matrix'] = design_matrix.to_dict(orient='records')
 
