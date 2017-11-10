@@ -1,14 +1,18 @@
 """
     Command line management tools.
 """
+import os
+import requests
+import json
+import datetime
 
 from flask_script import Manager, Shell
 from flask_migrate import Migrate, MigrateCommand
-from core import app, db
-import os
-import requests
+from flask_security.utils import encrypt_password
+
 import populate
-import json
+from core import app, db
+from models import user_datastore
 
 app.config.from_object(os.environ['APP_SETTINGS'])
 
@@ -33,16 +37,16 @@ manager.add_command('db', MigrateCommand)
 manager.add_command("shell", Shell(make_context=_make_context))
 
 @manager.command
-def add_user(email, password):
-	""" Add a user to the database.
-	email - A valid email address (primary login key)
-	password - Any string
-	"""
-	from models import user_datastore
-	from flask_security.utils import encrypt_password
-
-	user_datastore.create_user(email=email, password=encrypt_password(password))
-	db.session.commit()
+def add_user(email, password, confirm=True):
+    """ Add a user to the database.
+    email - A valid email address (primary login key)
+    password - Any string
+    """
+    user = user_datastore.create_user(
+        email=email, password=encrypt_password(password))
+    if confirm:
+        user.confirmed_at = datetime.datetime.now()
+    db.session.commit()
 
 @manager.command
 def add_task(local_path, task, replace=False, automagic=False,
