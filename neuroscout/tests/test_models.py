@@ -1,4 +1,5 @@
 import pytest
+import os
 from models import (Analysis, User, Dataset, Predictor, Stimulus, Run,
 					RunStimulus, Result, ExtractedFeature,
 					GroupPredictor, GroupPredictorValue)
@@ -59,6 +60,7 @@ def test_dataset_ingestion(session, add_task):
 	assert gpv.count() == 4
 	assert 'F' in [v.value for v in gpv]
 
+@pytest.mark.skipif(os.environ.get("TRAVIS") == "true", reason="Skipping this test on Travis CI.")
 def test_remote_dataset(session, add_task_remote):
 	dataset_model = Dataset.query.filter_by(id=add_task_remote).one()
 
@@ -87,6 +89,9 @@ def test_extracted_features(add_task_remote):
 	assert ['BrightnessExtractor', 'VibranceExtractor'] == extractor_names
 
 	ef_b = ExtractedFeature.query.filter_by(extractor_name='BrightnessExtractor').one()
+	assert ef_b.extractor_version is not None
+	assert ef_b.description == "Brightness of an image."
+
 	# Check that the number of features extracted is the same as Stimuli
 	assert ef_b.extracted_events.count() == Stimulus.query.count()
 
@@ -98,7 +103,6 @@ def test_extracted_features(add_task_remote):
 	assert pred.predictor_events.first().onset == 1.0
 
 	# Test that Predictors have description and name propgated down
-	assert pred.description == "Brightness of an image."
 	assert pred.name == "BrightnessExtractor.Brightness"
 
 	# Test that a Predictor was not made for vibrance (hidden)

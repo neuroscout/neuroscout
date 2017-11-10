@@ -5,7 +5,7 @@ click==6.7
 celery
 decorator==4.0.11
 pyld==0.7.3
-datalad==0.9.1
+-e git+https://github.com/adelavega/datalad.git#egg=datalad
 docopt==0.6.2
 duecredit==0.6.1
 Flask==0.12.1
@@ -41,7 +41,7 @@ pandas==0.19.2
 patsy
 passlib==1.7.1
 Pillow==4.1.1
--e git+https://github.com/tyarkoni/pliers.git#egg=pliers
+-e git+https://github.com/adelavega/pliers.git@updater#egg=pliers
 psycopg2==2.7.1
 py==1.4.33
 -e git+https://github.com/adelavega/pybids.git@transformer#egg=pybids

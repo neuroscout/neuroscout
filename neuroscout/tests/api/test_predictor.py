@@ -1,5 +1,5 @@
 from tests.request_utils import decode_json
-def test_get_predictor(auth_client, add_task):
+def test_get_predictor(auth_client, extract_features):
     # List of predictors
     resp = auth_client.get('/api/predictors')
     assert resp.status_code == 200
@@ -30,11 +30,9 @@ def test_get_predictor(auth_client, add_task):
     pred_select = decode_json(resp)
     assert type(pred_select) == list
 
-
     resp = auth_client.get('/api/predictors', params={'run_id' : '123123'})
     assert resp.status_code == 200
     assert len(decode_json(resp)) == 0
-
 
     # Test filtering by multiple parameters
     resp = auth_client.get('/api/predictors', params={'name': 'rt',
@@ -42,6 +40,24 @@ def test_get_predictor(auth_client, add_task):
     assert resp.status_code == 200
     pred_p = decode_json(resp)
     assert len(pred_p) == 1
+    assert 'extracted_feature' not in pred_p[0]
+
+    # Test extracted_feature
+    resp = auth_client.get('/api/predictors', params={'name': 'BrightnessExtractor.Brightness',
+        'run_id': run_id})
+    assert resp.status_code == 200
+    pred_p = decode_json(resp)
+    assert 'extracted_feature' in pred_p[0]
+    assert pred_p[0]['extracted_feature']['description'] == 'Brightness of an image.'
+
+
+def test_get_rextracted(auth_client, reextract):
+    ds = decode_json(
+        auth_client.get('/api/datasets'))
+    run_id = str(ds[0]['runs'][0]['id'])
+    resp = auth_client.get('/api/predictors', params={
+        'run_id': run_id, 'newest': 'false'})
+    assert len(decode_json(resp)) == 4
 
 def test_get_predictor_data(auth_client, add_task):
     # List of predictors

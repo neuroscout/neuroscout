@@ -40,10 +40,6 @@ class AnalysisSchema(Schema):
 		'RunSchema', many=True, only=['id'],
         description='Runs associated with analysis')
 
-	results = fields.Nested(
-		'ResultSchema', many=True, only=['id'], dump_only=True,
-        description='Result id(s) associated with analysis')
-
 
 	@validates('dataset_id')
 	def validate_dsid(self, value):

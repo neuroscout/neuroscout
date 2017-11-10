@@ -49,18 +49,17 @@ def add_user(email, password, confirm=True):
     db.session.commit()
 
 @manager.command
-def add_task(local_path, task, replace=False, automagic=False,
+def add_task(local_path, task, automagic=False,
 	skip_predictors=False, filters='{}'):
 	""" Add BIDS dataset to database.
 	local_path - Path to local_path directory
 	task - Task name
-	replace - If dataset is already in db, re-ingest?
 	automagic - Force enable datalad automagic
 	skip_predictors - Skip original Predictors
 	filters - string JSON object with optional run filters
 	"""
 	populate.add_task(db.session, task, local_path=local_path,
-			 replace=replace, verbose=True, skip_predictors=skip_predictors,
+			 verbose=True, skip_predictors=skip_predictors,
 			 automagic=automagic, **json.loads(filters))
 
 @manager.command
@@ -77,14 +76,14 @@ def extract_features(local_path, task, graph_spec, filters='{}'):
 ## Need to modify or create new function for updating dataset
 ## e.g. dealing w/ IncompleteResultsError if cloning into existing dir
 @manager.command
-def ingest_from_json(config_file, replace=False, automagic=False):
+def ingest_from_json(config_file, automagic=False, update=False):
 	""" Ingest/update datasets and extracted features from a json config file.
 	config_file - json config file detailing datasets and pliers graph_json
-	replace - If dataset is already in db, re-ingest?
 	automagic - Force enable datalad automagic
 	"""
-	populate.ingest_from_json(db.session, config_file, app.config['DATASET_DIR'],
-		replace=replace, automagic=automagic)
+	populate.ingest_from_json(db.session, config_file,
+                           app.config['DATASET_DIR'],
+                           automagic=automagic, update=update)
 
 
 if __name__ == '__main__':

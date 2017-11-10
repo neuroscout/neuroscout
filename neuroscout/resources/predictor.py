@@ -1,14 +1,27 @@
-from marshmallow import Schema, fields
+from marshmallow import Schema, fields, post_dump
 import webargs as wa
 from flask_apispec import MethodResource, marshal_with, use_kwargs, doc
 from models import Predictor, PredictorEvent
 from . import utils
+from sqlalchemy import func
+from database import db
+
+class ExtractedFeatureSchema(Schema):
+	extractor_parameters = fields.Str(description="Extractor parameters.")
+	description = fields.Str(description="Feature description.")
+	created_at = fields.Str(description="Extraction timestamp.")
 
 class PredictorSchema(Schema):
 	id = fields.Int()
 	name = fields.Str(description="Predictor name.")
 	description = fields.Str()
-	ef_id = fields.Int(description="Original extracted feature id.")
+	extracted_feature = fields.Nested('ExtractedFeatureSchema', skip_if=None)
+
+	@post_dump
+	def remove_null_values(self, data):
+		if data.get('extracted_feature', True) is None:
+			data.pop('extracted_feature')
+		return data
 
 class PredictorSingleSchema(PredictorSchema):
 	run_statistics = fields.Nested('PredictorRunSchema', many=True)
@@ -39,7 +52,11 @@ class PredictorListResource(MethodResource):
 	    'run_id': wa.fields.DelimitedList(fields.Int(),
 	                                      description="Run id(s)"),
 	    'name': wa.fields.DelimitedList(fields.Str(),
-	                                    description="Predictor name(s)"),	}, locations=['query'])
+	                                    description="Predictor name(s)"),
+		'newest': wa.fields.Boolean(missing=True,
+					description="Return only newest Predictor by name")
+        },
+		locations=['query'])
 	def get(self, **kwargs):
 		# Get Predictors that match up to specified runs
 		if 'run_id' in kwargs:
@@ -49,8 +66,17 @@ class PredictorListResource(MethodResource):
 					'predictor_id').with_entities('predictor_id').all()
 
 		query = Predictor.query
+
+		# Only return latest Predictor by name -- assumes no repetitions!
+		if  kwargs.pop('newest'):
+			query = query.filter(
+				Predictor.id.in_(
+					db.session.query(
+						func.max(Predictor.id)).group_by(Predictor.name)))
+
 		for param in kwargs:
 			query = query.filter(getattr(Predictor, param).in_(kwargs[param]))
+
 
 		return query.all()
 
