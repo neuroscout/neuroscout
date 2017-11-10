@@ -43,7 +43,7 @@ class FeatureSerializer(object):
             extractor_name, {}).get(original_name, {})
 
         unique = {}
-        tr_attrs = [getattr(ext_res, a) for a in ext_res.extractor._log_attributes]
+        tr_attrs = [getattr(ext_res.extractor, a) for a in ext_res.extractor._log_attributes]
         unique['extractor_parameters'] = str(dict(
             zip(ext_res.extractor._log_attributes, tr_attrs)))
         unique['extractor_name'] = extractor_name
@@ -109,61 +109,64 @@ def extract_features(db_session, local_path, name, task, graph_spec,
 
     extracted_features = {}
     for res in results:
-        """" Add new ExtractedFeature """
-        # Hash extractor name + feature name
-        ef_hash = hash_str(str(res.extractor.__hash__()) + res.features[0])
+        #### TODO - Handle empty results
+        #### Skip altogether? And then when creating Predictors fill in NAs for stimuli
+        if res.data != [[]]:
+            """" Add new ExtractedFeature """
+            # Hash extractor name + feature name
+            ef_hash = hash_str(str(res.extractor.__hash__()) + res.features[0])
 
-        # If we haven't already added this feature from this extractor + params
-        if ef_hash not in extracted_features:
-            unique, extra = serializer.load(res)
-            # Create/get feature
-            ef_model, _ = db_utils.get_or_create(db_session,
-                                                 ExtractedFeature,
-                                                 commit=False, **unique)
+            # If we haven't already added this feature from this extractor + params
+            if ef_hash not in extracted_features:
+                unique, extra = serializer.load(res)
+                # Create/get feature
+                ef_model, _ = db_utils.get_or_create(db_session,
+                                                     ExtractedFeature,
+                                                     commit=False, **unique)
 
-            # Add non identifying information and commit
-            ef_model.sha1_hash = ef_hash
-            for key, value in extra.items():
-                setattr(ef_model, key, value)
+                # Add non identifying information and commit
+                ef_model.sha1_hash = ef_hash
+                for key, value in extra.items():
+                    setattr(ef_model, key, value)
+                db_session.commit()
+                extracted_features[ef_hash] = (ef_model.id, ef_model.active)
+
+            """" Add ExtractedEvents """
+            # Get associated stimulus record
+            filename = res.stim.history.source_file \
+                        if res.stim.history \
+                        else res.stim.filename
+            stim_hash = hash_file(filename)
+            stimulus = db_session.query(Stimulus).filter_by(sha1_hash=stim_hash).one()
+
+            # Set onset for event
+            if pd.isnull(res.onsets):
+                onset = None
+            elif isinstance(res.onsets, float):
+                onset = res.onsets
+            else:
+                onset = res.onsets[0]
+
+            # Get or create ExtractedEvent
+            ee_model, ee_new = db_utils.get_or_create(db_session,
+                                                   ExtractedEvent,
+                                                   commit=False,
+                                                   onset=onset,
+                                                   stimulus_id=stimulus.id,
+                                                   ef_id=extracted_features[ef_hash][0])
+
+            # Add data to it (whether or not its new, as we may want to update)
+            ee_model.value = res.data[0][0]
+            if pd.isnull(res.durations):
+                ee_model.duration = None
+            elif isinstance(res.durations, float):
+                ee_model.duration = res.durations
+            else:
+                ee_model.duration = res.durations[0]
+
+            ee_model.history = res.history.string
+
             db_session.commit()
-            extracted_features[ef_hash] = (ef_model.id, ef_model.active)
-
-        """" Add ExtractedEvents """
-        # Get associated stimulus record
-        filename = res.stim.history.source_file \
-                    if res.stim.history \
-                    else res.stim.filename
-        stim_hash = hash_file(filename)
-        stimulus = db_session.query(Stimulus).filter_by(sha1_hash=stim_hash).one()
-
-        # Set onset for event
-        if pd.isnull(res.onsets):
-            onset = None
-        elif isinstance(res.onsets, float):
-            onset = res.onsets
-        else:
-            onset = res.onsets[0]
-
-        # Get or create ExtractedEvent
-        ee_model, ee_new = db_utils.get_or_create(db_session,
-                                               ExtractedEvent,
-                                               commit=False,
-                                               onset=onset,
-                                               stimulus_id=stimulus.id,
-                                               ef_id=extracted_features[ef_hash][0])
-
-        # Add data to it (whether or not its new, as we may want to update)
-        ee_model.value = res.data[0][0]
-        if pd.isnull(res.durations):
-            ee_model.duration = None
-        elif isinstance(res.durations, float):
-            ee_model.duration = res.durations
-        else:
-            ee_model.duration = res.durations[0]
-
-        ee_model.history = res.history.string
-
-        db_session.commit()
 
     """" Create Predictors from Extracted Features """
     # For all instances for stimuli in this task's runs
