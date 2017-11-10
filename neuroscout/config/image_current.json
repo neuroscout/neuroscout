@@ -7,7 +7,7 @@
       "transformer": "VibranceExtractor"
     },
     {
-      "transformer": "SharpnessExtractor"
+      "transformer": "GoogleVisionAPIFaceExtractor"
     }
   ]
 }
