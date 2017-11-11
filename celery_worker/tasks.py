@@ -29,17 +29,18 @@ def compile(analysis, resources, predictor_events, bids_dir):
         ## Write out event files for each run_id
         run_events = pes[pes.run_id==run['id']].drop('run_id', axis=1)
 
-        # Make wide
-        run_events = run_events.groupby(
-            ['onset', 'duration', 'predictor_id'])['value'].\
-            sum().unstack('predictor_id').reset_index()
+        if run_events.empty is False:
+            # Make wide
+            run_events = run_events.groupby(
+                ['onset', 'duration', 'predictor_id'])['value'].\
+                sum().unstack('predictor_id').reset_index()
 
-        # Write out BIDS path
-        ses = 'ses-{}_'.format(run['session']) if run.get('session') else ''
-        events_fname = join(files_dir,
-                            'sub-{}_{}task-{}_run-{}_events.tsv'.format(
-            run['subject'], ses, analysis['task_name'], run['number']))
-        run_events.to_csv(events_fname, sep='\t', index=False)
+            # Write out BIDS path
+            ses = 'ses-{}_'.format(run['session']) if run.get('session') else ''
+            events_fname = join(files_dir,
+                                'sub-{}_{}task-{}_run-{}_events.tsv'.format(
+                run['subject'], ses, analysis['task_name'], run['number']))
+            run_events.to_csv(events_fname, sep='\t', index=False)
 
     # Transform event files using BIDSEventCollection
     collection = BIDSEventCollection(base_dir=bids_dir)
