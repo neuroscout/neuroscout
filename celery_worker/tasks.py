@@ -29,17 +29,18 @@ def compile(analysis, resources, predictor_events, bids_dir):
         ## Write out event files for each run_id
         run_events = pes[pes.run_id==run['id']].drop('run_id', axis=1)
 
-        # Make wide
-        run_events = run_events.groupby(
-            ['onset', 'duration', 'predictor_id'])['value'].\
-            sum().unstack('predictor_id').reset_index()
+        if run_events.empty is False:
+            # Make wide
+            run_events = run_events.groupby(
+                ['onset', 'duration', 'predictor_id'])['value'].\
+                sum().unstack('predictor_id').reset_index()
 
-        # Write out BIDS path
-        ses = 'ses-{}_'.format(run['session']) if run.get('session') else ''
-        events_fname = join(files_dir,
-                            'sub-{}_{}task-{}_run-{}_events.tsv'.format(
-            run['subject'], ses, analysis['task_name'], run['number']))
-        run_events.to_csv(events_fname, sep='\t', index=False)
+            # Write out BIDS path
+            ses = 'ses-{}_'.format(run['session']) if run.get('session') else ''
+            events_fname = join(files_dir,
+                                'sub-{}_{}task-{}_run-{}_events.tsv'.format(
+                run['subject'], ses, analysis['task_name'], run['number']))
+            run_events.to_csv(events_fname, sep='\t', index=False)
 
     # Transform event files using BIDSEventCollection
     collection = BIDSEventCollection(base_dir=bids_dir)
@@ -58,9 +59,12 @@ def compile(analysis, resources, predictor_events, bids_dir):
     collection.write(file=all_path)
     design_matrix = pd.read_csv(all_path, sep='\t').drop('task', axis=1)
 
+    design_matrix.fillna('n/a', inplace=True)
+
     tsv_path = join(files_dir, 'events.tsv')
     paths.append(tsv_path)
     design_matrix.to_csv(tsv_path, sep='\t', index=False)
+
     analysis_update['design_matrix'] = design_matrix.to_dict(orient='records')
 
     # Save bundle as tarball

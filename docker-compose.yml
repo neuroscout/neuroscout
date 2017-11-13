@@ -11,9 +11,12 @@ services:
       - migrations:/migrations
       - ./neuroscout/:/neuroscout
       - $DATASET_DIR:/datasets
+      - $KEY_DIR:/keys
       - file-data:/file-data
     command: /usr/local/bin/gunicorn -w 2 -b :8000 core:app --log-level debug
-    env_file: .env
+    env_file:
+      - .env
+      - .pliersenv
 
   nginx:
     restart: always

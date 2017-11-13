@@ -6,6 +6,7 @@ from os.path import realpath, join
 import json
 import re
 import pandas as pd
+import numpy as np
 
 from pliers.stimuli import load_stims
 from pliers.graph import Graph
@@ -37,25 +38,31 @@ class FeatureSerializer(object):
         Output is split into uniquely identifying attributes, and additional
         attributes.
         """
-        # Load names
-        extractor_name = ext_res.extractor.name
-        feature_name = ext_res.features[0]
+        results = []
+        for feature_name in ext_res.features:
+            # Load names
+            extractor_name = ext_res.extractor.name
 
-        ## Look up feature in schema, set to None if not found
-        feature_schema = self.schema.get(
-            extractor_name, {}).get(feature_name, {})
+            ## Look up feature in schema, set to None if not found
+            feature_schema = self.schema.get(
+                extractor_name, {}).get(feature_name, {})
 
-        properties = {}
-        tr_attrs = [getattr(ext_res, a) for a in ext_res.extractor._log_attributes]
-        properties['extractor_parameters'] = str(dict(
-            zip(ext_res.extractor._log_attributes, tr_attrs)))
-        properties['extractor_name'] = extractor_name
-        properties['feature_name'] = feature_schema.get('rename', feature_name)
-        properties['extractor_version'] = ext_res.extractor.VERSION
-        properties['description'] = feature_schema.get('description')
-        properties['active'] = feature_schema.get('active', True)
+            unique = {}
+            tr_attrs = [getattr(ext_res.extractor, a) \
+                        for a in ext_res.extractor._log_attributes]
+            unique['extractor_parameters'] = str(dict(
+                zip(ext_res.extractor._log_attributes, tr_attrs)))
 
-        return properties
+            properties = {}
+            properties['extractor_name'] = extractor_name
+            properties['feature_name'] = feature_schema.get(
+                'rename', feature_name)
+            properties['extractor_version'] = ext_res.extractor.VERSION
+            properties['description'] = feature_schema.get('description')
+            properties['active'] = feature_schema.get('active', True)
+            results.append(properties)
+
+        return results
 
 def extract_features(db_session, dataset_name, task_name, graph_spec,
                      automagic=False, verbose=True, **filters):
@@ -107,63 +114,70 @@ def extract_features(db_session, dataset_name, task_name, graph_spec,
     results = graph.run(stims, merge=False)
 
     serializer = FeatureSerializer()
-
     extracted_features = {}
     for res in results:
-        """" Add new ExtractedFeature """
-        # Hash extractor name + feature name
-        ef_hash = hash_str(str(res.extractor.__hash__()) + res.features[0])
+        if np.array(res.data).size > 0:
+            serialized = serializer.load(res)
+            for i, feature in enumerate(res.features):
+                """" Add new ExtractedFeature """
+                # Hash extractor name + feature name
+                ef_hash = hash_str(
+                    str(res.extractor.__hash__()) + res.features[i])
 
-        # If we haven't already added this feature from this extractor + params
-        if ef_hash not in extracted_features:
-            # Create feature
-            ef_model = ExtractedFeature(sha1_hash=ef_hash,
-                                        **serializer.load(res))
-            db_session.add(ef_model)
-            db_session.commit()
-            extracted_features[ef_hash] = ef_model
+                # If we haven't already added this feature
+                if ef_hash not in extracted_features:
+                    # Create/get feature
+                    ef_model = ExtractedFeature(sha1_hash=ef_hash,
+                                                **serialized[i])
+                    db_session.add(ef_model)
+                    db_session.commit()
+                    extracted_features[ef_hash] = ef_model
 
-        """" Add ExtractedEvents """
-        # Get associated stimulus record
-        filename = res.stim.history.source_file \
-                    if res.stim.history \
-                    else res.stim.filename
-        stim_hash = hash_file(filename)
-        stimulus = db_session.query(Stimulus).filter_by(sha1_hash=stim_hash).one()
+                """" Add ExtractedEvents """
+                # Get associated stimulus record
+                filename = res.stim.history.source_file \
+                            if res.stim.history \
+                            else res.stim.filename
+                stim_hash = hash_file(filename)
+                stimulus = db_session.query(
+                    Stimulus).filter_by(sha1_hash=stim_hash).one()
 
-        # Set onset for event
-        if pd.isnull(res.onsets):
-            onset = None
-        elif isinstance(res.onsets, float):
-            onset = res.onsets
-        else:
-            onset = res.onsets[0]
+                # Set onset for event
+                if pd.isnull(res.onsets):
+                    onset = None
+                elif isinstance(res.onsets, float):
+                    onset = res.onsets
+                else:
+                    onset = res.onsets[0]
 
-        # Get or create ExtractedEvent
-        ee_model = ExtractedEvent(onset=onset, stimulus_id=stimulus.id,
-                                  history=res.history.string, ef_id=ef_model.id,
-                                  value=res.data[0][0])
+                # Get or create ExtractedEvent
+                ee_model = ExtractedEvent(onset=onset, stimulus_id=stimulus.id,
+                                          history=res.history.string,
+                                          ef_id=ef_model.id,
+                                          value=res.data[0][i])
 
-        # Add duration
-        if pd.isnull(res.durations):
-            ee_model.duration = None
-        elif isinstance(res.durations, float):
-            ee_model.duration = res.durations
-        else:
-            ee_model.duration = res.durations[0]
+                # Add duration
+                if pd.isnull(res.durations):
+                    ee_model.duration = None
+                elif isinstance(res.durations, float):
+                    ee_model.duration = res.durations
+                else:
+                    ee_model.duration = res.durations[0]
 
-        db_session.add(ee_model)
-        db_session.commit()
+                db_session.add(ee_model)
+                db_session.commit()
 
     """" Create Predictors from Extracted Features """
     # For all instances for stimuli in this task's runs
     task_runstimuli = RunStimulus.query.join(
-        Run).filter(Run.dataset_id == dataset_id and Run.task.name==task_name).all()
+        Run).filter(
+            Run.dataset_id == dataset_id and Run.task.name==task_name).all()
+
     for rs in task_runstimuli:
         # For every feature extracted
         for ef_hash, ef in extracted_features.items():
             if ef.active:
-                ### Abstract some of this logic out for when we later create derived features
+                ### Abstract some of this logic out for derived features
                 # Get ExtractedEvents associated with stimulus
                 ees = ef.extracted_events.filter_by(
                     stimulus_id = rs.stimulus_id).all()

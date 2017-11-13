@@ -1,10 +1,7 @@
 {
   "roots": [
     {
-      "transformer": "BrightnessExtractor"
-    },
-    {
-      "transformer": "VibranceExtractor"
+      "transformer": "GoogleVisionAPIFaceExtractor"
     }
   ]
 }

@@ -60,7 +60,8 @@ def test_dataset_ingestion(session, add_task):
 	assert gpv.count() == 4
 	assert 'F' in [v.value for v in gpv]
 
-@pytest.mark.skipif(os.environ.get("TRAVIS") == "true", reason="Skipping this test on Travis CI.")
+@pytest.mark.skipif(os.environ.get("TRAVIS") == "true",
+	reason="Skipping this test on Travis CI.")
 def test_remote_dataset(session, add_task_remote):
 	dataset_model = Dataset.query.filter_by(id=add_task_remote).one()
 
@@ -81,7 +82,7 @@ def test_remote_dataset(session, add_task_remote):
 	assert GroupPredictor.query.filter_by(
 			dataset_id=add_task_remote).count() == 3
 
-def test_extracted_features(add_task_remote):
+def test_extracted_features(add_task, extract_features):
 	""" This tests feature extraction from a remote dataset"""
 	assert ExtractedFeature.query.count() == 2
 
@@ -96,7 +97,7 @@ def test_extracted_features(add_task_remote):
 	assert ef_b.extracted_events.count() == Stimulus.query.count()
 
 	# And that a sensical value was extracted
-	assert ef_b.extracted_events.first().value < 1
+	assert float(ef_b.extracted_events.first().value) < 1
 
 	# Test that Predictors were created from EF
 	pred = Predictor.query.filter_by(ef_id=ef_b.id).one()

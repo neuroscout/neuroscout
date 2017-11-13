@@ -111,3 +111,4 @@ neuroscout/workflow/src
 neuroscout/config/app.py
 jest_0
 .my-env
+.pliersenv

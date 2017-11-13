@@ -28,7 +28,7 @@ class ExtractedEvent(db.Model):
 	id = db.Column(db.Integer, primary_key=True)
 	onset = db.Column(db.Float)
 	duration = db.Column(db.Float)
-	value = db.Column(db.Float, nullable=False)
+	value = db.Column(db.String, nullable=False)
 	history = db.Column(db.String)
 
 	stimulus_id = db.Column(db.Integer, db.ForeignKey('stimulus.id'), nullable=False)

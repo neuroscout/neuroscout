@@ -9,6 +9,14 @@ First, set up your mounted volumes (such as /datasets), by exporting environment
     DATASET_DIR=/home/myuser/datasets
     export DATASET_DIR
 
+To set up environment variables for pliers, create a file called .pliersenv, and
+configure your private keys for pliers there.
+
+In addition, configure where file keys (such as for Google) are located:
+
+    KEY_DIR=/home/me/.keys
+    export KEY_DIR
+
 Build the containers and start the services:
 
     docker-compose build
