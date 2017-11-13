@@ -97,7 +97,7 @@ def test_extracted_features(add_task, extract_features):
 	assert ef_b.extracted_events.count() == Stimulus.query.count()
 
 	# And that a sensical value was extracted
-	assert ef_b.extracted_events.first().value < 1
+	assert float(ef_b.extracted_events.first().value) < 1
 
 	# Test that Predictors were created from EF
 	pred = Predictor.query.filter_by(ef_id=ef_b.id).one()

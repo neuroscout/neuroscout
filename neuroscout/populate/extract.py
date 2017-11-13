@@ -6,6 +6,7 @@ from os.path import realpath, join
 import json
 import re
 import pandas as pd
+import numpy as np
 
 from pliers.stimuli import load_stims
 from pliers.graph import Graph
@@ -115,7 +116,7 @@ def extract_features(db_session, dataset_name, task_name, graph_spec,
     serializer = FeatureSerializer()
     extracted_features = {}
     for res in results:
-        if res.data != [[]]:
+        if np.array(res.data).size > 0:
             serialized = serializer.load(res)
             for i, feature in enumerate(res.features):
                 """" Add new ExtractedFeature """
