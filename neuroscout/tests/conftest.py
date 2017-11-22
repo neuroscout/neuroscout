@@ -83,8 +83,10 @@ DATASET_PATH = os.path.join(
     os.path.dirname(os.path.realpath(__file__)), 'data/datasets/bids_test')
 JSON_PATH = os.path.join(
     os.path.dirname(os.path.realpath(__file__)), 'data/test_dataset.json')
-PLIERS_PATH = os.path.join(
-    os.path.dirname(os.path.realpath(__file__)), 'data/test_pliers.json')
+EXTRACTORS = {
+    "BrightnessExtractor": {},
+    "VibranceExtractor": {}
+    }
 
 @pytest.fixture(scope="function")
 def add_users(app, db, session):
@@ -127,13 +129,11 @@ def add_task_remote(session):
 @pytest.fixture(scope="function")
 def extract_features(session, add_task):
     return populate.extract_features(session, 'Test Dataset', 'bidstest',
-                                     PLIERS_PATH,
-                                     run='01', subject='01')
+                                     EXTRACTORS)
 @pytest.fixture(scope="function")
 def reextract(session, extract_features):
     return populate.extract_features(session, 'Test Dataset', 'bidstest',
-                                     PLIERS_PATH,
-                                     run='01', subject='01')
+                                     EXTRACTORS)
 
 @pytest.fixture(scope="function")
 def add_analysis(session, add_users, add_task):
