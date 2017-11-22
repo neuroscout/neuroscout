@@ -3,9 +3,10 @@
     "dataset_address": "https://github.com/adelavega/bids_test.git",
     "tasks": {
       "bidstest": {
-        "features": [
-          "test_pliers.json"
-        ],
+        "extractors": {
+          "BrightnessExtractor": {},
+          "VibranceExtractor": {}
+        },
         "filters": {
           "run": 1,
           "subject": "01"

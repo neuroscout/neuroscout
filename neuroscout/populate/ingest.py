@@ -2,7 +2,7 @@
 Tools to populate database from BIDS datasets
 """
 from flask import current_app
-from os.path import dirname, realpath, join, basename, splitext
+from os.path import realpath, join, basename
 from os import makedirs
 import json
 from pathlib import Path
@@ -22,17 +22,20 @@ from models import (Dataset, Task, Run, Predictor, PredictorEvent, PredictorRun,
 
 import populate
 
-from pliers.updater import check_updates
+# from pliers.updater import check_updates
+
+def check_updates_json():
+    """ Checks which converters extractors have been updated in a json"""
+    ft_path = current_app.config['FEATURE_TRACKING_DIR']
+    makedirs(ft_path, exist_ok=True)
+
+    updated_extractors = []
+
+    return updated_extractors
 
 def ingest_from_json(db_session, config_file, install_path='/file-data',
                      automagic=False, update=False):
     dataset_config = json.load(open(config_file, 'r'))
-    config_path = dirname(realpath(config_file))
-
-    if update is True:
-        ft_path = current_app.config['FEATURE_TRACKING_DIR']
-        makedirs(ft_path, exist_ok=True)
-        updated_graphs = {}
 
     """ Loop over each dataset in config file """
     dataset_ids = []
@@ -50,7 +53,7 @@ def ingest_from_json(db_session, config_file, install_path='/file-data',
             new_path = local_path
 
         for task_name, options in items['tasks'].items():
-            # Add each task to database
+            """ Add task to database"""
             filters = options.get('filters', {})
             dp = options.get('dataset_parameters', {})
 
@@ -64,27 +67,15 @@ def ingest_from_json(db_session, config_file, install_path='/file-data',
             					  **dict(filters.items() | dp.items()))
             dataset_ids.append(dataset_id)
 
-            # Extract features if pliers graphs are provided
+            """ Convert stimuli in database """
+
+            """ Extract features from applicable stimuli """
             ep = options.get('extract_parameters',{})
-
-            if 'features' in options:
-                for graph_spec in options['features']:
-                    graph = join(config_path, graph_spec)
-                    graph_name = splitext(graph_spec)[0]
-
-                    if update is True:
-                        if graph_name in updated_graphs:
-                            graph = updated_graphs[graph_name]
-                        else:
-                            graph = check_updates(
-                                graph,
-                                join(ft_path, graph_name + ".csv"))['difference_graph']
-                            updated_graphs[graph_name] = graph
-
-                    if graph:
-                        populate.extract_features(db_session, dataset_name, task_name,
-                            graph, automagic=local_path is None or automagic,
-                            **dict(filters.items() | ep.items()))
+            extractors = options.get('extractors', {})
+            if extractors:
+                populate.extract_features(db_session, dataset_name, task_name,
+                    extractors, automagic=local_path is None or automagic,
+                    **ep)
 
     return dataset_ids
 
@@ -318,7 +309,7 @@ def add_task(db_session, task_name, dataset_name=None, local_path=None, dataset_
                 db_session, Stimulus, commit=False, sha1_hash=stim_hash)
             if new_stim:
                 stimulus_model.name=name
-                stimulus_model.path=local_path
+                stimulus_model.path=realpath(path)
                 stimulus_model.mimetype=mimetype
             db_session.commit()
 

@@ -2,26 +2,22 @@
 Set of methods to extract features from stimuli in a dataset and generate
 the associated predictors
 """
-from os.path import realpath, join
 import json
-import re
 import pandas as pd
 import numpy as np
 
 from pliers.stimuli import load_stims
-from pliers.graph import Graph
+import pliers.extractors
 
 from datalad import api as da
-from datalad.auto import AutomagicIO
+# from datalad.auto import AutomagicIO
 
 from flask import current_app
-
-from bids.events import BIDSEventCollection
 
 import populate
 from .utils import hash_file, hash_str
 
-from models import (Dataset,
+from models import (Dataset, Task,
     Run, Stimulus, RunStimulus, ExtractedFeature, ExtractedEvent)
 
 class FeatureSerializer(object):
@@ -64,54 +60,39 @@ class FeatureSerializer(object):
 
         return results
 
-def extract_features(db_session, dataset_name, task_name, graph_spec,
-                     automagic=False, verbose=True, **filters):
+def extract_features(db_session, dataset_name, task_name, extractors,
+                     verbose=True, automagic=False):
     """ Extract features using pliers for a dataset/task
         Args:
             db_session - database session object
             dataset_name - dataset name
             task_name - task name
-            graph_spec - pliers graph json spec location, or dictionary
+            extractors - dictionary of extractor names to parameters
             verbose - verbose output
-            filters - additional identifiers for runs
-            automagic - enable automagic and unlock stimuli with datalad
+            automagic - enable Datalad
         Output:
             list of db ids of extracted features
     """
     dataset = Dataset.query.filter_by(name=dataset_name).one()
     dataset_id = dataset.id
-    local_path = dataset.local_path
+
+    # Load all active stimuli for task
+    stim_objects = Stimulus.query.filter_by(active=True).join(
+        RunStimulus).join(Run).join(Task).filter_by(name=task_name).all()
+    stim_paths = [s.path for s in stim_objects]
 
     if automagic:
-        automagic = AutomagicIO()
-        automagic.activate()
-
-    # Load event files
-    collection = BIDSEventCollection(local_path)
-    collection.read(task=task_name, **filters)
-
-    # Filter to only get stim files
-    stim_pattern = 'stim_file/(.*)'
-    stim_paths = [join(local_path, 'stimuli',
-                          re.findall(stim_pattern, col)[0])
-     for col in collection.columns
-     if re.match(stim_pattern, col)]
-
-    # Monkey-patched auto doesn't work, so get and unlock manually
-    if automagic:
+        # Monkey-patched auto doesn't work, so get and unlock manually
         da.get(stim_paths)
         da.unlock(stim_paths)
+    stims = load_stims(stim_paths)
 
-    # Get absolute path and load
-    stims = load_stims([realpath(s) for s in stim_paths])
-
-    # Construct and run the graph
-    if isinstance(graph_spec, str):
-        graph = Graph(spec=graph_spec)
-    else:
-        graph = Graph(nodes=graph_spec)
-
-    results = graph.run(stims, merge=False)
+    results = []
+    for extractor_name, parameters in extractors.items():
+        # For every extractor, extract from matching stims
+        ext = getattr(pliers.extractors, extractor_name)(**parameters)
+        results += ext.transform(
+            [s for s in stims if ext._stim_matches_input_types(s)])
 
     serializer = FeatureSerializer()
     extracted_features = {}

@@ -5,13 +5,18 @@
     "path": "/datasets/ds009",
     "tasks": {
       "emotionalregulation": {
-        "features": [
-          "image_current.json"
-        ],
+        "converters": {
+          "TesseractConverter": {}
+        },
+        "extractors": {
+          "BrightnessExtractor": {},
+          "VibranceExtractor": {}
+        },
         "filters": {
           "run": 1,
           "subject": "0[0-4]"
-        }
+        },
+        "extract_parameters": {}
       }
     }
   }

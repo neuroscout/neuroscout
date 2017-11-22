@@ -9,6 +9,8 @@ class Stimulus(db.Model):
 	mimetype = db.Column(db.Text, nullable=False)
 	path = db.Column(db.Text, nullable=False)
 
+	active = db.Column(db.Boolean, nullable=False, default=True)
+
 	extracted_events = db.relationship('ExtractedEvent', backref='stimulus',
 	                            lazy='dynamic')
 	runs = db.relationship('Run',
