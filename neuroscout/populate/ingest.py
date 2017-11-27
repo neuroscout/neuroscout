@@ -2,7 +2,7 @@
 Tools to populate database from BIDS datasets
 """
 from flask import current_app
-from os.path import realpath, join, basename
+from os.path import realpath, join
 from os import makedirs
 import json
 from pathlib import Path
@@ -16,7 +16,7 @@ from datalad import api as dl
 from datalad.auto import AutomagicIO
 
 import db_utils
-from .utils import hash_file, remote_resource_exists, format_preproc
+from .utils import remote_resource_exists, format_preproc, hash_file
 from models import (Dataset, Task, Run, Predictor, PredictorEvent, PredictorRun,
                     Stimulus, RunStimulus, GroupPredictor, GroupPredictorValue)
 
@@ -168,6 +168,21 @@ def add_group_predictors(db_session, dataset_id, participants):
 
     return gp_ids
 
+def create_stimulus(db_session, path, stim_hash, parent_id=None):
+    """ Creare stimulus model """
+    mimetype = magic.from_file(path, mime=True)
+
+    model, new = db_utils.get_or_create(
+        db_session, Stimulus, commit=False, sha1_hash=stim_hash)
+
+    if new:
+        model.path=realpath(path)
+        model.mimetype=mimetype
+
+    db_session.commit()
+
+    return model, new
+
 def add_task(db_session, task_name, dataset_name=None, local_path=None,
              dataset_address=None, preproc_address=None, install_path='.',
              automagic=False, verbose=True, skip_predictors=False, **kwargs):
@@ -291,37 +306,25 @@ def add_task(db_session, task_name, dataset_name=None, local_path=None,
 
         stims_processed = {}
         for i, val in stims[stims!="n/a"].items():
-            base_path = 'stimuli/{}'.format(val)
-            path = join(local_path, base_path)
-            name = basename(path)
-
-            # If stim has already been processed, skip adding it
             if val not in stims_processed:
+                path = join(local_path, 'stimuli/{}'.format(val))
+
                 try:
-                    _ = open(path)
                     stim_hash = hash_file(path)
-                    mimetype = magic.from_file(realpath(path), mime=True)
-                except FileNotFoundError:
-                    if verbose:
-                        print('Stimulus: {} not found. Skipping.'.format(val))
+                except OSError:
+                    print('Stimulus: {} not found. Skipping.'.format(val))
                     continue
+
                 stims_processed[val] = stim_hash
             else:
                 stim_hash = stims_processed[val]
 
-            # Get or create stimulus model
-            stimulus_model, new_stim = db_utils.get_or_create(
-                db_session, Stimulus, commit=False, sha1_hash=stim_hash)
-            if new_stim:
-                stimulus_model.name=name
-                stimulus_model.path=realpath(path)
-                stimulus_model.mimetype=mimetype
-            db_session.commit()
+            stim_model, _ = create_stimulus(db_session, path, stim_hash)
 
             # Get or create Run Stimulus association
             runstim, _ = db_utils.get_or_create(db_session, RunStimulus,
                                                 commit=False,
-                                                stimulus_id=stimulus_model.id,
+                                                stimulus_id=stim_model.id,
                                                 run_id=run_model.id)
             runstim.onset=onsets[i]
             runstim.duration=durations[i]

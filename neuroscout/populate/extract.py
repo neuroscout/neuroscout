@@ -14,7 +14,7 @@ from datalad import api as da
 from flask import current_app
 
 import populate
-from .utils import hash_file, hash_str
+from .utils import hash_file, hash_data
 
 from models import (Dataset, Task,
     Run, Stimulus, RunStimulus, ExtractedFeature, ExtractedEvent)
@@ -99,7 +99,7 @@ def extract_features(db_session, dataset_name, task_name, extractors,
             for i, feature in enumerate(res.features):
                 """" Add new ExtractedFeature """
                 # Hash extractor name + feature name
-                ef_hash = hash_str(
+                ef_hash = hash_data(
                     str(res.extractor.__hash__()) + res.features[i])
 
                 # If we haven't already added this feature

@@ -5,6 +5,8 @@ import urllib.parse
 import hashlib
 import warnings
 
+from pliers.stimuli import load_stims
+
 def format_preproc(subject, task, run, session=None,
                    space="MNI152NLin2009cAsym", suffix="preproc"):
     """ Format relative fmri_prep paths """
@@ -17,20 +19,26 @@ def format_preproc(subject, task, run, session=None,
     task, run, space, suffix
 )
 
-def hash_file(f, blocksize=65536):
-    """ Hash a file, given a file name string """
-    hasher = hashlib.sha1()
-    with open(f, 'rb') as afile:
-        buf = afile.read(blocksize)
-        while len(buf) > 0:
-            hasher.update(buf)
-            buf = afile.read(blocksize)
-    return hasher.hexdigest()
+# def hash_file(f, blocksize=65536):
+#     """ Hash a file, given a file name string """
+#     hasher = hashlib.sha1()
+#     with open(f, 'rb') as afile:
+#         buf = afile.read(blocksize)
+#         while len(buf) > 0:
+#             hasher.update(buf)
+#             buf = afile.read(blocksize)
+#     return hasher.hexdigest()
 
-def hash_str(string, blocksize=65536):
-    """" Hash a string """
+def hash_file(f):
+    pliers_stim = load_stims(f)
+    return hash_data(pliers_stim.data)
+
+def hash_data(data, blocksize=65536):
+    """" Hashes data or string """
+    if isinstance(data, str):
+        data = data.encode('utf-8')
     hasher = hashlib.sha1()
-    hasher.update(string.encode('utf-8'))
+    hasher.update(data)
 
     return hasher.hexdigest()
 

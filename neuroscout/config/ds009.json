@@ -16,7 +16,9 @@
           "run": 1,
           "subject": "0[0-4]"
         },
-        "extract_parameters": {}
+        "extract_parameters": {},
+        "dataset_parameters": {},
+        "convert_paramters": {}
       }
     }
   }
