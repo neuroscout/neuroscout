@@ -18,7 +18,7 @@ class Stimulus(db.Model):
 	                        backref='stimulus')
 
 	def __repr__(self):
-	    return '<models.Stimulus[name={}]>'.format(self.name)
+	    return '<models.Stimulus[hash={}]>'.format(self.sha1_hash)
 
 
 class RunStimulus(db.Model):

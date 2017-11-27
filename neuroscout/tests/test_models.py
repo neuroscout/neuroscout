@@ -87,7 +87,8 @@ def test_extracted_features(add_task, extract_features):
 	assert ExtractedFeature.query.count() == 2
 
 	extractor_names = [ee.extractor_name for ee in ExtractedFeature.query.all()]
-	assert ['BrightnessExtractor', 'VibranceExtractor'] == extractor_names
+	assert 'BrightnessExtractor' in extractor_names
+	assert 'VibranceExtractor' in extractor_names
 
 	ef_b = ExtractedFeature.query.filter_by(extractor_name='BrightnessExtractor').one()
 	assert ef_b.extractor_version is not None
