@@ -52,30 +52,35 @@ def ingest_from_json(db_session, config_file, install_path='/file-data',
         else:
             new_path = local_path
 
-        for task_name, options in items['tasks'].items():
+        for task_name, params in items['tasks'].items():
             """ Add task to database"""
-            filters = options.get('filters', {})
-            dp = options.get('dataset_parameters', {})
+            dp = dict(params.get('filters', {}).items() | \
+                      params.get('dataset_args', {}).items())
 
             dataset_id = add_task(db_session, task_name,
                                   dataset_name=dataset_name,
                                   local_path=local_path,
                                   dataset_address=dataset_address,
                                   automagic=automagic,
-                                  verbose=True, install_path=new_path,
+                                  install_path=new_path,
                                   preproc_address=preproc_address,
-            					  **dict(filters.items() | dp.items()))
+            					  **dp)
             dataset_ids.append(dataset_id)
+            dataset_name = Dataset.query.filter_by(id=dataset_id).one().name
 
-            """ Convert stimuli in database """
+            """ Convert stimuli """
+            automagic = local_path is None or automagic
+            converters = params.get('converters', {})
+            if converters:
+                populate.convert_stimuli(db_session, dataset_name, task_name,
+                                         converters, automagic=automagic)
 
             """ Extract features from applicable stimuli """
-            ep = options.get('extract_parameters',{})
-            extractors = options.get('extractors', {})
+            extractors = params.get('extractors', {})
             if extractors:
                 populate.extract_features(db_session, dataset_name, task_name,
-                    extractors, automagic=local_path is None or automagic,
-                    **ep)
+                                          extractors, automagic=automagic,
+                                          **params.get('extract_args',{}))
 
     return dataset_ids
 
@@ -163,14 +168,14 @@ def add_group_predictors(db_session, dataset_id, participants):
 
     return gp_ids
 
-def add_task(db_session, task_name, dataset_name=None, local_path=None, dataset_address=None,
-             preproc_address=None, install_path='.', automagic=False,
-             verbose=True, skip_predictors=False, **kwargs):
+def add_task(db_session, task_name, dataset_name=None, local_path=None,
+             dataset_address=None, preproc_address=None, install_path='.',
+             automagic=False, verbose=True, skip_predictors=False, **kwargs):
     """ Adds a BIDS dataset task to the database.
         Args:
             db_session - sqlalchemy db db_session
             task_name - task to add
-            dataset_namename - overide dataset name
+            dataset_name - overide dataset name
             local_path - path to local bids dataset.
             dataset_address - remote address of BIDS dataset.
             preproc_address - remote address of preprocessed files.

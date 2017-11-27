@@ -10,7 +10,6 @@ from pliers.stimuli import load_stims
 import pliers.extractors
 
 from datalad import api as da
-# from datalad.auto import AutomagicIO
 
 from flask import current_app
 
@@ -73,12 +72,10 @@ def extract_features(db_session, dataset_name, task_name, extractors,
         Output:
             list of db ids of extracted features
     """
-    dataset = Dataset.query.filter_by(name=dataset_name).one()
-    dataset_id = dataset.id
-
     # Load all active stimuli for task
     stim_objects = Stimulus.query.filter_by(active=True).join(
-        RunStimulus).join(Run).join(Task).filter_by(name=task_name).all()
+        RunStimulus).join(Run).join(Task).filter_by(name=task_name).join(
+            Dataset).filter_by(name=dataset_name).all()
     stim_paths = [s.path for s in stim_objects]
 
     if automagic:
@@ -150,9 +147,9 @@ def extract_features(db_session, dataset_name, task_name, extractors,
 
     """" Create Predictors from Extracted Features """
     # For all instances for stimuli in this task's runs
-    task_runstimuli = RunStimulus.query.join(
-        Run).filter(
-            Run.dataset_id == dataset_id and Run.task.name==task_name).all()
+    task_runstimuli = RunStimulus.query.join(Run).join(
+        Task).filter_by(name=task_name).join(
+            Dataset).filter_by(name=dataset_name).all()
 
     for rs in task_runstimuli:
         # For every feature extracted
@@ -183,7 +180,8 @@ def extract_features(db_session, dataset_name, task_name, extractors,
 
                 predictor_name = '{}.{}'.format(ef.extractor_name, ef.feature_name)
 
-                populate.add_predictor(db_session, predictor_name, dataset_id,
+                ds_id = Dataset.query.filter_by(name=dataset_name).one().id
+                populate.add_predictor(db_session, predictor_name, ds_id,
                                        rs.run_id, onsets, durations, values,
                                        ef_id=ef.id)
 
