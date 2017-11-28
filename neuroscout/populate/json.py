@@ -2,6 +2,7 @@ import json
 from pathlib import Path
 from .ingest import add_task
 from .extract import extract_features
+from .convert import convert_stimuli
 
 from models import Dataset
 
@@ -27,7 +28,7 @@ def ingest_from_json(db_session, config_file, install_path='/file-data',
         for task_name, params in items['tasks'].items():
             """ Add task to database"""
             dp = dict(params.get('filters', {}).items() | \
-                      params.get('dataset_args', {}).items())
+                      params.get('ingest_args', {}).items())
 
             dataset_id = add_task(db_session, task_name,
                                   dataset_name=dataset_name,
@@ -42,10 +43,10 @@ def ingest_from_json(db_session, config_file, install_path='/file-data',
 
             """ Convert stimuli """
             automagic = local_path is None or automagic
-            # converters = params.get('converters', {})
-            # if converters:
-            #     populate.convert_stimuli(db_session, dataset_name, task_name,
-            #                              converters, automagic=automagic)
+            converters = params.get('converters', {})
+            if converters:
+                convert_stimuli(db_session, dataset_name, task_name,
+                                         converters, automagic=automagic)
 
             """ Extract features from applicable stimuli """
             extractors = params.get('extractors', {})

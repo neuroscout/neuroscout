@@ -9,8 +9,12 @@ class Stimulus(db.Model):
 	path = db.Column(db.Text, nullable=False)
 
 	active = db.Column(db.Boolean, nullable=False, default=True)
-	parent_id = db.Column(db.Integer, db.ForeignKey('stimulus.id'))
 
+	# For converted stimuli
+	parent_id = db.Column(db.Integer, db.ForeignKey('stimulus.id'))
+	converter_name = db.Column(db.String)
+	converter_parameters = db.Column(db.Text)
+	
 	extracted_events = db.relationship('ExtractedEvent', backref='stimulus',
 	                            lazy='dynamic')
 	runs = db.relationship('Run',

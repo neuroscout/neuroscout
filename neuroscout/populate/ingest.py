@@ -114,7 +114,8 @@ def add_group_predictors(db_session, dataset_id, participants):
 
     return gp_ids
 
-def create_stimulus(db_session, path, stim_hash, parent_id=None):
+def create_stimulus(db_session, path, stim_hash, parent_id=None,
+                    converter_name=None, converter_params=None):
     """ Creare stimulus model """
     mimetype = magic.from_file(path, mime=True)
 
@@ -124,6 +125,9 @@ def create_stimulus(db_session, path, stim_hash, parent_id=None):
     if new:
         model.path=realpath(path)
         model.mimetype=mimetype
+        model.parent_id=parent_id
+        model.converter_name=converter_name
+        model.converter_params=converter_params
 
     db_session.commit()
 

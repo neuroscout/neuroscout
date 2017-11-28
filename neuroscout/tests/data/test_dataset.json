@@ -7,6 +7,9 @@
           "BrightnessExtractor": {},
           "VibranceExtractor": {}
         },
+        "converters": {
+          "TesseractConverter": {}
+        },
         "filters": {
           "run": 1,
           "subject": "01"

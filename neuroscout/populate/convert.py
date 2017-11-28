@@ -56,17 +56,18 @@ def convert_stimuli(db_session, dataset_name, task_name, converters,
         return conv
 
     # Load converters
-    converters = [load_converter(**c) for c in converters.items()]
+    converters = [load_converter(n, p) for n, p in converters.items()]
 
-    # Load all active stimuli for task
-    stim_objects = Stimulus.query.filter_by(active=True).join(
+    # Load all active original stimuli for task
+    stim_objects = Stimulus.query.filter_by(active=True, parent_id=None).join(
         RunStimulus).join(Run).join(Task).filter_by(name=task_name).join(
             Dataset).filter_by(name=dataset_name).all()
 
-    # TODO: only apply to "original" stimuli (i.e. no parent)
+    # TODO:
     # For all converters, disable sitmuli generated with those converters previously
     # (for updating)
     # Also disbale RunStimulus record to only apply to featues about to generated
+    # Finally, how to selectively disbale some stimuli (e.g. german ones)
 
     # Datalad unlock all stim paths
     if automagic:
@@ -94,21 +95,29 @@ def convert_stimuli(db_session, dataset_name, task_name, converters,
         rs_orig = RunStimulus.query.filter_by(stimulus_id=stim.id).join(
             Run).join(Task).filter_by(name=task_name).all()
 
-        # Need to create new stimuli first
         for res in results:
-            # Save stim to file
-            stim_hash, path = save_stim_filename(
-                res, basepath=current_app.config['STIMULUS_DIR'])
+            if res.data:
+                # Save stim to file
+                stim_hash, path = save_stim_filename(
+                    res, basepath=current_app.config['STIMULUS_DIR'])
 
-            # Create stimulus model
-            new_model, new = create_stimulus(
-                db_session, path, stim_hash, parent_id=stim.id)
+                # Create stimulus model
+                new_model, new = create_stimulus(
+                    db_session, path, stim_hash, parent_id=stim.id,
+                    converter_name=res.history.transformer_class,
+                    converter_params=res.history.transformer_params)
 
-            # Create new RS associations
-            for rs in rs_orig:
-                new_rs = RunStimulus(stimulus_id=new_model.id,
-                                     run_id=rs.run_id,
-                                     onset=rs.onset+res.onset,
-                                     duration=res.duration)
-                db_session.add(new_rs)
-                db_session.commit()
+                if res.onset is None:
+                    res.onset = 0
+
+                # Create new RS associations
+                for rs in rs_orig:
+                    duration = rs.duration if res.duration is None \
+                               else res.duration
+
+                    new_rs = RunStimulus(stimulus_id=new_model.id,
+                                         run_id=rs.run_id,
+                                         onset=rs.onset+res.onset,
+                                         duration=duration)
+                    db_session.add(new_rs)
+                    db_session.commit()

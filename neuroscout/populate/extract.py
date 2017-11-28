@@ -72,16 +72,19 @@ def extract_features(db_session, dataset_name, task_name, extractors,
         Output:
             list of db ids of extracted features
     """
-    # Load all active stimuli for task
+    # Load all original stimuli for task
     stim_objects = Stimulus.query.filter_by(active=True).join(
         RunStimulus).join(Run).join(Task).filter_by(name=task_name).join(
             Dataset).filter_by(name=dataset_name).all()
-    stim_paths = [s.path for s in stim_objects]
 
+    stim_paths = [s.path for s in stim_objects if s.parent_id is None]
     if automagic:
         # Monkey-patched auto doesn't work, so get and unlock manually
         da.get(stim_paths)
         da.unlock(stim_paths)
+
+    stim_paths += [s.path for s in stim_objects if s.parent_id is not None]
+
     stims = load_stims(stim_paths)
 
     results = []

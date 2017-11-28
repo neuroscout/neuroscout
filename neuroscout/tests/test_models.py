@@ -76,11 +76,16 @@ def test_remote_dataset(session, add_task_remote):
 	assert predictor.predictor_events.count() == 4
 
 	# Test that Stimiuli were extracted
-	assert Stimulus.query.count() == 4
+	assert Stimulus.query.count() == 5
 
 	# Test participants.tsv ingestion
 	assert GroupPredictor.query.filter_by(
 			dataset_id=add_task_remote).count() == 3
+
+	# Test that stimuli were converted
+	converted_stim = [s for s in Stimulus.query.all() if s.parent_id is not None][0]
+
+	assert converted_stim.converter_name == 'TesseractConverter'
 
 def test_extracted_features(add_task, extract_features):
 	""" This tests feature extraction from a remote dataset"""

@@ -17,8 +17,7 @@
           "subject": "0[0-4]"
         },
         "extract_parameters": {},
-        "dataset_parameters": {},
-        "convert_paramters": {}
+        "ingest_parameters": {},
       }
     }
   }
