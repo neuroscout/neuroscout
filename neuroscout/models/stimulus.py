@@ -14,7 +14,7 @@ class Stimulus(db.Model):
 	parent_id = db.Column(db.Integer, db.ForeignKey('stimulus.id'))
 	converter_name = db.Column(db.String)
 	converter_parameters = db.Column(db.Text)
-	
+
 	extracted_events = db.relationship('ExtractedEvent', backref='stimulus',
 	                            lazy='dynamic')
 	runs = db.relationship('Run',
@@ -29,5 +29,5 @@ class RunStimulus(db.Model):
 	""" Run Stimulus association table """
 	stimulus_id = db.Column(db.Integer, db.ForeignKey('stimulus.id'), primary_key=True)
 	run_id = db.Column(db.Integer, db.ForeignKey('run.id'), primary_key=True)
-	onset = db.Column(db.Float, nullable=False)
-	duration = db.Column(db.Float, nullable=False)
+	onset = db.Column(db.Float)
+	duration = db.Column(db.Float)

@@ -1,9 +1,7 @@
 """ Dataset ingestion
 Tools to populate database from BIDS datasets
 """
-from flask import current_app
 from os.path import realpath, join
-from os import makedirs
 import json
 import magic
 
@@ -18,17 +16,6 @@ import db_utils
 from .utils import remote_resource_exists, format_preproc, hash_file
 from models import (Dataset, Task, Run, Predictor, PredictorEvent, PredictorRun,
                     Stimulus, RunStimulus, GroupPredictor, GroupPredictorValue)
-
-# from pliers.updater import check_updates
-
-def check_updates_json():
-    """ Checks which converters extractors have been updated in a json"""
-    ft_path = current_app.config['FEATURE_TRACKING_DIR']
-    makedirs(ft_path, exist_ok=True)
-
-    updated_extractors = []
-
-    return updated_extractors
 
 def add_predictor(db_session, predictor_name, dataset_id, run_id,
                   onsets, durations, values, **kwargs):
@@ -282,8 +269,6 @@ def add_task(db_session, task_name, dataset_name=None, local_path=None,
             runstim.onset=onsets[i]
             runstim.duration=durations[i]
             db_session.commit()
-
-    db_session.commit()
 
     """ Add GroupPredictors """
     if verbose:

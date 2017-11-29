@@ -6,6 +6,17 @@ from .convert import convert_stimuli
 
 from models import Dataset
 
+# from pliers.updater import check_updates
+
+# def check_updates_json():
+#     """ Checks which converters extractors have been updated in a json"""
+#     ft_path = current_app.config['FEATURE_TRACKING_DIR']
+#     makedirs(ft_path, exist_ok=True)
+#
+#     updated_extractors = []
+#
+#     return updated_extractors
+
 def ingest_from_json(db_session, config_file, install_path='/file-data',
                      automagic=False, update=False):
     dataset_config = json.load(open(config_file, 'r'))

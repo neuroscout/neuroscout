@@ -72,7 +72,7 @@ def extract_features(db_session, dataset_name, task_name, extractors,
         Output:
             list of db ids of extracted features
     """
-    # Load all original stimuli for task
+    # Load all active stimuli for task
     stim_objects = Stimulus.query.filter_by(active=True).join(
         RunStimulus).join(Run).join(Task).filter_by(name=task_name).join(
             Dataset).filter_by(name=dataset_name).all()
@@ -84,7 +84,6 @@ def extract_features(db_session, dataset_name, task_name, extractors,
         da.unlock(stim_paths)
 
     stim_paths += [s.path for s in stim_objects if s.parent_id is not None]
-
     stims = load_stims(stim_paths)
 
     results = []
@@ -150,6 +149,7 @@ def extract_features(db_session, dataset_name, task_name, extractors,
 
     """" Create Predictors from Extracted Features """
     # For all instances for stimuli in this task's runs
+    ## TODO: Only for RS's beloning to active stimuli
     task_runstimuli = RunStimulus.query.join(Run).join(
         Task).filter_by(name=task_name).join(
             Dataset).filter_by(name=dataset_name).all()

@@ -47,6 +47,7 @@ def convert_stimuli(db_session, dataset_name, task_name, converters,
         Output:
             list of db ids of converted stimuli
     """
+    print("Converting stims")
 
     def load_converter(converter_name, parameters):
         if hasattr(pliers.converters, converter_name):
@@ -63,11 +64,7 @@ def convert_stimuli(db_session, dataset_name, task_name, converters,
         RunStimulus).join(Run).join(Task).filter_by(name=task_name).join(
             Dataset).filter_by(name=dataset_name).all()
 
-    # TODO:
-    # For all converters, disable sitmuli generated with those converters previously
-    # (for updating)
-    # Also disbale RunStimulus record to only apply to featues about to generated
-    # Finally, how to selectively disbale some stimuli (e.g. german ones)
+    # TODO: How to selectively disbale some stimuli (e.g. german ones)
 
     # Datalad unlock all stim paths
     if automagic:
@@ -92,9 +89,7 @@ def convert_stimuli(db_session, dataset_name, task_name, converters,
                     else:
                         results.append(res)
 
-        rs_orig = RunStimulus.query.filter_by(stimulus_id=stim.id).join(
-            Run).join(Task).filter_by(name=task_name).all()
-
+        new_stims = []
         for res in results:
             if res.data:
                 # Save stim to file
@@ -102,15 +97,33 @@ def convert_stimuli(db_session, dataset_name, task_name, converters,
                     res, basepath=current_app.config['STIMULUS_DIR'])
 
                 # Create stimulus model
+                # TODO: As is, if two newly created stimuli have the same data,
+                # but originate from diffeent sources, they will share object
                 new_model, new = create_stimulus(
                     db_session, path, stim_hash, parent_id=stim.id,
                     converter_name=res.history.transformer_class,
                     converter_params=res.history.transformer_params)
+                new_stims.append(new_model.id)
 
                 if res.onset is None:
                     res.onset = 0
 
-                # Create new RS associations
+                # Delete previous RS associations with this derived stim (if any)
+                # TODO: This delete associations with only this Task
+                # In the long run, should refactor to add task, then convert
+                # and extract on *ALL* applicable stimuli
+                # Find more efficient way of doing this
+                to_delete = RunStimulus.query.filter_by(
+                    stimulus_id=new_model.id).join(Run).join(
+                        Task).filter_by(name=task_name)
+                for rs in to_delete:
+                    db_session.delete(rs)
+                    db_session.commit()
+
+                # Re-create new RS associations with newly created stims
+                # This must be done because onset/durations could have changed.
+                rs_orig = RunStimulus.query.filter_by(stimulus_id=stim.id).join(
+                    Run).join(Task).filter_by(name=task_name)
                 for rs in rs_orig:
                     duration = rs.duration if res.duration is None \
                                else res.duration
@@ -121,3 +134,13 @@ def convert_stimuli(db_session, dataset_name, task_name, converters,
                                          duration=duration)
                     db_session.add(new_rs)
                     db_session.commit()
+
+        # For updating, disable generated stimuli previously originating from this stimulus
+        # created with the converters we are using now.
+        # That is, stimuli with parent_id = stim.id &&
+        # id != one of the newly generated stims (becuse of hash re-using)
+        to_update = Stimulus.query.filter_by(parent_id=stim.id).filter(
+            Stimulus.id.notin_(new_stims))
+        if to_update.count():
+            to_update.update(dict(active=False))
+        db_session.commit()

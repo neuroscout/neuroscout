@@ -14,10 +14,10 @@
         },
         "filters": {
           "run": 1,
-          "subject": "0[0-4]"
+          "subject": "01"
         },
         "extract_parameters": {},
-        "ingest_parameters": {},
+        "ingest_parameters": {}
       }
     }
   }
