@@ -148,11 +148,13 @@ def extract_features(db_session, dataset_name, task_name, extractors,
                 db_session.commit()
 
     """" Create Predictors from Extracted Features """
+    # Active stimuli from this task
+    active_stims = db_session.query(Stimulus.id).query.filter_by(active=True). \
+        join(RunStimulus).join(Run).join(Task).filter_by(name=task_name). \
+        join(Dataset).filter_by(name=dataset_name).all()
     # For all instances for stimuli in this task's runs
-    ## TODO: Only for RS's beloning to active stimuli
-    task_runstimuli = RunStimulus.query.join(Run).join(
-        Task).filter_by(name=task_name).join(
-            Dataset).filter_by(name=dataset_name).all()
+    task_runstimuli = RunStimulus.query.filter(
+        RunStimulus.stimulus_id.in_(active_stims))
 
     for rs in task_runstimuli:
         # For every feature extracted

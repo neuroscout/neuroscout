@@ -11,7 +11,7 @@ from flask import current_app
 from .utils import hash_data
 
 from models import Dataset, Task, Run, Stimulus, RunStimulus
-from .ingest import create_stimulus
+from .ingest import add_stimulus
 from os.path import join
 
 from pliers.stimuli import (TextStim, ImageStim, VideoFrameStim,
@@ -66,8 +66,6 @@ def convert_stimuli(db_session, dataset_name, task_name, converters,
         RunStimulus).join(Run).join(Task).filter_by(name=task_name).join(
             Dataset).filter_by(name=dataset_name).all()
 
-    # TODO: How to selectively disbale some stimuli (e.g. german ones)
-
     # Datalad unlock all stim paths
     if automagic:
         stim_paths = [s.path for s in stim_objects]
@@ -99,9 +97,7 @@ def convert_stimuli(db_session, dataset_name, task_name, converters,
                     res, basepath=current_app.config['STIMULUS_DIR'])
 
                 # Create stimulus model
-                # TODO: As is, if two newly created stimuli have the same data,
-                # but originate from diffeent sources, they will share object
-                new_model, new = create_stimulus(
+                new_model, new = add_stimulus(
                     db_session, path, stim_hash, parent_id=stim.id,
                     converter_name=res.history.transformer_class,
                     converter_params=res.history.transformer_params,
@@ -124,7 +120,6 @@ def convert_stimuli(db_session, dataset_name, task_name, converters,
                     db_session.commit()
 
                 # Re-create new RS associations with newly created stims
-                # This must be done because onset/durations could have changed.
                 rs_orig = RunStimulus.query.filter_by(stimulus_id=stim.id).join(
                     Run).join(Task).filter_by(name=task_name)
                 for rs in rs_orig:
@@ -138,10 +133,8 @@ def convert_stimuli(db_session, dataset_name, task_name, converters,
                     db_session.add(new_rs)
                     db_session.commit()
 
-        # For updating, disable generated stimuli previously originating from this stimulus
-        # created with the converters we are using now.
-        # That is, stimuli with parent_id = stim.id &&
-        # id != one of the newly generated stims (becuse of hash re-using)
+        # For updating, disable generated stimuli previously originating
+        # from this stimulus & converters we are using now.
         to_update = Stimulus.query.filter_by(parent_id=stim.id).filter(
             Stimulus.id.notin_(new_stims))
         if to_update.count():

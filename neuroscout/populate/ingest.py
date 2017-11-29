@@ -17,6 +17,9 @@ from .utils import remote_resource_exists, format_preproc, hash_file
 from models import (Dataset, Task, Run, Predictor, PredictorEvent, PredictorRun,
                     Stimulus, RunStimulus, GroupPredictor, GroupPredictorValue)
 
+# TODO: How to selectively disbale some stimuli (e.g. german ones)
+
+
 def add_predictor(db_session, predictor_name, dataset_id, run_id,
                   onsets, durations, values, **kwargs):
     """" Adds a new Predictor to a run given a set of values
@@ -101,7 +104,7 @@ def add_group_predictors(db_session, dataset_id, participants):
 
     return gp_ids
 
-def create_stimulus(db_session, path, stim_hash, dataset_id, parent_id=None,
+def add_stimulus(db_session, path, stim_hash, dataset_id, parent_id=None,
                     converter_name=None, converter_params=None):
     """ Creare stimulus model """
     mimetype = magic.from_file(path, mime=True)
@@ -261,7 +264,7 @@ def add_task(db_session, task_name, dataset_name=None, local_path=None,
             else:
                 stim_hash = stims_processed[val]
 
-            stim_model, _ = create_stimulus(db_session, path, stim_hash,
+            stim_model, _ = add_stimulus(db_session, path, stim_hash,
                                             dataset_id=dataset_model.id)
 
             # Get or create Run Stimulus association
