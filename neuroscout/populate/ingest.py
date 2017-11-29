@@ -101,19 +101,20 @@ def add_group_predictors(db_session, dataset_id, participants):
 
     return gp_ids
 
-def create_stimulus(db_session, path, stim_hash, parent_id=None,
+def create_stimulus(db_session, path, stim_hash, dataset_id, parent_id=None,
                     converter_name=None, converter_params=None):
     """ Creare stimulus model """
     mimetype = magic.from_file(path, mime=True)
 
     model, new = db_utils.get_or_create(
-        db_session, Stimulus, commit=False, sha1_hash=stim_hash)
+        db_session, Stimulus, commit=False,
+        sha1_hash=stim_hash, dataset_id=dataset_id,
+        converter_name=converter_name)
 
     if new:
         model.path=realpath(path)
         model.mimetype=mimetype
         model.parent_id=parent_id
-        model.converter_name=converter_name
         model.converter_params=converter_params
 
     db_session.commit()
@@ -156,7 +157,8 @@ def add_task(db_session, task_name, dataset_name=None, local_path=None,
 
     dataset_description = json.load(open(
         join(local_path, 'dataset_description.json'), 'r'))
-    dataset_name = dataset_name if dataset_name is not None else dataset_description['Name']
+    dataset_name = dataset_name if dataset_name is not None \
+                   else dataset_description['Name']
 
     # Get or create dataset model from mandatory arguments
     dataset_model, new_ds = db_utils.get_or_create(
@@ -259,17 +261,15 @@ def add_task(db_session, task_name, dataset_name=None, local_path=None,
             else:
                 stim_hash = stims_processed[val]
 
-            stim_model, _ = create_stimulus(db_session, path, stim_hash)
+            stim_model, _ = create_stimulus(db_session, path, stim_hash,
+                                            dataset_id=dataset_model.id)
 
             # Get or create Run Stimulus association
             runstim, _ = db_utils.get_or_create(db_session, RunStimulus,
-                                                commit=False,
                                                 stimulus_id=stim_model.id,
-                                                run_id=run_model.id)
-            runstim.onset=onsets[i]
-            runstim.duration=durations[i]
-            db_session.commit()
-
+                                                run_id=run_model.id,
+                                                onset=onsets[i],
+                                                duration=durations[i])
     """ Add GroupPredictors """
     if verbose:
         print("Adding group predictors")

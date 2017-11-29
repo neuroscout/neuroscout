@@ -49,6 +49,8 @@ def convert_stimuli(db_session, dataset_name, task_name, converters,
     """
     print("Converting stims")
 
+    dataset_id = Dataset.query.filter_by(name=dataset_name).one().id
+
     def load_converter(converter_name, parameters):
         if hasattr(pliers.converters, converter_name):
             conv = getattr(pliers.converters, converter_name)(**parameters)
@@ -102,7 +104,8 @@ def convert_stimuli(db_session, dataset_name, task_name, converters,
                 new_model, new = create_stimulus(
                     db_session, path, stim_hash, parent_id=stim.id,
                     converter_name=res.history.transformer_class,
-                    converter_params=res.history.transformer_params)
+                    converter_params=res.history.transformer_params,
+                    dataset_id=dataset_id)
                 new_stims.append(new_model.id)
 
                 if res.onset is None:
