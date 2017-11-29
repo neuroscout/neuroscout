@@ -93,7 +93,6 @@ def convert_stimuli(db_session, dataset_name, task_name, converters,
             Run).join(Task).filter_by(name=task_name)
         new_stims = []
         for res in results:
-            if res.data:
                 # Save stim to file
                 stim_hash, path = save_stim_filename(
                     res, basepath=current_app.config['STIMULUS_DIR'])
@@ -121,12 +120,12 @@ def convert_stimuli(db_session, dataset_name, task_name, converters,
                                          duration=res.duration or rs.duration)
                     db_session.add(new_rs)
                     db_session.commit()
-
+                    
         # De-activate previously generated stimuli from these converters.
         to_update = Stimulus.query.filter_by(parent_id=stim.id).filter(
             Stimulus.id.notin_(new_stims))
         if to_update.count():
             to_update.update(dict(active=False))
         db_session.commit()
-        
+
         return new_stims

@@ -1,8 +1,9 @@
 import pytest
 import os
+from sqlalchemy import func
 from models import (Analysis, User, Dataset, Predictor, Stimulus, Run,
-					RunStimulus, Result, ExtractedFeature,
-					GroupPredictor, GroupPredictorValue)
+					RunStimulus, Result, ExtractedFeature, PredictorEvent,
+					GroupPredictor)
 
 def test_dataset_ingestion(session, add_task):
 	dataset_model = Dataset.query.filter_by(id=add_task).one()
@@ -87,7 +88,7 @@ def test_remote_dataset(session, add_task_remote):
 
 	assert converted_stim.converter_name == 'TesseractConverter'
 
-def test_extracted_features(add_task, extract_features):
+def test_extracted_features(session, add_task, extract_features):
 	""" This tests feature extraction from a remote dataset"""
 	assert ExtractedFeature.query.count() == 2
 
@@ -103,13 +104,11 @@ def test_extracted_features(add_task, extract_features):
 	assert ef_b.extracted_events.count() == Stimulus.query.count()
 
 	# And that a sensical value was extracted
-	assert float(ef_b.extracted_events.first().value) < 1
+	assert session.query(func.max(PredictorEvent.onset)).join(
+		Predictor).filter_by(ef_id=ef_b.id).one()[0] == 25.0
 
 	# Test that Predictors were created from EF
 	pred = Predictor.query.filter_by(ef_id=ef_b.id).one()
-	assert pred.predictor_events.first().onset == 1.0
-
-	# Test that Predictors have description and name propgated down
 	assert pred.name == "BrightnessExtractor.Brightness"
 
 	# Test that a Predictor was not made for vibrance (hidden)
