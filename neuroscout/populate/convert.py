@@ -1,24 +1,23 @@
 """ Stimulus conversion.
-To apply pliers converters to create new stimuli from original dataset stims
+To apply pliers converters to create new stimuli from original dataset stims.
 """
-from pliers.stimuli import load_stims
-import pliers.converters
-
-from datalad import api as da
-
+from os.path import join
 from flask import current_app
 
-from .utils import hash_data
-
-from models import Dataset, Task, Run, Stimulus, RunStimulus
-from .ingest import add_stimulus
-from os.path import join
-
+from pliers.stimuli import load_stims
+import pliers.converters
+import pliers.filters
 from pliers.stimuli import (TextStim, ImageStim, VideoFrameStim,
                             VideoStim, AudioStim)
+from datalad import api as da
+
+from models import Dataset, Task, Run, Stimulus, RunStimulus
+
+from .utils import hash_data
+from .ingest import add_stimulus
 
 def save_stim_filename(stimulus, basepath=''):
-    """ Given a pliers stimulus object, created hash, filename, and save """
+    """ Given a pliers stimulus object, create a hash, filename, and save """
     stim_hash = hash_data(stimulus.data)
 
     stim_types = {ImageStim: '.png',
@@ -51,6 +50,7 @@ def convert_stimuli(db_session, dataset_name, task_name, converters,
 
     dataset_id = Dataset.query.filter_by(name=dataset_name).one().id
 
+    # Load converters
     def load_converter(converter_name, parameters):
         if hasattr(pliers.converters, converter_name):
             conv = getattr(pliers.converters, converter_name)(**parameters)
@@ -58,13 +58,12 @@ def convert_stimuli(db_session, dataset_name, task_name, converters,
             conv = getattr(pliers.filters, converter_name)(**parameters)
         return conv
 
-    # Load converters
     converters = [load_converter(n, p) for n, p in converters.items()]
 
     # Load all active original stimuli for task
     stim_objects = Stimulus.query.filter_by(active=True, parent_id=None).join(
         RunStimulus).join(Run).join(Task).filter_by(name=task_name).join(
-            Dataset).filter_by(name=dataset_name).all()
+            Dataset).filter_by(name=dataset_name)
 
     # Datalad unlock all stim paths
     if automagic:
@@ -72,7 +71,7 @@ def convert_stimuli(db_session, dataset_name, task_name, converters,
         da.get(stim_paths)
         da.unlock(stim_paths)
 
-    # Loop over original stimuli in db
+    # Extract new stimuli from original stimuli
     for stim in stim_objects:
         results = []
         loaded_stim = load_stims(stim.path)
@@ -89,6 +88,9 @@ def convert_stimuli(db_session, dataset_name, task_name, converters,
                     else:
                         results.append(res)
 
+        # Re-create new RS associations with newly created stims
+        rs_orig = RunStimulus.query.filter_by(stimulus_id=stim.id).join(
+            Run).join(Task).filter_by(name=task_name)
         new_stims = []
         for res in results:
             if res.data:
@@ -97,46 +99,34 @@ def convert_stimuli(db_session, dataset_name, task_name, converters,
                     res, basepath=current_app.config['STIMULUS_DIR'])
 
                 # Create stimulus model
-                new_model, new = add_stimulus(
+                new_stim, new = add_stimulus(
                     db_session, path, stim_hash, parent_id=stim.id,
                     converter_name=res.history.transformer_class,
                     converter_params=res.history.transformer_params,
                     dataset_id=dataset_id)
-                new_stims.append(new_model.id)
+                new_stims.append(new_stim.id)
 
-                if res.onset is None:
-                    res.onset = 0
+                if not new:
+                    # Delete previous RS associations with this derived stim
+                    to_delete = db_session.query(RunStimulus.id).filter_by(
+                        stimulus_id=new_stim.id).join(Run).join(
+                            Task).filter_by(name=task_name)
+                    RunStimulus.query.filter(RunStimulus.id.in_(to_delete)).\
+                        delete(synchronize_session='fetch')
 
-                # Delete previous RS associations with this derived stim (if any)
-                # TODO: This delete associations with only this Task
-                # In the long run, should refactor to add task, then convert
-                # and extract on *ALL* applicable stimuli
-                # Find more efficient way of doing this
-                to_delete = RunStimulus.query.filter_by(
-                    stimulus_id=new_model.id).join(Run).join(
-                        Task).filter_by(name=task_name)
-                for rs in to_delete:
-                    db_session.delete(rs)
-                    db_session.commit()
-
-                # Re-create new RS associations with newly created stims
-                rs_orig = RunStimulus.query.filter_by(stimulus_id=stim.id).join(
-                    Run).join(Task).filter_by(name=task_name)
                 for rs in rs_orig:
-                    duration = rs.duration if res.duration is None \
-                               else res.duration
-
-                    new_rs = RunStimulus(stimulus_id=new_model.id,
+                    new_rs = RunStimulus(stimulus_id=new_stim.id,
                                          run_id=rs.run_id,
-                                         onset=rs.onset+res.onset,
-                                         duration=duration)
+                                         onset=rs.onset + (res.onset or 0),
+                                         duration=res.duration or rs.duration)
                     db_session.add(new_rs)
                     db_session.commit()
 
-        # For updating, disable generated stimuli previously originating
-        # from this stimulus & converters we are using now.
+        # De-activate previously generated stimuli from these converters.
         to_update = Stimulus.query.filter_by(parent_id=stim.id).filter(
             Stimulus.id.notin_(new_stims))
         if to_update.count():
             to_update.update(dict(active=False))
         db_session.commit()
+        
+        return new_stims

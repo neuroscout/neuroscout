@@ -2,22 +2,19 @@
 Set of methods to extract features from stimuli in a dataset and generate
 the associated predictors
 """
+from flask import current_app
 import json
 import pandas as pd
 import numpy as np
 
 from pliers.stimuli import load_stims
 import pliers.extractors
-
 from datalad import api as da
 
-from flask import current_app
-
 import populate
-from .utils import hash_file, hash_data
-
 from models import (Dataset, Task,
     Run, Stimulus, RunStimulus, ExtractedFeature, ExtractedEvent)
+from .utils import hash_file, hash_data
 
 class FeatureSerializer(object):
     """ Serialized Pliers results from a schema containing additional
@@ -34,22 +31,18 @@ class FeatureSerializer(object):
         attributes.
         """
         results = []
+        extractor_name = ext_res.extractor.name
         for feature_name in ext_res.features:
-            # Load names
-            extractor_name = ext_res.extractor.name
-
-            ## Look up feature in schema, set to None if not found
+            # Look up feature in schema, set to None if not found
             feature_schema = self.schema.get(
                 extractor_name, {}).get(feature_name, {})
 
-            unique = {}
-            tr_attrs = [getattr(ext_res.extractor, a) \
-                        for a in ext_res.extractor._log_attributes]
-            unique['extractor_parameters'] = str(dict(
-                zip(ext_res.extractor._log_attributes, tr_attrs)))
-
             properties = {}
             properties['extractor_name'] = extractor_name
+            tr_attrs = [getattr(ext_res.extractor, a) \
+                        for a in ext_res.extractor._log_attributes]
+            properties['extractor_parameters'] = str(dict(
+                zip(ext_res.extractor._log_attributes, tr_attrs)))
             properties['feature_name'] = feature_schema.get(
                 'rename', feature_name)
             properties['extractor_version'] = ext_res.extractor.VERSION
@@ -72,10 +65,12 @@ def extract_features(db_session, dataset_name, task_name, extractors,
         Output:
             list of db ids of extracted features
     """
+    dataset_id = Dataset.query.filter_by(name=dataset_name).one().id
+
     # Load all active stimuli for task
     stim_objects = Stimulus.query.filter_by(active=True).join(
         RunStimulus).join(Run).join(Task).filter_by(name=task_name).join(
-            Dataset).filter_by(name=dataset_name).all()
+            Dataset).filter_by(name=dataset_name)
 
     stim_paths = [s.path for s in stim_objects if s.parent_id is None]
     if automagic:
@@ -90,13 +85,14 @@ def extract_features(db_session, dataset_name, task_name, extractors,
     for extractor_name, parameters in extractors.items():
         # For every extractor, extract from matching stims
         ext = getattr(pliers.extractors, extractor_name)(**parameters)
-        results += ext.transform(
-            [s for s in stims if ext._stim_matches_input_types(s)])
+        valid_stims = [s for s in stims if ext._stim_matches_input_types(s)]
+        results += ext.transform(valid_stims)
 
     serializer = FeatureSerializer()
     extracted_features = {}
     for res in results:
         if np.array(res.data).size > 0:
+            # Annotate results
             serialized = serializer.load(res)
             for i, feature in enumerate(res.features):
                 """" Add new ExtractedFeature """
@@ -122,36 +118,29 @@ def extract_features(db_session, dataset_name, task_name, extractors,
                 stimulus = db_session.query(
                     Stimulus).filter_by(sha1_hash=stim_hash).one()
 
-                # Set onset for event
-                if pd.isnull(res.onsets):
-                    onset = None
-                elif isinstance(res.onsets, float):
-                    onset = res.onsets
-                else:
-                    onset = res.onsets[0]
+                def grab_value(val):
+                    if pd.isnull(val):
+                        return None
+                    elif isinstance(val, float):
+                        return val
+                    else:
+                        return val[0]
 
                 # Get or create ExtractedEvent
-                ee_model = ExtractedEvent(onset=onset, stimulus_id=stimulus.id,
+                ee_model = ExtractedEvent(onset=grab_value(res.onsets),
+                                          duration=grab_value(res.durations),
+                                          stimulus_id=stimulus.id,
                                           history=res.history.string,
                                           ef_id=ef_model.id,
                                           value=res.data[0][i])
-
-                # Add duration
-                if pd.isnull(res.durations):
-                    ee_model.duration = None
-                elif isinstance(res.durations, float):
-                    ee_model.duration = res.durations
-                else:
-                    ee_model.duration = res.durations[0]
-
                 db_session.add(ee_model)
                 db_session.commit()
 
     """" Create Predictors from Extracted Features """
     # Active stimuli from this task
-    active_stims = db_session.query(Stimulus.id).query.filter_by(active=True). \
+    active_stims = db_session.query(Stimulus.id).filter_by(active=True). \
         join(RunStimulus).join(Run).join(Task).filter_by(name=task_name). \
-        join(Dataset).filter_by(name=dataset_name).all()
+        join(Dataset).filter_by(name=dataset_name)
     # For all instances for stimuli in this task's runs
     task_runstimuli = RunStimulus.query.filter(
         RunStimulus.stimulus_id.in_(active_stims))
@@ -169,11 +158,7 @@ def extract_features(db_session, dataset_name, task_name, extractors,
                 durations = []
                 values = []
                 for ee in ees:
-                    if ee.onset:
-                        onsets.append(ee.onset + rs.onset)
-                    else:
-                        onsets.append(rs.onset)
-
+                    onsets.append((ee.onset or 0 )+ rs.onset)
                     durations.append(ee.duration)
                     if ee.value:
                         values.append(ee.value)
@@ -183,10 +168,10 @@ def extract_features(db_session, dataset_name, task_name, extractors,
                 if (len(durations) == 1) and (durations[0] is None):
                     durations[0] = rs.duration
 
-                predictor_name = '{}.{}'.format(ef.extractor_name, ef.feature_name)
+                predictor_name = '{}.{}'.format(
+                    ef.extractor_name, ef.feature_name)
 
-                ds_id = Dataset.query.filter_by(name=dataset_name).one().id
-                populate.add_predictor(db_session, predictor_name, ds_id,
+                populate.add_predictor(db_session, predictor_name, dataset_id,
                                        rs.run_id, onsets, durations, values,
                                        ef_id=ef.id)
 
