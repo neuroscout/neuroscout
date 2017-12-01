@@ -30,7 +30,7 @@ class Config(object):
     dir_path = dirname(dirname(realpath(__file__)))
     FEATURE_SCHEMA = join(dir_path, 'config/feature_schema.json')
 
-    FEATURE_TRACKING_DIR = 'path'
+    FEATURE_TRACKING_DIR = 'path.csv'
     STIMULUS_DIR = 'path'
 
 class DevelopmentConfig(Config):

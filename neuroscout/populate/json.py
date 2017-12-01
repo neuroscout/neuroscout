@@ -1,4 +1,6 @@
 import json
+from flask import current_app
+from os import makedirs
 from pathlib import Path
 from .ingest import add_task
 from .extract import extract_features
@@ -6,20 +8,49 @@ from .convert import convert_stimuli
 
 from models import Dataset
 
-# from pliers.updater import check_updates
+from pliers.utils.updater import check_updates
 
-# def check_updates_json():
-#     """ Checks which converters extractors have been updated in a json"""
-#     ft_path = current_app.config['FEATURE_TRACKING_DIR']
-#     makedirs(ft_path, exist_ok=True)
-#
-#     updated_extractors = []
-#
-#     return updated_extractors
+def get_delta_config(db_session, config_dict):
+    """ Returns element of config file that must be re-extracted """
+    ## Get set of extractors that are used
+    transformers = []
+    for _, dataset in config_dict.items():
+        for _, task in dataset['tasks'].items():
+         transformers += task.get('extractors', [])
+         transformers += task.get('converters', [])
+
+    ## Check for updates
+    ft_path = current_app.config['FEATURE_TRACKING_FILE']
+    updated = check_updates(transformers, datastore=ft_path)
+
+    filt_config = {}
+    for dname, dataset in config_dict.items():
+        new_tasks = {}
+        for tname, task in dataset.pop('tasks').items():
+            filt_ext = [e for e in task.get('extractors', []) \
+                        if tuple(e) in updated['transformers']]
+            filt_conv = [c for c in task.get('converters', []) \
+                        if tuple(c) in updated['transformers']]
+
+            if filt_ext or filt_conv:
+                task['extractors'] = filt_ext
+                task['converters'] = filt_conv
+                new_tasks[tname] = task
+
+        if new_tasks:
+            dataset['tasks'] = new_tasks
+            filt_config[dname] = dataset
+
+    return filt_config
 
 def ingest_from_json(db_session, config_file, install_path='/file-data',
                      automagic=False, update=False):
     dataset_config = json.load(open(config_file, 'r'))
+
+    if update:
+        dataset_config = get_delta_config(db_session, dataset_config)
+        if not dataset_config:
+            return None
 
     """ Loop over each dataset in config file """
     dataset_ids = []
