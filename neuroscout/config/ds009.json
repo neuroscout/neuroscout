@@ -5,13 +5,13 @@
     "path": "/datasets/ds009",
     "tasks": {
       "emotionalregulation": {
-        "converters": {
-          "TesseractConverter": {}
-        },
-        "extractors": {
-          "BrightnessExtractor": {},
-          "VibranceExtractor": {}
-        },
+        "converters": [
+          ["TesseractConverter", {}]
+        ],
+        "extractors": [
+          ["BrightnessExtractor", {}],
+          ["VibranceExtractor", {}]
+        ],
         "filters": {
           "run": 1,
           "subject": "01"

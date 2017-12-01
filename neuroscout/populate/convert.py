@@ -9,6 +9,7 @@ import pliers.converters
 import pliers.filters
 from pliers.stimuli import (TextStim, ImageStim, VideoFrameStim,
                             VideoStim, AudioStim)
+from pliers.transformers import get_transformer
 from datalad import api as da
 
 from models import Dataset, Task, Run, Stimulus, RunStimulus
@@ -49,16 +50,7 @@ def convert_stimuli(db_session, dataset_name, task_name, converters,
     print("Converting stims")
 
     dataset_id = Dataset.query.filter_by(name=dataset_name).one().id
-
-    # Load converters
-    def load_converter(converter_name, parameters):
-        if hasattr(pliers.converters, converter_name):
-            conv = getattr(pliers.converters, converter_name)(**parameters)
-        else:
-            conv = getattr(pliers.filters, converter_name)(**parameters)
-        return conv
-
-    converters = [load_converter(n, p) for n, p in converters.items()]
+    converters = [get_transformer(n, **p) for n, p in converters]
 
     # Load all active original stimuli for task
     stim_objects = Stimulus.query.filter_by(active=True, parent_id=None).join(
@@ -120,7 +112,7 @@ def convert_stimuli(db_session, dataset_name, task_name, converters,
                                          duration=res.duration or rs.duration)
                     db_session.add(new_rs)
                     db_session.commit()
-                    
+
         # De-activate previously generated stimuli from these converters.
         to_update = Stimulus.query.filter_by(parent_id=stim.id).filter(
             Stimulus.id.notin_(new_stims))

@@ -19,16 +19,6 @@ def format_preproc(subject, task, run, session=None,
     task, run, space, suffix
 )
 
-# def hash_file(f, blocksize=65536):
-#     """ Hash a file, given a file name string """
-#     hasher = hashlib.sha1()
-#     with open(f, 'rb') as afile:
-#         buf = afile.read(blocksize)
-#         while len(buf) > 0:
-#             hasher.update(buf)
-#             buf = afile.read(blocksize)
-#     return hasher.hexdigest()
-
 def hash_file(f):
     pliers_stim = load_stims(f)
     return hash_data(pliers_stim.data)

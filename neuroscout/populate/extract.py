@@ -8,7 +8,7 @@ import pandas as pd
 import numpy as np
 
 from pliers.stimuli import load_stims
-import pliers.extractors
+from pliers.transformers import get_transformer
 from datalad import api as da
 
 import populate
@@ -77,14 +77,13 @@ def extract_features(db_session, dataset_name, task_name, extractors,
         # Monkey-patched auto doesn't work, so get and unlock manually
         da.get(stim_paths)
         da.unlock(stim_paths)
-
     stim_paths += [s.path for s in stim_objects if s.parent_id is not None]
     stims = load_stims(stim_paths)
 
     results = []
-    for extractor_name, parameters in extractors.items():
+    for name, parameters in extractors:
         # For every extractor, extract from matching stims
-        ext = getattr(pliers.extractors, extractor_name)(**parameters)
+        ext = get_transformer(name, **parameters)
         valid_stims = [s for s in stims if ext._stim_matches_input_types(s)]
         results += ext.transform(valid_stims)
 
