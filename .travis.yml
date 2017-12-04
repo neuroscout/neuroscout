@@ -4,7 +4,7 @@ python:
 install:
   - pip install -r neuroscout/requirements.txt
   - pip install pytest-cov
-  - apt get install tesseract-ocr -yq
+  - apt-get install tesseract-ocr -yq
 script:
   - PYTHONPATH="neuroscout/" python -m pytest neuroscout/ --cov=./
   - cd neuroscout/frontend && npm test
