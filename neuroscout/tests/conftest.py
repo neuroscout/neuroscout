@@ -81,12 +81,14 @@ import populate
 
 DATASET_PATH = os.path.join(
     os.path.dirname(os.path.realpath(__file__)), 'data/datasets/bids_test')
-JSON_PATH = os.path.join(
-    os.path.dirname(os.path.realpath(__file__)), 'data/test_dataset.json')
-EXTRACTORS = {
-    "BrightnessExtractor": {},
-    "VibranceExtractor": {}
-    }
+LOCAL_JSON_PATH = os.path.join(
+    os.path.dirname(os.path.realpath(__file__)), 'data/test_local.json')
+REMOTE_JSON_PATH = os.path.join(
+    os.path.dirname(os.path.realpath(__file__)), 'data/test_remote.json')
+EXTRACTORS = [
+    ("BrightnessExtractor", {}),
+    ("VibranceExtractor", {})
+    ]
 
 @pytest.fixture(scope="function")
 def add_users(app, db, session):
@@ -123,8 +125,12 @@ def add_task(session):
 @pytest.fixture(scope="function")
 def add_task_remote(session):
     """ Add a dataset with two subjects. """
-    return populate.ingest_from_json(session, JSON_PATH,
-                                     '/tmp/datasets')[0]
+    return populate.ingest_from_json(session, REMOTE_JSON_PATH)[0]
+
+@pytest.fixture(scope="function")
+def add_local_task_json(session):
+    """ Add a dataset with two subjects. """
+    return populate.ingest_from_json(session, LOCAL_JSON_PATH)[0]
 
 @pytest.fixture(scope="function")
 def extract_features(session, add_task):
