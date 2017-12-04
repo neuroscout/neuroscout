@@ -6,7 +6,7 @@ from .extract import extract_features
 from .convert import convert_stimuli
 from models import Dataset
 from copy import deepcopy
-
+import os
 from pliers.utils.updater import check_updates
 
 def get_delta_config(db_session, config_dict):
@@ -20,8 +20,10 @@ def get_delta_config(db_session, config_dict):
          transformers += task.get('converters', [])
 
     # Check for updates
-    updated = check_updates(transformers,
-                            datastore=current_app.config['FEATURE_DATASTORE'])
+    datastore = current_app.config['FEATURE_DATASTORE']
+    os.makedirs(os.path.dirname(datastore), exist_ok=True)
+
+    updated = check_updates(transformers, datastore=datastore)
 
     filt_config = {}
     for dname, dataset in config_dict.items():
@@ -47,8 +49,8 @@ def ingest_from_json(db_session, config_file, automagic=False, update=False):
     dataset_config = json.load(open(config_file, 'r'))
     updated_config = get_delta_config(db_session, dataset_config)
     if update:
-        if not dataset_config:
-            return None
+        if not updated_config:
+            return []
         else:
             dataset_config = updated_config
 

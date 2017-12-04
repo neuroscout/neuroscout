@@ -109,6 +109,12 @@ def test_json_local_dataset(session, add_local_task_json):
 	converted_stim = [s for s in Stimulus.query if s.parent_id is not None][0]
 	assert converted_stim.converter_name == 'TesseractConverter'
 
+def test_local_update(update_local_json):
+	assert update_local_json is not None
+	assert ExtractedFeature.query.filter_by(
+		feature_name='Brightness').count() == 2
+
+
 def test_extracted_features(session, add_task, extract_features):
 	""" This tests feature extraction from a remote dataset"""
 	assert ExtractedFeature.query.count() == 2
