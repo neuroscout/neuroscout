@@ -45,7 +45,8 @@ class TestingConfig(Config):
     dir_path = dirname(dirname(realpath(__file__)))
     FEATURE_SCHEMA = join(dir_path, 'tests/data/test_feature_schema.json')
     DATASET_DIR = '/tmp/file-data'
-
+    FEATURE_DATASTORE = '/tmp/datastore.csv'
+    STIMULUS_DIR = '/tmp/stims'
 class DockerTestConfig(TestingConfig):
     SQLALCHEMY_DATABASE_URI = 'postgres://postgres@postgres:5432/scout_test'
 
@@ -54,6 +55,9 @@ class HomeTestingConfig(TestingConfig):
 
 class TravisConfig(TestingConfig):
     SQLALCHEMY_DATABASE_URI = "postgresql://postgres@localhost/travis_ci_test"
+    DATASET_DIR = './tmp/file-data'
+    FEATURE_DATASTORE = './tmp/datastore.csv'
+    STIMULUS_DIR = './tmp/stims'
 
 class HomeConfig(Config):
     SQLALCHEMY_DATABASE_URI = 'postgresql://zorro:dbpass@localhost:5432/neuroscout'

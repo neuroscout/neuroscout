@@ -63,11 +63,12 @@ def ingest_from_json(db_session, config_file, automagic=False, update=False):
         if not (local_path or dataset_address):
             raise Exception("Must provide path or remote address to dataset.")
 
-        # If dataset is remote link, set install path
-        new_path = Path(local_path) if local_path \
-                   else Path(current_app.config['DATASET_DIR']) / dataset_name
-        new_path = new_path.absolute().as_posix()
+        if local_path:
+            local_path = Path(local_path).absolute().as_posix()
 
+        install_path = local_path or \
+            (Path(current_app.config['DATASET_DIR']) / dataset_name).absolute(
+                ).as_posix()
 
         for task_name, params in items['tasks'].items():
             """ Add task to database"""
@@ -79,7 +80,7 @@ def ingest_from_json(db_session, config_file, automagic=False, update=False):
                                   local_path=local_path,
                                   dataset_address=dataset_address,
                                   automagic=automagic,
-                                  install_path=new_path,
+                                  install_path=install_path,
                                   preproc_address=preproc_address,
             					  **dp)
             dataset_ids.append(dataset_id)

@@ -4,10 +4,9 @@ python:
 install:
   - pip install -r neuroscout/requirements.txt
   - pip install pytest-cov
-  - apt-get install tesseract-ocr -yq
 script:
-  - PYTHONPATH="neuroscout/" python -m pytest neuroscout/ --cov=./
-  - cd neuroscout/frontend && npm test
+  - python -m pytest tests/ --cov=./
+  - cd frontend && npm test
 env:
 - APP_SETTINGS=config.app.TravisConfig
 addons:
@@ -17,11 +16,13 @@ before_script:
   - cp neuroscout/config/example_app.py neuroscout/config/app.py
   - psql -c 'create database travis_ci_test;' -U postgres
   - CI=""; cd neuroscout/frontend && yarn install --concurrency=1 && yarn build --concurrency=1
-  - CI="true"; cd ../../
+  - CI="true"; cd ../
   - python -c "import imageio; imageio.plugins.ffmpeg.download()"
 before_install:
   - bash <(wget -q -O- http://neuro.debian.net/_files/neurodebian-travis.sh)
-  - sudo apt-get install -yq git-annex-standalone
+  - sudo apt-get -qq update
+  - sudo apt-get install -yq git-annex-standalone tesseract-ocr
+
 apt:
   sources:
     - sourceline: 'deb https://dl.yarnpkg.com/debian/ stable main'

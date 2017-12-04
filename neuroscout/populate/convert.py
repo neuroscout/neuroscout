@@ -1,12 +1,12 @@
 """ Stimulus conversion.
 To apply pliers converters to create new stimuli from original dataset stims.
 """
-from os.path import join
+from os.path import join, dirname
+from os import makedirs
 from flask import current_app
+from pathlib import Path
 
 from pliers.stimuli import load_stims
-import pliers.converters
-import pliers.filters
 from pliers.stimuli import (TextStim, ImageStim, VideoFrameStim,
                             VideoStim, AudioStim)
 from pliers.transformers import get_transformer
@@ -30,6 +30,7 @@ def save_stim_filename(stimulus, basepath=''):
     ext = [e for c, e in stim_types.items() if isinstance(stimulus, c)][0]
     filename = join(basepath, stim_hash + ext)
 
+    makedirs(dirname(filename), exist_ok=True)
     stimulus.save(filename)
 
     return stim_hash, filename
@@ -86,8 +87,8 @@ def convert_stimuli(db_session, dataset_name, task_name, converters,
         new_stims = []
         for res in results:
                 # Save stim to file
-                stim_hash, path = save_stim_filename(
-                    res, basepath=current_app.config['STIMULUS_DIR'])
+                stim_hash, path = save_stim_filename(res, basepath=Path(
+                    current_app.config['STIMULUS_DIR']).absolute().as_posix())
 
                 # Create stimulus model
                 new_stim, new = add_stimulus(
