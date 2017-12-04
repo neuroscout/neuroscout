@@ -5,6 +5,8 @@ from core import app as _app
 from database import db as _db
 import datetime
 import sqlalchemy as sa
+import pandas as pd
+from flask import current_app
 
 """
 Session / db managment tools
@@ -131,6 +133,20 @@ def add_task_remote(session):
 def add_local_task_json(session):
     """ Add a dataset with two subjects. """
     return populate.ingest_from_json(session, LOCAL_JSON_PATH)[0]
+
+@pytest.fixture(scope="function")
+def update_local_json(session, add_local_task_json):
+    """ Add a dataset with two subjects. """
+    ## Edit datastore file
+    datastore_file = current_app.config['FEATURE_DATASTORE']
+    # Change value in datastore
+    ds = pd.read_csv(datastore_file)
+    ds.iloc[-1, 3] = 1
+    ds.to_csv(datastore_file, index=False)
+
+    ## Update
+    return populate.ingest_from_json(session, LOCAL_JSON_PATH,
+                                          update=True)[0]
 
 @pytest.fixture(scope="function")
 def extract_features(session, add_task):
