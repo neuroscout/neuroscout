@@ -84,7 +84,6 @@ def test_remote_dataset(session, add_task_remote):
 	assert GroupPredictor.query.filter_by(
 			dataset_id=add_task_remote).count() == 3
 
-
 def test_json_local_dataset(session, add_local_task_json):
 	dataset_model = Dataset.query.filter_by(id=add_local_task_json).one()
 
@@ -109,11 +108,13 @@ def test_json_local_dataset(session, add_local_task_json):
 	converted_stim = [s for s in Stimulus.query if s.parent_id is not None][0]
 	assert converted_stim.converter_name == 'TesseractConverter'
 
+	assert ExtractedFeature.query.filter_by(
+		feature_name='Brightness').count() == 1
+
 def test_local_update(update_local_json):
 	assert update_local_json is not None
 	assert ExtractedFeature.query.filter_by(
 		feature_name='Brightness').count() == 2
-
 
 def test_extracted_features(session, add_task, extract_features):
 	""" This tests feature extraction from a remote dataset"""
