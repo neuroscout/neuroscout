@@ -51,7 +51,8 @@ def test_dataset_ingestion(session, add_task):
 	assert Stimulus.query.count() == 4
 
 	# and that they were associated with runs (4 runs )
-	assert RunStimulus.query.count() == Stimulus.query.count() * Run.query.count() == 16
+	assert RunStimulus.query.count() == \
+		Stimulus.query.count() * Run.query.count() == 16
 
 	# Test participants.tsv ingestion
 	assert GroupPredictor.query.count() == 3
@@ -83,9 +84,29 @@ def test_remote_dataset(session, add_task_remote):
 	assert GroupPredictor.query.filter_by(
 			dataset_id=add_task_remote).count() == 3
 
-	# Test that stimuli were converted
-	converted_stim = [s for s in Stimulus.query.all() if s.parent_id is not None][0]
 
+def test_json_local_dataset(session, add_local_task_json):
+	dataset_model = Dataset.query.filter_by(id=add_local_task_json).one()
+
+	# Test mimetypes
+	assert 'image/jpeg' in dataset_model.mimetypes
+	assert 'bidstest' == dataset_model.tasks[0].name
+
+	# Test properties of Run
+	assert Run.query.filter_by(dataset_id=add_local_task_json).count() \
+			== dataset_model.runs.count() == 1
+	predictor = Predictor.query.filter_by(name='rt').first()
+	assert predictor.predictor_events.count() == 4
+
+	# Test that Stimiuli were extracted
+	assert Stimulus.query.count() == 5
+
+	# Test participants.tsv ingestion
+	assert GroupPredictor.query.filter_by(
+			dataset_id=add_local_task_json).count() == 3
+
+	# Test that stimuli were converted
+	converted_stim = [s for s in Stimulus.query if s.parent_id is not None][0]
 	assert converted_stim.converter_name == 'TesseractConverter'
 
 def test_extracted_features(session, add_task, extract_features):

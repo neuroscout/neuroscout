@@ -3,13 +3,13 @@
     "dataset_address": "https://github.com/adelavega/bids_test.git",
     "tasks": {
       "bidstest": {
-        "extractors": {
-          "BrightnessExtractor": {},
-          "VibranceExtractor": {}
-        },
-        "converters": {
-          "TesseractConverter": {}
-        },
+        "extractors": [
+          ["BrightnessExtractor", {}],
+          ["VibranceExtractor", {}]
+        ],
+        "converters": [
+          ["TesseractConverter", {}]
+        ],
         "filters": {
           "run": 1,
           "subject": "01"
