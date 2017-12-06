@@ -3,11 +3,22 @@ from database import db
 class Stimulus(db.Model):
 	""" A unique stimulus. A stimulus may occur at different points in time,
 		and perhaps even across different datasets. """
+	__table_args__ = (
+	    db.UniqueConstraint('sha1_hash', 'dataset_id', 'converter_name'),
+	)
 	id = db.Column(db.Integer, primary_key=True)
-	sha1_hash = db.Column(db.Text, nullable=False, unique=True)
-	name = db.Column(db.Text, nullable=False) # Default: base path
+	sha1_hash = db.Column(db.Text, nullable=False)
 	mimetype = db.Column(db.Text, nullable=False)
 	path = db.Column(db.Text, nullable=False)
+	dataset_id = db.Column(db.Integer, db.ForeignKey('dataset.id'),
+						   nullable=False)
+
+	active = db.Column(db.Boolean, nullable=False, default=True)
+
+	# For converted stimuli
+	parent_id = db.Column(db.Integer, db.ForeignKey('stimulus.id'))
+	converter_name = db.Column(db.String)
+	converter_parameters = db.Column(db.Text)
 
 	extracted_events = db.relationship('ExtractedEvent', backref='stimulus',
 	                            lazy='dynamic')
@@ -16,12 +27,16 @@ class Stimulus(db.Model):
 	                        backref='stimulus')
 
 	def __repr__(self):
-	    return '<models.Stimulus[name={}]>'.format(self.name)
+	    return '<models.Stimulus[hash={}]>'.format(self.sha1_hash)
 
 
 class RunStimulus(db.Model):
 	""" Run Stimulus association table """
-	stimulus_id = db.Column(db.Integer, db.ForeignKey('stimulus.id'), primary_key=True)
-	run_id = db.Column(db.Integer, db.ForeignKey('run.id'), primary_key=True)
-	onset = db.Column(db.Float, nullable=False)
-	duration = db.Column(db.Float, nullable=False)
+	__table_args__ = (
+	    db.UniqueConstraint('stimulus_id', 'run_id', 'onset'),
+	)
+	id = db.Column(db.Integer, primary_key=True)
+	stimulus_id = db.Column(db.Integer, db.ForeignKey('stimulus.id'))
+	run_id = db.Column(db.Integer, db.ForeignKey('run.id'))
+	onset = db.Column(db.Float)
+	duration = db.Column(db.Float)

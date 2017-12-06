@@ -5,17 +5,14 @@ RUN apt-key adv --recv-keys --keyserver hkp://keyserver.ubuntu.com:80 0xA5D32F01
 RUN curl -sL https://deb.nodesource.com/setup_6.x | bash -
 RUN apt-get install -y nodejs
 RUN npm install -g yarn
-RUN apt-get install -yq datalad
-RUN apt-get install -yq python-nipype
-RUN apt-get install -yq fsl
+RUN apt-get install -yq datalad python-nipype fsl python-opencv tesseract-ocr
 ENV FSLDIR="/usr/share/fsl/5.0"
 ENV PATH="${FSLDIR}/bin:${PATH}"
 RUN . /usr/share/fsl/5.0/etc/fslconf/fsl.sh
 RUN pip install git+https://github.com/qmac/nipype@events-interface#egg=nipype
-RUN apt-get install -yq python-opencv
 RUN git config --global user.name "Neuroscout"
 RUN git config --global  user.email "delavega@utexas.edu"
 RUN python -c "import imageio; imageio.plugins.ffmpeg.download()"
-RUN crontab /neuroscout/update.txt
+RUN crontab /usr/src/app/update.txt
 RUN service cron start
 WORKDIR /neuroscout

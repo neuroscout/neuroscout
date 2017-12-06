@@ -40,6 +40,7 @@ packaging==16.8
 pandas==0.19.2
 patsy
 passlib==1.7.1
+pytesseract
 Pillow==4.1.1
 -e git+https://github.com/adelavega/pliers.git@updater#egg=pliers
 psycopg2==2.7.1

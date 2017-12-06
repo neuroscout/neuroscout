@@ -82,7 +82,6 @@ def ingest_from_json(config_file, automagic=False, update=False):
 	automagic - Force enable datalad automagic
 	"""
 	populate.ingest_from_json(db.session, config_file,
-                           app.config['DATASET_DIR'],
                            automagic=automagic, update=update)
 
 

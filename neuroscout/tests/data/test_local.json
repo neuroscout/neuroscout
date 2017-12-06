@@ -1,0 +1,20 @@
+{
+  "bids_test": {
+    "path": "./tests/data/datasets/bids_test",
+    "tasks": {
+      "bidstest": {
+        "extractors": [
+          ["BrightnessExtractor", {}],
+          ["VibranceExtractor", {}]
+        ],
+        "converters": [
+          ["TesseractConverter", {}]
+        ],
+        "filters": {
+          "run": 1,
+          "subject": "01"
+        }
+      }
+    }
+  }
+}

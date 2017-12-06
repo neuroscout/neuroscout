@@ -1,8 +1,9 @@
 import pytest
 import os
+from sqlalchemy import func
 from models import (Analysis, User, Dataset, Predictor, Stimulus, Run,
-					RunStimulus, Result, ExtractedFeature,
-					GroupPredictor, GroupPredictorValue)
+					RunStimulus, Result, ExtractedFeature, PredictorEvent,
+					GroupPredictor)
 
 def test_dataset_ingestion(session, add_task):
 	dataset_model = Dataset.query.filter_by(id=add_task).one()
@@ -50,7 +51,8 @@ def test_dataset_ingestion(session, add_task):
 	assert Stimulus.query.count() == 4
 
 	# and that they were associated with runs (4 runs )
-	assert RunStimulus.query.count() == Stimulus.query.count() * Run.query.count() == 16
+	assert RunStimulus.query.count() == \
+		Stimulus.query.count() * Run.query.count() == 16
 
 	# Test participants.tsv ingestion
 	assert GroupPredictor.query.count() == 3
@@ -76,18 +78,51 @@ def test_remote_dataset(session, add_task_remote):
 	assert predictor.predictor_events.count() == 4
 
 	# Test that Stimiuli were extracted
-	assert Stimulus.query.count() == 4
+	assert Stimulus.query.count() == 5
 
 	# Test participants.tsv ingestion
 	assert GroupPredictor.query.filter_by(
 			dataset_id=add_task_remote).count() == 3
 
-def test_extracted_features(add_task, extract_features):
+def test_json_local_dataset(session, add_local_task_json):
+	dataset_model = Dataset.query.filter_by(id=add_local_task_json).one()
+
+	# Test mimetypes
+	assert 'image/jpeg' in dataset_model.mimetypes
+	assert 'bidstest' == dataset_model.tasks[0].name
+
+	# Test properties of Run
+	assert Run.query.filter_by(dataset_id=add_local_task_json).count() \
+			== dataset_model.runs.count() == 1
+	predictor = Predictor.query.filter_by(name='rt').first()
+	assert predictor.predictor_events.count() == 4
+
+	# Test that Stimiuli were extracted
+	assert Stimulus.query.count() == 5
+
+	# Test participants.tsv ingestion
+	assert GroupPredictor.query.filter_by(
+			dataset_id=add_local_task_json).count() == 3
+
+	# Test that stimuli were converted
+	converted_stim = [s for s in Stimulus.query if s.parent_id is not None][0]
+	assert converted_stim.converter_name == 'TesseractConverter'
+
+	assert ExtractedFeature.query.filter_by(
+		feature_name='Brightness').count() == 1
+
+def test_local_update(update_local_json):
+	assert update_local_json is not None
+	assert ExtractedFeature.query.filter_by(
+		feature_name='Brightness').count() == 2
+
+def test_extracted_features(session, add_task, extract_features):
 	""" This tests feature extraction from a remote dataset"""
 	assert ExtractedFeature.query.count() == 2
 
 	extractor_names = [ee.extractor_name for ee in ExtractedFeature.query.all()]
-	assert ['BrightnessExtractor', 'VibranceExtractor'] == extractor_names
+	assert 'BrightnessExtractor' in extractor_names
+	assert 'VibranceExtractor' in extractor_names
 
 	ef_b = ExtractedFeature.query.filter_by(extractor_name='BrightnessExtractor').one()
 	assert ef_b.extractor_version is not None
@@ -97,13 +132,11 @@ def test_extracted_features(add_task, extract_features):
 	assert ef_b.extracted_events.count() == Stimulus.query.count()
 
 	# And that a sensical value was extracted
-	assert float(ef_b.extracted_events.first().value) < 1
+	assert session.query(func.max(PredictorEvent.onset)).join(
+		Predictor).filter_by(ef_id=ef_b.id).one()[0] == 25.0
 
 	# Test that Predictors were created from EF
 	pred = Predictor.query.filter_by(ef_id=ef_b.id).one()
-	assert pred.predictor_events.first().onset == 1.0
-
-	# Test that Predictors have description and name propgated down
 	assert pred.name == "BrightnessExtractor.Brightness"
 
 	# Test that a Predictor was not made for vibrance (hidden)
