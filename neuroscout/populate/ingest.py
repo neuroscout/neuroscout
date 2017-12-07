@@ -1,11 +1,8 @@
 """ Dataset ingestion
 Tools to populate database from BIDS datasets
 """
-from flask import current_app
-from os.path import dirname, realpath, join, basename, splitext
-from os import makedirs
+from os.path import realpath, join
 import json
-from pathlib import Path
 import magic
 
 import pandas as pd
@@ -16,77 +13,12 @@ from datalad import api as dl
 from datalad.auto import AutomagicIO
 
 import db_utils
-from .utils import hash_file, remote_resource_exists, format_preproc
+from .utils import remote_resource_exists, format_preproc, hash_file
 from models import (Dataset, Task, Run, Predictor, PredictorEvent, PredictorRun,
                     Stimulus, RunStimulus, GroupPredictor, GroupPredictorValue)
 
-import populate
+# TODO: How to selectively disbale some stimuli (e.g. german ones)
 
-from pliers.updater import check_updates
-
-def ingest_from_json(db_session, config_file, install_path='/file-data',
-                     automagic=False, update=False):
-    dataset_config = json.load(open(config_file, 'r'))
-    config_path = dirname(realpath(config_file))
-
-    if update is True:
-        ft_path = current_app.config['FEATURE_TRACKING_DIR']
-        makedirs(ft_path, exist_ok=True)
-        updated_graphs = {}
-
-    """ Loop over each dataset in config file """
-    dataset_ids = []
-    for dataset_name, items in dataset_config.items():
-        dataset_address = items.get('dataset_address')
-        preproc_address = items.get('preproc_address')
-        local_path = items.get('path')
-        if not (local_path or dataset_address):
-            raise Exception("Must provide path or remote address to dataset.")
-
-        # If dataset is remote link, set install path
-        if local_path is None:
-            new_path = str((Path(install_path) / dataset_name).absolute())
-        else:
-            new_path = local_path
-
-        for task_name, options in items['tasks'].items():
-            # Add each task to database
-            filters = options.get('filters', {})
-            dp = options.get('dataset_parameters', {})
-
-            dataset_id = add_task(db_session, task_name,
-                                  dataset_name=dataset_name,
-                                  local_path=local_path,
-                                  dataset_address=dataset_address,
-                                  automagic=automagic,
-                                  verbose=True, install_path=new_path,
-                                  preproc_address=preproc_address,
-            					  **dict(filters.items() | dp.items()))
-            dataset_ids.append(dataset_id)
-
-            # Extract features if pliers graphs are provided
-            ep = options.get('extract_parameters',{})
-
-            if 'features' in options:
-                for graph_spec in options['features']:
-                    graph = join(config_path, graph_spec)
-                    graph_name = splitext(graph_spec)[0]
-
-                    if update is True:
-                        if graph_name in updated_graphs:
-                            graph = updated_graphs[graph_name]
-                        else:
-                            graph = check_updates(
-                                graph,
-                                join(ft_path, graph_name + ".csv"))['difference_graph']
-                            updated_graphs[graph_name] = graph
-
-                    if graph:
-                        populate.extract_features(db_session, dataset_name, task_name,
-                            graph, automagic=local_path is None or automagic,
-                            **dict(filters.items() | ep.items()))
-
-    return dataset_ids
 
 def add_predictor(db_session, predictor_name, dataset_id, run_id,
                   onsets, durations, values, **kwargs):
@@ -172,14 +104,34 @@ def add_group_predictors(db_session, dataset_id, participants):
 
     return gp_ids
 
-def add_task(db_session, task_name, dataset_name=None, local_path=None, dataset_address=None,
-             preproc_address=None, install_path='.', automagic=False,
-             verbose=True, skip_predictors=False, **kwargs):
+def add_stimulus(db_session, path, stim_hash, dataset_id, parent_id=None,
+                    converter_name=None, converter_params=None):
+    """ Creare stimulus model """
+    mimetype = magic.from_file(path, mime=True)
+
+    model, new = db_utils.get_or_create(
+        db_session, Stimulus, commit=False,
+        sha1_hash=stim_hash, dataset_id=dataset_id,
+        converter_name=converter_name)
+
+    if new:
+        model.path=realpath(path)
+        model.mimetype=mimetype
+        model.parent_id=parent_id
+        model.converter_params=converter_params
+
+    db_session.commit()
+
+    return model, new
+
+def add_task(db_session, task_name, dataset_name=None, local_path=None,
+             dataset_address=None, preproc_address=None, install_path='.',
+             automagic=False, verbose=True, skip_predictors=False, **kwargs):
     """ Adds a BIDS dataset task to the database.
         Args:
             db_session - sqlalchemy db db_session
             task_name - task to add
-            dataset_namename - overide dataset name
+            dataset_name - overide dataset name
             local_path - path to local bids dataset.
             dataset_address - remote address of BIDS dataset.
             preproc_address - remote address of preprocessed files.
@@ -208,7 +160,8 @@ def add_task(db_session, task_name, dataset_name=None, local_path=None, dataset_
 
     dataset_description = json.load(open(
         join(local_path, 'dataset_description.json'), 'r'))
-    dataset_name = dataset_name if dataset_name is not None else dataset_description['Name']
+    dataset_name = dataset_name if dataset_name is not None \
+                   else dataset_description['Name']
 
     # Get or create dataset model from mandatory arguments
     dataset_model, new_ds = db_utils.get_or_create(
@@ -295,44 +248,31 @@ def add_task(db_session, task_name, dataset_name=None, local_path=None, dataset_
 
         stims_processed = {}
         for i, val in stims[stims!="n/a"].items():
-            base_path = 'stimuli/{}'.format(val)
-            path = join(local_path, base_path)
-            name = basename(path)
-
-            # If stim has already been processed, skip adding it
             if val not in stims_processed:
+                path = join(local_path, 'stimuli/{}'.format(val))
+
                 try:
-                    _ = open(path)
+                    if automagic:
+                        dl.get(path)
+                        dl.unlock(path)
                     stim_hash = hash_file(path)
-                    mimetype = magic.from_file(realpath(path), mime=True)
-                except FileNotFoundError:
-                    if verbose:
-                        print('Stimulus: {} not found. Skipping.'.format(val))
+                except OSError:
+                    print('Stimulus: {} not found. Skipping.'.format(val))
                     continue
+
                 stims_processed[val] = stim_hash
             else:
                 stim_hash = stims_processed[val]
 
-            # Get or create stimulus model
-            stimulus_model, new_stim = db_utils.get_or_create(
-                db_session, Stimulus, commit=False, sha1_hash=stim_hash)
-            if new_stim:
-                stimulus_model.name=name
-                stimulus_model.path=local_path
-                stimulus_model.mimetype=mimetype
-            db_session.commit()
+            stim_model, _ = add_stimulus(db_session, path, stim_hash,
+                                            dataset_id=dataset_model.id)
 
             # Get or create Run Stimulus association
             runstim, _ = db_utils.get_or_create(db_session, RunStimulus,
-                                                commit=False,
-                                                stimulus_id=stimulus_model.id,
-                                                run_id=run_model.id)
-            runstim.onset=onsets[i]
-            runstim.duration=durations[i]
-            db_session.commit()
-
-    db_session.commit()
-
+                                                stimulus_id=stim_model.id,
+                                                run_id=run_model.id,
+                                                onset=onsets[i],
+                                                duration=durations[i])
     """ Add GroupPredictors """
     if verbose:
         print("Adding group predictors")

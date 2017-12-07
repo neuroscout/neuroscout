@@ -5,6 +5,8 @@ from core import app as _app
 from database import db as _db
 import datetime
 import sqlalchemy as sa
+import pandas as pd
+from flask import current_app
 
 """
 Session / db managment tools
@@ -81,10 +83,14 @@ import populate
 
 DATASET_PATH = os.path.join(
     os.path.dirname(os.path.realpath(__file__)), 'data/datasets/bids_test')
-JSON_PATH = os.path.join(
-    os.path.dirname(os.path.realpath(__file__)), 'data/test_dataset.json')
-PLIERS_PATH = os.path.join(
-    os.path.dirname(os.path.realpath(__file__)), 'data/test_pliers.json')
+LOCAL_JSON_PATH = os.path.join(
+    os.path.dirname(os.path.realpath(__file__)), 'data/test_local.json')
+REMOTE_JSON_PATH = os.path.join(
+    os.path.dirname(os.path.realpath(__file__)), 'data/test_remote.json')
+EXTRACTORS = [
+    ("BrightnessExtractor", {}),
+    ("VibranceExtractor", {})
+    ]
 
 @pytest.fixture(scope="function")
 def add_users(app, db, session):
@@ -121,19 +127,35 @@ def add_task(session):
 @pytest.fixture(scope="function")
 def add_task_remote(session):
     """ Add a dataset with two subjects. """
-    return populate.ingest_from_json(session, JSON_PATH,
-                                     '/tmp/datasets')[0]
+    return populate.ingest_from_json(session, REMOTE_JSON_PATH)[0]
+
+@pytest.fixture(scope="function")
+def add_local_task_json(session):
+    """ Add a dataset with two subjects. """
+    return populate.ingest_from_json(session, LOCAL_JSON_PATH)[0]
+
+@pytest.fixture(scope="function")
+def update_local_json(session, add_local_task_json):
+    """ Add a dataset with two subjects. """
+    ## Edit datastore file
+    datastore_file = current_app.config['FEATURE_DATASTORE']
+    # Change value in datastore
+    ds = pd.read_csv(datastore_file)
+    ds.iloc[-1, 1:] = 1
+    ds.to_csv(datastore_file, index=False)
+
+    ## Update
+    return populate.ingest_from_json(session, LOCAL_JSON_PATH,
+                                          update=True)[0]
 
 @pytest.fixture(scope="function")
 def extract_features(session, add_task):
     return populate.extract_features(session, 'Test Dataset', 'bidstest',
-                                     PLIERS_PATH,
-                                     run='01', subject='01')
+                                     EXTRACTORS)
 @pytest.fixture(scope="function")
 def reextract(session, extract_features):
     return populate.extract_features(session, 'Test Dataset', 'bidstest',
-                                     PLIERS_PATH,
-                                     run='01', subject='01')
+                                     EXTRACTORS)
 
 @pytest.fixture(scope="function")
 def add_analysis(session, add_users, add_task):
