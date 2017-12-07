@@ -141,7 +141,7 @@ def update_local_json(session, add_local_task_json):
     datastore_file = current_app.config['FEATURE_DATASTORE']
     # Change value in datastore
     ds = pd.read_csv(datastore_file)
-    ds.iloc[-1, 3] = 1
+    ds.iloc[-1, 1:] = 1
     ds.to_csv(datastore_file, index=False)
 
     ## Update

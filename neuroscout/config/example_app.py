@@ -30,7 +30,6 @@ class Config(object):
     dir_path = dirname(dirname(realpath(__file__)))
     FEATURE_SCHEMA = join(dir_path, 'config/feature_schema.json')
 
-    FEATURE_DATASTORE = 'path.csv'
     STIMULUS_DIR = 'path'
 
 class DevelopmentConfig(Config):
@@ -39,16 +38,17 @@ class DevelopmentConfig(Config):
     PROPAGATE_EXCEPTIONS = True
     MIGRATIONS_DIR = '/migrations/migrations'
     DATASET_DIR = '/file-data'
+    FEATURE_DATASTORE = '/file-data/feature-tracking.csv'
 
 class TestingConfig(Config):
     TESTING = True
     dir_path = dirname(dirname(realpath(__file__)))
     FEATURE_SCHEMA = join(dir_path, 'tests/data/test_feature_schema.json')
-    DATASET_DIR = '/tmp/file-data'
-    FEATURE_DATASTORE = '/tmp/datastore.csv'
-    STIMULUS_DIR = '/tmp/stims'
+    FEATURE_DATASTORE = '/tmp/file-data/feature-tracking.csv'
+
 class DockerTestConfig(TestingConfig):
     SQLALCHEMY_DATABASE_URI = 'postgres://postgres@postgres:5432/scout_test'
+    DATASET_DIR = '/tmp/file-data'
 
 class HomeTestingConfig(TestingConfig):
     SQLALCHEMY_DATABASE_URI = 'postgresql://zorro:dbpass@localhost:5432/scout_test'
