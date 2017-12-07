@@ -8,8 +8,7 @@ script:
   - python -m pytest tests/ --cov=./
   - cd frontend && npm test
 env:
-- APP_SETTINGS=config.app.TravisConfig
-- PYTHONHASHSEED=0
+- APP_SETTINGS=config.app.TravisConfig PYTHONHASHSEED=0
 addons:
   postgresql: "9.4"
 cache: yarn
