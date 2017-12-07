@@ -9,6 +9,7 @@ script:
   - cd frontend && npm test
 env:
 - APP_SETTINGS=config.app.TravisConfig
+- PYTHONHASHSEED=0
 addons:
   postgresql: "9.4"
 cache: yarn
