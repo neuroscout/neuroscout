@@ -139,9 +139,17 @@ def test_extracted_features(session, add_task, extract_features):
 	assert pred.name == "BrightnessExtractor.Brightness"
 
 	# Test that a Predictor was not made for vibrance (hidden)
-	ef_v = ExtractedFeature.query.filter_by(extractor_name='VibranceExtractor').one()
+	ef_v = ExtractedFeature.query.filter_by(
+		extractor_name='VibranceExtractor').one()
 	assert Predictor.query.filter_by(ef_id=ef_v.id).count() == 0
 
+	# Test that vibrance's name was changed using regex
+	assert ef_v.feature_name == "vib"
+	assert ef_v.description == "vib of an image."
+
+	# Test that sharpness was annotated regardless (even without entry)
+	ef_v = ExtractedFeature.query.filter_by(
+		extractor_name='SharpnessExtractor').count() == 1
 def test_analysis(session, add_analysis, add_predictor):
 	# Number of entries
 	assert Analysis.query.count() == 1

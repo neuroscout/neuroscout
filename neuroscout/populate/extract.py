@@ -18,16 +18,26 @@ from models import (Dataset, Task,
 from .utils import hash_file, hash_data
 
 class FeatureSerializer(object):
-    """ Serialized Pliers results from a schema containing additional
-        meta-data """
     def __init__(self, schema=None, add_all=True):
+        """ Serialize and annotate Pliers results using a schema.
+        Args:
+            schema - json schema file
+            add_all - serialize features that are not in the schema
+        """
         if schema is None:
             schema = current_app.config['FEATURE_SCHEMA']
         self.schema = json.load(open(schema, 'r'))
         self.add_all=True
 
-    @staticmethod
     def _annotate_feature(pattern, schema, feat, ext_hash, features):
+        """ Annotate a single pliers extracted result
+        Args:
+            pattern - regex pattern to match feature name
+            schema - sub-schema that matches feature name
+            feat - feature name from pliers
+            ext_hash - hash of the extractor
+            features - list of all features
+        """
         features.remove(feat)
         name = re.sub(pattern, schema['replace'], feat) \
             if 'replace' in schema else feat
@@ -46,9 +56,9 @@ class FeatureSerializer(object):
 
     def load(self, res):
         """" Load and annotate features in an extractor result object.
-
-        Output is split into uniquely identifying attributes, and additional
-        attributes.
+        Args:
+            res - Pliers ExtractorResult object
+        Returns a dictionary of annotated features
         """
         features = res.features.copy()
         ext_hash = res.extractor.__hash__()

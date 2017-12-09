@@ -6,14 +6,10 @@
     }
   },
   "VibranceExtractor": {
-    "vibrance$" : {
-      "active" : "false",
-      "description": "Vibrance of an image."
-    }
-  },
-  "SharpnessExtractor": {
-    "sharpness$" : {
-      "description": "Brightness of an image."
+    "(vib)rance$" : {
+      "active": "false",
+      "replace": "\\1",
+      "description": "\\1 of an image."
     }
   }
 }
