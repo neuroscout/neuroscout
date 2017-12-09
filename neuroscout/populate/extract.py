@@ -4,6 +4,7 @@ the associated predictors
 """
 from flask import current_app
 import json
+import re
 import pandas as pd
 import numpy as np
 
@@ -19,38 +20,64 @@ from .utils import hash_file, hash_data
 class FeatureSerializer(object):
     """ Serialized Pliers results from a schema containing additional
         meta-data """
-    def __init__(self, schema=None):
+    def __init__(self, schema=None, add_all=True):
         if schema is None:
             schema = current_app.config['FEATURE_SCHEMA']
         self.schema = json.load(open(schema, 'r'))
+        self.add_all=True
 
-    def load(self, ext_res):
-        """" Load a single pliers feature result to dictionaries.
+    @staticmethod
+    def _annotate_feature(pattern, schema, feat, ext_hash, features):
+        features.remove(feat)
+        name = re.sub(pattern, schema['replace'], feat) \
+            if 'replace' in schema else feat
+        description = re.sub(pattern, schema['description'], feat) \
+            if 'description' in schema else None
+
+        # Look up feature in schema, set to None if not found
+        properties = {
+            'feature_name': name,
+            'sha1_hash': hash_data(str(ext_hash) + name),
+            'description': description,
+            'active': schema.get('active', True)
+            }
+
+        return properties
+
+    def load(self, res):
+        """" Load and annotate features in an extractor result object.
 
         Output is split into uniquely identifying attributes, and additional
         attributes.
         """
-        results = []
-        extractor_name = ext_res.extractor.name
-        for feature_name in ext_res.features:
-            # Look up feature in schema, set to None if not found
-            feature_schema = self.schema.get(
-                extractor_name, {}).get(feature_name, {})
+        features = res.features.copy()
+        ext_hash = res.extractor.__hash__()
 
-            properties = {}
-            properties['extractor_name'] = extractor_name
-            tr_attrs = [getattr(ext_res.extractor, a) \
-                        for a in ext_res.extractor._log_attributes]
-            properties['extractor_parameters'] = str(dict(
-                zip(ext_res.extractor._log_attributes, tr_attrs)))
-            properties['feature_name'] = feature_schema.get(
-                'rename', feature_name)
-            properties['extractor_version'] = ext_res.extractor.VERSION
-            properties['description'] = feature_schema.get('description')
-            properties['active'] = feature_schema.get('active', True)
-            results.append(properties)
+        annotated = []
+        # Add all features in schema, popping features that match
+        for pattern, schema in self.schema.get(res.extractor.name, {}).items():
+            matching = filter(re.compile(pattern).match, features)
+            annotated += [self._annotate_feature(
+                pattern, schema, feat, ext_hash, features) for feat in matching]
 
-        return results
+        # Add all remaining features
+        if self.add_all is True:
+            annotated += [self._annotate_feature(
+                ".*", {}, feat, ext_hash, features) for feat in features]
+
+        # Add extractor constants
+        tr_attrs = [getattr(res.extractor, a) \
+                    for a in res.extractor._log_attributes]
+        constants = {
+            "extractor_name": res.extractor.name,
+            "extractor_parameters": str(dict(
+                zip(res.extractor._log_attributes, tr_attrs))),
+            "extractor_version": res.extractor.VERSION
+        }
+        for a in annotated:
+            a.update(constants)
+
+        return annotated
 
 def extract_features(db_session, dataset_name, task_name, extractors,
                      verbose=True, automagic=False):
@@ -96,14 +123,11 @@ def extract_features(db_session, dataset_name, task_name, extractors,
             for i, feature in enumerate(res.features):
                 """" Add new ExtractedFeature """
                 # Hash extractor name + feature name
-                ef_hash = hash_data(
-                    str(res.extractor.__hash__()) + res.features[i])
-
+                ef_hash = serialized[i]['sha1_hash']
                 # If we haven't already added this feature
                 if ef_hash not in extracted_features:
                     # Create/get feature
-                    ef_model = ExtractedFeature(sha1_hash=ef_hash,
-                                                **serialized[i])
+                    ef_model = ExtractedFeature(**serialized[i])
                     db_session.add(ef_model)
                     db_session.commit()
                     extracted_features[ef_hash] = ef_model

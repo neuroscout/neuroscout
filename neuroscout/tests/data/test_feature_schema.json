@@ -1,18 +1,18 @@
 {
   "BrightnessExtractor" : {
-    "brightness" : {
-      "rename": "Brightness",
+    "brightness$" : {
+      "replace": "Brightness",
       "description": "Brightness of an image."
     }
   },
   "VibranceExtractor": {
-    "vibrance" : {
+    "vibrance$" : {
       "active" : "false",
       "description": "Vibrance of an image."
     }
   },
   "SharpnessExtractor": {
-    "sharpness" : {
+    "sharpness$" : {
       "description": "Brightness of an image."
     }
   }

@@ -1,7 +1,7 @@
 {
   "BrightnessExtractor" : {
     "brightness" : {
-      "rename": "brightness",
+      "replace": "(\\1 brightness",
       "description": "Brightness of an image."
     }
   },
