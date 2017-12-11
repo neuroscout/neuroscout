@@ -10,6 +10,17 @@
           "description": "Brightness of an image."
         }
       }
+    },
+    {
+      "attributes": {
+        "VERSION": "10.0"
+      },
+      "features": {
+        "brightness$" : {
+          "replace": "Brightness",
+          "description": "This should not match."
+        }
+      }
     }
   ],
   "VibranceExtractor": [
