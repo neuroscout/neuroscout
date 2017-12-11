@@ -29,7 +29,7 @@ class FeatureSerializer(object):
         self.schema = json.load(open(schema, 'r'))
         self.add_all=True
 
-    def _annotate_feature(pattern, schema, feat, ext_hash, features):
+    def _annotate_feature(self, pattern, schema, feat, ext_hash, features):
         """ Annotate a single pliers extracted result
         Args:
             pattern - regex pattern to match feature name
