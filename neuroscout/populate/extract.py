@@ -63,9 +63,19 @@ class FeatureSerializer(object):
         features = res.features.copy()
         ext_hash = res.extractor.__hash__()
 
+        # Find matching extractor schema + attribute combination
+        # Entries with no attributes will match any
+        ext_schema = {}
+        for candidate in self.schema.get(res.extractor.name, {}):
+            for name, value in candidate.get("attributes", {}).items():
+                if getattr(res.extractor, name) != value:
+                    break
+            else:
+                ext_schema = candidate
+
         annotated = []
         # Add all features in schema, popping features that match
-        for pattern, schema in self.schema.get(res.extractor.name, {}).items():
+        for pattern, schema in ext_schema['features'].items():
             matching = filter(re.compile(pattern).match, features)
             annotated += [self._annotate_feature(
                 pattern, schema, feat, ext_hash, features) for feat in matching]
