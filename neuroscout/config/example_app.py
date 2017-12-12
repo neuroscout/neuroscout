@@ -29,6 +29,7 @@ class Config(object):
 
     dir_path = dirname(dirname(realpath(__file__)))
     FEATURE_SCHEMA = join(dir_path, 'config/feature_schema.json')
+    ALL_TRANSFORMERS = join(dir_path, 'config/transformers.json')
 
     STIMULUS_DIR = 'path'
 

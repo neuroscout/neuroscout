@@ -46,6 +46,8 @@ def get_delta_config(db_session, config_dict):
     return filt_config
 
 def ingest_from_json(db_session, config_file, automagic=False, update=False):
+    all_transformers = json.load(
+        open(current_app.config['ALL_TRANSFORMERS'], 'r'))
     dataset_config = json.load(open(config_file, 'r'))
     updated_config = get_delta_config(db_session, dataset_config)
     if update:
@@ -87,13 +89,20 @@ def ingest_from_json(db_session, config_file, automagic=False, update=False):
             dataset_name = Dataset.query.filter_by(id=dataset_id).one().name
 
             """ Convert stimuli """
-            converters = params.get('converters', {})
+            converters = params.get('converters', None)
+
+            if converters is None:
+                converters = all_transformers['converters']
             if converters:
                 convert_stimuli(db_session, dataset_name, task_name,
                                          converters, automagic=automagic)
 
             """ Extract features from applicable stimuli """
-            extractors = params.get('extractors', {})
+            extractors = params.get('extractors', None)
+
+            if extractors is None:
+                extractors = all_transformers['extractors']
+
             if extractors:
                 extract_features(db_session, dataset_name, task_name,
                                           extractors, automagic=automagic,

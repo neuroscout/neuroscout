@@ -1,0 +1,29 @@
+{
+  "converters": [
+    ["TesseractConverter", {}],
+    ["FrameSamplingFilter", { "every": 200 }],
+    ["VideoToAudioConverter", {}]
+  ],
+  "extractors": [
+    ["FarnebackOpticalFlowExtractor", {}],
+    ["BrightnessExtractor", {}],
+    ["VibranceExtractor", {}],
+    ["SharpnessExtractor", {}],
+    ["SaliencyExtractor", {}],
+    ["GoogleVisionAPIFaceExtractor", {}],
+    ["GoogleVisionAPILabelExtractor", {}],
+    ["GoogleVisionAPIPropertyExtractor", {}],
+    ["GoogleVisionAPISafeSearchExtractor", {}],
+    ["ClarifaiAPIExtractor", { "model": "general-v1.3" }],
+    ["ClarifaiAPIExtractor", { "model": "nsfw-v1.0" }],
+    ["IndicoAPIImageExtractor", { "models": [
+      "fer", "content_filtering", "image_recognition"] }],
+    ["STFTAudioExtractor", {}],
+    ["IndicoAPITextExtractor", { "models": [
+      "sentiment", "sentiment_hq", "text_tags", "personality", "persona", "emotion"] }],
+    ["MeanAmplitudeExtractor", {}],
+    ["SpectralCentroidExtractor", {}],
+    ["VADERSentimentExtractor", {}],
+    ["RMSEExtractor", {}]
+  ]
+}

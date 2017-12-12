@@ -2,7 +2,7 @@
   "BrightnessExtractor": [
     {
       "features": {
-        "brightness$" : {
+        "brightness$": {
           "description": "Brightness of an image."
         }
       }
@@ -11,7 +11,7 @@
   "VibranceExtractor": [
     {
       "features": {
-        "vibrance$" : {
+        "vibrance$": {
           "description": "Brightness of an image."
         }
       }
@@ -20,7 +20,7 @@
   "SharpnessExtractor": [
     {
       "features": {
-        "shaprness$" : {
+        "shaprness$": {
           "description": "Brightness of an image."
         }
       }
@@ -32,15 +32,15 @@
         "max_saliency$" : {
           "description": "Maximum salience in image."
         },
-        "max_y$" : {
+        "max_y$": {
           "description": "Y coord of maximum salience.",
-          "active": false,
+          "active": false
         },
-        "max_x$" : {
+        "max_x$": {
           "description": "Y coord of maximum salience.",
-          "active": false,
+          "active": false
         },
-        "frac_high_saliency$" : {
+        "frac_high_saliency$": {
           "description": "?"
         }
       }
@@ -50,7 +50,7 @@
     {
       "attributes": { "model": "general-v1.3" },
       "features": {
-        "(.*)" : {
+        "(.*)": {
           "description": "General model label class: (\\1)"
         }
       }
@@ -60,7 +60,7 @@
     {
       "attributes": { "model": "nsfw-v1.0" },
       "features": {
-        "nsfw$" : {
+        "nsfw$": {
           "description": "Probability of nudity"
         }
       }
@@ -69,13 +69,13 @@
   "IndicoAPIImageExtractor": [
     {
       "features": {
-        "fer_(.*)$" : {
+        "fer_(.*)$": {
           "description": "Probability of emotion \\1 in face"
         },
-        "content_filtering$" : {
+        "content_filtering$": {
           "description": "Determines whether or not an image contains mature content"
         },
-        "image_recognition_(.*)$" : {
+        "image_recognition_(.*)$": {
           "description": "Image recognition label: \\1"
         }
       }
@@ -84,31 +84,31 @@
   "IndicoAPITextExtractor": [
     {
       "features": {
-        "sentiment$" : {
+        "sentiment$": {
           "description": "Sentiment (valence)"
         },
-        "sentiment_hq$" : {
+        "sentiment_hq$": {
           "description": "Sentiment (valence)"
         },
-        "text_tags_(.*)$" : {
+        "text_tags_(.*)$": {
           "description": "Text topic: \\1"
         },
-        "personality_(.*)$" : {
+        "personality_(.*)$": {
           "description": "Probability of speakers personality trait: //1"
         },
-        "persona_(.*)$" : {
+        "persona_(.*)$": {
           "description": "Probability of Myers-Briggs persona: //1"
         },
-        "emotion_(.*)$" : {
+        "emotion_(.*)$": {
           "description": "Emotion of speaker: //1"
-        },
+        }
       }
     }
   ],
   "STFTAudioExtractor": [
     {
       "features": {
-        "(.*)" : {
+        "(.*)": {
           "description": "Audio power at frequency band //1 Hz."
         }
       }
@@ -117,7 +117,7 @@
   "MeanAmplitudeExtractor": [
     {
       "features": {
-        "mean_amplitude" : {
+        "mean_amplitude": {
           "description": "Mean audio amplitude during speech."
         }
       }
@@ -126,7 +126,7 @@
   "SpectralCentroidExtractor": [
     {
       "features": {
-        "spectral_centroid" : {
+        "spectral_centroid": {
           "description": "Spectral centroids from audio."
         }
       }
@@ -135,7 +135,7 @@
   "RMSEExtractor": [
     {
       "features": {
-        "rmse" : {
+        "rmse": {
           "description": "Root mean square (RMS) energy from audio."
         }
       }
@@ -144,55 +144,55 @@
   "GoogleVisionAPIFaceExtractor": [
     {
       "features": {
-        "face([0-9]*)_boundingPoly_vertex([0-9])_([xy])" : {
+        "face([0-9]*)_boundingPoly_vertex([0-9])_([xy])": {
           "description": "Bounding polygon around face. \\3 coordinate for vertex \\2",
           "active": false
         },
-        "face([0-9]*)_fdboundingPoly_vertex([0-9])_([xy])" : {
+        "face([0-9]*)_fdboundingPoly_vertex([0-9])_([xy])": {
           "description": "Tight bounding polygon around face. \\3 coordinate for vertex \\2",
           "active": false
         },
-        "face([0-9]*)_landmark_([A-Z])_[xyz]" : {
+        "face([0-9]*)_landmark_([A-Z])_[xyz]": {
           "description": "\\3 coordinate for \\2"
         },
-        "face([0-9]*)_rollAngle" : {
+        "face([0-9]*)_rollAngle": {
           "description": "Clockwise/anti-clockwise rotation of the face relative to the image vertical about the axis perpendicular to the face"
         },
-        "face([0-9]*)_panAngle" : {
+        "face([0-9]*)_panAngle": {
           "description": "Yaw angle, which indicates the leftward/rightward angle that the face is pointing relative to the vertical plane perpendicular to the image",
           "active": false
         },
-        "face([0-9]*)_tiltAngle" : {
+        "face([0-9]*)_tiltAngle": {
           "description": "Pitch angle, which indicates the upwards/downwards angle that the face is pointing relative to the image's horizontal plane",
           "active": false
         },
-        "face([0-9]*)_detectionConfidence" : {
+        "face([0-9]*)_detectionConfidence": {
           "description": "Face detection confidence"
         },
-        "face([0-9]*)_landmarkingConfidence" : {
+        "face([0-9]*)_landmarkingConfidence": {
           "description": "Face landmarking confidence"
         },
-        "face([0-9]*)_joyLikelihood" : {
+        "face([0-9]*)_joyLikelihood": {
           "description": "Joy likelihood.",
           "active": false
         },
-        "face([0-9]*)_sorrowLikelihood" : {
+        "face([0-9]*)_sorrowLikelihood": {
           "description": "Sorrow likelihood.",
           "active": false
         },
-        "face([0-9]*)_angerLikelihood" : {
+        "face([0-9]*)_angerLikelihood": {
           "description": "Anger likelihood"
         },
-        "face([0-9]*)_surpriseLikelihood" : {
+        "face([0-9]*)_surpriseLikelihood": {
           "description": "Surprise likelihood"
         },
-        "face([0-9]*)_underExposedLikelihood" : {
+        "face([0-9]*)_underExposedLikelihood": {
           "description": "Under-exposed likelihood."
         },
-        "face([0-9]*)_blurredLikelihood" : {
+        "face([0-9]*)_blurredLikelihood": {
           "description": "Blurred likelihood"
         },
-        "face([0-9]*)_headwearLikelihood" : {
+        "face([0-9]*)_headwearLikelihood": {
           "description": "Headwear likelihood"
         }
       }
@@ -201,7 +201,7 @@
   "GoogleVisionAPILabelExtractor": [
     {
       "(.*)": {
-        "name" : {
+        "name": {
           "description": "Confidence of image class \\1"
         }
       }
@@ -210,7 +210,7 @@
   "GoogleVisionAPIPropertyExtractor": [
     {
       ".*": {
-        "name" : {
+        "name": {
           "description": "RGB Channel."
         }
       }
@@ -219,22 +219,22 @@
   "GoogleVisionAPISafeSearchExtractor": [
     {
       "adult": {
-        "name" : {
+        "name": {
           "description": "Likelihood of nudity, pornographic images or cartoons, or sexual activities."
-        },
+        }
       },
       "spoof": {
-        "name" : {
+        "name": {
           "description": "Likelihood that an modification was made to the image's canonical version to make it appear funny or offensive"
-        },
+        }
       },
       "medical": {
-        "name" : {
+        "name": {
           "description": "Likelihood that this is a medical image."
-        },
+        }
       },
       "violence": {
-        "name" : {
+        "name": {
           "description": "Likelihood that this image contains violent content."
         }
       }
@@ -243,22 +243,22 @@
   "VADERSentimentExtractor": [
     {
       "sentiment_compound": {
-        "name" : {
+        "name": {
           "description": "Overall valence."
         }
       },
       "sentiment_neu": {
-        "name" : {
+        "name": {
           "description": "Neutral sentiment."
         }
       },
       "sentiment_pos": {
-        "name" : {
+        "name": {
           "description": "Positive sentiment."
         }
       },
       "sentiment_neg": {
-        "name" : {
+        "name": {
           "description": "Negative sentiment."
         }
       }
@@ -267,10 +267,10 @@
   "FarnebackOpticalFlowExtractor": [
     {
       "FarnebackOpticalFlowExtractor": {
-        "name" : {
+        "name": {
           "description": "Total amount of dense optical flow between every pair of video frames"
         }
       }
     }
-  ],
+  ]
 }
