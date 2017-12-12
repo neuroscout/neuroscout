@@ -29,7 +29,8 @@ class FeatureSerializer(object):
         self.schema = json.load(open(schema, 'r'))
         self.add_all=True
 
-    def _annotate_feature(self, pattern, schema, feat, ext_hash, features):
+    def _annotate_feature(self, pattern, schema, feat, ext_hash, features,
+                          default_active=True):
         """ Annotate a single pliers extracted result
         Args:
             pattern - regex pattern to match feature name
@@ -49,7 +50,7 @@ class FeatureSerializer(object):
             'feature_name': name,
             'sha1_hash': hash_data(str(ext_hash) + name),
             'description': description,
-            'active': schema.get('active', True)
+            'active': schema.get('active', default_active)
             }
 
         return properties
@@ -83,7 +84,8 @@ class FeatureSerializer(object):
         # Add all remaining features
         if self.add_all is True:
             annotated += [self._annotate_feature(
-                ".*", {}, feat, ext_hash, features) for feat in features]
+                ".*", {}, feat, ext_hash, features,
+                default_active=False) for feat in features]
 
         # Add extractor constants
         tr_attrs = [getattr(res.extractor, a) \
