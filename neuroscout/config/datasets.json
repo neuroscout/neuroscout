@@ -1,29 +1,18 @@
 {
   "studyforrest_phase2": {
-    "dataset_address": "https://github.com/adelavega/studyforrest-data-phase2.git",
+    "dataset_address": "///openfmri/ds000009",
     "path": "/datasets/studyforrest-data-phase2/",
     "tasks": {
       "movie": {
-        "features": [
-          "movie.json"
+        "extractors": [
+          ["BrightnessExtractor", {}],
+          ["VibranceExtractor", {}]
         ],
         "filters": {
           "run": 1,
-          "session": "movie",
-          "subject": "01"
+          "subject": "01",
+          "session": "movie"
         },
-        "parameters": {
-          "skip_predictors": true
-        }
-      },
-      "objectcategories": {
-        "features": [
-          "default.json"
-        ],
-        "filters": {
-          "run": 1,
-          "subject": "0[1-2]"
-        }
       }
     }
   }
