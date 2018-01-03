@@ -200,75 +200,53 @@
   "GoogleVisionAPILabelExtractor": [
     {
       "(.*)": {
-        "name": {
-          "description": "Confidence of image class \\1"
-        }
+        "description": "Confidence of image class \\1"
       }
     }
   ],
   "GoogleVisionAPIPropertyExtractor": [
     {
       ".*": {
-        "name": {
-          "description": "RGB Channel."
-        }
+        "description": "RGB Channel."
       }
     }
   ],
   "GoogleVisionAPISafeSearchExtractor": [
     {
       "adult": {
-        "name": {
-          "description": "Likelihood of nudity, pornographic images or cartoons, or sexual activities."
-        }
+        "description": "Likelihood of nudity, pornographic images or cartoons, or sexual activities."
       },
       "spoof": {
-        "name": {
-          "description": "Likelihood that an modification was made to the image's canonical version to make it appear funny or offensive"
-        }
+        "description": "Likelihood that an modification was made to the image's canonical version to make it appear funny or offensive"
       },
       "medical": {
-        "name": {
-          "description": "Likelihood that this is a medical image."
-        }
+        "description": "Likelihood that this is a medical image."
       },
       "violence": {
-        "name": {
-          "description": "Likelihood that this image contains violent content."
+        "description": "Likelihood that this image contains violent content."
         }
-      }
     }
   ],
   "VADERSentimentExtractor": [
     {
       "sentiment_compound": {
-        "name": {
-          "description": "Overall valence."
-        }
+        "description": "Overall valence."
       },
       "sentiment_neu": {
-        "name": {
-          "description": "Neutral sentiment."
-        }
+        "description": "Neutral sentiment."
       },
       "sentiment_pos": {
-        "name": {
-          "description": "Positive sentiment."
-        }
+        "description": "Positive sentiment."
       },
       "sentiment_neg": {
-        "name": {
-          "description": "Negative sentiment."
-        }
+        "description": "Negative sentiment."
       }
     }
   ],
   "FarnebackOpticalFlowExtractor": [
     {
       "FarnebackOpticalFlowExtractor": {
-        "name": {
-          "description": "Total amount of dense optical flow between every pair of video frames"
-        }
+        "description": "Total amount of dense optical flow between every pair of video frames"
       }
     }
   ]

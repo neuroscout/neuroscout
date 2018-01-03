@@ -38,6 +38,7 @@ class FeatureSerializer(object):
             feat - feature name from pliers
             ext_hash - hash of the extractor
             features - list of all features
+            default_active - set to active by default?
         """
         features.remove(feat)
         name = re.sub(pattern, schema['replace'], feat) \
@@ -45,7 +46,6 @@ class FeatureSerializer(object):
         description = re.sub(pattern, schema['description'], feat) \
             if 'description' in schema else None
 
-        # Look up feature in schema, set to None if not found
         properties = {
             'feature_name': name,
             'sha1_hash': hash_data(str(ext_hash) + name),

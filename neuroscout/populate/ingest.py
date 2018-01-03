@@ -17,8 +17,6 @@ from .utils import remote_resource_exists, format_preproc, hash_file
 from models import (Dataset, Task, Run, Predictor, PredictorEvent, PredictorRun,
                     Stimulus, RunStimulus, GroupPredictor, GroupPredictorValue)
 
-# TODO: How to selectively disbale some stimuli (e.g. german ones)
-
 
 def add_predictor(db_session, predictor_name, dataset_id, run_id,
                   onsets, durations, values, **kwargs):
