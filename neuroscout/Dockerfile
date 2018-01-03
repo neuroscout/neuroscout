@@ -10,6 +10,7 @@ RUN add-apt-repository ppa:joyard-nicolas/ffmpeg -y
 RUN apt-get -qq update
 RUN apt-get install -yq ffmpeg tesseract-ocr
 RUN apt-get install -y graphviz libgraphviz-dev pkg-config
+RUN apt-get install -yq libav-tools
 
 ENV FSLDIR="/usr/share/fsl/5.0"
 ENV PATH="${FSLDIR}/bin:${PATH}"
