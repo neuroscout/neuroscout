@@ -42,7 +42,7 @@ patsy
 passlib==1.7.1
 pytesseract
 Pillow==4.1.1
-pliers
+-e git+https://github.com/tyarkoni/pliers.git#egg=pybids
 psycopg2==2.7.1
 py==1.4.33
 -e git+https://github.com/adelavega/pybids.git@transformer#egg=pybids
