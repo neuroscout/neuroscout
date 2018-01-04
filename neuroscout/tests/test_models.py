@@ -130,7 +130,11 @@ def test_extracted_features(session, add_task, extract_features):
 	# Check that the number of features extracted is the same as Stimuli
 	assert ef_b.extracted_events.count() == Stimulus.query.count()
 
-	# And that a sensical value was extracted
+	# Check for sensical value
+	assert session.query(func.max(PredictorEvent.value)).join(
+		Predictor).filter_by(ef_id=ef_b.id).one()[0] == '1.7756858854652973'
+
+	# And that a sensical onset was extracted
 	assert session.query(func.max(PredictorEvent.onset)).join(
 		Predictor).filter_by(ef_id=ef_b.id).one()[0] == 25.0
 

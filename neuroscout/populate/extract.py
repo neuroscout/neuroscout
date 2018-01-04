@@ -16,6 +16,7 @@ import populate
 from models import (Dataset, Task,
     Run, Stimulus, RunStimulus, ExtractedFeature, ExtractedEvent)
 from .utils import hash_file, hash_data
+from populate.transformations import Preprocessing
 
 class FeatureSerializer(object):
     def __init__(self, schema=None, add_all=True):
@@ -29,7 +30,7 @@ class FeatureSerializer(object):
         self.schema = json.load(open(schema, 'r'))
         self.add_all=True
 
-    def _annotate_feature(self, pattern, schema, feat, ext_hash, features,
+    def _annotate_feature(self, pattern, schema, feat, ext_hash, features, val,
                           default_active=True):
         """ Annotate a single pliers extracted result
         Args:
@@ -46,11 +47,15 @@ class FeatureSerializer(object):
         description = re.sub(pattern, schema['description'], feat) \
             if 'description' in schema else None
 
+        for fn in schema.get('preprocess', []):
+            val = getattr(Preprocessing, 'double')(val)
+
         properties = {
             'feature_name': name,
             'sha1_hash': hash_data(str(ext_hash) + name),
             'description': description,
-            'active': schema.get('active', default_active)
+            'active': schema.get('active', default_active),
+            'value': val
             }
 
         return properties
@@ -62,6 +67,7 @@ class FeatureSerializer(object):
         Returns a dictionary of annotated features
         """
         features = res.features.copy()
+        all_vals = dict(zip(res.features, res.data[0].tolist()))
         ext_hash = res.extractor.__hash__()
 
         # Find matching extractor schema + attribute combination
@@ -79,7 +85,8 @@ class FeatureSerializer(object):
         for pattern, schema in ext_schema['features'].items():
             matching = filter(re.compile(pattern).match, features)
             annotated += [self._annotate_feature(
-                pattern, schema, feat, ext_hash, features) for feat in matching]
+                pattern, schema, feat, ext_hash, features, all_vals[feat])
+                          for feat in matching]
 
         # Add all remaining features
         if self.add_all is True:
@@ -146,6 +153,7 @@ def extract_features(db_session, dataset_name, task_name, extractors,
                 """" Add new ExtractedFeature """
                 # Hash extractor name + feature name
                 ef_hash = serialized[i]['sha1_hash']
+                value = serialized[i].pop('value')
                 # If we haven't already added this feature
                 if ef_hash not in extracted_features:
                     # Create/get feature
@@ -177,7 +185,7 @@ def extract_features(db_session, dataset_name, task_name, extractors,
                                           stimulus_id=stimulus.id,
                                           history=res.history.string,
                                           ef_id=ef_model.id,
-                                          value=res.data[0][i])
+                                          value=value)
                 db_session.add(ee_model)
                 db_session.commit()
 
