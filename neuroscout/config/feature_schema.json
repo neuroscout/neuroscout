@@ -159,10 +159,10 @@
           "description": "Clockwise/anti-clockwise rotation of the face relative to the image vertical about the axis perpendicular to the face"
         },
         "face([0-9]*)_panAngle": {
-          "description": "Yaw angle, which indicates the leftward/rightward angle that the face is pointing relative to the vertical plane perpendicular to the image",
+          "description": "Yaw angle, which indicates the leftward/rightward angle that the face is pointing relative to the vertical plane perpendicular to the image"
         },
         "face([0-9]*)_tiltAngle": {
-          "description": "Pitch angle, which indicates the upwards/downwards angle that the face is pointing relative to the image's horizontal plane",
+          "description": "Pitch angle, which indicates the upwards/downwards angle that the face is pointing relative to the image's horizontal plane"
         },
         "face([0-9]*)_detectionConfidence": {
           "description": "Face detection confidence"
@@ -171,10 +171,10 @@
           "description": "Face landmarking confidence"
         },
         "face([0-9]*)_joyLikelihood": {
-          "description": "Joy likelihood.",
+          "description": "Joy likelihood."
         },
         "face([0-9]*)_sorrowLikelihood": {
-          "description": "Sorrow likelihood.",
+          "description": "Sorrow likelihood."
         },
         "face([0-9]*)_angerLikelihood": {
           "description": "Anger likelihood"
