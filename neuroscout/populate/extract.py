@@ -87,7 +87,7 @@ class FeatureSerializer(object):
         for pattern, schema in ext_schema['features'].items():
             matching = filter(re.compile(pattern).match, self.features)
             annotated += [self._annotate_feature(
-                pattern, schema, feat, ext_hash, all_vals[feat])
+                pattern, schema, feat, ext_hash, all_vals[feat])    
                           for feat in matching]
 
         # Add all remaining features
