@@ -190,9 +190,6 @@
         },
         "face([0-9]*)_headwearLikelihood": {
           "description": "Headwear likelihood"
-        },
-        "^(?!tbd_)(.+)": {
-          "replace": "face1_\\1"
         }
       }
     }
