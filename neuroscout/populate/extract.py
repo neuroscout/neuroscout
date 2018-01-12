@@ -30,7 +30,11 @@ class FeatureSerializer(object):
         self.schema = json.load(open(schema, 'r'))
         self.add_all=True
 
+<<<<<<< HEAD
     def _annotate_feature(self, pattern, schema, feat, ext_hash, val,
+=======
+    def _annotate_feature(self, pattern, schema, feat, ext_hash, features, val,
+>>>>>>> master
                           default_active=True):
         """ Annotate a single pliers extracted result
         Args:
@@ -67,8 +71,13 @@ class FeatureSerializer(object):
             res - Pliers ExtractorResult object
         Returns a dictionary of annotated features
         """
+<<<<<<< HEAD
         self.features = res.features.copy()
         all_vals = dict(zip(res.features, res.data[0]))
+=======
+        features = res.features.copy()
+        all_vals = dict(zip(res.features, res.data[0].tolist()))
+>>>>>>> master
         ext_hash = res.extractor.__hash__()
 
         # Find matching extractor schema + attribute combination
@@ -87,7 +96,11 @@ class FeatureSerializer(object):
         for pattern, schema in ext_schema['features'].items():
             matching = filter(re.compile(pattern).match, self.features)
             annotated += [self._annotate_feature(
+<<<<<<< HEAD
                 pattern, schema, feat, ext_hash, all_vals[feat])    
+=======
+                pattern, schema, feat, ext_hash, features, all_vals[feat])
+>>>>>>> master
                           for feat in matching]
 
         # Add all remaining features
