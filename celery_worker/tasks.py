@@ -16,7 +16,11 @@ def writeout_events(analysis, pes, dir):
     """ Write event files from JSON """
     dir = join(dir, "func/")
     makedirs(dir, exist_ok=True)
+
+    # Load events and rename columns to human-readable
     pes = pd.DataFrame(pes)
+    predictor_names = {di["id"]: di["name"] for di in analysis['predictors']}
+    pes.predictor_id = pes.predictor_id.map(predictor_names)
     # Write out event files
 
     paths = []
@@ -30,6 +34,8 @@ def writeout_events(analysis, pes, dir):
                 ['onset', 'duration', 'predictor_id'])['value'].\
                 sum().unstack('predictor_id').reset_index()
 
+            print(run_events.columns)
+
             # Write out BIDS path
             ses = 'ses-{}_'.format(run['session']) if run.get('session') else ''
             events_fname = join(dir,
@@ -41,12 +47,10 @@ def writeout_events(analysis, pes, dir):
     return paths
 
 @celery_app.task(name='workflow.compile')
-def compile(analysis, resources, predictor_events, bids_dir):
+def compile(analysis, predictor_events, resources, bids_dir):
     files_dir = mkdtemp()
-    analysis = json.load(open('neuroscout/tmp2/analysis_2.json', 'r'))
-    resources = json.load(open('neuroscout/tmp/res.json', 'r'))
-    predictor_events = json.load(open('neuroscout/tmp2/pes.json', 'r'))
-    bids_dir = '/home/zorro/datasets/ds009'
+    model = analysis.pop('model')
+    scan_length = analysis['runs'][0]['duration'] or 1000 # Default value
 
     analysis_update = {} # New fields to return for analysis
 
@@ -54,24 +58,20 @@ def compile(analysis, resources, predictor_events, bids_dir):
     bids_layout = BIDSLayout([bids_dir, files_dir])
 
     variables = {
-        'time': load_event_variables(bids_layout, task=analysis['task_name'],
-                                          derivatives='only')
+        'time': load_event_variables(bids_layout, derivatives='only',
+                                     task=analysis['task_name'],
+                                     scan_length=scan_length)
         }
-    
-    model = analysis.pop('model')
 
-    bids_analysis = Analysis(bids_layout, model,
-                             variables=variables)
+
+    bids_analysis = Analysis(bids_layout, model, variables=variables)
     try:
         bids_analysis.setup()
     except:
-        error = 'Error applying transformations'
-    else:
-        error = None
+        raise Exception("Transformations failed.")
 
     # Write out analysis & resource JSON
-    for obj, name in [
-        (analysis, 'analysis'), (resources, 'resources'), (model, 'model')]:
+    for obj, name in [(analysis, 'analysis'), (resources, 'resources'), (model, 'model')]:
         path = join(files_dir, '{}.json'.format(name))
         json.dump(obj, open(path, 'w'))
         bundle_paths.append(path)
@@ -83,6 +83,5 @@ def compile(analysis, resources, predictor_events, bids_dir):
             tar.add(path, arcname=basename(path))
 
     analysis_update['bundle_path'] = bundle_path
-    analysis_update['error'] = error
 
     return analysis_update

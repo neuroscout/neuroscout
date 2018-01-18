@@ -158,7 +158,7 @@ def reextract(session, extract_features):
                                      EXTRACTORS)
 
 @pytest.fixture(scope="function")
-def add_analysis(session, add_users, add_task):
+def add_analysis(session, add_users, add_task, extract_features):
     dataset = Dataset.query.filter_by(id=add_task).first()
 
     analysis = Analysis(dataset_id = add_task, user_id = add_users[0][0],
@@ -172,21 +172,65 @@ def add_analysis(session, add_users, add_task):
 
     analysis.predictors = Predictor.query.filter(Predictor.id.in_(pred_id)).all()
 
-    rt_pred = Predictor.query.filter_by(name='rt').first()
-    analysis.contrasts = [
-        {
-          "contrastType": "T",
-          "name": "test",
-          "predictors": [ analysis.predictors[0].id, analysis.predictors[1].id ],
-          "weights": [1,-1]
-        }]
+    analysis.model = {
+    "name": "test_model1",
+    "description": "this is a sample",
+    "input": {
+      "task": "bidstest"
+    },
+    "blocks": [
+      {
+        "level": "run",
+        "transformations": [
+          {
+            "name": "scale",
+            "input": [
+              "BrightnessExtractor.Brightness"
+            ]
+          }
+        ],
+        "model": {
+          "HRF_variables": [
+            "BrightnessExtractor.Brightness",
+            "rt"
+          ],
+          "variables": [
+            "BrightnessExtractor.Brightness",
+            "rt"
+          ]
+        },
+        "contrasts": [
+          {
+            "name": "BvsRT",
+            "condition_list": [
+              "BrightnessExtractor.Brightness",
+              "rt"
+            ],
+            "weights": [
+              1,
+              -1
+            ],
+            "type": "T"
+          }
+        ]
+      },
+      {
+        "level": "session",
+      },
+      {
+        "level": "subject",
+        "model": {
+          "variables": [
+            "BvsRT"
+          ]
+        },
+      },
+      {
+        "level": "dataset"
+      }
+    ]
+  }
 
-    analysis.transformations = [
-        { "input": [ rt_pred.id ],
-         "name": "scale",
-         "parameters": [
-             { "kind": "boolean", "name": "demean", "value": False },
-             { "kind": "boolean", "name": "rescale", "value": True } ] } ]
 
     session.add(analysis)
     session.commit()

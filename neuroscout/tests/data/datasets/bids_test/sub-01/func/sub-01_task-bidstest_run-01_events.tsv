@@ -1,5 +1,5 @@
 onset	duration	trial_type	rt	stim_file
 1	5	rate	198	obama.jpg
-7	3	rate	220	apple.jpg
+7	3	view	220	apple.jpg
 13	5	rate	121	thai_people.jpg
-21	3	rate	130	button.jpg
+21	3	view	130	button.jpg
