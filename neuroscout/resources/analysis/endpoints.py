@@ -130,21 +130,3 @@ class AnalysisBundleResource(MethodResource):
 			msg = "Analysis bundle not available. Try compiling."
 			utils.abort(404, msg)
 		return send_file(analysis.bundle_path, as_attachment=True)
-
-class DesignEventsResource(MethodResource):
-	@marshal_with(DesignEventsSchema(many=True))
-	@doc(tags=['analysis'], summary='Get analysis events design as JSON.')
-	@utils.fetch_analysis
-	def get(self, analysis):
-		if analysis.status != "PASSED":
-			utils.abort(404, "Analysis not yet compiled")
-		return analysis.design_matrix
-
-# @doc(tags=['analysis'])
-# class DesignEventsTSVResource(MethodResource):
-# 	@doc(summary='Get complete analysis bundled as JSON.')
-# 	@utils.fetch_analysis
-# 	def get(self, analysis):
-# 		if analysis.status != "PASSED":
-# 			utils.abort(404, "Analysis not yet compiled")
-# 		return analysis
