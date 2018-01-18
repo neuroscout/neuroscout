@@ -173,63 +173,63 @@ def add_analysis(session, add_users, add_task, extract_features):
     analysis.predictors = Predictor.query.filter(Predictor.id.in_(pred_id)).all()
 
     analysis.model = {
-    "name": "test_model1",
-    "description": "this is a sample",
-    "input": {
-      "task": "bidstest"
-    },
-    "blocks": [
-      {
-        "level": "run",
-        "transformations": [
-          {
-            "name": "scale",
-            "input": [
-              "BrightnessExtractor.Brightness"
-            ]
-          }
-        ],
-        "model": {
-          "HRF_variables": [
-            "BrightnessExtractor.Brightness",
-            "rt"
-          ],
-          "variables": [
-            "BrightnessExtractor.Brightness",
-            "rt"
-          ]
+        "name": "test_model1",
+        "description": "this is a sample",
+        "input": {
+          "task": "bidstest"
         },
-        "contrasts": [
+        "blocks": [
           {
-            "name": "BvsRT",
-            "condition_list": [
-              "BrightnessExtractor.Brightness",
-              "rt"
+            "level": "run",
+            "transformations": [
+              {
+                "name": "scale",
+                "input": [
+                  "BrightnessExtractor.Brightness"
+                ]
+              }
             ],
-            "weights": [
-              1,
-              -1
-            ],
-            "type": "T"
+            "model": {
+              "HRF_variables": [
+                "BrightnessExtractor.Brightness",
+                "rt"
+              ],
+              "variables": [
+                "BrightnessExtractor.Brightness",
+                "rt"
+              ]
+            },
+            "contrasts": [
+              {
+                "name": "BvsRT",
+                "condition_list": [
+                  "BrightnessExtractor.Brightness",
+                  "rt"
+                ],
+                "weights": [
+                  1,
+                  -1
+                ],
+                "type": "T"
+              }
+            ]
+          },
+          {
+            "level": "session",
+          },
+          {
+            "level": "subject",
+            "model": {
+              "variables": [
+                "BvsRT"
+              ]
+            },
+          },
+          {
+            "level": "dataset"
           }
         ]
-      },
-      {
-        "level": "session",
-      },
-      {
-        "level": "subject",
-        "model": {
-          "variables": [
-            "BvsRT"
-          ]
-        },
-      },
-      {
-        "level": "dataset"
       }
-    ]
-  }
 
 
     session.add(analysis)
