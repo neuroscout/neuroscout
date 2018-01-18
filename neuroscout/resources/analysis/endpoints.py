@@ -1,4 +1,4 @@
-from flask import current_app, send_file
+from flask import send_file
 from flask_apispec import MethodResource, marshal_with, use_kwargs, doc
 from flask_jwt import current_identity
 from worker import celery_app
@@ -10,7 +10,7 @@ from os.path import exists
 from .. import utils
 from ..predictor import PredictorEventSchema
 from .schemas import (AnalysisSchema, AnalysisFullSchema,
-					 AnalysisResourcesSchema, DesignEventsSchema)
+					 AnalysisResourcesSchema)
 
 @doc(tags=['analysis'])
 @marshal_with(AnalysisSchema)
