@@ -1,4 +1,4 @@
-from flask import current_app, send_file
+from flask import send_file
 from flask_apispec import MethodResource, marshal_with, use_kwargs, doc
 from flask_jwt import current_identity
 from worker import celery_app
@@ -10,7 +10,7 @@ from os.path import exists
 from .. import utils
 from ..predictor import PredictorEventSchema
 from .schemas import (AnalysisSchema, AnalysisFullSchema,
-					 AnalysisResourcesSchema, DesignEventsSchema)
+					 AnalysisResourcesSchema)
 
 @doc(tags=['analysis'])
 @marshal_with(AnalysisSchema)
@@ -75,32 +75,33 @@ class CloneAnalysisResource(AnalysisBaseResource):
 		db.session.commit()
 		return cloned
 
-class CompileAnalysisResource(AnalysisBaseResource):
-	@staticmethod
-	def get_predictor_events(analysis):
-		pred_ids = [p.id for p in analysis.predictors]
-		run_ids = [r.id for r in analysis.runs]
-		return PredictorEvent.query.filter(
-		    (PredictorEvent.predictor_id.in_(pred_ids)) & \
-		    (PredictorEvent.run_id.in_(run_ids))).all()
 
+def json_analysis(analysis):
+	analysis_json = AnalysisFullSchema().dump(analysis)[0]
+
+	pred_ids = [p.id for p in analysis.predictors]
+	run_ids = [r.id for r in analysis.runs]
+	pes = PredictorEvent.query.filter(
+	    (PredictorEvent.predictor_id.in_(pred_ids)) & \
+	    (PredictorEvent.run_id.in_(run_ids))).all()
+	pes_json = PredictorEventSchema(many=True, exclude=['id']).dump(pes)[0]
+
+	resources_json = AnalysisResourcesSchema().dump(analysis)[0]
+
+	return analysis_json, pes_json, resources_json
+
+class CompileAnalysisResource(AnalysisBaseResource):
 	@doc(summary='Compile and lock analysis.')
 	@utils.owner_required
 	def post(self, analysis):
 		analysis.status = 'PENDING'
-		analysis_json = AnalysisFullSchema().dump(analysis)[0]
-		pes_json = PredictorEventSchema(many=True, exclude=['id']).dump(
-			self.get_predictor_events(analysis))[0]
-		resources_json = AnalysisResourcesSchema().dump(analysis)[0]
-
 		task = celery_app.send_task('workflow.compile',
-				args=[analysis_json, resources_json, pes_json,
+				args=[*json_analysis(analysis),
 				analysis.dataset.local_path])
 		analysis.celery_id = task.id
 
 		db.session.add(analysis)
 		db.session.commit()
-		current_app.logger
 		return analysis
 
 class AnalysisFullResource(AnalysisBaseResource):
@@ -129,21 +130,3 @@ class AnalysisBundleResource(MethodResource):
 			msg = "Analysis bundle not available. Try compiling."
 			utils.abort(404, msg)
 		return send_file(analysis.bundle_path, as_attachment=True)
-
-class DesignEventsResource(MethodResource):
-	@marshal_with(DesignEventsSchema(many=True))
-	@doc(tags=['analysis'], summary='Get analysis events design as JSON.')
-	@utils.fetch_analysis
-	def get(self, analysis):
-		if analysis.status != "PASSED":
-			utils.abort(404, "Analysis not yet compiled")
-		return analysis.design_matrix
-
-# @doc(tags=['analysis'])
-# class DesignEventsTSVResource(MethodResource):
-# 	@doc(summary='Get complete analysis bundled as JSON.')
-# 	@utils.fetch_analysis
-# 	def get(self, analysis):
-# 		if analysis.status != "PASSED":
-# 			utils.abort(404, "Analysis not yet compiled")
-# 		return analysis
