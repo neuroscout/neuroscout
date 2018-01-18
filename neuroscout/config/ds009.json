@@ -7,8 +7,7 @@
       "emotionalregulation": {
         "extractors": [
           ["BrightnessExtractor", {}],
-          ["VibranceExtractor", {}],
-          ["GoogleVisionAPIFaceExtractor", {}]
+          ["VibranceExtractor", {}]
         ],
         "filters": {
           "run": 1,
