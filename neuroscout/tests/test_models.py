@@ -37,6 +37,7 @@ def test_dataset_ingestion(session, add_task):
 
 	predictor = Predictor.query.filter_by(name='rt').first()
 	assert predictor.predictor_events.count() == 16
+	assert predictor.source == 'events'
 
 	# Test run summary statistics
 	assert len(predictor.run_statistics) == 4
@@ -141,6 +142,7 @@ def test_extracted_features(session, add_task, extract_features):
 	# Test that Predictors were created from EF
 	pred = Predictor.query.filter_by(ef_id=ef_b.id).one()
 	assert pred.name == "BrightnessExtractor.Brightness"
+	assert pred.source == "extracted"
 
 	# Test that a Predictor was not made for vibrance (hidden)
 	ef_v = ExtractedFeature.query.filter_by(

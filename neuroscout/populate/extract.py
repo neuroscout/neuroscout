@@ -87,7 +87,7 @@ class FeatureSerializer(object):
         for pattern, schema in ext_schema['features'].items():
             matching = filter(re.compile(pattern).match, self.features)
             annotated += [self._annotate_feature(
-                pattern, schema, feat, ext_hash, all_vals[feat])    
+                pattern, schema, feat, ext_hash, all_vals[feat])
                           for feat in matching]
 
         # Add all remaining features
@@ -228,6 +228,7 @@ def extract_features(db_session, dataset_name, task_name, extractors,
 
                 populate.add_predictor(db_session, predictor_name, dataset_id,
                                        rs.run_id, onsets, durations, values,
+                                       source='extracted',
                                        ef_id=ef.id)
 
     return list(extracted_features.values())

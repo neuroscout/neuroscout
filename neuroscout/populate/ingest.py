@@ -9,6 +9,7 @@ import pandas as pd
 import nibabel as nib
 
 from bids.grabbids import BIDSLayout
+from bids.analysis.variables import load_event_variables
 from datalad import api as dl
 from datalad.auto import AutomagicIO
 
@@ -19,7 +20,7 @@ from models import (Dataset, Task, Run, Predictor, PredictorEvent, PredictorRun,
 
 
 def add_predictor(db_session, predictor_name, dataset_id, run_id,
-                  onsets, durations, values, **kwargs):
+                  onsets, durations, values, source=None, **kwargs):
     """" Adds a new Predictor to a run given a set of values
     If Predictor already exist, use that one
     Args:
@@ -30,6 +31,7 @@ def add_predictor(db_session, predictor_name, dataset_id, run_id,
         onsets - list of onsets
         durations - list of durations
         values - list of values
+        source - source of event
         kwargs - additional identifiers of the Predictor
     Output:
         predictor id
@@ -38,6 +40,7 @@ def add_predictor(db_session, predictor_name, dataset_id, run_id,
     predictor, _ = db_utils.get_or_create(db_session, Predictor,
                                           name=predictor_name,
                                           dataset_id=dataset_id,
+                                          source=source,
                                           **kwargs)
 
     values = pd.Series(values, dtype='object')
@@ -124,7 +127,7 @@ def add_stimulus(db_session, path, stim_hash, dataset_id, parent_id=None,
 
 def add_task(db_session, task_name, dataset_name=None, local_path=None,
              dataset_address=None, preproc_address=None, install_path='.',
-             automagic=False, verbose=True, skip_predictors=False, **kwargs):
+             automagic=False, verbose=True, **kwargs):
     """ Adds a BIDS dataset task to the database.
         Args:
             db_session - sqlalchemy db db_session
@@ -136,7 +139,6 @@ def add_task(db_session, task_name, dataset_name=None, local_path=None,
             install_path - if remote with no local path, where to install.
             automagic - force enable DataLad automagic
             verbose - verbose output
-            skip_predictors - skip ingesting original predictors
             kwargs - arguments to filter runs by
         Output:
             dataset model id
@@ -227,18 +229,18 @@ def add_task(db_session, task_name, dataset_name=None, local_path=None,
         """ Extract Predictors"""
         if verbose:
             print("Extracting predictors")
-        # Read event file and extract information
-        tsv = pd.read_csv(open(run_events.filename, 'r'), delimiter='\t')
-        tsv = dict(tsv.iteritems())
-        onsets = tsv.pop('onset').tolist()
-        durations = tsv.pop('duration').tolist()
-        stims = tsv.pop('stim_file')
 
-        if skip_predictors is False:
-            # Parse event columns and insert as Predictors
-            for predictor in tsv.keys():
-                add_predictor(db_session, predictor, dataset_model.id, run_model.id,
-                              onsets, durations, tsv[predictor])
+        variables = load_event_variables(layout, task=task_name,
+                                          extract_recordings=True,
+                                          extract_confounds=True,
+                                          **kwargs)
+        stims = variables.columns.pop('stim_file').to_df()['amplitude']
+
+        # Parse event columns and insert as Predictors
+        for name in variables:
+            var = variables[name]
+            add_predictor(db_session, name, dataset_model.id, run_model.id,
+                          var.onset, var.duration, var.values, source='events')
 
         """ Ingest Stimuli """
         if verbose:

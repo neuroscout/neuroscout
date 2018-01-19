@@ -6,6 +6,7 @@ class Predictor(db.Model):
 		A collection of PredictorEvents. """
 	id = db.Column(db.Integer, primary_key=True)
 	name = db.Column(db.Text, nullable=False)
+	source = db.Column(db.Text) # Extracted? Physio?
 
 	dataset_id = db.Column(db.Integer, db.ForeignKey('dataset.id'), nullable=False)
 	ef_id = db.Column(db.Integer, db.ForeignKey('extracted_feature.id'))
