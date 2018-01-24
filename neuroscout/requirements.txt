@@ -5,7 +5,7 @@ click==6.7
 celery
 decorator==4.0.11
 pyld==0.7.3
--e git+https://github.com/adelavega/datalad.git#egg=datalad
+datalad
 docopt==0.6.2
 duecredit==0.6.1
 Flask==0.12.1
@@ -42,10 +42,10 @@ patsy
 passlib==1.7.1
 pytesseract
 Pillow==4.1.1
--e git+https://github.com/tyarkoni/pliers.git#egg=pliers
 psycopg2==2.7.1
 py==1.4.33
--e git+https://github.com/adelavega/pybids.git@analysis-module#egg=pybids
+-e git+https://github.com/grabbles/grabbit.git#egg=grabbit
+-e git+https://github.com/INCF/pybids.git#egg=pybids
 PyJWT==1.4.2
 pyparsing==2.2.0
 pytest==3.0.7
@@ -55,7 +55,6 @@ pytz==2017.2
 redis
 requests==2.13.0
 scipy==0.19.0
-six==1.10.0
 SQLAlchemy==1.1.9
 tqdm==4.11.2
 webargs==1.6.0
