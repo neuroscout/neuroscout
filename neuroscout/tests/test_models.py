@@ -5,6 +5,8 @@ from models import (Analysis, User, Dataset, Predictor, Stimulus, Run,
 					RunStimulus, Result, ExtractedFeature, PredictorEvent,
 					GroupPredictor)
 
+from numpy import isclose
+
 def test_dataset_ingestion(session, add_task):
 	dataset_model = Dataset.query.filter_by(id=add_task).one()
 
@@ -132,8 +134,8 @@ def test_extracted_features(session, add_task, extract_features):
 	assert ef_b.extracted_events.count() == Stimulus.query.count()
 
 	# Check for sensical value
-	assert session.query(func.max(PredictorEvent.value)).join(
-		Predictor).filter_by(ef_id=ef_b.id).one()[0] == '1.7756858854652973'
+	assert isclose(float(session.query(func.max(PredictorEvent.value)).join(
+		Predictor).filter_by(ef_id=ef_b.id).one()[0]), 1.775, 0.1)
 
 	# And that a sensical onset was extracted
 	assert session.query(func.max(PredictorEvent.onset)).join(
