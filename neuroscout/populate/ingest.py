@@ -120,8 +120,7 @@ def add_stimulus(db_session, path, stim_hash, dataset_id, parent_id=None,
         model.mimetype=mimetype
         model.parent_id=parent_id
         model.converter_params=converter_params
-
-    db_session.commit()
+        db_session.commit()
 
     return model, new
 
@@ -189,68 +188,97 @@ def add_task(db_session, task_name, dataset_name=None, local_path=None,
         db_session.commit()
 
 
+    stims_processed = {}
     """ Parse every Run """
-    for run_events in layout.get(task=task_name, type='events', **kwargs):
+    for img in layout.get(task=task_name, type='bold', extensions='.nii.gz',
+                          **kwargs):
         if verbose:
             print("Processing task {} subject {}, run {}".format(
-                run_events.task, run_events.subject, run_events.run))
+                img.task, img.subject, img.run))
 
         # Get entities
-        entities = {entity : getattr(run_events, entity)
+        entities = {entity : getattr(img, entity)
                     for entity in ['subject', 'session']
-                    if entity in run_events._fields}
+                    if entity in img._fields}
 
         """ Extract Run information """
         run_model, new = db_utils.get_or_create(db_session, Run,
                                                 dataset_id=dataset_model.id,
-                                                number=run_events.run,
+                                                number=img.run,
                                                 task_id = task_model.id,
                                                 **entities)
-        entities['run'] = run_events.run
+        entities['run'] = img.run
         entities['task'] = task_model.name
 
         # Get duration (helps w/ transformations)
         try:
-            img = nib.load(layout.get(type='bold', extensions='.nii.gz',
-                              return_type='file', **entities)[0])
-            run_model.duration = img.shape[3] * img.header.get_zooms()[-1] / 1000
+            img_ni = nib.load(img.filename)
+            run_model.duration = img_ni.shape[3] * img_ni.header.get_zooms()[-1] \
+                                    / 1000
         except (nib.filebasedimages.ImageFileError, IndexError) as e:
             print("Error loading BOLD file, duration not loaded.")
 
         run_model.func_path = format_preproc(suffix="preproc", **entities)
         run_model.mask_path = format_preproc(suffix="brainmask", **entities)
-        db_session.commit()
 
         # Confirm remote address exists:
         if dataset_model.preproc_address is not None:
-            remote_resource_exists(dataset_model.preproc_address, run_model.func_path)
-            remote_resource_exists(dataset_model.preproc_address, run_model.mask_path)
+            remote_resource_exists(
+                dataset_model.preproc_address, run_model.func_path)
+            remote_resource_exists(
+                dataset_model.preproc_address, run_model.mask_path)
 
         """ Extract Predictors"""
         if verbose:
             print("Extracting predictors")
 
-        variables = load_event_variables(layout, task=task_name,
-                                          extract_recordings=True,
-                                          extract_confounds=True,
-                                          **kwargs)
-        stims = variables.columns.pop('stim_file').to_df()['amplitude']
+        if automagic:
+            events = layout.get_events(img.filename)
+            if isinstance(events, str):
+                events = [events]
+            for e in events:
+                dl.get(e)
+                dl.unlock(e)
+
+        variables = []
+        variables.append(
+            (load_event_variables(layout,
+                                  extract_events=True,
+                                  extract_recordings=False,
+                                  extract_confounds=False,
+                                  scan_length=run_model.duration or 100,
+                                  **entities), 'events'))
+        stims = variables[0][0].columns.pop('stim_file')
+
+        variables.append(
+            (load_event_variables(layout,
+                                  extract_events=False,
+                                  extract_recordings=True,
+                                  extract_confounds=False,
+                                  scan_length=run_model.duration or 100,
+                                  **entities), 'recordings'))
+        variables.append(
+            (load_event_variables(layout,
+                                  extract_events=False,
+                                  extract_recordings=False,
+                                  extract_confounds=True,
+                                  scan_length=run_model.duration or 100,
+                                  **entities), 'confounds'))
 
         # Parse event columns and insert as Predictors
-        for name in variables:
-            var = variables[name]
-            add_predictor(db_session, name, dataset_model.id, run_model.id,
-                          var.onset, var.duration, var.values, source='events')
+        for collection, source in variables:
+            for name, var in collection.columns.items():
+                add_predictor(db_session, name, dataset_model.id, run_model.id,
+                              var.onset.tolist(), var.duration.tolist(),
+                              var.values.tolist(), source=source)
 
         """ Ingest Stimuli """
         if verbose:
             print("Ingesting stimuli")
 
-        stims_processed = {}
-        for i, val in stims[stims!="n/a"].items():
+        for i, val in enumerate(stims.values):
+            path = join(local_path, 'stimuli/{}'.format(val))
             if val not in stims_processed:
-                path = join(local_path, 'stimuli/{}'.format(val))
-
                 try:
                     if automagic:
                         dl.get(path)
@@ -271,8 +299,8 @@ def add_task(db_session, task_name, dataset_name=None, local_path=None,
             runstim, _ = db_utils.get_or_create(db_session, RunStimulus,
                                                 stimulus_id=stim_model.id,
                                                 run_id=run_model.id,
-                                                onset=onsets[i],
-                                                duration=durations[i])
+                                                onset=stims.onset.tolist()[i],
+                                                duration=stims.duration.tolist()[i])
     """ Add GroupPredictors """
     if verbose:
         print("Adding group predictors")

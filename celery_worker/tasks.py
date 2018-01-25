@@ -9,6 +9,7 @@ from tempfile import mkdtemp
 from bids.analysis.variables import load_event_variables
 from bids.analysis import Analysis
 from bids.grabbids import BIDSLayout
+
 logger = get_task_logger(__name__)
 
 
@@ -48,17 +49,16 @@ def writeout_events(analysis, pes, dir):
 
 @celery_app.task(name='workflow.compile')
 def compile(analysis, predictor_events, resources, bids_dir):
+    analysis_update = {} # New fields to return for analysis
     files_dir = mkdtemp()
     model = analysis.pop('model')
     scan_length = analysis['runs'][0]['duration'] or 1000 # Default value
 
-    analysis_update = {} # New fields to return for analysis
-
     bundle_paths = writeout_events(analysis, predictor_events, files_dir)
-    bids_layout = BIDSLayout([bids_dir, files_dir])
 
+    bids_layout = BIDSLayout([bids_dir, files_dir])
     variables = {
-        'time': load_event_variables(bids_layout, derivatives='only',
+        'time': load_event_variables(bids_layout, # derivatives='only',
                                      task=analysis['task_name'],
                                      scan_length=scan_length)
         }

@@ -239,7 +239,7 @@ def add_analysis(session, add_users, add_task, extract_features):
 
 @pytest.fixture(scope="function")
 def add_analysis_fail(session, add_users, add_task):
-    """ This analysis is from user 2 and also should fail compilation """
+    """ This analysis is from user 1 should fail compilation """
     dataset = Dataset.query.filter_by(id=add_task).first()
     analysis = Analysis(dataset_id = add_task, user_id = add_users[0][0],
         name = "A bad analysis!", description = "Bad!",
