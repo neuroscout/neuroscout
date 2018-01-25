@@ -5,33 +5,40 @@ from .ingest import add_task
 from .extract import extract_features
 from .convert import convert_stimuli
 from models import Dataset
-from copy import deepcopy
 import os
 from pliers.utils.updater import check_updates
+import itertools
+from copy import deepcopy
 
 def get_delta_config(db_session, config_dict):
     """ Returns element of config file that must be re-extracted """
-    # Get set of extractors that are used
     config_dict = deepcopy(config_dict)
-    transformers = []
+    default_tfs = json.load(
+        open(current_app.config['ALL_TRANSFORMERS'], 'r'))
+
+    tfs = []
     for _, dataset in config_dict.items():
         for _, task in dataset['tasks'].items():
-         transformers += task.get('extractors', [])
-         transformers += task.get('converters', [])
+         task['extractors'] = task.get('extractors', default_tfs['extractors'])
+         task['converters'] = task.get('converters', default_tfs['converters'])
+
+         tfs += task['extractors'] + task['converters']
 
     # Check for updates
     datastore = current_app.config['FEATURE_DATASTORE']
     os.makedirs(os.path.dirname(datastore), exist_ok=True)
+    tfs = list(k for k,_ in itertools.groupby(tfs)) # Unique-ify
 
-    updated = check_updates(transformers, datastore=datastore)
+    updated = check_updates(tfs, datastore=datastore)
 
+    # Filter configs to only include updated transformers
     filt_config = {}
     for dname, dataset in config_dict.items():
         new_tasks = {}
         for tname, task in dataset.pop('tasks').items():
-            filt_ext = [e for e in task.get('extractors', []) \
+            filt_ext = [e for e in task['extractors'] \
                         if tuple(e) in updated['transformers']]
-            filt_conv = [c for c in task.get('converters', []) \
+            filt_conv = [c for c in task['converters'] \
                         if tuple(c) in updated['transformers']]
 
             if filt_ext or filt_conv:
@@ -46,8 +53,15 @@ def get_delta_config(db_session, config_dict):
     return filt_config
 
 def ingest_from_json(db_session, config_file, automagic=False, update=False):
-    all_transformers = json.load(
-        open(current_app.config['ALL_TRANSFORMERS'], 'r'))
+    """ Adds a datasets from a JSON configuration file
+        Args:
+            db_session - sqlalchemy db db_session
+            config_file - a path to a json file
+            automagic - force enable DataLad automagic
+            update - only re-extracted updated extractors in config file
+        Output:
+            list of dataset model ids
+     """
     dataset_config = json.load(open(config_file, 'r'))
     updated_config = get_delta_config(db_session, dataset_config)
     if update:
@@ -91,8 +105,6 @@ def ingest_from_json(db_session, config_file, automagic=False, update=False):
             """ Convert stimuli """
             converters = params.get('converters', None)
 
-            if converters is None:
-                converters = all_transformers['converters']
             if converters:
                 convert_stimuli(db_session, dataset_name, task_name,
                                          converters, automagic=automagic)
@@ -100,12 +112,8 @@ def ingest_from_json(db_session, config_file, automagic=False, update=False):
             """ Extract features from applicable stimuli """
             extractors = params.get('extractors', None)
 
-            if extractors is None:
-                extractors = all_transformers['extractors']
-
             if extractors:
                 extract_features(db_session, dataset_name, task_name,
                                           extractors, automagic=automagic,
                                           **params.get('extract_args',{}))
-
     return dataset_ids
