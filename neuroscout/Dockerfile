@@ -3,7 +3,6 @@ ARG DEBIAN_FRONTEND=noninteractive
 RUN echo "deb http://ftp.debian.org/debian jessie-backports main" | tee -a /etc/apt/sources.list
 RUN apt-get -qq update
 RUN apt-get install -yq ffmpeg tesseract-ocr
-RUN pip install git+https://github.com/tyarkoni/pliers.git#egg=pliers
 RUN python -c "import imageio; imageio.plugins.ffmpeg.download()"
 
 RUN apt-get install -yq cmake libopenblas-dev liblapack-dev
