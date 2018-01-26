@@ -139,6 +139,7 @@ def update_local_json(session, add_local_task_json):
     """ Add a dataset with two subjects. """
     ## Edit datastore file
     datastore_file = current_app.config['FEATURE_DATASTORE']
+
     # Change value in datastore
     ds = pd.read_csv(datastore_file)
     ds.iloc[-1, 1:] = 1

@@ -3,6 +3,7 @@ python:
   - "3.5"
 install:
   - pip install -r neuroscout/requirements.txt
+  - pip install git+https://github.com/tyarkoni/pliers.git#egg=pliers
   - pip install pytest-cov
 script:
   - python -m pytest tests/ --cov=./
@@ -17,7 +18,6 @@ before_script:
   - psql -c 'create database travis_ci_test;' -U postgres
   - CI=""; cd neuroscout/frontend && yarn install --concurrency=1 && yarn build --concurrency=1
   - CI="true"; cd ../
-  - pip install git+https://github.com/tyarkoni/pliers.git#egg=pliers
   - python -c "import imageio; imageio.plugins.ffmpeg.download()"
 before_install:
   - bash <(wget -q -O- http://neuro.debian.net/_files/neurodebian-travis.sh)
