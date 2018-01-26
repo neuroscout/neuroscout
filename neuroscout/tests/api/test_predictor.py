@@ -1,5 +1,5 @@
 from tests.request_utils import decode_json
-from models import Predictor
+from models import Predictor, Dataset
 def test_get_predictor(auth_client, extract_features):
     # List of predictors
     resp = auth_client.get('/api/predictors')
@@ -54,12 +54,13 @@ def test_get_predictor(auth_client, extract_features):
 
 def test_get_rextracted(auth_client, reextract):
     ds = decode_json(
-        auth_client.get('/api/datasets'))
-    run_id = str(ds[0]['runs'][0]['id'])
+        auth_client.get('/api/datasets'))[0]
+    dataset = Dataset.query.filter_by(name=ds['name'])
+    run_id = str(ds['runs'][0]['id'])
     resp = auth_client.get('/api/predictors', params={
         'run_id': run_id, 'newest': 'false'})
+    assert Predictor.query.filter_by(dataset_id=dataset.id).count() == 5
     assert len(decode_json(resp)) == 5
-    assert Predictor.query.count() == 5
 
 def test_get_predictor_data(auth_client, add_task):
     # List of predictors
