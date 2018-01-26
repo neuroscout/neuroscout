@@ -11,6 +11,8 @@ def test_get_predictor(auth_client, extract_features):
     pred_id = [p for p in pred_list if p['name'] == 'rt'][0]['id']
     assert 'name' in pred_list[0]
 
+    # Check that derivative event is in there
+    assert len([p for p in pred_list if p['name'] == 'rating']) > 0
 
     rv = auth_client.get('/api/predictors/{}'.format(pred_id))
     assert rv.status_code == 200
@@ -55,7 +57,7 @@ def test_get_predictor(auth_client, extract_features):
 def test_get_rextracted(auth_client, reextract):
     ds = decode_json(
         auth_client.get('/api/datasets'))[0]
-    dataset = Dataset.query.filter_by(name=ds['name'])
+    dataset = Dataset.query.filter_by(name=ds['name']).one()
     run_id = str(ds['runs'][0]['id'])
     resp = auth_client.get('/api/predictors', params={
         'run_id': run_id, 'newest': 'false'})
