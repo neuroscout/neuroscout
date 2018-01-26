@@ -52,23 +52,24 @@ def get_delta_config(db_session, config_dict):
 
     return filt_config
 
-def ingest_from_json(db_session, config_file, automagic=False, update=False):
+def ingest_from_json(db_session, config_file, automagic=False,
+                     update_features=False, reingest=False):
     """ Adds a datasets from a JSON configuration file
         Args:
             db_session - sqlalchemy db db_session
             config_file - a path to a json file
             automagic - force enable DataLad automagic
-            update - only re-extracted updated extractors in config file
+            update_features - re-extracted updated extractors
+            reingest - force reingest dataset
         Output:
             list of dataset model ids
      """
     dataset_config = json.load(open(config_file, 'r'))
     updated_config = get_delta_config(db_session, dataset_config)
-    if update:
-        if not updated_config:
-            return []
-        else:
-            dataset_config = updated_config
+    if update_features:
+        dataset_config = updated_config
+        if not (updated_config or reingest):
+            return []            
 
     """ Loop over each dataset in config file """
     dataset_ids = []
@@ -98,6 +99,7 @@ def ingest_from_json(db_session, config_file, automagic=False, update=False):
                                   automagic=automagic,
                                   install_path=install_path,
                                   preproc_address=preproc_address,
+                                  reingest=reingest,
             					  **dp)
             dataset_ids.append(dataset_id)
             dataset_name = Dataset.query.filter_by(id=dataset_id).one().name

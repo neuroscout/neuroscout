@@ -36,7 +36,7 @@ numpy==1.12.0
 olefile==0.44
 opencv-python
 packaging==16.8
-pandas==0.19.2
+pandas==0.22
 patsy
 passlib==1.7.1
 pytesseract

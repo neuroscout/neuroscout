@@ -32,10 +32,12 @@ def test_dataset_ingestion(session, add_task):
 	assert run_model.func_path == 'sub-01/func/sub-01_task-bidstest_run-01_bold_space-MNI152NLin2009cAsym_preproc.nii.gz'
 
 	# Test properties of first run's predictor events
-	assert run_model.predictor_events.count() == 8
-	assert Predictor.query.count() == dataset_model.predictors.count() == 2
+	assert run_model.predictor_events.count() == 12
+	assert Predictor.query.count() == dataset_model.predictors.count() == 3
 
-	assert 'rt' in [p.name for p in Predictor.query.all()]
+	pred_names = [p.name for p in Predictor.query.all()]
+	assert 'rt' in pred_names
+	assert 'rating' in pred_names ## Derivative event
 
 	predictor = Predictor.query.filter_by(name='rt').first()
 	assert predictor.predictor_events.count() == 16

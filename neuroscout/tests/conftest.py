@@ -146,7 +146,7 @@ def update_local_json(session, add_local_task_json):
 
     ## Update
     return populate.ingest_from_json(session, LOCAL_JSON_PATH,
-                                          update=True)[0]
+                                          update_features=True)[0]
 
 @pytest.fixture(scope="function")
 def extract_features(session, add_task):

@@ -1,7 +1,7 @@
 """ Dataset ingestion
 Tools to populate database from BIDS datasets
 """
-from os.path import realpath, join
+from os.path import realpath, join, exists
 import json
 import magic
 
@@ -126,7 +126,7 @@ def add_stimulus(db_session, path, stim_hash, dataset_id, parent_id=None,
 
 def add_task(db_session, task_name, dataset_name=None, local_path=None,
              dataset_address=None, preproc_address=None, install_path='.',
-             automagic=False, verbose=True, **kwargs):
+             automagic=False, verbose=True, reingest=False, **kwargs):
     """ Adds a BIDS dataset task to the database.
         Args:
             db_session - sqlalchemy db db_session
@@ -138,6 +138,7 @@ def add_task(db_session, task_name, dataset_name=None, local_path=None,
             install_path - if remote with no local path, where to install.
             automagic - force enable DataLad automagic
             verbose - verbose output
+            reingest - force reingesting even if dataset already exists
             kwargs - arguments to filter runs by
         Output:
             dataset model id
@@ -152,7 +153,13 @@ def add_task(db_session, task_name, dataset_name=None, local_path=None,
         automagic = AutomagicIO()
         automagic.activate()
 
-    layout = BIDSLayout(local_path)
+    # Look for events folder in derivatives
+    path = local_path
+    extra_events = join(local_path, 'derivatives/events')
+    if exists(extra_events):
+        path = [local_path, extra_events]
+
+    layout = BIDSLayout(path)
     if task_name not in layout.get_tasks():
         raise ValueError("Task {} not found in dataset {}".format(
             task_name, local_path))
@@ -172,7 +179,7 @@ def add_task(db_session, task_name, dataset_name=None, local_path=None,
         dataset_model.preproc_address = preproc_address
         dataset_model.local_path = local_path
         db_session.commit()
-    else:
+    elif not reingest:
         if automagic:
             automagic.deactivate()
         return dataset_model.id

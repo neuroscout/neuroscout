@@ -57,14 +57,14 @@ def test_get_rextracted(auth_client, reextract):
     run_id = str(ds[0]['runs'][0]['id'])
     resp = auth_client.get('/api/predictors', params={
         'run_id': run_id, 'newest': 'false'})
-    assert len(decode_json(resp)) == 4
+    assert len(decode_json(resp)) == 5
 
 def test_get_predictor_data(auth_client, add_task):
     # List of predictors
     resp = auth_client.get('/api/predictor-events')
     assert resp.status_code == 200
     pe_list = decode_json(resp)
-    assert len(pe_list) == 32
+    assert len(pe_list) == 36
 
     pe = pe_list[0]
     # Get PEs only for one run
