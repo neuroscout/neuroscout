@@ -142,7 +142,8 @@ def update_local_json(session, add_local_task_json):
 
     # Change value in datastore
     ds = pd.read_csv(datastore_file)
-    ds.iloc[-1, 1:] = 1
+    select_cols = [c for c in ds.columns if c != "time_extracted"]
+    ds.loc[ds.time_extracted.max() == ds.time_extracted, select_cols] = 1
     ds.to_csv(datastore_file, index=False)
 
     ## Update
