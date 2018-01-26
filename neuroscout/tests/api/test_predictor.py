@@ -1,4 +1,5 @@
 from tests.request_utils import decode_json
+from models import Predictor
 def test_get_predictor(auth_client, extract_features):
     # List of predictors
     resp = auth_client.get('/api/predictors')
@@ -58,6 +59,7 @@ def test_get_rextracted(auth_client, reextract):
     resp = auth_client.get('/api/predictors', params={
         'run_id': run_id, 'newest': 'false'})
     assert len(decode_json(resp)) == 5
+    assert Predictor.query.count() == 5
 
 def test_get_predictor_data(auth_client, add_task):
     # List of predictors
