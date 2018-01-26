@@ -58,7 +58,7 @@ def compile(analysis, predictor_events, resources, bids_dir):
 
     bids_layout = BIDSLayout([bids_dir, files_dir])
     variables = {
-        'time': load_event_variables(bids_layout, # derivatives='only',
+        'time': load_event_variables(bids_layout, derivatives='only',
                                      task=analysis['task_name'],
                                      scan_length=scan_length)
         }
