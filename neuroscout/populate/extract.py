@@ -15,7 +15,7 @@ from datalad import api as da
 import populate
 from models import (Dataset, Task,
     Run, Stimulus, RunStimulus, ExtractedFeature, ExtractedEvent)
-from .utils import hash_file, hash_data
+from .utils import hash_data, hash_stim
 from populate.transformations import Preprocessing
 
 class FeatureSerializer(object):
@@ -166,10 +166,7 @@ def extract_features(db_session, dataset_name, task_name, extractors,
 
                 """" Add ExtractedEvents """
                 # Get associated stimulus record
-                filename = res.stim.history.source_file \
-                            if res.stim.history \
-                            else res.stim.filename
-                stim_hash = hash_file(filename)
+                stim_hash = hash_stim(res.stim)
                 stimulus = db_session.query(
                     Stimulus).filter_by(sha1_hash=stim_hash).one()
 

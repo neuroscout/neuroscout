@@ -15,7 +15,7 @@ from datalad import api as dl
 from datalad.auto import AutomagicIO
 
 import db_utils
-from .utils import remote_resource_exists, format_preproc, hash_file
+from .utils import remote_resource_exists, format_preproc, hash_stim
 from models import (Dataset, Task, Run, Predictor, PredictorEvent, PredictorRun,
                     Stimulus, RunStimulus, GroupPredictor, GroupPredictorValue)
 
@@ -65,9 +65,20 @@ def add_predictor(db_session, predictor_name, dataset_id, run_id,
     return predictor.id
 
 def add_predictor_collection(db_session, collection, ds_id, run_id, source=None,
-                             TR=None):
-    """" Add a BIDSVariableCollection to the database. """
+                             TR=None, include_predictors=None):
+    """ Add a BIDSVariableCollection to the database.
+    Args:
+        db_session - sqlalchemy db db_session
+        collection - BIDSVariableCollection to ingest
+        ds_id - Dataset model id
+        r_id - Run model id
+        source - source of collection. e.g "events", "recordings"
+        TR - time repetiton of task
+        include_predictors - list of predictors to include. all if None.
+    """
     for name, var in collection.columns.items():
+        if include_predictors is not None and name not in include_predictors:
+            break
         values = var.values.tolist()
         if hasattr(var, 'onset'):
             onset = var.onset
@@ -152,7 +163,7 @@ def add_stimulus(db_session, path, stim_hash, dataset_id, parent_id=None,
 def add_task(db_session, task_name, dataset_name=None, local_path=None,
              dataset_address=None, preproc_address=None, install_path='.',
              automagic=False, verbose=True, reingest=False, scan_length=1000,
-             **kwargs):
+             include_predictors=None, **kwargs):
     """ Adds a BIDS dataset task to the database.
         Args:
             db_session - sqlalchemy db db_session
@@ -166,6 +177,7 @@ def add_task(db_session, task_name, dataset_name=None, local_path=None,
             verbose - verbose output
             reingest - force reingesting even if dataset already exists
             scan_length - default scan length in case it cant be found in image
+            include_predictors - set of predictors to ingest
             kwargs - arguments to filter runs by
         Output:
             dataset model id
@@ -303,6 +315,7 @@ def add_task(db_session, task_name, dataset_name=None, local_path=None,
         for collection, source in variables:
             add_predictor_collection(db_session, collection, dataset_model.id,
                                      run_model.id, source=source,
+                                     include_predictors=include_predictors,
                                      TR=task_model.TR)
 
         """ Ingest Stimuli """
@@ -316,8 +329,8 @@ def add_task(db_session, task_name, dataset_name=None, local_path=None,
                     if automagic:
                         dl.get(path)
                         dl.unlock(path)
-                    stim_hash = hash_file(path)
-                except OSError:
+                    stim_hash = hash_stim(path)
+                except OSError as e:
                     print('Stimulus: {} not found. Skipping.'.format(val))
                     continue
 

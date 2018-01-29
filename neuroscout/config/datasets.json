@@ -12,7 +12,10 @@
           "run": 1,
           "subject": "01",
           "session": "movie"
-        }
+        },
+        "ingest_args": {
+          "include_predictors": ["stim_file"]
+          }
       }
     }
   }

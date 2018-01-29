@@ -19,11 +19,28 @@ def format_preproc(subject, task, run, session=None,
     task, run, space, suffix
 )
 
-def hash_file(f):
-    pliers_stim = load_stims(f)
-    return hash_data(pliers_stim.data)
+def hash_stim(f, blocksize = 65536):
+    """ Hash a pliers stimulus """
+    if isinstance(f, str):
+        stim = load_stims(f)
 
-def hash_data(data, blocksize=65536):
+    hasher = hashlib.sha1()
+
+    if hasattr(stim, "data"):
+        hasher.update(stim.data)
+    else:
+        filename = stim.history.source_file \
+                    if stim.history \
+                    else stim.filename
+        with open(filename, 'rb') as afile:
+            buf = afile.read(blocksize)
+            while len(buf) > 0:
+                hasher.update(buf)
+                buf = afile.read(blocksize)
+
+    return hasher.hexdigest()
+
+def hash_data(data):
     """" Hashes data or string """
     if isinstance(data, str):
         data = data.encode('utf-8')

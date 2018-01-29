@@ -14,12 +14,12 @@ from datalad import api as da
 
 from models import Dataset, Task, Run, Stimulus, RunStimulus
 
-from .utils import hash_data
+from .utils import hash_stim
 from .ingest import add_stimulus
 
 def save_stim_filename(stimulus, basepath=''):
     """ Given a pliers stimulus object, create a hash, filename, and save """
-    stim_hash = hash_data(stimulus.data)
+    stim_hash = hash_stim(stimulus)
 
     stim_types = {ImageStim: '.png',
                   TextStim: '.txt',

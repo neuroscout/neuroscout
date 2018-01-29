@@ -69,7 +69,7 @@ def ingest_from_json(db_session, config_file, automagic=False,
     if update_features:
         dataset_config = updated_config
         if not (updated_config or reingest):
-            return []            
+            return []
 
     """ Loop over each dataset in config file """
     dataset_ids = []
@@ -89,8 +89,8 @@ def ingest_from_json(db_session, config_file, automagic=False,
 
         for task_name, params in items['tasks'].items():
             """ Add task to database"""
-            dp = dict(params.get('filters', {}).items() | \
-                      params.get('ingest_args', {}).items())
+            dp = params.get('ingest_args', {})
+            dp.update(params.get('filters', {}))
 
             dataset_id = add_task(db_session, task_name,
                                   dataset_name=dataset_name,
