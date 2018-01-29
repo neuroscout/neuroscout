@@ -7,6 +7,7 @@ import magic
 
 import pandas as pd
 import nibabel as nib
+import numpy as np
 
 from bids.grabbids import BIDSLayout
 from bids.analysis.variables import load_event_variables
@@ -37,6 +38,7 @@ def add_predictor(db_session, predictor_name, dataset_id, run_id,
         predictor id
 
     """
+    print("Extracting {}".format(predictor_name))
     predictor, _ = db_utils.get_or_create(db_session, Predictor,
                                           name=predictor_name,
                                           dataset_id=dataset_id,
@@ -61,6 +63,29 @@ def add_predictor(db_session, predictor_name, dataset_id, run_id,
                                    run_id = run_id)
 
     return predictor.id
+
+def add_predictor_collection(db_session, collection, ds_id, run_id, source=None,
+                             TR=None):
+    """" Add a BIDSVariableCollection to the database. """
+    for name, var in collection.columns.items():
+        values = var.values.tolist()
+        if hasattr(var, 'onset'):
+            onset = var.onset
+            duration = var.duration
+        else:
+            if TR is not None:
+                var.resample(1 / TR)
+                print("Resampling")
+            else:
+                TR = var.sampling_rate / 2
+
+            onset = len(np.arange(0, len(var.values) * TR, TR)).tolist()
+            duration = len([(TR)] * len(var.values))
+
+
+        add_predictor(db_session, name, ds_id, run_id,
+                      onset, duration, values, source)
+
 
 def add_group_predictors(db_session, dataset_id, participants):
     """ Adds group predictors using participants.tsv
@@ -126,7 +151,8 @@ def add_stimulus(db_session, path, stim_hash, dataset_id, parent_id=None,
 
 def add_task(db_session, task_name, dataset_name=None, local_path=None,
              dataset_address=None, preproc_address=None, install_path='.',
-             automagic=False, verbose=True, reingest=False, **kwargs):
+             automagic=False, verbose=True, reingest=False, scan_length=1000,
+             **kwargs):
     """ Adds a BIDS dataset task to the database.
         Args:
             db_session - sqlalchemy db db_session
@@ -139,6 +165,7 @@ def add_task(db_session, task_name, dataset_name=None, local_path=None,
             automagic - force enable DataLad automagic
             verbose - verbose output
             reingest - force reingesting even if dataset already exists
+            scan_length - default scan length in case it cant be found in image
             kwargs - arguments to filter runs by
         Output:
             dataset model id
@@ -194,7 +221,6 @@ def add_task(db_session, task_name, dataset_name=None, local_path=None,
         task_model.TR = task_model.description['RepetitionTime']
         db_session.commit()
 
-
     stims_processed = {}
     """ Parse every Run """
     for img in layout.get(task=task_name, type='bold', extensions='.nii.gz',
@@ -223,7 +249,8 @@ def add_task(db_session, task_name, dataset_name=None, local_path=None,
             run_model.duration = img_ni.shape[3] * img_ni.header.get_zooms()[-1] \
                                     / 1000
         except (nib.filebasedimages.ImageFileError, IndexError) as e:
-            print("Error loading BOLD file, duration not loaded.")
+            print("Error loading BOLD file, default duration used.")
+            run_model.duration = scan_length
 
         run_model.func_path = format_preproc(suffix="preproc", **entities)
         run_model.mask_path = format_preproc(suffix="brainmask", **entities)
@@ -253,7 +280,7 @@ def add_task(db_session, task_name, dataset_name=None, local_path=None,
                                   extract_events=True,
                                   extract_recordings=False,
                                   extract_confounds=False,
-                                  scan_length=run_model.duration or 100,
+                                  scan_length=run_model.duration or scan_length,
                                   **entities), 'events'))
         stims = variables[0][0].columns.pop('stim_file')
 
@@ -262,22 +289,21 @@ def add_task(db_session, task_name, dataset_name=None, local_path=None,
                                   extract_events=False,
                                   extract_recordings=True,
                                   extract_confounds=False,
-                                  scan_length=run_model.duration or 100,
+                                  scan_length=run_model.duration or scan_length,
                                   **entities), 'recordings'))
         variables.append(
             (load_event_variables(layout,
                                   extract_events=False,
                                   extract_recordings=False,
                                   extract_confounds=True,
-                                  scan_length=run_model.duration or 100,
+                                  scan_length=run_model.duration or scan_length,
                                   **entities), 'confounds'))
 
         # Parse event columns and insert as Predictors
         for collection, source in variables:
-            for name, var in collection.columns.items():
-                add_predictor(db_session, name, dataset_model.id, run_model.id,
-                              var.onset.tolist(), var.duration.tolist(),
-                              var.values.tolist(), source=source)
+            add_predictor_collection(db_session, collection, dataset_model.id,
+                                     run_model.id, source=source,
+                                     TR=task_model.TR)
 
         """ Ingest Stimuli """
         if verbose:

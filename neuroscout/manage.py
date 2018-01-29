@@ -76,13 +76,15 @@ def extract_features(local_path, task, graph_spec, filters='{}'):
 ## Need to modify or create new function for updating dataset
 ## e.g. dealing w/ IncompleteResultsError if cloning into existing dir
 @manager.command
-def ingest_from_json(config_file, automagic=False, update_features=False):
+def ingest_from_json(config_file, automagic=False, update_features=False,
+                     reingest=False):
 	""" Ingest/update datasets and extracted features from a json config file.
 	config_file - json config file detailing datasets and pliers graph_json
 	automagic - Force enable datalad automagic
 	"""
 	populate.ingest_from_json(db.session, config_file,
-                           automagic=automagic, update_features=update_features)
+                           automagic=automagic, update_features=update_features,
+                           reingest=reingest)
 
 
 if __name__ == '__main__':
