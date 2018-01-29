@@ -8,11 +8,12 @@ from models import Dataset
 import os
 from pliers.utils.updater import check_updates
 import itertools
-from copy import deepcopy
 
-def get_delta_config(db_session, config_dict):
-    """ Returns element of config file that must be re-extracted """
-    config_dict = deepcopy(config_dict)
+def load_update_config(db_session, config_file, update=False):
+    """ Returns element of config file that must be re-extracted
+        as well as prepopulating default transformers in config file. """
+    config_dict =  json.load(open(config_file, 'r'))
+
     default_tfs = json.load(
         open(current_app.config['ALL_TRANSFORMERS'], 'r'))
 
@@ -31,26 +32,29 @@ def get_delta_config(db_session, config_dict):
 
     updated = check_updates(tfs, datastore=datastore)
 
-    # Filter configs to only include updated transformers
-    filt_config = {}
-    for dname, dataset in config_dict.items():
-        new_tasks = {}
-        for tname, task in dataset.pop('tasks').items():
-            filt_ext = [e for e in task['extractors'] \
-                        if tuple(e) in updated['transformers']]
-            filt_conv = [c for c in task['converters'] \
-                        if tuple(c) in updated['transformers']]
+    if update:
+        # Filter configs to only include updated transformers
+        filt_config = {}
+        for dname, dataset in config_dict.items():
+            new_tasks = {}
+            for tname, task in dataset.pop('tasks').items():
+                filt_ext = [e for e in task['extractors'] \
+                            if tuple(e) in updated['transformers']]
+                filt_conv = [c for c in task['converters'] \
+                            if tuple(c) in updated['transformers']]
 
-            if filt_ext or filt_conv:
-                task['extractors'] = filt_ext
-                task['converters'] = filt_conv
-                new_tasks[tname] = task
+                if filt_ext or filt_conv:
+                    task['extractors'] = filt_ext
+                    task['converters'] = filt_conv
+                    new_tasks[tname] = task
 
-        if new_tasks:
-            dataset['tasks'] = new_tasks
-            filt_config[dname] = dataset
+            if new_tasks:
+                dataset['tasks'] = new_tasks
+                filt_config[dname] = dataset
 
-    return filt_config
+        config_dict = filt_config
+
+    return config_dict
 
 def ingest_from_json(db_session, config_file, automagic=False,
                      update_features=False, reingest=False):
@@ -64,11 +68,10 @@ def ingest_from_json(db_session, config_file, automagic=False,
         Output:
             list of dataset model ids
      """
-    dataset_config = json.load(open(config_file, 'r'))
-    updated_config = get_delta_config(db_session, dataset_config)
+    dataset_config = load_update_config(db_session, config_file,
+                                      update=update_features)
     if update_features:
-        dataset_config = updated_config
-        if not (updated_config or reingest):
+        if not (dataset_config or reingest):
             return []
 
     """ Loop over each dataset in config file """

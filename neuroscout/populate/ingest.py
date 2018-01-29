@@ -81,8 +81,8 @@ def add_predictor_collection(db_session, collection, ds_id, run_id, source=None,
             break
         values = var.values.tolist()
         if hasattr(var, 'onset'):
-            onset = var.onset
-            duration = var.duration
+            onset = var.onset.tolist()
+            duration = var.duration.tolist()
         else:
             if TR is not None:
                 var.resample(1 / TR)
