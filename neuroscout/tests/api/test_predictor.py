@@ -10,6 +10,8 @@ def test_get_predictor(auth_client, extract_features):
     pred_id = [p for p in pred_list if p['name'] == 'rt'][0]['id']
     assert 'name' in pred_list[0]
 
+    # Check that derivative event is in there
+    assert len([p for p in pred_list if p['name'] == 'rating']) > 0
 
     rv = auth_client.get('/api/predictors/{}'.format(pred_id))
     assert rv.status_code == 200
@@ -52,19 +54,18 @@ def test_get_predictor(auth_client, extract_features):
 
 
 def test_get_rextracted(auth_client, reextract):
-    ds = decode_json(
-        auth_client.get('/api/datasets'))
-    run_id = str(ds[0]['runs'][0]['id'])
+    run_id = decode_json(
+        auth_client.get('/api/runs', params={'number' : '01', 'subject': '01'}))[0]['id']
     resp = auth_client.get('/api/predictors', params={
         'run_id': run_id, 'newest': 'false'})
-    assert len(decode_json(resp)) == 4
+    assert len(decode_json(resp)) == 5
 
 def test_get_predictor_data(auth_client, add_task):
     # List of predictors
     resp = auth_client.get('/api/predictor-events')
     assert resp.status_code == 200
     pe_list = decode_json(resp)
-    assert len(pe_list) == 32
+    assert len(pe_list) == 36
 
     pe = pe_list[0]
     # Get PEs only for one run

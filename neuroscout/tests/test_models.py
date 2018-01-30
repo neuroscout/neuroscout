@@ -5,6 +5,8 @@ from models import (Analysis, User, Dataset, Predictor, Stimulus, Run,
 					RunStimulus, Result, ExtractedFeature, PredictorEvent,
 					GroupPredictor)
 
+from numpy import isclose
+
 def test_dataset_ingestion(session, add_task):
 	dataset_model = Dataset.query.filter_by(id=add_task).one()
 
@@ -26,17 +28,19 @@ def test_dataset_ingestion(session, add_task):
 	assert 'TaskName' in run_model.task.description
 	assert run_model.task.description['RepetitionTime'] == 2.0
 
-	assert run_model.duration is None
 	assert run_model.func_path == 'sub-01/func/sub-01_task-bidstest_run-01_bold_space-MNI152NLin2009cAsym_preproc.nii.gz'
 
 	# Test properties of first run's predictor events
-	assert run_model.predictor_events.count() == 8
-	assert Predictor.query.count() == dataset_model.predictors.count() == 2
+	assert run_model.predictor_events.count() == 12
+	assert Predictor.query.count() == dataset_model.predictors.count() == 3
 
-	assert 'rt' in [p.name for p in Predictor.query.all()]
+	pred_names = [p.name for p in Predictor.query.all()]
+	assert 'rt' in pred_names
+	assert 'rating' in pred_names ## Derivative event
 
 	predictor = Predictor.query.filter_by(name='rt').first()
 	assert predictor.predictor_events.count() == 16
+	assert predictor.source == 'events'
 
 	# Test run summary statistics
 	assert len(predictor.run_statistics) == 4
@@ -131,8 +135,8 @@ def test_extracted_features(session, add_task, extract_features):
 	assert ef_b.extracted_events.count() == Stimulus.query.count()
 
 	# Check for sensical value
-	assert session.query(func.max(PredictorEvent.value)).join(
-		Predictor).filter_by(ef_id=ef_b.id).one()[0] == '1.7756858854652973'
+	assert isclose(float(session.query(func.max(PredictorEvent.value)).join(
+		Predictor).filter_by(ef_id=ef_b.id).one()[0]), 1.775, 0.1)
 
 	# And that a sensical onset was extracted
 	assert session.query(func.max(PredictorEvent.onset)).join(
@@ -141,6 +145,7 @@ def test_extracted_features(session, add_task, extract_features):
 	# Test that Predictors were created from EF
 	pred = Predictor.query.filter_by(ef_id=ef_b.id).one()
 	assert pred.name == "BrightnessExtractor.Brightness"
+	assert pred.source == "extracted"
 
 	# Test that a Predictor was not made for vibrance (hidden)
 	ef_v = ExtractedFeature.query.filter_by(

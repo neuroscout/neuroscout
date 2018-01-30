@@ -121,8 +121,7 @@ def add_users(app, db, session):
 @pytest.fixture(scope="function")
 def add_task(session):
     """ Add a dataset with two subjects """
-    return populate.add_task(session, 'bidstest', local_path=DATASET_PATH,
-                                verbose=False)
+    return populate.add_task(session, 'bidstest', local_path=DATASET_PATH)
 
 @pytest.fixture(scope="function")
 def add_task_remote(session):
@@ -139,14 +138,16 @@ def update_local_json(session, add_local_task_json):
     """ Add a dataset with two subjects. """
     ## Edit datastore file
     datastore_file = current_app.config['FEATURE_DATASTORE']
+
     # Change value in datastore
     ds = pd.read_csv(datastore_file)
-    ds.iloc[-1, 1:] = 1
+    select_cols = [c for c in ds.columns if c != "time_extracted"]
+    ds.loc[ds.time_extracted.max() == ds.time_extracted, select_cols] = 1
     ds.to_csv(datastore_file, index=False)
 
     ## Update
     return populate.ingest_from_json(session, LOCAL_JSON_PATH,
-                                          update=True)[0]
+                                          update_features=True)[0]
 
 @pytest.fixture(scope="function")
 def extract_features(session, add_task):
@@ -239,7 +240,7 @@ def add_analysis(session, add_users, add_task, extract_features):
 
 @pytest.fixture(scope="function")
 def add_analysis_fail(session, add_users, add_task):
-    """ This analysis is from user 2 and also should fail compilation """
+    """ This analysis is from user 1 should fail compilation """
     dataset = Dataset.query.filter_by(id=add_task).first()
     analysis = Analysis(dataset_id = add_task, user_id = add_users[0][0],
         name = "A bad analysis!", description = "Bad!",

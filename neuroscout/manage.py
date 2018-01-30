@@ -59,7 +59,7 @@ def add_task(local_path, task, automagic=False,
 	filters - string JSON object with optional run filters
 	"""
 	populate.add_task(db.session, task, local_path=local_path,
-			 verbose=True, skip_predictors=skip_predictors,
+			 skip_predictors=skip_predictors,
 			 automagic=automagic, **json.loads(filters))
 
 @manager.command
@@ -71,18 +71,20 @@ def extract_features(local_path, task, graph_spec, filters='{}'):
 	filters - string JSON object with optional run filters
 	"""
 	populate.extract_features(db.session, local_path, task, graph_spec,
-		verbose=True, **json.loads(filters))
+		**json.loads(filters))
 
 ## Need to modify or create new function for updating dataset
 ## e.g. dealing w/ IncompleteResultsError if cloning into existing dir
 @manager.command
-def ingest_from_json(config_file, automagic=False, update=False):
+def ingest_from_json(config_file, automagic=False, update_features=False,
+                     reingest=False):
 	""" Ingest/update datasets and extracted features from a json config file.
 	config_file - json config file detailing datasets and pliers graph_json
 	automagic - Force enable datalad automagic
 	"""
 	populate.ingest_from_json(db.session, config_file,
-                           automagic=automagic, update=update)
+                           automagic=automagic, update_features=update_features,
+                           reingest=reingest)
 
 
 if __name__ == '__main__':

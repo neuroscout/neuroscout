@@ -112,3 +112,4 @@ neuroscout/config/app.py
 jest_0
 .my-env
 .pliersenv
+celery_worker/src

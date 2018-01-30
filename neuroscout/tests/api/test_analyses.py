@@ -252,13 +252,13 @@ def test_compile(auth_client, add_analysis, add_analysis_fail):
 	while decode_json(resp)['status'] == 'PENDING':
 		time.sleep(0.2)
 		resp = auth_client.get('/api/analyses/{}'.format(analysis_bad.hash_id))
-		new_analysis = decode_json(resp)
-		if new_analysis['status'] == 'PASSED':
-			assert new_analysis['bundle_path'] is not None
-			break
-		elif new_analysis['status'] == 'FAILED' or time.time() > timeout:
+		if time.time() > timeout:
 			assert 0
 			break
+
+	new_analysis = decode_json(resp)
+	if new_analysis['status'] !=  'FAILED':
+		assert 0
 
 	# Test getting bundle prior to compiling
 	resp = auth_client.get('/api/analyses/{}/bundle'.format(analysis.hash_id))
@@ -290,12 +290,15 @@ def test_compile(auth_client, add_analysis, add_analysis_fail):
 	resp = auth_client.get('/api/analyses/{}'.format(analysis.hash_id))
 	timeout = time.time() + 60*1   # 1 minute timeout
 	while decode_json(resp)['status'] == 'PENDING':
-		resp = auth_client.get('/api/analyses/{}'.format(analysis.hash_id))
-		if decode_json(resp)['status'] == 'PASSED' or time.time() > timeout:
-			assert 1
-			break
 		time.sleep(0.2)
+		if time.time() > timeout:
+			assert 0
+			break
+		resp = auth_client.get('/api/analyses/{}'.format(analysis.hash_id))
 
+	if decode_json(resp)['status'] != 'PASSED':
+		assert 0
+		
 	# Try deleting locked analysis
 	resp = auth_client.delete('/api/analyses/{}'.format(analysis.hash_id))
 	assert resp.status_code == 422

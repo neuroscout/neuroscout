@@ -15,7 +15,7 @@ from datalad import api as da
 import populate
 from models import (Dataset, Task,
     Run, Stimulus, RunStimulus, ExtractedFeature, ExtractedEvent)
-from .utils import hash_file, hash_data
+from .utils import hash_data, hash_stim
 from populate.transformations import Preprocessing
 
 class FeatureSerializer(object):
@@ -87,7 +87,7 @@ class FeatureSerializer(object):
         for pattern, schema in ext_schema['features'].items():
             matching = filter(re.compile(pattern).match, self.features)
             annotated += [self._annotate_feature(
-                pattern, schema, feat, ext_hash, all_vals[feat])    
+                pattern, schema, feat, ext_hash, all_vals[feat])
                           for feat in matching]
 
         # Add all remaining features
@@ -166,10 +166,7 @@ def extract_features(db_session, dataset_name, task_name, extractors,
 
                 """" Add ExtractedEvents """
                 # Get associated stimulus record
-                filename = res.stim.history.source_file \
-                            if res.stim.history \
-                            else res.stim.filename
-                stim_hash = hash_file(filename)
+                stim_hash = hash_stim(res.stim)
                 stimulus = db_session.query(
                     Stimulus).filter_by(sha1_hash=stim_hash).one()
 
@@ -228,6 +225,7 @@ def extract_features(db_session, dataset_name, task_name, extractors,
 
                 populate.add_predictor(db_session, predictor_name, dataset_id,
                                        rs.run_id, onsets, durations, values,
+                                       source='extracted',
                                        ef_id=ef.id)
 
     return list(extracted_features.values())

@@ -1,25 +1,28 @@
 """ Dataset ingestion
 Tools to populate database from BIDS datasets
 """
-from os.path import realpath, join
+from os.path import realpath, join, exists
 import json
 import magic
+from flask import current_app
 
 import pandas as pd
 import nibabel as nib
+import numpy as np
 
 from bids.grabbids import BIDSLayout
+from bids.analysis.variables import load_event_variables
 from datalad import api as dl
 from datalad.auto import AutomagicIO
 
 import db_utils
-from .utils import remote_resource_exists, format_preproc, hash_file
+from .utils import remote_resource_exists, format_preproc, hash_stim
 from models import (Dataset, Task, Run, Predictor, PredictorEvent, PredictorRun,
                     Stimulus, RunStimulus, GroupPredictor, GroupPredictorValue)
 
 
 def add_predictor(db_session, predictor_name, dataset_id, run_id,
-                  onsets, durations, values, **kwargs):
+                  onsets, durations, values, source=None, **kwargs):
     """" Adds a new Predictor to a run given a set of values
     If Predictor already exist, use that one
     Args:
@@ -30,14 +33,17 @@ def add_predictor(db_session, predictor_name, dataset_id, run_id,
         onsets - list of onsets
         durations - list of durations
         values - list of values
+        source - source of event
         kwargs - additional identifiers of the Predictor
     Output:
         predictor id
 
     """
+    current_app.logger.info("Extracting {}".format(predictor_name))
     predictor, _ = db_utils.get_or_create(db_session, Predictor,
                                           name=predictor_name,
                                           dataset_id=dataset_id,
+                                          source=source,
                                           **kwargs)
 
     values = pd.Series(values, dtype='object')
@@ -58,6 +64,39 @@ def add_predictor(db_session, predictor_name, dataset_id, run_id,
                                    run_id = run_id)
 
     return predictor.id
+
+def add_predictor_collection(db_session, collection, ds_id, run_id, source=None,
+                             TR=None, include_predictors=None):
+    """ Add a BIDSVariableCollection to the database.
+    Args:
+        db_session - sqlalchemy db db_session
+        collection - BIDSVariableCollection to ingest
+        ds_id - Dataset model id
+        r_id - Run model id
+        source - source of collection. e.g "events", "recordings"
+        TR - time repetiton of task
+        include_predictors - list of predictors to include. all if None.
+    """
+    for name, var in collection.columns.items():
+        if include_predictors is not None and name not in include_predictors:
+            break
+        values = var.values.tolist()
+        if hasattr(var, 'onset'):
+            onset = var.onset.tolist()
+            duration = var.duration.tolist()
+        else:
+            if TR is not None:
+                var.resample(1 / TR)
+            else:
+                TR = var.sampling_rate / 2
+
+            onset = len(np.arange(0, len(var.values) * TR, TR)).tolist()
+            duration = len([(TR)] * len(var.values))
+
+
+        add_predictor(db_session, name, ds_id, run_id,
+                      onset, duration, values, source)
+
 
 def add_group_predictors(db_session, dataset_id, participants):
     """ Adds group predictors using participants.tsv
@@ -117,14 +156,14 @@ def add_stimulus(db_session, path, stim_hash, dataset_id, parent_id=None,
         model.mimetype=mimetype
         model.parent_id=parent_id
         model.converter_params=converter_params
-
-    db_session.commit()
+        db_session.commit()
 
     return model, new
 
 def add_task(db_session, task_name, dataset_name=None, local_path=None,
              dataset_address=None, preproc_address=None, install_path='.',
-             automagic=False, verbose=True, skip_predictors=False, **kwargs):
+             automagic=False, reingest=False, scan_length=1000,
+             include_predictors=None, **kwargs):
     """ Adds a BIDS dataset task to the database.
         Args:
             db_session - sqlalchemy db db_session
@@ -135,8 +174,9 @@ def add_task(db_session, task_name, dataset_name=None, local_path=None,
             preproc_address - remote address of preprocessed files.
             install_path - if remote with no local path, where to install.
             automagic - force enable DataLad automagic
-            verbose - verbose output
-            skip_predictors - skip ingesting original predictors
+            reingest - force reingesting even if dataset already exists
+            scan_length - default scan length in case it cant be found in image
+            include_predictors - set of predictors to ingest
             kwargs - arguments to filter runs by
         Output:
             dataset model id
@@ -151,7 +191,13 @@ def add_task(db_session, task_name, dataset_name=None, local_path=None,
         automagic = AutomagicIO()
         automagic.activate()
 
-    layout = BIDSLayout(local_path)
+    # Look for events folder in derivatives
+    path = local_path
+    extra_events = join(local_path, 'derivatives/events')
+    if exists(extra_events):
+        path = [local_path, extra_events]
+
+    layout = BIDSLayout(path)
     if task_name not in layout.get_tasks():
         raise ValueError("Task {} not found in dataset {}".format(
             task_name, local_path))
@@ -171,7 +217,7 @@ def add_task(db_session, task_name, dataset_name=None, local_path=None,
         dataset_model.preproc_address = preproc_address
         dataset_model.local_path = local_path
         db_session.commit()
-    else:
+    elif not reingest:
         if automagic:
             automagic.deactivate()
         return dataset_model.id
@@ -186,76 +232,104 @@ def add_task(db_session, task_name, dataset_name=None, local_path=None,
         task_model.TR = task_model.description['RepetitionTime']
         db_session.commit()
 
-
+    stims_processed = {}
     """ Parse every Run """
-    for run_events in layout.get(task=task_name, type='events', **kwargs):
-        if verbose:
-            print("Processing task {} subject {}, run {}".format(
-                run_events.task, run_events.subject, run_events.run))
+    for img in layout.get(task=task_name, type='bold', extensions='.nii.gz',
+                          **kwargs):
+        current_app.logger.info("Processing task {} subject {}, run {}".format(
+            img.task, img.subject, img.run))
 
         # Get entities
-        entities = {entity : getattr(run_events, entity)
+        entities = {entity : getattr(img, entity)
                     for entity in ['subject', 'session']
-                    if entity in run_events._fields}
+                    if entity in img._fields}
 
         """ Extract Run information """
         run_model, new = db_utils.get_or_create(db_session, Run,
                                                 dataset_id=dataset_model.id,
-                                                number=run_events.run,
+                                                number=img.run,
                                                 task_id = task_model.id,
                                                 **entities)
-        entities['run'] = run_events.run
+        entities['run'] = img.run
         entities['task'] = task_model.name
 
         # Get duration (helps w/ transformations)
         try:
-            img = nib.load(layout.get(type='bold', extensions='.nii.gz',
-                              return_type='file', **entities)[0])
-            run_model.duration = img.shape[3] * img.header.get_zooms()[-1] / 1000
+            img_ni = nib.load(img.filename)
+            run_model.duration = img_ni.shape[3] * img_ni.header.get_zooms()[-1] \
+                                    / 1000
         except (nib.filebasedimages.ImageFileError, IndexError) as e:
-            print("Error loading BOLD file, duration not loaded.")
+            current_app.logger.debug(
+                "Error loading BOLD file, default duration used.")
+            run_model.duration = scan_length
 
         run_model.func_path = format_preproc(suffix="preproc", **entities)
         run_model.mask_path = format_preproc(suffix="brainmask", **entities)
-        db_session.commit()
 
         # Confirm remote address exists:
         if dataset_model.preproc_address is not None:
-            remote_resource_exists(dataset_model.preproc_address, run_model.func_path)
-            remote_resource_exists(dataset_model.preproc_address, run_model.mask_path)
+            remote_resource_exists(
+                dataset_model.preproc_address, run_model.func_path)
+            remote_resource_exists(
+                dataset_model.preproc_address, run_model.mask_path)
 
         """ Extract Predictors"""
-        if verbose:
-            print("Extracting predictors")
-        # Read event file and extract information
-        tsv = pd.read_csv(open(run_events.filename, 'r'), delimiter='\t')
-        tsv = dict(tsv.iteritems())
-        onsets = tsv.pop('onset').tolist()
-        durations = tsv.pop('duration').tolist()
-        stims = tsv.pop('stim_file')
+        current_app.logger.info("Extracting predictors")
 
-        if skip_predictors is False:
-            # Parse event columns and insert as Predictors
-            for predictor in tsv.keys():
-                add_predictor(db_session, predictor, dataset_model.id, run_model.id,
-                              onsets, durations, tsv[predictor])
+        if automagic:
+            events = layout.get_events(img.filename)
+            if isinstance(events, str):
+                events = [events]
+            for e in events:
+                dl.get(e)
+                dl.unlock(e)
+
+        variables = []
+        variables.append(
+            (load_event_variables(layout,
+                                  extract_events=True,
+                                  extract_recordings=False,
+                                  extract_confounds=False,
+                                  scan_length=run_model.duration or scan_length,
+                                  **entities), 'events'))
+        stims = variables[0][0].columns.pop('stim_file')
+
+        variables.append(
+            (load_event_variables(layout,
+                                  extract_events=False,
+                                  extract_recordings=True,
+                                  extract_confounds=False,
+                                  scan_length=run_model.duration or scan_length,
+                                  **entities), 'recordings'))
+        variables.append(
+            (load_event_variables(layout,
+                                  extract_events=False,
+                                  extract_recordings=False,
+                                  extract_confounds=True,
+                                  scan_length=run_model.duration or scan_length,
+                                  **entities), 'confounds'))
+
+        # Parse event columns and insert as Predictors
+        for collection, source in variables:
+            add_predictor_collection(db_session, collection, dataset_model.id,
+                                     run_model.id, source=source,
+                                     include_predictors=include_predictors,
+                                     TR=task_model.TR)
 
         """ Ingest Stimuli """
-        if verbose:
-            print("Ingesting stimuli")
+        current_app.logger.info("Ingesting stimuli")
 
-        stims_processed = {}
-        for i, val in stims[stims!="n/a"].items():
+        for i, val in enumerate(stims.values):
+            path = join(local_path, 'stimuli/{}'.format(val))
             if val not in stims_processed:
-                path = join(local_path, 'stimuli/{}'.format(val))
-
                 try:
                     if automagic:
                         dl.get(path)
                         dl.unlock(path)
-                    stim_hash = hash_file(path)
-                except OSError:
-                    print('Stimulus: {} not found. Skipping.'.format(val))
+                    stim_hash = hash_stim(path)
+                except OSError as e:
+                    current_app.logger.debug(
+                        'Stimulus: {} not found. Skipping.'.format(val))
                     continue
 
                 stims_processed[val] = stim_hash
@@ -269,11 +343,10 @@ def add_task(db_session, task_name, dataset_name=None, local_path=None,
             runstim, _ = db_utils.get_or_create(db_session, RunStimulus,
                                                 stimulus_id=stim_model.id,
                                                 run_id=run_model.id,
-                                                onset=onsets[i],
-                                                duration=durations[i])
+                                                onset=stims.onset.tolist()[i],
+                                                duration=stims.duration.tolist()[i])
     """ Add GroupPredictors """
-    if verbose:
-        print("Adding group predictors")
+    current_app.logger.info("Adding group predictors")
     add_group_predictors(db_session, dataset_model.id,
                          join(local_path, 'participants.tsv'))
 
