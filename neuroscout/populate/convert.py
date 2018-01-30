@@ -17,8 +17,9 @@ from models import Dataset, Task, Run, Stimulus, RunStimulus
 from .utils import hash_stim
 from .ingest import add_stimulus
 
-def save_stim_filename(stimulus, basepath=''):
+def save_stim_filename(stimulus):
     """ Given a pliers stimulus object, create a hash, filename, and save """
+    basepath = Path(current_app.config['STIMULUS_DIR']).absolute().as_posix()
     stim_hash = hash_stim(stimulus)
 
     stim_types = {ImageStim: '.png',
@@ -89,9 +90,9 @@ def convert_stimuli(db_session, dataset_name, task_name, converters,
 
 
             for res in results:
-                    # Save stim to file
-                    stim_hash, path = save_stim_filename(res, basepath=Path(
-                        current_app.config['STIMULUS_DIR']).absolute().as_posix())
+                # Save stim to file
+                if hasattr(res, 'data') and res.data:
+                    stim_hash, path = save_stim_filename(res)
 
                     # Create stimulus model
                     new_stim, new = add_stimulus(
@@ -103,12 +104,13 @@ def convert_stimuli(db_session, dataset_name, task_name, converters,
 
                     if not new:
                         # Delete previous RS associations with this derived stim
-                        to_delete = db_session.query(RunStimulus.id).filter_by(
+                        delete = db_session.query(RunStimulus.id).filter_by(
                             stimulus_id=new_stim.id).join(Run).join(
                                 Task).filter_by(name=task_name)
-                        RunStimulus.query.filter(RunStimulus.id.in_(to_delete)).\
+                        RunStimulus.query.filter(RunStimulus.id.in_(delete)).\
                             delete(synchronize_session='fetch')
 
+                    # Create new run stimulus associations
                     for rs in rs_orig:
                         new_rs = RunStimulus(stimulus_id=new_stim.id,
                                              run_id=rs.run_id,
@@ -118,10 +120,10 @@ def convert_stimuli(db_session, dataset_name, task_name, converters,
                         db_session.commit()
 
         # De-activate previously generated stimuli from these converters.
-        to_update = Stimulus.query.filter_by(parent_id=stim.id).filter(
+        update = Stimulus.query.filter_by(parent_id=stim.id).filter(
             Stimulus.id.notin_(new_stims))
-        if to_update.count():
-            to_update.update(dict(active=False))
+        if update.count():
+            update.update(dict(active=False))
         db_session.commit()
         total_new_stims += new_stims
 
