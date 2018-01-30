@@ -37,14 +37,13 @@ def save_stim_filename(stimulus):
     return stim_hash, filename
 
 def convert_stimuli(db_session, dataset_name, task_name, converters,
-                     verbose=True, automagic=False):
+                     automagic=False):
     """ Extract features using pliers for a dataset/task
         Args:
             db_session - database session object
             dataset_name - dataset name
             task_name - task name
             converters - dictionary of converter names to parameters
-            verbose - verbose output
             automagic - enable Datalad
         Output:
             list of db ids of converted stimuli

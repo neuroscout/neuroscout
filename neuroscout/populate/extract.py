@@ -111,14 +111,13 @@ class FeatureSerializer(object):
         return annotated
 
 def extract_features(db_session, dataset_name, task_name, extractors,
-                     verbose=True, automagic=False):
+                     automagic=False):
     """ Extract features using pliers for a dataset/task
         Args:
             db_session - database session object
             dataset_name - dataset name
             task_name - task name
             extractors - dictionary of extractor names to parameters
-            verbose - verbose output
             automagic - enable Datalad
         Output:
             list of db ids of extracted features
@@ -220,10 +219,7 @@ def extract_features(db_session, dataset_name, task_name, extractors,
                 if (len(durations) == 1) and (durations[0] is None):
                     durations[0] = rs.duration
 
-                predictor_name = '{}.{}'.format(
-                    ef.extractor_name, ef.feature_name)
-
-                populate.add_predictor(db_session, predictor_name, dataset_id,
+                populate.add_predictor(db_session, ef.feature_name, dataset_id,
                                        rs.run_id, onsets, durations, values,
                                        source='extracted',
                                        ef_id=ef.id)

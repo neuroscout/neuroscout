@@ -45,7 +45,7 @@ def test_get_predictor(auth_client, extract_features):
     assert 'extracted_feature' not in pred_p[0]
 
     # Test extracted_feature
-    resp = auth_client.get('/api/predictors', params={'name': 'BrightnessExtractor.Brightness',
+    resp = auth_client.get('/api/predictors', params={'name': 'Brightness',
         'run_id': run_id})
     assert resp.status_code == 200
     pred_p = decode_json(resp)

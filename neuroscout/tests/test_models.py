@@ -144,7 +144,7 @@ def test_extracted_features(session, add_task, extract_features):
 
 	# Test that Predictors were created from EF
 	pred = Predictor.query.filter_by(ef_id=ef_b.id).one()
-	assert pred.name == "BrightnessExtractor.Brightness"
+	assert pred.name == "Brightness"
 	assert pred.source == "extracted"
 
 	# Test that a Predictor was not made for vibrance (hidden)
