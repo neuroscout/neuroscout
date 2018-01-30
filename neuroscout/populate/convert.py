@@ -49,7 +49,7 @@ def convert_stimuli(db_session, dataset_name, task_name, converters,
         Output:
             list of db ids of converted stimuli
     """
-    print("Converting stims")
+    current_app.logger.info("Converting stimuli")
 
     dataset_id = Dataset.query.filter_by(name=dataset_name).one().id
     converters = [get_transformer(n, **p) for n, p in converters]

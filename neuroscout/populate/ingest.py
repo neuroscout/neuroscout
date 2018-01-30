@@ -4,6 +4,7 @@ Tools to populate database from BIDS datasets
 from os.path import realpath, join, exists
 import json
 import magic
+from flask import current_app
 
 import pandas as pd
 import nibabel as nib
@@ -38,7 +39,7 @@ def add_predictor(db_session, predictor_name, dataset_id, run_id,
         predictor id
 
     """
-    print("Extracting {}".format(predictor_name))
+    current_app.logger.info("Extracting {}".format(predictor_name))
     predictor, _ = db_utils.get_or_create(db_session, Predictor,
                                           name=predictor_name,
                                           dataset_id=dataset_id,
@@ -86,7 +87,6 @@ def add_predictor_collection(db_session, collection, ds_id, run_id, source=None,
         else:
             if TR is not None:
                 var.resample(1 / TR)
-                print("Resampling")
             else:
                 TR = var.sampling_rate / 2
 
@@ -162,7 +162,7 @@ def add_stimulus(db_session, path, stim_hash, dataset_id, parent_id=None,
 
 def add_task(db_session, task_name, dataset_name=None, local_path=None,
              dataset_address=None, preproc_address=None, install_path='.',
-             automagic=False, verbose=True, reingest=False, scan_length=1000,
+             automagic=False, reingest=False, scan_length=1000,
              include_predictors=None, **kwargs):
     """ Adds a BIDS dataset task to the database.
         Args:
@@ -174,7 +174,6 @@ def add_task(db_session, task_name, dataset_name=None, local_path=None,
             preproc_address - remote address of preprocessed files.
             install_path - if remote with no local path, where to install.
             automagic - force enable DataLad automagic
-            verbose - verbose output
             reingest - force reingesting even if dataset already exists
             scan_length - default scan length in case it cant be found in image
             include_predictors - set of predictors to ingest
@@ -237,9 +236,8 @@ def add_task(db_session, task_name, dataset_name=None, local_path=None,
     """ Parse every Run """
     for img in layout.get(task=task_name, type='bold', extensions='.nii.gz',
                           **kwargs):
-        if verbose:
-            print("Processing task {} subject {}, run {}".format(
-                img.task, img.subject, img.run))
+        current_app.logger.info("Processing task {} subject {}, run {}".format(
+            img.task, img.subject, img.run))
 
         # Get entities
         entities = {entity : getattr(img, entity)
@@ -261,7 +259,8 @@ def add_task(db_session, task_name, dataset_name=None, local_path=None,
             run_model.duration = img_ni.shape[3] * img_ni.header.get_zooms()[-1] \
                                     / 1000
         except (nib.filebasedimages.ImageFileError, IndexError) as e:
-            print("Error loading BOLD file, default duration used.")
+            current_app.logger.debug(
+                "Error loading BOLD file, default duration used.")
             run_model.duration = scan_length
 
         run_model.func_path = format_preproc(suffix="preproc", **entities)
@@ -275,8 +274,7 @@ def add_task(db_session, task_name, dataset_name=None, local_path=None,
                 dataset_model.preproc_address, run_model.mask_path)
 
         """ Extract Predictors"""
-        if verbose:
-            print("Extracting predictors")
+        current_app.logger.info("Extracting predictors")
 
         if automagic:
             events = layout.get_events(img.filename)
@@ -319,8 +317,7 @@ def add_task(db_session, task_name, dataset_name=None, local_path=None,
                                      TR=task_model.TR)
 
         """ Ingest Stimuli """
-        if verbose:
-            print("Ingesting stimuli")
+        current_app.logger.info("Ingesting stimuli")
 
         for i, val in enumerate(stims.values):
             path = join(local_path, 'stimuli/{}'.format(val))
@@ -331,7 +328,8 @@ def add_task(db_session, task_name, dataset_name=None, local_path=None,
                         dl.unlock(path)
                     stim_hash = hash_stim(path)
                 except OSError as e:
-                    print('Stimulus: {} not found. Skipping.'.format(val))
+                    current_app.logger.debug(
+                        'Stimulus: {} not found. Skipping.'.format(val))
                     continue
 
                 stims_processed[val] = stim_hash
@@ -348,8 +346,7 @@ def add_task(db_session, task_name, dataset_name=None, local_path=None,
                                                 onset=stims.onset.tolist()[i],
                                                 duration=stims.duration.tolist()[i])
     """ Add GroupPredictors """
-    if verbose:
-        print("Adding group predictors")
+    current_app.logger.info("Adding group predictors")
     add_group_predictors(db_session, dataset_model.id,
                          join(local_path, 'participants.tsv'))
 

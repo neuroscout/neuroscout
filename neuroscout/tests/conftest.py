@@ -121,8 +121,7 @@ def add_users(app, db, session):
 @pytest.fixture(scope="function")
 def add_task(session):
     """ Add a dataset with two subjects """
-    return populate.add_task(session, 'bidstest', local_path=DATASET_PATH,
-                                verbose=False)
+    return populate.add_task(session, 'bidstest', local_path=DATASET_PATH)
 
 @pytest.fixture(scope="function")
 def add_task_remote(session):
