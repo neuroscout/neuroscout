@@ -186,17 +186,17 @@ def add_analysis(session, add_users, add_task, extract_features):
               {
                 "name": "scale",
                 "input": [
-                  "BrightnessExtractor.Brightness"
+                  "Brightness"
                 ]
               }
             ],
             "model": {
               "HRF_variables": [
-                "BrightnessExtractor.Brightness",
+                "Brightness",
                 "rt"
               ],
               "variables": [
-                "BrightnessExtractor.Brightness",
+                "Brightness",
                 "rt"
               ]
             },
@@ -204,7 +204,7 @@ def add_analysis(session, add_users, add_task, extract_features):
               {
                 "name": "BvsRT",
                 "condition_list": [
-                  "BrightnessExtractor.Brightness",
+                  "Brightness",
                   "rt"
                 ],
                 "weights": [

@@ -49,20 +49,32 @@ def writeout_events(analysis, pes, dir):
 
 @celery_app.task(name='workflow.compile')
 def compile(analysis, predictor_events, resources, bids_dir):
-    analysis_update = {} # New fields to return for analysis
     files_dir = mkdtemp()
     model = analysis.pop('model')
-    scan_length = analysis['runs'][0]['duration'] or 1000 # Default value
+    scan_length = analysis['runs'][0]['duration']
 
+    # Get run entities
+    entities = {'session': [], 'subject': [], 'number': []}
+    for ent, entries in entities.items():
+        for r in analysis['runs']:
+            if r[ent]:
+             entries += [r[ent]]
+    entities = {k:v for k,v in entities.items() if v}
+    entities['run'] = entities.pop('number')
+
+    logger.info(entities)
+
+    # Write out events
     bundle_paths = writeout_events(analysis, predictor_events, files_dir)
 
+    # Load events and try applying transformations
     bids_layout = BIDSLayout([bids_dir, files_dir])
     variables = {
         'time': load_event_variables(bids_layout, derivatives='only',
                                      task=analysis['task_name'],
-                                     scan_length=scan_length)
+                                     scan_length=scan_length,
+                                     **entities)
         }
-
 
     bids_analysis = Analysis(bids_layout, model, variables=variables)
     try:
@@ -82,6 +94,4 @@ def compile(analysis, predictor_events, resources, bids_dir):
         for path in bundle_paths:
             tar.add(path, arcname=basename(path))
 
-    analysis_update['bundle_path'] = bundle_path
-
-    return analysis_update
+    return {'bundle_path': bundle_path}
