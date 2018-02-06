@@ -1,7 +1,7 @@
 """ Dataset ingestion
 Tools to populate database from BIDS datasets
 """
-from os.path import realpath, join, exists
+from os.path import realpath, join, exists, isfile
 import json
 import magic
 from flask import current_app
@@ -17,6 +17,7 @@ from datalad.auto import AutomagicIO
 
 import db_utils
 from .utils import remote_resource_exists, format_preproc, hash_stim
+from utils import listify
 from models import (Dataset, Task, Run, Predictor, PredictorEvent, PredictorRun,
                     Stimulus, RunStimulus, GroupPredictor, GroupPredictorValue)
 
@@ -276,13 +277,9 @@ def add_task(db_session, task_name, dataset_name=None, local_path=None,
         """ Extract Predictors"""
         current_app.logger.info("Extracting predictors")
 
-        if automagic:
-            events = layout.get_events(img.filename)
-            if isinstance(events, str):
-                events = [events]
-            for e in events:
-                dl.get(e)
-                dl.unlock(e)
+        # Assert event files exist (for DataLad)
+        for e in listify(layout.get_events(img.filename)):
+            assert isfile(e)
 
         variables = []
         variables.append(
@@ -323,9 +320,6 @@ def add_task(db_session, task_name, dataset_name=None, local_path=None,
             path = join(local_path, 'stimuli/{}'.format(val))
             if val not in stims_processed:
                 try:
-                    if automagic:
-                        dl.get(path)
-                        dl.unlock(path)
                     stim_hash = hash_stim(path)
                 except OSError as e:
                     current_app.logger.debug(

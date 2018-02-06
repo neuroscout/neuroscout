@@ -5,8 +5,6 @@ import urllib.parse
 import hashlib
 import warnings
 
-from pliers.stimuli import load_stims
-
 def format_preproc(subject, task, run, session=None,
                    space="MNI152NLin2009cAsym", suffix="preproc"):
     """ Format relative fmri_prep paths """
@@ -22,6 +20,7 @@ def format_preproc(subject, task, run, session=None,
 def hash_stim(stim, blocksize = 65536):
     """ Hash a pliers stimulus """
     if isinstance(stim, str):
+        from pliers.stimuli import load_stims
         stim = load_stims(stim)
 
     hasher = hashlib.sha1()
