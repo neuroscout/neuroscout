@@ -6,11 +6,9 @@ from os import makedirs
 from flask import current_app
 from pathlib import Path
 
-from pliers.stimuli import load_stims
 from pliers.stimuli import (TextStim, ImageStim, VideoFrameStim,
-                            VideoStim, AudioStim)
+                            VideoStim, AudioStim, load_stims)
 from pliers.transformers import get_transformer
-from datalad import api as da
 
 from models import Dataset, Task, Run, Stimulus, RunStimulus
 
@@ -36,15 +34,13 @@ def save_stim_filename(stimulus):
 
     return stim_hash, filename
 
-def convert_stimuli(db_session, dataset_name, task_name, converters,
-                     automagic=False):
+def convert_stimuli(db_session, dataset_name, task_name, converters):
     """ Extract features using pliers for a dataset/task
         Args:
             db_session - database session object
             dataset_name - dataset name
             task_name - task name
             converters - dictionary of converter names to parameters
-            automagic - enable Datalad
         Output:
             list of db ids of converted stimuli
     """
@@ -57,12 +53,6 @@ def convert_stimuli(db_session, dataset_name, task_name, converters,
     stim_objects = Stimulus.query.filter_by(active=True, parent_id=None).join(
         RunStimulus).join(Run).join(Task).filter_by(name=task_name).join(
             Dataset).filter_by(name=dataset_name)
-
-    # Datalad unlock all stim paths
-    if automagic:
-        stim_paths = [s.path for s in stim_objects]
-        da.get(stim_paths)
-        da.unlock(stim_paths)
 
     total_new_stims = []
     # Extract new stimuli from original stimuli
@@ -86,7 +76,6 @@ def convert_stimuli(db_session, dataset_name, task_name, converters,
                         results += converted.elements
                     else:
                         results.append(converted)
-
 
             for res in results:
                 # Save stim to file
