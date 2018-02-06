@@ -110,15 +110,13 @@ class FeatureSerializer(object):
 
         return annotated
 
-def extract_features(db_session, dataset_name, task_name, extractors,
-                     automagic=False):
+def extract_features(db_session, dataset_name, task_name, extractors):
     """ Extract features using pliers for a dataset/task
         Args:
             db_session - database session object
             dataset_name - dataset name
             task_name - task name
             extractors - dictionary of extractor names to parameters
-            automagic - enable Datalad
         Output:
             list of db ids of extracted features
     """
@@ -130,10 +128,6 @@ def extract_features(db_session, dataset_name, task_name, extractors,
             Dataset).filter_by(name=dataset_name)
 
     stim_paths = [s.path for s in stim_objects if s.parent_id is None]
-    if automagic:
-        # Monkey-patched auto doesn't work, so get and unlock manually
-        da.get(stim_paths)
-        da.unlock(stim_paths)
     stim_paths += [s.path for s in stim_objects if s.parent_id is not None]
     stims = load_stims(stim_paths)
 
