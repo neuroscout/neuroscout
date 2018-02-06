@@ -109,16 +109,12 @@ def ingest_from_json(db_session, config_file, automagic=False,
 
             """ Convert stimuli """
             converters = params.get('converters', None)
-
             if converters:
-                convert_stimuli(db_session, dataset_name, task_name,
-                                         converters, automagic=automagic)
+                convert_stimuli(db_session, dataset_name, task_name, converters)
 
             """ Extract features from applicable stimuli """
             extractors = params.get('extractors', None)
-
             if extractors:
                 extract_features(db_session, dataset_name, task_name,
-                                          extractors, automagic=automagic,
-                                          **params.get('extract_args',{}))
+                                 extractors, **params.get('extract_args',{}))
     return dataset_ids
