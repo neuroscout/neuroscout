@@ -28,7 +28,7 @@ def load_update_config(db_session, config_file, update=False):
 
     # Check for updates
     datastore = Path(current_app.config['FEATURE_DATASTORE'])
-    datastore.mkdir(exist_ok=True)
+    datastore.parents[0].mkdir(exist_ok=True)
     updated = check_updates(tfs, datastore=datastore.as_posix())
 
     if update:

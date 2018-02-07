@@ -103,18 +103,17 @@ def add_predictor_collection(db_session, collection, ds_id, run_id, source=None,
 def add_group_predictors(db_session, dataset_id, participants):
     """ Adds group predictors using participants.tsv
     Args:
-        participants - path to participants tsv, or pandas file
+        participants - path to participants tsv
         dataset_id - Dataset model id
         subjects - subject ids to processed
     Output:
         Ids of group predictors added
     """
     gp_ids = []
-    if isinstance(participants, str):
-        try:
-            participants = pd.read_csv(open(participants, 'r'), delimiter='\t')
-        except FileNotFoundError:
-            return []
+    try:
+        participants = pd.read_csv(participants, delimiter='\t')
+    except FileNotFoundError:
+        return []
 
     participants = dict(participants.iteritems())
     subs = participants.pop('participant_id')
@@ -208,17 +207,16 @@ def add_task(db_session, task_name, dataset_name=None, local_path=None,
         raise ValueError("Task {} not found in dataset {}".format(
             task_name, local_path))
 
-    dataset_description = json.load(open(
-        local_path / 'dataset_description.json'), 'r')
+    description = json.load((local_path / 'dataset_description.json').open())
     dataset_name = dataset_name if dataset_name is not None \
-                   else dataset_description['Name']
+                   else description['Name']
 
     # Get or create dataset model from mandatory arguments
     dataset_model, new_ds = db_utils.get_or_create(
         db_session, Dataset, name=dataset_name)
 
     if new_ds:
-        dataset_model.description = dataset_description
+        dataset_model.description = description
         dataset_model.dataset_address = dataset_address
         dataset_model.preproc_address = preproc_address
         dataset_model.local_path = local_path.as_posix()
@@ -233,8 +231,8 @@ def add_task(db_session, task_name, dataset_name=None, local_path=None,
         db_session, Task, name=task_name, dataset_id=dataset_model.id)
 
     if new_task:
-        task_model.description = json.load(open(
-            local_path / 'task-{}_bold.json'.format(task_name), 'r'))
+        task_model.description = json.load(
+            (local_path / 'task-{}_bold.json'.format(task_name)).open())
         task_model.TR = task_model.description['RepetitionTime']
         db_session.commit()
 
@@ -325,9 +323,8 @@ def add_task(db_session, task_name, dataset_name=None, local_path=None,
             stim_path = local_path / 'stimuli' / val
             if val not in stims_processed:
                 try:
-                    assert isfile(stim_path.as_posix())
                     stim_hash = hash_stim(stim_path)
-                except OSError as e:
+                except OSError:
                     current_app.logger.debug('{} not found.'.format(val))
                     continue
 

@@ -82,7 +82,7 @@ def compile(analysis, predictor_events, resources, bids_dir):
 
     # Write out analysis & resource JSON
     for obj, name in [(analysis, 'analysis'), (resources, 'resources'), (model, 'model')]:
-        path = (files_dir / name).with_suffix(name)
+        path = (files_dir / name).with_suffix('.json')
         json.dump(obj, path.open('w'))
         bundle_paths.append(path)
 
