@@ -61,6 +61,7 @@ def add_predictor(predictor_name, dataset_id, run_id, onsets, durations, values,
 
     return predictor.id
 
+
 def add_predictor_collection(collection, ds_id, run_id, source=None, TR=None,
                              include_predictors=None):
     """ Add a BIDSVariableCollection to the database.
@@ -129,6 +130,7 @@ def add_group_predictors(dataset_id, participants):
 
     return gp_ids
 
+
 def add_stimulus(path, stim_hash, dataset_id, parent_id=None,
                  converter_name=None, converter_params=None):
     """ Creare stimulus model """
@@ -140,13 +142,14 @@ def add_stimulus(path, stim_hash, dataset_id, parent_id=None,
         dataset_id=dataset_id, converter_name=converter_name)
 
     if new:
-        model.path=path
-        model.mimetype=mimetype
-        model.parent_id=parent_id
-        model.converter_params=converter_params
+        model.path = path
+        model.mimetype = mimetype
+        model.parent_id = parent_id
+        model.converter_params = converter_params
         db.session.commit()
 
     return model, new
+
 
 def add_task(task_name, dataset_name=None, local_path=None,
              dataset_address=None, preproc_address=None, include_predictors=None,
@@ -170,8 +173,9 @@ def add_task(task_name, dataset_name=None, local_path=None,
     if dataset_address is not None and local_path is None:
         local_path = install(
             source=dataset_address,
-            path=(Path(current_app.config['DATASET_DIR']) / dataset_name).\
-                absolute().as_posix()).path
+            path=(Path(
+                current_app.config['DATASET_DIR']) / dataset_name).as_posix()
+            )
         automagic = True
 
     if automagic:
@@ -181,10 +185,10 @@ def add_task(task_name, dataset_name=None, local_path=None,
     local_path = Path(local_path)
 
     # Look for events folder in derivatives
-    path = local_path.as_posix()
-    extra_events = local_path / 'derivatives/events'
+    path = [local_path.as_posix()]
+    extra_events = local_path / 'derivatives' / 'events'
     if extra_events.exists():
-        path = [path, extra_events.as_posix()]
+        path.append(extra_events.as_posix())
 
     layout = BIDSLayout(path)
     if task_name not in layout.get_tasks():
@@ -252,11 +256,9 @@ def add_task(task_name, dataset_name=None, local_path=None,
         run_model.mask_path = format_preproc(suffix="brainmask", **entities)
 
         # Confirm remote address exists:
-        if dataset_model.preproc_address is not None:
-            remote_resource_exists(
-                dataset_model.preproc_address, run_model.func_path)
-            remote_resource_exists(
-                dataset_model.preproc_address, run_model.mask_path)
+        if preproc_address is not None:
+            remote_resource_exists(preproc_address, run_model.func_path)
+            remote_resource_exists(preproc_address, run_model.mask_path)
 
         """ Extract Predictors"""
         current_app.logger.info("Extracting predictors")
