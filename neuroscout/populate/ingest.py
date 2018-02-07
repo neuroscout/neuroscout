@@ -266,12 +266,11 @@ def add_task(task_name, dataset_name=None, local_path=None,
             assert isfile(e)
 
         variables = []
-        variables.append(
-            (load_event_variables(layout,
+        variables.append((load_event_variables(layout,
                                   extract_events=True,
                                   extract_recordings=False,
                                   extract_confounds=False,
-                                  scan_length=run_model.duration or scan_length,
+                                  scan_length=run_model.duration,
                                   **entities), 'events'))
         stims = variables[0][0].columns.pop('stim_file')
 
@@ -280,14 +279,14 @@ def add_task(task_name, dataset_name=None, local_path=None,
                                   extract_events=False,
                                   extract_recordings=True,
                                   extract_confounds=False,
-                                  scan_length=run_model.duration or scan_length,
+                                  scan_length=run_model.duration,
                                   **entities), 'recordings'))
         variables.append(
             (load_event_variables(layout,
                                   extract_events=False,
                                   extract_recordings=False,
                                   extract_confounds=True,
-                                  scan_length=run_model.duration or scan_length,
+                                  scan_length=run_model.duration,
                                   **entities), 'confounds'))
 
         # Parse event columns and insert as Predictors
