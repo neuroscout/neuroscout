@@ -48,7 +48,7 @@ class AnalysisResource(AnalysisBaseResource):
 			kwargs = {k: v for k, v in kwargs.items() if k in exceptions}
 			if not kwargs:
 				abort(422, "Analysis is not editable. Try cloning it.")
-		return put_record(db.session, kwargs, analysis)
+		return put_record(kwargs, analysis)
 
 	@doc(summary='Delete analysis.')
 	@owner_required

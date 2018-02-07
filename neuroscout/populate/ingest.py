@@ -41,28 +41,23 @@ def add_predictor(predictor_name, dataset_id, run_id, onsets, durations, values,
 
     """
     current_app.logger.info("Extracting {}".format(predictor_name))
-    predictor, _ = get_or_create(db.session, Predictor,
-                                          name=predictor_name,
-                                          dataset_id=dataset_id,
-                                          source=source,
-                                          **kwargs)
+    predictor, _ = get_or_create(
+        Predictor, name=predictor_name, dataset_id=dataset_id,
+        source=source, **kwargs)
 
     values = pd.Series(values, dtype='object')
     # Insert each row of Predictor as PredictorEvent
     for i, val in enumerate(values[values!='n/a']):
-        pe, _ = get_or_create(db.session, PredictorEvent,
-                                       commit=False,
-                                       onset=onsets[i],
-                                       predictor_id=predictor.id,
-                                       run_id = run_id)
+        pe, _ = get_or_create(
+            PredictorEvent, commit=False,
+            onset=onsets[i], predictor_id=predictor.id, run_id = run_id)
         pe.duration = durations[i]
         pe.value = str(val)
         db.session.commit()
 
     # Add PredictorRun
-    pr, _ = get_or_create(db.session, PredictorRun,
-                                   predictor_id=predictor.id,
-                                   run_id = run_id)
+    pr, _ = get_or_create(
+        PredictorRun, predictor_id=predictor.id, run_id = run_id)
 
     return predictor.id
 
@@ -117,22 +112,17 @@ def add_group_predictors(dataset_id, participants):
 
     # Parse participant columns and insert as GroupPredictors
     for col in participants.keys():
-        gp, _ = get_or_create(db.session, GroupPredictor,
-                                              name=col,
-                                              dataset_id=dataset_id,
-                                              level='subject')
+        gp, _ = get_or_create(
+            GroupPredictor, name=col, dataset_id=dataset_id, level='subject')
 
         for i, val in participants[col].items():
             sub_id = subs[i].split('-')[1]
             subject_runs = Run.query.filter_by(dataset_id=dataset_id,
                                                subject=sub_id)
             for run in subject_runs:
-                gpv, _ = get_or_create(db.session,
-                                                GroupPredictorValue,
-                                                commit=False,
-                                                gp_id=gp.id,
-                                                run_id = run.id,
-                                                level_id=sub_id)
+                gpv, _ = get_or_create(
+                    GroupPredictorValue, commit=False,
+                    gp_id=gp.id, run_id = run.id, level_id=sub_id)
                 gpv.value = str(val)
         db.session.commit()
         gp_ids.append(gp.id)
@@ -146,9 +136,8 @@ def add_stimulus(path, stim_hash, dataset_id, parent_id=None,
     mimetype = magic.from_file(path, mime=True)
 
     model, new = get_or_create(
-        db.session, Stimulus, commit=False,
-        sha1_hash=stim_hash, dataset_id=dataset_id,
-        converter_name=converter_name)
+        Stimulus, commit=False, sha1_hash=stim_hash,
+        dataset_id=dataset_id, converter_name=converter_name)
 
     if new:
         model.path=path
@@ -207,8 +196,7 @@ def add_task(task_name, dataset_name=None, local_path=None,
                    else description['Name']
 
     # Get or create dataset model from mandatory arguments
-    dataset_model, new_ds = get_or_create(
-        db.session, Dataset, name=dataset_name)
+    dataset_model, new_ds = get_or_create(Dataset, name=dataset_name)
 
     if new_ds:
         dataset_model.description = description
@@ -223,7 +211,7 @@ def add_task(task_name, dataset_name=None, local_path=None,
 
     # Get or create task
     task_model, new_task = get_or_create(
-        db.session, Task, name=task_name, dataset_id=dataset_model.id)
+        Task, name=task_name, dataset_id=dataset_model.id)
 
     if new_task:
         task_model.description = json.load(
@@ -244,11 +232,9 @@ def add_task(task_name, dataset_name=None, local_path=None,
                     if entity in img._fields}
 
         """ Extract Run information """
-        run_model, new = get_or_create(db.session, Run,
-                                                dataset_id=dataset_model.id,
-                                                number=img.run,
-                                                task_id = task_model.id,
-                                                **entities)
+        run_model, new = get_or_create(
+            Run, dataset_id=dataset_model.id, number=img.run,
+            task_id = task_model.id, **entities)
         entities['run'] = img.run
         entities['task'] = task_model.name
 
@@ -331,8 +317,8 @@ def add_task(task_name, dataset_name=None, local_path=None,
 
             # Get or create Run Stimulus association
             runstim, _ = get_or_create(
-                db.session, RunStimulus, stimulus_id=stim_model.id,
-                run_id=run_model.id, onset=stims.onset.tolist()[i],
+                RunStimulus, stimulus_id=stim_model.id, run_id=run_model.id,
+                onset=stims.onset.tolist()[i],
                 duration=stims.duration.tolist()[i])
 
     """ Add GroupPredictors """

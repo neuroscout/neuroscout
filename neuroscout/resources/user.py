@@ -66,7 +66,7 @@ class UserRootResource(MethodResource):
         if User.query.filter((User.email==kwargs['email']) \
                              & (User.id!=current_identity.id)).all():
             abort(422, 'Email already in use.')
-        return put_record(db.session, kwargs, current_identity)
+        return put_record(kwargs, current_identity)
 
 @doc(tags=['auth'])
 class UserResendConfirm(MethodResource):
