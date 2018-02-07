@@ -1,5 +1,5 @@
 import datetime
-from os.path import join, dirname, realpath
+from pathlib import Path
 
 class Config(object):
     SERVER_NAME = 'external_host'
@@ -27,9 +27,9 @@ class Config(object):
     CONFIRM_USERS = True
     SEND_REGISTER_EMAIL = True
 
-    dir_path = dirname(dirname(realpath(__file__)))
-    FEATURE_SCHEMA = join(dir_path, 'config/feature_schema.json')
-    ALL_TRANSFORMERS = join(dir_path, 'config/transformers.json')
+    dir_path = Path(__file__).resolve().parents[1]
+    FEATURE_SCHEMA = (dir_path / 'config/feature_schema.json').as_posix()
+    ALL_TRANSFORMERS = (dir_path / 'config/transformers.json').as_posix()
 
     STIMULUS_DIR = 'path'
 
@@ -43,8 +43,8 @@ class DevelopmentConfig(Config):
 
 class TestingConfig(Config):
     TESTING = True
-    dir_path = dirname(dirname(realpath(__file__)))
-    FEATURE_SCHEMA = join(dir_path, 'tests/data/test_feature_schema.json')
+    dir_path = Path(__file__).resolve().parents[1]
+    FEATURE_SCHEMA = (dir_path / 'tests/data/test_feature_schema.json').as_posix()
     FEATURE_DATASTORE = '/tmp/file-data/feature-tracking.csv'
 
 class DockerTestConfig(TestingConfig):

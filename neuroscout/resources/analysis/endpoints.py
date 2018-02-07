@@ -3,11 +3,11 @@ from flask_apispec import MethodResource, marshal_with, use_kwargs, doc
 from flask_jwt import current_identity
 from worker import celery_app
 from database import db
-from db_utils import put_record
 from models import Analysis, PredictorEvent
 from os.path import exists
 
-from .. import utils
+from utils.db import put_record
+from ..utils import owner_required, auth_required, fetch_analysis, abort
 from ..predictor import PredictorEventSchema
 from .schemas import (AnalysisSchema, AnalysisFullSchema,
 					 AnalysisResourcesSchema)
@@ -26,7 +26,7 @@ class AnalysisRootResource(AnalysisBaseResource):
 
 	@use_kwargs(AnalysisSchema)
 	@doc(summary='Add new analysis!')
-	@utils.auth_required
+	@auth_required
 	def post(self, **kwargs):
 		new = Analysis(user_id = current_identity.id, **kwargs)
 		db.session.add(new)
@@ -35,26 +35,26 @@ class AnalysisRootResource(AnalysisBaseResource):
 
 class AnalysisResource(AnalysisBaseResource):
 	@doc(summary='Get analysis by id.')
-	@utils.fetch_analysis
+	@fetch_analysis
 	def get(self, analysis):
 		return analysis
 
 	@doc(summary='Edit analysis.')
 	@use_kwargs(AnalysisSchema)
-	@utils.owner_required
+	@owner_required
 	def put(self, analysis, **kwargs):
 		if analysis.status not in ['DRAFT', 'FAILED']:
 			exceptions = ['private']
 			kwargs = {k: v for k, v in kwargs.items() if k in exceptions}
 			if not kwargs:
-				utils.abort(422, "Analysis is not editable. Try cloning it.")
-		return put_record(db.session, kwargs, analysis)
+				abort(422, "Analysis is not editable. Try cloning it.")
+		return put_record(kwargs, analysis)
 
 	@doc(summary='Delete analysis.')
-	@utils.owner_required
+	@owner_required
 	def delete(self, analysis):
 		if analysis.status != 'DRAFT':
-			utils.abort(422, "Analysis is not editable, too bad!")
+			abort(422, "Analysis is not editable, too bad!")
 		db.session.delete(analysis)
 		db.session.commit()
 
@@ -62,12 +62,12 @@ class AnalysisResource(AnalysisBaseResource):
 
 class CloneAnalysisResource(AnalysisBaseResource):
 	@doc(summary='Clone analysis.')
-	@utils.auth_required
-	@utils.fetch_analysis
+	@auth_required
+	@fetch_analysis
 	def post(self, analysis):
 		if analysis.user_id != current_identity.id:
 			if analysis.status != 'PASSED':
-				utils.abort(422, "You can only clone somebody else's analysis"
+				abort(422, "You can only clone somebody else's analysis"
 								  " if they have been compiled.")
 
 		cloned = analysis.clone(current_identity)
@@ -92,7 +92,7 @@ def json_analysis(analysis):
 
 class CompileAnalysisResource(AnalysisBaseResource):
 	@doc(summary='Compile and lock analysis.')
-	@utils.owner_required
+	@owner_required
 	def post(self, analysis):
 		analysis.status = 'PENDING'
 		task = celery_app.send_task('workflow.compile',
@@ -107,14 +107,14 @@ class CompileAnalysisResource(AnalysisBaseResource):
 class AnalysisFullResource(AnalysisBaseResource):
 	@marshal_with(AnalysisFullSchema)
 	@doc(summary='Get analysis (including nested fields).')
-	@utils.fetch_analysis
+	@fetch_analysis
 	def get(self, analysis):
 		return analysis
 
 class AnalysisResourcesResource(AnalysisBaseResource):
 	@marshal_with(AnalysisResourcesSchema)
 	@doc(summary='Get analysis resources.')
-	@utils.fetch_analysis
+	@fetch_analysis
 	def get(self, analysis):
 		return analysis
 
@@ -123,10 +123,10 @@ class AnalysisBundleResource(MethodResource):
 	responses={"200": {
 		"description": "gzip tarball, including analysis, resources and events.",
 		"type": "application/x-tar"}})
-	@utils.fetch_analysis
+	@fetch_analysis
 	def get(self, analysis):
 		if (analysis.status != "PASSED" or analysis.bundle_path is None or \
 		not exists(analysis.bundle_path)):
 			msg = "Analysis bundle not available. Try compiling."
-			utils.abort(404, msg)
+			abort(404, msg)
 		return send_file(analysis.bundle_path, as_attachment=True)

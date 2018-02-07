@@ -2,7 +2,7 @@ from marshmallow import Schema, fields, post_dump
 import webargs as wa
 from flask_apispec import MethodResource, marshal_with, use_kwargs, doc
 from models import Predictor, PredictorEvent
-from . import utils
+from .utils import first_or_404
 from sqlalchemy import func
 from database import db
 
@@ -43,7 +43,7 @@ class PredictorResource(MethodResource):
 	@doc(tags=['predictors'], summary='Get predictor by id.')
 	@marshal_with(PredictorSingleSchema)
 	def get(self, predictor_id, **kwargs):
-		return utils.first_or_404(Predictor.query.filter_by(id=predictor_id))
+		return first_or_404(Predictor.query.filter_by(id=predictor_id))
 
 class PredictorListResource(MethodResource):
 	@doc(tags=['predictors'], summary='Get list of predictors.',)

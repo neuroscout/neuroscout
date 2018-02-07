@@ -7,8 +7,8 @@ from marshmallow import Schema, fields, validates, ValidationError, post_load
 from models.auth import User
 from database import db
 from auth import register_user, reset_password, send_confirmation
-from . import utils
-import db_utils
+from .utils import abort, auth_required
+from utils.db import put_record
 
 class UserSchema(Schema):
     email = fields.Email(required=True)
@@ -50,7 +50,7 @@ class UserResetSchema(UserCreationSchema):
 @marshal_with(UserSchema)
 class UserRootResource(MethodResource):
     @doc(summary='Get current user information.')
-    @utils.auth_required
+    @auth_required
     def get(self):
     	return current_identity
 
@@ -61,12 +61,12 @@ class UserRootResource(MethodResource):
 
     @doc(summary='Edit user information.')
     @use_kwargs(UserSchema)
-    @utils.auth_required
+    @auth_required
     def put(self, **kwargs):
         if User.query.filter((User.email==kwargs['email']) \
                              & (User.id!=current_identity.id)).all():
-            utils.abort(422, 'Email already in use.')
-        return db_utils.put_record(db.session, kwargs, current_identity)
+            abort(422, 'Email already in use.')
+        return put_record(kwargs, current_identity)
 
 @doc(tags=['auth'])
 class UserResendConfirm(MethodResource):

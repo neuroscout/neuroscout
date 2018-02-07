@@ -3,6 +3,7 @@ Set of methods to extract features from stimuli in a dataset and generate
 the associated predictors
 """
 from flask import current_app
+from database import db
 import json
 import re
 import pandas as pd
@@ -10,7 +11,6 @@ import numpy as np
 
 from pliers.stimuli import load_stims
 from pliers.transformers import get_transformer
-from datalad import api as da
 
 import populate
 from models import (Dataset, Task,
@@ -110,15 +110,12 @@ class FeatureSerializer(object):
 
         return annotated
 
-def extract_features(db_session, dataset_name, task_name, extractors,
-                     automagic=False):
+def extract_features(dataset_name, task_name, extractors):
     """ Extract features using pliers for a dataset/task
         Args:
-            db_session - database session object
             dataset_name - dataset name
             task_name - task name
             extractors - dictionary of extractor names to parameters
-            automagic - enable Datalad
         Output:
             list of db ids of extracted features
     """
@@ -130,10 +127,6 @@ def extract_features(db_session, dataset_name, task_name, extractors,
             Dataset).filter_by(name=dataset_name)
 
     stim_paths = [s.path for s in stim_objects if s.parent_id is None]
-    if automagic:
-        # Monkey-patched auto doesn't work, so get and unlock manually
-        da.get(stim_paths)
-        da.unlock(stim_paths)
     stim_paths += [s.path for s in stim_objects if s.parent_id is not None]
     stims = load_stims(stim_paths)
 
@@ -159,14 +152,14 @@ def extract_features(db_session, dataset_name, task_name, extractors,
                 if ef_hash not in extracted_features:
                     # Create/get feature
                     ef_model = ExtractedFeature(**serialized[i])
-                    db_session.add(ef_model)
-                    db_session.commit()
+                    db.session.add(ef_model)
+                    db.session.commit()
                     extracted_features[ef_hash] = ef_model
 
                 """" Add ExtractedEvents """
                 # Get associated stimulus record
                 stim_hash = hash_stim(res.stim)
-                stimulus = db_session.query(
+                stimulus = db.session.query(
                     Stimulus).filter_by(sha1_hash=stim_hash).one()
 
                 def grab_value(val):
@@ -184,12 +177,12 @@ def extract_features(db_session, dataset_name, task_name, extractors,
                                           history=res.history.string,
                                           ef_id=ef_model.id,
                                           value=value)
-                db_session.add(ee_model)
-                db_session.commit()
+                db.session.add(ee_model)
+                db.session.commit()
 
     """" Create Predictors from Extracted Features """
     # Active stimuli from this task
-    active_stims = db_session.query(Stimulus.id).filter_by(active=True). \
+    active_stims = db.session.query(Stimulus.id).filter_by(active=True). \
         join(RunStimulus).join(Run).join(Task).filter_by(name=task_name). \
         join(Dataset).filter_by(name=dataset_name)
     # For all instances for stimuli in this task's runs
@@ -219,9 +212,8 @@ def extract_features(db_session, dataset_name, task_name, extractors,
                 if (len(durations) == 1) and (durations[0] is None):
                     durations[0] = rs.duration
 
-                populate.add_predictor(db_session, ef.feature_name, dataset_id,
-                                       rs.run_id, onsets, durations, values,
-                                       source='extracted',
-                                       ef_id=ef.id)
+                populate.add_predictor(
+                    ef.feature_name, dataset_id, rs.run_id, onsets, durations,
+                    values, source='extracted', ef_id=ef.id)
 
     return list(extracted_features.values())

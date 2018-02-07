@@ -3,8 +3,7 @@ from celery.utils.log import get_task_logger
 import pandas as pd
 import tarfile
 import json
-from os.path import join, basename
-from os import makedirs
+from pathlib import Path
 from tempfile import mkdtemp
 from bids.analysis.variables import load_event_variables
 from bids.analysis import Analysis
@@ -13,10 +12,10 @@ from bids.grabbids import BIDSLayout
 logger = get_task_logger(__name__)
 
 
-def writeout_events(analysis, pes, dir):
+def writeout_events(analysis, pes, outdir):
     """ Write event files from JSON """
-    dir = join(dir, "func/")
-    makedirs(dir, exist_ok=True)
+    outdir = outdir / "func"
+    outdir.mkdir(exist_ok=True)
 
     # Load events and rename columns to human-readable
     pes = pd.DataFrame(pes)
@@ -39,9 +38,8 @@ def writeout_events(analysis, pes, dir):
 
             # Write out BIDS path
             ses = 'ses-{}_'.format(run['session']) if run.get('session') else ''
-            events_fname = join(dir,
-                                'sub-{}_{}task-{}_run-{}_events.tsv'.format(
-                run['subject'], ses, analysis['task_name'], run['number']))
+            events_fname = outdir / 'sub-{}_{}task-{}_run-{}_events.tsv'.format(
+                run['subject'], ses, analysis['task_name'], run['number'])
             paths.append(events_fname)
             run_events.to_csv(events_fname, sep='\t', index=False)
 
@@ -49,7 +47,7 @@ def writeout_events(analysis, pes, dir):
 
 @celery_app.task(name='workflow.compile')
 def compile(analysis, predictor_events, resources, bids_dir):
-    files_dir = mkdtemp()
+    files_dir = Path(mkdtemp())
     model = analysis.pop('model')
     scan_length = analysis['runs'][0]['duration']
 
@@ -68,7 +66,7 @@ def compile(analysis, predictor_events, resources, bids_dir):
     bundle_paths = writeout_events(analysis, predictor_events, files_dir)
 
     # Load events and try applying transformations
-    bids_layout = BIDSLayout([bids_dir, files_dir])
+    bids_layout = BIDSLayout([bids_dir, files_dir.as_posix()])
     variables = {
         'time': load_event_variables(bids_layout, derivatives='only',
                                      task=analysis['task_name'],
@@ -84,14 +82,14 @@ def compile(analysis, predictor_events, resources, bids_dir):
 
     # Write out analysis & resource JSON
     for obj, name in [(analysis, 'analysis'), (resources, 'resources'), (model, 'model')]:
-        path = join(files_dir, '{}.json'.format(name))
-        json.dump(obj, open(path, 'w'))
+        path = (files_dir / name).with_suffix('.json')
+        json.dump(obj, path.open('w'))
         bundle_paths.append(path)
 
     # Save bundle as tarball
     bundle_path = '/file-data/analyses/{}_bundle.tar.gz'.format(analysis['hash_id'])
     with tarfile.open(bundle_path, "w:gz") as tar:
         for path in bundle_paths:
-            tar.add(path, arcname=basename(path))
+            tar.add(path.as_posix(), arcname=path.name)
 
     return {'bundle_path': bundle_path}

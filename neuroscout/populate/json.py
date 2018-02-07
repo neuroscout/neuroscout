@@ -1,15 +1,14 @@
 import json
 from flask import current_app
-from pathlib import Path
 from .ingest import add_task
 from .extract import extract_features
 from .convert import convert_stimuli
 from models import Dataset
-import os
+from pathlib import Path
 from pliers.utils.updater import check_updates
 import itertools
 
-def load_update_config(db_session, config_file, update=False):
+def load_update_config(config_file, update=False):
     """ Returns element of config file that must be re-extracted
         as well as prepopulating default transformers in config file. """
     config_dict =  json.load(open(config_file, 'r'))
@@ -25,12 +24,12 @@ def load_update_config(db_session, config_file, update=False):
 
          tfs += task['extractors'] + task['converters']
 
-    # Check for updates
-    datastore = current_app.config['FEATURE_DATASTORE']
-    os.makedirs(os.path.dirname(datastore), exist_ok=True)
     tfs = list(k for k,_ in itertools.groupby(tfs)) # Unique-ify
 
-    updated = check_updates(tfs, datastore=datastore)
+    # Check for updates
+    datastore = Path(current_app.config['FEATURE_DATASTORE'])
+    datastore.parents[0].mkdir(exist_ok=True)
+    updated = check_updates(tfs, datastore=datastore.as_posix())
 
     if update:
         # Filter configs to only include updated transformers
@@ -56,11 +55,10 @@ def load_update_config(db_session, config_file, update=False):
 
     return config_dict
 
-def ingest_from_json(db_session, config_file, automagic=False,
+def ingest_from_json(config_file, automagic=False,
                      update_features=False, reingest=False):
     """ Adds a datasets from a JSON configuration file
         Args:
-            db_session - sqlalchemy db db_session
             config_file - a path to a json file
             automagic - force enable DataLad automagic
             update_features - re-extracted updated extractors
@@ -68,8 +66,7 @@ def ingest_from_json(db_session, config_file, automagic=False,
         Output:
             list of dataset model ids
      """
-    dataset_config = load_update_config(db_session, config_file,
-                                      update=update_features)
+    dataset_config = load_update_config(config_file, update=update_features)
     if update_features:
         if not (dataset_config or reingest):
             return []
@@ -80,27 +77,22 @@ def ingest_from_json(db_session, config_file, automagic=False,
         dataset_address = items.get('dataset_address')
         preproc_address = items.get('preproc_address')
         local_path = items.get('path')
-        if not (local_path or dataset_address):
-            raise Exception("Must provide path or remote address to dataset.")
 
         if local_path:
             local_path = Path(local_path).absolute().as_posix()
-
-        install_path = local_path or \
-            (Path(current_app.config['DATASET_DIR']) / dataset_name).absolute(
-                ).as_posix()
+        elif not dataset_address:
+            raise Exception("Must provide path or remote address to dataset.")
 
         for task_name, params in items['tasks'].items():
             """ Add task to database"""
             dp = params.get('ingest_args', {})
             dp.update(params.get('filters', {}))
 
-            dataset_id = add_task(db_session, task_name,
+            dataset_id = add_task(task_name,
                                   dataset_name=dataset_name,
                                   local_path=local_path,
                                   dataset_address=dataset_address,
                                   automagic=automagic,
-                                  install_path=install_path,
                                   preproc_address=preproc_address,
                                   reingest=reingest,
             					  **dp)
@@ -109,16 +101,12 @@ def ingest_from_json(db_session, config_file, automagic=False,
 
             """ Convert stimuli """
             converters = params.get('converters', None)
-
             if converters:
-                convert_stimuli(db_session, dataset_name, task_name,
-                                         converters, automagic=automagic)
+                convert_stimuli(dataset_name, task_name, converters)
 
             """ Extract features from applicable stimuli """
             extractors = params.get('extractors', None)
-
             if extractors:
-                extract_features(db_session, dataset_name, task_name,
-                                          extractors, automagic=automagic,
-                                          **params.get('extract_args',{}))
+                extract_features(dataset_name, task_name,
+                                 extractors, **params.get('extract_args',{}))
     return dataset_ids

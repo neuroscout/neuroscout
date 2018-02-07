@@ -5,7 +5,7 @@ from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.event import listens_for
 
 from database import db
-from db_utils import copy_row
+from utils.db import copy_row
 
 from hashids import Hashids
 import datetime

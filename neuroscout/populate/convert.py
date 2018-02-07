@@ -1,16 +1,13 @@
 """ Stimulus conversion.
 To apply pliers converters to create new stimuli from original dataset stims.
 """
-from os.path import join, dirname
-from os import makedirs
 from flask import current_app
+from database import db
 from pathlib import Path
 
-from pliers.stimuli import load_stims
 from pliers.stimuli import (TextStim, ImageStim, VideoFrameStim,
-                            VideoStim, AudioStim)
+                            VideoStim, AudioStim, load_stims)
 from pliers.transformers import get_transformer
-from datalad import api as da
 
 from models import Dataset, Task, Run, Stimulus, RunStimulus
 
@@ -19,7 +16,7 @@ from .ingest import add_stimulus
 
 def save_stim_filename(stimulus):
     """ Given a pliers stimulus object, create a hash, filename, and save """
-    basepath = Path(current_app.config['STIMULUS_DIR']).absolute().as_posix()
+    basepath = Path(current_app.config['STIMULUS_DIR']).absolute()
     stim_hash = hash_stim(stimulus)
 
     stim_types = {ImageStim: '.png',
@@ -29,22 +26,19 @@ def save_stim_filename(stimulus):
                   AudioStim: '.wav'}
 
     ext = [e for c, e in stim_types.items() if isinstance(stimulus, c)][0]
-    filename = join(basepath, stim_hash + ext)
+    filename = (basepath / stim_hash).with_suffix(ext)
 
-    makedirs(dirname(filename), exist_ok=True)
-    stimulus.save(filename)
+    filename.parents[0].mkdir(exist_ok=True)
+    stimulus.save(filename.as_posix())
 
     return stim_hash, filename
 
-def convert_stimuli(db_session, dataset_name, task_name, converters,
-                     automagic=False):
+def convert_stimuli(dataset_name, task_name, converters):
     """ Extract features using pliers for a dataset/task
         Args:
-            db_session - database session object
             dataset_name - dataset name
             task_name - task name
             converters - dictionary of converter names to parameters
-            automagic - enable Datalad
         Output:
             list of db ids of converted stimuli
     """
@@ -57,12 +51,6 @@ def convert_stimuli(db_session, dataset_name, task_name, converters,
     stim_objects = Stimulus.query.filter_by(active=True, parent_id=None).join(
         RunStimulus).join(Run).join(Task).filter_by(name=task_name).join(
             Dataset).filter_by(name=dataset_name)
-
-    # Datalad unlock all stim paths
-    if automagic:
-        stim_paths = [s.path for s in stim_objects]
-        da.get(stim_paths)
-        da.unlock(stim_paths)
 
     total_new_stims = []
     # Extract new stimuli from original stimuli
@@ -87,7 +75,6 @@ def convert_stimuli(db_session, dataset_name, task_name, converters,
                     else:
                         results.append(converted)
 
-
             for res in results:
                 # Save stim to file
                 if hasattr(res, 'data') and res.data:
@@ -95,7 +82,7 @@ def convert_stimuli(db_session, dataset_name, task_name, converters,
 
                     # Create stimulus model
                     new_stim, new = add_stimulus(
-                        db_session, path, stim_hash, parent_id=stim.id,
+                        path, stim_hash, parent_id=stim.id,
                         converter_name=converted.history.transformer_class,
                         converter_params=converted.history.transformer_params,
                         dataset_id=dataset_id)
@@ -103,7 +90,7 @@ def convert_stimuli(db_session, dataset_name, task_name, converters,
 
                     if not new:
                         # Delete previous RS associations with this derived stim
-                        delete = db_session.query(RunStimulus.id).filter_by(
+                        delete = db.session.query(RunStimulus.id).filter_by(
                             stimulus_id=new_stim.id).join(Run).join(
                                 Task).filter_by(name=task_name)
                         RunStimulus.query.filter(RunStimulus.id.in_(delete)).\
@@ -115,15 +102,15 @@ def convert_stimuli(db_session, dataset_name, task_name, converters,
                                              run_id=rs.run_id,
                                              onset=rs.onset + (res.onset or 0),
                                              duration=res.duration or rs.duration)
-                        db_session.add(new_rs)
-                        db_session.commit()
+                        db.session.add(new_rs)
+                        db.session.commit()
 
         # De-activate previously generated stimuli from these converters.
         update = Stimulus.query.filter_by(parent_id=stim.id).filter(
             Stimulus.id.notin_(new_stims))
         if update.count():
             update.update(dict(active=False))
-        db_session.commit()
+        db.session.commit()
         total_new_stims += new_stims
 
     return total_new_stims
