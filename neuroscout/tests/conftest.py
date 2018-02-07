@@ -1,4 +1,5 @@
-import os
+from os import environ
+from pathlib import Path
 import pytest
 from flask_security.utils import encrypt_password
 from core import app as _app
@@ -14,7 +15,7 @@ Session / db managment tools
 @pytest.fixture(scope='session')
 def app():
     """Session-wide test `Flask` application."""
-    if 'APP_SETTINGS' not in os.environ:
+    if 'APP_SETTINGS' not in environ:
         _app.config.from_object('config.app.TestingConfig')
 
     # Establish an application context before running the tests.
@@ -81,12 +82,11 @@ from models import (Analysis, Result, Predictor,
                     PredictorEvent, User, Role, Dataset)
 import populate
 
-DATASET_PATH = os.path.join(
-    os.path.dirname(os.path.realpath(__file__)), 'data/datasets/bids_test')
-LOCAL_JSON_PATH = os.path.join(
-    os.path.dirname(os.path.realpath(__file__)), 'data/test_local.json')
-REMOTE_JSON_PATH = os.path.join(
-    os.path.dirname(os.path.realpath(__file__)), 'data/test_remote.json')
+DATA_PATH = Path(__file__).resolve().parents[0] / 'data'
+
+DATASET_PATH = DATA_PATH / 'datasets/bids_test'
+LOCAL_JSON_PATH = (DATA_PATH / 'test_local.json').as_posix()
+REMOTE_JSON_PATH = (DATA_PATH / 'test_remote.json').as_posix()
 EXTRACTORS = [
     ("BrightnessExtractor", {}),
     ("VibranceExtractor", {})
