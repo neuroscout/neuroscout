@@ -1,8 +1,6 @@
 """ Stimulus conversion.
 To apply pliers converters to create new stimuli from original dataset stims.
 """
-from os.path import join, dirname
-from os import makedirs
 from flask import current_app
 from pathlib import Path
 
@@ -17,7 +15,7 @@ from .ingest import add_stimulus
 
 def save_stim_filename(stimulus):
     """ Given a pliers stimulus object, create a hash, filename, and save """
-    basepath = Path(current_app.config['STIMULUS_DIR']).absolute().as_posix()
+    basepath = Path(current_app.config['STIMULUS_DIR']).absolute()
     stim_hash = hash_stim(stimulus)
 
     stim_types = {ImageStim: '.png',
@@ -27,10 +25,10 @@ def save_stim_filename(stimulus):
                   AudioStim: '.wav'}
 
     ext = [e for c, e in stim_types.items() if isinstance(stimulus, c)][0]
-    filename = join(basepath, stim_hash + ext)
+    filename = (basepath / stim_hash).with_suffix(ext)
 
-    makedirs(dirname(filename), exist_ok=True)
-    stimulus.save(filename)
+    filename.parents[0].mkdir(exist_ok=True)
+    stimulus.save(filename.as_posix())
 
     return stim_hash, filename
 

@@ -13,7 +13,7 @@ import numpy as np
 
 from bids.grabbids import BIDSLayout
 from bids.analysis.variables import load_event_variables
-from datalad import api as dl
+from datalad.api import install
 from datalad.auto import AutomagicIO
 
 import db_utils
@@ -185,7 +185,7 @@ def add_task(db_session, task_name, dataset_name=None, local_path=None,
      """
 
     if dataset_address is not None and local_path is None:
-        local_path = dl.install(
+        local_path = install(
             source=dataset_address,
             path=(Path(current_app.config['DATASET_DIR']) / dataset_name).\
                 absolute().as_posix()).path
@@ -313,10 +313,10 @@ def add_task(db_session, task_name, dataset_name=None, local_path=None,
 
         # Parse event columns and insert as Predictors
         for collection, source in variables:
-            add_predictor_collection(db_session, collection, dataset_model.id,
-                                     run_model.id, source=source,
-                                     include_predictors=include_predictors,
-                                     TR=task_model.TR)
+            add_predictor_collection(
+                db_session, collection, dataset_model.id, run_model.id,
+                source=source, include_predictors=include_predictors,
+                TR=task_model.TR)
 
         """ Ingest Stimuli """
         current_app.logger.info("Ingesting stimuli")

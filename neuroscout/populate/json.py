@@ -4,7 +4,6 @@ from .ingest import add_task
 from .extract import extract_features
 from .convert import convert_stimuli
 from models import Dataset
-from os import makedirs
 from pathlib import Path
 from pliers.utils.updater import check_updates
 import itertools
@@ -25,12 +24,12 @@ def load_update_config(db_session, config_file, update=False):
 
          tfs += task['extractors'] + task['converters']
 
-    # Check for updates
-    datastore = Path(current_app.config['FEATURE_DATASTORE']).dirname()
-    makedirs(datastore, exist_ok=True)
     tfs = list(k for k,_ in itertools.groupby(tfs)) # Unique-ify
 
-    updated = check_updates(tfs, datastore=datastore)
+    # Check for updates
+    datastore = Path(current_app.config['FEATURE_DATASTORE'])
+    datastore.mkdir(exist_ok=True)
+    updated = check_updates(tfs, datastore=datastore.as_posix())
 
     if update:
         # Filter configs to only include updated transformers
