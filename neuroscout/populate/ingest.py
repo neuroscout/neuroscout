@@ -1,10 +1,11 @@
 """ Dataset ingestion
 Tools to populate database from BIDS datasets
 """
-from os.path import realpath, join, exists, isfile
+from os.path import isfile
 import json
 import magic
 from flask import current_app
+from pathlib import Path
 
 import pandas as pd
 import nibabel as nib
@@ -145,6 +146,7 @@ def add_group_predictors(db_session, dataset_id, participants):
 def add_stimulus(db_session, path, stim_hash, dataset_id, parent_id=None,
                     converter_name=None, converter_params=None):
     """ Creare stimulus model """
+    path = path.resolve().as_posix()
     mimetype = magic.from_file(path, mime=True)
 
     model, new = db_utils.get_or_create(
@@ -153,7 +155,7 @@ def add_stimulus(db_session, path, stim_hash, dataset_id, parent_id=None,
         converter_name=converter_name)
 
     if new:
-        model.path=realpath(path)
+        model.path=path
         model.mimetype=mimetype
         model.parent_id=parent_id
         model.converter_params=converter_params
@@ -162,7 +164,7 @@ def add_stimulus(db_session, path, stim_hash, dataset_id, parent_id=None,
     return model, new
 
 def add_task(db_session, task_name, dataset_name=None, local_path=None,
-             dataset_address=None, preproc_address=None, install_path='.',
+             dataset_address=None, preproc_address=None,
              automagic=False, reingest=False, scan_length=1000,
              include_predictors=None, **kwargs):
     """ Adds a BIDS dataset task to the database.
@@ -173,7 +175,6 @@ def add_task(db_session, task_name, dataset_name=None, local_path=None,
             local_path - path to local bids dataset.
             dataset_address - remote address of BIDS dataset.
             preproc_address - remote address of preprocessed files.
-            install_path - if remote with no local path, where to install.
             automagic - force enable DataLad automagic
             reingest - force reingesting even if dataset already exists
             scan_length - default scan length in case it cant be found in image
@@ -184,19 +185,23 @@ def add_task(db_session, task_name, dataset_name=None, local_path=None,
      """
 
     if dataset_address is not None and local_path is None:
-        local_path = dl.install(source=dataset_address,
-                               path=install_path).path
+        local_path = dl.install(
+            source=dataset_address,
+            path=(Path(current_app.config['DATASET_DIR']) / dataset_name).\
+                absolute().as_posix()).path
         automagic = True
 
     if automagic:
         automagic = AutomagicIO()
         automagic.activate()
 
+    local_path = Path(local_path)
+
     # Look for events folder in derivatives
-    path = local_path
-    extra_events = join(local_path, 'derivatives/events')
-    if exists(extra_events):
-        path = [local_path, extra_events]
+    path = local_path.as_posix()
+    extra_events = local_path / 'derivatives/events'
+    if extra_events.exists():
+        path = [path, extra_events.as_posix()]
 
     layout = BIDSLayout(path)
     if task_name not in layout.get_tasks():
@@ -204,7 +209,7 @@ def add_task(db_session, task_name, dataset_name=None, local_path=None,
             task_name, local_path))
 
     dataset_description = json.load(open(
-        join(local_path, 'dataset_description.json'), 'r'))
+        local_path / 'dataset_description.json'), 'r')
     dataset_name = dataset_name if dataset_name is not None \
                    else dataset_description['Name']
 
@@ -216,7 +221,7 @@ def add_task(db_session, task_name, dataset_name=None, local_path=None,
         dataset_model.description = dataset_description
         dataset_model.dataset_address = dataset_address
         dataset_model.preproc_address = preproc_address
-        dataset_model.local_path = local_path
+        dataset_model.local_path = local_path.as_posix()
         db_session.commit()
     elif not reingest:
         if automagic:
@@ -229,7 +234,7 @@ def add_task(db_session, task_name, dataset_name=None, local_path=None,
 
     if new_task:
         task_model.description = json.load(open(
-            join(local_path, 'task-{}_bold.json'.format(task_name)), 'r'))
+            local_path / 'task-{}_bold.json'.format(task_name), 'r'))
         task_model.TR = task_model.description['RepetitionTime']
         db_session.commit()
 
@@ -317,32 +322,32 @@ def add_task(db_session, task_name, dataset_name=None, local_path=None,
         current_app.logger.info("Ingesting stimuli")
 
         for i, val in enumerate(stims.values):
-            path = join(local_path, 'stimuli/{}'.format(val))
+            stim_path = local_path / 'stimuli' / val
             if val not in stims_processed:
                 try:
-                    stim_hash = hash_stim(path)
+                    assert isfile(stim_path.as_posix())
+                    stim_hash = hash_stim(stim_path)
                 except OSError as e:
-                    current_app.logger.debug(
-                        'Stimulus: {} not found. Skipping.'.format(val))
+                    current_app.logger.debug('{} not found.'.format(val))
                     continue
 
                 stims_processed[val] = stim_hash
             else:
                 stim_hash = stims_processed[val]
 
-            stim_model, _ = add_stimulus(db_session, path, stim_hash,
-                                            dataset_id=dataset_model.id)
+            stim_model, _ = add_stimulus(
+                db_session, stim_path, stim_hash, dataset_id=dataset_model.id)
 
             # Get or create Run Stimulus association
-            runstim, _ = db_utils.get_or_create(db_session, RunStimulus,
-                                                stimulus_id=stim_model.id,
-                                                run_id=run_model.id,
-                                                onset=stims.onset.tolist()[i],
-                                                duration=stims.duration.tolist()[i])
+            runstim, _ = db_utils.get_or_create(
+                db_session, RunStimulus, stimulus_id=stim_model.id,
+                run_id=run_model.id, onset=stims.onset.tolist()[i],
+                duration=stims.duration.tolist()[i])
+
     """ Add GroupPredictors """
     current_app.logger.info("Adding group predictors")
     add_group_predictors(db_session, dataset_model.id,
-                         join(local_path, 'participants.tsv'))
+                         local_path / 'participants.tsv')
 
     if automagic:
         automagic.deactivate()

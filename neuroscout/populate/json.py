@@ -1,11 +1,11 @@
 import json
 from flask import current_app
-from pathlib import Path
 from .ingest import add_task
 from .extract import extract_features
 from .convert import convert_stimuli
 from models import Dataset
-import os
+from os import makedirs
+from pathlib import Path
 from pliers.utils.updater import check_updates
 import itertools
 
@@ -26,8 +26,8 @@ def load_update_config(db_session, config_file, update=False):
          tfs += task['extractors'] + task['converters']
 
     # Check for updates
-    datastore = current_app.config['FEATURE_DATASTORE']
-    os.makedirs(os.path.dirname(datastore), exist_ok=True)
+    datastore = Path(current_app.config['FEATURE_DATASTORE']).dirname()
+    makedirs(datastore, exist_ok=True)
     tfs = list(k for k,_ in itertools.groupby(tfs)) # Unique-ify
 
     updated = check_updates(tfs, datastore=datastore)
@@ -80,15 +80,11 @@ def ingest_from_json(db_session, config_file, automagic=False,
         dataset_address = items.get('dataset_address')
         preproc_address = items.get('preproc_address')
         local_path = items.get('path')
-        if not (local_path or dataset_address):
-            raise Exception("Must provide path or remote address to dataset.")
 
         if local_path:
             local_path = Path(local_path).absolute().as_posix()
-
-        install_path = local_path or \
-            (Path(current_app.config['DATASET_DIR']) / dataset_name).absolute(
-                ).as_posix()
+        elif not dataset_address:
+            raise Exception("Must provide path or remote address to dataset.")
 
         for task_name, params in items['tasks'].items():
             """ Add task to database"""
@@ -100,7 +96,6 @@ def ingest_from_json(db_session, config_file, automagic=False,
                                   local_path=local_path,
                                   dataset_address=dataset_address,
                                   automagic=automagic,
-                                  install_path=install_path,
                                   preproc_address=preproc_address,
                                   reingest=reingest,
             					  **dp)
