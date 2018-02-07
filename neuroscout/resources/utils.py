@@ -8,7 +8,7 @@ from models import Analysis
 import celery.states as states
 from worker import celery_app
 from database import db
-from db_utils import put_record
+from utils import put_record
 
 def abort(code, message=''):
     """ JSONified abort """

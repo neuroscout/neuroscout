@@ -1,7 +1,7 @@
 from flask_apispec import MethodResource, marshal_with, doc
 from marshmallow import Schema, fields
 from models import Dataset
-from . import utils
+from .utils import first_or_404
 
 class DatasetSchema(Schema):
 	""" Dataset validation schema. """
@@ -21,7 +21,7 @@ class DatasetResource(MethodResource):
     @doc(tags=['dataset'], summary='Get dataset by id.')
     @marshal_with(DatasetSchema)
     def get(self, dataset_id):
-    	return utils.first_or_404(Dataset.query.filter_by(id=dataset_id))
+    	return first_or_404(Dataset.query.filter_by(id=dataset_id))
 
 class DatasetListResource(MethodResource):
     @doc(tags=['dataset'], summary='Returns list of datasets.')

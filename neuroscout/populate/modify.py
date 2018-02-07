@@ -6,8 +6,9 @@ TODO
 """
 
 from models import Dataset, Task
+from database import db
 
-def delete_task(db_session, dataset, task):
+def delete_task(dataset, task):
     """ Deletes BIDS dataset task from the database, and *all* associated
     data in other tables.
         Args:
@@ -24,5 +25,5 @@ def delete_task(db_session, dataset, task):
     if not task_model:
         raise ValueError("Task not found, cannot delete.")
 
-    db_session.delete(task_model)
-    db_session.commit()
+    db.session.delete(task_model)
+    db.session.commit()

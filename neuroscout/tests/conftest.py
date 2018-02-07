@@ -121,17 +121,17 @@ def add_users(app, db, session):
 @pytest.fixture(scope="function")
 def add_task(session):
     """ Add a dataset with two subjects """
-    return populate.add_task(session, 'bidstest', local_path=DATASET_PATH)
+    return populate.add_task('bidstest', local_path=DATASET_PATH)
 
 @pytest.fixture(scope="function")
 def add_task_remote(session):
     """ Add a dataset with two subjects. """
-    return populate.ingest_from_json(session, REMOTE_JSON_PATH)[0]
+    return populate.ingest_from_json(REMOTE_JSON_PATH)[0]
 
 @pytest.fixture(scope="function")
 def add_local_task_json(session):
     """ Add a dataset with two subjects. """
-    return populate.ingest_from_json(session, LOCAL_JSON_PATH)[0]
+    return populate.ingest_from_json(LOCAL_JSON_PATH)[0]
 
 @pytest.fixture(scope="function")
 def update_local_json(session, add_local_task_json):
@@ -146,17 +146,14 @@ def update_local_json(session, add_local_task_json):
     ds.to_csv(datastore_file, index=False)
 
     ## Update
-    return populate.ingest_from_json(session, LOCAL_JSON_PATH,
-                                          update_features=True)[0]
+    return populate.ingest_from_json(LOCAL_JSON_PATH, update_features=True)[0]
 
 @pytest.fixture(scope="function")
 def extract_features(session, add_task):
-    return populate.extract_features(session, 'Test Dataset', 'bidstest',
-                                     EXTRACTORS)
+    return populate.extract_features('Test Dataset', 'bidstest', EXTRACTORS)
 @pytest.fixture(scope="function")
 def reextract(session, extract_features):
-    return populate.extract_features(session, 'Test Dataset', 'bidstest',
-                                     EXTRACTORS)
+    return populate.extract_features('Test Dataset', 'bidstest', EXTRACTORS)
 
 @pytest.fixture(scope="function")
 def add_analysis(session, add_users, add_task, extract_features):
