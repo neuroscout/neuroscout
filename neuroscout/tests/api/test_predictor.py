@@ -55,7 +55,7 @@ def test_get_predictor(auth_client, extract_features):
 
 def test_get_rextracted(auth_client, reextract):
     run_id = decode_json(
-        auth_client.get('/api/runs', params={'number' : '01', 'subject': '01'}))[0]['id']
+        auth_client.get('/api/runs', params={'number' : '1', 'subject': '01'}))[0]['id']
     resp = auth_client.get('/api/predictors', params={
         'run_id': run_id, 'newest': 'false'})
     assert len(decode_json(resp)) == 5

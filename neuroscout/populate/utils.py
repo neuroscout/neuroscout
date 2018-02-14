@@ -4,7 +4,6 @@ import requests
 import urllib.parse
 import hashlib
 import warnings
-from os.path import isfile
 from pathlib import Path
 
 def format_preproc(subject, task, run, session=None,
@@ -16,7 +15,7 @@ def format_preproc(subject, task, run, session=None,
     return "{}{}func/{}{}task-{}_run-{}_bold_space-{}_{}.nii.gz".format(
     subject_f, session_f,
     subject_f.replace("/", "_"), session_f.replace("/", "_"),
-    task, run, space, suffix
+    task, run.zfill(2), space, suffix
 )
 
 def hash_stim(stim, blocksize = 65536):
@@ -25,6 +24,7 @@ def hash_stim(stim, blocksize = 65536):
         stim = stim.as_posix()
     if isinstance(stim, str):
         from pliers.stimuli import load_stims
+        from os.path import isfile
         assert isfile(stim)
         stim = load_stims(stim)
 
