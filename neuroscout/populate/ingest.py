@@ -270,11 +270,8 @@ def add_task(task_name, dataset_name=None, local_path=None,
         for e in listify(layout.get_events(img.filename)):
             assert isfile(e)
 
-        # Temporary workaround
-        assert isfile((local_path / 'participants.tsv').as_posix())
-
         collection = load_variables(
-            layout, level='run', scan_length=run_model.duration,  **entities).\
+            layout, levels='run', scan_length=run_model.duration,  **entities).\
             get_collections('run')[0]
 
         stims = collection.variables.pop('stim_file')
