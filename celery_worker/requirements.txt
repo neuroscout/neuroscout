@@ -2,7 +2,7 @@ celery
 flower
 redis
 docopt
--e git+https://github.com/adelavega/pybids.git@resample_patch#egg=pybids
+-e git+https://github.com/incf/pybids.git#egg=pybids
 duecredit
 pandas
 patsy

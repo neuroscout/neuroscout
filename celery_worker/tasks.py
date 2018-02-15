@@ -5,7 +5,7 @@ import tarfile
 import json
 from pathlib import Path
 from tempfile import mkdtemp
-from bids.analysis.variables import load_event_variables
+from bids.variables import load_variables
 from bids.analysis import Analysis
 from bids.grabbids import BIDSLayout
 
@@ -67,16 +67,18 @@ def compile(analysis, predictor_events, resources, bids_dir):
 
     # Load events and try applying transformations
     bids_layout = BIDSLayout([bids_dir, files_dir.as_posix()])
-    variables = {
-        'time': load_event_variables(bids_layout, derivatives='only',
-                                     task=analysis['task_name'],
-                                     scan_length=scan_length,
-                                     **entities)
+    collections = {
+        'run': load_variables(bids_layout,
+                              derivatives='only',
+                              task=analysis['task_name'],
+                              scan_length=scan_length,
+                              level='run',
+                              **entities).get_collections('run')[0]
         }
 
-    bids_analysis = Analysis(bids_layout, model, variables=variables)
+    bids_analysis = Analysis(bids_layout, model, collections=collections)
     try:
-        bids_analysis.setup()
+        bids_analysis.setup(scan_length=scan_length)
     except:
         raise Exception("Transformations failed.")
 

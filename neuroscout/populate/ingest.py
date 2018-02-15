@@ -1,7 +1,6 @@
 """ Dataset ingestion
 Tools to populate database from BIDS datasets
 """
-from os.path import isfile
 import json
 import magic
 from flask import current_app
@@ -12,7 +11,7 @@ import nibabel as nib
 import numpy as np
 
 from bids.grabbids import BIDSLayout
-from bids.analysis.variables import load_event_variables
+from bids.variables import load_variables
 from datalad.api import install
 from datalad.auto import AutomagicIO
 
@@ -62,19 +61,18 @@ def add_predictor(predictor_name, dataset_id, run_id, onsets, durations, values,
     return predictor.id
 
 
-def add_predictor_collection(collection, ds_id, run_id, source=None, TR=None,
-                             include_predictors=None):
-    """ Add a BIDSVariableCollection to the database.
+def add_predictor_collection(collection, ds_id, run_id, TR=None, include=None):
+    """ Add a RunNode to the database.
     Args:
         collection - BIDSVariableCollection to ingest
         ds_id - Dataset model id
         r_id - Run model id
         source - source of collection. e.g "events", "recordings"
         TR - time repetiton of task
-        include_predictors - list of predictors to include. all if None.
+        include - list of predictors to include. all if None.
     """
-    for name, var in collection.columns.items():
-        if include_predictors is not None and name not in include_predictors:
+    for name, var in collection.variables.items():
+        if include is not None and name not in include:
             break
         values = var.values.tolist()
         if hasattr(var, 'onset'):
@@ -89,8 +87,7 @@ def add_predictor_collection(collection, ds_id, run_id, source=None, TR=None,
             onset = len(np.arange(0, len(var.values) * TR, TR)).tolist()
             duration = len([(TR)] * len(var.values))
 
-
-        add_predictor(name, ds_id, run_id, onset, duration, values, source)
+        add_predictor(name, ds_id, run_id, onset, duration, values, var.source)
 
 
 def add_group_predictors(dataset_id, participants):
@@ -175,12 +172,14 @@ def add_task(task_name, dataset_name=None, local_path=None,
             source=dataset_address,
             path=(Path(
                 current_app.config['DATASET_DIR']) / dataset_name).as_posix()
-            )
+            ).path
         automagic = True
 
     if automagic:
         automagic = AutomagicIO()
         automagic.activate()
+
+    from os.path import isfile
 
     local_path = Path(local_path)
 
@@ -189,6 +188,10 @@ def add_task(task_name, dataset_name=None, local_path=None,
     extra_events = local_path / 'derivatives' / 'events'
     if extra_events.exists():
         path.append(extra_events.as_posix())
+
+    # Remove once grabbit bug fix is in
+    if len(path) == 1:
+        path = path[0]
 
     layout = BIDSLayout(path)
     if task_name not in layout.get_tasks():
@@ -267,35 +270,18 @@ def add_task(task_name, dataset_name=None, local_path=None,
         for e in listify(layout.get_events(img.filename)):
             assert isfile(e)
 
-        variables = []
-        variables.append((load_event_variables(layout,
-                                  extract_events=True,
-                                  extract_recordings=False,
-                                  extract_confounds=False,
-                                  scan_length=run_model.duration,
-                                  **entities), 'events'))
-        stims = variables[0][0].columns.pop('stim_file')
+        # Temporary workaround
+        assert isfile((local_path / 'participants.tsv').as_posix())
 
-        variables.append(
-            (load_event_variables(layout,
-                                  extract_events=False,
-                                  extract_recordings=True,
-                                  extract_confounds=False,
-                                  scan_length=run_model.duration,
-                                  **entities), 'recordings'))
-        variables.append(
-            (load_event_variables(layout,
-                                  extract_events=False,
-                                  extract_recordings=False,
-                                  extract_confounds=True,
-                                  scan_length=run_model.duration,
-                                  **entities), 'confounds'))
+        collection = load_variables(
+            layout, level='run', scan_length=run_model.duration,  **entities).\
+            get_collections('run')[0]
 
-        # Parse event columns and insert as Predictors
-        for collection, source in variables:
-            add_predictor_collection(
-                collection, dataset_model.id, run_model.id, source=source,
-                include_predictors=include_predictors, TR=task_model.TR)
+        stims = collection.variables.pop('stim_file')
+
+        add_predictor_collection(
+            collection, dataset_model.id, run_model.id,
+            include=include_predictors, TR=task_model.TR)
 
         """ Ingest Stimuli """
         current_app.logger.info("Ingesting stimuli")

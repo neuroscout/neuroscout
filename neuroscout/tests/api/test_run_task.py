@@ -46,7 +46,7 @@ def test_get_run(auth_client, add_task):
 	task_id = decode_json(resp)[0]['task']['id']
 
 	# Test filtering by multiple parameters
-	resp = auth_client.get('/api/runs', params={'number': '01,02',
+	resp = auth_client.get('/api/runs', params={'number': '1,2',
 											'task': 'bidstest'})
 	assert resp.status_code == 200
 	run_p = decode_json(resp)

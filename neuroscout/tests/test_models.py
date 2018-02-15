@@ -23,7 +23,7 @@ def test_dataset_ingestion(session, add_task):
 
 	# Test properties of Run
 	assert Run.query.count() == dataset_model.runs.count() == 4
-	run_model =  dataset_model.runs.filter_by(number='01', subject='01').first()
+	run_model =  dataset_model.runs.filter_by(number='1', subject='01').first()
 	assert run_model.dataset_id == dataset_model.id
 	assert 'TaskName' in run_model.task.description
 	assert run_model.task.description['RepetitionTime'] == 2.0
