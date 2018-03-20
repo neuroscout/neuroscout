@@ -8,9 +8,12 @@ import json
 import re
 import pandas as pd
 import numpy as np
+from pathlib import Path
+import datetime
 
 from pliers.stimuli import load_stims
 from pliers.transformers import get_transformer
+from pliers.extractors import merge_results
 
 import populate
 from models import (Dataset, Task,
@@ -136,6 +139,17 @@ def extract_features(dataset_name, task_name, extractors):
         ext = get_transformer(name, **parameters)
         valid_stims = [s for s in stims if ext._stim_matches_input_types(s)]
         results += ext.transform(valid_stims)
+
+    # Save results to file
+    if results != []:
+        results_df = merge_results(results)
+        results_path = Path(current_app.config['EXTRACTION_DIR']).absolute() / \
+            '{}_{}_{}.csv'.format(
+                dataset_name, task_name,
+                datetime.datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
+                )
+        results_path.parents[0].mkdir(exist_ok=True)
+        results_df.to_csv(results_path.as_posix())
 
     serializer = FeatureSerializer()
     extracted_features = {}
