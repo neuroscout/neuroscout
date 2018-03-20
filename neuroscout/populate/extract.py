@@ -141,7 +141,7 @@ def extract_features(dataset_name, task_name, extractors):
         results += ext.transform(valid_stims)
 
     # Save results to file
-    if results != []:
+    if results != [] and 'EXTRACTION_DIR' in current_app.config:
         results_df = merge_results(results)
         results_path = Path(current_app.config['EXTRACTION_DIR']).absolute() / \
             '{}_{}_{}.csv'.format(
