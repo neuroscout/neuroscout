@@ -71,7 +71,7 @@ class FeatureSerializer(object):
         Returns a dictionary of annotated features
         """
         self.features = res.features.copy()
-        all_vals = dict(zip(res.features, res.data[0]))
+        all_vals = dict(zip(res.features, res._data[0]))
         ext_hash = res.extractor.__hash__()
 
         # Find matching extractor schema + attribute combination
@@ -154,7 +154,7 @@ def extract_features(dataset_name, task_name, extractors):
     serializer = FeatureSerializer()
     extracted_features = {}
     for res in results:
-        if np.array(res.data).size > 0:
+        if np.array(res._data).size > 0:
             # Annotate results
             serialized = serializer.load(res)
             for i, feature in enumerate(res.features):
@@ -185,8 +185,8 @@ def extract_features(dataset_name, task_name, extractors):
                         return val[0]
 
                 # Get or create ExtractedEvent
-                ee_model = ExtractedEvent(onset=grab_value(res.onsets),
-                                          duration=grab_value(res.durations),
+                ee_model = ExtractedEvent(onset=grab_value(res.onset),
+                                          duration=grab_value(res.duration),
                                           stimulus_id=stimulus.id,
                                           history=res.history.string,
                                           ef_id=ef_model.id,
