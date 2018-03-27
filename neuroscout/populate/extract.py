@@ -19,7 +19,6 @@ import populate
 from models import (Dataset, Task,
     Run, Stimulus, RunStimulus, ExtractedFeature, ExtractedEvent)
 from .utils import hash_data, hash_stim
-from populate.transformations import Preprocessing
 
 class FeatureSerializer(object):
     def __init__(self, schema=None, add_all=True):
@@ -33,7 +32,7 @@ class FeatureSerializer(object):
         self.schema = json.load(open(schema, 'r'))
         self.add_all=True
 
-    def _annotate_feature(self, pattern, schema, feat, ext_hash, val,
+    def _annotate_feature(self, pattern, schema, feat, ext_hash, vals,
                           default_active=True):
         """ Annotate a single pliers extracted result
         Args:
@@ -51,16 +50,13 @@ class FeatureSerializer(object):
         description = re.sub(pattern, schema['description'], feat) \
             if 'description' in schema else None
 
-        for fn in schema.get('preprocess', []):
-            val = getattr(Preprocessing, 'double')(val)
-
-        properties = {
+        properties = [{
             'feature_name': name,
             'sha1_hash': hash_data(str(ext_hash) + name),
             'description': description,
             'active': schema.get('active', default_active),
-            'value': val
-            }
+            'value': v
+            } for v in vals]
 
         return properties
 
@@ -89,15 +85,16 @@ class FeatureSerializer(object):
         # Add all features in schema, popping features that match
         for pattern, schema in ext_schema['features'].items():
             matching = filter(re.compile(pattern).match, self.features)
-            annotated += [self._annotate_feature(
-                pattern, schema, feat, ext_hash, res_df[res_df.feature == feat].value.values)
-                          for feat in matching]
+            for feat in matching:
+                annotated += self._annotate_feature(
+                    pattern, schema, feat, ext_hash, res_df[res_df.feature == feat].value.values)
 
         # Add all remaining features
         if self.add_all is True:
-            annotated += [self._annotate_feature(
-                ".*", {}, feat, ext_hash, res_df[res_df.feature == feat].value.values,
-                default_active=False) for feat in self.features.copy()]
+            for feat in self.features.copy():
+                annotated += self._annotate_feature(
+                    ".*", {}, feat, ext_hash,
+                    res_df[res_df.feature == feat].value.values, default_active=False)
 
         # Add extractor constants
         tr_attrs = [getattr(res.extractor, a) \
@@ -111,7 +108,18 @@ class FeatureSerializer(object):
         for a in annotated:
             a.update(constants)
 
+        ## Only return non-null values
+        annotated = [a for a in annotated if a['value'] is not None]
+
         return annotated
+
+def grab_value(val):
+    if pd.isnull(val):
+        return None
+    elif isinstance(val, float):
+        return val
+    else:
+        return val[0]
 
 def extract_features(dataset_name, task_name, extractors):
     """ Extract features using pliers for a dataset/task
@@ -161,6 +169,7 @@ def extract_features(dataset_name, task_name, extractors):
                 # Hash extractor name + feature name
                 ef_hash = feature['sha1_hash']
                 value = feature.pop('value')
+
                 # If we haven't already added this feature
                 if ef_hash not in extracted_features:
                     # Create/get feature
@@ -175,21 +184,13 @@ def extract_features(dataset_name, task_name, extractors):
                 stimulus = db.session.query(
                     Stimulus).filter_by(sha1_hash=stim_hash).one()
 
-                def grab_value(val):
-                    if pd.isnull(val):
-                        return None
-                    elif isinstance(val, float):
-                        return val
-                    else:
-                        return val[0]
-
                 # Get or create ExtractedEvent
                 ee_model = ExtractedEvent(onset=grab_value(res.onset),
                                           duration=grab_value(res.duration),
                                           stimulus_id=stimulus.id,
                                           history=res.history.string,
                                           ef_id=ef_model.id,
-                                          value=grab_value(value))
+                                          value=value)
                 db.session.add(ee_model)
                 db.session.commit()
 
