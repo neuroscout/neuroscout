@@ -136,7 +136,7 @@ def test_extracted_features(session, add_task, extract_features):
 
 	# Check for sensical value
 	assert isclose(float(session.query(func.max(PredictorEvent.value)).join(
-		Predictor).filter_by(ef_id=ef_b.id).one()[0]), 1.775, 0.1)
+		Predictor).filter_by(ef_id=ef_b.id).one()[0]), 0.88, 0.1)
 
 	# And that a sensical onset was extracted
 	assert session.query(func.max(PredictorEvent.onset)).join(

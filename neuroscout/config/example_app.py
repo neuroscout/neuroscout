@@ -32,13 +32,15 @@ class Config(object):
     ALL_TRANSFORMERS = (dir_path / 'config/transformers.json').as_posix()
 
     STIMULUS_DIR = 'path'
+    EXTRACTION_DIR = 'path'
+
 
 class DevelopmentConfig(Config):
     DEBUG = True
     SQLALCHEMY_DATABASE_URI = 'postgres://postgres@postgres:5432/neuroscout'
     PROPAGATE_EXCEPTIONS = True
     MIGRATIONS_DIR = '/migrations/migrations'
-    DATASET_DIR = '/file-data'
+    DATASET_DIR = '/file-data/datasets'
     FEATURE_DATASTORE = '/file-data/feature-tracking.csv'
 
 class TestingConfig(Config):
@@ -59,6 +61,7 @@ class TravisConfig(TestingConfig):
     DATASET_DIR = './tmp/file-data'
     FEATURE_DATASTORE = './tmp/datastore.csv'
     STIMULUS_DIR = './tmp/stims'
+    EXTRACTED_DIR = './tmp/extracted'
 
 class HomeConfig(Config):
     SQLALCHEMY_DATABASE_URI = 'postgresql://zorro:dbpass@localhost:5432/neuroscout'

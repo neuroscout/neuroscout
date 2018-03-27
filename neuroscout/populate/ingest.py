@@ -39,7 +39,6 @@ def add_predictor(predictor_name, dataset_id, run_id, onsets, durations, values,
         predictor id
 
     """
-    current_app.logger.info("Extracting {}".format(predictor_name))
     predictor, _ = get_or_create(
         Predictor, name=predictor_name, dataset_id=dataset_id,
         source=source, **kwargs)
@@ -74,18 +73,18 @@ def add_predictor_collection(collection, ds_id, run_id, TR=None, include=None):
     for name, var in collection.variables.items():
         if include is not None and name not in include:
             break
-        values = var.values.tolist()
+        values = var.values.values.tolist()
         if hasattr(var, 'onset'):
             onset = var.onset.tolist()
             duration = var.duration.tolist()
         else:
             if TR is not None:
-                var.resample(1 / TR)
+                var = var.resample(1 / TR)
             else:
                 TR = var.sampling_rate / 2
 
-            onset = len(np.arange(0, len(var.values) * TR, TR)).tolist()
-            duration = len([(TR)] * len(var.values))
+            onset = np.arange(0, len(var.values) * TR, TR).tolist()
+            duration = [(TR)] * len(var.values)
 
         add_predictor(name, ds_id, run_id, onset, duration, values, var.source)
 
@@ -101,6 +100,8 @@ def add_group_predictors(dataset_id, participants):
     """
     gp_ids = []
     try:
+        from os.path import isfile
+        assert isfile(participants.as_posix())
         participants = pd.read_csv(participants, delimiter='\t')
     except FileNotFoundError:
         return []

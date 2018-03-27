@@ -8,6 +8,7 @@ from tempfile import mkdtemp
 from bids.variables import load_variables
 from bids.analysis import Analysis
 from bids.grabbids import BIDSLayout
+from celery.contrib import rdb
 
 logger = get_task_logger(__name__)
 
@@ -58,8 +59,7 @@ def compile(analysis, predictor_events, resources, bids_dir):
             if r[ent]:
              entries += [r[ent]]
     entities = {k:v for k,v in entities.items() if v}
-    entities['run'] = entities.pop('number')
-
+    entities['run'] = [int(r) for r in entities.pop('number')]
     logger.info(entities)
 
     # Write out events
@@ -67,20 +67,9 @@ def compile(analysis, predictor_events, resources, bids_dir):
 
     # Load events and try applying transformations
     bids_layout = BIDSLayout([bids_dir, files_dir.as_posix()])
-    collections = {
-        'run': load_variables(bids_layout,
-                              derivatives='only',
-                              task=analysis['task_name'],
-                              scan_length=scan_length,
-                              level='run',
-                              **entities).get_collections('run')[0]
-        }
-
-    bids_analysis = Analysis(bids_layout, model, collections=collections)
-    try:
-        bids_analysis.setup(scan_length=scan_length)
-    except:
-        raise Exception("Transformations failed.")
+    bids_analysis = Analysis(bids_layout, model, scan_length=scan_length)
+    bids_analysis.setup(derivatives='only', task=analysis['task_name'],
+                        scan_length=scan_length, **entities)
 
     # Write out analysis & resource JSON
     for obj, name in [(analysis, 'analysis'), (resources, 'resources'), (model, 'model')]:
