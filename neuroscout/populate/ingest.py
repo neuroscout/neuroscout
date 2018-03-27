@@ -100,6 +100,8 @@ def add_group_predictors(dataset_id, participants):
     """
     gp_ids = []
     try:
+        from os.path import isfile
+        assert isfile(participants.as_posix())
         participants = pd.read_csv(participants, delimiter='\t')
     except FileNotFoundError:
         return []

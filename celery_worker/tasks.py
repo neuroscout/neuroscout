@@ -68,7 +68,8 @@ def compile(analysis, predictor_events, resources, bids_dir):
     # Load events and try applying transformations
     bids_layout = BIDSLayout([bids_dir, files_dir.as_posix()])
     bids_analysis = Analysis(bids_layout, model, scan_length=scan_length)
-    bids_analysis.setup(derivatives='only', task=analysis['task_name'], **entities)
+    bids_analysis.setup(derivatives='only', task=analysis['task_name'],
+                        scan_length=scan_length, **entities)
 
     # Write out analysis & resource JSON
     for obj, name in [(analysis, 'analysis'), (resources, 'resources'), (model, 'model')]:
