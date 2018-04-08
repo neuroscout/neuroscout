@@ -54,9 +54,7 @@
           "description": "General model label class: (\\1)"
         }
       }
-    }
-  ],
-  "ClarifaiAPIExtractor": [
+    },
     {
       "attributes": { "model": "nsfw-v1.0" },
       "features": {
@@ -79,9 +77,7 @@
           "description": "Image recognition label: \\1"
         }
       }
-    }
-  ],
-  "IndicoAPITextExtractor": [
+    },
     {
       "features": {
         "sentiment$": {

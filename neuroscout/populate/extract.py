@@ -73,7 +73,7 @@ class FeatureSerializer(object):
         # Find matching extractor schema + attribute combination
         # Entries with no attributes will match any
         ext_schema = {}
-        for candidate in self.schema.get(res.extractor.name, {}):
+        for candidate in self.schema.get(res.extractor.name, []):
             for name, value in candidate.get("attributes", {}).items():
                 if getattr(res.extractor, name) != value:
                     break
@@ -83,7 +83,7 @@ class FeatureSerializer(object):
 
         annotated = []
         # Add all features in schema, popping features that match
-        for pattern, schema in ext_schema['features'].items():
+        for pattern, schema in ext_schema.get('features', []).items():
             matching = filter(re.compile(pattern).match, self.features)
             for feat in matching:
                 annotated += self._annotate_feature(
