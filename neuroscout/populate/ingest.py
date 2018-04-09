@@ -103,7 +103,7 @@ def add_group_predictors(dataset_id, participants):
         from os.path import isfile
         assert isfile(participants.as_posix())
         participants = pd.read_csv(participants, delimiter='\t')
-    except FileNotFoundError:
+    except:
         return []
 
     participants = dict(participants.iteritems())
