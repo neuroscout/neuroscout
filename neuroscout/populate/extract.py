@@ -10,6 +10,7 @@ import pandas as pd
 import numpy as np
 from pathlib import Path
 import datetime
+import logger
 
 from pliers.stimuli import load_stims
 from pliers.transformers import get_transformer
@@ -83,7 +84,7 @@ class FeatureSerializer(object):
 
         annotated = []
         # Add all features in schema, popping features that match
-        for pattern, schema in ext_schema.get('features', []).items():
+        for pattern, schema in ext_schema.get('features', {}).items():
             matching = filter(re.compile(pattern).match, self.features)
             for feat in matching:
                 annotated += self._annotate_feature(
@@ -194,6 +195,8 @@ def extract_features(dataset_name, task_name, extractors):
                 db.session.add(ee_model)
                 db.session.commit()
 
+
+    logger.info("Creating predictors")
     """" Create Predictors from Extracted Features """
     # Active stimuli from this task
     active_stims = db.session.query(Stimulus.id).filter_by(active=True). \
