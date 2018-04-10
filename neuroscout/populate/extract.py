@@ -160,41 +160,42 @@ def extract_features(dataset_name, task_name, extractors):
         results_path.parents[0].mkdir(exist_ok=True)
         results_df.to_csv(results_path.as_posix())
 
-    serializer = FeatureSerializer()
-    extracted_features = {}
-    for res in results:
-        if res._data != [{}]:
-            # Annotate results
-            for feature in serializer.load(res):
-                """" Add new ExtractedFeature """
-                # Hash extractor name + feature name
-                ef_hash = feature['sha1_hash']
-                value = feature.pop('value')
+    with progressbar.ProgressBar(max_value=len(results)) as bar:
+        serializer = FeatureSerializer()
+        extracted_features = {}
+        for i, res in enumerate(results):
+            if res._data != [{}]:
+                # Annotate results
+                for feature in serializer.load(res):
+                    """" Add new ExtractedFeature """
+                    # Hash extractor name + feature name
+                    ef_hash = feature['sha1_hash']
+                    value = feature.pop('value')
 
-                # If we haven't already added this feature
-                if ef_hash not in extracted_features:
-                    # Create/get feature
-                    ef_model = ExtractedFeature(**feature)
-                    db.session.add(ef_model)
+                    # If we haven't already added this feature
+                    if ef_hash not in extracted_features:
+                        # Create/get feature
+                        ef_model = ExtractedFeature(**feature)
+                        db.session.add(ef_model)
+                        db.session.commit()
+                        extracted_features[ef_hash] = ef_model
+
+                    """" Add ExtractedEvents """
+                    # Get associated stimulus record
+                    stim_hash = hash_stim(res.stim)
+                    stimulus = db.session.query(
+                        Stimulus).filter_by(sha1_hash=stim_hash).one()
+
+                    # Get or create ExtractedEvent
+                    ee_model = ExtractedEvent(onset=grab_value(res.onset),
+                                              duration=grab_value(res.duration),
+                                              stimulus_id=stimulus.id,
+                                              history=res.history.string,
+                                              ef_id=ef_model.id,
+                                              value=value)
+                    db.session.add(ee_model)
                     db.session.commit()
-                    extracted_features[ef_hash] = ef_model
-
-                """" Add ExtractedEvents """
-                # Get associated stimulus record
-                stim_hash = hash_stim(res.stim)
-                stimulus = db.session.query(
-                    Stimulus).filter_by(sha1_hash=stim_hash).one()
-
-                # Get or create ExtractedEvent
-                ee_model = ExtractedEvent(onset=grab_value(res.onset),
-                                          duration=grab_value(res.duration),
-                                          stimulus_id=stimulus.id,
-                                          history=res.history.string,
-                                          ef_id=ef_model.id,
-                                          value=value)
-                db.session.add(ee_model)
-                db.session.commit()
-
+            bar.update(i)
 
     logging.info("Creating predictors")
     """" Create Predictors from Extracted Features """
