@@ -16,7 +16,6 @@ from pliers.stimuli import load_stims
 from pliers.transformers import get_transformer
 from pliers.extractors import merge_results
 
-import populate
 from models import (Dataset, Task, Predictor, PredictorEvent, PredictorRun,
     Run, Stimulus, RunStimulus, ExtractedFeature, ExtractedEvent)
 from .utils import hash_data, hash_stim
@@ -69,7 +68,7 @@ class FeatureSerializer(object):
         Returns a dictionary of annotated features
         """
         res_df = res.to_df(format='long')
-        self.features = res_df['feature'].tolist()
+        self.features = res_df['feature'].unique().tolist()
         ext_hash = res.extractor.__hash__()
 
         # Find matching extractor schema + attribute combination
@@ -181,6 +180,8 @@ def extract_features(dataset_name, task_name, extractors):
                         db.session.add(ef_model)
                         db.session.commit()
                         extracted_features[ef_hash] = ef_model
+                    else:
+                        ef_model = extracted_features[ef_hash]
 
                     """" Add ExtractedEvents """
                     # Get associated stimulus record

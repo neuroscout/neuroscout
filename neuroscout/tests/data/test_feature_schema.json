@@ -34,5 +34,17 @@
         }
       }
     }
+  ],
+  "FaceRecognitionFaceLandmarksExtractor":[
+    {
+      "features": {
+        "face_landmarks_bottom_lip": {
+          "active": "true"
+        },
+        "face_landmarks_upper_lip": {
+          "active": "true"
+        }
+      }
+    }
   ]
 }

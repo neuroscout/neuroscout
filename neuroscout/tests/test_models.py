@@ -88,6 +88,24 @@ def test_remote_dataset(session, add_task_remote):
 	assert GroupPredictor.query.filter_by(
 			dataset_id=add_task_remote).count() == 3
 
+	fre = ExtractedFeature.query.filter_by(
+		extractor_name='FaceRecognitionFaceLandmarksExtractor')
+
+	assert fre.count() == 9
+	fre_ids = [ef.id for ef in fre]
+
+	ef = ExtractedFeature.query.filter_by(
+			extractor_name='FaceRecognitionFaceLandmarksExtractor',
+			feature_name='face_landmarks_bottom_lip').first()
+
+	assert ef.extracted_events.count() == 5
+
+	# Test that predictor was made, (only this feature should be active)
+	preds = Predictor.query.filter(Predictor.ef_id.in_(fre_ids))
+	assert preds.count() == 1
+
+	assert preds.first().predictor_events.count() == 5
+
 def test_json_local_dataset(session, add_local_task_json):
 	dataset_model = Dataset.query.filter_by(id=add_local_task_json).one()
 
@@ -159,6 +177,7 @@ def test_extracted_features(session, add_task, extract_features):
 	# Test that sharpness was annotated regardless (even without entry)
 	ef_v = ExtractedFeature.query.filter_by(
 		extractor_name='SharpnessExtractor').count() == 1
+
 def test_analysis(session, add_analysis, add_predictor):
 	# Number of entries
 	assert Analysis.query.count() == 1
