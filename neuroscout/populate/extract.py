@@ -217,7 +217,6 @@ def extract_features(dataset_name, task_name, extractors):
                                       source='extracted', ef_id=ef.id)
                 db.session.add(predictor)
                 db.session.commit()
-                current_app.logger.info(predictor.id)
 
                 for stim in active_stims:
                     # For all instances for stimuli in this task's runs
