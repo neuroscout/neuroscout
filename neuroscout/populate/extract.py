@@ -33,7 +33,7 @@ class FeatureSerializer(object):
         self.schema = json.load(open(schema, 'r'))
         self.add_all=True
 
-    def _annotate_feature(self, pattern, schema, feat, ext_hash, vals,
+    def _annotate_feature(self, pattern, schema, feat, ext_hash, sub_df,
                           default_active=True):
         """ Annotate a single pliers extracted result
         Args:
@@ -56,8 +56,9 @@ class FeatureSerializer(object):
             'sha1_hash': hash_data(str(ext_hash) + name),
             'description': description,
             'active': schema.get('active', default_active),
-            'value': v
-            } for v in vals]
+            'value': v['value'],
+            'object_id': v['object_id'],
+            } for i, v in sub_df.iterrows()]
 
         return properties
 
@@ -88,14 +89,14 @@ class FeatureSerializer(object):
             matching = filter(re.compile(pattern).match, self.features)
             for feat in matching:
                 annotated += self._annotate_feature(
-                    pattern, schema, feat, ext_hash, res_df[res_df.feature == feat].value.values)
+                    pattern, schema, feat, ext_hash, res_df[res_df.feature == feat])
 
         # Add all remaining features
         if self.add_all is True:
             for feat in self.features.copy():
                 annotated += self._annotate_feature(
                     ".*", {}, feat, ext_hash,
-                    res_df[res_df.feature == feat].value.values, default_active=False)
+                    res_df[res_df.feature == feat], default_active=False)
 
         # Add extractor constants
         tr_attrs = [getattr(res.extractor, a) \
@@ -171,7 +172,7 @@ def extract_features(dataset_name, task_name, extractors):
                     # Hash extractor name + feature name
                     ef_hash = feature['sha1_hash']
                     value = feature.pop('value')
-
+                    object_id = feature.pop('object_id')
                     # If we haven't already added this feature
                     if ef_hash not in extracted_features:
                         # Create/get feature
@@ -192,7 +193,8 @@ def extract_features(dataset_name, task_name, extractors):
                                               stimulus_id=stimulus.id,
                                               history=res.history.string,
                                               ef_id=ef_model.id,
-                                              value=value)
+                                              value=value,
+                                              object_id=object_id)
                     db.session.add(ee_model)
                     db.session.commit()
             bar.update(i)
