@@ -9,7 +9,6 @@ import re
 import pandas as pd
 from pathlib import Path
 import datetime
-import logging
 import progressbar
 
 from pliers.stimuli import load_stims
@@ -199,7 +198,7 @@ def extract_features(dataset_name, task_name, extractors):
                     db.session.commit()
             bar.update(i)
 
-    logging.info("Creating predictors")
+    current_app.logger.info("Creating predictors")
     """" Create Predictors from Extracted Features """
     # Active stimuli from this task
     active_stims = db.session.query(Stimulus.id).filter_by(active=True). \
