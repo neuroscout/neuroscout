@@ -7,10 +7,10 @@ from database import db
 import json
 import re
 import pandas as pd
-import numpy as np
 from pathlib import Path
 import datetime
-import logger
+import logging
+import progressbar
 
 from pliers.stimuli import load_stims
 from pliers.transformers import get_transformer
@@ -196,7 +196,7 @@ def extract_features(dataset_name, task_name, extractors):
                 db.session.commit()
 
 
-    logger.info("Creating predictors")
+    logging.info("Creating predictors")
     """" Create Predictors from Extracted Features """
     # Active stimuli from this task
     active_stims = db.session.query(Stimulus.id).filter_by(active=True). \
@@ -204,33 +204,35 @@ def extract_features(dataset_name, task_name, extractors):
         join(Dataset).filter_by(name=dataset_name)
     # For all instances for stimuli in this task's runs
     task_runstimuli = RunStimulus.query.filter(
-        RunStimulus.stimulus_id.in_(active_stims))
+        RunStimulus.stimulus_id.in_(active_stims)).all()
 
-    for rs in task_runstimuli:
-        # For every feature extracted
-        for ef_hash, ef in extracted_features.items():
-            if ef.active:
-                ### Abstract some of this logic out for derived features
-                # Get ExtractedEvents associated with stimulus
-                ees = ef.extracted_events.filter_by(
-                    stimulus_id = rs.stimulus_id).all()
+    with progressbar.ProgressBar(max_value=len(task_runstimuli)) as bar:
+        for i, rs in enumerate(task_runstimuli):
+            # For every feature extracted
+            for ef_hash, ef in extracted_features.items():
+                if ef.active:
+                    ### Abstract some of this logic out for derived features
+                    # Get ExtractedEvents associated with stimulus
+                    ees = ef.extracted_events.filter_by(
+                        stimulus_id = rs.stimulus_id).all()
 
-                onsets = []
-                durations = []
-                values = []
-                for ee in ees:
-                    onsets.append((ee.onset or 0 )+ rs.onset)
-                    durations.append(ee.duration)
-                    if ee.value:
-                        values.append(ee.value)
+                    onsets = []
+                    durations = []
+                    values = []
+                    for ee in ees:
+                        onsets.append((ee.onset or 0 )+ rs.onset)
+                        durations.append(ee.duration)
+                        if ee.value:
+                            values.append(ee.value)
 
-                # If only a single value was extracted, and there is no duration
-                # Set to stimulus duration
-                if (len(durations) == 1) and (durations[0] is None):
-                    durations[0] = rs.duration
+                    # If only a single value was extracted, and there is no duration
+                    # Set to stimulus duration
+                    if (len(durations) == 1) and (durations[0] is None):
+                        durations[0] = rs.duration
 
-                populate.add_predictor(
-                    ef.feature_name, dataset_id, rs.run_id, onsets, durations,
-                    values, source='extracted', ef_id=ef.id)
+                    populate.add_predictor(
+                        ef.feature_name, dataset_id, rs.run_id, onsets, durations,
+                        values, source='extracted', ef_id=ef.id)
+        bar.update(i)
 
     return list(extracted_features.values())
