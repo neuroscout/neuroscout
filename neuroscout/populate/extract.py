@@ -241,6 +241,6 @@ def extract_features(dataset_name, task_name, extractors):
                       for pred_id, run_id in set(all_rs)]
             db.session.bulk_save_objects(all_pes + all_rs)
             db.session.commit()
-            bar.update(count)
+            bar.update(ix)
 
     return list(extracted_features.values())
