@@ -20,6 +20,7 @@ from utils import listify, get_or_create
 from models import (Dataset, Task, Run, Predictor, PredictorEvent, PredictorRun,
                     Stimulus, RunStimulus, GroupPredictor, GroupPredictorValue)
 from database import db
+import progressbar
 
 
 def add_predictor(predictor_name, dataset_id, run_id, onsets, durations, values,
@@ -228,82 +229,80 @@ def add_task(task_name, dataset_name=None, local_path=None,
 
     stims_processed = {}
     """ Parse every Run """
-    for img in layout.get(task=task_name, type='bold', extensions='.nii.gz',
-                          **kwargs):
-        current_app.logger.info("Processing task {} subject {}, run {}".format(
-            img.task, img.subject, img.run))
+    current_app.logger.info("Parsing runs")
+    all_runs = layout.get(task=task_name, type='bold', extensions='.nii.gz',
+                          **kwargs)
+    with progressbar.ProgressBar(max_value=len(all_runs)) as bar:
+        for counter, img in enumerate(all_runs):
+            # Get entities
+            entities = {entity : getattr(img, entity)
+                        for entity in ['subject', 'session']
+                        if entity in img._fields}
 
-        # Get entities
-        entities = {entity : getattr(img, entity)
-                    for entity in ['subject', 'session']
-                    if entity in img._fields}
+            """ Extract Run information """
+            run_model, new = get_or_create(
+                Run, dataset_id=dataset_model.id, number=img.run,
+                task_id = task_model.id, **entities)
+            entities['run'] = img.run
+            entities['task'] = task_model.name
 
-        """ Extract Run information """
-        run_model, new = get_or_create(
-            Run, dataset_id=dataset_model.id, number=img.run,
-            task_id = task_model.id, **entities)
-        entities['run'] = img.run
-        entities['task'] = task_model.name
+            # Get duration (helps w/ transformations)
+            try:
+                img_ni = nib.load(img.filename)
+                run_model.duration = img_ni.shape[3] * img_ni.header.get_zooms()[-1] \
+                                        / 1000
+            except (nib.filebasedimages.ImageFileError, IndexError) as e:
+                current_app.logger.debug(
+                    "Error loading BOLD file, default duration used.")
+                run_model.duration = scan_length
 
-        # Get duration (helps w/ transformations)
-        try:
-            img_ni = nib.load(img.filename)
-            run_model.duration = img_ni.shape[3] * img_ni.header.get_zooms()[-1] \
-                                    / 1000
-        except (nib.filebasedimages.ImageFileError, IndexError) as e:
-            current_app.logger.debug(
-                "Error loading BOLD file, default duration used.")
-            run_model.duration = scan_length
+            run_model.func_path = format_preproc(suffix="preproc", **entities)
+            run_model.mask_path = format_preproc(suffix="brainmask", **entities)
 
-        run_model.func_path = format_preproc(suffix="preproc", **entities)
-        run_model.mask_path = format_preproc(suffix="brainmask", **entities)
+            # Confirm remote address exists:
+            if preproc_address is not None:
+                remote_resource_exists(preproc_address, run_model.func_path)
+                remote_resource_exists(preproc_address, run_model.mask_path)
 
-        # Confirm remote address exists:
-        if preproc_address is not None:
-            remote_resource_exists(preproc_address, run_model.func_path)
-            remote_resource_exists(preproc_address, run_model.mask_path)
+            """ Extract Predictors"""
+            # Assert event files exist (for DataLad)
+            for e in listify(layout.get_events(img.filename)):
+                assert isfile(e)
 
-        """ Extract Predictors"""
-        current_app.logger.info("Extracting predictors")
+            collection = load_variables(
+                layout, levels='run', scan_length=run_model.duration,  **entities).\
+                get_collections('run')[0]
 
-        # Assert event files exist (for DataLad)
-        for e in listify(layout.get_events(img.filename)):
-            assert isfile(e)
+            stims = collection.variables.pop('stim_file')
 
-        collection = load_variables(
-            layout, levels='run', scan_length=run_model.duration,  **entities).\
-            get_collections('run')[0]
+            add_predictor_collection(
+                collection, dataset_model.id, run_model.id,
+                include=include_predictors, TR=task_model.TR)
 
-        stims = collection.variables.pop('stim_file')
+            """ Ingest Stimuli """
+            for i, val in enumerate(stims.values):
+                stim_path = local_path / 'stimuli' / val
+                if val not in stims_processed:
+                    try:
+                        stim_hash = hash_stim(stim_path)
+                    except OSError:
+                        current_app.logger.debug('{} not found.'.format(val))
+                        continue
 
-        add_predictor_collection(
-            collection, dataset_model.id, run_model.id,
-            include=include_predictors, TR=task_model.TR)
+                    stims_processed[val] = stim_hash
+                else:
+                    stim_hash = stims_processed[val]
 
-        """ Ingest Stimuli """
-        current_app.logger.info("Ingesting stimuli")
+                stim_model, _ = add_stimulus(
+                    stim_path, stim_hash, dataset_id=dataset_model.id)
 
-        for i, val in enumerate(stims.values):
-            stim_path = local_path / 'stimuli' / val
-            if val not in stims_processed:
-                try:
-                    stim_hash = hash_stim(stim_path)
-                except OSError:
-                    current_app.logger.debug('{} not found.'.format(val))
-                    continue
+                # Get or create Run Stimulus association
+                runstim, _ = get_or_create(
+                    RunStimulus, stimulus_id=stim_model.id, run_id=run_model.id,
+                    onset=stims.onset.tolist()[i],
+                    duration=stims.duration.tolist()[i])
 
-                stims_processed[val] = stim_hash
-            else:
-                stim_hash = stims_processed[val]
-
-            stim_model, _ = add_stimulus(
-                stim_path, stim_hash, dataset_id=dataset_model.id)
-
-            # Get or create Run Stimulus association
-            runstim, _ = get_or_create(
-                RunStimulus, stimulus_id=stim_model.id, run_id=run_model.id,
-                onset=stims.onset.tolist()[i],
-                duration=stims.duration.tolist()[i])
+            bar.update(counter)
 
     """ Add GroupPredictors """
     current_app.logger.info("Adding group predictors")

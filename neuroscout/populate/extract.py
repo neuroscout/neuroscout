@@ -10,13 +10,14 @@ import pandas as pd
 from pathlib import Path
 import datetime
 import progressbar
+from utils import get_or_create
 
 from pliers.stimuli import load_stims
 from pliers.transformers import get_transformer
 from pliers.extractors import merge_results
 
 import populate
-from models import (Dataset, Task,
+from models import (Dataset, Task, Predictor, PredictorEvent, PredictorRun,
     Run, Stimulus, RunStimulus, ExtractedFeature, ExtractedEvent)
 from .utils import hash_data, hash_stim
 
@@ -205,38 +206,50 @@ def extract_features(dataset_name, task_name, extractors):
     # Active stimuli from this task
     active_stims = db.session.query(Stimulus.id).filter_by(active=True). \
         join(RunStimulus).join(Run).join(Task).filter_by(name=task_name). \
-        join(Dataset).filter_by(name=dataset_name)
-    # For all instances for stimuli in this task's runs
-    task_runstimuli = RunStimulus.query.filter(
-        RunStimulus.stimulus_id.in_(active_stims)).all()
+        join(Dataset).filter_by(name=dataset_name).distinct().all()
 
-    with progressbar.ProgressBar(max_value=len(task_runstimuli)) as bar:
-        for i, rs in enumerate(task_runstimuli):
-            # For every feature extracted
-            for ef_hash, ef in extracted_features.items():
-                if ef.active:
-                    ### Abstract some of this logic out for derived features
-                    # Get ExtractedEvents associated with stimulus
+    with progressbar.ProgressBar(max_value=len(extracted_features)) as bar:
+        all_pes = []
+        for count, (ef_hash, ef) in enumerate(extracted_features.items()):
+            if ef.active:
+                predictor = Predictor(name=ef.feature_name,
+                                      dataset_id=dataset_id,
+                                      source='extracted', ef_id=ef.id)
+                db.session.add(predictor)
+                db.session.commit()
+                current_app.logger.info(predictor.id)
+
+                for stim in active_stims:
+                    # For all instances for stimuli in this task's runs
                     ees = ef.extracted_events.filter_by(
-                        stimulus_id = rs.stimulus_id).all()
+                        stimulus_id = stim.id).all()
+                    if ees:
+                        for rs in RunStimulus.query.filter_by(
+                            stimulus_id=stim).all():
+                                onsets = []
+                                durations = []
+                                values = []
+                                for ee in ees:
+                                    onsets.append((ee.onset or 0 )+ rs.onset)
+                                    durations.append(ee.duration)
+                                    if ee.value:
+                                        values.append(ee.value)
 
-                    onsets = []
-                    durations = []
-                    values = []
-                    for ee in ees:
-                        onsets.append((ee.onset or 0 )+ rs.onset)
-                        durations.append(ee.duration)
-                        if ee.value:
-                            values.append(ee.value)
+                                # If only a single value was extracted, and there is no duration
+                                # Set to stimulus duration
+                                if (len(durations) == 1) and (durations[0] is None):
+                                    durations[0] = rs.duration
 
-                    # If only a single value was extracted, and there is no duration
-                    # Set to stimulus duration
-                    if (len(durations) == 1) and (durations[0] is None):
-                        durations[0] = rs.duration
+                                values = pd.Series(values, dtype='object')
 
-                    populate.add_predictor(
-                        ef.feature_name, dataset_id, rs.run_id, onsets, durations,
-                        values, source='extracted', ef_id=ef.id)
-            bar.update(i)
+                                ### Bulk create a bunch of PES
+                                all_pes += [PredictorEvent(onset=onsets[i], duration = durations[i],
+                                               predictor_id=predictor.id, run_id = rs.run_id,
+                                               value = str(val))
+                                       for i, val in enumerate(values[values!='n/a'])]
+                                get_or_create(PredictorRun, predictor_id=predictor.id, run_id = rs.run_id)
+            bar.update(count)
+    db.session.bulk_save_objects(all_pes)
+    db.session.commit()
 
     return list(extracted_features.values())
