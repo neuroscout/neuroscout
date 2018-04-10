@@ -201,54 +201,45 @@ def extract_features(dataset_name, task_name, extractors):
                 db.session.commit()
             bar.update(i)
 
-    current_app.logger.info("Creating predictors")
     """" Create Predictors from Extracted Features """
-    # Active stimuli from this task
-    active_stims = db.session.query(Stimulus.id).filter_by(active=True). \
-        join(RunStimulus).join(Run).join(Task).filter_by(name=task_name). \
-        join(Dataset).filter_by(name=dataset_name).distinct().all()
+    current_app.logger.info("Creating predictors")
+    active_features = [ef for ef in extracted_features.values() if ef.active]
+    all_preds = []
+    for count, ef in enumerate(active_features):
+        all_preds.append(get_or_create(
+            Predictor, name=ef.feature_name, dataset_id=dataset_id,
+            source='extracted', ef_id=ef.id)[0])
 
-    with progressbar.ProgressBar(max_value=len(extracted_features)) as bar:
-        all_pes = []
-        for count, (ef_hash, ef) in enumerate(extracted_features.items()):
-            if ef.active:
-                predictor = Predictor(name=ef.feature_name,
-                                      dataset_id=dataset_id,
-                                      source='extracted', ef_id=ef.id)
-                db.session.add(predictor)
-                db.session.commit()
 
-                for stim in active_stims:
-                    # For all instances for stimuli in this task's runs
-                    ees = ef.extracted_events.filter_by(
-                        stimulus_id = stim.id).all()
-                    if ees:
-                        for rs in RunStimulus.query.filter_by(
-                            stimulus_id=stim).all():
-                                onsets = []
-                                durations = []
-                                values = []
-                                for ee in ees:
-                                    onsets.append((ee.onset or 0 )+ rs.onset)
-                                    durations.append(ee.duration)
-                                    if ee.value:
-                                        values.append(ee.value)
+    current_app.logger.info("Creating predictor events")
+    with progressbar.ProgressBar(max_value=len(all_preds)) as bar:
+        for ix, predictor in enumerate(all_preds):
+            ef = active_features[ix]
+            all_pes = []
+            all_rs = []
+            # For all instances for stimuli in this task's runs
+            for ee in ef.extracted_events:
+                # if ee.value:
+                for rs in RunStimulus.query.filter_by(stimulus_id=ee.stimulus_id):
+                        all_rs.append((predictor.id, rs.run_id))
+                        duration = ee.duration
+                        if duration is None:
+                            duration = rs.duration
+                        all_pes.append(
+                            PredictorEvent(
+                                onset=(ee.onset or 0)+ rs.onset,
+                                value=ee.value,
+                                object_id=ee.object_id,
+                                duration=duration,
+                                predictor_id=predictor.id,
+                                run_id=rs.run_id
+                            )
+                        )
 
-                                # If only a single value was extracted, and there is no duration
-                                # Set to stimulus duration
-                                if (len(durations) == 1) and (durations[0] is None):
-                                    durations[0] = rs.duration
-
-                                values = pd.Series(values, dtype='object')
-
-                                ### Bulk create a bunch of PES
-                                all_pes += [PredictorEvent(onset=onsets[i], duration = durations[i],
-                                               predictor_id=predictor.id, run_id = rs.run_id,
-                                               value = str(val))
-                                       for i, val in enumerate(values[values!='n/a'])]
-                                get_or_create(PredictorRun, predictor_id=predictor.id, run_id = rs.run_id)
+            all_rs = [PredictorRun(predictor_id=pred_id, run_id=run_id)
+                      for pred_id, run_id in set(all_rs)]
+            db.session.bulk_save_objects(all_pes + all_rs)
+            db.session.commit()
             bar.update(count)
-    db.session.bulk_save_objects(all_pes)
-    db.session.commit()
 
     return list(extracted_features.values())
