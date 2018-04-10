@@ -202,11 +202,19 @@ def extract_features(dataset_name, task_name, extractors):
                 db.session.commit()
             bar.update(i)
 
+    create_predictors(
+        [ef for ef in extracted_features.values() if ef.active],
+        dataset_id)
+
+    return list(extracted_features.values())
+
+
+
+def create_predictors(features, dataset_id):
     """" Create Predictors from Extracted Features """
     current_app.logger.info("Creating predictors")
-    active_features = [ef for ef in extracted_features.values() if ef.active]
     all_preds = []
-    for count, ef in enumerate(active_features):
+    for count, ef in enumerate(features):
         all_preds.append(get_or_create(
             Predictor, name=ef.feature_name, dataset_id=dataset_id,
             source='extracted', ef_id=ef.id)[0])
@@ -215,7 +223,7 @@ def extract_features(dataset_name, task_name, extractors):
     current_app.logger.info("Creating predictor events")
     with progressbar.ProgressBar(max_value=len(all_preds)) as bar:
         for ix, predictor in enumerate(all_preds):
-            ef = active_features[ix]
+            ef = features[ix]
             all_pes = []
             all_rs = []
             # For all instances for stimuli in this task's runs
@@ -242,5 +250,3 @@ def extract_features(dataset_name, task_name, extractors):
             db.session.bulk_save_objects(all_pes + all_rs)
             db.session.commit()
             bar.update(ix)
-
-    return list(extracted_features.values())
