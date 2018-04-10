@@ -45,13 +45,12 @@ def add_predictor(predictor_name, dataset_id, run_id, onsets, durations, values,
 
     values = pd.Series(values, dtype='object')
     # Insert each row of Predictor as PredictorEvent
-    for i, val in enumerate(values[values!='n/a']):
-        pe, _ = get_or_create(
-            PredictorEvent, commit=False,
-            onset=onsets[i], predictor_id=predictor.id, run_id = run_id)
-        pe.duration = durations[i]
-        pe.value = str(val)
-        db.session.commit()
+    pes = [PredictorEvent(onset=onsets[i], duration = durations[i],
+                   predictor_id=predictor.id, run_id = run_id,
+                   value = str(val))
+           for i, val in enumerate(values[values!='n/a'])]
+    db.session.bulk_save_objects(pes)
+    db.session.commit()
 
     # Add PredictorRun
     pr, _ = get_or_create(

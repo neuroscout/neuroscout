@@ -166,6 +166,7 @@ def extract_features(dataset_name, task_name, extractors):
         for i, res in enumerate(results):
             if res._data != [{}]:
                 # Annotate results
+                bulk_ees = []
                 for feature in serializer.load(res):
                     """" Add new ExtractedFeature """
                     # Hash extractor name + feature name
@@ -187,15 +188,16 @@ def extract_features(dataset_name, task_name, extractors):
                         Stimulus).filter_by(sha1_hash=stim_hash).one()
 
                     # Get or create ExtractedEvent
-                    ee_model = ExtractedEvent(onset=grab_value(res.onset),
-                                              duration=grab_value(res.duration),
-                                              stimulus_id=stimulus.id,
-                                              history=res.history.string,
-                                              ef_id=ef_model.id,
-                                              value=value,
-                                              object_id=object_id)
-                    db.session.add(ee_model)
-                    db.session.commit()
+                    bulk_ees.append(
+                        ExtractedEvent(onset=grab_value(res.onset),
+                                       duration=grab_value(res.duration),
+                                       stimulus_id=stimulus.id,
+                                       history=res.history.string,
+                                       ef_id=ef_model.id,
+                                       value=value,
+                                       object_id=object_id))
+                db.session.bulk_save_objects(bulk_ees)
+                db.session.commit()
             bar.update(i)
 
     current_app.logger.info("Creating predictors")
@@ -235,6 +237,6 @@ def extract_features(dataset_name, task_name, extractors):
                     populate.add_predictor(
                         ef.feature_name, dataset_id, rs.run_id, onsets, durations,
                         values, source='extracted', ef_id=ef.id)
-        bar.update(i)
+            bar.update(i)
 
     return list(extracted_features.values())
