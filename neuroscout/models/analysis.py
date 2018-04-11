@@ -59,6 +59,27 @@ class Analysis(db.Model):
         return self.runs[0].task.name if self.runs else None
 
     @hybrid_property
+    def subject(self):
+        items = list(set([run.subject for run in self.runs]) -  set([None]))
+        if len == 0:
+            items = None
+        return items
+
+    @hybrid_property
+    def run(self):
+        items = list(set([run.number for run in self.runs]) -  set([None]))
+        if len == 0:
+            items = None
+        return items
+
+    @hybrid_property
+    def session(self):
+        items = list(set([run.session for run in self.runs]) -  set([None]))
+        if len == 0:
+            items = None
+        return items
+
+    @hybrid_property
     def TR(self):
         return self.runs[0].task.TR if self.runs else None
 
