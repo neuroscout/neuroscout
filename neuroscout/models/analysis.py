@@ -67,7 +67,7 @@ class Analysis(db.Model):
 
     @hybrid_property
     def run(self):
-        items = list(set([run.number for run in self.runs]) -  set([None]))
+        items = list(set([int(run.number) for run in self.runs]) -  set([None]))
         if len == 0:
             items = None
         return items

@@ -61,8 +61,8 @@ def add_default_model(analysis, commit=True):
                 {
                     "level": "run",
                     "model": {
-                        "variables": features,
-                        "HRF_variables": features + confounds
+                        "variables": features + confounds,
+                        "HRF_variables": features ,
                         },
                     "transformations": [
                         {
