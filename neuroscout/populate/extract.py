@@ -92,7 +92,6 @@ class FeatureSerializer(object):
         # Add all remaining features
         if self.add_all is True:
             for feat in features:
-                assert 0
                 annotated += self._annotate_feature(
                     ".*", {}, feat, ext_hash,
                     res_df[res_df.feature == feat], default_active=False)
