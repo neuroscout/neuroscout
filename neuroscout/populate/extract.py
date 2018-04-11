@@ -43,8 +43,6 @@ class FeatureSerializer(object):
             features - list of all features
             default_active - set to active by default?
         """
-        self.features.remove(feat)
-
         name = re.sub(pattern, schema['replace'], feat) \
             if 'replace' in schema else feat
         description = re.sub(pattern, schema['description'], feat) \
@@ -68,7 +66,7 @@ class FeatureSerializer(object):
         Returns a dictionary of annotated features
         """
         res_df = res.to_df(format='long')
-        self.features = res_df['feature'].unique().tolist()
+        features = res_df['feature'].unique().tolist()
         ext_hash = res.extractor.__hash__()
 
         # Find matching extractor schema + attribute combination
@@ -85,14 +83,16 @@ class FeatureSerializer(object):
         annotated = []
         # Add all features in schema, popping features that match
         for pattern, schema in ext_schema.get('features', {}).items():
-            matching = filter(re.compile(pattern).match, self.features)
+            matching = list(filter(re.compile(pattern).match, features))
+            features = set(features) - set(matching)
             for feat in matching:
                 annotated += self._annotate_feature(
                     pattern, schema, feat, ext_hash, res_df[res_df.feature == feat])
 
         # Add all remaining features
         if self.add_all is True:
-            for feat in self.features.copy():
+            for feat in features:
+                assert 0
                 annotated += self._annotate_feature(
                     ".*", {}, feat, ext_hash,
                     res_df[res_df.feature == feat], default_active=False)
