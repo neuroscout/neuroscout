@@ -35,6 +35,9 @@ class PredictorEvent(db.Model):
 	predictor_id = db.Column(db.Integer, db.ForeignKey('predictor.id'),
 							nullable=False)
 
+	def __repr__(self):
+	    return '<models.PredictorEvent[run_id={} predictor={}]>'.format(self.run_id, self.predictor.name)
+
 class PredictorRun(db.Model):
 	""" Predictor run association cache table """
 	run_id = db.Column(db.Integer, db.ForeignKey('run.id'), primary_key=True)
