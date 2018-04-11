@@ -48,7 +48,7 @@
   ],
   "ClarifaiAPIExtractor": [
     {
-      "attributes": { "model": "general-v1.3" },
+      "attributes": { "model_name": "general-v1.3" },
       "features": {
         "(.*)": {
           "description": "General model label class: (\\1)"
@@ -56,7 +56,7 @@
       }
     },
     {
-      "attributes": { "model": "nsfw-v1.0" },
+      "attributes": { "model_name": "nsfw-v1.0" },
       "features": {
         "nsfw$": {
           "description": "Probability of nudity"
