@@ -208,7 +208,6 @@ def extract_features(dataset_name, task_name, extractors):
     return list(extracted_features.values())
 
 
-
 def create_predictors(features, dataset_id):
     """" Create Predictors from Extracted Features """
     current_app.logger.info("Creating predictors")
@@ -235,12 +234,13 @@ def create_predictors(features, dataset_id):
                             duration = rs.duration
                         all_pes.append(
                             PredictorEvent(
-                                onset=(ee.onset or 0)+ rs.onset,
+                                onset=(ee.onset or 0) + rs.onset,
                                 value=ee.value,
                                 object_id=ee.object_id,
                                 duration=duration,
                                 predictor_id=predictor.id,
-                                run_id=rs.run_id
+                                run_id=rs.run_id,
+                                stimulus_id=ee.stimulus_id
                             )
                         )
 
