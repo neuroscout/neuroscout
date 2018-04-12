@@ -1,4 +1,4 @@
 PATH=/usr/local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 PYTHONPATH=/usr/local/lib/python36.zip:/usr/local/lib/python3.6:/usr/local/lib/python3.6/lib-dynload:/usr/local/lib/python3.6/site-packages:/usr/src/app/src/datalad:/usr/src/app/src/pliers:/usr/src/app/src/pybids
 APP_SETTINGS=config.app.DevelopmentConfig
-0 0 * * * python3 /neuroscout/manage.py ingest_from_json /neuroscout/config/ds009.json -u >> /var/log/update.log 2> /var/log/update.log
+0 0 * * * python3 /neuroscout/manage.py ingest_from_json /neuroscout/config/no_updates.json -u >> /var/log/update.log 2> /var/log/update.log
