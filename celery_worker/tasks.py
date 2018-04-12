@@ -57,7 +57,7 @@ def compile(analysis, predictor_events, resources, bids_dir):
 
     # Write out events
     bundle_paths = writeout_events(analysis, predictor_events, files_dir)
-    rdb.set_trace()
+
     # Load events and try applying transformations
     bids_layout = BIDSLayout([bids_dir, files_dir.as_posix()])
     bids_analysis = Analysis(bids_layout, model)
