@@ -30,6 +30,7 @@ class ExtractedEvent(db.Model):
 	duration = db.Column(db.Float)
 	value = db.Column(db.String, nullable=False)
 	history = db.Column(db.String)
+	object_id = db.Column(db.Integer)
 
 	stimulus_id = db.Column(db.Integer, db.ForeignKey('stimulus.id'), nullable=False)
 	ef_id = db.Column(db.Integer, db.ForeignKey(ExtractedFeature.id),

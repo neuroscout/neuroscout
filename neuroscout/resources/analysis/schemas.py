@@ -85,6 +85,8 @@ class AnalysisResourcesSchema(Schema):
 		'DatasetSchema', only='preproc_address', attribute='dataset')
 	dataset_address = fields.Nested(
 		'DatasetSchema', only='dataset_address', attribute='dataset')
+	dataset_name = fields.Nested(
+		'DatasetSchema', only='name', attribute='dataset')
 	func_paths = fields.Nested(
 		'RunSchema', many=True, only='func_path', attribute='runs')
 	mask_paths = fields.Nested(

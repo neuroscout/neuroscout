@@ -48,17 +48,15 @@
   ],
   "ClarifaiAPIExtractor": [
     {
-      "attributes": { "model": "general-v1.3" },
+      "attributes": { "model_name": "general-v1.3" },
       "features": {
         "(.*)": {
           "description": "General model label class: (\\1)"
         }
       }
-    }
-  ],
-  "ClarifaiAPIExtractor": [
+    },
     {
-      "attributes": { "model": "nsfw-v1.0" },
+      "attributes": { "model_name": "nsfw-v1.0" },
       "features": {
         "nsfw$": {
           "description": "Probability of nudity"
@@ -79,9 +77,7 @@
           "description": "Image recognition label: \\1"
         }
       }
-    }
-  ],
-  "IndicoAPITextExtractor": [
+    },
     {
       "features": {
         "sentiment$": {
