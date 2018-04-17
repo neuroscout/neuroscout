@@ -34,6 +34,7 @@ class PredictorEvent(db.Model):
 	run_id = db.Column(db.Integer, db.ForeignKey('run.id'), nullable=False)
 	predictor_id = db.Column(db.Integer, db.ForeignKey('predictor.id'),
 							nullable=False)
+	stimulus_id = db.Column(db.Integer, db.ForeignKey('stimulus.id'))
 
 	def __repr__(self):
 	    return '<models.PredictorEvent[run_id={} predictor={}]>'.format(self.run_id, self.predictor.name)

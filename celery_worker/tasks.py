@@ -34,7 +34,12 @@ def writeout_events(analysis, pes, outdir):
                 ['onset', 'duration', 'predictor_id'])['value'].\
                 sum().unstack('predictor_id').reset_index()
 
-            print(run_events.columns)
+            # Missing columns
+            missing = set(predictor_names.values()) - set(run_events.columns)
+            for col in missing:
+                run_events[col] = 'n/a'
+
+            run_events = run_events.fillna('n/a')
 
             # Write out BIDS path
             ses = 'ses-{}_'.format(run['session']) if run.get('session') else ''
@@ -49,16 +54,6 @@ def writeout_events(analysis, pes, outdir):
 def compile(analysis, predictor_events, resources, bids_dir):
     files_dir = Path(mkdtemp())
     model = analysis.pop('model')
-    scan_length = analysis['runs'][0]['duration']
-
-    # Get run entities
-    entities = {'session': [], 'subject': [], 'number': []}
-    for ent, entries in entities.items():
-        for r in analysis['runs']:
-            if r[ent]:
-             entries += [r[ent]]
-    entities = {k:v for k,v in entities.items() if v}
-    entities['run'] = [int(r) for r in entities.pop('number')]
 
     # Write out events
     bundle_paths = writeout_events(analysis, predictor_events, files_dir)
@@ -66,7 +61,7 @@ def compile(analysis, predictor_events, resources, bids_dir):
     # Load events and try applying transformations
     bids_layout = BIDSLayout([bids_dir, files_dir.as_posix()])
     bids_analysis = Analysis(bids_layout, model)
-    bids_analysis.setup(derivatives='only', task=analysis['task_name'], scan_length=scan_length, **entities)
+    bids_analysis.setup(derivatives='only', task=analysis['task_name'])
 
     # Write out analysis & resource JSON
     for obj, name in [(analysis, 'analysis'), (resources, 'resources'), (model, 'model')]:
