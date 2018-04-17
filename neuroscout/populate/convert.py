@@ -77,7 +77,7 @@ def convert_stimuli(dataset_name, task_name, converters):
 
             for res in results:
                 # Save stim to file
-                if hasattr(res, 'data') and res.data:
+                if hasattr(res, 'data') and res.data is not None:
                     stim_hash, path = save_stim_filename(res)
 
                     # Create stimulus model
