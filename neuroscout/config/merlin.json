@@ -1,0 +1,18 @@
+{
+  "generic_object_decoding": {
+    "preproc_address": "https://s3.amazonaws.com/openneuro.outputs/1490855922c3beb08e8c2daa4b4fd531/b444ac37-851d-4085-a228-5ae96e4683ed/fmriprep",
+    "path": "/datasets/SherlockMerlin/",
+    "tasks": {
+      "MerlinMovie": {
+        "converters": [
+          ["FrameSamplingFilter", { "every": 200 }]
+        ],
+        "extractors": [
+        ],
+        "filters": {
+          "subject": "30"
+        }
+      }
+    }
+  }
+}
