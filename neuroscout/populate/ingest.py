@@ -240,11 +240,13 @@ def add_task(task_name, dataset_name=None, local_path=None,
                         if entity in img._fields}
 
             """ Extract Run information """
+            run_number = img.run if hasattr(img, 'run') else None
             run_model, new = get_or_create(
-                Run, dataset_id=dataset_model.id, number=img.run,
+                Run, dataset_id=dataset_model.id, number=run_number,
                 task_id = task_model.id, **entities)
-            entities['run'] = img.run
             entities['task'] = task_model.name
+            if run_number:
+                entities['run'] = run_number
 
             # Get duration (helps w/ transformations)
             try:
@@ -286,7 +288,7 @@ def add_task(task_name, dataset_name=None, local_path=None,
                     try:
                         stim_hash = hash_stim(stim_path)
                     except OSError:
-                        current_app.logger.debug('{} not found.'.format(val))
+                        current_app.logger.debug('{} not found.'.format(stim_path))
                         continue
 
                     stims_processed[val] = stim_hash

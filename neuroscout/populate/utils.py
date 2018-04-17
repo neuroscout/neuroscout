@@ -6,16 +6,16 @@ import hashlib
 import warnings
 from pathlib import Path
 
-def format_preproc(subject, task, run, session=None,
+def format_preproc(subject, task, run=None, session=None,
                    space="MNI152NLin2009cAsym", suffix="preproc"):
     """ Format relative fmri_prep paths """
     subject_f = "sub-{}/".format(subject)
     session_f = "ses-{}/".format(session) if session else ""
-
-    return "{}{}func/{}{}task-{}_run-{}_bold_space-{}_{}.nii.gz".format(
+    run_f = "run-{}_".format(run.zfill(2)) if run else ""
+    return "{}{}func/{}{}task-{}_{}bold_space-{}_{}.nii.gz".format(
     subject_f, session_f,
     subject_f.replace("/", "_"), session_f.replace("/", "_"),
-    task, run.zfill(2), space, suffix
+    task, run_f, space, suffix
 )
 
 def hash_stim(stim, blocksize = 65536):
