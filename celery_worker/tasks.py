@@ -37,9 +37,9 @@ def writeout_events(analysis, pes, outdir):
             # Missing columns
             missing = set(predictor_names.values()) - set(run_events.columns)
             for col in missing:
-                run_events[col] = 'n/a'
+                run_events[col] = 0.0
 
-            run_events = run_events.fillna('n/a')
+            run_events = run_events.fillna(0.0)
 
             # Write out BIDS path
             ses = 'ses-{}_'.format(run['session']) if run.get('session') else ''
