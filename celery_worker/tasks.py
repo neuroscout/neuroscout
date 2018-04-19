@@ -32,7 +32,7 @@ def writeout_events(analysis, pes, outdir):
             # Make wide
             run_events = run_events.groupby(
                 ['onset', 'duration', 'predictor_id'])['value'].\
-                sum().unstack('predictor_id').reset_index()
+                max().unstack('predictor_id').reset_index()
 
             # Missing columns
             missing = set(predictor_names.values()) - set(run_events.columns)
