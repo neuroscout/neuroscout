@@ -20,7 +20,7 @@
   "SharpnessExtractor": [
     {
       "features": {
-        "shaprness$": {
+        "sharpness$": {
           "description": "Brightness of an image."
         }
       }
