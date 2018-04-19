@@ -6,10 +6,18 @@ class Stimulus(db.Model):
 	__table_args__ = (
 	    db.UniqueConstraint('sha1_hash', 'dataset_id', 'converter_name'),
 	)
+
+	__table_args__ = (
+  		db.CheckConstraint('NOT(path IS NULL AND content IS NULL)'),
+	)
+
 	id = db.Column(db.Integer, primary_key=True)
 	sha1_hash = db.Column(db.Text, nullable=False)
 	mimetype = db.Column(db.Text, nullable=False)
-	path = db.Column(db.Text, nullable=False)
+
+	path = db.Column(db.Text)
+	content = db.Column(db.Text)
+
 	dataset_id = db.Column(db.Integer, db.ForeignKey('dataset.id'),
 						   nullable=False)
 

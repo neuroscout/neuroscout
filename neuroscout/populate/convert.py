@@ -33,6 +33,38 @@ def save_stim_filename(stimulus):
 
     return stim_hash, filename
 
+def save_new_stimulus(dataset_id, task_name, stim_id, rs_orig, stim_hash,
+                      transformer=None, transformer_params=None,
+                      path=None, data=None, onset=None, duration=None):
+    if path is None and data is None:
+        raise ValueError("Stimulus path and data cannot both be None")
+
+    # Create stimulus model
+    new_stim, new = add_stimulus(
+        stim_hash, path=path, data=data, parent_id=stim_id,
+        converter_name=transformer,
+        converter_params=transformer_params,
+        dataset_id=dataset_id)
+
+    if not new:
+        # Delete previous RS associations with this derived stim
+        delete = db.session.query(RunStimulus.id).filter_by(
+            stimulus_id=new_stim.id).join(Run).join(
+                Task).filter_by(name=task_name)
+        RunStimulus.query.filter(RunStimulus.id.in_(delete)).\
+            delete(synchronize_session='fetch')
+
+    # Create new run stimulus associations
+    for rs in rs_orig:
+        new_rs = RunStimulus(stimulus_id=new_stim.id,
+                             run_id=rs.run_id,
+                             onset=rs.onset + (onset or 0),
+                             duration=duration or rs.duration)
+        db.session.add(new_rs)
+        db.session.commit()
+
+    return new_stim.id
+
 def convert_stimuli(dataset_name, task_name, converters):
     """ Extract features using pliers for a dataset/task
         Args:
@@ -45,6 +77,7 @@ def convert_stimuli(dataset_name, task_name, converters):
     current_app.logger.info("Converting stimuli")
 
     dataset_id = Dataset.query.filter_by(name=dataset_name).one().id
+
     converters = [get_transformer(n, **p) for n, p in converters]
 
     # Load all active original stimuli for task
@@ -76,34 +109,29 @@ def convert_stimuli(dataset_name, task_name, converters):
                         results.append(converted)
 
             for res in results:
-                # Save stim to file
+                # Save stim
                 if hasattr(res, 'data') and res.data is not '':
-                    stim_hash, path = save_stim_filename(res)
+                    if isinstance(res, TextStim):
+                        args = {
+                            'stim_hash': hash_stim(res),
+                            'data': res.data
+                        }
+                    else:
+                        stim_hash, path = save_stim_filename(res)
+                        args = {
+                            'stim_hash': stim_hash,
+                            'path': path
+                        }
 
-                    # Create stimulus model
-                    new_stim, new = add_stimulus(
-                        path, stim_hash, parent_id=stim.id,
-                        converter_name=converted.history.transformer_class,
-                        converter_params=converted.history.transformer_params,
-                        dataset_id=dataset_id)
-                    new_stims.append(new_stim.id)
+                    args['onset'] = res.onset
+                    args['duration'] = res.duration
 
-                    if not new:
-                        # Delete previous RS associations with this derived stim
-                        delete = db.session.query(RunStimulus.id).filter_by(
-                            stimulus_id=new_stim.id).join(Run).join(
-                                Task).filter_by(name=task_name)
-                        RunStimulus.query.filter(RunStimulus.id.in_(delete)).\
-                            delete(synchronize_session='fetch')
-
-                    # Create new run stimulus associations
-                    for rs in rs_orig:
-                        new_rs = RunStimulus(stimulus_id=new_stim.id,
-                                             run_id=rs.run_id,
-                                             onset=rs.onset + (res.onset or 0),
-                                             duration=res.duration or rs.duration)
-                        db.session.add(new_rs)
-                        db.session.commit()
+                    new_stims.append(
+                        save_new_stimulus(
+                            dataset_id, task_name, stim.id,
+                            converted.history.transformer_class,
+                            converted.history.transformer_params,
+                            rs_orig, **args))
 
         # De-activate previously generated stimuli from these converters.
         update = Stimulus.query.filter_by(parent_id=stim.id).filter(
