@@ -216,7 +216,7 @@ def test_external_text(get_data_path, add_task):
 	filename = (get_data_path / 'fake_transcript.csv').as_posix()
 
 	dataset_model = Dataset.query.filter_by(id=add_task).one()
-	task_name = Task.query.filter_by(id=add_task).one().name
+	task_name = Task.query.filter_by(dataset_id=add_task).one().name
 
 	stim = Stimulus.query.filter_by(dataset_id=dataset_model.id).first()
 
