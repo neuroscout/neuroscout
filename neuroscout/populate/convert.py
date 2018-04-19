@@ -112,26 +112,20 @@ def convert_stimuli(dataset_name, task_name, converters):
                 # Save stim
                 if hasattr(res, 'data') and res.data is not '':
                     if isinstance(res, TextStim):
-                        args = {
-                            'stim_hash': hash_stim(res),
-                            'data': res.data
-                        }
+                        stim_hash = hash_stim(res)
+                        data = res.data
+                        path = None
                     else:
                         stim_hash, path = save_stim_filename(res)
-                        args = {
-                            'stim_hash': stim_hash,
-                            'path': path
-                        }
-
-                    args['onset'] = res.onset
-                    args['duration'] = res.duration
+                        data = None
 
                     new_stims.append(
                         save_new_stimulus(
-                            dataset_id, task_name, stim.id,
-                            converted.history.transformer_class,
-                            converted.history.transformer_params,
-                            rs_orig, **args))
+                            dataset_id, task_name, stim.id, rs_orig, stim_hash,
+                            transformer=converted.history.transformer_class,
+                            transformer_params=converted.history.transformer_params,
+                            data=data, path=path, onset=res.onset,
+                            duration=res.duration))
 
         # De-activate previously generated stimuli from these converters.
         update = Stimulus.query.filter_by(parent_id=stim.id).filter(
