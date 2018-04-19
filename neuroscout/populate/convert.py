@@ -11,8 +11,10 @@ from pliers.transformers import get_transformer
 
 from models import Dataset, Task, Run, Stimulus, RunStimulus
 
-from .utils import hash_stim
+from .utils import hash_stim, hash_data
 from .ingest import add_stimulus
+
+import pandas as pd
 
 def save_stim_filename(stimulus):
     """ Given a pliers stimulus object, create a hash, filename, and save """
@@ -33,15 +35,12 @@ def save_stim_filename(stimulus):
 
     return stim_hash, filename
 
-def save_new_stimulus(dataset_id, task_name, stim_id, rs_orig, stim_hash,
+def save_new_stimulus(dataset_id, task_name, parent_id, rs_orig, stim_hash,
                       transformer=None, transformer_params=None,
-                      path=None, data=None, onset=None, duration=None):
-    if path is None and data is None:
-        raise ValueError("Stimulus path and data cannot both be None")
-
+                      path=None, content=None, onset=None, duration=None):
     # Create stimulus model
     new_stim, new = add_stimulus(
-        stim_hash, path=path, data=data, parent_id=stim_id,
+        stim_hash, path=path, content=content, parent_id=parent_id,
         converter_name=transformer,
         converter_params=transformer_params,
         dataset_id=dataset_id)
@@ -113,18 +112,18 @@ def convert_stimuli(dataset_name, task_name, converters):
                 if hasattr(res, 'data') and res.data is not '':
                     if isinstance(res, TextStim):
                         stim_hash = hash_stim(res)
-                        data = res.data
+                        content = res.data
                         path = None
                     else:
                         stim_hash, path = save_stim_filename(res)
-                        data = None
+                        content = None
 
                     new_stims.append(
                         save_new_stimulus(
                             dataset_id, task_name, stim.id, rs_orig, stim_hash,
                             transformer=converted.history.transformer_class,
                             transformer_params=converted.history.transformer_params,
-                            data=data, path=path, onset=res.onset,
+                            content=content, path=path, onset=res.onset,
                             duration=res.duration))
 
         # De-activate previously generated stimuli from these converters.
@@ -136,3 +135,23 @@ def convert_stimuli(dataset_name, task_name, converters):
         total_new_stims += new_stims
 
     return total_new_stims
+
+def ingest_text_stimuli(filename, dataset_name, task_name, parent_id,
+                        transformer, transformer_params=None):
+    """ Ingest converted text stimuli from file. """
+    ## This ingests from a single parents. May want to refactor in the future
+    ## For more complex files (e.g. multiple parents)
+    df = pd.read_csv(filename, delimiter='\t')
+    dataset_id = Dataset.query.filter_by(name=dataset_name).one().id
+
+    ## Get associations with parent stimulus
+    rs_orig = RunStimulus.query.filter_by(stimulus_id=parent_id).join(
+        Run).join(Task).filter_by(name=task_name)
+
+    for ix, row in df.iterrows():
+        stim_hash = hash_data(row['text'])
+        save_new_stimulus(dataset_id, task_name, parent_id, rs_orig, stim_hash,
+                          transformer=transformer,
+                          transformer_params=transformer_params,
+                          content=row['text'], onset=row['onset'],
+                          duration=row.get('duration'))
