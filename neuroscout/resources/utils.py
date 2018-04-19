@@ -79,7 +79,7 @@ def add_default_model(analysis, commit=True):
                 ],
             }
 
-        if analysis.session is not []:
+        if analysis.session is not None:
             model['input']['session'] = analysis.session
         if analysis.run is not None:
             model['input']['run'] = analysis.run_num
