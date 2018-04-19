@@ -7,11 +7,6 @@ set -e
 PG_HOST="postgres"
 PG_USER="postgres"
 
-# AWS Credentials
-AWS_ACCESS_KEY_ID=SECRET
-AWS_SECRET_ACCESS_KEY=SECRET
-export AWS_ACCESS_KEY_ID
-export AWS_SECRET_ACCESS_KEY
 
 # S3
 S3_PATH="neuroscout-backup"

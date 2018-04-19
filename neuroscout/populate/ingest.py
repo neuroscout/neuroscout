@@ -184,30 +184,19 @@ def add_task(task_name, dataset_name=None, local_path=None,
 
     local_path = Path(local_path)
 
-    # Look for events folder in derivatives
-    path = [local_path.as_posix()]
-    extra_events = local_path / 'derivatives' / 'events'
-    if extra_events.exists():
-        path.append(extra_events.as_posix())
-
-    # Remove once grabbit bug fix is in
-    if len(path) == 1:
-        path = path[0]
-
-    layout = BIDSLayout(path)
+    layout = BIDSLayout(local_path.as_posix())
     if task_name not in layout.get_tasks():
         raise ValueError("Task {} not found in dataset {}".format(
             task_name, local_path))
 
-    description = json.load((local_path / 'dataset_description.json').open())
     dataset_name = dataset_name if dataset_name is not None \
-                   else description['Name']
+                   else layout.description['Name']
 
     # Get or create dataset model from mandatory arguments
     dataset_model, new_ds = get_or_create(Dataset, name=dataset_name)
 
     if new_ds:
-        dataset_model.description = description
+        dataset_model.description = layout.description
         dataset_model.dataset_address = dataset_address
         dataset_model.preproc_address = preproc_address
         dataset_model.local_path = local_path.as_posix()
@@ -240,11 +229,13 @@ def add_task(task_name, dataset_name=None, local_path=None,
                         if entity in img._fields}
 
             """ Extract Run information """
+            run_number = img.run if hasattr(img, 'run') else None
             run_model, new = get_or_create(
-                Run, dataset_id=dataset_model.id, number=img.run,
+                Run, dataset_id=dataset_model.id, number=run_number,
                 task_id = task_model.id, **entities)
-            entities['run'] = img.run
             entities['task'] = task_model.name
+            if run_number:
+                entities['run'] = run_number
 
             # Get duration (helps w/ transformations)
             try:
@@ -286,7 +277,7 @@ def add_task(task_name, dataset_name=None, local_path=None,
                     try:
                         stim_hash = hash_stim(stim_path)
                     except OSError:
-                        current_app.logger.debug('{} not found.'.format(val))
+                        current_app.logger.debug('{} not found.'.format(stim_path))
                         continue
 
                     stims_processed[val] = stim_hash

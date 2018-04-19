@@ -45,7 +45,7 @@ psycopg2==2.7.1
 progressbar2
 py==1.4.33
 -e git+https://github.com/grabbles/grabbit.git#egg=grabbit
--e git+https://github.com/INCF/pybids.git#egg=pybids
+-e git+https://github.com/adelavega/pybids.git@optional_desc#egg=pybids
 PyJWT==1.4.2
 pyparsing==2.2.0
 pytest==3.0.7
