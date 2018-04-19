@@ -55,7 +55,6 @@ def add_default_model(analysis, commit=True):
             "input": {
                 "task": analysis.task_name,
                 "subject": analysis.subject,
-                "run": analysis.run,
                 },
             "blocks": [
                 {
@@ -80,8 +79,10 @@ def add_default_model(analysis, commit=True):
                 ],
             }
 
-        if analysis.session is not None:
+        if analysis.session is not []:
             model['input']['session'] = analysis.session
+        if analysis.run is not None:
+            model['input']['run'] = analysis.run_num
         analysis.model = model
 
         if commit is True:

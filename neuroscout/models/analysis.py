@@ -61,21 +61,21 @@ class Analysis(db.Model):
     @hybrid_property
     def subject(self):
         items = list(set([run.subject for run in self.runs]) -  set([None]))
-        if len == 0:
+        if len(items) == 0:
             items = None
         return items
 
     @hybrid_property
     def run(self):
-        items = list(set([int(run.number) for run in self.runs]) -  set([None]))
-        if len == 0:
+        items = list(set([int(run.number) for run in self.runs if run.number is not None]) -  set([None]))
+        if len(items) == 0:
             items = None
         return items
 
     @hybrid_property
     def session(self):
         items = list(set([run.session for run in self.runs]) -  set([None]))
-        if len == 0:
+        if len(items) == 0:
             items = None
         return items
 

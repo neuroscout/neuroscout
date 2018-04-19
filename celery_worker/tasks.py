@@ -43,8 +43,9 @@ def writeout_events(analysis, pes, outdir):
 
             # Write out BIDS path
             ses = 'ses-{}_'.format(run['session']) if run.get('session') else ''
-            events_fname = outdir / 'sub-{}_{}task-{}_run-{}_events.tsv'.format(
-                run['subject'], ses, analysis['task_name'], run['number'])
+            run_num = 'run-{}_'.format(run['number']) if run.get('number') else ''
+            events_fname = outdir / 'sub-{}_{}task-{}_{}events.tsv'.format(
+                run['subject'], ses, analysis['task_name'], run_num)
             paths.append(events_fname)
             run_events.to_csv(events_fname, sep='\t', index=False)
 
