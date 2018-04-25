@@ -16,7 +16,7 @@ import { BrowserRouter as Router, Route, Link, Redirect } from 'react-router-dom
 import './App.css';
 
 const FormItem = Form.Item;
-const DOMAINROOT = 'http://localhost:80';
+const DOMAINROOT = 'http://alpha.neuroscout.org:80';
 const { localStorage } = window;
 
 const { Footer, Content, Header } = Layout;
@@ -203,7 +203,7 @@ class App extends React.Component<{}, AppState> {
           title: 'Account created!',
           content: 'Your account has been sucessfully created. \
           You will receive a confirmation email shortly. Please follow the instructions to activate your account\
-          and start using Neurosynth. ',
+          and start using Neuroscout. ',
           okText: 'Okay',
         });
       })
@@ -470,7 +470,7 @@ class App extends React.Component<{}, AppState> {
         }}
       >
         <p>
-          {loginError ? loginError : 'For development try "user@example.com" and "string"'}
+          {loginError ? loginError : ''}
         </p>
         <br />
         <Form
