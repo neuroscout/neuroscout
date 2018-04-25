@@ -46,7 +46,7 @@ class UserCreationSchema(UserSchema):
 class UserResetSchema(UserCreationSchema):
     token = fields.Str(required=True, description="Password reset token.")
 
-@doc(tags=['auth'])
+# @doc(tags=['auth'])
 @marshal_with(UserSchema)
 class UserRootResource(MethodResource):
     @doc(summary='Get current user information.')
@@ -68,7 +68,7 @@ class UserRootResource(MethodResource):
             abort(422, 'Email already in use.')
         return put_record(kwargs, current_identity)
 
-@doc(tags=['auth'])
+# @doc(tags=['auth'])
 class UserResendConfirm(MethodResource):
     @doc(summary='Resend confirmation email.')
     @doc(params={"authorization": {
@@ -82,14 +82,14 @@ class UserResendConfirm(MethodResource):
             resp = {'message': 'User is already confirmed'}
         return resp
 
-@doc(tags=['auth'], summary='Request a password reset token.')
+# @doc(tags=['auth'], summary='Request a password reset token.')
 @use_kwargs(UserSchema(only=['email']))
 class UserTriggerResetResource(MethodResource):
     def post(self, **kwargs):
         reset_password(kwargs['email'])
         return {'message' : 'Password reset token sent'}, 200
 
-@doc(tags=['auth'], summary='Reset user password using a token.')
+# @doc(tags=['auth'], summary='Reset user password using a token.')
 @use_kwargs(UserCreationSchema(only=['token', 'password']))
 class UserResetSubmitResource(MethodResource):
     def post(self, **kwargs):
