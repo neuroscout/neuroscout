@@ -30,7 +30,7 @@ def _make_context():
 	except:
 		client = None
 
-	return dict(app=app, db=db, models=models, client=client,
+	return dict(app=app, db=db, ms=models, client=client,
 		resources=resources)
 
 manager.add_command('db', MigrateCommand)

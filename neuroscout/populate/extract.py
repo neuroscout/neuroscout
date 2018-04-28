@@ -12,7 +12,7 @@ import datetime
 import progressbar
 from utils import get_or_create
 
-from pliers.stimuli import load_stims
+from pliers.stimuli import load_stims, TextStim
 from pliers.transformers import get_transformer
 from pliers.extractors import merge_results
 
@@ -121,6 +121,12 @@ def grab_value(val):
     else:
         return val[0]
 
+def load_stim_object(stim_object):
+    if stim_object.path is not None:
+        return load_stims(stim_object.path)
+    else:
+        return TextStim(text=stim_object.content)
+
 def extract_features(dataset_name, task_name, extractors):
     """ Extract features using pliers for a dataset/task
         Args:
@@ -137,9 +143,11 @@ def extract_features(dataset_name, task_name, extractors):
         RunStimulus).join(Run).join(Task).filter_by(name=task_name).join(
             Dataset).filter_by(name=dataset_name)
 
-    stim_paths = [s.path for s in stim_objects if s.parent_id is None]
-    stim_paths += [s.path for s in stim_objects if s.parent_id is not None]
-    stims = load_stims(stim_paths)
+    # Order
+    all_stims = [s for s in stim_objects if s.parent_id is None]
+    all_stims += [s for s in stim_objects if s.parent_id is not None]
+
+    stims = [load_stim_object(stim) for stim in all_stims]
 
     results = []
     for name, parameters in extractors:

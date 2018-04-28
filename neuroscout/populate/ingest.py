@@ -129,11 +129,16 @@ def add_group_predictors(dataset_id, participants):
     return gp_ids
 
 
-def add_stimulus(path, stim_hash, dataset_id, parent_id=None,
+def add_stimulus(stim_hash, dataset_id, parent_id=None, path=None, content=None,
                  converter_name=None, converter_params=None):
-    """ Creare stimulus model """
-    path = path.resolve().as_posix()
-    mimetype = magic.from_file(path, mime=True)
+    """ Create stimulus model """
+    if path is None and content is None:
+        raise ValueError("Stimulus path and data cannot both be None")
+    if path is not None:
+        path = path.resolve().as_posix()
+        mimetype = magic.from_file(path, mime=True)
+    elif content is not None:
+        mimetype = 'text/plain'
 
     model, new = get_or_create(
         Stimulus, commit=False, sha1_hash=stim_hash,
@@ -141,6 +146,7 @@ def add_stimulus(path, stim_hash, dataset_id, parent_id=None,
 
     if new:
         model.path = path
+        model.content = content
         model.mimetype = mimetype
         model.parent_id = parent_id
         model.converter_params = converter_params
@@ -285,7 +291,7 @@ def add_task(task_name, dataset_name=None, local_path=None,
                     stim_hash = stims_processed[val]
 
                 stim_model, _ = add_stimulus(
-                    stim_path, stim_hash, dataset_id=dataset_model.id)
+                    stim_hash, path=stim_path, dataset_id=dataset_model.id)
 
                 # Get or create Run Stimulus association
                 runstim, _ = get_or_create(

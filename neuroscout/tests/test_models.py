@@ -3,9 +3,10 @@ import os
 from sqlalchemy import func
 from models import (Analysis, User, Dataset, Predictor, Stimulus, Run,
 					RunStimulus, Result, ExtractedFeature, PredictorEvent,
-					GroupPredictor)
+					GroupPredictor, Task)
 
 from numpy import isclose
+from populate.convert import ingest_text_stimuli
 
 def test_dataset_ingestion(session, add_task):
 	dataset_model = Dataset.query.filter_by(id=add_task).one()
@@ -210,3 +211,23 @@ def test_analysis(session, add_analysis, add_predictor):
 
 def test_result(add_result):
 	assert Result.query.count() == 1
+
+def test_external_text(get_data_path, add_task):
+	filename = (get_data_path / 'fake_transcript.csv').as_posix()
+
+	dataset_model = Dataset.query.filter_by(id=add_task).one()
+	task_name = Task.query.filter_by(dataset_id=add_task).one().name
+
+	stim = Stimulus.query.filter_by(dataset_id=dataset_model.id).first()
+
+	ingest_text_stimuli(filename, dataset_model.name, task_name, stim.id,
+						'FakeTextExtraction')
+
+	data = [s for s in Stimulus.query.all() if s.content is not None]
+
+	first_stim = [s for s in data if s.content == 'no'][0]
+	rs = RunStimulus.query.filter_by(stimulus_id=first_stim.id).all()
+
+	assert len(data) == 2
+	assert len(rs) == 4
+	assert 7.922 in [s.onset for s in rs]

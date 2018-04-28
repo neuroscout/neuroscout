@@ -84,13 +84,17 @@ import populate
 
 DATA_PATH = Path(__file__).resolve().parents[0] / 'data'
 
-DATASET_PATH = DATA_PATH / 'datasets/bids_test'
+DATASET_PATH = DATA_PATH / 'bids_test'
 LOCAL_JSON_PATH = (DATA_PATH / 'test_local.json').as_posix()
 REMOTE_JSON_PATH = (DATA_PATH / 'test_remote.json').as_posix()
 EXTRACTORS = [
     ("BrightnessExtractor", {}),
     ("VibranceExtractor", {})
     ]
+
+@pytest.fixture()
+def get_data_path():
+    return DATA_PATH
 
 @pytest.fixture(scope="function")
 def add_users(app, db, session):
