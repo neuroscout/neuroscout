@@ -54,6 +54,8 @@ class FeatureSerializer(object):
             'description': description,
             'active': schema.get('active', default_active),
             'value': v['value'],
+            'onset': v['onset'] if not pd.isnull(v['onset']) else None,
+            'duration': v['duration'] if not pd.isnull(v['duration']) else None,
             'object_id': v['object_id'],
             } for i, v in sub_df.iterrows()]
 
@@ -113,13 +115,6 @@ class FeatureSerializer(object):
 
         return annotated
 
-def grab_value(val):
-    if pd.isnull(val):
-        return None
-    elif isinstance(val, float):
-        return val
-    else:
-        return val[0]
 
 def load_stim_object(stim_object):
     if stim_object.path is not None:
@@ -178,8 +173,9 @@ def extract_features(dataset_name, task_name, extractors):
                     """" Add new ExtractedFeature """
                     # Hash extractor name + feature name
                     ef_hash = feature['sha1_hash']
-                    value = feature.pop('value')
-                    object_id = feature.pop('object_id')
+                    ee_kwargs = {n: feature.pop(n) for n in
+                                 ['value', 'onset', 'duration', 'object_id']}
+
                     # If we haven't already added this feature
                     if ef_hash not in extracted_features:
                         # Create/get feature
@@ -192,19 +188,15 @@ def extract_features(dataset_name, task_name, extractors):
 
                     """" Add ExtractedEvents """
                     # Get associated stimulus record
-                    stim_hash = hash_stim(res.stim)
                     stimulus = db.session.query(
-                        Stimulus).filter_by(sha1_hash=stim_hash).one()
+                        Stimulus).filter_by(path=res.stim.filename).one()
 
                     # Get or create ExtractedEvent
                     bulk_ees.append(
-                        ExtractedEvent(onset=grab_value(res.onset),
-                                       duration=grab_value(res.duration),
-                                       stimulus_id=stimulus.id,
+                        ExtractedEvent(stimulus_id=stimulus.id,
                                        history=res.history.string,
                                        ef_id=ef_model.id,
-                                       value=value,
-                                       object_id=object_id))
+                                       **ee_kwargs))
                 db.session.bulk_save_objects(bulk_ees)
                 db.session.commit()
             bar.update(i)
