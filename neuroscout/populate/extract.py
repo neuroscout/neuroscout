@@ -48,18 +48,27 @@ class FeatureSerializer(object):
         description = re.sub(pattern, schema['description'], feat) \
             if 'description' in schema else None
 
-        properties = [{
-            'feature_name': name,
-            'sha1_hash': hash_data(str(ext_hash) + name),
-            'description': description,
-            'active': schema.get('active', default_active),
-            'value': v['value'],
-            'onset': v['onset'] if not pd.isnull(v['onset']) else None,
-            'duration': v['duration'] if not pd.isnull(v['duration']) else None,
-            'object_id': v['object_id'],
-            } for i, v in sub_df.iterrows()]
+        annotated = []
+        for i, v in sub_df.iterrows():
+            if v['value'] is not None:
+                annotated.append(
+                    (
+                        {
+                            'value': v['value'],
+                            'onset': v['onset'] if not pd.isnull(v['onset']) else None,
+                            'duration': v['duration'] if not pd.isnull(v['duration']) else None,
+                            'object_id': v['object_id']
+                            },
+                        {
+                            'sha1_hash': hash_data(str(ext_hash) + name),
+                            'feature_name': name,
+                            'description': description,
+                            'active': schema.get('active', default_active),
+                            }
+                        )
+                    )
 
-        return properties
+        return annotated
 
     def load(self, res):
         """" Load and annotate features in an extractor result object.
@@ -80,7 +89,6 @@ class FeatureSerializer(object):
                     break
             else:
                 ext_schema = candidate
-
 
         annotated = []
         # Add all features in schema, popping features that match
@@ -107,11 +115,8 @@ class FeatureSerializer(object):
                 zip(res.extractor._log_attributes, tr_attrs))),
             "extractor_version": res.extractor.VERSION
         }
-        for a in annotated:
-            a.update(constants)
-
-        ## Only return non-null values
-        annotated = [a for a in annotated if a['value'] is not None]
+        for ee, ef in annotated:
+            ef.update(constants)
 
         return annotated
 
@@ -166,39 +171,35 @@ def extract_features(dataset_name, task_name, extractors):
         serializer = FeatureSerializer()
         extracted_features = {}
         for i, res in enumerate(results):
-            if not res.to_df().empty:
-                # Annotate results
-                bulk_ees = []
-                for feature in serializer.load(res):
-                    """" Add new ExtractedFeature """
-                    # Hash extractor name + feature name
-                    ef_hash = feature['sha1_hash']
-                    ee_kwargs = {n: feature.pop(n) for n in
-                                 ['value', 'onset', 'duration', 'object_id']}
+            bulk_ees = []
+            for ee_props, ef_props in serializer.load(res):
+                """" Add new ExtractedFeature """
+                # Hash extractor name + feature name
+                feat_hash = ef_props['sha1_hash']
 
-                    # If we haven't already added this feature
-                    if ef_hash not in extracted_features:
-                        # Create/get feature
-                        ef_model = ExtractedFeature(**feature)
-                        db.session.add(ef_model)
-                        db.session.commit()
-                        extracted_features[ef_hash] = ef_model
-                    else:
-                        ef_model = extracted_features[ef_hash]
+                # If we haven't already added this feature
+                if feat_hash not in extracted_features:
+                    # Create/get feature
+                    ef_model = ExtractedFeature(**ef_props)
+                    db.session.add(ef_model)
+                    db.session.commit()
+                    extracted_features[feat_hash] = ef_model
+                else:
+                    ef_model = extracted_features[feat_hash]
 
-                    """" Add ExtractedEvents """
-                    # Get associated stimulus record
-                    stimulus = db.session.query(
-                        Stimulus).filter_by(path=res.stim.filename).one()
+                """" Add ExtractedEvents """
+                # Get associated stimulus record
+                stimulus = db.session.query(
+                    Stimulus).filter_by(path=res.stim.filename).one()
 
-                    # Get or create ExtractedEvent
-                    bulk_ees.append(
-                        ExtractedEvent(stimulus_id=stimulus.id,
-                                       history=res.history.string,
-                                       ef_id=ef_model.id,
-                                       **ee_kwargs))
-                db.session.bulk_save_objects(bulk_ees)
-                db.session.commit()
+                # Get or create ExtractedEvent
+                bulk_ees.append(
+                    ExtractedEvent(stimulus_id=stimulus.id,
+                                   history=res.history.string,
+                                   ef_id=ef_model.id,
+                                   **ee_props))
+            db.session.bulk_save_objects(bulk_ees)
+            db.session.commit()
             bar.update(i)
 
     create_predictors(
