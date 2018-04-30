@@ -171,7 +171,7 @@ def extract_features(dataset_name, task_name, extractors):
         serializer = FeatureSerializer()
         extracted_features = {}
         for i, res in enumerate(results):
-            if res._data != [{}]:
+            if not res.to_df().empty:
                 # Annotate results
                 bulk_ees = []
                 for feature in serializer.load(res):

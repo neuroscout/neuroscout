@@ -182,13 +182,13 @@ def add_task(task_name, dataset_name=None, local_path=None,
             ).path
         automagic = True
 
+    local_path = Path(local_path)
     if automagic:
         automagic = AutomagicIO()
         automagic.activate()
 
     from os.path import isfile
-
-    local_path = Path(local_path)
+    assert isfile((local_path / 'dataset_description.json').as_posix())
 
     layout = BIDSLayout(local_path.as_posix())
     if task_name not in layout.get_tasks():
