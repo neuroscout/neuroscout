@@ -12,7 +12,7 @@ import datetime
 import progressbar
 from utils import get_or_create
 
-from pliers.stimuli import load_stims, TextStim
+from pliers.stimuli import load_stims, ComplexTextStim
 from pliers.transformers import get_transformer
 from pliers.extractors import merge_results
 
@@ -125,7 +125,7 @@ def load_stim_object(stim_object):
     if stim_object.path is not None:
         return load_stims(stim_object.path)
     else:
-        return TextStim(text=stim_object.content)
+        return ComplexTextStim(text=stim_object.content)
 
 def extract_features(dataset_name, task_name, extractors):
     """ Extract features using pliers for a dataset/task

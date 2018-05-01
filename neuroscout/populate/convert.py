@@ -148,6 +148,9 @@ def ingest_text_stimuli(filename, dataset_name, task_name, parent_id,
     rs_orig = RunStimulus.query.filter_by(stimulus_id=parent_id).join(
         Run).join(Task).filter_by(name=task_name)
 
+    if not rs_orig.count():
+        raise Exception("No RunStimulus associations match.")
+
     for ix, row in df.iterrows():
         stim_hash = hash_data(row['text'])
         save_new_stimulus(dataset_id, task_name, parent_id, rs_orig, stim_hash,
