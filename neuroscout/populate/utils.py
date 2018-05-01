@@ -4,26 +4,47 @@ import requests
 import urllib.parse
 import hashlib
 import warnings
+from pathlib import Path
 
-from pliers.stimuli import load_stims
-
-def format_preproc(subject, task, run, session=None,
+def format_preproc(subject, task, run=None, session=None,
                    space="MNI152NLin2009cAsym", suffix="preproc"):
     """ Format relative fmri_prep paths """
     subject_f = "sub-{}/".format(subject)
     session_f = "ses-{}/".format(session) if session else ""
-
-    return "{}{}func/{}{}task-{}_run-{}_bold_space-{}_{}.nii.gz".format(
+    run_f = "run-{}_".format(run.zfill(2)) if run else ""
+    return "{}{}func/{}{}task-{}_{}bold_space-{}_{}.nii.gz".format(
     subject_f, session_f,
     subject_f.replace("/", "_"), session_f.replace("/", "_"),
-    task, run, space, suffix
+    task, run_f, space, suffix
 )
 
-def hash_file(f):
-    pliers_stim = load_stims(f)
-    return hash_data(pliers_stim.data)
+def hash_stim(stim, blocksize = 65536):
+    """ Hash a pliers stimulus """
+    if isinstance(stim, Path):
+        stim = stim.as_posix()
+    if isinstance(stim, str):
+        from pliers.stimuli import load_stims
+        from os.path import isfile
+        assert isfile(stim)
+        stim = load_stims(stim)
 
-def hash_data(data, blocksize=65536):
+    hasher = hashlib.sha1()
+
+    if hasattr(stim, "data"):
+        return hash_data(stim.data)
+    else:
+        filename = stim.history.source_file \
+                    if stim.history \
+                    else stim.filename
+        with open(filename, 'rb') as afile:
+            buf = afile.read(blocksize)
+            while len(buf) > 0:
+                hasher.update(buf)
+                buf = afile.read(blocksize)
+
+    return hasher.hexdigest()
+
+def hash_data(data):
     """" Hashes data or string """
     if isinstance(data, str):
         data = data.encode('utf-8')

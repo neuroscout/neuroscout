@@ -1,5 +1,5 @@
 import datetime
-from os.path import join, dirname, realpath
+from pathlib import Path
 
 class Config(object):
     SERVER_NAME = 'external_host'
@@ -27,24 +27,26 @@ class Config(object):
     CONFIRM_USERS = True
     SEND_REGISTER_EMAIL = True
 
-    dir_path = dirname(dirname(realpath(__file__)))
-    FEATURE_SCHEMA = join(dir_path, 'config/feature_schema.json')
-    ALL_TRANSFORMERS = join(dir_path, 'config/transformers.json')
+    dir_path = Path(__file__).resolve().parents[1]
+    FEATURE_SCHEMA = (dir_path / 'config/feature_schema.json').as_posix()
+    ALL_TRANSFORMERS = (dir_path / 'config/transformers.json').as_posix()
 
     STIMULUS_DIR = 'path'
+    EXTRACTION_DIR = 'path'
+
 
 class DevelopmentConfig(Config):
     DEBUG = True
     SQLALCHEMY_DATABASE_URI = 'postgres://postgres@postgres:5432/neuroscout'
     PROPAGATE_EXCEPTIONS = True
     MIGRATIONS_DIR = '/migrations/migrations'
-    DATASET_DIR = '/file-data'
+    DATASET_DIR = '/file-data/datasets'
     FEATURE_DATASTORE = '/file-data/feature-tracking.csv'
 
 class TestingConfig(Config):
     TESTING = True
-    dir_path = dirname(dirname(realpath(__file__)))
-    FEATURE_SCHEMA = join(dir_path, 'tests/data/test_feature_schema.json')
+    dir_path = Path(__file__).resolve().parents[1]
+    FEATURE_SCHEMA = (dir_path / 'tests/data/test_feature_schema.json').as_posix()
     FEATURE_DATASTORE = '/tmp/file-data/feature-tracking.csv'
 
 class DockerTestConfig(TestingConfig):
@@ -59,6 +61,7 @@ class TravisConfig(TestingConfig):
     DATASET_DIR = './tmp/file-data'
     FEATURE_DATASTORE = './tmp/datastore.csv'
     STIMULUS_DIR = './tmp/stims'
+    EXTRACTED_DIR = './tmp/extracted'
 
 class HomeConfig(Config):
     SQLALCHEMY_DATABASE_URI = 'postgresql://zorro:dbpass@localhost:5432/neuroscout'

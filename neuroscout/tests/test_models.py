@@ -3,7 +3,10 @@ import os
 from sqlalchemy import func
 from models import (Analysis, User, Dataset, Predictor, Stimulus, Run,
 					RunStimulus, Result, ExtractedFeature, PredictorEvent,
-					GroupPredictor)
+					GroupPredictor, Task)
+
+from numpy import isclose
+from populate.convert import ingest_text_stimuli
 
 def test_dataset_ingestion(session, add_task):
 	dataset_model = Dataset.query.filter_by(id=add_task).one()
@@ -21,22 +24,24 @@ def test_dataset_ingestion(session, add_task):
 
 	# Test properties of Run
 	assert Run.query.count() == dataset_model.runs.count() == 4
-	run_model =  dataset_model.runs.filter_by(number='01', subject='01').first()
+	run_model =  dataset_model.runs.filter_by(number='1', subject='01').first()
 	assert run_model.dataset_id == dataset_model.id
 	assert 'TaskName' in run_model.task.description
 	assert run_model.task.description['RepetitionTime'] == 2.0
 
-	assert run_model.duration is None
 	assert run_model.func_path == 'sub-01/func/sub-01_task-bidstest_run-01_bold_space-MNI152NLin2009cAsym_preproc.nii.gz'
 
 	# Test properties of first run's predictor events
-	assert run_model.predictor_events.count() == 8
-	assert Predictor.query.count() == dataset_model.predictors.count() == 2
+	assert run_model.predictor_events.count() == 12
+	assert Predictor.query.count() == dataset_model.predictors.count() == 3
 
-	assert 'rt' in [p.name for p in Predictor.query.all()]
+	pred_names = [p.name for p in Predictor.query.all()]
+	assert 'rt' in pred_names
+	assert 'rating' in pred_names ## Derivative event
 
 	predictor = Predictor.query.filter_by(name='rt').first()
 	assert predictor.predictor_events.count() == 16
+	assert predictor.source == 'events'
 
 	# Test run summary statistics
 	assert len(predictor.run_statistics) == 4
@@ -84,6 +89,24 @@ def test_remote_dataset(session, add_task_remote):
 	assert GroupPredictor.query.filter_by(
 			dataset_id=add_task_remote).count() == 3
 
+	fre = ExtractedFeature.query.filter_by(
+		extractor_name='FaceRecognitionFaceLandmarksExtractor')
+
+	assert fre.count() == 9
+	fre_ids = [ef.id for ef in fre]
+
+	ef = ExtractedFeature.query.filter_by(
+			extractor_name='FaceRecognitionFaceLandmarksExtractor',
+			feature_name='face_landmarks_bottom_lip').first()
+
+	assert ef.extracted_events.count() == 5
+
+	# Test that predictor was made, (only this feature should be active)
+	preds = Predictor.query.filter(Predictor.ef_id.in_(fre_ids))
+	assert preds.count() == 1
+
+	assert preds.first().predictor_events.count() == 5
+
 def test_json_local_dataset(session, add_local_task_json):
 	dataset_model = Dataset.query.filter_by(id=add_local_task_json).one()
 
@@ -130,13 +153,18 @@ def test_extracted_features(session, add_task, extract_features):
 	# Check that the number of features extracted is the same as Stimuli
 	assert ef_b.extracted_events.count() == Stimulus.query.count()
 
-	# And that a sensical value was extracted
+	# Check for sensical value
+	assert isclose(float(session.query(func.max(PredictorEvent.value)).join(
+		Predictor).filter_by(ef_id=ef_b.id).one()[0]), 0.88, 0.1)
+
+	# And that a sensical onset was extracted
 	assert session.query(func.max(PredictorEvent.onset)).join(
 		Predictor).filter_by(ef_id=ef_b.id).one()[0] == 25.0
 
 	# Test that Predictors were created from EF
 	pred = Predictor.query.filter_by(ef_id=ef_b.id).one()
-	assert pred.name == "BrightnessExtractor.Brightness"
+	assert pred.name == "Brightness"
+	assert pred.source == "extracted"
 
 	# Test that a Predictor was not made for vibrance (hidden)
 	ef_v = ExtractedFeature.query.filter_by(
@@ -150,6 +178,7 @@ def test_extracted_features(session, add_task, extract_features):
 	# Test that sharpness was annotated regardless (even without entry)
 	ef_v = ExtractedFeature.query.filter_by(
 		extractor_name='SharpnessExtractor').count() == 1
+
 def test_analysis(session, add_analysis, add_predictor):
 	# Number of entries
 	assert Analysis.query.count() == 1
@@ -182,3 +211,23 @@ def test_analysis(session, add_analysis, add_predictor):
 
 def test_result(add_result):
 	assert Result.query.count() == 1
+
+def test_external_text(get_data_path, add_task):
+	filename = (get_data_path / 'fake_transcript.csv').as_posix()
+
+	dataset_model = Dataset.query.filter_by(id=add_task).one()
+	task_name = Task.query.filter_by(dataset_id=add_task).one().name
+
+	stim = Stimulus.query.filter_by(dataset_id=dataset_model.id).first()
+
+	ingest_text_stimuli(filename, dataset_model.name, task_name, stim.id,
+						'FakeTextExtraction')
+
+	data = [s for s in Stimulus.query.all() if s.content is not None]
+
+	first_stim = [s for s in data if s.content == 'no'][0]
+	rs = RunStimulus.query.filter_by(stimulus_id=first_stim.id).all()
+
+	assert len(data) == 2
+	assert len(rs) == 4
+	assert 7.922 in [s.onset for s in rs]

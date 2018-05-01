@@ -1,7 +1,7 @@
 {
   "name": "frontend",
   "version": "0.1.0",
-  "proxy": "http://localhost:80",
+  "proxy": "http://alpha.neuroscout.org:80",
   "private": true,
   "dependencies": {
     "@types/antd": "^1.0.0",

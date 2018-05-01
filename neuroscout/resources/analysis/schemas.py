@@ -4,7 +4,7 @@ from models import  Dataset, Run, Predictor
 class AnalysisSchema(Schema):
 	""" Primary analysis schema """
 	hash_id = fields.Str(dump_only=True, description='Hashed analysis id.')
-	parent_id = fields.Str(dump_only=True,description="Parent analysis, if cloned.")
+	parent_id = fields.Str(dump_only=True, description="Parent analysis, if cloned.")
 	user_id = fields.Int(dump_only=True)
 
 	name = fields.Str(required=True, description='Analysis name.')
@@ -15,11 +15,7 @@ class AnalysisSchema(Schema):
 	task_name = fields.Str(description='Task name', dump_only=True)
 	TR = fields.Float(description='Time repetition (s)', dump_only=True)
 
-	config = fields.Dict(description='fMRI analysis configuration parameters.')
-	contrasts = fields.List(fields.Dict(),
-						    description='Array of contrasts')
-	transformations = fields.List(fields.Dict(),
-								  description='Array of transformation objects')
+	model = fields.Dict(description='BIDS model.')
 
 	created_at = fields.Time(dump_only=True)
 	modified_at = fields.Time(dump_only=True)
@@ -77,7 +73,7 @@ class AnalysisFullSchema(AnalysisSchema):
 	""" Analysis schema, with additional nested fields """
 	runs = fields.Nested(
 		'RunSchema', many=True, description='Runs associated with analysis',
-	    exclude=['duration', 'dataset_id', 'task'], dump_only=True)
+	    exclude=['dataset_id', 'task'], dump_only=True)
 
 	predictors = fields.Nested(
 		'PredictorSchema', many=True, only=['id', 'name'],
@@ -89,17 +85,9 @@ class AnalysisResourcesSchema(Schema):
 		'DatasetSchema', only='preproc_address', attribute='dataset')
 	dataset_address = fields.Nested(
 		'DatasetSchema', only='dataset_address', attribute='dataset')
+	dataset_name = fields.Nested(
+		'DatasetSchema', only='name', attribute='dataset')
 	func_paths = fields.Nested(
 		'RunSchema', many=True, only='func_path', attribute='runs')
 	mask_paths = fields.Nested(
 		'RunSchema', many=True, only='mask_path', attribute='runs')
-
-class DesignEventsSchema(Schema):
-	# Nested dataset fields
-	trial_type = fields.Str(description='Predictor id.', attribute='condition')
-	amplitude = fields.Float()
-	duration = fields.Float()
-	onset = fields.Float()
-	session = fields.Str(description='Session number')
-	subject = fields.Str(description='Subject id')
-	number = fields.Str(description='Run id', attribute='run')

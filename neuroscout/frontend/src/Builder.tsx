@@ -31,7 +31,7 @@ const { TabPane } = Tabs;
 const { Footer, Content } = Layout;
 
 // const logo = require('./logo.svg');
-const domainRoot = 'http://localhost:80';
+const domainRoot = 'http://alpha.neuroscout.org:80';
 const EMAIL = 'user@example.com';
 const PASSWORD = 'string';
 const DEFAULT_SMOOTHING = 50;

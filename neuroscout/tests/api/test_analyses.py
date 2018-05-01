@@ -55,15 +55,71 @@ def test_post(auth_client, add_task, add_predictor):
 	"dataset_id" : add_task,
 	"name" : "some analysis",
 	"description" : "pretty damn innovative",
-	"transformations" : [{
-		"name" : "scale",
-		"inputs" : [add_predictor],
-		"parameters" : [
-			{
-				"name" : "demean",
-				"value" : {"kind" : "boolean", "value" : True}
-			}]}]
+	"model" : {
+	  "name": "test_model1",
+	  "description": "this is a sample",
+	  "input": {
+	    "task": "bidstest"
+	  },
+	  "blocks": [
+	    {
+	      "level": "run",
+	      "transformations": [
+	        {
+	          "name": "scale",
+	          "input": [
+	            "BrightnessExtractor.brightness"
+	          ]
+	        }
+	      ],
+	      "model": {
+	        "HRF_variables": [
+	          "BrightnessExtractor.brightness",
+	          "VibranceExtractor.vibrance"
+	        ],
+	        "variables": [
+	          "BrightnessExtractor.brightness",
+	          "VibranceExtractor.vibrance"
+	        ]
+	      },
+	      "contrasts": [
+	        {
+	          "name": "BvsV",
+	          "condition_list": [
+	            "BrightnessExtractor.brightness",
+	            "VibranceExtractor.vibrance"
+	          ],
+	          "weights": [
+	            1,
+	            -1
+	          ],
+	          "type": "T"
+	        }
+	      ]
+	    },
+	    {
+	      "level": "session",
+	    },
+	    {
+	      "level": "subject",
+	      "model": {
+	        "variables": [
+	          "BvsV"
+	        ]
+	      },
+	    },
+	    {
+	      "level": "dataset",
+	      "model": {
+	        "variables": [
+	          "session_diff"
+	        ]
+	      },
+	    }
+	  ]
 	}
+	}
+
 
 	resp= auth_client.post('/api/analyses', data = test_analysis)
 	assert resp.status_code == 200
@@ -123,7 +179,6 @@ def test_clone(session, auth_client, add_task, add_analysis, add_users):
 
 	resp = auth_client.post('/api/analyses/{}/clone'.format(analysis.hash_id))
 	assert resp.status_code == 422
-
 
 def test_put(auth_client, add_analysis, add_task, session):
 	# Get analysis to edit
@@ -197,13 +252,13 @@ def test_compile(auth_client, add_analysis, add_analysis_fail):
 	while decode_json(resp)['status'] == 'PENDING':
 		time.sleep(0.2)
 		resp = auth_client.get('/api/analyses/{}'.format(analysis_bad.hash_id))
-		new_analysis = decode_json(resp)
-		if new_analysis['status'] == 'PASSED':
-			assert new_analysis['design_matrix'] is not None
+		if time.time() > timeout:
+			assert 0
 			break
-		elif new_analysis['status'] == 'FAILED' or time.time() > timeout:
-			assert 1
-			break
+
+	new_analysis = decode_json(resp)
+	if new_analysis['status'] !=  'FAILED':
+		assert 0
 
 	# Test getting bundle prior to compiling
 	resp = auth_client.get('/api/analyses/{}/bundle'.format(analysis.hash_id))
@@ -235,12 +290,15 @@ def test_compile(auth_client, add_analysis, add_analysis_fail):
 	resp = auth_client.get('/api/analyses/{}'.format(analysis.hash_id))
 	timeout = time.time() + 60*1   # 1 minute timeout
 	while decode_json(resp)['status'] == 'PENDING':
-		resp = auth_client.get('/api/analyses/{}'.format(analysis.hash_id))
-		if decode_json(resp)['status'] == 'PASSED' or time.time() > timeout:
-			assert 1
-			break
 		time.sleep(0.2)
+		if time.time() > timeout:
+			assert 0
+			break
+		resp = auth_client.get('/api/analyses/{}'.format(analysis.hash_id))
 
+	if decode_json(resp)['status'] != 'PASSED':
+		assert 0
+		
 	# Try deleting locked analysis
 	resp = auth_client.delete('/api/analyses/{}'.format(analysis.hash_id))
 	assert resp.status_code == 422
@@ -250,10 +308,6 @@ def test_compile(auth_client, add_analysis, add_analysis_fail):
 	assert resp.status_code == 200
 	assert resp.mimetype == 'application/x-tar'
 
-	# Test getting event files
-	resp = auth_client.get('/api/analyses/{}/design/events'.format(analysis.hash_id))
-	assert resp.status_code == 200
-	assert len(decode_json(resp)) == 48
 
 def test_auth_id(auth_client, add_analysis_user2):
 	# Try deleting analysis you are not owner of

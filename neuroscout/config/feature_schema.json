@@ -20,7 +20,7 @@
   "SharpnessExtractor": [
     {
       "features": {
-        "shaprness$": {
+        "sharpness$": {
           "description": "Brightness of an image."
         }
       }
@@ -48,17 +48,15 @@
   ],
   "ClarifaiAPIExtractor": [
     {
-      "attributes": { "model": "general-v1.3" },
+      "attributes": { "model_name": "general-v1.3" },
       "features": {
         "(.*)": {
           "description": "General model label class: (\\1)"
         }
       }
-    }
-  ],
-  "ClarifaiAPIExtractor": [
+    },
     {
-      "attributes": { "model": "nsfw-v1.0" },
+      "attributes": { "model_name": "nsfw-v1.0" },
       "features": {
         "nsfw$": {
           "description": "Probability of nudity"
@@ -79,9 +77,7 @@
           "description": "Image recognition label: \\1"
         }
       }
-    }
-  ],
-  "IndicoAPITextExtractor": [
+    },
     {
       "features": {
         "sentiment$": {
@@ -159,12 +155,10 @@
           "description": "Clockwise/anti-clockwise rotation of the face relative to the image vertical about the axis perpendicular to the face"
         },
         "face([0-9]*)_panAngle": {
-          "description": "Yaw angle, which indicates the leftward/rightward angle that the face is pointing relative to the vertical plane perpendicular to the image",
-          "active": false
+          "description": "Yaw angle, which indicates the leftward/rightward angle that the face is pointing relative to the vertical plane perpendicular to the image"
         },
         "face([0-9]*)_tiltAngle": {
-          "description": "Pitch angle, which indicates the upwards/downwards angle that the face is pointing relative to the image's horizontal plane",
-          "active": false
+          "description": "Pitch angle, which indicates the upwards/downwards angle that the face is pointing relative to the image's horizontal plane"
         },
         "face([0-9]*)_detectionConfidence": {
           "description": "Face detection confidence"
@@ -173,12 +167,10 @@
           "description": "Face landmarking confidence"
         },
         "face([0-9]*)_joyLikelihood": {
-          "description": "Joy likelihood.",
-          "active": false
+          "description": "Joy likelihood."
         },
         "face([0-9]*)_sorrowLikelihood": {
-          "description": "Sorrow likelihood.",
-          "active": false
+          "description": "Sorrow likelihood."
         },
         "face([0-9]*)_angerLikelihood": {
           "description": "Anger likelihood"
@@ -200,17 +192,18 @@
   ],
   "GoogleVisionAPILabelExtractor": [
     {
-      "(.*)": {
-        "name": {
+      "features": {
+        "(.*)": {
           "description": "Confidence of image class \\1"
         }
       }
+
     }
   ],
   "GoogleVisionAPIPropertyExtractor": [
     {
-      ".*": {
-        "name": {
+      "features": {
+        ".*": {
           "description": "RGB Channel."
         }
       }
@@ -218,56 +211,46 @@
   ],
   "GoogleVisionAPISafeSearchExtractor": [
     {
-      "adult": {
-        "name": {
+      "features": {
+        "adult": {
           "description": "Likelihood of nudity, pornographic images or cartoons, or sexual activities."
-        }
-      },
-      "spoof": {
-        "name": {
+        },
+        "spoof": {
           "description": "Likelihood that an modification was made to the image's canonical version to make it appear funny or offensive"
-        }
-      },
-      "medical": {
-        "name": {
+        },
+        "medical": {
           "description": "Likelihood that this is a medical image."
-        }
-      },
-      "violence": {
-        "name": {
+        },
+        "violence": {
           "description": "Likelihood that this image contains violent content."
-        }
+          }
       }
+
     }
   ],
   "VADERSentimentExtractor": [
     {
-      "sentiment_compound": {
-        "name": {
+      "features": {
+        "sentiment_compound": {
           "description": "Overall valence."
-        }
-      },
-      "sentiment_neu": {
-        "name": {
+        },
+        "sentiment_neu": {
           "description": "Neutral sentiment."
-        }
-      },
-      "sentiment_pos": {
-        "name": {
+        },
+        "sentiment_pos": {
           "description": "Positive sentiment."
-        }
-      },
-      "sentiment_neg": {
-        "name": {
+        },
+        "sentiment_neg": {
           "description": "Negative sentiment."
         }
       }
+
     }
   ],
   "FarnebackOpticalFlowExtractor": [
     {
-      "FarnebackOpticalFlowExtractor": {
-        "name": {
+      "features": {
+        "FarnebackOpticalFlowExtractor": {
           "description": "Total amount of dense optical flow between every pair of video frames"
         }
       }

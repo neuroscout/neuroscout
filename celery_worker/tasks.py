@@ -3,28 +3,27 @@ from celery.utils.log import get_task_logger
 import pandas as pd
 import tarfile
 import json
-from os.path import join, basename
+from pathlib import Path
 from tempfile import mkdtemp
-from bids.events import BIDSEventCollection
+from bids.analysis import Analysis
+from bids.grabbids import BIDSLayout
+from celery.contrib import rdb
+
 logger = get_task_logger(__name__)
 
-@celery_app.task(name='workflow.compile')
-def compile(analysis, resources, predictor_events, bids_dir):
-    files_dir = mkdtemp()
-    analysis_update = {} # New fields to return for analysis
 
-    # Write out analysis jsons & generate bundle paths
-    paths = []
-    for obj, name in [(analysis, 'analysis'), (resources, 'resources')]:
-        path = join(files_dir, '{}.json'.format(name))
-        json.dump(obj, open(path, 'w'))
-        paths.append(path)
+def writeout_events(analysis, pes, outdir):
+    """ Write event files from JSON """
+    outdir = outdir / "func"
+    outdir.mkdir(exist_ok=True)
 
-
+    # Load events and rename columns to human-readable
+    pes = pd.DataFrame(pes)
+    predictor_names = {di["id"]: di["name"] for di in analysis['predictors']}
+    pes.predictor_id = pes.predictor_id.map(predictor_names)
     # Write out event files
-    pes = pd.DataFrame(predictor_events)
 
-    # For each run, make events wide and write out to tempdir
+    paths = []
     for run in analysis.pop('runs'):
         ## Write out event files for each run_id
         run_events = pes[pes.run_id==run['id']].drop('run_id', axis=1)
@@ -33,46 +32,50 @@ def compile(analysis, resources, predictor_events, bids_dir):
             # Make wide
             run_events = run_events.groupby(
                 ['onset', 'duration', 'predictor_id'])['value'].\
-                sum().unstack('predictor_id').reset_index()
+                max().unstack('predictor_id').reset_index()
+
+            # Missing columns
+            missing = set(predictor_names.values()) - set(run_events.columns)
+            for col in missing:
+                run_events[col] = 0.0
+
+            run_events = run_events.fillna(0.0)
 
             # Write out BIDS path
             ses = 'ses-{}_'.format(run['session']) if run.get('session') else ''
-            events_fname = join(files_dir,
-                                'sub-{}_{}task-{}_run-{}_events.tsv'.format(
-                run['subject'], ses, analysis['task_name'], run['number']))
+            run_num = 'run-{}_'.format(run['number']) if run.get('number') else ''
+            events_fname = outdir / 'sub-{}_{}task-{}_{}events.tsv'.format(
+                run['subject'], ses, analysis['task_name'], run_num)
+            paths.append(events_fname)
             run_events.to_csv(events_fname, sep='\t', index=False)
 
-    # Transform event files using BIDSEventCollection
-    collection = BIDSEventCollection(base_dir=bids_dir)
-    collection.read(file_directory=files_dir)
+    return paths
 
-    # Change collection name keys to integers, because inputs come from JSON
-    # as such. Could change keys to names to deal with this.
-    collection.columns = {int(k):v for k,v in collection.columns.items()}
+@celery_app.task(name='workflow.compile')
+def compile(analysis, predictor_events, resources, bids_dir):
+    files_dir = Path(mkdtemp())
+    model = analysis.pop('model')
+    scan_length = analysis['runs'][0]['duration']
 
-    for t in analysis['transformations']:
-        args = {a['name']:a['value'] for a in t['parameters']}
-        collection.apply(t['name'], t['input'], **args)
+    # Write out events
+    bundle_paths = writeout_events(analysis, predictor_events, files_dir)
 
-    # Save out and add to update dictionary
-    all_path = join(files_dir, 'all_subjects.tsv')
-    collection.write(file=all_path)
-    design_matrix = pd.read_csv(all_path, sep='\t').drop('task', axis=1)
+    # Load events and try applying transformations
+    bids_layout = BIDSLayout([bids_dir, files_dir.as_posix()])
+    bids_analysis = Analysis(bids_layout, model)
+    bids_analysis.setup(derivatives='only', task=analysis['task_name'],
+                        scan_length=scan_length)
 
-    design_matrix.fillna('n/a', inplace=True)
-
-    tsv_path = join(files_dir, 'events.tsv')
-    paths.append(tsv_path)
-    design_matrix.to_csv(tsv_path, sep='\t', index=False)
-
-    analysis_update['design_matrix'] = design_matrix.to_dict(orient='records')
+    # Write out analysis & resource JSON
+    for obj, name in [(analysis, 'analysis'), (resources, 'resources'), (model, 'model')]:
+        path = (files_dir / name).with_suffix('.json')
+        json.dump(obj, path.open('w'))
+        bundle_paths.append(path)
 
     # Save bundle as tarball
     bundle_path = '/file-data/analyses/{}_bundle.tar.gz'.format(analysis['hash_id'])
     with tarfile.open(bundle_path, "w:gz") as tar:
-        for path in paths:
-            tar.add(path, arcname=basename(path))
+        for path in bundle_paths:
+            tar.add(path.as_posix(), arcname=path.name)
 
-    analysis_update['bundle_path'] = bundle_path
-
-    return analysis_update
+    return {'bundle_path': bundle_path}

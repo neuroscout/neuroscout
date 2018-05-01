@@ -1,4 +1,5 @@
-import os
+from os import environ
+from pathlib import Path
 import pytest
 from flask_security.utils import encrypt_password
 from core import app as _app
@@ -14,7 +15,7 @@ Session / db managment tools
 @pytest.fixture(scope='session')
 def app():
     """Session-wide test `Flask` application."""
-    if 'APP_SETTINGS' not in os.environ:
+    if 'APP_SETTINGS' not in environ:
         _app.config.from_object('config.app.TestingConfig')
 
     # Establish an application context before running the tests.
@@ -81,16 +82,19 @@ from models import (Analysis, Result, Predictor,
                     PredictorEvent, User, Role, Dataset)
 import populate
 
-DATASET_PATH = os.path.join(
-    os.path.dirname(os.path.realpath(__file__)), 'data/datasets/bids_test')
-LOCAL_JSON_PATH = os.path.join(
-    os.path.dirname(os.path.realpath(__file__)), 'data/test_local.json')
-REMOTE_JSON_PATH = os.path.join(
-    os.path.dirname(os.path.realpath(__file__)), 'data/test_remote.json')
+DATA_PATH = Path(__file__).resolve().parents[0] / 'data'
+
+DATASET_PATH = DATA_PATH / 'bids_test'
+LOCAL_JSON_PATH = (DATA_PATH / 'test_local.json').as_posix()
+REMOTE_JSON_PATH = (DATA_PATH / 'test_remote.json').as_posix()
 EXTRACTORS = [
     ("BrightnessExtractor", {}),
     ("VibranceExtractor", {})
     ]
+
+@pytest.fixture()
+def get_data_path():
+    return DATA_PATH
 
 @pytest.fixture(scope="function")
 def add_users(app, db, session):
@@ -121,44 +125,42 @@ def add_users(app, db, session):
 @pytest.fixture(scope="function")
 def add_task(session):
     """ Add a dataset with two subjects """
-    return populate.add_task(session, 'bidstest', local_path=DATASET_PATH,
-                                verbose=False)
+    return populate.add_task('bidstest', local_path=DATASET_PATH)
 
 @pytest.fixture(scope="function")
 def add_task_remote(session):
     """ Add a dataset with two subjects. """
-    return populate.ingest_from_json(session, REMOTE_JSON_PATH)[0]
+    return populate.ingest_from_json(REMOTE_JSON_PATH)[0]
 
 @pytest.fixture(scope="function")
 def add_local_task_json(session):
     """ Add a dataset with two subjects. """
-    return populate.ingest_from_json(session, LOCAL_JSON_PATH)[0]
+    return populate.ingest_from_json(LOCAL_JSON_PATH)[0]
 
 @pytest.fixture(scope="function")
 def update_local_json(session, add_local_task_json):
     """ Add a dataset with two subjects. """
     ## Edit datastore file
     datastore_file = current_app.config['FEATURE_DATASTORE']
+
     # Change value in datastore
     ds = pd.read_csv(datastore_file)
-    ds.iloc[-1, 1:] = 1
+    select_cols = [c for c in ds.columns if c != "time_extracted"]
+    ds.loc[ds.time_extracted.max() == ds.time_extracted, select_cols] = 1
     ds.to_csv(datastore_file, index=False)
 
     ## Update
-    return populate.ingest_from_json(session, LOCAL_JSON_PATH,
-                                          update=True)[0]
+    return populate.ingest_from_json(LOCAL_JSON_PATH, update_features=True)[0]
 
 @pytest.fixture(scope="function")
 def extract_features(session, add_task):
-    return populate.extract_features(session, 'Test Dataset', 'bidstest',
-                                     EXTRACTORS)
+    return populate.extract_features('Test Dataset', 'bidstest', EXTRACTORS)
 @pytest.fixture(scope="function")
 def reextract(session, extract_features):
-    return populate.extract_features(session, 'Test Dataset', 'bidstest',
-                                     EXTRACTORS)
+    return populate.extract_features('Test Dataset', 'bidstest', EXTRACTORS)
 
 @pytest.fixture(scope="function")
-def add_analysis(session, add_users, add_task):
+def add_analysis(session, add_users, add_task, extract_features):
     dataset = Dataset.query.filter_by(id=add_task).first()
 
     analysis = Analysis(dataset_id = add_task, user_id = add_users[0][0],
@@ -172,21 +174,65 @@ def add_analysis(session, add_users, add_task):
 
     analysis.predictors = Predictor.query.filter(Predictor.id.in_(pred_id)).all()
 
-    rt_pred = Predictor.query.filter_by(name='rt').first()
-    analysis.contrasts = [
-        {
-          "contrastType": "T",
-          "name": "test",
-          "predictors": [ analysis.predictors[0].id, analysis.predictors[1].id ],
-          "weights": [1,-1]
-        }]
+    analysis.model = {
+        "name": "test_model1",
+        "description": "this is a sample",
+        "input": {
+          "task": "bidstest"
+        },
+        "blocks": [
+          {
+            "level": "run",
+            "transformations": [
+              {
+                "name": "scale",
+                "input": [
+                  "Brightness"
+                ]
+              }
+            ],
+            "model": {
+              "HRF_variables": [
+                "Brightness",
+                "rt"
+              ],
+              "variables": [
+                "Brightness",
+                "rt"
+              ]
+            },
+            "contrasts": [
+              {
+                "name": "BvsRT",
+                "condition_list": [
+                  "Brightness",
+                  "rt"
+                ],
+                "weights": [
+                  1,
+                  -1
+                ],
+                "type": "T"
+              }
+            ]
+          },
+          {
+            "level": "session",
+          },
+          {
+            "level": "subject",
+            "model": {
+              "variables": [
+                "BvsRT"
+              ]
+            },
+          },
+          {
+            "level": "dataset"
+          }
+        ]
+      }
 
-    analysis.transformations = [
-        { "input": [ rt_pred.id ],
-         "name": "scale",
-         "parameters": [
-             { "kind": "boolean", "name": "demean", "value": False },
-             { "kind": "boolean", "name": "rescale", "value": True } ] } ]
 
     session.add(analysis)
     session.commit()
@@ -195,7 +241,7 @@ def add_analysis(session, add_users, add_task):
 
 @pytest.fixture(scope="function")
 def add_analysis_fail(session, add_users, add_task):
-    """ This analysis is from user 2 and also should fail compilation """
+    """ This analysis is from user 1 should fail compilation """
     dataset = Dataset.query.filter_by(id=add_task).first()
     analysis = Analysis(dataset_id = add_task, user_id = add_users[0][0],
         name = "A bad analysis!", description = "Bad!",

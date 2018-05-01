@@ -7,7 +7,8 @@
       "features": {
         "brightness$" : {
           "replace": "Brightness",
-          "description": "Brightness of an image."
+          "description": "Brightness of an image.",
+          "preprocess": ["double"]
         }
       }
     },
@@ -30,6 +31,18 @@
           "active": "false",
           "replace": "\\1",
           "description": "\\1 of an image."
+        }
+      }
+    }
+  ],
+  "FaceRecognitionFaceLandmarksExtractor":[
+    {
+      "features": {
+        "face_landmarks_bottom_lip": {
+          "active": "true"
+        },
+        "face_landmarks_upper_lip": {
+          "active": "true"
         }
       }
     }

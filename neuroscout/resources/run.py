@@ -2,7 +2,7 @@ from marshmallow import Schema, fields
 from flask_apispec import MethodResource, marshal_with, use_kwargs, doc
 import webargs as wa
 from models import Run
-from . import utils
+from .utils import first_or_404
 
 class RunSchema(Schema):
 	id = fields.Int()
@@ -21,7 +21,7 @@ class RunResource(MethodResource):
     @doc(tags=['run'], summary='Get run by id.')
     @marshal_with(RunSchema(exclude=exclude))
     def get(self, run_id):
-        return utils.first_or_404(Run.query.filter_by(id=run_id))
+        return first_or_404(Run.query.filter_by(id=run_id))
 
 class RunListResource(MethodResource):
     @doc(tags=['run'], summary='Returns list of runs.')

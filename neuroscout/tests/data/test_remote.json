@@ -5,7 +5,7 @@
       "bidstest": {
         "extractors": [
           ["BrightnessExtractor", {}],
-          ["VibranceExtractor", {}]
+          ["FaceRecognitionFaceLandmarksExtractor", {}]
         ],
         "converters": [
           ["TesseractConverter", {}]

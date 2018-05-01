@@ -1,6 +1,6 @@
 {
   "bids_test": {
-    "path": "./tests/data/datasets/bids_test",
+    "path": "./tests/data/bids_test",
     "tasks": {
       "bidstest": {
         "extractors": [

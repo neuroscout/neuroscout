@@ -5,7 +5,7 @@ from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.event import listens_for
 
 from database import db
-from db_utils import copy_row
+from utils.db import copy_row
 
 from hashids import Hashids
 import datetime
@@ -23,44 +23,61 @@ class Analysis(db.Model):
 
     name = db.Column(db.Text, nullable=False)
     description = db.Column(db.Text)
-    data = db.Column(JSONB, default={})
+    predictions = db.Column(db.Text, default='')
+    private = db.Column(db.Boolean, default=True)
+
+    model = db.Column(JSONB, default={}) # BIDS Model
+    data = db.Column(JSONB, default={}) # Additional data (e.g. )
     filters = db.Column(JSONB) # List of filters used to select runs
-    transformations = db.Column(JSONB, default=[])
-    contrasts = db.Column(JSONB, default=[])
-    config = db.Column(JSONB, default={}) # fMRI analysis parameters
+
     created_at = db.Column(db.DateTime, default=datetime.datetime.utcnow)
     modified_at = db.Column(db.DateTime, default=datetime.datetime.utcnow)
+    compiled_at = db.Column(db.DateTime)
     saved_count = db.Column(db.Integer, default=0)
+
     status = db.Column(db.Text, default='DRAFT')
-    celery_error = db.Column(db.Text)
     __table_args__ = (
     	db.CheckConstraint(status.in_(['PASSED', 'FAILED', 'PENDING', 'DRAFT'])), )
-    compiled_at = db.Column(db.DateTime)
-    private = db.Column(db.Boolean, default=True)
-    predictions = db.Column(db.Text, default='')
 
+    celery_error = db.Column(db.Text)
     celery_id = db.Column(db.Text) # Celery task id
+    bundle_path = db.Column(db.Text)
 
-    dataset_id = db.Column(db.Integer, db.ForeignKey('dataset.id'), nullable=False)
+    dataset_id = db.Column(db.Integer, db.ForeignKey('dataset.id'),
+                           nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     # If cloned, this is the parent analysis:
     parent_id = db.Column(db.Text, db.ForeignKey('analysis.hash_id'))
 
-    results = db.relationship('Result', backref='analysis',
-                                lazy='dynamic')
-    predictors = db.relationship('Predictor',
-                                 secondary=analysis_predictor,
+    results = db.relationship('Result', backref='analysis', lazy='dynamic')
+    predictors = db.relationship('Predictor', secondary=analysis_predictor,
                                  backref='analysis')
-    runs = db.relationship('Run',
-                            secondary='analysis_run')
-
-    design_matrix = db.Column(JSONB)
-    design_matrix_tsv = db.Column(db.Text) # Path to TSV
-    bundle_path = db.Column(db.Text)
+    runs = db.relationship('Run', secondary='analysis_run')
 
     @hybrid_property
     def task_name(self):
         return self.runs[0].task.name if self.runs else None
+
+    @hybrid_property
+    def subject(self):
+        items = list(set([run.subject for run in self.runs]) -  set([None]))
+        if len(items) == 0:
+            items = None
+        return items
+
+    @hybrid_property
+    def run(self):
+        items = list(set([int(run.number) for run in self.runs if run.number is not None]) -  set([None]))
+        if len(items) == 0:
+            items = None
+        return items
+
+    @hybrid_property
+    def session(self):
+        items = list(set([run.session for run in self.runs]) -  set([None]))
+        if len(items) == 0:
+            items = None
+        return items
 
     @hybrid_property
     def TR(self):

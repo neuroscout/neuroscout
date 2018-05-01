@@ -2,10 +2,10 @@ celery
 flower
 redis
 docopt
--e git+https://github.com/incf/pybids@transformer#egg=pybids
+-e git+https://github.com/adelavega/pybids.git@optional_desc#egg=pybids
 duecredit
 pandas
 patsy
 networkx==1.9
--e git+http://github.com/qmac/nipype@events-interface#egg=nipype
--e git+http://github.com/PsychoinformaticsLab/neuroscout-cli.git@package#egg=neuroscout-cli
+nibabel
+scipy

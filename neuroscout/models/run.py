@@ -33,4 +33,4 @@ class Run(db.Model):
                             secondary='analysis_run',
                             lazy='dynamic')
     def __repr__(self):
-        return '<models.Run[task={} number={}]>'.format(self.task, self.number)
+        return '<models.Run[task={} sub={} sess={} number={}]>'.format(self.task, self.subject, self.session, self.number)
