@@ -14,9 +14,10 @@ import AnalysisBuilder from './Builder';
 import Browse from './Browse';
 import { BrowserRouter as Router, Route, Link, Redirect } from 'react-router-dom';
 import './App.css';
+import config from '../config.js';
 
 const FormItem = Form.Item;
-const DOMAINROOT = 'http://alpha.neuroscout.org:80';
+const DOMAINROOT = config.server_url;
 const { localStorage } = window;
 
 const { Footer, Content, Header } = Layout;

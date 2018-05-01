@@ -26,12 +26,13 @@ import {
 import { displayError, jwtFetch } from './utils';
 import { Space } from './HelperComponents';
 import Status from './Status';
+import config from '../config.js';
 
 const { TabPane } = Tabs;
 const { Footer, Content } = Layout;
 
 // const logo = require('./logo.svg');
-const domainRoot = 'http://alpha.neuroscout.org:80';
+const domainRoot = config.server_url
 const EMAIL = 'user@example.com';
 const PASSWORD = 'string';
 const DEFAULT_SMOOTHING = 50;
