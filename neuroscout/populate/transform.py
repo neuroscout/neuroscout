@@ -3,26 +3,33 @@ from models import (Dataset, ExtractedFeature, ExtractedEvent,
                     Stimulus, RunStimulus, Run, Task)
 from database import db
 from sqlalchemy import func
+from sqlalchemy.sql.expression import cast
 from .utils import hash_data
 from .extract import create_predictors
 
 class Postprocessing(object):
     """ Functions applied to one or more ExtractedFeatures """
     @staticmethod
-    def num_objects(ef):
-        """ Counts the number of Extracted Events for each stimulus """
-        ef = ef.one()
-        counts = []
-        for stimulus_id, count in db.session.query(
-            ExtractedEvent.stimulus_id, func.count(
-                ExtractedEvent.stimulus_id)).group_by(
-                    ExtractedEvent.stimulus_id).filter_by(ef_id=ef.id):
-                    counts.append(
-                        {'stimulus_id': stimulus_id,
-                         'value': count}
-                    )
+    def num_objects(efs, threshold=None):
+        """ Counts the number of Extracted Events for each stimulus.
+            efs - BaseQuery object with ExtractedFeature object(s)
+            threshold - filter threshold for ExtractedEvent value """
+        query = db.session.query(
+            ExtractedEvent.stimulus_id, func.count(ExtractedEvent.stimulus_id))
+
+        if threshold is not None:
+            query = query.filter(cast(ExtractedEvent.value, db.Float) > threshold)
+
+        # Group by stimulus and filter by EFs
+        query = query.group_by(
+            ExtractedEvent.stimulus_id).filter(
+                ExtractedEvent.ef_id.in_(efs.values('id')))
+
+        counts = [{'stimulus_id': stimulus_id, 'value': count}
+                  for stimulus_id, count in query]
 
         return counts
+
 
 
 def transform_feature(function, new_name, dataset_name,
