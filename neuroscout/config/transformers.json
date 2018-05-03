@@ -6,6 +6,7 @@
   ],
   "extractors": [
     ["FarnebackOpticalFlowExtractor", {}],
+    ["WordEmbeddingExtractor", {"embedding_file": "/datasets/glove.6B.300d.txt.word2vec", "binary": false}],
     ["BrightnessExtractor", {}],
     ["VibranceExtractor", {}],
     ["SharpnessExtractor", {}],
@@ -26,6 +27,6 @@
     ["MeanAmplitudeExtractor", {}],
     ["SpectralCentroidExtractor", {}],
     ["VADERSentimentExtractor", {}],
-    ["RMSEExtractor", {}]
+    ["RMSEExtractor", {"frame_length": 72000, "hop_length": 72000, "center": false}]
   ]
 }
