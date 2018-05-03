@@ -5,13 +5,16 @@
     "tasks": {
       "MerlinMovie": {
         "converters": [
-          ["FrameSamplingFilter", { "hertz": 1 }]
         ],
         "extractors": [
         ],
-        "filters": {
-          "subject": "30"
-        }
+        "transformations": [
+          {
+            "function": "num_objects",
+            "new_name": "num_faces",
+            "feature_name": "face_detectionConfidence"
+          }
+        ]
       }
     }
   }
