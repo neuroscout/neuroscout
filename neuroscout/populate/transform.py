@@ -27,13 +27,19 @@ class Postprocessing(object):
 
 def transform_feature(function, new_name, dataset_name,
                          task_name=None, **kwargs):
-    # Query to get matching EFs
+    # Query to get latest matching EFs
     dataset_id = Dataset.query.filter_by(name=dataset_name).one().id
-    efs =  ExtractedFeature.query.filter_by(**kwargs).join(
+    ef_ids = db.session.query(func.max(ExtractedFeature.id)).join(
             ExtractedEvent).join(Stimulus).filter_by(dataset_id=dataset_id)
 
     if task_name is not None:
-        efs = efs.join(RunStimulus).join(Run).join(Task).filter_by(name=task_name)
+        ef_ids = ef_ids.join(
+            RunStimulus).join(Run).join(Task).filter_by(name=task_name)
+
+    ef_ids = ef_ids.group_by(ExtractedFeature.feature_name)
+
+    efs =  ExtractedFeature.query.filter(ExtractedFeature.id.in_(
+        ef_ids)).filter_by(**kwargs)
 
     # Apply function and get new values
     ee_results = getattr(Postprocessing, function)(efs)

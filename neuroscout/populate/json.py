@@ -112,6 +112,6 @@ def ingest_from_json(config_file, automagic=False,
                                  extractors, **params.get('extract_args',{}))
             transformations = params.get("transformations", [])
             for args in transformations:
-                transform_feature(dataset_name=dataset_name, task_name=task_name
+                transform_feature(dataset_name=dataset_name, task_name=task_name,
                                   **args)
     return dataset_ids
