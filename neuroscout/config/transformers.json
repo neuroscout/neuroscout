@@ -28,5 +28,18 @@
     ["SpectralCentroidExtractor", {}],
     ["VADERSentimentExtractor", {}],
     ["RMSEExtractor", {"frame_length": 72000, "hop_length": 72000, "center": false}]
+  ],
+  "transformations":[
+    {
+      "function": "num_objects",
+      "new_name": "num_faces",
+      "feature_name": "face_detectionConfidence"
+    },
+    {
+      "function": "num_objects",
+      "new_name": "num_colors_0.07",
+      "extractor_name": "GoogleVisionAPIPropertyExtractor",
+      "func_args": {"threshold": 0.07}
+    }
   ]
 }
