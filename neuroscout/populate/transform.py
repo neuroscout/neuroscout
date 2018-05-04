@@ -33,7 +33,7 @@ class Postprocessing(object):
 
 
 def transform_feature(function, new_name, dataset_name,
-                         task_name=None, **kwargs):
+                      task_name=None, func_args={}, **kwargs):
     # Query to get latest matching EFs
     dataset_id = Dataset.query.filter_by(name=dataset_name).one().id
     ef_ids = db.session.query(func.max(ExtractedFeature.id)).join(
@@ -49,9 +49,9 @@ def transform_feature(function, new_name, dataset_name,
         ef_ids)).filter_by(**kwargs)
 
     # Apply function and get new values
-    ee_results = getattr(Postprocessing, function)(efs)
+    ee_results = getattr(Postprocessing, function)(efs, **func_args)
 
-    ext_name = efs.first().extractor_name
+    ext_name = efs.first().extractor_name + "_trans"
     new_ef = ExtractedFeature(extractor_name=ext_name,
                               feature_name=new_name,
                               active=True,
