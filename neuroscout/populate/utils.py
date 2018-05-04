@@ -48,6 +48,8 @@ def hash_data(data):
     """" Hashes data or string """
     if isinstance(data, str):
         data = data.encode('utf-8')
+    elif hasattr(data, 'to_string'):
+        data = data.to_string().encode('utf-8')
     hasher = hashlib.sha1()
     hasher.update(data)
 

@@ -7,13 +7,10 @@
         "converters": [
         ],
         "extractors": [
+          ["ComplexTextExtractor", {}]
         ],
         "transformations": [
-          {
-            "function": "num_objects",
-            "new_name": "num_faces",
-            "feature_name": "face_detectionConfidence"
-          }
+          
         ]
       }
     }

@@ -3,33 +3,32 @@ from models import (Dataset, ExtractedFeature, ExtractedEvent,
                     Stimulus, RunStimulus, Run, Task)
 from database import db
 from sqlalchemy import func
-from sqlalchemy.sql.expression import cast
+# from sqlalchemy.sql.expression import cast
 from .utils import hash_data
 from .extract import create_predictors
 
 class Postprocessing(object):
     """ Functions applied to one or more ExtractedFeatures """
     @staticmethod
-    def num_objects(efs, threshold=None):
+    def num_objects(efs):
         """ Counts the number of Extracted Events for each stimulus.
-            efs - BaseQuery object with ExtractedFeature object(s)
-            threshold - filter threshold for ExtractedEvent value """
+            Args:
+                efs - BaseQuery object with ExtractedFeature object(s)
+                threshold - filter threshold for ExtractedEvent value
+        """
         query = db.session.query(
-            ExtractedEvent.stimulus_id, func.count(ExtractedEvent.stimulus_id))
+            ExtractedEvent.stimulus_id, func.count(ExtractedEvent.stimulus_id)).\
+        group_by(ExtractedEvent.stimulus_id).filter(
+            ExtractedEvent.ef_id.in_(efs.values('id')))
 
-        if threshold is not None:
-            query = query.filter(cast(ExtractedEvent.value, db.Float) > threshold)
-
-        # Group by stimulus and filter by EFs
-        query = query.group_by(
-            ExtractedEvent.stimulus_id).filter(
-                ExtractedEvent.ef_id.in_(efs.values('id')))
+        # if threshold is not None:
+            ## Even though this comes after, it seems to execute over all EEs, which fails on non-castable
+            # query = query.filter(cast(ExtractedEvent.value, db.Float) > threshold)
 
         counts = [{'stimulus_id': stimulus_id, 'value': count}
                   for stimulus_id, count in query]
 
         return counts
-
 
 
 def transform_feature(function, new_name, dataset_name,

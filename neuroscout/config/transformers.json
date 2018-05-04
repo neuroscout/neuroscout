@@ -27,7 +27,8 @@
     ["MeanAmplitudeExtractor", {}],
     ["SpectralCentroidExtractor", {}],
     ["VADERSentimentExtractor", {}],
-    ["RMSEExtractor", {"frame_length": 72000, "hop_length": 72000, "center": false}]
+    ["RMSEExtractor", {"frame_length": 72000, "hop_length": 72000, "center": false}],
+    ["ComplexTextExtractor", {}]
   ],
   "transformations":[
     {
@@ -37,9 +38,8 @@
     },
     {
       "function": "num_objects",
-      "new_name": "num_colors_0.07",
-      "extractor_name": "GoogleVisionAPIPropertyExtractor",
-      "func_args": {"threshold": 0.07}
+      "new_name": "speech",
+      "extractor_name": "ComplexTextExtractor"
     }
   ]
 }

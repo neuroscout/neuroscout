@@ -189,8 +189,17 @@ def extract_features(dataset_name, task_name, extractors):
 
                 """" Add ExtractedEvents """
                 # Get associated stimulus record
+                ### TODO: For ComplexTextStim hash does not match! For "can not"
+                ## Because "cannot" is tokenized as "can not". Need to tokenize on ingestion!!!!
+                
+                stim_hash = hash_stim(res.stim)
                 stimulus = db.session.query(
-                    Stimulus).filter_by(path=res.stim.filename).one()
+                    Stimulus).filter_by(sha1_hash=stim_hash).one_or_none()
+
+                # If hash fails, use filename
+                if stimulus is None:
+                    stimulus = db.session.query(
+                        Stimulus).filter_by(filename=res.stim.filename).one()
 
                 # Get or create ExtractedEvent
                 bulk_ees.append(
