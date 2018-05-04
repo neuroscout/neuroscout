@@ -138,7 +138,7 @@ def test_json_local_dataset(session, add_local_task_json):
 	assert num_bright.count() == 1
 	assert num_bright.first().extracted_events.count() == 3
 
-	for ee in num_bright.extracted_events:
+	for ee in num_bright.first().extracted_events:
 		assert ee.value == 1
 
 
