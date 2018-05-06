@@ -6,38 +6,48 @@ from database import db
 from pathlib import Path
 
 from pliers.stimuli import (TextStim, ImageStim, VideoFrameStim,
-                            VideoStim, AudioStim, load_stims)
+                            ComplexTextStim, VideoStim, AudioStim, load_stims)
 from pliers.transformers import get_transformer
 
 from models import Dataset, Task, Run, Stimulus, RunStimulus
 
-from .utils import hash_stim, hash_data
+from .utils import hash_stim
 from .ingest import add_stimulus
 
 import pandas as pd
 
 def save_stim_filename(stimulus):
-    """ Given a pliers stimulus object, create a hash, filename, and save """
-    basepath = Path(current_app.config['STIMULUS_DIR']).absolute()
+    """ Given a pliers stimulus object, create a hash, filename, and save.
+        If type if TextStim or ComplexTextStim, return content rather than path.
+    """
+    if isinstance(stimulus, TextStim):
+        stimulus = ComplexTextStim(text=stimulus.data)
+
     stim_hash = hash_stim(stimulus)
 
-    stim_types = {ImageStim: '.png',
-                  TextStim: '.txt',
-                  VideoFrameStim: '.png',
-                  VideoStim: '.mkv',
-                  AudioStim: '.wav'}
+    if isinstance(stimulus, ComplexTextStim):
+        return stim_hash, None, stimulus.data
+    else:
+        basepath = Path(current_app.config['STIMULUS_DIR']).absolute()
 
-    ext = [e for c, e in stim_types.items() if isinstance(stimulus, c)][0]
-    filename = (basepath / stim_hash).with_suffix(ext)
+        stim_types = {ImageStim: '.png',
+                      VideoFrameStim: '.png',
+                      VideoStim: '.mkv',
+                      AudioStim: '.wav'}
 
-    filename.parents[0].mkdir(exist_ok=True)
-    stimulus.save(filename.as_posix())
+        ext = [e for c, e in stim_types.items() if isinstance(stimulus, c)][0]
+        path = (basepath / stim_hash).with_suffix(ext)
 
-    return stim_hash, filename
+        path.parents[0].mkdir(exist_ok=True)
+        stimulus.save(path.as_posix())
 
-def save_new_stimulus(dataset_id, task_name, parent_id, rs_orig, stim_hash,
-                      transformer=None, transformer_params=None,
-                      path=None, content=None, onset=None, duration=None):
+        return stim_hash, path, None
+
+def save_new_stimulus(dataset_id, task_name, parent_id, rs_orig, stim,
+                      transformer=None, transformer_params=None):
+
+    stim_hash, path, content = save_stim_filename(stim)
+
     # Create stimulus model
     new_stim, new = add_stimulus(
         stim_hash, path=path, content=content, parent_id=parent_id,
@@ -57,8 +67,8 @@ def save_new_stimulus(dataset_id, task_name, parent_id, rs_orig, stim_hash,
     for rs in rs_orig:
         new_rs = RunStimulus(stimulus_id=new_stim.id,
                              run_id=rs.run_id,
-                             onset=rs.onset + (onset or 0),
-                             duration=duration or rs.duration)
+                             onset=rs.onset + (stim.onset or 0),
+                             duration=stim.duration or rs.duration)
         db.session.add(new_rs)
         db.session.commit()
 
@@ -110,21 +120,11 @@ def convert_stimuli(dataset_name, task_name, converters):
             for res in results:
                 # Save stim
                 if hasattr(res, 'data') and res.data is not '':
-                    if isinstance(res, TextStim):
-                        stim_hash = hash_stim(res)
-                        content = res.data
-                        path = None
-                    else:
-                        stim_hash, path = save_stim_filename(res)
-                        content = None
-
                     new_stims.append(
                         save_new_stimulus(
-                            dataset_id, task_name, stim.id, rs_orig, stim_hash,
+                            dataset_id, task_name, stim.id, rs_orig, res,
                             transformer=converted.history.transformer_class,
-                            transformer_params=converted.history.transformer_params,
-                            content=content, path=path, onset=res.onset,
-                            duration=res.duration))
+                            transformer_params=converted.history.transformer_params))
 
         # De-activate previously generated stimuli from these converters.
         update = Stimulus.query.filter_by(parent_id=stim.id).filter(
@@ -141,8 +141,8 @@ def convert_stimuli(dataset_name, task_name, converters):
 def ingest_text_stimuli(filename, dataset_name, task_name, parent_id,
                         transformer, transformer_params=None):
     """ Ingest converted text stimuli from file. """
-    ## This ingests from a single parents. May want to refactor in the future
-    ## For more complex files (e.g. multiple parents)
+    ## This ingests from a single parent stim. May want to refactor
+    ## for more complex files (e.g. multiple parents)
     df = pd.read_csv(filename, delimiter='\t')
     dataset_id = Dataset.query.filter_by(name=dataset_name).one().id
 
@@ -154,9 +154,8 @@ def ingest_text_stimuli(filename, dataset_name, task_name, parent_id,
         raise Exception("No RunStimulus associations match.")
 
     for ix, row in df.iterrows():
-        stim_hash = hash_data(row['text'])
-        save_new_stimulus(dataset_id, task_name, parent_id, rs_orig, stim_hash,
+        stim = ComplexTextStim(
+            text=row['text'], onset=row['onset'], duration=row.get('duration'))
+        save_new_stimulus(dataset_id, task_name, parent_id, rs_orig, stim,
                           transformer=transformer,
-                          transformer_params=transformer_params,
-                          content=row['text'], onset=row['onset'],
-                          duration=row.get('duration'))
+                          transformer_params=transformer_params)
