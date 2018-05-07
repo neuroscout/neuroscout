@@ -204,7 +204,8 @@
     {
       "features": {
         ".*": {
-          "description": "RGB Channel."
+          "description": "RGB Channel.",
+          "active": false
         }
       }
     }

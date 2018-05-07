@@ -9,17 +9,20 @@ import pandas as pd
 
 class Postprocessing(object):
     """ Functions applied to one or more ExtractedFeatures """
-    @staticmethod
-    def num_objects(efs, threshold=None):
+    def _load_df(self, efs):
+        query = ExtractedEvent.query.filter(
+            ExtractedEvent.ef_id.in_(efs.values('id')))
+        df = pd.read_sql(query.statement, db.session.bind)
+
+        return df
+
+    def num_objects(self, efs, threshold=None):
         """ Counts the number of Extracted Events for each stimulus.
             Args:
                 efs - BaseQuery object with ExtractedFeature object(s)
                 threshold - filter threshold for ExtractedEvent value
         """
-        query = ExtractedEvent.query.filter(
-            ExtractedEvent.ef_id.in_(efs.values('id')))
-        df = pd.read_sql(query.statement, db.session.bind)
-
+        df = self._load_df(efs)
         if threshold is not None:
             df.value = df.value.astype('float')
             df = df[df.value > threshold]
@@ -27,6 +30,13 @@ class Postprocessing(object):
         counts = df.groupby('stimulus_id').count()['value'].reset_index()
 
         return counts.to_dict('index').values()
+
+    def dummy(self, efs):
+        """ Gives a dummy feature of 1s for each stimulus """
+        df = self._load_df(efs)
+
+        dummy = df.groupby('stimulus_id').apply(lambda x: 1).reset_index()
+        return dummy.rename(columns={0: 'value'}).to_dict('index').values()
 
 
 def transform_feature(function, new_name, dataset_name,
@@ -46,7 +56,7 @@ def transform_feature(function, new_name, dataset_name,
         ef_ids)).filter_by(**kwargs)
 
     # Apply function and get new values
-    ee_results = getattr(Postprocessing, function)(efs, **func_args)
+    ee_results = getattr(Postprocessing(), function)(efs, **func_args)
 
     ext_name = efs.first().extractor_name + "_trans"
     new_ef = ExtractedFeature(extractor_name=ext_name,
