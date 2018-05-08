@@ -36,6 +36,7 @@ interface XformDisplayProps {
   enableDown: boolean;
   onMove: (index: number, direction: 'up' | 'down') => void;
 }
+
 const XformDisplay = (props: XformDisplayProps) => {
   const { xform, index, onDelete, onMove, enableUp, enableDown } = props;
   const input = xform.input || [];
