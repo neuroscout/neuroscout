@@ -159,6 +159,22 @@ export interface ApiAnalysis {
   contrasts?: Contrast[];
   config: AnalysisConfig;
   modified_at?: string;
+  model?: Model;
+}
+
+export interface Model {
+  blocks: Block[];
+}
+
+export interface Block {
+  block_model: BlockModel;
+  transformations?: Transformation[];
+}
+
+export interface BlockModel {
+  level?: string;
+  variables: string[];
+  hrf_variables?: string[];
 }
 
 // Shape of User object as consumed/produced by the backend API
