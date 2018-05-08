@@ -7,7 +7,7 @@ from sqlalchemy import func
 from database import db
 
 class ExtractedFeatureSchema(Schema):
-    extractor_parameters = fields.Str(description="Extractor parameters.")
+    id = fields.Int(description="Extractor id")
     description = fields.Str(description="Feature description.")
     created_at = fields.Str(description="Extraction timestamp.")
 
@@ -58,22 +58,18 @@ class PredictorListResource(MethodResource):
         },
         locations=['query'])
     def get(self, **kwargs):
-        # Get Predictors that match up to specified runs
+        if kwargs.pop('newest'):
+            predictor_ids = db.session.query(
+                func.max(Predictor.id)).group_by(Predictor.name)
+        else:
+            predictor_ids = db.session.query(Predictor.id)
+
         if 'run_id' in kwargs:
             run_id = kwargs.pop('run_id')
-            kwargs['id'] = PredictorEvent.query.filter(
-                PredictorEvent.run_id.in_(run_id)).distinct(
-                    'predictor_id').with_entities('predictor_id').all()
+            predictor_ids = predictor_ids.join(PredictorEvent).filter(
+                PredictorEvent.run_id.in_(run_id))
 
-        query = Predictor.query
-
-        # Only return latest Predictor by name -- assumes no repetitions!
-        if  kwargs.pop('newest'):
-            query = query.filter(
-                Predictor.id.in_(
-                    db.session.query(
-                        func.max(Predictor.id)).group_by(Predictor.name)))
-
+        query = Predictor.query.filter(Predictor.id.in_(predictor_ids))
         for param in kwargs:
             query = query.filter(getattr(Predictor, param).in_(kwargs[param]))
 
