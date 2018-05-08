@@ -3,7 +3,7 @@ from flask import current_app
 from .ingest import add_task
 from .extract import extract_features
 from .convert import convert_stimuli
-from .transform import transform_feature
+from .transform import Postprocessing
 from models import Dataset
 from pathlib import Path
 from pliers.utils.updater import check_updates
@@ -111,7 +111,9 @@ def ingest_from_json(config_file, automagic=False,
                 extract_features(dataset_name, task_name,
                                  extractors, **params.get('extract_args',{}))
             transformations = params.get("transformations", [])
+            post = Postprocessing(dataset_name, task_name)
             for args in transformations:
-                transform_feature(dataset_name=dataset_name, task_name=task_name,
-                                  **args)
+                post = Postprocessing(dataset_name, task_name)
+                post.apply_transformation(**args)
+
     return dataset_ids

@@ -9,70 +9,82 @@ import pandas as pd
 
 class Postprocessing(object):
     """ Functions applied to one or more ExtractedFeatures """
-    def _load_df(self, efs):
+    def __init__(self, dataset_name, task_name=None):
+        self.dataset_id = Dataset.query.filter_by(name=dataset_name).one().id
+
+        ef_ids = db.session.query(func.max(ExtractedFeature.id)).join(
+                ExtractedEvent).join(Stimulus).filter_by(
+                    dataset_id=self.dataset_id)
+
+        if task_name is not None:
+            ef_ids = ef_ids.join(
+                RunStimulus).join(Run).join(Task).filter_by(name=task_name)
+
+        ef_ids = ef_ids.group_by(ExtractedFeature.feature_name)
+
+        self.efs = ExtractedFeature.query.filter(
+            ExtractedFeature.id.in_(ef_ids))
+
+    def _ef_to_df(self, efs):
         query = ExtractedEvent.query.filter(
             ExtractedEvent.ef_id.in_(efs.values('id')))
-        df = pd.read_sql(query.statement, db.session.bind)
+        return pd.read_sql(query.statement, db.session.bind)
 
-        return df
-
-    def num_objects(self, efs, threshold=None):
+    @staticmethod
+    def num_objects(ee_df, threshold=None):
         """ Counts the number of Extracted Events for each stimulus.
             Args:
-                efs - BaseQuery object with ExtractedFeature object(s)
+                ee_df - ExtractedEvents in pandas df format
                 threshold - filter threshold for ExtractedEvent value
         """
-        df = self._load_df(efs)
         if threshold is not None:
-            df.value = df.value.astype('float')
-            df = df[df.value > threshold]
+            ee_df.value = ee_df.value.astype('float')
+            ee_df = ee_df[ee_df.value > threshold]
 
-        counts = df.groupby('stimulus_id').count()['value'].reset_index()
+        counts = ee_df.groupby('stimulus_id').count()['value'].reset_index()
 
         return counts.to_dict('index').values()
 
-    def dummy(self, efs):
-        """ Gives a dummy feature of 1s for each stimulus """
-        df = self._load_df(efs)
-
-        dummy = df.groupby('stimulus_id').apply(lambda x: 1).reset_index()
+    @staticmethod
+    def dummy(ee_df):
+        """ Returns a dummy feature of 1s for each stimulus
+            Args:
+                ee_df - ExtractedEvents in pandas df format
+        """
+        dummy = ee_df.groupby('stimulus_id').apply(lambda x: 1).reset_index()
         return dummy.rename(columns={0: 'value'}).to_dict('index').values()
 
+    def apply_transformation(self, new_name, function, func_args={}, **filter):
+        """ Queries EFs, applies transformation, and saves as new EF/Predictor
+        Args:
+            new_name - Feature/predictor name for transformed results
+            func - Function name to apply
+            func_args - keyword args for transformation function
+            filter - arguments to filter ExtractedFeatures
+        Returns:
+            Database id of new ExtractedFeature
+        """
+        # Query EFs
+        efs = self.efs.filter_by(**filter)
 
-def transform_feature(function, new_name, dataset_name,
-                      task_name=None, func_args={}, **kwargs):
-    # Query to get latest matching EFs
-    dataset_id = Dataset.query.filter_by(name=dataset_name).one().id
-    ef_ids = db.session.query(func.max(ExtractedFeature.id)).join(
-            ExtractedEvent).join(Stimulus).filter_by(dataset_id=dataset_id)
+        # Create EF
+        ext_name = efs.first().extractor_name + "_trans"
+        new_ef = ExtractedFeature(
+            extractor_name=ext_name, feature_name=new_name,
+            active=True, sha1_hash=hash_data(ext_name + new_name))
+        db.session.add(new_ef)
+        db.session.commit()
 
-    if task_name is not None:
-        ef_ids = ef_ids.join(
-            RunStimulus).join(Run).join(Task).filter_by(name=task_name)
+        # Apply function, get new EE values, and create models
+        ee_results = getattr(self, function)(self._ef_to_df(efs), **func_args)
 
-    ef_ids = ef_ids.group_by(ExtractedFeature.feature_name)
+        # Create EEs and predictor
+        db.session.bulk_save_objects(
+            [ExtractedEvent(ef_id=new_ef.id, **ee) for ee in ee_results]
+            )
+        db.session.commit()
 
-    efs =  ExtractedFeature.query.filter(ExtractedFeature.id.in_(
-        ef_ids)).filter_by(**kwargs)
+        # Create Predictors from EFs
+        create_predictors([new_ef], self.dataset_id)
 
-    # Apply function and get new values
-    ee_results = getattr(Postprocessing(), function)(efs, **func_args)
-
-    ext_name = efs.first().extractor_name + "_trans"
-    new_ef = ExtractedFeature(extractor_name=ext_name,
-                              feature_name=new_name,
-                              active=True,
-                              sha1_hash=hash_data(ext_name + new_name)
-                              )
-    db.session.add(new_ef)
-    db.session.commit()
-
-    # Create EEs and predictor
-    db.session.bulk_save_objects(
-        [ExtractedEvent(ef_id=new_ef.id, **ee) for ee in ee_results]
-        )
-    db.session.commit()
-
-    create_predictors([new_ef], dataset_id)
-
-    return new_ef.id
+        return new_ef.id
