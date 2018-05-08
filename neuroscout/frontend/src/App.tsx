@@ -14,7 +14,7 @@ import AnalysisBuilder from './Builder';
 import Browse from './Browse';
 import { BrowserRouter as Router, Route, Link, Redirect } from 'react-router-dom';
 import './App.css';
-import config from '../config.js';
+import { config } from './config';
 
 const FormItem = Form.Item;
 const DOMAINROOT = config.server_url;
