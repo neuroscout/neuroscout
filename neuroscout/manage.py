@@ -20,18 +20,18 @@ migrate = Migrate(app, db, directory=app.config['MIGRATIONS_DIR'])
 manager = Manager(app)
 
 def _make_context():
-	import models
-	from tests.request_utils import Client
-	import resources
+    import models
+    from tests.request_utils import Client
+    import resources
 
-	try:
-		client = Client(requests, 'http://127.0.0.1:80',
-			username='test2@test.com', password='password')
-	except:
-		client = None
+    try:
+        client = Client(requests, 'http://127.0.0.1:80',
+            username='test2@test.com', password='password')
+    except:
+        client = None
 
-	return dict(app=app, db=db, ms=models, client=client,
-		resources=resources)
+    return dict(app=app, db=db, ms=models, client=client,
+        resources=resources)
 
 manager.add_command('db', MigrateCommand)
 manager.add_command("shell", Shell(make_context=_make_context))
@@ -50,27 +50,27 @@ def add_user(email, password, confirm=True):
 
 @manager.command
 def add_task(local_path, task, automagic=False,
-	skip_predictors=False, filters='{}'):
-	""" Add BIDS dataset to database.
-	local_path - Path to local_path directory
-	task - Task name
-	automagic - Force enable datalad automagic
-	skip_predictors - Skip original Predictors
-	filters - string JSON object with optional run filters
-	"""
-	populate.add_task(
+             skip_predictors=False, filters='{}'):
+    """ Add BIDS dataset to database.
+    local_path - Path to local_path directory
+    task - Task name
+    automagic - Force enable datalad automagic
+    skip_predictors - Skip original Predictors
+    filters - string JSON object with optional run filters
+    """
+    populate.add_task(
         task, local_path=local_path, skip_predictors=skip_predictors,
         automagic=automagic, **json.loads(filters))
 
 @manager.command
 def extract_features(local_path, task, graph_spec, filters='{}'):
-	""" Extract features from a BIDS dataset.
-	local_path - Path to bids directory
-	task - Task name
-	graph_spec - Path to JSON pliers graph spec
-	filters - string JSON object with optional run filters
-	"""
-	populate.extract_features(
+    """ Extract features from a BIDS dataset.
+    local_path - Path to bids directory
+    task - Task name
+    graph_spec - Path to JSON pliers graph spec
+    filters - string JSON object with optional run filters
+    """
+    populate.extract_features(
         local_path, task, graph_spec, **json.loads(filters))
 
 ## Need to modify or create new function for updating dataset
@@ -78,11 +78,11 @@ def extract_features(local_path, task, graph_spec, filters='{}'):
 @manager.command
 def ingest_from_json(config_file, automagic=False, update_features=False,
                      reingest=False):
-	""" Ingest/update datasets and extracted features from a json config file.
-	config_file - json config file detailing datasets and pliers graph_json
-	automagic - Force enable datalad automagic
-	"""
-	populate.ingest_from_json(
+    """ Ingest/update datasets and extracted features from a json config file.
+    config_file - json config file detailing datasets and pliers graph_json
+    automagic - Force enable datalad automagic
+    """
+    populate.ingest_from_json(
         config_file, automagic=automagic, update_features=update_features,
         reingest=reingest)
 
