@@ -9,10 +9,10 @@ import re
 import pandas as pd
 from pathlib import Path
 import datetime
-import progressbar
+from progressbar import progressbar
 from utils import get_or_create
 
-from pliers.stimuli import load_stims, ComplexTextStim
+from pliers.stimuli import load_stims, ComplexTextStim, TextStim
 from pliers.transformers import get_transformer
 from pliers.extractors import merge_results
 
@@ -49,24 +49,23 @@ class FeatureSerializer(object):
             if 'description' in schema else None
 
         annotated = []
-        for i, v in sub_df.iterrows():
-            if v['value'] is not None:
-                annotated.append(
-                    (
-                        {
-                            'value': v['value'],
-                            'onset': v['onset'] if not pd.isnull(v['onset']) else None,
-                            'duration': v['duration'] if not pd.isnull(v['duration']) else None,
-                            'object_id': v['object_id']
-                            },
-                        {
-                            'sha1_hash': hash_data(str(ext_hash) + name),
-                            'feature_name': name,
-                            'description': description,
-                            'active': schema.get('active', default_active),
-                            }
-                        )
+        for i, v in sub_df[sub_df.value.notnull()].iterrows():
+            annotated.append(
+                (
+                    {
+                        'value': v['value'],
+                        'onset': v['onset'] if not pd.isnull(v['onset']) else None,
+                        'duration': v['duration'] if not pd.isnull(v['duration']) else None,
+                        'object_id': v['object_id']
+                        },
+                    {
+                        'sha1_hash': hash_data(str(ext_hash) + name),
+                        'feature_name': name,
+                        'description': description,
+                        'active': schema.get('active', default_active),
+                        }
                     )
+                )
 
         return annotated
 
@@ -121,11 +120,28 @@ class FeatureSerializer(object):
         return annotated
 
 
-def load_stim_object(stim_object):
-    if stim_object.path is not None:
-        return load_stims(stim_object.path)
-    else:
-        return ComplexTextStim(text=stim_object.content)
+def load_stim_objects(dataset_name, task_name):
+    """ Given a dataset and task, load all available stimuli as Pliers
+    stimuli """
+    stim_objects = Stimulus.query.filter_by(active=True).join(
+        RunStimulus).join(Run).join(Task).filter_by(name=task_name).join(
+            Dataset).filter_by(name=dataset_name)
+
+    # Order
+    all_stims = [s for s in stim_objects if s.parent_id is None]
+    all_stims += [s for s in stim_objects if s.parent_id is not None]
+
+    stims = []
+    for stim_object in all_stims:
+        if stim_object.path is None:
+            complex = ComplexTextStim(text=stim_object.content)
+            stims.append(complex)
+            stims.append(TextStim(text=complex.data)) # Append both ways
+        else:
+            stims.append(load_stims(stim_object.path))
+
+    return stims
+
 
 def extract_features(dataset_name, task_name, extractors):
     """ Extract features using pliers for a dataset/task
@@ -136,25 +152,16 @@ def extract_features(dataset_name, task_name, extractors):
         Output:
             list of db ids of extracted features
     """
-    dataset_id = Dataset.query.filter_by(name=dataset_name).one().id
-
     # Load all active stimuli for task
-    stim_objects = Stimulus.query.filter_by(active=True).join(
-        RunStimulus).join(Run).join(Task).filter_by(name=task_name).join(
-            Dataset).filter_by(name=dataset_name)
-
-    # Order
-    all_stims = [s for s in stim_objects if s.parent_id is None]
-    all_stims += [s for s in stim_objects if s.parent_id is not None]
-
-    stims = [load_stim_object(stim) for stim in all_stims]
+    stims = load_stim_objects(dataset_name, task_name)
 
     results = []
     for name, parameters in extractors:
         # For every extractor, extract from matching stims
         ext = get_transformer(name, **parameters)
-        valid_stims = [s for s in stims if ext._stim_matches_input_types(s)]
-        results += ext.transform(valid_stims)
+        results += ext.transform(
+            [s for s in stims if ext._stim_matches_input_types(s)]
+            )
 
     # Save results to file
     if results != [] and 'EXTRACTION_DIR' in current_app.config:
@@ -167,92 +174,91 @@ def extract_features(dataset_name, task_name, extractors):
         results_path.parents[0].mkdir(exist_ok=True)
         results_df.to_csv(results_path.as_posix())
 
-    with progressbar.ProgressBar(max_value=len(results)) as bar:
-        serializer = FeatureSerializer()
-        extracted_features = {}
-        for i, res in enumerate(results):
-            bulk_ees = []
-            for ee_props, ef_props in serializer.load(res):
-                """" Add new ExtractedFeature """
-                # Hash extractor name + feature name
-                feat_hash = ef_props['sha1_hash']
+    serializer = FeatureSerializer()
+    extracted_features = {}
+    for res in progressbar(results):
+        bulk_ees = []
+        for ee_props, ef_props in serializer.load(res):
+            """" Add new ExtractedFeature """
+            # Hash extractor name + feature name
+            feat_hash = ef_props['sha1_hash']
 
-                # If we haven't already added this feature
-                if feat_hash not in extracted_features:
-                    # Create/get feature
-                    ef_model = ExtractedFeature(**ef_props)
-                    db.session.add(ef_model)
-                    db.session.commit()
-                    extracted_features[feat_hash] = ef_model
-                else:
-                    ef_model = extracted_features[feat_hash]
+            # If we haven't already added this feature
+            if feat_hash not in extracted_features:
+                # Create/get feature
+                ef_model = ExtractedFeature(**ef_props)
+                db.session.add(ef_model)
+                db.session.commit()
+                extracted_features[feat_hash] = ef_model
+            else:
+                ef_model = extracted_features[feat_hash]
 
-                """" Add ExtractedEvents """
-                # Get associated stimulus record
-                stim_hash = hash_stim(res.stim)
+            """" Add ExtractedEvents """
+            # Get associated stimulus record
+            stim_hash = hash_stim(res.stim)
+            stimulus = db.session.query(
+                Stimulus).filter_by(sha1_hash=stim_hash).one_or_none()
+
+            # If hash fails, use filename
+            if stimulus is None:
                 stimulus = db.session.query(
-                    Stimulus).filter_by(sha1_hash=stim_hash).one_or_none()
+                    Stimulus).filter_by(filename=res.stim.filename).one()
 
-                # If hash fails, use filename
-                if stimulus is None:
-                    stimulus = db.session.query(
-                        Stimulus).filter_by(filename=res.stim.filename).one()
-
-                # Get or create ExtractedEvent
-                bulk_ees.append(
-                    ExtractedEvent(stimulus_id=stimulus.id,
-                                   history=res.history.string,
-                                   ef_id=ef_model.id,
-                                   **ee_props))
-            db.session.bulk_save_objects(bulk_ees)
-            db.session.commit()
-            bar.update(i)
+            # Get or create ExtractedEvent
+            bulk_ees.append(
+                ExtractedEvent(stimulus_id=stimulus.id,
+                               history=res.history.string,
+                               ef_id=ef_model.id,
+                               **ee_props))
+        db.session.bulk_save_objects(bulk_ees)
+        db.session.commit()
 
     create_predictors(
         [ef for ef in extracted_features.values() if ef.active],
-        dataset_id)
+        dataset_name
+        )
 
     return list(extracted_features.values())
 
 
-def create_predictors(features, dataset_id):
+def create_predictors(features, dataset_name):
     """" Create Predictors from Extracted Features """
+    dataset_id = Dataset.query.filter_by(name=dataset_name).one().id
+
     current_app.logger.info("Creating predictors")
     all_preds = []
-    for count, ef in enumerate(features):
+    for ef in features:
         all_preds.append(get_or_create(
             Predictor, name=ef.feature_name, dataset_id=dataset_id,
             source='extracted', ef_id=ef.id)[0])
 
 
     current_app.logger.info("Creating predictor events")
-    with progressbar.ProgressBar(max_value=len(all_preds)) as bar:
-        for ix, predictor in enumerate(all_preds):
-            ef = features[ix]
-            all_pes = []
-            all_rs = []
-            # For all instances for stimuli in this task's runs
-            for ee in ef.extracted_events:
-                # if ee.value:
-                for rs in RunStimulus.query.filter_by(stimulus_id=ee.stimulus_id):
-                        all_rs.append((predictor.id, rs.run_id))
-                        duration = ee.duration
-                        if duration is None:
-                            duration = rs.duration
-                        all_pes.append(
-                            PredictorEvent(
-                                onset=(ee.onset or 0) + rs.onset,
-                                value=ee.value,
-                                object_id=ee.object_id,
-                                duration=duration,
-                                predictor_id=predictor.id,
-                                run_id=rs.run_id,
-                                stimulus_id=ee.stimulus_id
-                            )
+    for ix, predictor in enumerate(progressbar(all_preds)):
+        ef = features[ix]
+        all_pes = []
+        all_rs = []
+        # For all instances for stimuli in this task's runs
+        for ee in ef.extracted_events:
+            # if ee.value:
+            for rs in RunStimulus.query.filter_by(stimulus_id=ee.stimulus_id):
+                    all_rs.append((predictor.id, rs.run_id))
+                    duration = ee.duration
+                    if duration is None:
+                        duration = rs.duration
+                    all_pes.append(
+                        PredictorEvent(
+                            onset=(ee.onset or 0) + rs.onset,
+                            value=ee.value,
+                            object_id=ee.object_id,
+                            duration=duration,
+                            predictor_id=predictor.id,
+                            run_id=rs.run_id,
+                            stimulus_id=ee.stimulus_id
                         )
+                    )
 
-            all_rs = [PredictorRun(predictor_id=pred_id, run_id=run_id)
-                      for pred_id, run_id in set(all_rs)]
-            db.session.bulk_save_objects(all_pes + all_rs)
-            db.session.commit()
-            bar.update(ix)
+        all_rs = [PredictorRun(predictor_id=pred_id, run_id=run_id)
+                  for pred_id, run_id in set(all_rs)]
+        db.session.bulk_save_objects(all_pes + all_rs)
+        db.session.commit()

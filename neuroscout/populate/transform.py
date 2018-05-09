@@ -10,11 +10,11 @@ import pandas as pd
 class Postprocessing(object):
     """ Functions applied to one or more ExtractedFeatures """
     def __init__(self, dataset_name, task_name=None):
-        self.dataset_id = Dataset.query.filter_by(name=dataset_name).one().id
+        self.dataset_name = dataset_name
 
         ef_ids = db.session.query(func.max(ExtractedFeature.id)).join(
-                ExtractedEvent).join(Stimulus).filter_by(
-                    dataset_id=self.dataset_id)
+                ExtractedEvent).join(Stimulus).join(Dataset).filter_by(
+                    name=dataset_name)
 
         if task_name is not None:
             ef_ids = ef_ids.join(
@@ -85,6 +85,6 @@ class Postprocessing(object):
         db.session.commit()
 
         # Create Predictors from EFs
-        create_predictors([new_ef], self.dataset_id)
+        create_predictors([new_ef], self.dataset_name)
 
         return new_ef.id

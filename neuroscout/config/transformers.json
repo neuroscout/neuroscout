@@ -1,7 +1,7 @@
 {
   "converters": [
     ["TesseractConverter", {}],
-    ["FrameSamplingFilter", { "every": 200 }],
+    ["FrameSamplingFilter", { "hertz": 1 }],
     ["VideoToAudioConverter", {}]
   ],
   "extractors": [
@@ -37,9 +37,15 @@
       "feature_name": "face_detectionConfidence"
     },
     {
-      "function": "num_objects",
+      "function": "dummy",
       "new_name": "speech",
       "extractor_name": "ComplexTextExtractor"
+    },
+    {
+      "function": "num_objects",
+      "func_args": {"threshold": 0.07},
+      "new_name": "num_colors_0.07",
+      "extractor_name": "GoogleVisionAPIPropertyExtractor"
     }
   ]
 }
