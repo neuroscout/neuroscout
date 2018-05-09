@@ -10,6 +10,14 @@
         "converters": [
           ["TesseractConverter", {}]
         ],
+        "transformations":[
+          {
+            "function": "num_objects",
+            "new_name": "num_bright",
+            "feature_name": "Brightness",
+            "func_args": {"threshold": 0.5}
+          }
+        ],
         "filters": {
           "run": 1,
           "subject": "01"

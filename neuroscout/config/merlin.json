@@ -5,13 +5,13 @@
     "tasks": {
       "MerlinMovie": {
         "converters": [
-          ["FrameSamplingFilter", { "hertz": 1 }]
         ],
         "extractors": [
+          ["ComplexTextExtractor", {}]
         ],
-        "filters": {
-          "subject": "30"
-        }
+        "transformations": [
+          
+        ]
       }
     }
   }
