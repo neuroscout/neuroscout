@@ -3,7 +3,7 @@ python:
   - "3.5"
 install:
   - pip install -r neuroscout/requirements.txt
-  - pip install -e git+https://github.com/tyarkoni/pliers.git#egg=pliers
+  - pip install -e git+https://github.com/adelavega/pliers.git@unique_hashing#egg=pliers
   - pip install pytest-cov
 script:
   - python -m pytest tests/ --cov=./
