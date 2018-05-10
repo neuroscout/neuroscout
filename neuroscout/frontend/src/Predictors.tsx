@@ -5,14 +5,16 @@ filter the table down to predictors whose name or description match the entered 
 */
 import * as React from 'react';
 import { Table, Input, Button, Row, Col, Tag } from 'antd';
-import { TableProps, TableRowSelection } from 'antd/lib/table/Table';
+import { TableRowSelection } from 'antd/lib/table';
 import { Analysis, Predictor } from './coretypes';
 
+/*
 class PredictorTable extends React.Component<TableProps<any>, any> {
   render() {
     return <Table {...this.props} />;
   }
 }
+*/
 
 interface PredictorSelectorProps {
   availablePredictors: Predictor[]; // All available predictors to select from
@@ -31,7 +33,7 @@ export class PredictorSelector extends React.Component<
   PredictorsSelectorState
 > {
   constructor(props: PredictorSelectorProps) {
-    super();
+    super(props);
     const { availablePredictors, selectedPredictors } = props;
     this.state = {
       searchText: '',
@@ -98,7 +100,7 @@ export class PredictorSelector extends React.Component<
             <div>
               <p>{`Select predictors (displaying ${filteredPredictors.length} 
             out of ${availablePredictors.length} total predictors):`}</p>
-              <PredictorTable
+              <Table
                 columns={columns}
                 rowKey="id"
                 pagination={false}

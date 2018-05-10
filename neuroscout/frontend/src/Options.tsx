@@ -15,7 +15,6 @@ import {
   Checkbox,
   Select
 } from 'antd';
-import { TableProps, TableRowSelection } from 'antd/lib/table/Table';
 import { Analysis, AnalysisConfig, Predictor, PredictorConfig } from './coretypes';
 const FormItem = Form.Item;
 const Panel = Collapse.Panel;

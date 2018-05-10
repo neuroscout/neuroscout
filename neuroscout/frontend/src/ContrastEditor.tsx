@@ -3,7 +3,6 @@
 */
 import * as React from 'react';
 import { Form, Input, Button, Radio, message, Modal, Alert } from 'antd';
-import { TableProps, TableRowSelection } from 'antd/lib/table/Table';
 import { Analysis, Predictor, Contrast } from './coretypes';
 import { PredictorSelector } from './Predictors';
 import { Space } from './HelperComponents';
@@ -32,7 +31,7 @@ export default class ContrastEditor extends React.Component<
   ContrastEditorState
 > {
   constructor(props: ContrastEditorProps) {
-    super();
+    super(props);
     const { contrast, availablePredictors } = props;
     this.state = {
       predictors: [],
@@ -142,7 +141,7 @@ export default class ContrastEditor extends React.Component<
                 value={weights[i]}
                 type="number"
                 onChange={(event: React.FormEvent<HTMLInputElement>) =>
-                  this.updateWeight(i, parseInt(event.currentTarget.value))}
+                  this.updateWeight(i, parseInt(event.currentTarget.value, 10))}
               />
             </FormItem>
           )}
