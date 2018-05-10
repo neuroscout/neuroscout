@@ -18,6 +18,8 @@
   },
   "devDependencies": {
     "@types/enzyme": "^3.1.10",
+    "enzyme": "^3.3.0",
+    "enzyme-adapter-react-16": "^1.1.1",
     "react-scripts-ts": "^2.3.2",
     "typescript": "^2.8.3"
   },
