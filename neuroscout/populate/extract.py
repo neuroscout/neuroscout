@@ -202,7 +202,7 @@ def extract_features(dataset_name, task_name, extractors):
             # If hash fails, use filename
             if stimulus is None:
                 stimulus = db.session.query(
-                    Stimulus).filter_by(filename=res.stim.filename).one()
+                    Stimulus).filter_by(path=res.stim.filename).one()
 
             # Get or create ExtractedEvent
             bulk_ees.append(
