@@ -11,7 +11,6 @@ import { OverviewTab } from './Overview';
 import AnalysisBuilder from './Builder';
 import App from './App';
 
-
 describe('Test moveItem', () => {
   it('Move up', () => {
     expect(moveItem(['zero', 'one', 'two', 'three'], 2, 'up')).toEqual([
