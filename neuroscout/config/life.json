@@ -1,0 +1,17 @@
+{
+  "Life": {
+    "dataset_address": "///labs/haxby/life",
+    "path": "/datasets/life/",
+    "tasks": {
+      "life": {
+        "converters": [
+        ],
+        "extractors": [
+          ["RMSEExtractor", {"frame_length": 72000, "hop_length": 72000, "center": false}]
+        ],
+        "transformations":[
+        ]
+      }
+    }
+  }
+}

@@ -46,7 +46,7 @@
       }
     }
   ],
-  "ClarifaiAPIExtractor": [
+  "ClarifaiAPIImageExtractor": [
     {
       "attributes": { "model_name": "general-v1.3" },
       "features": {
@@ -204,7 +204,8 @@
     {
       "features": {
         ".*": {
-          "description": "RGB Channel."
+          "description": "RGB Channel.",
+          "active": false
         }
       }
     }

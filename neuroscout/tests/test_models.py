@@ -134,9 +134,17 @@ def test_json_local_dataset(session, add_local_task_json):
 	assert ExtractedFeature.query.filter_by(
 		feature_name='Brightness').count() == 1
 
+	num_bright = ExtractedFeature.query.filter_by(feature_name='num_bright')
+	assert num_bright.count() == 1
+	assert num_bright.first().extracted_events.count() == 3
+
+	for ee in num_bright.first().extracted_events:
+		assert ee.value == '1'
+
+
 def test_local_update(update_local_json):
 	assert update_local_json is not None
-	assert ExtractedFeature.query.count() == 4
+	assert ExtractedFeature.query.count() == 6
 
 def test_extracted_features(session, add_task, extract_features):
 	""" This tests feature extraction from a remote dataset"""
