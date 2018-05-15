@@ -14,6 +14,9 @@ logger = get_task_logger(__name__)
 
 def writeout_events(analysis, pes, outdir):
     """ Write event files from JSON """
+    desc = {"Name": "Events", "BIDSVersion": "1.0"}
+    json.dump(desc, (outdir / 'dataset_description.json').open('w'))
+
     outdir = outdir / "func"
     outdir.mkdir(exist_ok=True)
 
