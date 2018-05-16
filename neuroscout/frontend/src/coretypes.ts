@@ -186,6 +186,7 @@ export interface InputType {
 export interface Block {
   model?: BlockModel;
   transformations?: Transformation[];
+  contrasts?: Contrast[];
 }
 
 export interface BlockModel {
