@@ -245,8 +245,7 @@ def add_task(task_name, dataset_name=None, local_path=None,
         # Get duration (helps w/ transformations)
         try:
             img_ni = nib.load(img.filename)
-            run_model.duration = img_ni.shape[3] * img_ni.header.get_zooms()[-1] \
-                                    / 1000
+            run_model.duration = img_ni.shape[3] * img_ni.header.get_zooms()[-1]
         except (nib.filebasedimages.ImageFileError, IndexError) as e:
             current_app.logger.debug(
                 "Error loading BOLD file, default duration used.")
