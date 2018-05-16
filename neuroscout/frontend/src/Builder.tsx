@@ -166,7 +166,8 @@ type BuilderProps = {
 const buildModel = (analysis: Analysis) => {
   let block = {
     level: 'run',
-    transformations: analysis.transformations
+    transformations: analysis.transformations,
+    contrasts: analysis.contrasts
   };
 
   return {
@@ -277,11 +278,16 @@ export default class AnalysisBuilder extends React.Component<BuilderProps, Store
   // and fetch the associated runs
   loadAnalysis = (data: ApiAnalysis): Promise<Analysis> => {
     data.transformations = [];
+    
+    // Extract transformations from within block.
     if (data && data.model && data.model.blocks) {
       for (var i = 0; i < data.model.blocks.length; i++) {
         if (data.model.blocks[i].transformations) {
           data.transformations = data.model.blocks[i].transformations;
         }
+        if (data.model.blocks[i].transformations) {
+          data.contrasts = data.model.blocks[i].contrasts;
+        } 
       }
     }
 
