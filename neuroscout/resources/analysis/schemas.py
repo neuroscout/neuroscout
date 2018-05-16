@@ -93,3 +93,10 @@ class AnalysisResourcesSchema(Schema):
 		'RunSchema', many=True, only='func_path', attribute='runs')
 	mask_paths = fields.Nested(
 		'RunSchema', many=True, only='mask_path', attribute='runs')
+
+class AnalysisCompiledSchema(Schema):
+	""" Simple route for checking if analysis compilation status. """
+	status = fields.Str(description='PASSED, FAILED, PENDING, or DRAFT.',
+		dump_only=True)
+	compile_traceback = fields.Str(
+		description='Traceback of compilation error.')
