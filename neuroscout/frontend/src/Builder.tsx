@@ -22,7 +22,8 @@ import {
   AnalysisConfig,
   Transformation,
   Contrast,
-  Block
+  Block,
+  BidsModel
 } from './coretypes';
 import { displayError, jwtFetch } from './utils';
 import { Space } from './HelperComponents';
@@ -161,6 +162,20 @@ type BuilderProps = {
   id?: string;
   updatedAnalysis: () => void;
 };
+
+const buildModel = (analysis: Analysis) => {
+  let block = {
+    level: 'run',
+    transformations: analysis.transformations
+  };
+
+  return {
+    name: analysis.name,
+    description: analysis.description,
+    blocks: [block]
+  };
+};
+
 export default class AnalysisBuilder extends React.Component<BuilderProps, Store> {
   constructor(props: BuilderProps) {
     super(props);
@@ -189,15 +204,18 @@ export default class AnalysisBuilder extends React.Component<BuilderProps, Store
     if ((!compile && !this.saveEnabled()) || (compile && !this.submitEnabled())) {
       return;
     }
+
     const analysis = this.state.analysis;
     if (analysis.datasetId === null) {
       displayError(Error('Analysis cannot be saved without selecting a dataset'));
       return;
     }
+
     if (!analysis.name) {
       displayError(Error('Analysis cannot be saved without a name'));
       return;
     }
+
     const apiAnalysis: ApiAnalysis = {
       name: analysis.name,
       description: analysis.description,
@@ -211,6 +229,9 @@ export default class AnalysisBuilder extends React.Component<BuilderProps, Store
       contrasts: analysis.contrasts,
       config: analysis.config
     };
+
+    apiAnalysis.model = buildModel(analysis);
+
     // const method = analysis.analysisId ? 'put' : 'post';
     let method: string;
     let url: string;
@@ -255,11 +276,11 @@ export default class AnalysisBuilder extends React.Component<BuilderProps, Store
   // Decode data returned by '/api/analyses/<id>' (ApiAnalysis) to convert it to the right shape (Analysis)
   // and fetch the associated runs
   loadAnalysis = (data: ApiAnalysis): Promise<Analysis> => {
-    if (data.model && data.model.blocks && !data.transformations) {
-      data.transformations = [];
+    data.transformations = [];
+    if (data && data.model && data.model.blocks) {
       for (var i = 0; i < data.model.blocks.length; i++) {
-        if (data.model.blocks[i].transformations != null) {
-          data.transformations = data.transformations.concat(...data.model.blocks[i].transformations!);
+        if (data.model.blocks[i].transformations) {
+          data.transformations = data.model.blocks[i].transformations;
         }
       }
     }
