@@ -23,6 +23,8 @@ class AnalysisSchema(Schema):
 							dump_only=True)
 	status = fields.Str(description='PASSED, FAILED, PENDING, or DRAFT.',
 		dump_only=True)
+	compile_traceback = fields.Str(
+		description='Traceback of compilation error.')
 
 	private = fields.Bool(description='Analysis private or discoverable?')
 
