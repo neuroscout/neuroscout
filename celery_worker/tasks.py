@@ -39,18 +39,16 @@ def writeout_events(analysis, pes, outdir):
         run_events = pes[pes.run_id==run['id']].drop('run_id', axis=1).rename(
             columns={'value': 'amplitude'})
 
+        run['run'] = run.pop('number')
         entities = {r:v for r,v in run.items()
-                    if r in ['number', 'session', 'subject'] and v is not None}
-        if 'number' in entities:
-            entities['run'] = entities.pop('number')
+                    if r in ['run', 'session', 'subject'] and v is not None}
 
-        run_info = RunInfo(entities=entities,
-                           duration=run_events['duration'],
+        run_info = RunInfo(entities=entities, duration=run['duration'],
                            tr=None, image=None)
 
         if run_events.empty is False:
             dfs = []
-            for name, df in run_events.groupby('predictor_id'):
+            for name, df in run_events.groupby('caca'):
                 max_val = df.groupby(['onset', 'duration'])['amplitude'].max().reset_index()
 
                 variable = SparseRunVariable(name, max_val, run_info, 'events')

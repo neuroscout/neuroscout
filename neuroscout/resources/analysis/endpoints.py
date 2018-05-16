@@ -22,7 +22,7 @@ class AnalysisRootResource(AnalysisBaseResource):
 	@marshal_with(AnalysisSchema(many=True))
 	@doc(summary='Returns list of public analyses.')
 	def get(self):
-		return Analysis.query.filter_by(private=False).all()
+		return Analysis.query.filter_by(private=False, status='PASSED').all()
 
 	@use_kwargs(AnalysisSchema)
 	@doc(summary='Add new analysis!')
