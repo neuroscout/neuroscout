@@ -48,7 +48,7 @@ def writeout_events(analysis, pes, outdir):
 
         if run_events.empty is False:
             dfs = []
-            for name, df in run_events.groupby('caca'):
+            for name, df in run_events.groupby('predictor_id'):
                 max_val = df.groupby(['onset', 'duration'])['amplitude'].max().reset_index()
 
                 variable = SparseRunVariable(name, max_val, run_info, 'events')
