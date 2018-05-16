@@ -82,9 +82,11 @@ export type TransformName = 'scale' | 'orthogonalize';
 export interface Transformation {
   name: TransformName;
   input?: string[]; // predictor IDs
-  parameters: Parameter[];
+  demean?: boolean;
+  rescale?: boolean;
+  wrt?: string[];
 }
-
+ 
 // Lookup hash of available transformations (as specified in transforms.ts) by their name
 export interface XformRules {
   [name: string]: Transformation;
@@ -159,20 +161,34 @@ export interface ApiAnalysis {
   contrasts?: Contrast[];
   config: AnalysisConfig;
   modified_at?: string;
-  model?: Model;
+  model?: BidsModel;
 }
 
-export interface Model {
-  blocks: Block[];
+export interface BidsModel {
+  input?: ImageInput[];
+  blocks: Block[] | never[];
+  name: string;
+  description?: string;
+}
+
+export interface ImageInput {
+  include?: InputType[];
+  exclude?: InputType[];
+}
+
+export interface InputType {
+  task?: string[];
+  run?: string[];
+  session?: string[];
+  subject?: string[];
 }
 
 export interface Block {
-  block_model: BlockModel;
+  model?: BlockModel;
   transformations?: Transformation[];
 }
 
 export interface BlockModel {
-  level?: string;
   variables: string[];
   hrf_variables?: string[];
 }
