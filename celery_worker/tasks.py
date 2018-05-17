@@ -10,6 +10,7 @@ from bids.variables import SparseRunVariable
 from bids.variables.entities import RunInfo
 from bids.grabbids import BIDSLayout
 from celery.contrib import rdb
+from copy import deepcopy
 
 logger = get_task_logger(__name__)
 
@@ -75,7 +76,6 @@ def compile(analysis, predictor_events, resources, bids_dir):
     files_dir = Path(mkdtemp())
     model = analysis.pop('model')
     scan_length = analysis['runs'][0]['duration']
-
     subject = [model['input']['subject'][0]]
 
     # Write out events
@@ -83,7 +83,7 @@ def compile(analysis, predictor_events, resources, bids_dir):
 
     # Load events and try applying transformations
     bids_layout = BIDSLayout(bids_dir, config=[('bids', [bids_dir, files_dir.as_posix()])])
-    bids_analysis = Analysis(bids_layout, model)
+    bids_analysis = Analysis(bids_layout, deepcopy(model))
     bids_analysis.setup(derivatives='only', task=analysis['task_name'],
                         scan_length=scan_length, subject=subject)
 
