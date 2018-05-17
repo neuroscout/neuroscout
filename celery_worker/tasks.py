@@ -16,7 +16,7 @@ logger = get_task_logger(__name__)
 
 def get_events_path(entities, task_name):
     ses = 'ses-{}_'.format(entities['session']) if entities.get('session') else ''
-    run_num = 'run-{}_'.format(entities['number']) if entities.get('number') else ''
+    run_num = 'run-{}_'.format(entities['run']) if entities.get('run') else ''
     fname = 'sub-{}_{}task-{}_{}events.tsv'.format(
         entities['subject'], ses, task_name, run_num)
 
