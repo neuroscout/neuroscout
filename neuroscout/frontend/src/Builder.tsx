@@ -61,7 +61,14 @@ const initializeStore = (): Store => ({
     private: true,
     config: defaultConfig,
     transformations: [],
-    contrasts: []
+    contrasts: [],
+    model: {
+      blocks: [{
+        level: 'run',
+        transformations: [],
+        contrasts: []
+      }]
+    }
   },
   datasets: [],
   availableTasks: [],
@@ -69,7 +76,8 @@ const initializeStore = (): Store => ({
   selectedTaskId: null,
   availablePredictors: [],
   selectedPredictors: [],
-  unsavedChanges: false
+  unsavedChanges: false,
+  currentLevel: 'run'
 });
 
 const getJwt = () =>
@@ -282,6 +290,9 @@ export default class AnalysisBuilder extends React.Component<BuilderProps, Store
     // Extract transformations from within block.
     if (data && data.model && data.model.blocks) {
       for (var i = 0; i < data.model.blocks.length; i++) {
+        if (data.model.blocks[i].level !== this.state.currentLevel) {
+          continue;
+        }
         if (data.model.blocks[i].transformations) {
           data.transformations = data.model.blocks[i].transformations;
         }
