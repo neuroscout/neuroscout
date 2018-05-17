@@ -20,6 +20,7 @@ export interface Analysis {
   config: AnalysisConfig;
   transformations: Transformation[];
   contrasts: Contrast[];
+  model?: BidsModel;
 }
 
 // Normalized dataset object in Analysis Builder
@@ -79,6 +80,8 @@ export type Parameter = BooleanParam | PredictorsParam;
 
 export type TransformName = 'scale' | 'orthogonalize';
 
+export type BlockLevel = 'run' | 'session' | 'subject' | 'dataset';
+
 export interface Transformation {
   name: TransformName;
   input?: string[]; // predictor IDs
@@ -126,6 +129,7 @@ export interface Store {
   // but store these separately for performance reasons
   selectedPredictors: Predictor[];
   unsavedChanges: boolean;
+  currentLevel: BlockLevel;
 }
 
 // Dataset object as returned by /api/datasets
@@ -166,8 +170,8 @@ export interface ApiAnalysis {
 
 export interface BidsModel {
   input?: ImageInput[];
-  blocks: Block[] | never[];
-  name: string;
+  blocks?: Block[] | never[];
+  name?: string;
   description?: string;
 }
 
@@ -187,6 +191,7 @@ export interface Block {
   model?: BlockModel;
   transformations?: Transformation[];
   contrasts?: Contrast[];
+  level: string;
 }
 
 export interface BlockModel {
