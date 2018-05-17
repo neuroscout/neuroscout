@@ -6,11 +6,22 @@ import json
 from pathlib import Path
 from tempfile import mkdtemp
 from bids.analysis import Analysis
+from bids.variables import SparseRunVariable
+from bids.variables.entities import RunInfo
 from bids.grabbids import BIDSLayout
 from celery.contrib import rdb
+from copy import deepcopy
 
 logger = get_task_logger(__name__)
 
+
+def get_events_path(entities, task_name):
+    ses = 'ses-{}_'.format(entities['session']) if entities.get('session') else ''
+    run_num = 'run-{}_'.format(entities['run']) if entities.get('run') else ''
+    fname = 'sub-{}_{}task-{}_{}events.tsv'.format(
+        entities['subject'], ses, task_name, run_num)
+
+    return fname
 
 def writeout_events(analysis, pes, outdir):
     """ Write event files from JSON """
@@ -29,28 +40,37 @@ def writeout_events(analysis, pes, outdir):
     paths = []
     for run in analysis.pop('runs'):
         ## Write out event files for each run_id
-        run_events = pes[pes.run_id==run['id']].drop('run_id', axis=1)
+        run_events = pes[pes.run_id==run['id']].drop('run_id', axis=1).rename(
+            columns={'value': 'amplitude'})
+
+        run['run'] = run.pop('number')
+        entities = {r:v for r,v in run.items()
+                    if r in ['run', 'session', 'subject'] and v is not None}
+
+        run_info = RunInfo(entities=entities, duration=run['duration'],
+                           tr=None, image=None)
 
         if run_events.empty is False:
-            # Make wide
-            run_events = run_events.groupby(
-                ['onset', 'duration', 'predictor_id'])['value'].\
-                max().unstack('predictor_id').reset_index()
+            dfs = []
+            for name, df in run_events.groupby('predictor_id'):
+                max_val = df.groupby(['onset', 'duration'])['amplitude'].max().reset_index()
 
-            # Missing columns
-            missing = set(predictor_names.values()) - set(run_events.columns)
-            for col in missing:
-                run_events[col] = 0.0
+                variable = SparseRunVariable(name, max_val, run_info, 'events')
 
-            run_events = run_events.fillna(0.0)
+                ## TODO: Only up sample variables to convert nas to 0
+                df = variable.to_dense(2).to_df()
+                df['condition'] = name
+                dfs.append(df)
+
+            dfs = pd.concat(dfs)
+            dfs['amplitude'] = dfs['amplitude'].astype('float')
+            dfs = dfs.pivot_table(index=['onset', 'duration'], values='amplitude',
+                            columns=['condition']).reset_index()
 
             # Write out BIDS path
-            ses = 'ses-{}_'.format(run['session']) if run.get('session') else ''
-            run_num = 'run-{}_'.format(run['number']) if run.get('number') else ''
-            events_fname = outdir / 'sub-{}_{}task-{}_{}events.tsv'.format(
-                run['subject'], ses, analysis['task_name'], run_num)
-            paths.append(events_fname)
-            run_events.to_csv(events_fname, sep='\t', index=False)
+            fname = outdir / get_events_path(entities, analysis['task_name'])
+            paths.append(fname)
+            dfs.to_csv(fname, sep='\t', index=False)
 
     return paths
 
@@ -59,15 +79,16 @@ def compile(analysis, predictor_events, resources, bids_dir):
     files_dir = Path(mkdtemp())
     model = analysis.pop('model')
     scan_length = analysis['runs'][0]['duration']
+    subject = [model['input']['subject'][0]]
 
     # Write out events
     bundle_paths = writeout_events(analysis, predictor_events, files_dir)
 
     # Load events and try applying transformations
-    bids_layout = BIDSLayout([bids_dir, files_dir.as_posix()])
-    bids_analysis = Analysis(bids_layout, model)
+    bids_layout = BIDSLayout(bids_dir, config=[('bids', [bids_dir, files_dir.as_posix()])])
+    bids_analysis = Analysis(bids_layout, deepcopy(model))
     bids_analysis.setup(derivatives='only', task=analysis['task_name'],
-                        scan_length=scan_length)
+                        scan_length=scan_length, subject=subject)
 
     # Write out analysis & resource JSON
     for obj, name in [(analysis, 'analysis'), (resources, 'resources'), (model, 'model')]:

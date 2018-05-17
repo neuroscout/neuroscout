@@ -22,17 +22,15 @@ def test_get(session, auth_client, add_analysis):
 	assert resp.status_code == 200
 	analysis_list = decode_json(resp)
 	assert type(analysis_list) == list
-	assert len(analysis_list) == 1 # Analysis should now be public
+	assert len(analysis_list) == 0 # Analysis should not be displayed, yet...
 
 	# Get first analysis
-	assert 'hash_id' in decode_json(resp)[0]
-	first_analysis_id = decode_json(resp)[0]['hash_id']
+	first_analysis_id = analysis.hash_id
 
 	# Get first analysis by id
 	resp= auth_client.get('/api/analyses/{}'.format(first_analysis_id))
 	assert resp.status_code == 200
 	analysis = decode_json(resp)
-	assert analysis_list[0] == analysis
 
 	for required_fields in ['name', 'description']:
 		assert analysis[required_fields] != ''
@@ -247,11 +245,11 @@ def test_compile(auth_client, add_analysis, add_analysis_fail):
 	locked_analysis = decode_json(resp)
 
 	# Test status after some time
-	resp = auth_client.get('/api/analyses/{}'.format(analysis_bad.hash_id))
+	resp = auth_client.get('/api/analyses/{}/status'.format(analysis_bad.hash_id))
 	timeout = time.time() + 60*1   # 1 minute timeout
 	while decode_json(resp)['status'] == 'PENDING':
 		time.sleep(0.2)
-		resp = auth_client.get('/api/analyses/{}'.format(analysis_bad.hash_id))
+		resp = auth_client.get('/api/analyses/{}/status'.format(analysis_bad.hash_id))
 		if time.time() > timeout:
 			assert 0
 			break
@@ -287,18 +285,18 @@ def test_compile(auth_client, add_analysis, add_analysis_fail):
 	assert decode_json(resp)['name'] != "Should not change to this"
 
 	# Test status after some time
-	resp = auth_client.get('/api/analyses/{}'.format(analysis.hash_id))
+	resp = auth_client.get('/api/analyses/{}/status'.format(analysis.hash_id))
 	timeout = time.time() + 60*1   # 1 minute timeout
 	while decode_json(resp)['status'] == 'PENDING':
 		time.sleep(0.2)
 		if time.time() > timeout:
 			assert 0
 			break
-		resp = auth_client.get('/api/analyses/{}'.format(analysis.hash_id))
+		resp = auth_client.get('/api/analyses/{}/status'.format(analysis.hash_id))
 
 	if decode_json(resp)['status'] != 'PASSED':
 		assert 0
-		
+
 	# Try deleting locked analysis
 	resp = auth_client.delete('/api/analyses/{}'.format(analysis.hash_id))
 	assert resp.status_code == 422
