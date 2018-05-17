@@ -175,7 +175,11 @@ const buildModel = (analysis: Analysis) => {
   let block = {
     level: 'run',
     transformations: analysis.transformations,
-    contrasts: analysis.contrasts
+    contrasts: analysis.contrasts,
+    model: {
+      variables: analysis.predictorIds,
+      hrf_variables: analysis.predictorIds
+    }
   };
 
   return {
