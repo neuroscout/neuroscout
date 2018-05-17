@@ -172,13 +172,15 @@ def add_analysis(session, add_users, add_task, extract_features):
         PredictorEvent.run_id.in_(run_id)).distinct(
             'predictor_id').with_entities('predictor_id').all()
 
-    analysis.predictors = Predictor.query.filter(Predictor.id.in_(pred_id)).all()
+    analysis.predictors = Predictor.query.filter(Predictor.id.in_(pred_id),
+                                                 Predictor.name.in_(['Brightness', 'rt'])).all()
 
     analysis.model = {
         "name": "test_model1",
         "description": "this is a sample",
         "input": {
-          "task": "bidstest"
+          "task": "bidstest",
+          "subject": ["01", "02"]
         },
         "blocks": [
           {

@@ -3,7 +3,7 @@
 from .endpoints import (AnalysisResource, AnalysisRootResource,
                        AnalysisBundleResource, CloneAnalysisResource,
                        CompileAnalysisResource, AnalysisFullResource,
-                       AnalysisResourcesResource)
+                       AnalysisResourcesResource, AnalysisStatusResource)
 
 __all__ = [
     'AnalysisResource',
@@ -11,6 +11,7 @@ __all__ = [
     'AnalysisFullResource',
     'AnalysisResourcesResource',
     'AnalysisBundleResource',
+    'AnalysisStatusResource',
     'CloneAnalysisResource',
     'CompileAnalysisResource',
     ]
