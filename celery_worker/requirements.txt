@@ -10,3 +10,6 @@ patsy
 networkx==1.9
 nibabel
 scipy
+Flask-SQLAlchemy==2.2
+psycopg2==2.7.1
+Flask==0.12.1

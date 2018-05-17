@@ -26,4 +26,6 @@ RUN git config --global  user.email "delavega@utexas.edu"
 RUN crontab /usr/src/app/update.txt
 RUN service cron start
 
+RUN pip install -e /neuroscout
+
 WORKDIR /neuroscout

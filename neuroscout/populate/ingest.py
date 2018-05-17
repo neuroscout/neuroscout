@@ -19,7 +19,7 @@ from .utils import remote_resource_exists, format_preproc, hash_stim
 from utils import listify, get_or_create
 from models import (Dataset, Task, Run, Predictor, PredictorEvent, PredictorRun,
                     Stimulus, RunStimulus, GroupPredictor, GroupPredictorValue)
-from database import db
+from app import db
 from progressbar import progressbar
 
 

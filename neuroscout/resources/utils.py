@@ -7,7 +7,7 @@ from models import Analysis
 
 import celery.states as states
 from worker import celery_app
-from database import db
+from app import db
 from utils import put_record
 
 def abort(code, message=''):

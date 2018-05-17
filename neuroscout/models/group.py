@@ -1,4 +1,4 @@
-from database import db
+from app import db
 
 class GroupPredictor(db.Model):
     """ Group-level predictors, e.g. across subjects, sessions, etc... """

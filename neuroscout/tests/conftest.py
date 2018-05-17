@@ -3,7 +3,7 @@ from pathlib import Path
 import pytest
 from flask_security.utils import encrypt_password
 from core import app as _app
-from database import db as _db
+from app import db as _db
 import datetime
 import sqlalchemy as sa
 import pandas as pd

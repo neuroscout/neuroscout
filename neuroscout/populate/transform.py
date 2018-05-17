@@ -1,7 +1,7 @@
 """" Custom transformations of extracted features """
 from models import (Dataset, ExtractedFeature, ExtractedEvent,
                     Stimulus, RunStimulus, Run, Task)
-from database import db
+from app import db
 from sqlalchemy import func
 from .utils import hash_data
 from .extract import create_predictors

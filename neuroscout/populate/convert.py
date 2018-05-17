@@ -2,7 +2,7 @@
 To apply pliers converters to create new stimuli from original dataset stims.
 """
 from flask import current_app
-from database import db
+from app import db
 from pathlib import Path
 
 from pliers.stimuli import (TextStim, ImageStim, VideoFrameStim,

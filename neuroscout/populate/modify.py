@@ -6,7 +6,7 @@ TODO
 """
 
 from models import Dataset, Task
-from database import db
+from app import db
 
 def delete_task(dataset, task):
     """ Deletes BIDS dataset task from the database, and *all* associated

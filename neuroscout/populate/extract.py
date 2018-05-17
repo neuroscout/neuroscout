@@ -3,7 +3,7 @@ Set of methods to extract features from stimuli in a dataset and generate
 the associated predictors
 """
 from flask import current_app
-from database import db
+from app import db
 import json
 import re
 import pandas as pd

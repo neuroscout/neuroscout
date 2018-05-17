@@ -1,12 +1,7 @@
 # -*- coding: utf-8 -*-
 """ Core Neuroscout App """
-import os
-from flask import Flask, send_file, render_template, url_for
-from database import db
-
-app = Flask(__name__, static_folder='/static')
-app.config.from_object(os.environ['APP_SETTINGS'])
-db.init_app(app)
+from flask import send_file, render_template, url_for
+from app import db, app
 
 from flask_mail import Mail
 mail = Mail(app)

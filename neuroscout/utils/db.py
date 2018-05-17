@@ -3,7 +3,7 @@
 """
 from flask import abort, current_app
 from sqlalchemy.exc import SQLAlchemyError
-from database import db
+from app import db
 
 def copy_row(model, row, ignored_columns=[], ignored_relationships=[]):
     copy = model()
