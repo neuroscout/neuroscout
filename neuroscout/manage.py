@@ -10,9 +10,9 @@ from flask_script import Manager, Shell
 from flask_migrate import Migrate, MigrateCommand
 from flask_security.utils import encrypt_password
 
-import populate
+import neuroscout.populate as populate
 from core import app, db
-from models import user_datastore
+from .models import user_datastore
 
 app.config.from_object(os.environ['APP_SETTINGS'])
 

@@ -1,4 +1,4 @@
-from database import db
+from ..app import db
 
 # Association table between analysis and run.
 analysis_run = db.Table('analysis_run',

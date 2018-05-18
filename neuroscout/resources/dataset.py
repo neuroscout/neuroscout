@@ -1,6 +1,6 @@
 from flask_apispec import MethodResource, marshal_with, doc
 from marshmallow import Schema, fields
-from models import Dataset
+from ..models import Dataset
 from .utils import first_or_404
 
 class DatasetSchema(Schema):

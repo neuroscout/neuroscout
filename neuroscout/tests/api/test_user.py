@@ -51,7 +51,7 @@ def test_put(auth_client):
 	assert 'Email already in use' in decode_json(resp)['message']
 
 from flask_security.confirmable import confirm_user
-from models.auth import User
+from neuroscout.models.auth import User
 def test_create_new(auth_client, session):
 	# Make a new user and authorize
 	resp = auth_client.post('/api/user',

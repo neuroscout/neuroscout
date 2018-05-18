@@ -1,4 +1,4 @@
-from database import db
+from ..app import db
 import datetime
 
 class ExtractedFeature(db.Model):

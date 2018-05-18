@@ -3,11 +3,11 @@ from flask_jwt import jwt_required, current_identity
 from flask_apispec import doc
 import datetime
 from webargs.flaskparser import parser
-from models import Analysis
+from neuroscout.models import Analysis
 
 import celery.states as states
 from worker import celery_app
-from database import db
+from ..app import db
 from utils import put_record
 
 def abort(code, message=''):
@@ -29,7 +29,7 @@ def update_analysis_status(analysis, commit=True):
         res = celery_app.AsyncResult(analysis.celery_id)
         if res.state == states.FAILURE:
             analysis.status = "FAILED"
-            analysis.compile_traceback = res.traceback 
+            analysis.compile_traceback = res.traceback
         elif res.state == states.SUCCESS:
             analysis = put_record(res.result, analysis, commit=commit)
             analysis.status = "PASSED"

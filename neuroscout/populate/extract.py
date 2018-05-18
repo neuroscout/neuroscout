@@ -3,20 +3,20 @@ Set of methods to extract features from stimuli in a dataset and generate
 the associated predictors
 """
 from flask import current_app
-from database import db
 import json
 import re
 import pandas as pd
 from pathlib import Path
 import datetime
 from progressbar import progressbar
-from utils import get_or_create
 
 from pliers.stimuli import load_stims, ComplexTextStim, TextStim
 from pliers.transformers import get_transformer
 from pliers.extractors import merge_results
 
-from models import (Dataset, Task, Predictor, PredictorEvent, PredictorRun,
+from ..app import db
+from ..utils import get_or_create
+from ..models import (Dataset, Task, Predictor, PredictorEvent, PredictorRun,
     Run, Stimulus, RunStimulus, ExtractedFeature, ExtractedEvent)
 from .utils import hash_data, hash_stim
 

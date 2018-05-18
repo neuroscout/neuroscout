@@ -1,5 +1,5 @@
 """ Auth related functions """
-from models.auth import user_datastore, User
+from .models.auth import user_datastore, User
 from flask_security.utils import verify_password
 from flask_security.confirmable import generate_confirmation_token
 from flask_security.recoverable import generate_reset_password_token
