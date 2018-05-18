@@ -1,4 +1,4 @@
-from app import db
+from ..app import db
 
 class Stimulus(db.Model):
 	""" A unique stimulus. A stimulus may occur at different points in time,

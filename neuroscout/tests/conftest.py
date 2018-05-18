@@ -2,8 +2,8 @@ from os import environ
 from pathlib import Path
 import pytest
 from flask_security.utils import encrypt_password
-from core import app as _app
-from app import db as _db
+from ..app import app as _app
+from ..app import db as _db
 import datetime
 import sqlalchemy as sa
 import pandas as pd
@@ -78,7 +78,7 @@ def auth_client(add_users):
 """
 Data population fixtures
 """
-from models import (Analysis, Result, Predictor,
+from neuroscout.models import (Analysis, Result, Predictor,
                     PredictorEvent, User, Role, Dataset)
 import populate
 

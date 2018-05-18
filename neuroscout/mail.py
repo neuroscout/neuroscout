@@ -3,7 +3,7 @@
 """
 from flask import render_template, current_app
 from flask_mail import Message
-from core import mail
+from .core import mail
 
 def send_confirm_mail(recipient, name, confirmation_link):
     """Send account confirmation email

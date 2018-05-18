@@ -7,10 +7,9 @@
         "converters": [
         ],
         "extractors": [
-          ["ComplexTextExtractor", {}]
+          ["RMSEExtractor", {"frame_length": 44100, "hop_length": 44100, "center": false}]
         ],
         "transformations": [
-          
         ]
       }
     }

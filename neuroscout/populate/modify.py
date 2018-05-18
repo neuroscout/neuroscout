@@ -5,8 +5,8 @@ TODO
  - Add tools to create new predictors from existing features
 """
 
-from models import Dataset, Task
-from app import db
+from ..models import Dataset, Task
+from ..app import db
 
 def delete_task(dataset, task):
     """ Deletes BIDS dataset task from the database, and *all* associated

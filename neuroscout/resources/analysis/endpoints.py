@@ -2,8 +2,8 @@ from flask import send_file
 from flask_apispec import MethodResource, marshal_with, use_kwargs, doc
 from flask_jwt import current_identity
 from worker import celery_app
-from app import db
-from models import Analysis, PredictorEvent
+from ...app import db
+from ...models import Analysis, PredictorEvent
 from os.path import exists
 
 from utils.db import put_record

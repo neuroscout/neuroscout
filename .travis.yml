@@ -2,7 +2,7 @@ language: python
 python:
   - "3.5"
 install:
-  - pip install -r neuroscout/requirements.txt
+  - pip install -r requirements.txt
   - pip install -e git+https://github.com/tyarkoni/pliers.git#egg=pliers
   - pip install pytest-cov
 script:

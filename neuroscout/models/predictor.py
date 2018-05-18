@@ -1,4 +1,4 @@
-from app import db
+from ..app import db
 import statistics
 
 class Predictor(db.Model):

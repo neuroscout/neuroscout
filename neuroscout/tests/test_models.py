@@ -1,12 +1,12 @@
 import pytest
 import os
 from sqlalchemy import func
-from models import (Analysis, User, Dataset, Predictor, Stimulus, Run,
+from ..models import (Analysis, User, Dataset, Predictor, Stimulus, Run,
 					RunStimulus, Result, ExtractedFeature, PredictorEvent,
 					GroupPredictor, Task)
 
 from numpy import isclose
-from populate.convert import ingest_text_stimuli
+from ..populate.convert import ingest_text_stimuli
 
 def test_dataset_ingestion(session, add_task):
 	dataset_model = Dataset.query.filter_by(id=add_task).one()

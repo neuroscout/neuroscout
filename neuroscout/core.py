@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """ Core Neuroscout App """
 from flask import send_file, render_template, url_for
-from app import db, app
+from neuroscout.app import db, app
 
 from flask_mail import Mail
 mail = Mail(app)
@@ -10,7 +10,7 @@ from flask_jwt import JWT
 from flask_security import Security
 from flask_security.confirmable import confirm_email_token_status, confirm_user
 from auth import authenticate, load_user, add_auth_to_swagger
-from models import *
+from neuroscout.models import *
 
 # Setup Flask-Security and JWT
 security = Security(app, user_datastore)

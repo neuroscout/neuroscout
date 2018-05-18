@@ -1,10 +1,10 @@
 from marshmallow import Schema, fields, post_dump
 import webargs as wa
 from flask_apispec import MethodResource, marshal_with, use_kwargs, doc
-from models import Predictor, PredictorEvent
 from .utils import first_or_404
 from sqlalchemy import func
-from app import db
+from ..app import db
+from ..models import Predictor, PredictorEvent
 
 class ExtractedFeatureSchema(Schema):
     id = fields.Int(description="Extractor id")

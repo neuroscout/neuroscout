@@ -4,6 +4,7 @@ redis
 docopt
 -e git+https://github.com/INCF/pybids.git#egg=pybids
 -e git+https://github.com/grabbles/grabbit.git#egg=grabbit
+-e git+https://github.com/PsychoinformaticsLab/neuroscout.git@celery_sql#egg=neuroscout
 duecredit
 pandas
 patsy
@@ -13,3 +14,5 @@ scipy
 Flask-SQLAlchemy==2.2
 psycopg2==2.7.1
 Flask==0.12.1
+hashids
+flask_security

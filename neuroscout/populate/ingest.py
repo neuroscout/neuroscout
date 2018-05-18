@@ -16,10 +16,10 @@ from datalad.api import install
 from datalad.auto import AutomagicIO
 
 from .utils import remote_resource_exists, format_preproc, hash_stim
-from utils import listify, get_or_create
-from models import (Dataset, Task, Run, Predictor, PredictorEvent, PredictorRun,
+from ..utils import listify, get_or_create
+from ..models import (Dataset, Task, Run, Predictor, PredictorEvent, PredictorRun,
                     Stimulus, RunStimulus, GroupPredictor, GroupPredictorValue)
-from app import db
+from ..app import db
 from progressbar import progressbar
 
 

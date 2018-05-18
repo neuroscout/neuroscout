@@ -1,4 +1,4 @@
-from app import db
+from ..app import db
 
 class Result(db.Model):
 	"""" Some representation of the result of an analysis. TBD """

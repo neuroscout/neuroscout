@@ -1,5 +1,5 @@
 from marshmallow import Schema, fields, validates, ValidationError, post_load
-from models import  Dataset, Run, Predictor
+from ...models import  Dataset, Run, Predictor
 
 class AnalysisSchema(Schema):
 	""" Primary analysis schema """

@@ -2,14 +2,14 @@
 To apply pliers converters to create new stimuli from original dataset stims.
 """
 from flask import current_app
-from app import db
 from pathlib import Path
 
 from pliers.stimuli import (TextStim, ImageStim, VideoFrameStim,
                             ComplexTextStim, VideoStim, AudioStim, load_stims)
 from pliers.transformers import get_transformer
 
-from models import Dataset, Task, Run, Stimulus, RunStimulus
+from ..app import db
+from ..models import Dataset, Task, Run, Stimulus, RunStimulus
 
 from .utils import hash_stim
 from .ingest import add_stimulus

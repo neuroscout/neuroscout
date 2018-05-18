@@ -27,7 +27,7 @@
     ["MeanAmplitudeExtractor", {}],
     ["SpectralCentroidExtractor", {}],
     ["VADERSentimentExtractor", {}],
-    ["RMSEExtractor", {"frame_length": 72000, "hop_length": 72000, "center": false}],
+    ["RMSEExtractor", {"frame_length": 44100, "hop_length": 44100, "center": false}],
     ["ComplexTextExtractor", {}]
   ],
   "transformations":[
