@@ -1,5 +1,5 @@
 from tests.request_utils import decode_json
-from ...models import Analysis, Run
+from neuroscout.models import Analysis, Run
 import pytest
 import os
 import time
