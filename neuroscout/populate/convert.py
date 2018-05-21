@@ -149,7 +149,8 @@ def convert_stimuli(dataset_name, task_name, converters):
     return total_new_stims
 
 def ingest_text_stimuli(filename, dataset_name, task_name, parent_ids,
-                        transformer='FAVEAlign', params=None, onsets=None):
+                        transformer='FAVEAlign', params=None, onsets=None,
+                        resample_ratio=1):
     """ Ingest converted text stimuli from file.
     Args:
         filename - aligned transcript, with onset, duration and text columns
@@ -158,6 +159,8 @@ def ingest_text_stimuli(filename, dataset_name, task_name, parent_ids,
         transformer - Transformer name
         params - Extra parameters to recordings
         onsets - onset of the parent stimulus relative to the transcript.
+        resample_ratio - Ratio to multiply onsets (after cropping) to adjust for
+                         variable play speeds.
     """
     df = pd.read_csv(filename, delimiter='\t')
     parent_ids = listify(parent_ids)
@@ -175,7 +178,7 @@ def ingest_text_stimuli(filename, dataset_name, task_name, parent_ids,
     for onset, parent_id in zip(onsets, parent_ids):
         # Trim and align trancript
         sub = df[df.onset > onset]
-        sub['onset'] = sub['onset'] - onset
+        sub['onset'] = (sub['onset'] - onset) * resample_ratio
 
         duration = max(db.session.query(RunStimulus.duration).filter_by(
             stimulus_id=parent_id).distinct())[0]
@@ -198,6 +201,7 @@ def ingest_text_stimuli(filename, dataset_name, task_name, parent_ids,
 
         params['onset'] = onset
         params['duration'] = duration
+        params['resample_ratio'] = resample_ratio
 
         create_new_stimuli(
             dataset_id, task_name, parent_id, new_stims, rs_orig,
