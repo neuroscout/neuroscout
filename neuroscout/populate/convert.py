@@ -155,6 +155,7 @@ def ingest_text_stimuli(filename, dataset_name, task_name, parent_ids,
     Args:
         filename - aligned transcript, with onset, duration and text columns
         dataset_name - Name of dataset in debug
+        task_name - Task name
         parent_ids - Parent stimulus db id(s)
         transformer - Transformer name
         params - Extra parameters to recordings
@@ -185,7 +186,7 @@ def ingest_text_stimuli(filename, dataset_name, task_name, parent_ids,
         if onset < 0:
             duration = duration - onset
         sub = sub[sub.onset < duration]
-
+        
         # Get associations with parent stimulus
         rs_orig = RunStimulus.query.filter_by(stimulus_id=parent_id).join(
             Run).join(Task).filter_by(name=task_name)

@@ -229,13 +229,12 @@ def test_external_text(get_data_path, add_task):
 	stim = Stimulus.query.filter_by(dataset_id=dataset_model.id).first()
 
 	ingest_text_stimuli(filename, dataset_model.name, task_name, stim.id,
-						'FakeTextExtraction')
+						transformer='FakeTextExtraction')
 
 	data = [s for s in Stimulus.query.all() if s.content is not None]
 
 	first_stim = [s for s in data if s.content == 'no'][0]
-	rs = RunStimulus.query.filter_by(stimulus_id=first_stim.id).all()
 
 	assert len(data) == 2
-	assert len(rs) == 4
-	assert 7.922 in [s.onset for s in rs]
+	assert first_stim.run_stimuli.count() == 4
+	assert 2.2 in [s.onset for s in first_stim.run_stimuli]
