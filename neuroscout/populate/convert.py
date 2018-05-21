@@ -10,7 +10,7 @@ from pliers.stimuli import (TextStim, ImageStim, VideoFrameStim,
 from pliers.transformers import get_transformer
 
 from models import Dataset, Task, Run, Stimulus, RunStimulus
-
+from utils.core import listify
 from .utils import hash_stim
 from .ingest import add_stimulus
 
@@ -148,25 +148,62 @@ def convert_stimuli(dataset_name, task_name, converters):
 
     return total_new_stims
 
-def ingest_text_stimuli(filename, dataset_name, task_name, parent_id,
-                        transformer, transformer_params=None, offset=0):
-    """ Ingest converted text stimuli from file. """
-    ## This ingests from a single parent stim. May want to refactor
-    ## for more complex files (e.g. multiple parents)
+def ingest_text_stimuli(filename, dataset_name, task_name, parent_ids,
+                        transformer='FAVEAlign', params=None, onsets=None,
+                        resample_ratio=1):
+    """ Ingest converted text stimuli from file.
+    Args:
+        filename - aligned transcript, with onset, duration and text columns
+        dataset_name - Name of dataset in debug
+        task_name - Task name
+        parent_ids - Parent stimulus db id(s)
+        transformer - Transformer name
+        params - Extra parameters to recordings
+        onsets - onset of the parent stimulus relative to the transcript.
+        resample_ratio - Ratio to multiply onsets (after cropping) to adjust for
+                         variable play speeds.
+    """
     df = pd.read_csv(filename, delimiter='\t')
+    parent_ids = listify(parent_ids)
+    onsets = listify(onsets)
+    if params is None:
+        params = {}
+
     dataset_id = Dataset.query.filter_by(name=dataset_name).one().id
 
-    ## Get associations with parent stimulus
-    rs_orig = RunStimulus.query.filter_by(stimulus_id=parent_id).join(
-        Run).join(Task).filter_by(name=task_name)
+    if onsets is None:
+        onsets = [0] * len(parent_ids)
+    if len(parent_ids) != len(onsets):
+        raise ValueError("parent_ids must match number of onsets")
 
-    if not rs_orig.count():
-        raise Exception("No RunStimulus associations match.")
+    for onset, parent_id in zip(onsets, parent_ids):
+        # Trim and align trancript
+        sub = df[df.onset > onset]
+        sub['onset'] = (sub['onset'] - onset) * resample_ratio
 
-    new_stims = [
-        ComplexTextStim(text=row['text'], onset=row['onset'] + offset, duration=row.get('duration'))
-        for ix, row in df.iterrows()]
+        duration = max(db.session.query(RunStimulus.duration).filter_by(
+            stimulus_id=parent_id).distinct())[0]
+        if onset < 0:
+            duration = duration - onset
+        sub = sub[sub.onset < duration]
+        
+        # Get associations with parent stimulus
+        rs_orig = RunStimulus.query.filter_by(stimulus_id=parent_id).join(
+            Run).join(Task).filter_by(name=task_name)
 
-    create_new_stimuli(
-        dataset_id, task_name, parent_id, new_stims, rs_orig,
-        transformer=transformer, transformer_params=transformer_params)
+        if not rs_orig.count():
+            raise Exception("No RunStimulus associations match.")
+
+        # Create new stimuli
+        new_stims = [
+            ComplexTextStim(text=row['text'], onset=row['onset'],
+                            duration=row.get('duration'))
+            for ix, row in sub.iterrows()]
+
+        params['onset'] = onset
+        params['duration'] = duration
+        params['resample_ratio'] = resample_ratio
+
+        create_new_stimuli(
+            dataset_id, task_name, parent_id, new_stims, rs_orig,
+            transformer=transformer, transformer_params=params)
