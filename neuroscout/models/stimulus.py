@@ -30,8 +30,9 @@ class Stimulus(db.Model):
 	converter_parameters = db.Column(db.Text)
 
 	extracted_events = db.relationship('ExtractedEvent', lazy='dynamic')
-	runs = db.relationship('Run', secondary='run_stimulus')
-	run_stimuli = db.relationship('RunStimulus', lazy='dynamic')
+	runs = db.relationship('Run',secondary='run_stimulus')
+	run_stimuli = db.relationship('RunStimulus', lazy='dynamic',
+							   	  backref='stimulus')
 
 	def __repr__(self):
 	    return '<models.Stimulus[hash={}]>'.format(self.sha1_hash)
