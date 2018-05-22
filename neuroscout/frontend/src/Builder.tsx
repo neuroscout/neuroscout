@@ -76,6 +76,7 @@ const initializeStore = (): Store => ({
   selectedTaskId: null,
   availablePredictors: [],
   selectedPredictors: [],
+  selectedHRFPredictors: [],
   unsavedChanges: false,
   currentLevel: 'run'
 });
@@ -290,7 +291,7 @@ export default class AnalysisBuilder extends React.Component<BuilderProps, Store
   // and fetch the associated runs
   loadAnalysis = (data: ApiAnalysis): Promise<Analysis> => {
     data.transformations = [];
-    
+
     // Extract transformations from within block.
     if (data && data.model && data.model.blocks) {
       for (var i = 0; i < data.model.blocks.length; i++) {
@@ -466,6 +467,7 @@ export default class AnalysisBuilder extends React.Component<BuilderProps, Store
       selectedTaskId,
       availablePredictors,
       selectedPredictors,
+      selectedHRFPredictors,
       unsavedChanges
     } = this.state;
     const statusText: string = {
@@ -526,6 +528,13 @@ export default class AnalysisBuilder extends React.Component<BuilderProps, Store
                   availablePredictors={availablePredictors}
                   selectedPredictors={selectedPredictors}
                   updateSelection={this.updateState('selectedPredictors')}
+                />
+                <br/>
+                <h3>HRF Variables:</h3>
+                <PredictorSelector
+                  availablePredictors={selectedPredictors}
+                  selectedPredictors={selectedHRFPredictors}
+                  updateSelection={this.updateState('selectedHRFPredictors')}
                 />
               </TabPane>
               <TabPane

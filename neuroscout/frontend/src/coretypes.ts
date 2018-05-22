@@ -128,6 +128,7 @@ export interface Store {
   // Technically selectedPredictors is redundant because we're also storing Analysis.predictorIds
   // but store these separately for performance reasons
   selectedPredictors: Predictor[];
+  selectedHRFPredictors: Predictor[];
   unsavedChanges: boolean;
   currentLevel: BlockLevel;
 }

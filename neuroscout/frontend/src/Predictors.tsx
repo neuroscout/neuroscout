@@ -65,6 +65,7 @@ export class PredictorSelector extends React.Component<
       this.setState({ filteredPredictors: nextProps.availablePredictors, searchText: '' });
     }
   }
+
   render() {
     const { availablePredictors, selectedPredictors, updateSelection } = this.props;
     const { filteredPredictors } = this.state;
