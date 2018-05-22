@@ -152,6 +152,8 @@ def extract_features(dataset_name, task_name, extractors):
         Output:
             list of db ids of extracted features
     """
+    import socket
+    socket.setdefaulttimeout(10000)
     # Load all active stimuli for task
     stims = load_stim_objects(dataset_name, task_name)
 
@@ -197,7 +199,8 @@ def extract_features(dataset_name, task_name, extractors):
             # Get associated stimulus record
             stim_hash = hash_stim(res.stim)
             stimulus = db.session.query(
-                Stimulus).filter_by(sha1_hash=stim_hash).one_or_none()
+                Stimulus).filter_by(sha1_hash=stim_hash).join(
+                    Dataset).filter_by(name=dataset_name).one_or_none()
 
             # If hash fails, use filename
             if stimulus is None:
