@@ -97,11 +97,8 @@ export interface XformRules {
 }
 
 export interface Contrast {
-  // short name/description of contrast
   name: string;
-  // For simplicilty for now store entire predictor object as opposed to just the ID.
-  // TODO: change this to just the predictor IDs
-  predictors: Predictor[];
+  predictors: string[];
   weights: number[];
   contrastType: 't' | 'F';
 }
@@ -199,6 +196,13 @@ export interface Block {
 export interface BlockModel {
   variables: string[];
   hrf_variables?: string[];
+}
+
+export interface ModelContrast {
+  name: string;
+  predictors: string[];
+  weights: number[];
+  contrastType: 't' | 'F';
 }
 
 // Shape of User object as consumed/produced by the backend API

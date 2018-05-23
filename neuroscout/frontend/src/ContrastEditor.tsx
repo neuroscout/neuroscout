@@ -24,6 +24,7 @@ interface ContrastEditorProps {
 
 interface ContrastEditorState extends Contrast {
   errors: string[];
+  selectedPredictors: Predictor[];
 }
 
 export default class ContrastEditor extends React.Component<
@@ -38,7 +39,8 @@ export default class ContrastEditor extends React.Component<
       name: contrast ? contrast.name : '',
       weights: contrast ? contrast.weights : [],
       contrastType: 't',
-      errors: []
+      errors: [],
+      selectedPredictors: []
     };
   }
 
@@ -64,20 +66,21 @@ export default class ContrastEditor extends React.Component<
     this.props.onSave(newContrast);
   };
 
-  updatePredictors = (predictors: Predictor[]): void => {
+  updatePredictors = (selectedPredictors: Predictor[]): void => {
     const that = this;
     // Warn user if they have already entered weights but are now changing the predictors
+    let updatedPredictors = selectedPredictors.map(x => x.name);
     if (this.state.weights.length > 0) {
       Modal.confirm({
         title: 'Are you sure?',
         content: 'You have already entered some weights. Changing the selection will discard that.',
         okText: 'Yes',
         cancelText: 'No',
-        onOk: () => that.setState({ predictors, weights: [] })
+        onOk: () => that.setState({ selectedPredictors, weights: [], predictors: updatedPredictors})
       });
       return;
     }
-    this.setState({ predictors });
+    this.setState({ selectedPredictors, predictors: updatedPredictors});
   };
 
   updateWeight = (index: number, value: number) => {
@@ -87,7 +90,7 @@ export default class ContrastEditor extends React.Component<
   };
 
   render() {
-    const { name, predictors, weights, contrastType, errors } = this.state;
+    const { name, predictors, selectedPredictors, weights, contrastType, errors } = this.state;
     const { availablePredictors } = this.props;
     return (
       <div>
@@ -123,7 +126,7 @@ export default class ContrastEditor extends React.Component<
         <p>Select predictors:</p>
         <PredictorSelector
           availablePredictors={availablePredictors}
-          selectedPredictors={predictors}
+          selectedPredictors={selectedPredictors}
           updateSelection={this.updatePredictors}
         />
         <br />
@@ -132,7 +135,7 @@ export default class ContrastEditor extends React.Component<
         <Form layout="horizontal">
           {predictors.map((predictor, i) =>
             <FormItem
-              label={predictor.name}
+              label={predictor}
               key={i}
               labelCol={{ span: 4 }}
               wrapperCol={{ span: 2 }}
