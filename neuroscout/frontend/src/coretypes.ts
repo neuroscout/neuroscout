@@ -171,19 +171,19 @@ export interface ApiAnalysis {
 }
 
 export interface BidsModel {
-  input?: ImageInput[];
+  input?: ImageInput;
   blocks?: Block[] | never[];
   name?: string;
   description?: string;
 }
 
 export interface ImageInput {
-  include?: InputType[];
-  exclude?: InputType[];
+  include?: InputType;
+  exclude?: InputType;
 }
 
 export interface InputType {
-  task?: string[];
+  task?: string;
   run?: string[];
   session?: string[];
   subject?: string[];
