@@ -10,7 +10,7 @@ from utils.db import put_record
 from ..utils import owner_required, auth_required, fetch_analysis, abort
 from ..predictor import PredictorEventSchema
 from .schemas import (AnalysisSchema, AnalysisFullSchema,
-					 AnalysisResourcesSchema)
+					 AnalysisResourcesSchema, AnalysisCompiledSchema)
 
 @doc(tags=['analysis'])
 @marshal_with(AnalysisSchema)
@@ -22,7 +22,7 @@ class AnalysisRootResource(AnalysisBaseResource):
 	@marshal_with(AnalysisSchema(many=True))
 	@doc(summary='Returns list of public analyses.')
 	def get(self):
-		return Analysis.query.filter_by(private=False).all()
+		return Analysis.query.filter_by(private=False, status='PASSED').all()
 
 	@use_kwargs(AnalysisSchema)
 	@doc(summary='Add new analysis!')
@@ -95,6 +95,7 @@ class CompileAnalysisResource(AnalysisBaseResource):
 	@owner_required
 	def post(self, analysis):
 		analysis.status = 'PENDING'
+		analysis.compile_traceback = ''
 		task = celery_app.send_task('workflow.compile',
 				args=[*json_analysis(analysis),
 				analysis.dataset.local_path])
@@ -102,6 +103,13 @@ class CompileAnalysisResource(AnalysisBaseResource):
 
 		db.session.add(analysis)
 		db.session.commit()
+		return analysis
+
+class AnalysisStatusResource(AnalysisBaseResource):
+	@marshal_with(AnalysisCompiledSchema)
+	@doc(summary='Check if analysis has compiled.')
+	@fetch_analysis
+	def get(self, analysis):
 		return analysis
 
 class AnalysisFullResource(AnalysisBaseResource):
