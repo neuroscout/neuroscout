@@ -35,8 +35,6 @@ interface ContrastDisplayProps {
 const ContrastDisplay = (props: ContrastDisplayProps) => {
   const { contrast, index, onDelete, onMove, enableUp, enableDown } = props;
   const inputs = contrast.predictors || [];
-  // tslint:disable-next-line:no-console
-  console.log(contrast.predictors);
   return (
     <div>
       <h3>{`${index + 1}: ${contrast.name}`}</h3>

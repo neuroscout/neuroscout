@@ -451,8 +451,6 @@ export default class AnalysisBuilder extends React.Component<BuilderProps, Store
           // .then(response => response.json())
           .then((data: Run[]) => {
             message.success(`Fetched ${data.length} runs associated with the selected dataset`);
-            // tslint:disable-next-line:no-console
-            console.log(data);
             this.setState({
               availableRuns: data,
               availableTasks: getTasks(data)
