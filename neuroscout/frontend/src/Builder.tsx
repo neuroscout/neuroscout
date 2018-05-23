@@ -23,7 +23,9 @@ import {
   Transformation,
   Contrast,
   Block,
-  BidsModel
+  BidsModel,
+  ImageInput,
+  InputType
 } from './coretypes';
 import { displayError, jwtFetch } from './utils';
 import { Space } from './HelperComponents';
@@ -173,24 +175,6 @@ type BuilderProps = {
   updatedAnalysis: () => void;
 };
 
-const buildModel = (analysis: Analysis) => {
-  let block = {
-    level: 'run',
-    transformations: analysis.transformations,
-    contrasts: analysis.contrasts,
-    model: {
-      variables: analysis.predictorIds,
-      hrf_variables: analysis.hrfPredictorIds
-    }
-  };
-
-  return {
-    name: analysis.name,
-    description: analysis.description,
-    blocks: [block]
-  };
-};
-
 export default class AnalysisBuilder extends React.Component<BuilderProps, Store> {
   constructor(props: BuilderProps) {
     super(props);
@@ -213,6 +197,69 @@ export default class AnalysisBuilder extends React.Component<BuilderProps, Store
 
   saveEnabled = (): boolean => this.state.unsavedChanges && this.state.analysis.status === 'DRAFT';
   submitEnabled = (): boolean => this.state.analysis.status === 'DRAFT';
+
+  buildModel = (): BidsModel => {
+
+    let availableRuns = this.state.availableRuns;
+    let input: ImageInput;
+
+    let task: string[] = this.state.availableTasks.filter(x => x.id === this.state.selectedTaskId).map(y => y.name);
+    let runs: string[] = this.state.availableRuns.filter(
+      x => this.state.analysis.runIds.find(y => y === x.id)
+    ).map(z => z.number);
+
+    /* The following finds a list of subjects who are not used in the analysis but have a run that is being used.
+       The Analysis object tracks user/runs by a unique id, a bids-model doesn't know about these unique ids so we
+       describe the inputs in terms of task names, run 'numbers', and subjects. All of this information is kept in
+       the Store object in a single list of all available runs by unique identifier. We use the unique Ids in Analysis
+       to cross reference the values we need to extract the subjects from the Store available runs.
+     */
+    let selectedRunIds = this.state.analysis.runIds;
+    /* The get full run objects of runIds in analysis */
+    let usedRunsById = this.state.availableRuns.filter(x => selectedRunIds.includes(x.id));
+    /* get the task numbers from those objects */
+    let usedNumbers = Array.from(new Set(usedRunsById.map(x => x.number)));
+    /* extract used subjects */
+    let usedSubjects = usedRunsById.map(x => x.subject);
+    /* get just the run objects by number */
+    let usedRunByNumber = this.state.availableRuns.filter(x => usedNumbers.includes(x.number));
+    /* finally get subjects names from list of subjects who are not in our used subjects list */
+    let unusedSubjects = usedRunByNumber.filter(
+      x => !(usedSubjects.includes(x.subject))
+    ).map(y => y.subject) as string[];
+
+    let block = {
+      level: 'run',
+      transformations: this.state.analysis.transformations,
+      contrasts: this.state.analysis.contrasts,
+      model: {
+        variables: this.state.analysis.predictorIds,
+        hrf_variables: this.state.analysis.hrfPredictorIds
+      }
+    };
+
+    let imgInput: ImageInput = {
+      include: {
+        run: runs
+      },
+      exclude: {}
+    };
+
+    if (task[0]) {
+      imgInput.include!.task = task[0];
+    }
+
+    if (unusedSubjects && unusedSubjects.length > 0) {
+      imgInput.exclude!.subject = unusedSubjects;
+    }
+
+    return {
+      name: this.state.analysis.name,
+      description: this.state.analysis.description,
+      input: imgInput,
+      blocks: [block]
+    };
+  };
 
   // Save analysis to server, either with lock=false (just save), or lock=true (save & submit)
   saveAnalysis = ({ compile = false }) => (): void => {
@@ -245,7 +292,7 @@ export default class AnalysisBuilder extends React.Component<BuilderProps, Store
       config: analysis.config
     };
 
-    apiAnalysis.model = buildModel(analysis);
+    apiAnalysis.model = this.buildModel();
 
     // const method = analysis.analysisId ? 'put' : 'post';
     let method: string;
@@ -388,6 +435,7 @@ export default class AnalysisBuilder extends React.Component<BuilderProps, Store
    like loading a new analysis (loadAnalysis function) where updateState is called but
    since state changes aren't really user edits we don't want to set unsavedChanges.
    */
+
   updateState = (attrName: keyof Store, keepClean = false) => (value: any) => {
     const { analysis, availableRuns, availablePredictors } = this.state;
     if (analysis.status !== 'DRAFT' && !keepClean) {
@@ -403,6 +451,8 @@ export default class AnalysisBuilder extends React.Component<BuilderProps, Store
           // .then(response => response.json())
           .then((data: Run[]) => {
             message.success(`Fetched ${data.length} runs associated with the selected dataset`);
+            // tslint:disable-next-line:no-console
+            console.log(data);
             this.setState({
               availableRuns: data,
               availableTasks: getTasks(data)
