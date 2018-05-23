@@ -57,6 +57,7 @@ const initializeStore = (): Store => ({
     predictions: '',
     runIds: [],
     predictorIds: [],
+    hrfPredictorIds: [],
     status: 'DRAFT',
     private: true,
     config: defaultConfig,
@@ -179,7 +180,7 @@ const buildModel = (analysis: Analysis) => {
     contrasts: analysis.contrasts,
     model: {
       variables: analysis.predictorIds,
-      hrf_variables: analysis.predictorIds
+      hrf_variables: analysis.hrfPredictorIds
     }
   };
 
@@ -292,7 +293,9 @@ export default class AnalysisBuilder extends React.Component<BuilderProps, Store
   loadAnalysis = (data: ApiAnalysis): Promise<Analysis> => {
     data.transformations = [];
 
-    // Extract transformations from within block.
+    // Extract transformations and contrasts from within block object of response.
+    let contrasts;
+    let hrfPredictorIds;
     if (data && data.model && data.model.blocks) {
       for (var i = 0; i < data.model.blocks.length; i++) {
         if (data.model.blocks[i].level !== this.state.currentLevel) {
@@ -301,9 +304,12 @@ export default class AnalysisBuilder extends React.Component<BuilderProps, Store
         if (data.model.blocks[i].transformations) {
           data.transformations = data.model.blocks[i].transformations;
         }
-        if (data.model.blocks[i].transformations) {
+        if (data.model.blocks[i].contrasts) {
           data.contrasts = data.model.blocks[i].contrasts;
-        } 
+        }
+        if (data.model.blocks[i].model && data.model.blocks[i].model!.hrf_variables) {
+          hrfPredictorIds = data.model.blocks[i].model!.hrf_variables;
+        }
       }
     }
 
@@ -320,6 +326,7 @@ export default class AnalysisBuilder extends React.Component<BuilderProps, Store
       datasetId: data.dataset_id,
       runIds: data.runs!.map(({ id }) => id),
       predictorIds: data.predictors!.map(({ id }) => id),
+      hrfPredictorIds: hrfPredictorIds,
       config: data.config || defaultConfig,
       transformations: data.transformations,
       contrasts: data.contrasts || []
@@ -417,9 +424,16 @@ export default class AnalysisBuilder extends React.Component<BuilderProps, Store
               const selectedPredictors = data.filter(
                 p => updatedAnalysis.predictorIds.indexOf(p.id) > -1
               );
+              let selectedHRFPredictors: Predictor[] = [];
+              if (updatedAnalysis.hrfPredictorIds) {
+                selectedHRFPredictors = data.filter(
+                  p => updatedAnalysis.hrfPredictorIds.indexOf(p.name) > -1
+                );
+              }
               this.setState({
                 availablePredictors: data,
-                selectedPredictors
+                selectedPredictors,
+                selectedHRFPredictors
               });
               updatedAnalysis.config = getUpdatedConfig(
                 updatedAnalysis.config,
@@ -446,7 +460,12 @@ export default class AnalysisBuilder extends React.Component<BuilderProps, Store
       newAnalysis.config = getUpdatedConfig(newAnalysis.config, newAnalysis.predictorIds);
       stateUpdate.analysis = newAnalysis;
       stateUpdate.transformationsActive = newAnalysis.predictorIds.length > 0;
+    } else if (attrName === 'selectedHRFPredictors') {
+      let newAnalysis = { ...this.state.analysis };
+      newAnalysis.hrfPredictorIds = (value as Predictor[]).map(p => p.name);
+      stateUpdate.analysis = newAnalysis;
     }
+
     stateUpdate[attrName] = value;
     if (!keepClean) stateUpdate.unsavedChanges = true;
     this.setState(stateUpdate);

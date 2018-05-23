@@ -14,6 +14,7 @@ export interface Analysis {
   runIds: string[]; // IDs of selected runs
   predictions: string;
   predictorIds: string[]; // IDs of selected predictors
+  hrfPredictorIds: string[];
   status: AnalysisStatus;
   private?: boolean;
   modifiedAt?: string;
