@@ -219,7 +219,7 @@ export default class AnalysisBuilder extends React.Component<BuilderProps, Store
     let usedRunsById = this.state.availableRuns.filter(x => selectedRunIds.includes(x.id));
     /* get the task numbers from those objects */
     let usedNumbers = Array.from(new Set(usedRunsById.map(x => x.number)));
-    /* extract used subjects */
+    /* extract used subject strings */
     let usedSubjects = usedRunsById.map(x => x.subject);
     /* get just the run objects by number */
     let usedRunByNumber = this.state.availableRuns.filter(x => usedNumbers.includes(x.number));

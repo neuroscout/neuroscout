@@ -36,8 +36,6 @@ interface XformDisplayProps {
   onMove: (index: number, direction: 'up' | 'down') => void;
 }
 
-// if (!(key in reserved)) { 
-
 function renderParamItems(xform: Transformation) {
     let reserved = ['input', 'name', 'output']; 
     let paramItems: any = [];
@@ -119,7 +117,7 @@ class ParameterField extends React.Component<ParameterFieldProps> {
     const {name,  onChange, value, options } = this.props;
     // const selectedPredictors = (options as Predictor[] || []).filter(p => value.indexOf(p.id) > -1);
     const wrtSet = new Set(value as string[]);
-    const selectedPredictors = ((options as Predictor[]) || []).filter(p => wrtSet.has(p.id));
+    const selectedPredictors = ((options as Predictor[]) || []).filter(p => wrtSet.has(p.name));
     return (
       <div>
         <p>
@@ -128,7 +126,7 @@ class ParameterField extends React.Component<ParameterFieldProps> {
         <PredictorSelector
           availablePredictors={options as Predictor[]}
           selectedPredictors={selectedPredictors}
-          updateSelection={predictors => onChange(predictors.map(x => x.id))}
+          updateSelection={predictors => onChange(predictors.map(x => x.name))}
         />
         <br />
       </div>
@@ -170,7 +168,7 @@ class XformEditor extends React.Component<XformEditorProps, XformEditorState> {
     // In the special case of the orthogonalize transformation if new inputs are selected
     // we need to make sure we remove them from the 'wrt' parameter if they've already been added there
     const {transformation} = this.state;
-    const inputIds = new Set(input.map(x => x.id));
+    const inputIds = new Set(input.map(x => x.name));
     let newXform = transformation;
     if (transformation.name === 'orthogonalize') {
         if (transformation.wrt) {
@@ -201,7 +199,7 @@ class XformEditor extends React.Component<XformEditorProps, XformEditorState> {
   render() {
     // tslint:disable-next-line:no-shadowed-variable
     const {xform,  xformRules, availableInputs } = this.props;
-    const {name,  transformation, input } = this.state;
+    const { name,  transformation, input } = this.state;
     const editMode = !!xform;
     const allowedXformNames = Object.keys(xformRules);
     const availableParameters = name ? Object.keys(xformRules[name]) : undefined;
@@ -233,8 +231,8 @@ class XformEditor extends React.Component<XformEditorProps, XformEditorState> {
                   if (transformation.name === 'orthogonalize') {
                     // Special case for wrt parameter: in 'options' exclude predictors
                     // that were selected for 'inputs'
-                    const inputIds = new Set(input.map(x => x.id));
-                    options = availableInputs.filter(x => !inputIds.has(x.id));
+                    const inputIds = new Set(input.map(x => x.name));
+                    options = availableInputs.filter(x => !inputIds.has(x.name));
                   }
                   return (
                     <div key={param}>
