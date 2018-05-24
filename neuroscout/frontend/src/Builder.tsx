@@ -228,12 +228,27 @@ export default class AnalysisBuilder extends React.Component<BuilderProps, Store
       x => !(usedSubjects.includes(x.subject))
     ).map(y => y.subject) as string[];
 
+    let variables: string[];
+
+    /* analysis predictorIds is still being stored in its own field in database.
+     * Leave it alone in analysis object and convert Ids to names here. If the 
+     * predictors field in the database is dropped, predictorIds should be converted
+     * to hold predictor names instead of Ids.
+     */
+    variables = this.state.analysis.predictorIds.map(id => {
+      let found = this.state.availablePredictors.find(elem => elem.id === id);
+      if (found) {
+        return found.name;
+      }
+      return '';
+    });
+
     let block = {
       level: 'run',
       transformations: this.state.analysis.transformations,
       contrasts: this.state.analysis.contrasts,
       model: {
-        variables: this.state.analysis.predictorIds,
+        variables: variables,
         hrf_variables: this.state.analysis.hrfPredictorIds
       }
     };
