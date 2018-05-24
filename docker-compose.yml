@@ -10,10 +10,10 @@ services:
     volumes:
       - migrations:/migrations
       - ./neuroscout/:/neuroscout
-      - $DATASET_DIR:/datasets
-      - $KEY_DIR:/keys
-      - file-data:/file-data
-    command: /usr/local/bin/gunicorn -w 2 -b :8000 core:app --log-level debug
+      - D:/neuroscout/datasets:/datasets
+      - D:/keys:/keys
+      - D:/neuroscout/file_data:/file-data
+    command: /usr/local/bin/gunicorn -w 2 -b :8000 core:app --log-level debug --timeout 300 --graceful-timeout 300
     env_file:
       - .env
       - .pliersenv
@@ -65,8 +65,8 @@ services:
       - redis
     entrypoint: celery -A tasks worker --loglevel=info
     volumes:
-      - file-data:/file-data
-      - $DATASET_DIR:/datasets
+      - D:/neuroscout/file_data:/file-data
+      - D:/neuroscout/datasets:/datasets
       - ./neuroscout/:/neuroscout
       - ./celery_worker/:/celery_worker
 
