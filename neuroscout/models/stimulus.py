@@ -4,7 +4,8 @@ class Stimulus(db.Model):
 	""" A unique stimulus. A stimulus may occur at different points in time,
 		and perhaps even across different datasets. """
 	__table_args__ = (
-	    db.UniqueConstraint('sha1_hash', 'dataset_id', 'converter_name'),
+	    db.UniqueConstraint('sha1_hash', 'dataset_id', 'converter_name',
+							'parent_id'),
 	)
 
 	__table_args__ = (
@@ -28,13 +29,10 @@ class Stimulus(db.Model):
 	converter_name = db.Column(db.String)
 	converter_parameters = db.Column(db.Text)
 
-	extracted_events = db.relationship('ExtractedEvent', backref='stimulus',
-	                            lazy='dynamic')
-	runs = db.relationship('Run',
-	                        secondary='run_stimulus',
-	                        backref='stimulus')
-	run_stimuli = db.relationship('RunStimulus', backref='stimulus',
-								  lazy='dynamic')
+	extracted_events = db.relationship('ExtractedEvent', lazy='dynamic')
+	runs = db.relationship('Run',secondary='run_stimulus')
+	run_stimuli = db.relationship('RunStimulus', lazy='dynamic',
+							   	  backref='stimulus')
 
 	def __repr__(self):
 	    return '<models.Stimulus[hash={}]>'.format(self.sha1_hash)

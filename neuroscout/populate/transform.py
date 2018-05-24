@@ -54,6 +54,15 @@ class Postprocessing(object):
         dummy = ee_df.groupby('stimulus_id').apply(lambda x: 1).reset_index()
         return dummy.rename(columns={0: 'value'}).to_dict('index').values()
 
+    @staticmethod
+    def dummy_value(ee_df):
+        """ Sets the values to one
+            Args:
+                ee_df - ExtractedEvents in pandas df format
+        """
+        ee_df['value'] = 1
+        return ee_df[['onset', 'value', 'stimulus_id']].to_dict('index').values()
+
     def apply_transformation(self, new_name, function, func_args={}, **filter):
         """ Queries EFs, applies transformation, and saves as new EF/Predictor
         Args:
