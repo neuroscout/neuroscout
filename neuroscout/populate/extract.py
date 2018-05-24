@@ -157,8 +157,12 @@ def extract_features(dataset_name, task_name, extractors):
     for name, parameters in extractors:
         # For every extractor, extract from matching stims
         ext = get_transformer(name, **parameters)
-        results += [(so, ext.transform(s)) for so, s in stims
-                    if ext._stim_matches_input_types(s)]
+        for so, s in stims:
+            if ext._stim_matches_input_types(s):
+                ### Hacky workaround. Look for compatible AVI
+                if 'GoogleVideoAPIShotDetectionExtractor' in str(ext.__class__):
+                    s.filename = Path(s.filename).with_suffix('.avi').as_posix()
+                results.append((so, ext.transform(s)))
 
     # Save results to file
     if results != [] and 'EXTRACTION_DIR' in current_app.config.get('EXTRACTION_DIR'):
