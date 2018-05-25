@@ -141,14 +141,13 @@ def add_stimulus(stim_hash, dataset_id, parent_id=None, path=None, content=None,
         mimetype = 'text/plain'
 
     model, new = get_or_create(
-        Stimulus, commit=False, sha1_hash=stim_hash,
+        Stimulus, commit=False, sha1_hash=stim_hash, parent_id=parent_id,
         dataset_id=dataset_id, converter_name=converter_name)
 
     if new:
         model.path = path
         model.content = content
         model.mimetype = mimetype
-        model.parent_id = parent_id
         model.converter_params = converter_params
         db.session.commit()
 

@@ -5,6 +5,7 @@ the associated predictors
 from flask import current_app
 from database import db
 import json
+import socket
 import re
 import pandas as pd
 from pathlib import Path
@@ -18,7 +19,7 @@ from pliers.extractors import merge_results
 
 from models import (Dataset, Task, Predictor, PredictorEvent, PredictorRun,
     Run, Stimulus, RunStimulus, ExtractedFeature, ExtractedEvent)
-from .utils import hash_data, hash_stim
+from .utils import hash_data
 
 class FeatureSerializer(object):
     def __init__(self, schema=None, add_all=True):
@@ -122,23 +123,19 @@ class FeatureSerializer(object):
 
 def load_stim_objects(dataset_name, task_name):
     """ Given a dataset and task, load all available stimuli as Pliers
-    stimuli """
+    stimuli, and pair them with original database stim object. """
     stim_objects = Stimulus.query.filter_by(active=True).join(
         RunStimulus).join(Run).join(Task).filter_by(name=task_name).join(
             Dataset).filter_by(name=dataset_name)
 
-    # Order
-    all_stims = [s for s in stim_objects if s.parent_id is None]
-    all_stims += [s for s in stim_objects if s.parent_id is not None]
-
     stims = []
-    for stim_object in all_stims:
+    for stim_object in stim_objects:
         if stim_object.path is None:
-            complex = ComplexTextStim(text=stim_object.content)
-            stims.append(complex)
-            stims.append(TextStim(text=complex.data)) # Append both ways
+             # Append both ways for Text stimuli
+            stims.append((stim_object, ComplexTextStim(text=stim_object.content)))
+            stims.append((stim_object, TextStim(text=stims[-1][1].data)))
         else:
-            stims.append(load_stims(stim_object.path))
+            stims.append((stim_object, load_stims(stim_object.path)))
 
     return stims
 
@@ -152,6 +149,7 @@ def extract_features(dataset_name, task_name, extractors):
         Output:
             list of db ids of extracted features
     """
+    socket.setdefaulttimeout(10000)
     # Load all active stimuli for task
     stims = load_stim_objects(dataset_name, task_name)
 
@@ -159,24 +157,27 @@ def extract_features(dataset_name, task_name, extractors):
     for name, parameters in extractors:
         # For every extractor, extract from matching stims
         ext = get_transformer(name, **parameters)
-        results += ext.transform(
-            [s for s in stims if ext._stim_matches_input_types(s)]
-            )
+        for so, s in stims:
+            if ext._stim_matches_input_types(s):
+                ### Hacky workaround. Look for compatible AVI
+                if 'GoogleVideoAPIShotDetectionExtractor' in str(ext.__class__):
+                    s.filename = Path(s.filename).with_suffix('.avi').as_posix()
+                results.append((so, ext.transform(s)))
 
     # Save results to file
-    if results != [] and 'EXTRACTION_DIR' in current_app.config:
-        results_df = merge_results(results)
-        results_path = Path(current_app.config['EXTRACTION_DIR']).absolute() / \
-            '{}_{}_{}.csv'.format(
+    if results != [] and 'EXTRACTION_DIR' in current_app.config.get('EXTRACTION_DIR'):
+        results_df = merge_results(list(zip(*results))[1])
+        outfile = Path(
+            current_app.config['EXTRACTION_DIR']) / '{}_{}_{}.csv'.format(
                 dataset_name, task_name,
                 datetime.datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
-                )
-        results_path.parents[0].mkdir(exist_ok=True)
-        results_df.to_csv(results_path.as_posix())
+            )
+        outfile.parents[0].mkdir(exist_ok=True)
+        results_df.to_csv(outfile)
 
     serializer = FeatureSerializer()
-    extracted_features = {}
-    for res in progressbar(results):
+    ext_feats = {}
+    for so, res in progressbar(results):
         bulk_ees = []
         for ee_props, ef_props in serializer.load(res):
             """" Add new ExtractedFeature """
@@ -184,41 +185,29 @@ def extract_features(dataset_name, task_name, extractors):
             feat_hash = ef_props['sha1_hash']
 
             # If we haven't already added this feature
-            if feat_hash not in extracted_features:
+            if feat_hash not in ext_feats:
                 # Create/get feature
                 ef_model = ExtractedFeature(**ef_props)
                 db.session.add(ef_model)
                 db.session.commit()
-                extracted_features[feat_hash] = ef_model
-            else:
-                ef_model = extracted_features[feat_hash]
+                ext_feats[feat_hash] = ef_model
 
             """" Add ExtractedEvents """
-            # Get associated stimulus record
-            stim_hash = hash_stim(res.stim)
-            stimulus = db.session.query(
-                Stimulus).filter_by(sha1_hash=stim_hash).one_or_none()
-
-            # If hash fails, use filename
-            if stimulus is None:
-                stimulus = db.session.query(
-                    Stimulus).filter_by(path=res.stim.filename).one()
-
             # Get or create ExtractedEvent
             bulk_ees.append(
-                ExtractedEvent(stimulus_id=stimulus.id,
+                ExtractedEvent(stimulus_id=so.id,
                                history=res.history.string,
-                               ef_id=ef_model.id,
+                               ef_id=ext_feats[feat_hash].id,
                                **ee_props))
         db.session.bulk_save_objects(bulk_ees)
         db.session.commit()
 
     create_predictors(
-        [ef for ef in extracted_features.values() if ef.active],
+        [ef for ef in ext_feats.values() if ef.active],
         dataset_name
         )
 
-    return list(extracted_features.values())
+    return list(ext_feats.values())
 
 
 def create_predictors(features, dataset_name):
@@ -233,7 +222,6 @@ def create_predictors(features, dataset_name):
             source='extracted', ef_id=ef.id)[0])
 
 
-    current_app.logger.info("Creating predictor events")
     for ix, predictor in enumerate(progressbar(all_preds)):
         ef = features[ix]
         all_pes = []

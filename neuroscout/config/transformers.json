@@ -14,6 +14,7 @@
     ["GoogleVisionAPIFaceExtractor", {}],
     ["GoogleVisionAPILabelExtractor", {}],
     ["GoogleVisionAPIPropertyExtractor", {}],
+    ["GoogleVideoAPIShotDetectionExtractor", {"timeout": 100000}],
     ["GoogleVisionAPISafeSearchExtractor", {}],
     ["ClarifaiAPIImageExtractor", { "model": "general-v1.3",
       "select_concepts": ["alphabet", "portrait", "dark", "daylight", "creativity", "animal", "face", "wild", "abstract", "sky", "room", "vertical", "text", "business", "vehicle", "wear", "horizontal", "man", "furniture", "old", "home", "two", "nature", "image", "family", "building", "empty", "road", "design", "woman", "girl", "landscape", "hand", "fashion", "equipment", "child", "art", "sunset", "music", "summer", "light", "wildlife", "competition", "simplicity", "architecture", "desktop", "retro", "technology", "street", "indoors", "adult", "outdoors", "recreation", "military", "color", "blur", "wood", "writing", "illustration", "travel", "one", "car", "action", "pattern", "water", "city", "people"]
@@ -40,6 +41,12 @@
       "function": "dummy",
       "new_name": "speech",
       "extractor_name": "ComplexTextExtractor"
+    },
+    {
+      "function": "dummy_value",
+      "new_name": "shot_change",
+      "extractor_name": "GoogleVideoAPIShotDetectionExtractor",
+      "feature_name": "shot_id"
     },
     {
       "function": "num_objects",
