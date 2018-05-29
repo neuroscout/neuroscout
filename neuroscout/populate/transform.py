@@ -61,7 +61,8 @@ class Postprocessing(object):
                 ee_df - ExtractedEvents in pandas df format
         """
         ee_df['value'] = 1
-        return ee_df[['onset', 'value', 'stimulus_id']].to_dict('index').values()
+        ee_df['duration'] = 1
+        return ee_df[['onset', 'duration', 'value', 'stimulus_id']].to_dict('index').values()
 
     def apply_transformation(self, new_name, function, func_args={}, **filter):
         """ Queries EFs, applies transformation, and saves as new EF/Predictor

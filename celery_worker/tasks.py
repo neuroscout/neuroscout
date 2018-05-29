@@ -57,8 +57,10 @@ def writeout_events(analysis, pes, outdir):
 
                 variable = SparseRunVariable(name, max_val, run_info, 'events')
 
+                sr = 1 / (analysis['TR'] / 4)
+
                 ## TODO: Only up sample variables to convert nas to 0
-                df = variable.to_dense(2).to_df()
+                df = variable.to_dense(sr).to_df()
                 df['condition'] = name
                 dfs.append(df)
 
