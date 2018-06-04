@@ -5,20 +5,24 @@
   "private": true,
   "dependencies": {
     "@types/antd": "^1.0.0",
-    "@types/jest": "^19.2.2",
-    "@types/jquery": "^2.0.41",
-    "@types/node": "^7.0.12",
-    "@types/react": "^15.0.31",
-    "@types/react-dom": "^15.5.1",
-    "antd": "^2.11.2",
-    "react": "^15.6.1",
-    "react-dom": "^15.6.1",
+    "@types/jest": "^22.2.3",
+    "@types/jquery": "^3.3.1",
+    "@types/node": "^10.0.6",
+    "@types/react": "^16.3.14",
+    "@types/react-dom": "^16.0.5",
+    "antd": "^3.5.1",
+    "react": "^16.3.2",
+    "react-dom": "^16.3.2",
     "react-router": "^4.1.1",
     "react-router-dom": "^4.1.1"
   },
   "devDependencies": {
-    "@types/enzyme": "^2.8.1",
-    "react-scripts-ts": "^2.3.2"
+    "@types/enzyme": "^3.1.10",
+    "enzyme": "^3.3.0",
+    "enzyme-adapter-react-16": "^1.1.1",
+    "react-scripts-ts": "^2.3.2",
+    "tsutils": "^2.26.2",
+    "typescript": "^2.8.3"
   },
   "scripts": {
     "start": "react-scripts-ts start",

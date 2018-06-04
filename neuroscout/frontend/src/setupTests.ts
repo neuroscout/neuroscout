@@ -2,6 +2,11 @@
 Jest (the test runner) runs this file first before running any of the test suites.
 Create mock matchMedia and localStorage for the tests to work.
 */
+import { configure } from 'enzyme';
+import Adapter from 'enzyme-adapter-react-16';
+
+configure({ adapter: new Adapter() });
+
 window.matchMedia =
   window.matchMedia ||
   function() {

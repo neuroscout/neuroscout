@@ -140,9 +140,9 @@ const getTasks = (runs: Run[]): Task[] => {
 
 // Given an updated list of predictor IDs, create an updated version of analysis config.
 // preserving the existing predictor configs, and adding/removing new/old ones as necessary
-const getUpdatedConfig = (config: AnalysisConfig, predictorIds: string[]): AnalysisConfig => {
-  let newConfig = { ...config };
-  let newPredictorConfigs = { ...config.predictorConfigs };
+const getUpdatedConfig = (old_config: AnalysisConfig, predictorIds: string[]): AnalysisConfig => {
+  let newConfig = { ...old_config };
+  let newPredictorConfigs = { ...old_config.predictorConfigs };
   predictorIds.forEach(id => {
     if (!newPredictorConfigs.hasOwnProperty(id)) {
       newPredictorConfigs[id] = {
@@ -256,10 +256,10 @@ export default class AnalysisBuilder extends React.Component<BuilderProps, Store
   // and fetch the associated runs
   loadAnalysis = (data: ApiAnalysis): Promise<Analysis> => {
     if (data.model && data.model.blocks && !data.transformations) {
-      data.transformations = []
+      data.transformations = [];
       for (var i = 0; i < data.model.blocks.length; i++) {
         if (data.model.blocks[i].transformations != null) {
-          data.transformations = data.transformations.concat(...data.model.blocks[i].transformations!) 
+          data.transformations = data.transformations.concat(...data.model.blocks[i].transformations!);
         }
       }
     }
@@ -285,8 +285,8 @@ export default class AnalysisBuilder extends React.Component<BuilderProps, Store
     if (analysis.runIds.length > 0) {
       jwtFetch(`${domainRoot}/api/runs/${analysis.runIds[0]}`)
         // .then(response => response.json() as Promise<Run>)
-        .then(data => {
-          this.setState({ selectedTaskId: data.task.id });
+        .then(fetch_data => {
+          this.setState({ selectedTaskId: fetch_data.task.id });
           this.updateState('analysis', true)(analysis);
         })
         .catch(displayError);

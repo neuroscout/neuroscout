@@ -3,17 +3,19 @@
 */
 import * as React from 'react';
 import { Form, Input, AutoComplete, Table, Switch, Button } from 'antd';
-import { TableProps, TableRowSelection } from 'antd/lib/table/Table';
+import { ColumnProps, TableRowSelection } from 'antd/lib/table';
 
 const FormItem = Form.Item;
 
 import { Analysis, Dataset, Run, Task } from './coretypes';
 
-class DataTable extends React.Component<TableProps<any>, any> {
+/*
+class DataTable extends React.Component<any> {
   render() {
     return <Table {...this.props} />;
   }
 }
+*/
 
 interface OverviewTabProps {
   analysis: Analysis;
@@ -125,45 +127,43 @@ export class OverviewTab extends React.Component<OverviewTabProps, any> {
             />
           </FormItem>
           <FormItem label="Description:">
-            <Input
+            <Input.TextArea
               placeholder="Description of your analysis"
               value={analysis.description}
-              onChange={this.updateAnalysisFromEvent('description')}
-              type="textarea"
               autosize={{ minRows: 3, maxRows: 20 }}
+              onPressEnter={this.updateAnalysisFromEvent('description')}
             />
           </FormItem>
           <FormItem label="Predictions:">
-            <Input
+            <Input.TextArea
               placeholder="Enter your preditions about what you expect the results to look like"
               value={analysis.predictions}
-              onChange={this.updateAnalysisFromEvent('predictions')}
-              type="textarea"
               autosize={{ minRows: 3, maxRows: 20 }}
+              onPressEnter={this.updateAnalysisFromEvent('description')}
             />
           </FormItem>
           <p>Select a dataset:</p>
           <br />
-          <DataTable
+          <Table
             columns={datasetColumns}
             rowKey="id"
             size="small"
             dataSource={datasets}
             rowSelection={datasetRowSelection}
-            pagination={datasets.length > 20}
+            pagination={(datasets.length > 20) ? {'position': 'bottom'} : false}
           />
           <br />
           {availableRuns.length > 0 &&
             <div>
               <p>Select a task:</p>
               <br />
-              <DataTable
+              <Table
                 columns={taskColumns}
                 rowKey="id"
                 size="small"
                 dataSource={availableTasks}
                 rowSelection={taskRowSelection}
-                pagination={datasets.length > 20}
+                pagination={(datasets.length > 20) ? {'position': 'bottom'} : false}
               />
               <br />
             </div>}
@@ -171,12 +171,12 @@ export class OverviewTab extends React.Component<OverviewTabProps, any> {
             <div>
               <p>Select runs:</p>
               <br />
-              <DataTable
+              <Table
                 columns={runColumns}
                 rowKey="id"
                 size="small"
                 dataSource={availableRuns.filter(r => r.task.id === selectedTaskId)}
-                pagination={availableRuns.length > 20}
+                pagination={(availableRuns.length > 20) ? {'position': 'bottom'} : false}
                 rowSelection={runRowSelection}
               />
               <br />

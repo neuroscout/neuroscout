@@ -15,6 +15,7 @@ export interface AnalysisListProps {
   analyses: AppAnalysis[];
   cloneAnalysis: (id: string) => void;
   onDelete?: (analysis: AppAnalysis) => void;
+  children?: React.ReactNode;
 }
 
 class AnalysisTable extends Table<AppAnalysis> {}
@@ -30,10 +31,11 @@ const AnalysisList = (props: AnalysisListProps) => {
     { title: 'ID', dataIndex: 'id' },
     {
       title: 'Name',
-      render: (text, record: AppAnalysis) =>
+      render: (text, record: AppAnalysis) => (
         <Link to={`/builder/${record.id}`}>
           {record.name}
         </Link>
+      )
     },
     {
       title: 'Status',
@@ -43,7 +45,7 @@ const AnalysisList = (props: AnalysisListProps) => {
     { title: 'Modified at', dataIndex: 'modifiedAt' },
     {
       title: 'Actions',
-      render: (text, record: AppAnalysis) =>
+      render: (text, record: AppAnalysis) => (
         <span>
           <Button type="primary" ghost={true} onClick={() => cloneAnalysis(record.id)}>
             Clone
@@ -55,6 +57,7 @@ const AnalysisList = (props: AnalysisListProps) => {
               Delete
             </Button>}
         </span>
+      )
     }
   ];
   return (
@@ -68,12 +71,13 @@ const AnalysisList = (props: AnalysisListProps) => {
           <p>
             {record.description}
           </p>}
-        pagination={analyses.length > 20}
+        pagination={(analyses.length > 20) ? {'position': 'bottom'} : false}
       />
     </div>
   );
 
-  /* Old card-based interface - Leaving it here but commented out in case we decide to go back to using cards instead of a table
+  /* Old card-based interface - Leaving it here but commented out in case we 
+   * decide to go back to using cards instead of a table
   return (
     <Row type="flex" justify="center">
       <Col span={18}>

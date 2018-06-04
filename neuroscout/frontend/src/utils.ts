@@ -8,6 +8,7 @@ export const displayError = (error: Error) => {
     // to make jsdom tests work
     return;
   } finally {
+    // tslint:disable-next-line:no-console
     console.error(error);
   }
 };

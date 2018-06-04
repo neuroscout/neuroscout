@@ -4,7 +4,6 @@ import { Transformation } from './coretypes';
 // At first, only allow transformations that occur in place
 // Include: scale, orthogonalize, threshold
 
-
 // Later: allow transformations w/ predictable names,
 // but need to implement detecting new column names and making them available
 // for subsequent transformations.
