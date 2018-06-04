@@ -60,3 +60,4 @@ tqdm==4.11.2
 webargs==1.6.0
 Werkzeug==0.12.1
 WTForms==2.1
+xlrd
