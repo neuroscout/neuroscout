@@ -15,7 +15,7 @@ from bids.variables import load_variables
 from datalad.api import install
 from datalad.auto import AutomagicIO
 
-from .utils import remote_resource_exists, format_preproc, hash_stim
+from .utils import remote_resource_exists, hash_stim
 from utils import listify, get_or_create
 from models import (Dataset, Task, Run, Predictor, PredictorEvent, PredictorRun,
                     Stimulus, RunStimulus, GroupPredictor, GroupPredictorValue)
@@ -254,10 +254,12 @@ def add_task(task_name, dataset_name=None, local_path=None,
                          '[ses-{session}_]task-{task}_[acq-{acquisition}_]'
                          '[run-{run}_]bold_[space-{space}_]{type}.nii.gz']
 
-        run_model.func_path = layout.build_path(path_patterns=path_patterns,
-                                                type="preproc", **entities)
-        run_model.mask_path = layout.build_path(path_patterns=path_patterns,
-                                                type="brainmask", **entities)
+        run_model.func_path = layout.build_path(
+            {'type': 'preproc', 'space': 'MNI152NLin2009cAsym', **entities},
+            path_patterns=path_patterns)
+        run_model.mask_path = layout.build_path(
+            {'type': 'brainmask', 'space': 'MNI152NLin2009cAsym', **entities},
+            path_patterns=path_patterns)
 
         # Confirm remote address exists:
         if preproc_address is not None:
