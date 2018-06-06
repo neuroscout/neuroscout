@@ -15,7 +15,7 @@ from bids.variables import load_variables
 from datalad.api import install
 from datalad.auto import AutomagicIO
 
-from .utils import remote_resource_exists, format_preproc, hash_stim
+from .utils import remote_resource_exists, hash_stim
 from utils import listify, get_or_create
 from models import (Dataset, Task, Run, Predictor, PredictorEvent, PredictorRun,
                     Stimulus, RunStimulus, GroupPredictor, GroupPredictorValue)
@@ -227,13 +227,13 @@ def add_task(task_name, dataset_name=None, local_path=None,
     all_runs = layout.get(task=task_name, type='bold', extensions='.nii.gz',
                           **kwargs)
     for img in progressbar(all_runs):
+        """ Extract Run information """
         # Get entities
         entities = {entity : getattr(img, entity)
-                    for entity in ['subject', 'session']
+                    for entity in ['subject', 'session', 'acquisition']
                     if entity in img._fields}
-
-        """ Extract Run information """
         run_number = img.run if hasattr(img, 'run') else None
+
         run_model, new = get_or_create(
             Run, dataset_id=dataset_model.id, number=run_number,
             task_id = task_model.id, **entities)
@@ -250,8 +250,16 @@ def add_task(task_name, dataset_name=None, local_path=None,
                 "Error loading BOLD file, default duration used.")
             run_model.duration = scan_length
 
-        run_model.func_path = format_preproc(suffix="preproc", **entities)
-        run_model.mask_path = format_preproc(suffix="brainmask", **entities)
+        path_patterns = ['sub-{subject}[ses-{session}/]/func/sub-{subject}_'
+                         '[ses-{session}_]task-{task}_[acq-{acquisition}_]'
+                         '[run-{run}_]bold_[space-{space}_]{type}.nii.gz']
+
+        run_model.func_path = layout.build_path(
+            {'type': 'preproc', 'space': 'MNI152NLin2009cAsym', **entities},
+            path_patterns=path_patterns)
+        run_model.mask_path = layout.build_path(
+            {'type': 'brainmask', 'space': 'MNI152NLin2009cAsym', **entities},
+            path_patterns=path_patterns)
 
         # Confirm remote address exists:
         if preproc_address is not None:
