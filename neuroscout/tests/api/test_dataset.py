@@ -8,7 +8,6 @@ def test_get_dataset(auth_client, add_task):
 	assert type(dataset_list) == list
 
 	# Get first dataset
-	assert 'mimetypes' in dataset_list[0]
 	assert 'tasks' in dataset_list[0]
 	first_dataset_id = dataset_list[0]['id']
 
@@ -17,7 +16,6 @@ def test_get_dataset(auth_client, add_task):
 	assert resp.status_code == 200
 	dataset = decode_json(resp)
 	assert first_dataset_id == dataset['id']
-	assert dataset['mimetypes'] == ['image/jpeg']
 	assert dataset['tasks'][0]['name'] == 'bidstest'
 	assert dataset['name'] == 'Test Dataset'
 
