@@ -9,22 +9,16 @@ from bids.analysis import Analysis
 from bids.variables import SparseRunVariable
 from bids.variables.entities import RunInfo
 from bids.grabbids import BIDSLayout
+from grabbit import Layout
 from celery.contrib import rdb
 from copy import deepcopy
 
 logger = get_task_logger(__name__)
-
-
-def get_events_path(entities, task_name):
-    ses = 'ses-{}_'.format(entities['session']) if entities.get('session') else ''
-    run_num = 'run-{}_'.format(entities['run']) if entities.get('run') else ''
-    fname = 'sub-{}_{}task-{}_{}events.tsv'.format(
-        entities['subject'], ses, task_name, run_num)
-
-    return fname
+PATHS = ['sub-{subject}_[ses-{session}_]task-{task}_[acq-{acquisition}_][run-{run}_]events.tsv']
 
 def writeout_events(analysis, pes, outdir):
     """ Write event files from JSON """
+    gl = Layout(outdir)
     outdir = outdir / "func"
     outdir.mkdir(exist_ok=True)
 
@@ -45,6 +39,7 @@ def writeout_events(analysis, pes, outdir):
         run['run'] = run.pop('number')
         entities = {r:v for r,v in run.items()
                     if r in ['run', 'session', 'subject'] and v is not None}
+        entities['task'] = analysis['task_name']
 
         if run_events.empty is False:
             for name, df in run_events.groupby('predictor_id'):
@@ -52,7 +47,7 @@ def writeout_events(analysis, pes, outdir):
                 df_col = df_col.reset_index().rename(columns={'value': name})
 
                 # Write out BIDS path
-                fname = outdir / name / get_events_path(entities, analysis['task_name'])
+                fname = outdir / name / gl.build_path(entities, path_patterns=PATHS)
                 fname.parent.mkdir(exist_ok=True)
                 paths.append((fname.as_posix(), 'events/{}/{}'.format(name,fname.name)))
                 df_col.to_csv(fname, sep='\t', index=False)
