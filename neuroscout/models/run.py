@@ -12,6 +12,8 @@ class Run(db.Model):
     )
     id = db.Column(db.Integer, primary_key=True)
     session = db.Column(db.Text)
+    acquisition = db.Column(db.Text)
+
     subject = db.Column(db.Text)
     number = db.Column(db.Text)
 
