@@ -212,10 +212,12 @@ export default class AnalysisBuilder extends React.Component<BuilderProps, Store
     let sessions: string[] = this.state.availableRuns.filter(
       x => this.state.analysis.runIds.find(runId => runId === x.id)
     ).filter(y => y.session !== null).map(z => z.session) as string[];
+    sessions = Array.from(new Set(sessions));
 
     let subjects: string[] = this.state.availableRuns.filter(
       x => this.state.analysis.runIds.find(runId => runId === x.id)
     ).filter(y => y.subject !== null).map(z => z.subject) as string[];
+    subjects = Array.from(new Set(subjects));
 
     /* analysis predictorIds is still being stored in its own field in database.
      * Leave it alone in analysis object and convert Ids to names here. If the 
