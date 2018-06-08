@@ -175,11 +175,6 @@ export interface BidsModel {
 }
 
 export interface ImageInput {
-  include?: InputType;
-  exclude?: InputType;
-}
-
-export interface InputType {
   task?: string;
   run?: string[];
   session?: string[];
