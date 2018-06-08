@@ -7,6 +7,7 @@ from .utils import first_or_404
 class RunSchema(Schema):
 	id = fields.Int()
 	session = fields.Str(description='Session number')
+	acquisition = fields.Str(description='Acquisition')
 	subject = fields.Str(description='Subject id')
 	number = fields.Str(description='Run id')
 	duration = fields.Number(description='Total run duration in seconds.')
