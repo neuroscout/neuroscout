@@ -240,7 +240,7 @@ export default class AnalysisBuilder extends React.Component<BuilderProps, Store
       contrasts: this.state.analysis.contrasts,
       model: {
         variables: variables,
-        hrf_variables: this.state.analysis.hrfPredictorIds
+        HRF_variables: this.state.analysis.hrfPredictorIds
       }
     };
 
