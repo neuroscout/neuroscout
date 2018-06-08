@@ -25,7 +25,6 @@ import {
   Block,
   BidsModel,
   ImageInput,
-  InputType
 } from './coretypes';
 import { displayError, jwtFetch } from './utils';
 import { Space } from './HelperComponents';
@@ -201,40 +200,29 @@ export default class AnalysisBuilder extends React.Component<BuilderProps, Store
   buildModel = (): BidsModel => {
 
     let availableRuns = this.state.availableRuns;
-    let input: ImageInput;
 
-    let task: string[] = this.state.availableTasks.filter(x => x.id === this.state.selectedTaskId).map(y => y.name);
+    let task: string[] = this.state.availableTasks.filter(
+      x => x.id === this.state.selectedTaskId
+    ).map(y => y.name);
     let runs: string[] = this.state.availableRuns.filter(
-      x => this.state.analysis.runIds.find(y => y === x.id)
-    ).map(z => z.number);
+      x => this.state.analysis.runIds.find(runId => runId === x.id)
+    ).filter(y => y.number !== null).map(z => z.number);
+    runs = Array.from(new Set(runs));
 
-    /* The following finds a list of subjects who are not used in the analysis but have a run that is being used.
-       The Analysis object tracks user/runs by a unique id, a bids-model doesn't know about these unique ids so we
-       describe the inputs in terms of task names, run 'numbers', and subjects. All of this information is kept in
-       the Store object in a single list of all available runs by unique identifier. We use the unique Ids in Analysis
-       to cross reference the values we need to extract the subjects from the Store available runs.
-     */
-    let selectedRunIds = this.state.analysis.runIds;
-    /* The get full run objects of runIds in analysis */
-    let usedRunsById = this.state.availableRuns.filter(x => selectedRunIds.includes(x.id));
-    /* get the task numbers from those objects */
-    let usedNumbers = Array.from(new Set(usedRunsById.map(x => x.number)));
-    /* extract used subject strings */
-    let usedSubjects = usedRunsById.map(x => x.subject);
-    /* get just the run objects by number */
-    let usedRunByNumber = this.state.availableRuns.filter(x => usedNumbers.includes(x.number));
-    /* finally get subjects names from list of subjects who are not in our used subjects list */
-    let unusedSubjects = usedRunByNumber.filter(
-      x => !(usedSubjects.includes(x.subject))
-    ).map(y => y.subject) as string[];
+    let sessions: string[] = this.state.availableRuns.filter(
+      x => this.state.analysis.runIds.find(runId => runId === x.id)
+    ).filter(y => y.session !== null).map(z => z.session) as string[];
 
-    let variables: string[];
+    let subjects: string[] = this.state.availableRuns.filter(
+      x => this.state.analysis.runIds.find(runId => runId === x.id)
+    ).filter(y => y.subject !== null).map(z => z.subject) as string[];
 
     /* analysis predictorIds is still being stored in its own field in database.
      * Leave it alone in analysis object and convert Ids to names here. If the 
      * predictors field in the database is dropped, predictorIds should be converted
      * to hold predictor names instead of Ids.
      */
+    let variables: string[];
     variables = this.state.analysis.predictorIds.map(id => {
       let found = this.state.availablePredictors.find(elem => elem.id === id);
       if (found) {
@@ -242,6 +230,7 @@ export default class AnalysisBuilder extends React.Component<BuilderProps, Store
       }
       return '';
     });
+    variables = variables.filter(x => x !== '');
 
     let block = {
       level: 'run',
@@ -253,19 +242,21 @@ export default class AnalysisBuilder extends React.Component<BuilderProps, Store
       }
     };
 
-    let imgInput: ImageInput = {
-      include: {
-        run: runs
-      },
-      exclude: {}
-    };
-
-    if (task[0]) {
-      imgInput.include!.task = task[0];
+    let imgInput: ImageInput = {};
+    if (runs.length > 0) {
+      imgInput.run = runs;
     }
 
-    if (unusedSubjects && unusedSubjects.length > 0) {
-      imgInput.exclude!.subject = unusedSubjects;
+    if (sessions.length > 0) {
+      imgInput.session = sessions;
+    }
+
+    if (subjects.length >  0) {
+      imgInput.subject = subjects;
+    }
+
+    if (task[0]) {
+      imgInput.task = task[0];
     }
 
     return {
