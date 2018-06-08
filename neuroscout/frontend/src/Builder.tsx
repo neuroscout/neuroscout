@@ -409,6 +409,7 @@ export default class AnalysisBuilder extends React.Component<BuilderProps, Store
       okText: 'Yes',
       cancelText: 'No',
       onOk() {
+        saveAnalysis({ compile: false})();
         saveAnalysis({ compile: true })();
       }
     });
