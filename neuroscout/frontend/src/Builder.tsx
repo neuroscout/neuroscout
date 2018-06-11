@@ -204,9 +204,10 @@ export default class AnalysisBuilder extends React.Component<BuilderProps, Store
     let task: string[] = this.state.availableTasks.filter(
       x => x.id === this.state.selectedTaskId
     ).map(y => y.name);
-    let runs: string[] = this.state.availableRuns.filter(
+
+    let runs: number[] = this.state.availableRuns.filter(
       x => this.state.analysis.runIds.find(runId => runId === x.id)
-    ).filter(y => y.number !== null).map(z => z.number);
+    ).filter(y => y.number !== null).map(z => parseInt(z.number, 10));
     runs = Array.from(new Set(runs));
 
     let sessions: string[] = this.state.availableRuns.filter(
@@ -234,16 +235,25 @@ export default class AnalysisBuilder extends React.Component<BuilderProps, Store
     });
     variables = variables.filter(x => x !== '');
 
-    let block = {
-      level: 'run',
-      transformations: this.state.analysis.transformations,
-      contrasts: this.state.analysis.contrasts,
-      model: {
-        variables: variables,
-        HRF_variables: this.state.analysis.hrfPredictorIds
+    let blocks = [
+      {
+        level: 'run',
+        transformations: this.state.analysis.transformations,
+        contrasts: this.state.analysis.contrasts,
+        model: {
+          variables: variables,
+          HRF_variables: this.state.analysis.hrfPredictorIds
+        }
+      },
+      {
+        level: 'subject',
+        auto_contrasts: true
+      },
+      {
+        level: 'dataset',
+        auto_contrasts: true
       }
-    };
-
+    ];
     let imgInput: ImageInput = {};
     if (runs.length > 0) {
       imgInput.run = runs;
@@ -265,7 +275,7 @@ export default class AnalysisBuilder extends React.Component<BuilderProps, Store
       name: this.state.analysis.name,
       description: this.state.analysis.description,
       input: imgInput,
-      blocks: [block]
+      blocks: blocks,
     };
   };
 

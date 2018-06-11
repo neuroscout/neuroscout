@@ -176,7 +176,7 @@ export interface BidsModel {
 
 export interface ImageInput {
   task?: string;
-  run?: string[];
+  run?: number[];
   session?: string[];
   subject?: string[];
 }
