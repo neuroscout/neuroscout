@@ -582,6 +582,7 @@ export default class AnalysisBuilder extends React.Component<BuilderProps, Store
               </Button>
               <Space />
               <Button
+                hidden={!this.state.analysis.analysisId}
                 onClick={this.confirmSubmission}
                 type={'primary'}
                 disabled={!this.submitEnabled()}
