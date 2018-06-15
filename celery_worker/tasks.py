@@ -6,11 +6,8 @@ import json
 from pathlib import Path
 from tempfile import mkdtemp
 from bids.analysis import Analysis
-from bids.variables import SparseRunVariable
-from bids.variables.entities import RunInfo
 from bids.grabbids import BIDSLayout
 from grabbit import Layout
-from celery.contrib import rdb
 from copy import deepcopy
 
 logger = get_task_logger(__name__)
@@ -70,8 +67,12 @@ def compile(analysis, predictor_events, resources, bids_dir):
     bids_analysis.setup(derivatives='only', task=analysis['task_name'],
                         scan_length=scan_length, subject=subject)
 
+    # Sidecar:
+    sidecar = {"RepetitionTime": analysis['TR']}
+
     # Write out analysis & resource JSON
-    for obj, name in [(analysis, 'analysis'), (resources, 'resources'), (model, 'model')]:
+    for obj, name in [(analysis, 'analysis'), (resources, 'resources'),
+                      (model, 'model'), (sidecar, 'task-{}_preproc'.format(analysis['task_name']))]:
         path = (files_dir / name).with_suffix('.json')
         json.dump(obj, path.open('w'))
         bundle_paths.append((path.as_posix(), path.name))
