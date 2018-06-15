@@ -72,7 +72,7 @@ def compile(analysis, predictor_events, resources, bids_dir):
 
     # Write out analysis & resource JSON
     for obj, name in [(analysis, 'analysis'), (resources, 'resources'),
-                      (model, 'model'), (sidecar, 'task-{}_preproc'.format(analysis['task_name']))]:
+                      (model, 'model'), (sidecar, 'task-{}_bold'.format(analysis['task_name']))]:
         path = (files_dir / name).with_suffix('.json')
         json.dump(obj, path.open('w'))
         bundle_paths.append((path.as_posix(), path.name))
