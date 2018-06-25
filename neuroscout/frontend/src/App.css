@@ -25,6 +25,10 @@
   to { transform: rotate(360deg); }
 }
 
+.Login-col {
+  float: right;
+}
+
 body {
     background-color: white;
 }
