@@ -240,14 +240,11 @@ export default class AnalysisBuilder extends React.Component<BuilderProps, Store
         level: 'run',
         transformations: this.state.analysis.transformations,
         contrasts: this.state.analysis.contrasts,
+        auto_contrasts: true
         model: {
           variables: variables,
           HRF_variables: this.state.analysis.hrfPredictorIds
         }
-      },
-      {
-        level: 'subject',
-        auto_contrasts: true
       },
       {
         level: 'dataset',
