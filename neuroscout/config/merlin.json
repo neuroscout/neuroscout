@@ -8,10 +8,17 @@
           ["FrameSamplingFilter", { "hertz": 1 }]
         ],
         "extractors": [
+<<<<<<< Updated upstream
         ],
         "filters": {
           "subject": "30"
         }
+=======
+          ["PredefinedDictionaryExtractor", {"variables": ["subtlexusfrequency/Lg10WF"], "missing": "n/a"}]
+        ],
+        "transformations": [
+        ]
+>>>>>>> Stashed changes
       }
     }
   }
