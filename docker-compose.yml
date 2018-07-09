@@ -5,15 +5,13 @@ services:
     build: ./neuroscout
     expose:
       - "8000"
-    links:
-      - postgres:postgres
     volumes:
       - migrations:/migrations
       - ./neuroscout/:/neuroscout
-      - D:/neuroscout/datasets:/datasets
-      - D:/keys:/keys
-      - D:/neuroscout/file_data:/file-data
-    command: /usr/local/bin/gunicorn -w 2 -b :8000 core:app --log-level debug --timeout 300 --graceful-timeout 300
+      - ${DATASET_DIR}:/datasets
+      - ${KEY_DIR}:/keys
+      - ${FILE_DATA}:/file-data
+    command: /usr/local/bin/gunicorn -w 2 -b :8000 core:app --log-level debug
     env_file:
       - .env
       - .pliersenv
@@ -28,22 +26,14 @@ services:
       - ./nginx/sites-enabled:/etc/nginx/sites-enabled:ro
     volumes_from:
       - neuroscout
-    links:
-      - neuroscout:neuroscout
-
-  data:
-    image: postgres:latest
-    volumes:
-      - /var/lib/postgresql
-    command: "true"
 
   postgres:
     restart: always
     build: ./postgres
-    volumes_from:
-      - data
-    ports:
-      - "5432:5432"
+    volumes:
+        - postgres-data:/var/lib/postgresql/data
+    expose:
+      - '5432'
     environment:
       - POSTGRES_DB=neuroscout
 
@@ -51,8 +41,8 @@ services:
     image: swaggerapi/swagger-ui
     environment:
       - "API_URL=/swagger"
-    ports:
-      - '8080:8080'
+    expose:
+      - '8080'
 
   redis:
     image: redis
@@ -65,11 +55,10 @@ services:
       - redis
     entrypoint: celery -A tasks worker --loglevel=info
     volumes:
-      - D:/neuroscout/file_data:/file-data
-      - D:/neuroscout/datasets:/datasets
+      - ${FILE_DATA}:/file-data
+      - ${DATASET_DIR}:/datasets
       - ./neuroscout/:/neuroscout
       - ./celery_worker/:/celery_worker
-
     env_file: .env
 
   monitor:
@@ -86,4 +75,4 @@ services:
 
 volumes:
   migrations:
-  file-data:
+  postgres-data:
