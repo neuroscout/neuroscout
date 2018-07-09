@@ -1,7 +1,7 @@
 server {
 
     listen 80;
-    server_name http://alpha.neuroscout.org;
+    server_name alpha.neuroscout.org;
     charset utf-8;
 
     root /neuroscout/frontend/build;
