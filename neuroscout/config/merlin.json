@@ -5,9 +5,9 @@
     "tasks": {
       "MerlinMovie": {
         "converters": [
-          ["FrameSamplingFilter", { "hertz": 1 }]
         ],
         "extractors": [
+<<<<<<< HEAD
 <<<<<<< Updated upstream
         ],
         "filters": {
@@ -19,6 +19,13 @@
         "transformations": [
         ]
 >>>>>>> Stashed changes
+=======
+          ["ComplexTextExtractor", {}]
+        ],
+        "transformations": [
+          
+        ]
+>>>>>>> master
       }
     }
   }

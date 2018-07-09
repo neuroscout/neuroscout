@@ -3,6 +3,7 @@
 */
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
+import { BrowserRouter }  from 'react-router-dom';
 import { shallow, mount } from 'enzyme';
 import { moveItem } from './utils';
 import { Analysis, Dataset } from './coretypes';
@@ -59,7 +60,7 @@ it('Overview tab renders without errors', () => {
 });
 
 it('Analysis builder renders without errors', () => {
-  const wrapper = mount(<AnalysisBuilder updatedAnalysis={() => {}} />);
+  const wrapper = mount(<BrowserRouter><AnalysisBuilder updatedAnalysis={() => {}} /></BrowserRouter>);
   // Expect 7 tabs
   expect(wrapper.find('div[role="tab"]').length).toBe(7);
 });

@@ -46,7 +46,7 @@
       }
     }
   ],
-  "ClarifaiAPIExtractor": [
+  "ClarifaiAPIImageExtractor": [
     {
       "attributes": { "model_name": "general-v1.3" },
       "features": {
@@ -204,7 +204,8 @@
     {
       "features": {
         ".*": {
-          "description": "RGB Channel."
+          "description": "RGB Channel.",
+          "active": false
         }
       }
     }
@@ -252,6 +253,15 @@
       "features": {
         "FarnebackOpticalFlowExtractor": {
           "description": "Total amount of dense optical flow between every pair of video frames"
+        }
+      }
+    }
+  ],
+  "PredefinedDictionaryExtractor":[
+    {
+      "features": {
+        "subtlexusfrequency_Lg10WF": {
+          "description": "log10(FREQcount+1), where FREQcount is the number of times the word appears in the corpus (i.e., on the total of 51 million words)"
         }
       }
     }

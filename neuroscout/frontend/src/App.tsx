@@ -14,7 +14,7 @@ import AnalysisBuilder from './Builder';
 import Browse from './Browse';
 import { BrowserRouter as Router, Route, Link, Redirect } from 'react-router-dom';
 import './App.css';
-import config from '../config.js';
+import { config } from './config';
 
 const FormItem = Form.Item;
 const DOMAINROOT = config.server_url;
@@ -126,9 +126,8 @@ class App extends React.Component<{}, AppState> {
           if (data.status_code === 401) {
             this.setState({ loginError: data.description || '' });
             reject('Authentication failed');
-          }
-          else if (data.access_token) {
-            const token = data.access_token
+          } else if (data.access_token) {
+            const token = data.access_token;
             fetch(DOMAINROOT + '/api/user', {
               method: 'get',
               headers: {
@@ -138,26 +137,23 @@ class App extends React.Component<{}, AppState> {
             })
             .then((response) => {
               if (response.status === 401) {
-                response.json().then((data: {message: string}) => {
-                  if (data.message === "Your account has not been confirmed.") {
-                    accountconfirmError(token)
+                response.json().then((missing_data: {message: string}) => {
+                  if (missing_data.message === 'Your account has not been confirmed.') {
+                    accountconfirmError(token);
                   }
-                reject('Authentication failed');
-                })
+                  reject('Authentication failed');
+                });
 
-              }
-              else {
-                message.success("Logged in.");
+              } else {
+                message.success('Logged in.');
                 localStorage.setItem('jwt', token);
                 localStorage.setItem('email', email!);
                 resolve(token);
               }
-            })
-            .catch(displayError);;
+            }).catch(displayError);
           }}
-        )
-      .catch(displayError);}
-      );
+        ).catch(displayError);
+      });
 
   // Log user in
   login = () => {
@@ -272,7 +268,9 @@ class App extends React.Component<{}, AppState> {
       }
     })
     .catch(displayError)
-    .then(() =>  {this.setState({ openEnterResetToken: true, openReset: false });});
+    .then(() => {
+      this.setState({ openEnterResetToken: true, openReset: false });
+    });
   };
 
   // Reset password function
@@ -288,10 +286,9 @@ class App extends React.Component<{}, AppState> {
     })
     .then((response) =>  {
       if (response.ok) {
-        this.setState({ openEnterResetToken: false})
+        this.setState({ openEnterResetToken: false});
         this.login();
-      }
-      else {
+      } else {
         response.json().then(json => ({ ... json }))
         .then((data: any) => {
           let errorMessage = '';
@@ -299,7 +296,7 @@ class App extends React.Component<{}, AppState> {
             errorMessage += data.message[key];
           });
           that.setState({resetError: errorMessage});
-      })
+      });
     }
   })
     .catch(displayError);
@@ -373,7 +370,7 @@ class App extends React.Component<{}, AppState> {
         </Router>
       );
 
-    const resetPasswordModal = () =>
+    const resetPasswordModal = () => (
       <Modal
         title="Reset password"
         visible={openReset}
@@ -383,34 +380,35 @@ class App extends React.Component<{}, AppState> {
           this.setState({ openReset: false });
         }}
       >
-      <p>
-       Please enter an email address to send reset instructions
-     </p>
-      <Form
-        onSubmit={e => {
-          e.preventDefault();
-          this.resetPassword();
-        }}
-      >
-        <FormItem>
-          <Input
-            prefix={<Icon type="mail" style={{ fontSize: 13 }}/>}
-            placeholder="Email"
-            type="email"
-            size="large"
-            value={email}
-            onChange={this.setStateFromInput('email')}
-          />
-        </FormItem>
-        <FormItem>
-          <Button style={{ width: '100%' }} htmlType="submit" type="primary">
-            Reset password
-          </Button>
-        </FormItem>
-      </Form>
-    </Modal>;
+        <p>
+         Please enter an email address to send reset instructions
+        </p>
+        <Form
+          onSubmit={e => {
+            e.preventDefault();
+            this.resetPassword();
+          }}
+        >
+          <FormItem>
+            <Input
+              prefix={<Icon type="mail" style={{ fontSize: 13 }}/>}
+              placeholder="Email"
+              type="email"
+              size="large"
+              value={email}
+              onChange={this.setStateFromInput('email')}
+            />
+          </FormItem>
+          <FormItem>
+            <Button style={{ width: '100%' }} htmlType="submit" type="primary">
+              Reset password
+            </Button>
+          </FormItem>
+        </Form>
+      </Modal>
+  );
 
-    const enterResetTokenModal = () =>
+    const enterResetTokenModal = () => (
       <Modal
         title="Change password"
         visible={openEnterResetToken}
@@ -420,47 +418,48 @@ class App extends React.Component<{}, AppState> {
           this.setState({ openEnterResetToken: false });
         }}
       >
-      <p>
-       We have sent a reset token to {email} <br/>
-       Please enter the token below, along with a new password for the account.
-     </p>
-      <Form
-        onSubmit={e => {
-          e.preventDefault();
-          this.submitToken();
-        }}
-      >
-        <FormItem>
-          <Input
-            prefix={<Icon type="tags" style={{ fontSize: 13 }}/>}
-            placeholder="Token"
-            type="token"
-            size="large"
-            onChange={this.setStateFromInput('token')}
-          />
-        </FormItem>
-        <FormItem>
-          <Input
-            prefix={<Icon type="lock" style={{ fontSize: 13 }}/>}
-            placeholder="Password"
-            type="password"
-            size="large"
-            onChange={this.setStateFromInput('password')}
-          />
-        </FormItem>
-        <FormItem>
-          <Button style={{ width: '100%' }} htmlType="submit" type="primary">
-            Submit
-          </Button>
-        </FormItem>
-      </Form>
-      <p>
-        {resetError}
-      </p>
-      <br />
-    </Modal>;
+        <p>
+         We have sent a reset token to {email} <br/>
+         Please enter the token below, along with a new password for the account.
+       </p>
+        <Form
+          onSubmit={e => {
+            e.preventDefault();
+            this.submitToken();
+          }}
+        >
+          <FormItem>
+            <Input
+              prefix={<Icon type="tags" style={{ fontSize: 13 }}/>}
+              placeholder="Token"
+              type="token"
+              size="large"
+              onChange={this.setStateFromInput('token')}
+            />
+          </FormItem>
+          <FormItem>
+            <Input
+              prefix={<Icon type="lock" style={{ fontSize: 13 }}/>}
+              placeholder="Password"
+              type="password"
+              size="large"
+              onChange={this.setStateFromInput('password')}
+            />
+          </FormItem>
+          <FormItem>
+            <Button style={{ width: '100%' }} htmlType="submit" type="primary">
+              Submit
+            </Button>
+          </FormItem>
+        </Form>
+        <p>
+          {resetError}
+        </p>
+        <br />
+      </Modal>
+  );
 
-    const loginModal = () =>
+    const loginModal = () => (
       <Modal
         title="Log into Neuroscout"
         visible={openLogin}
@@ -500,14 +499,16 @@ class App extends React.Component<{}, AppState> {
             />
           </FormItem>
           <FormItem>
-           <a onClick={e => {this.setState({ openLogin:false, openReset: true });}}>Forgot password</a><br/>
+           <a onClick={e => {this.setState( { openLogin: false, openReset: true}); }}>Forgot password</a><br/>
             <Button style={{ width: '100%' }} htmlType="submit" type="primary">
               Log in
             </Button>
           </FormItem>
         </Form>
-      </Modal>;
-    const signupModal = () =>
+      </Modal>
+    );
+
+    const signupModal = () => (
       <Modal
         title="Sign up for a Neuroscout account"
         visible={openSignup}
@@ -558,7 +559,9 @@ class App extends React.Component<{}, AppState> {
             </Button>
           </FormItem>
         </Form>
-      </Modal>;
+      </Modal>
+    );
+
     return (
       <Router>
         <div>
@@ -599,7 +602,7 @@ class App extends React.Component<{}, AppState> {
             </Header>
             <Content style={{ background: '#fff' }}>
               <Route
-                exact
+                exact={true}
                 path="/"
                 render={props =>
                   <Home
@@ -610,7 +613,7 @@ class App extends React.Component<{}, AppState> {
                   />}
               />
               <Route
-                exact
+                exact={true}
                 path="/builder"
                 render={props => {
                   // This is a temporary solution to prevent non logged-in users from entering the builder.
@@ -633,7 +636,7 @@ class App extends React.Component<{}, AppState> {
                   />}
               />
               <Route
-                exact
+                exact={true}
                 path="/browse"
                 render={props =>
                   <Browse analyses={publicAnalyses} cloneAnalysis={this.cloneAnalysis} />}

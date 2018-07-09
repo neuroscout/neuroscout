@@ -7,47 +7,47 @@ from pathlib import Path
 from tempfile import mkdtemp
 from bids.analysis import Analysis
 from bids.grabbids import BIDSLayout
-from celery.contrib import rdb
+from grabbit import Layout
+from copy import deepcopy
 
 logger = get_task_logger(__name__)
-
+PATHS = ['sub-{subject}_[ses-{session}_]task-{task}_[acq-{acquisition}_][run-{run}_]events.tsv']
 
 def writeout_events(analysis, pes, outdir):
     """ Write event files from JSON """
+    gl = Layout(outdir)
     outdir = outdir / "func"
     outdir.mkdir(exist_ok=True)
+
+    desc = {"Name": "Events", "BIDSVersion": "1.0"}
+    json.dump(desc, (outdir / 'dataset_description.json').open('w'))
 
     # Load events and rename columns to human-readable
     pes = pd.DataFrame(pes)
     predictor_names = {di["id"]: di["name"] for di in analysis['predictors']}
     pes.predictor_id = pes.predictor_id.map(predictor_names)
-    # Write out event files
 
+    # Write out event files
     paths = []
     for run in analysis.pop('runs'):
-        ## Write out event files for each run_id
+        # Write out event files for each run_id
         run_events = pes[pes.run_id==run['id']].drop('run_id', axis=1)
 
+        run['run'] = run.pop('number')
+        entities = {r:v for r,v in run.items()
+                    if r in ['run', 'session', 'subject'] and v is not None}
+        entities['task'] = analysis['task_name']
+
         if run_events.empty is False:
-            # Make wide
-            run_events = run_events.groupby(
-                ['onset', 'duration', 'predictor_id'])['value'].\
-                max().unstack('predictor_id').reset_index()
+            for name, df in run_events.groupby('predictor_id'):
+                df_col = df.groupby(['onset', 'duration'])['value'].max()
+                df_col = df_col.reset_index().rename(columns={'value': name})
 
-            # Missing columns
-            missing = set(predictor_names.values()) - set(run_events.columns)
-            for col in missing:
-                run_events[col] = 0.0
-
-            run_events = run_events.fillna(0.0)
-
-            # Write out BIDS path
-            ses = 'ses-{}_'.format(run['session']) if run.get('session') else ''
-            run_num = 'run-{}_'.format(run['number']) if run.get('number') else ''
-            events_fname = outdir / 'sub-{}_{}task-{}_{}events.tsv'.format(
-                run['subject'], ses, analysis['task_name'], run_num)
-            paths.append(events_fname)
-            run_events.to_csv(events_fname, sep='\t', index=False)
+                # Write out BIDS path
+                fname = outdir / name / gl.build_path(entities, path_patterns=PATHS)
+                fname.parent.mkdir(exist_ok=True)
+                paths.append((fname.as_posix(), 'events/{}/{}'.format(name,fname.name)))
+                df_col.to_csv(fname, sep='\t', index=False)
 
     return paths
 
@@ -56,26 +56,31 @@ def compile(analysis, predictor_events, resources, bids_dir):
     files_dir = Path(mkdtemp())
     model = analysis.pop('model')
     scan_length = analysis['runs'][0]['duration']
+    subject = [model['input']['subject'][0]]
 
     # Write out events
     bundle_paths = writeout_events(analysis, predictor_events, files_dir)
 
     # Load events and try applying transformations
-    bids_layout = BIDSLayout([bids_dir, files_dir.as_posix()])
-    bids_analysis = Analysis(bids_layout, model)
+    bids_layout = BIDSLayout(bids_dir, config=[('bids', [bids_dir, files_dir.as_posix()])])
+    bids_analysis = Analysis(bids_layout, deepcopy(model))
     bids_analysis.setup(derivatives='only', task=analysis['task_name'],
-                        scan_length=scan_length)
+                        scan_length=scan_length, subject=subject)
+
+    # Sidecar:
+    sidecar = {"RepetitionTime": analysis['TR']}
 
     # Write out analysis & resource JSON
-    for obj, name in [(analysis, 'analysis'), (resources, 'resources'), (model, 'model')]:
+    for obj, name in [(analysis, 'analysis'), (resources, 'resources'),
+                      (model, 'model'), (sidecar, 'task-{}_bold'.format(analysis['task_name']))]:
         path = (files_dir / name).with_suffix('.json')
         json.dump(obj, path.open('w'))
-        bundle_paths.append(path)
+        bundle_paths.append((path.as_posix(), path.name))
 
     # Save bundle as tarball
     bundle_path = '/file-data/analyses/{}_bundle.tar.gz'.format(analysis['hash_id'])
     with tarfile.open(bundle_path, "w:gz") as tar:
-        for path in bundle_paths:
-            tar.add(path.as_posix(), arcname=path.name)
+        for path, arcname in bundle_paths:
+            tar.add(path, arcname=arcname)
 
     return {'bundle_path': bundle_path}

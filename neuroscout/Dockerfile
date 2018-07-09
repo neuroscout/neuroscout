@@ -5,10 +5,10 @@ RUN apt-get -qq update
 RUN apt-get install -yq ffmpeg tesseract-ocr
 RUN pip install -e git+https://github.com/tyarkoni/pliers.git#egg=pliers
 RUN python -c "import imageio; imageio.plugins.ffmpeg.download()"
-
 RUN apt-get install -yq cmake libopenblas-dev liblapack-dev
 RUN pip install -e git+https://github.com/davisking/dlib.git#egg=dlib
 RUN curl https://raw.githubusercontent.com/tyarkoni/pliers/master/optional-dependencies.txt | pip install -r /dev/stdin
+RUN python -m pliers.support.download
 
 RUN wget -O- http://neuro.debian.net/lists/jessie.us-nh.full | tee /etc/apt/sources.list.d/neurodebian.sources.list
 RUN apt-key adv --recv-keys --keyserver hkp://keyserver.ubuntu.com:80 0xA5D32F012649A5A9

@@ -6,18 +6,6 @@ import hashlib
 import warnings
 from pathlib import Path
 
-def format_preproc(subject, task, run=None, session=None,
-                   space="MNI152NLin2009cAsym", suffix="preproc"):
-    """ Format relative fmri_prep paths """
-    subject_f = "sub-{}/".format(subject)
-    session_f = "ses-{}/".format(session) if session else ""
-    run_f = "run-{}_".format(run.zfill(2)) if run else ""
-    return "{}{}func/{}{}task-{}_{}bold_space-{}_{}.nii.gz".format(
-    subject_f, session_f,
-    subject_f.replace("/", "_"), session_f.replace("/", "_"),
-    task, run_f, space, suffix
-)
-
 def hash_stim(stim, blocksize = 65536):
     """ Hash a pliers stimulus """
     if isinstance(stim, Path):
@@ -48,6 +36,8 @@ def hash_data(data):
     """" Hashes data or string """
     if isinstance(data, str):
         data = data.encode('utf-8')
+    elif hasattr(data, 'to_string'):
+        data = data.to_string().encode('utf-8')
     hasher = hashlib.sha1()
     hasher.update(data)
 

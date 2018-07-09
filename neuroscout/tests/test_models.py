@@ -29,7 +29,7 @@ def test_dataset_ingestion(session, add_task):
 	assert 'TaskName' in run_model.task.description
 	assert run_model.task.description['RepetitionTime'] == 2.0
 
-	assert run_model.func_path == 'sub-01/func/sub-01_task-bidstest_run-01_bold_space-MNI152NLin2009cAsym_preproc.nii.gz'
+	assert run_model.func_path == 'sub-01/func/sub-01_task-bidstest_run-1_bold_space-MNI152NLin2009cAsym_preproc.nii.gz'
 
 	# Test properties of first run's predictor events
 	assert run_model.predictor_events.count() == 12
@@ -134,9 +134,17 @@ def test_json_local_dataset(session, add_local_task_json):
 	assert ExtractedFeature.query.filter_by(
 		feature_name='Brightness').count() == 1
 
+	num_bright = ExtractedFeature.query.filter_by(feature_name='num_bright')
+	assert num_bright.count() == 1
+	assert num_bright.first().extracted_events.count() == 3
+
+	for ee in num_bright.first().extracted_events:
+		assert ee.value == '1'
+
+
 def test_local_update(update_local_json):
 	assert update_local_json is not None
-	assert ExtractedFeature.query.count() == 4
+	assert ExtractedFeature.query.count() == 6
 
 def test_extracted_features(session, add_task, extract_features):
 	""" This tests feature extraction from a remote dataset"""
@@ -221,13 +229,12 @@ def test_external_text(get_data_path, add_task):
 	stim = Stimulus.query.filter_by(dataset_id=dataset_model.id).first()
 
 	ingest_text_stimuli(filename, dataset_model.name, task_name, stim.id,
-						'FakeTextExtraction')
+						transformer='FakeTextExtraction')
 
 	data = [s for s in Stimulus.query.all() if s.content is not None]
 
 	first_stim = [s for s in data if s.content == 'no'][0]
-	rs = RunStimulus.query.filter_by(stimulus_id=first_stim.id).all()
 
 	assert len(data) == 2
-	assert len(rs) == 4
-	assert 7.922 in [s.onset for s in rs]
+	assert first_stim.run_stimuli.count() == 4
+	assert 2.2 in [s.onset for s in first_stim.run_stimuli]

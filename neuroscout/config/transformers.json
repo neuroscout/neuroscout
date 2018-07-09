@@ -1,11 +1,12 @@
 {
   "converters": [
     ["TesseractConverter", {}],
-    ["FrameSamplingFilter", { "every": 200 }],
+    ["FrameSamplingFilter", { "hertz": 1 }],
     ["VideoToAudioConverter", {}]
   ],
   "extractors": [
     ["FarnebackOpticalFlowExtractor", {}],
+    ["WordEmbeddingExtractor", {"embedding_file": "/datasets/glove.6B.300d.txt.word2vec", "binary": false}],
     ["BrightnessExtractor", {}],
     ["VibranceExtractor", {}],
     ["SharpnessExtractor", {}],
@@ -13,11 +14,12 @@
     ["GoogleVisionAPIFaceExtractor", {}],
     ["GoogleVisionAPILabelExtractor", {}],
     ["GoogleVisionAPIPropertyExtractor", {}],
+    ["GoogleVideoAPIShotDetectionExtractor", {"timeout": 100000}],
     ["GoogleVisionAPISafeSearchExtractor", {}],
-    ["ClarifaiAPIExtractor", { "model": "general-v1.3",
+    ["ClarifaiAPIImageExtractor", { "model": "general-v1.3",
       "select_concepts": ["alphabet", "portrait", "dark", "daylight", "creativity", "animal", "face", "wild", "abstract", "sky", "room", "vertical", "text", "business", "vehicle", "wear", "horizontal", "man", "furniture", "old", "home", "two", "nature", "image", "family", "building", "empty", "road", "design", "woman", "girl", "landscape", "hand", "fashion", "equipment", "child", "art", "sunset", "music", "summer", "light", "wildlife", "competition", "simplicity", "architecture", "desktop", "retro", "technology", "street", "indoors", "adult", "outdoors", "recreation", "military", "color", "blur", "wood", "writing", "illustration", "travel", "one", "car", "action", "pattern", "water", "city", "people"]
       }],
-    ["ClarifaiAPIExtractor", { "model": "nsfw-v1.0" }],
+    ["ClarifaiAPIImageExtractor", { "model": "nsfw-v1.0" }],
     ["IndicoAPIImageExtractor", { "models": [
       "fer", "content_filtering", "image_recognition"] }],
     ["STFTAudioExtractor", {}],
@@ -26,6 +28,32 @@
     ["MeanAmplitudeExtractor", {}],
     ["SpectralCentroidExtractor", {}],
     ["VADERSentimentExtractor", {}],
-    ["RMSEExtractor", {}]
+    ["RMSEExtractor", {"frame_length": 72000, "hop_length": 72000, "center": false}],
+    ["ComplexTextExtractor", {}],
+    ["PredefinedDictionaryExtractor", {"variables": ["subtlexusfrequency/Lg10WF"], "missing": "n/a"} ]
+  ],
+  "transformations":[
+    {
+      "function": "num_objects",
+      "new_name": "num_faces",
+      "feature_name": "face_detectionConfidence"
+    },
+    {
+      "function": "dummy",
+      "new_name": "speech",
+      "extractor_name": "ComplexTextExtractor"
+    },
+    {
+      "function": "dummy_value",
+      "new_name": "shot_change",
+      "extractor_name": "GoogleVideoAPIShotDetectionExtractor",
+      "feature_name": "shot_id"
+    },
+    {
+      "function": "num_objects",
+      "func_args": {"threshold": 0.07},
+      "new_name": "num_colors_0_07",
+      "extractor_name": "GoogleVisionAPIPropertyExtractor"
+    }
   ]
 }

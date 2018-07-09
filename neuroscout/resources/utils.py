@@ -29,7 +29,7 @@ def update_analysis_status(analysis, commit=True):
         res = celery_app.AsyncResult(analysis.celery_id)
         if res.state == states.FAILURE:
             analysis.status = "FAILED"
-            analysis.celery_error = str(res.result)
+            analysis.compile_traceback = res.traceback 
         elif res.state == states.SUCCESS:
             analysis = put_record(res.result, analysis, commit=commit)
             analysis.status = "PASSED"
@@ -82,7 +82,7 @@ def add_default_model(analysis, commit=True):
         if analysis.session is not None:
             model['input']['session'] = analysis.session
         if analysis.run is not None:
-            model['input']['run'] = analysis.run_num
+            model['input']['run'] = analysis.run
         analysis.model = model
 
         if commit is True:

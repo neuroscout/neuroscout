@@ -21,18 +21,19 @@ import {
   ApiAnalysis,
   AnalysisConfig,
   Transformation,
-  Contrast
+  Contrast,
+  Block
 } from './coretypes';
 import { displayError, jwtFetch } from './utils';
 import { Space } from './HelperComponents';
 import Status from './Status';
-import config from '../config.js';
+import { config } from './config';
 
 const { TabPane } = Tabs;
 const { Footer, Content } = Layout;
 
 // const logo = require('./logo.svg');
-const domainRoot = config.server_url
+const domainRoot = config.server_url;
 const EMAIL = 'user@example.com';
 const PASSWORD = 'string';
 const DEFAULT_SMOOTHING = 50;
@@ -139,9 +140,9 @@ const getTasks = (runs: Run[]): Task[] => {
 
 // Given an updated list of predictor IDs, create an updated version of analysis config.
 // preserving the existing predictor configs, and adding/removing new/old ones as necessary
-const getUpdatedConfig = (config: AnalysisConfig, predictorIds: string[]): AnalysisConfig => {
-  let newConfig = { ...config };
-  let newPredictorConfigs = { ...config.predictorConfigs };
+const getUpdatedConfig = (old_config: AnalysisConfig, predictorIds: string[]): AnalysisConfig => {
+  let newConfig = { ...old_config };
+  let newPredictorConfigs = { ...old_config.predictorConfigs };
   predictorIds.forEach(id => {
     if (!newPredictorConfigs.hasOwnProperty(id)) {
       newPredictorConfigs[id] = {
@@ -254,9 +255,19 @@ export default class AnalysisBuilder extends React.Component<BuilderProps, Store
   // Decode data returned by '/api/analyses/<id>' (ApiAnalysis) to convert it to the right shape (Analysis)
   // and fetch the associated runs
   loadAnalysis = (data: ApiAnalysis): Promise<Analysis> => {
+    if (data.model && data.model.blocks && !data.transformations) {
+      data.transformations = [];
+      for (var i = 0; i < data.model.blocks.length; i++) {
+        if (data.model.blocks[i].transformations != null) {
+          data.transformations = data.transformations.concat(...data.model.blocks[i].transformations!);
+        }
+      }
+    }
+
     if (!data.transformations) {
       return Promise.reject('Data returned by server is missing transformations array.');
     }
+
     const analysis: Analysis = {
       name: data.name,
       description: data.description,
@@ -267,14 +278,15 @@ export default class AnalysisBuilder extends React.Component<BuilderProps, Store
       runIds: data.runs!.map(({ id }) => id),
       predictorIds: data.predictors!.map(({ id }) => id),
       config: data.config || defaultConfig,
-      transformations: data.transformations.filter(xform => xform.name), // TODO: remove the filter once this issue is fixed: https://github.com/PsychoinformaticsLab/neuroscout/issues/99
+      transformations: data.transformations,
       contrasts: data.contrasts || []
     };
+
     if (analysis.runIds.length > 0) {
       jwtFetch(`${domainRoot}/api/runs/${analysis.runIds[0]}`)
         // .then(response => response.json() as Promise<Run>)
-        .then(data => {
-          this.setState({ selectedTaskId: data.task.id });
+        .then(fetch_data => {
+          this.setState({ selectedTaskId: fetch_data.task.id });
           this.updateState('analysis', true)(analysis);
         })
         .catch(displayError);
@@ -353,7 +365,7 @@ export default class AnalysisBuilder extends React.Component<BuilderProps, Store
         // If there was any change in selection of runs, fetch the associated predictors
         const runIds = updatedAnalysis.runIds.join(',');
         if (runIds) {
-          jwtFetch(`${domainRoot}/api/predictors?runs=${runIds}`)
+          jwtFetch(`${domainRoot}/api/predictors?run_id=${runIds}`)
             // .then(response => response.json())
             .then((data: Predictor[]) => {
               message.success(
