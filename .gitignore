@@ -114,3 +114,4 @@ jest_0
 .pliersenv
 celery_worker/src
 neuroscout/frontend/src/config.ts
+.env
