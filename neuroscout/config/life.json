@@ -7,7 +7,7 @@
         "converters": [
         ],
         "extractors": [
-          ["RMSEExtractor", {"frame_length": 72000, "hop_length": 72000, "center": false}]
+          ["PredefinedDictionaryExtractor", {"variables": ["subtlexusfrequency/Lg10WF"], "missing": "n/a"} ]
         ],
         "transformations":[
         ]
