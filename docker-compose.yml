@@ -40,8 +40,8 @@ services:
   postgres:
     restart: always
     build: ./postgres
-    volumes_from:
-      - data
+    volumes:
+        - postgres-data:/var/lig/postgresql/data
     ports:
       - "5432:5432"
     environment:
@@ -87,3 +87,4 @@ services:
 volumes:
   migrations:
   file-data:
+  postgres-data:
