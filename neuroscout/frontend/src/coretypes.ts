@@ -88,7 +88,7 @@ export interface Transformation {
   input?: string[]; // predictor IDs
   demean?: boolean;
   rescale?: boolean;
-  wrt?: string[];
+  other?: string[];
 }
  
 // Lookup hash of available transformations (as specified in transforms.ts) by their name

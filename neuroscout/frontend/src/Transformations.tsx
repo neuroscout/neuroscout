@@ -171,8 +171,8 @@ class XformEditor extends React.Component<XformEditorProps, XformEditorState> {
     const inputIds = new Set(input.map(x => x.name));
     let newXform = transformation;
     if (transformation.name === 'orthogonalize') {
-        if (transformation.wrt) {
-          newXform.wrt = transformation.wrt.filter(x => !inputIds.has(x));
+        if (transformation.other) {
+          newXform.other = transformation.other.filter(x => !inputIds.has(x));
         }
     }
     newXform.input = Array.from(inputIds);

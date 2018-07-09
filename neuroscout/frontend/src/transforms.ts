@@ -37,7 +37,7 @@ const transformDefinitions: Transformation[] = [
   },
   {
     name: 'orthogonalize',
-    wrt: []
+    other: []
   }
 ];
 
