@@ -98,7 +98,7 @@ export interface XformRules {
 
 export interface Contrast {
   name: string;
-  predictors: string[];
+  condition_list: string[];
   weights: number[];
   contrastType: 't' | 'F';
 }

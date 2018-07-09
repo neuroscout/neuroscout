@@ -35,7 +35,7 @@ export default class ContrastEditor extends React.Component<
     super(props);
     const { contrast, availablePredictors } = props;
     this.state = {
-      predictors: [],
+      condition_list: [],
       name: contrast ? contrast.name : '',
       weights: contrast ? contrast.weights : [],
       contrastType: 't',
@@ -46,12 +46,12 @@ export default class ContrastEditor extends React.Component<
 
   // Validate and save contrast
   onSave = (): void => {
-    const { name, predictors, weights, contrastType } = this.state;
+    const { name, condition_list, weights, contrastType } = this.state;
     let errors: string[] = [];
     if (!name) {
       errors.push('Please specify a name for the contrast');
     }
-    if (predictors.length !== weights.length) {
+    if (condition_list.length !== weights.length) {
       errors.push('Please enter a numeric weight for each predictor');
     }
     weights.forEach((value, index) => {
@@ -62,7 +62,7 @@ export default class ContrastEditor extends React.Component<
       this.setState({ errors });
       return;
     }
-    const newContrast: Contrast = { name, predictors, weights, contrastType };
+    const newContrast: Contrast = { name, condition_list, weights, contrastType };
     this.props.onSave(newContrast);
   };
 
@@ -76,11 +76,11 @@ export default class ContrastEditor extends React.Component<
         content: 'You have already entered some weights. Changing the selection will discard that.',
         okText: 'Yes',
         cancelText: 'No',
-        onOk: () => that.setState({ selectedPredictors, weights: [], predictors: updatedPredictors})
+        onOk: () => that.setState({ selectedPredictors, weights: [], condition_list: updatedPredictors})
       });
       return;
     }
-    this.setState({ selectedPredictors, predictors: updatedPredictors});
+    this.setState({ selectedPredictors, condition_list: updatedPredictors});
   };
 
   updateWeight = (index: number, value: number) => {
@@ -90,7 +90,7 @@ export default class ContrastEditor extends React.Component<
   };
 
   render() {
-    const { name, predictors, selectedPredictors, weights, contrastType, errors } = this.state;
+    const { name, condition_list, selectedPredictors, weights, contrastType, errors } = this.state;
     const { availablePredictors } = this.props;
     return (
       <div>
@@ -133,7 +133,7 @@ export default class ContrastEditor extends React.Component<
         <p>Enter weights for the selected predictors:</p>
         <br />
         <Form layout="horizontal">
-          {predictors.map((predictor, i) =>
+          {condition_list.map((predictor, i) =>
             <FormItem
               label={predictor}
               key={i}
