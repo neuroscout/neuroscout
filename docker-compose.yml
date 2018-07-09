@@ -5,8 +5,6 @@ services:
     build: ./neuroscout
     expose:
       - "8000"
-    links:
-      - "postgres"
     volumes:
       - migrations:/migrations
       - ./neuroscout/:/neuroscout
