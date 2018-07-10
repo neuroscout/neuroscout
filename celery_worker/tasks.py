@@ -35,7 +35,7 @@ def writeout_events(analysis, pes, outdir):
 
         run['run'] = run.pop('number')
         entities = {r:v for r,v in run.items()
-                    if r in ['run', 'session', 'subject'] and v is not None}
+                    if r in ['run', 'session', 'subject', 'acquisition'] and v is not None}
         entities['task'] = analysis['task_name']
 
         if run_events.empty is False:

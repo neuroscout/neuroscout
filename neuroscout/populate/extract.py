@@ -156,6 +156,7 @@ def extract_features(dataset_name, task_name, extractors):
     results = []
     for name, parameters in extractors:
         # For every extractor, extract from matching stims
+        current_app.logger.info("Extractor: {}".format(name))
         ext = get_transformer(name, **parameters)
         for so, s in stims:
             if ext._stim_matches_input_types(s):
@@ -210,18 +211,25 @@ def extract_features(dataset_name, task_name, extractors):
     return list(ext_feats.values())
 
 
-def create_predictors(features, dataset_name):
-    """" Create Predictors from Extracted Features """
-    dataset_id = Dataset.query.filter_by(name=dataset_name).one().id
-
+def create_predictors(features, dataset_name, run_ids=None):
+    """ Create Predictors from Extracted Features.
+        Args:
+            features (object) - ExtractedFeature objects
+            dataset_name (str) - Dataset name
+            run_ids (list of ints) - Optional list of run_ids for which to
+                                     create PredictorEvents for.
+    """
     current_app.logger.info("Creating predictors")
+
+    # Create/Get Predictors
     all_preds = []
     for ef in features:
         all_preds.append(get_or_create(
-            Predictor, name=ef.feature_name, dataset_id=dataset_id,
+            Predictor, name=ef.feature_name,
+            dataset_id=Dataset.query.filter_by(name=dataset_name).one().id,
             source='extracted', ef_id=ef.id)[0])
 
-
+    # Create PredictorEvents and PredictorRuns
     for ix, predictor in enumerate(progressbar(all_preds)):
         ef = features[ix]
         all_pes = []
@@ -229,7 +237,10 @@ def create_predictors(features, dataset_name):
         # For all instances for stimuli in this task's runs
         for ee in ef.extracted_events:
             # if ee.value:
-            for rs in RunStimulus.query.filter_by(stimulus_id=ee.stimulus_id):
+            query = RunStimulus.query.filter_by(stimulus_id=ee.stimulus_id)
+            if run_ids is not None:
+                query = query.filter(RunStimulus.run_id.in_(run_ids))
+            for rs in query:
                     all_rs.append((predictor.id, rs.run_id))
                     duration = ee.duration
                     if duration is None:
