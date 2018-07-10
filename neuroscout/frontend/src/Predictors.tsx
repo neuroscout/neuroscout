@@ -52,6 +52,10 @@ export class PredictorSelector extends React.Component<
         searchRegex.test(p.name + (p.description || ''))
       );
     }
+    // tslint:disable-next-line:no-console
+    console.log(this.props);
+    // tslint:disable-next-line:no-console
+    console.log(newState);
     this.setState(newState);
   };
 
