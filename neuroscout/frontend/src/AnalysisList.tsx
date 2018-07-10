@@ -28,21 +28,32 @@ const AnalysisList = (props: AnalysisListProps) => {
   // Delete button: only if not a public list and analysis is in draft mode
   // Clone button: any analysis
   const analysisTableColumns = [
-    { title: 'ID', dataIndex: 'id' },
+    { 
+      title: 'ID',
+      dataIndex: 'id', 
+      sorter: (a, b) => a.id.localeCompare(b.id)
+    },
     {
       title: 'Name',
       render: (text, record: AppAnalysis) => (
         <Link to={`/builder/${record.id}`}>
           {record.name}
         </Link>
-      )
+      ),
+      sorter: (a, b) => a.name.localeCompare(b.name)
     },
     {
       title: 'Status',
       dataIndex: 'status',
-      render: (text, record) => <Status status={record.status} />
+      render: (text, record) => <Status status={record.status} />,
+      sorter: (a, b) => a.status.localeCompare(b.status)
     },
-    { title: 'Modified at', dataIndex: 'modifiedAt' },
+    {
+      title: 'Modified at',
+      dataIndex: 'modifiedAt',
+      defaultSortOrder: 'descend' as 'descend',
+      sorter: (a, b) => a.modifiedAt.localeCompare(b.modifiedAt)
+    },
     {
       title: 'Actions',
       render: (text, record: AppAnalysis) => (
