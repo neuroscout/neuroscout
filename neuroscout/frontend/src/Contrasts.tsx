@@ -34,15 +34,15 @@ interface ContrastDisplayProps {
 
 const ContrastDisplay = (props: ContrastDisplayProps) => {
   const { contrast, index, onDelete, onMove, enableUp, enableDown } = props;
-  const inputs = contrast.predictors || [];
+  const inputs = contrast.condition_list || [];
   return (
     <div>
       <h3>{`${index + 1}: ${contrast.name}`}</h3>
       <p>Weights:</p>
       <ul>
-        {contrast.predictors.map((predictor, i) =>
-          <li key={predictor.id}>
-            {predictor.name + ': ' + contrast.weights[i]}
+        {contrast.condition_list.map((predictor, i) =>
+          <li key={i}>
+            {predictor + ': ' + contrast.weights[i]}
           </li>
         )}
       </ul>

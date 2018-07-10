@@ -24,6 +24,7 @@ interface ContrastEditorProps {
 
 interface ContrastEditorState extends Contrast {
   errors: string[];
+  selectedPredictors: Predictor[];
 }
 
 export default class ContrastEditor extends React.Component<
@@ -34,22 +35,23 @@ export default class ContrastEditor extends React.Component<
     super(props);
     const { contrast, availablePredictors } = props;
     this.state = {
-      predictors: [],
+      condition_list: [],
       name: contrast ? contrast.name : '',
       weights: contrast ? contrast.weights : [],
       contrastType: 't',
-      errors: []
+      errors: [],
+      selectedPredictors: []
     };
   }
 
   // Validate and save contrast
   onSave = (): void => {
-    const { name, predictors, weights, contrastType } = this.state;
+    const { name, condition_list, weights, contrastType } = this.state;
     let errors: string[] = [];
     if (!name) {
       errors.push('Please specify a name for the contrast');
     }
-    if (predictors.length !== weights.length) {
+    if (condition_list.length !== weights.length) {
       errors.push('Please enter a numeric weight for each predictor');
     }
     weights.forEach((value, index) => {
@@ -60,24 +62,25 @@ export default class ContrastEditor extends React.Component<
       this.setState({ errors });
       return;
     }
-    const newContrast: Contrast = { name, predictors, weights, contrastType };
+    const newContrast: Contrast = { name, condition_list, weights, contrastType };
     this.props.onSave(newContrast);
   };
 
-  updatePredictors = (predictors: Predictor[]): void => {
+  updatePredictors = (selectedPredictors: Predictor[]): void => {
     const that = this;
     // Warn user if they have already entered weights but are now changing the predictors
+    let updatedPredictors = selectedPredictors.map(x => x.name);
     if (this.state.weights.length > 0) {
       Modal.confirm({
         title: 'Are you sure?',
         content: 'You have already entered some weights. Changing the selection will discard that.',
         okText: 'Yes',
         cancelText: 'No',
-        onOk: () => that.setState({ predictors, weights: [] })
+        onOk: () => that.setState({ selectedPredictors, weights: [], condition_list: updatedPredictors})
       });
       return;
     }
-    this.setState({ predictors });
+    this.setState({ selectedPredictors, condition_list: updatedPredictors});
   };
 
   updateWeight = (index: number, value: number) => {
@@ -87,7 +90,7 @@ export default class ContrastEditor extends React.Component<
   };
 
   render() {
-    const { name, predictors, weights, contrastType, errors } = this.state;
+    const { name, condition_list, selectedPredictors, weights, contrastType, errors } = this.state;
     const { availablePredictors } = this.props;
     return (
       <div>
@@ -123,16 +126,16 @@ export default class ContrastEditor extends React.Component<
         <p>Select predictors:</p>
         <PredictorSelector
           availablePredictors={availablePredictors}
-          selectedPredictors={predictors}
+          selectedPredictors={selectedPredictors}
           updateSelection={this.updatePredictors}
         />
         <br />
         <p>Enter weights for the selected predictors:</p>
         <br />
         <Form layout="horizontal">
-          {predictors.map((predictor, i) =>
+          {condition_list.map((predictor, i) =>
             <FormItem
-              label={predictor.name}
+              label={predictor}
               key={i}
               labelCol={{ span: 4 }}
               wrapperCol={{ span: 2 }}

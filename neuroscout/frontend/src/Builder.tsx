@@ -22,7 +22,9 @@ import {
   AnalysisConfig,
   Transformation,
   Contrast,
-  Block
+  Block,
+  BidsModel,
+  ImageInput,
 } from './coretypes';
 import { displayError, jwtFetch } from './utils';
 import { Space } from './HelperComponents';
@@ -56,11 +58,19 @@ const initializeStore = (): Store => ({
     predictions: '',
     runIds: [],
     predictorIds: [],
+    hrfPredictorIds: [],
     status: 'DRAFT',
     private: true,
     config: defaultConfig,
     transformations: [],
-    contrasts: []
+    contrasts: [],
+    model: {
+      blocks: [{
+        level: 'run',
+        transformations: [],
+        contrasts: []
+      }]
+    }
   },
   datasets: [],
   availableTasks: [],
@@ -68,7 +78,9 @@ const initializeStore = (): Store => ({
   selectedTaskId: null,
   availablePredictors: [],
   selectedPredictors: [],
-  unsavedChanges: false
+  selectedHRFPredictors: [],
+  unsavedChanges: false,
+  currentLevel: 'run'
 });
 
 const getJwt = () =>
@@ -161,6 +173,7 @@ type BuilderProps = {
   id?: string;
   updatedAnalysis: () => void;
 };
+
 export default class AnalysisBuilder extends React.Component<BuilderProps, Store> {
   constructor(props: BuilderProps) {
     super(props);
@@ -184,20 +197,102 @@ export default class AnalysisBuilder extends React.Component<BuilderProps, Store
   saveEnabled = (): boolean => this.state.unsavedChanges && this.state.analysis.status === 'DRAFT';
   submitEnabled = (): boolean => this.state.analysis.status === 'DRAFT';
 
+  buildModel = (): BidsModel => {
+
+    let availableRuns = this.state.availableRuns;
+
+    let task: string[] = this.state.availableTasks.filter(
+      x => x.id === this.state.selectedTaskId
+    ).map(y => y.name);
+
+    let runs: number[] = this.state.availableRuns.filter(
+      x => this.state.analysis.runIds.find(runId => runId === x.id)
+    ).filter(y => y.number !== null).map(z => parseInt(z.number, 10));
+    runs = Array.from(new Set(runs));
+
+    let sessions: string[] = this.state.availableRuns.filter(
+      x => this.state.analysis.runIds.find(runId => runId === x.id)
+    ).filter(y => y.session !== null).map(z => z.session) as string[];
+    sessions = Array.from(new Set(sessions));
+
+    let subjects: string[] = this.state.availableRuns.filter(
+      x => this.state.analysis.runIds.find(runId => runId === x.id)
+    ).filter(y => y.subject !== null).map(z => z.subject) as string[];
+    subjects = Array.from(new Set(subjects));
+
+    /* analysis predictorIds is still being stored in its own field in database.
+     * Leave it alone in analysis object and convert Ids to names here. If the 
+     * predictors field in the database is dropped, predictorIds should be converted
+     * to hold predictor names instead of Ids.
+     */
+    let variables: string[];
+    variables = this.state.analysis.predictorIds.map(id => {
+      let found = this.state.availablePredictors.find(elem => elem.id === id);
+      if (found) {
+        return found.name;
+      }
+      return '';
+    });
+    variables = variables.filter(x => x !== '');
+
+    let blocks = [
+      {
+        level: 'run',
+        transformations: this.state.analysis.transformations,
+        contrasts: this.state.analysis.contrasts,
+        auto_contrasts: true,
+        model: {
+          variables: variables,
+          HRF_variables: this.state.analysis.hrfPredictorIds
+        }
+      },
+      {
+        level: 'dataset',
+        auto_contrasts: true
+      }
+    ];
+    let imgInput: ImageInput = {};
+    if (runs.length > 0) {
+      imgInput.run = runs;
+    }
+
+    if (sessions.length > 0) {
+      imgInput.session = sessions;
+    }
+
+    if (subjects.length >  0) {
+      imgInput.subject = subjects;
+    }
+
+    if (task[0]) {
+      imgInput.task = task[0];
+    }
+
+    return {
+      name: this.state.analysis.name,
+      description: this.state.analysis.description,
+      input: imgInput,
+      blocks: blocks,
+    };
+  };
+
   // Save analysis to server, either with lock=false (just save), or lock=true (save & submit)
   saveAnalysis = ({ compile = false }) => (): void => {
     if ((!compile && !this.saveEnabled()) || (compile && !this.submitEnabled())) {
       return;
     }
+
     const analysis = this.state.analysis;
     if (analysis.datasetId === null) {
       displayError(Error('Analysis cannot be saved without selecting a dataset'));
       return;
     }
+
     if (!analysis.name) {
       displayError(Error('Analysis cannot be saved without a name'));
       return;
     }
+
     const apiAnalysis: ApiAnalysis = {
       name: analysis.name,
       description: analysis.description,
@@ -211,6 +306,9 @@ export default class AnalysisBuilder extends React.Component<BuilderProps, Store
       contrasts: analysis.contrasts,
       config: analysis.config
     };
+
+    apiAnalysis.model = this.buildModel();
+
     // const method = analysis.analysisId ? 'put' : 'post';
     let method: string;
     let url: string;
@@ -255,11 +353,24 @@ export default class AnalysisBuilder extends React.Component<BuilderProps, Store
   // Decode data returned by '/api/analyses/<id>' (ApiAnalysis) to convert it to the right shape (Analysis)
   // and fetch the associated runs
   loadAnalysis = (data: ApiAnalysis): Promise<Analysis> => {
-    if (data.model && data.model.blocks && !data.transformations) {
-      data.transformations = [];
+    data.transformations = [];
+
+    // Extract transformations and contrasts from within block object of response.
+    let contrasts;
+    let hrfPredictorIds;
+    if (data && data.model && data.model.blocks) {
       for (var i = 0; i < data.model.blocks.length; i++) {
-        if (data.model.blocks[i].transformations != null) {
-          data.transformations = data.transformations.concat(...data.model.blocks[i].transformations!);
+        if (data.model.blocks[i].level !== this.state.currentLevel) {
+          continue;
+        }
+        if (data.model.blocks[i].transformations) {
+          data.transformations = data.model.blocks[i].transformations;
+        }
+        if (data.model.blocks[i].contrasts) {
+          data.contrasts = data.model.blocks[i].contrasts;
+        }
+        if (data.model.blocks[i].model && data.model.blocks[i].model!.hrf_variables) {
+          hrfPredictorIds = data.model.blocks[i].model!.hrf_variables;
         }
       }
     }
@@ -277,6 +388,7 @@ export default class AnalysisBuilder extends React.Component<BuilderProps, Store
       datasetId: data.dataset_id,
       runIds: data.runs!.map(({ id }) => id),
       predictorIds: data.predictors!.map(({ id }) => id),
+      hrfPredictorIds: hrfPredictorIds,
       config: data.config || defaultConfig,
       transformations: data.transformations,
       contrasts: data.contrasts || []
@@ -306,6 +418,7 @@ export default class AnalysisBuilder extends React.Component<BuilderProps, Store
       okText: 'Yes',
       cancelText: 'No',
       onOk() {
+        saveAnalysis({ compile: false})();
         saveAnalysis({ compile: true })();
       }
     });
@@ -338,6 +451,7 @@ export default class AnalysisBuilder extends React.Component<BuilderProps, Store
    like loading a new analysis (loadAnalysis function) where updateState is called but
    since state changes aren't really user edits we don't want to set unsavedChanges.
    */
+
   updateState = (attrName: keyof Store, keepClean = false) => (value: any) => {
     const { analysis, availableRuns, availablePredictors } = this.state;
     if (analysis.status !== 'DRAFT' && !keepClean) {
@@ -374,9 +488,16 @@ export default class AnalysisBuilder extends React.Component<BuilderProps, Store
               const selectedPredictors = data.filter(
                 p => updatedAnalysis.predictorIds.indexOf(p.id) > -1
               );
+              let selectedHRFPredictors: Predictor[] = [];
+              if (updatedAnalysis.hrfPredictorIds) {
+                selectedHRFPredictors = data.filter(
+                  p => updatedAnalysis.hrfPredictorIds.indexOf(p.name) > -1
+                );
+              }
               this.setState({
                 availablePredictors: data,
-                selectedPredictors
+                selectedPredictors,
+                selectedHRFPredictors
               });
               updatedAnalysis.config = getUpdatedConfig(
                 updatedAnalysis.config,
@@ -403,7 +524,12 @@ export default class AnalysisBuilder extends React.Component<BuilderProps, Store
       newAnalysis.config = getUpdatedConfig(newAnalysis.config, newAnalysis.predictorIds);
       stateUpdate.analysis = newAnalysis;
       stateUpdate.transformationsActive = newAnalysis.predictorIds.length > 0;
+    } else if (attrName === 'selectedHRFPredictors') {
+      let newAnalysis = { ...this.state.analysis };
+      newAnalysis.hrfPredictorIds = (value as Predictor[]).map(p => p.name);
+      stateUpdate.analysis = newAnalysis;
     }
+
     stateUpdate[attrName] = value;
     if (!keepClean) stateUpdate.unsavedChanges = true;
     this.setState(stateUpdate);
@@ -424,6 +550,7 @@ export default class AnalysisBuilder extends React.Component<BuilderProps, Store
       selectedTaskId,
       availablePredictors,
       selectedPredictors,
+      selectedHRFPredictors,
       unsavedChanges
     } = this.state;
     const statusText: string = {
@@ -452,6 +579,7 @@ export default class AnalysisBuilder extends React.Component<BuilderProps, Store
               </Button>
               <Space />
               <Button
+                hidden={!this.state.analysis.analysisId}
                 onClick={this.confirmSubmission}
                 type={'primary'}
                 disabled={!this.submitEnabled()}
@@ -484,6 +612,13 @@ export default class AnalysisBuilder extends React.Component<BuilderProps, Store
                   availablePredictors={availablePredictors}
                   selectedPredictors={selectedPredictors}
                   updateSelection={this.updateState('selectedPredictors')}
+                />
+                <br/>
+                <h3>HRF Variables:</h3>
+                <PredictorSelector
+                  availablePredictors={selectedPredictors}
+                  selectedPredictors={selectedHRFPredictors}
+                  updateSelection={this.updateState('selectedHRFPredictors')}
                 />
               </TabPane>
               <TabPane

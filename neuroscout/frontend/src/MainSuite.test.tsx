@@ -39,6 +39,7 @@ it('Overview tab renders without errors', () => {
     runIds: [],
     datasetId: null,
     predictorIds: [],
+    hrfPredictorIds: [],
     status: 'DRAFT',
     config: { smoothing: 10, predictorConfigs: {} },
     transformations: [],

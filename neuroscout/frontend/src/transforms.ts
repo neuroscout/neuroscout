@@ -32,28 +32,12 @@ const transformationSchema = {
 const transformDefinitions: Transformation[] = [
   {
     name: 'scale',
-    parameters: [
-      {
-        name: 'demean',
-        kind: 'boolean',
-        value: false // default value
-      },
-      {
-        name: 'rescale',
-        kind: 'boolean',
-        value: true // default value
-      }
-    ]
+    demean: false,
+    rescale: true
   },
   {
     name: 'orthogonalize',
-    parameters: [
-      {
-        name: 'other',
-        kind: 'predictors',
-        value: []
-      }
-    ]
+    other: []
   }
 ];
 

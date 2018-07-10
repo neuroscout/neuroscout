@@ -14,12 +14,14 @@ export interface Analysis {
   runIds: string[]; // IDs of selected runs
   predictions: string;
   predictorIds: string[]; // IDs of selected predictors
+  hrfPredictorIds: string[];
   status: AnalysisStatus;
   private?: boolean;
   modifiedAt?: string;
   config: AnalysisConfig;
   transformations: Transformation[];
   contrasts: Contrast[];
+  model?: BidsModel;
 }
 
 // Normalized dataset object in Analysis Builder
@@ -79,23 +81,24 @@ export type Parameter = BooleanParam | PredictorsParam;
 
 export type TransformName = 'scale' | 'orthogonalize';
 
+export type BlockLevel = 'run' | 'session' | 'subject' | 'dataset';
+
 export interface Transformation {
   name: TransformName;
   input?: string[]; // predictor IDs
-  parameters: Parameter[];
+  demean?: boolean;
+  rescale?: boolean;
+  other?: string[];
 }
-
+ 
 // Lookup hash of available transformations (as specified in transforms.ts) by their name
 export interface XformRules {
   [name: string]: Transformation;
 }
 
 export interface Contrast {
-  // short name/description of contrast
   name: string;
-  // For simplicilty for now store entire predictor object as opposed to just the ID.
-  // TODO: change this to just the predictor IDs
-  predictors: Predictor[];
+  condition_list: string[];
   weights: number[];
   contrastType: 't' | 'F';
 }
@@ -123,7 +126,9 @@ export interface Store {
   // Technically selectedPredictors is redundant because we're also storing Analysis.predictorIds
   // but store these separately for performance reasons
   selectedPredictors: Predictor[];
+  selectedHRFPredictors: Predictor[];
   unsavedChanges: boolean;
+  currentLevel: BlockLevel;
 }
 
 // Dataset object as returned by /api/datasets
@@ -159,22 +164,40 @@ export interface ApiAnalysis {
   contrasts?: Contrast[];
   config: AnalysisConfig;
   modified_at?: string;
-  model?: Model;
+  model?: BidsModel;
 }
 
-export interface Model {
-  blocks: Block[];
+export interface BidsModel {
+  input?: ImageInput;
+  blocks?: Block[] | never[];
+  name?: string;
+  description?: string;
+}
+
+export interface ImageInput {
+  task?: string;
+  run?: number[];
+  session?: string[];
+  subject?: string[];
 }
 
 export interface Block {
-  block_model: BlockModel;
+  model?: BlockModel;
   transformations?: Transformation[];
+  contrasts?: Contrast[];
+  level: string;
 }
 
 export interface BlockModel {
-  level?: string;
   variables: string[];
   hrf_variables?: string[];
+}
+
+export interface ModelContrast {
+  name: string;
+  predictors: string[];
+  weights: number[];
+  contrastType: 't' | 'F';
 }
 
 // Shape of User object as consumed/produced by the backend API
