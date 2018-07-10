@@ -570,36 +570,32 @@ class App extends React.Component<{}, AppState> {
           {openSignup && signupModal()}
           {openEnterResetToken && enterResetTokenModal()}
           <Layout>
-            <Header style={{ background: '#fff', padding: 0 }}>
-              <Row type="flex" justify="center">
-                <Col span={18}>
-                  <Row type="flex" justify="space-between">
-                    <Col span={12}>
-                      <h1>
-                        <Link to="/">Neuroscout</Link>
-                      </h1>
-                    </Col>
-                    <Col span={6}>
-                      {loggedIn
-                        ? <span>
-                            {`Logged in as ${email}`}
-                            <Space />
-                            <Button onClick={e => this.confirmLogout()}>Log out</Button>
-                          </span>
-                        : <span>
-                            <Button onClick={e => this.setState({ openLogin: true })}>
-                              Log in
-                            </Button>
-                            <Space />
-                            <Button onClick={e => this.setState({ openSignup: true })}>
-                              Sign up
-                            </Button>
-                          </span>}
-                    </Col>
-                  </Row>
-                </Col>
+            <Row type="flex" justify="center"style={{ background: '#fff', padding: 0 }}>
+                  <Col span={9}>
+                    <h1>
+                      <Link to="/">Neuroscout</Link>
+                    </h1>
+                  </Col>
+                  <Col span={9}>
+                    <div className="Login-col">
+                    {loggedIn
+                      ? <span>
+                          {`Logged in as ${email}`}
+                          <Space />
+                          <Button onClick={e => this.confirmLogout()}>Log out</Button>
+                        </span>
+                      : <span>
+                          <Button onClick={e => this.setState({ openLogin: true })}>
+                            Log in
+                          </Button>
+                          <Space />
+                          <Button onClick={e => this.setState({ openSignup: true })}>
+                            Sign up
+                          </Button>
+                        </span>}
+                    </div>
+                  </Col>
               </Row>
-            </Header>
             <Content style={{ background: '#fff' }}>
               <Route
                 exact={true}
