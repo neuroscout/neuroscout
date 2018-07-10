@@ -570,6 +570,7 @@ class App extends React.Component<{}, AppState> {
           {openSignup && signupModal()}
           {openEnterResetToken && enterResetTokenModal()}
           <Layout>
+            <div className="headerRow">
             <Row type="flex" justify="center"style={{ background: '#fff', padding: 0 }}>
                   <Col span={9}>
                     <h1>
@@ -596,6 +597,7 @@ class App extends React.Component<{}, AppState> {
                     </div>
                   </Col>
               </Row>
+              </div>
             <Content style={{ background: '#fff' }}>
               <Route
                 exact={true}

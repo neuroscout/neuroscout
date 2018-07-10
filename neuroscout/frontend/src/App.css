@@ -36,3 +36,11 @@ body {
 .privateSwitch {
     text-align: center;
 }
+
+.headerRow {
+    padding-top: 20px;
+}
+
+.ant-layout {
+    background-color: white;
+}
