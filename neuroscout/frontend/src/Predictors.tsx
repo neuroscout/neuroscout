@@ -19,7 +19,8 @@ class PredictorTable extends React.Component<TableProps<any>, any> {
 interface PredictorSelectorProps {
   availablePredictors: Predictor[]; // All available predictors to select from
   selectedPredictors: Predictor[]; // List of predicors selected by the user (when used as a controlled component)
-  updateSelection: (newPredictors: Predictor[]) => void; // Callback to parent component to update selection
+  // Callback to parent component to update selection
+  updateSelection: (newPredictors: Predictor[], filteredPredictors: Predictor[]) => void;
 }
 
 interface PredictorsSelectorState {
@@ -52,16 +53,13 @@ export class PredictorSelector extends React.Component<
         searchRegex.test(p.name + (p.description || ''))
       );
     }
-    // tslint:disable-next-line:no-console
-    console.log(this.props);
-    // tslint:disable-next-line:no-console
-    console.log(newState);
     this.setState(newState);
   };
 
+  // only for use with sidebar showing selected predictors
   removePredictor = (predictorId: string) => {
     const newSelection = this.props.selectedPredictors.filter(p => p.id !== predictorId);
-    this.props.updateSelection(newSelection);
+    this.props.updateSelection(newSelection, this.props.selectedPredictors);
   };
 
   componentWillReceiveProps(nextProps: PredictorSelectorProps) {
@@ -81,10 +79,10 @@ export class PredictorSelector extends React.Component<
 
     const rowSelection: TableRowSelection<Predictor> = {
       onSelect: (record, selected, selectedRows: Predictor[]) => {
-        updateSelection(selectedRows);
+        updateSelection(selectedRows, filteredPredictors);
       },
       onSelectAll: (selected, selectedRows: Predictor[], changeRows) => {
-        updateSelection(selectedRows);
+        updateSelection(selectedRows, filteredPredictors);
       },
       selectedRowKeys: selectedPredictors.map(p => p.id)
     };
