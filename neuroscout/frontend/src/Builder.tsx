@@ -235,6 +235,16 @@ export default class AnalysisBuilder extends React.Component<BuilderProps, Store
     });
     variables = variables.filter(x => x !== '');
 
+    let hrfVariables: string[];
+    hrfVariables = this.state.analysis.hrfPredictorIds.map(id => {
+      let found = this.state.availablePredictors.find(elem => elem.id === id);
+      if (found) {
+        return found.name;
+      }
+      return '';
+    });
+    hrfVariables = hrfVariables.filter(x => x !== '');
+
     let blocks = [
       {
         level: 'run',
@@ -243,7 +253,7 @@ export default class AnalysisBuilder extends React.Component<BuilderProps, Store
         auto_contrasts: true,
         model: {
           variables: variables,
-          HRF_variables: this.state.analysis.hrfPredictorIds
+          HRF_variables: hrfVariables
         }
       },
       {
@@ -369,8 +379,8 @@ export default class AnalysisBuilder extends React.Component<BuilderProps, Store
         if (data.model.blocks[i].contrasts) {
           data.contrasts = data.model.blocks[i].contrasts;
         }
-        if (data.model.blocks[i].model && data.model.blocks[i].model!.hrf_variables) {
-          hrfPredictorIds = data.model.blocks[i].model!.hrf_variables;
+        if (data.model.blocks[i].model && data.model.blocks[i].model!.HRF_variables) {
+          hrfPredictorIds = data.model.blocks[i].model!.HRF_variables;
         }
       }
     }
@@ -542,8 +552,11 @@ export default class AnalysisBuilder extends React.Component<BuilderProps, Store
                 selectedHRFPredictors = data.filter(
                   p => updatedAnalysis.hrfPredictorIds.indexOf(p.name) > -1
                 );
+                // hrfPredictorIds comes in as a list of names from api, convert it to IDs here.
+                updatedAnalysis.hrfPredictorIds = selectedHRFPredictors.map(x => x.id);
               }
               this.setState({
+                analysis: updatedAnalysis,
                 availablePredictors: data,
                 selectedPredictors,
                 selectedHRFPredictors
