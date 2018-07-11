@@ -5,6 +5,9 @@ server {
     charset utf-8;
 
     root /neuroscout/frontend/build;
+    ssl_protocols TLSv1 TLSv1.1 TLSv1.2;
+    ssl_ciphers 'EECDH+AESGCM:EDH+AESGCM:AES256+EECDH:AES256+EDH:!3DES';
+
 
     location /static/ {
     }
