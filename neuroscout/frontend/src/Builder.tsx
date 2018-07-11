@@ -472,6 +472,21 @@ export default class AnalysisBuilder extends React.Component<BuilderProps, Store
         return newAnalysis[predictorIds].indexOf(x.id) > -1;
       }
     );
+
+    // If we remove a predictor this needs to be reflected in the selected hrf predictors
+    if (!(hrf)) {
+      stateUpdate.selectedHRFPredictors = this.state.selectedHRFPredictors.filter(
+        (x) => {
+          return stateUpdate.analysis.predictorIds.indexOf(x.id) > -1;
+        }
+      );
+      stateUpdate.analysis.hrfPredictorIds = this.state.analysis.hrfPredictorIds.filter(
+        (x) => {
+          return stateUpdate.analysis.predictorIds.indexOf(x) > -1;
+        }
+      );
+    }
+
     this.setState(stateUpdate);
   }
 
