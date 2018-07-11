@@ -121,7 +121,7 @@ class ParameterField extends React.Component<ParameterFieldProps> {
     return (
       <div>
         <p>
-          {'Select predictors you\'d like to orthogonalize against:'}
+          {'Select predictors you\'d like to orthogonalize with respect to:'}
         </p>
         <PredictorSelector
           availablePredictors={options as Predictor[]}
@@ -138,7 +138,7 @@ class ParameterField extends React.Component<ParameterFieldProps> {
     return (
       <span>
         {kind === 'boolean' && this.BooleanField()}
-        {name === 'wrt' && this.WrtField()}
+        {name === 'other' && this.WrtField()}
       </span>
     );
   }

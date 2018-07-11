@@ -25,6 +25,22 @@
   to { transform: rotate(360deg); }
 }
 
+.Login-col {
+  float: right;
+}
+
 body {
+    background-color: white;
+}
+
+.privateSwitch {
+    text-align: center;
+}
+
+.headerRow {
+    padding-top: 20px;
+}
+
+.ant-layout {
     background-color: white;
 }

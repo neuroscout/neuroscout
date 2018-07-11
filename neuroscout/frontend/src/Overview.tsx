@@ -2,10 +2,11 @@
  OverviewTab component
 */
 import * as React from 'react';
-import { Form, Input, AutoComplete, Table, Switch, Button } from 'antd';
+import { Col, Form, Input, AutoComplete, Row, Table, Tooltip, Switch, Button } from 'antd';
 import { ColumnProps, TableRowSelection } from 'antd/lib/table';
 
 const FormItem = Form.Item;
+const InputGroup = Input.Group;
 
 import { Analysis, Dataset, Run, Task } from './coretypes';
 
@@ -52,10 +53,14 @@ export class OverviewTab extends React.Component<OverviewTabProps, any> {
     } = this.props;
 
     const datasetColumns = [
-      { title: 'Name', dataIndex: 'name', width: 60 },
-      { title: 'Description', dataIndex: 'description', width: 300 },
+      {
+        title: 'Name',
+        dataIndex: 'name',
+        width: 100,
+        sorter: (a, b) => a.name.localeCompare(b.name)
+      },
+      { title: 'Description', dataIndex: 'description', width: 100 },
       { title: 'Author(s)', dataIndex: 'authors', width: 100 },
-      { title: 'URL', dataIndex: 'url', width: 100 }
     ];
 
     const selectedDatasetId: string[] = analysis.datasetId ? [analysis.datasetId.toString()] : [];
@@ -78,9 +83,14 @@ export class OverviewTab extends React.Component<OverviewTabProps, any> {
     };
 
     const taskColumns = [
-      { title: 'Name', dataIndex: 'name' },
+      { title: 'Name', dataIndex: 'name', sorter: (a, b) => a.name.localeCompare(b.name)},
+
       { title: 'Description', dataIndex: 'description' },
-      { title: '#Runs', dataIndex: 'numRuns' }
+      {
+        title: '#Runs',
+        dataIndex: 'numRuns',
+        sorter: (a, b) => a.numRuns - b.numRuns
+      }
     ];
 
     const taskRowSelection: TableRowSelection<Task> = {
@@ -92,9 +102,22 @@ export class OverviewTab extends React.Component<OverviewTabProps, any> {
     };
 
     const runColumns = [
-      { title: 'ID', dataIndex: 'id' },
-      { title: 'Subject', dataIndex: 'subject' },
-      { title: 'Session', dataIndex: 'session' }
+      {
+        title: 'ID',
+        dataIndex: 'id',
+        defaultOrder: 'ascend' as 'ascend',
+        sorter: (a, b) => a.id - b.id
+      },
+      {
+        title: 'Subject',
+        dataIndex: 'subject',
+        sorter: (a, b) => a.subject.localeCompare(b.subject, undefined, {numeric: true}),
+      },
+      {
+        title: 'Session',
+        dataIndex: 'session',
+        sorter: (a, b) => a.session.localeCompare(b.session, undefined, {numeric: true}),
+      }
     ];
 
     const runRowSelection: TableRowSelection<Run> = {
@@ -112,19 +135,27 @@ export class OverviewTab extends React.Component<OverviewTabProps, any> {
       <div>
         <Form layout="vertical">
           <FormItem label="Analysis name:">
-            <Input
-              placeholder="Analysis name"
-              value={analysis.name}
-              onChange={this.updateAnalysisFromEvent('name')}
-            />
-          </FormItem>
-          <FormItem label="Should this analysis be private (only visible to you) or public?">
-            <Switch
-              checked={analysis.private}
-              checkedChildren="Private"
-              unCheckedChildren="Public"
-              onChange={checked => this.updateAnalysis('private')(checked)}
-            />
+            <Row type="flex" justify="space-between">
+              <Col xs={24} md={21}>
+                <Input
+                  placeholder="Analysis name"
+                  value={analysis.name}
+                  onChange={this.updateAnalysisFromEvent('name')}
+                />
+              </Col>
+              <Col md={3}>
+                <div className="privateSwitch">
+                  <Tooltip title="Should this analysis be private (only visible to you) or public?">
+                    <Switch
+                      checked={analysis.private}
+                      checkedChildren="Public"
+                      unCheckedChildren="Private"
+                      onChange={checked => this.updateAnalysis('private')(checked)}
+                    />
+                  </Tooltip>
+                </div>
+              </Col>
+            </Row>
           </FormItem>
           <FormItem label="Description:">
             <Input.TextArea
@@ -150,7 +181,7 @@ export class OverviewTab extends React.Component<OverviewTabProps, any> {
             size="small"
             dataSource={datasets}
             rowSelection={datasetRowSelection}
-            pagination={(datasets.length > 20) ? {'position': 'bottom'} : false}
+            pagination={(datasets.length > 10) ? {'position': 'bottom'} : false}
           />
           <br />
           {availableRuns.length > 0 &&
