@@ -552,18 +552,6 @@ export default class AnalysisBuilder extends React.Component<BuilderProps, Store
         ...analysis,
         runIds: availableRuns.filter(r => r.task.id === value).map(r => r.id)
       });
-    } else if (attrName === 'selectedPredictors') {
-      let newAnalysis = { ...this.state.analysis };
-
-      newAnalysis.predictorIds = (value as Predictor[]).map(p => p.id);
-      newAnalysis.config = getUpdatedConfig(newAnalysis.config, newAnalysis.predictorIds);
-      stateUpdate.analysis = newAnalysis;
-      stateUpdate.transformationsActive = newAnalysis.predictorIds.length > 0;
-
-    } else if (attrName === 'selectedHRFPredictors') {
-      let newAnalysis = { ...this.state.analysis };
-      newAnalysis.hrfPredictorIds = (value as Predictor[]).map(p => p.name);
-      stateUpdate.analysis = newAnalysis;
     }
 
     stateUpdate[attrName] = value;
