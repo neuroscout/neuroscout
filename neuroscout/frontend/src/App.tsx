@@ -1,12 +1,10 @@
 /*
 Top-level App component containing AppState. The App component is currently responsible for:
 - Authentication (signup, login and logout)
-- Routing
-- Managing user's saved analyses (list display, clone and delete)
 */
 import * as React from 'react';
 import { Tabs, Row, Col, Layout, Button, Modal, Icon, Input, Form, message } from 'antd';
-import { displayError, jwtFetch } from './utils';
+import { displayError, jwtFetch, timeout } from './utils';
 import { Space } from './HelperComponents';
 import { ApiUser, ApiAnalysis, AppAnalysis } from './coretypes';
 import Home from './Home';
@@ -109,6 +107,32 @@ class App extends React.Component<{}, AppState> {
       })
       .catch(displayError);
 
+  /* iterate over analyses. Ignore draft or passed or failed,
+     hit api with analyses id to get status. If status change issue popup and update state
+   */ 
+  checkAnalysesStatus = async () => {
+    let changeFlag = false;
+    let updatedAnalyses = this.state.analyses.map(async (analysis) => {
+      if (['DRAFT', 'PASSED'].indexOf(analysis.status) > -1) {
+        return analysis;
+      }
+      await jwtFetch(`${DOMAINROOT}/api/analyses/${id}`, { method: 'get' })
+        .then((data: ApiAnalysis) => {
+          if (data.status !== analysis.status) {
+            changeFlag = True;
+            analysis.status = data.status;
+            return analysis;
+          }
+          return analysis;
+      })
+      .catch(() => {return analysis});
+    });
+    if (changeFlag) {
+      this.setState({ analyses: updatedAnalyses });
+    }
+    await timeout(5000);
+  };
+  
   // Authenticate the user with the server. This function is called from login()
   authenticate = () =>
     new Promise((resolve, reject) => {
