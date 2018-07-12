@@ -74,7 +74,7 @@ export class PredictorSelector extends React.Component<
     const columns = [
       { title: 'ID', dataIndex: 'id', sorter: (a, b) => a.id - b.id},
       { title: 'Name', dataIndex: 'name', sorter: (a, b) => a.name.localeCompare(b.name)},
-      { title: 'Description', dataIndex: 'description' }
+      { title: 'Description', dataIndex: 'extracted_feature.description' }
     ];
 
     const rowSelection: TableRowSelection<Predictor> = {
