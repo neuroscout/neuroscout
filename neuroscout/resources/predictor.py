@@ -10,6 +10,7 @@ class ExtractedFeatureSchema(Schema):
     id = fields.Int(description="Extractor id")
     description = fields.Str(description="Feature description.")
     created_at = fields.Str(description="Extraction timestamp.")
+    extractor_name = fields.Str(description="Extractor name.")
 
 class PredictorSchema(Schema):
     id = fields.Int()
