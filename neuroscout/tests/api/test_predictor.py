@@ -26,7 +26,9 @@ def test_get_predictor(auth_client, extract_features):
     # Test parameters
     ds = decode_json(
         auth_client.get('/api/datasets'))
+    dataset_id = ds[0]['id']
     run_id = str(ds[0]['runs'][0]['id'])
+
     resp = auth_client.get('/api/predictors', params={'run_id' : run_id})
     assert resp.status_code == 200
     pred_select = decode_json(resp)
@@ -35,6 +37,13 @@ def test_get_predictor(auth_client, extract_features):
     resp = auth_client.get('/api/predictors', params={'run_id' : '123123'})
     assert resp.status_code == 200
     assert len(decode_json(resp)) == 0
+
+    # Test filtering by dataset
+    resp = auth_client.get('/api/predictors', params={'dataset_id' : dataset_id})
+    assert resp.status_code == 200
+    pred_select = decode_json(resp)
+    assert type(pred_select) == list
+    assert len(pred_select) == 4
 
     # Test filtering by multiple parameters
     resp = auth_client.get('/api/predictors', params={'name': 'rt',
@@ -76,4 +85,3 @@ def test_get_predictor_data(auth_client, add_task):
     assert resp.status_code == 200
     pe_list_filt = decode_json(resp)
     assert len(pe_list_filt) == 4
-    assert pe_list_filt[0]['duration'] == 5

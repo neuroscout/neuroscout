@@ -10,6 +10,7 @@ class ExtractedFeatureSchema(Schema):
     id = fields.Int(description="Extractor id")
     description = fields.Str(description="Feature description.")
     created_at = fields.Str(description="Extraction timestamp.")
+    extractor_name = fields.Str(description="Extractor name.")
 
 class PredictorSchema(Schema):
     id = fields.Int()
@@ -49,8 +50,10 @@ class PredictorListResource(MethodResource):
     @doc(tags=['predictors'], summary='Get list of predictors.',)
     @marshal_with(PredictorSchema(many=True))
     @use_kwargs({
-        'run_id': wa.fields.DelimitedList(fields.Int(),
-                                          description="Run id(s)"),
+        'dataset_id': wa.fields.DelimitedList(
+            fields.Int(), description="Dataset id(s). If set, ignores run ids"),
+        'run_id': wa.fields.DelimitedList(
+            fields.Int(), description="Run id(s). Warning, slow query."),
         'name': wa.fields.DelimitedList(fields.Str(),
                                         description="Predictor name(s)"),
         'newest': wa.fields.Boolean(missing=True,
@@ -64,8 +67,14 @@ class PredictorListResource(MethodResource):
         else:
             predictor_ids = db.session.query(Predictor.id)
 
+        if 'dataset_id' in kwargs:
+            dataset_id = kwargs.pop('dataset_id')
+            if 'run_id' in kwargs: kwargs.pop('run_id')
+            predictor_ids.filter(Predictor.dataset_id.in_(dataset_id))
+
         if 'run_id' in kwargs:
             run_id = kwargs.pop('run_id')
+            # This following JOIN is quite slow
             predictor_ids = predictor_ids.join(PredictorEvent).filter(
                 PredictorEvent.run_id.in_(run_id))
 
