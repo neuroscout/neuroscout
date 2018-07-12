@@ -68,9 +68,9 @@ class PredictorListResource(MethodResource):
 
         if 'dataset_id' in kwargs:
             dataset_id = kwargs.pop('dataset_id')
-            kwargs.pop('run_id')
+            if 'run_id' in kwargs: kwargs.pop('run_id')
             predictor_ids.filter(Predictor.dataset_id.in_(dataset_id))
-            
+
         if 'run_id' in kwargs:
             run_id = kwargs.pop('run_id')
             # This following JOIN is quite slow
