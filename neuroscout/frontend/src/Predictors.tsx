@@ -39,7 +39,7 @@ export class PredictorSelector extends React.Component<
     this.state = {
       searchText: '',
       filteredPredictors: availablePredictors,
-      selectedPredictors
+      selectedPredictors,
     };
   }
 
@@ -72,9 +72,20 @@ export class PredictorSelector extends React.Component<
     const { availablePredictors, selectedPredictors, updateSelection } = this.props;
     const { filteredPredictors } = this.state;
     const columns = [
-      { title: 'ID', dataIndex: 'id', sorter: (a, b) => a.id - b.id},
-      { title: 'Name', dataIndex: 'name', sorter: (a, b) => a.name.localeCompare(b.name)},
-      { title: 'Description', dataIndex: 'extracted_feature.description' }
+      {
+        title: 'ID',
+        dataIndex: 'id',
+        sorter: (a, b) => a.id - b.id,
+      },
+      {
+        title: 'Name',
+        dataIndex: 'name',
+        sorter: (a, b) => a.name.localeCompare(b.name),
+      },
+      {
+        title: 'Description',
+        dataIndex: 'extracted_feature.description',
+      }
     ];
 
     const rowSelection: TableRowSelection<Predictor> = {
@@ -106,8 +117,7 @@ export class PredictorSelector extends React.Component<
               <Table
                 columns={columns}
                 rowKey="id"
-                pagination={false}
-                scroll={{ y: 300 }}
+                pagination={{position: 'bottom'}}
                 size="small"
                 dataSource={this.state.filteredPredictors}
                 rowSelection={rowSelection}
