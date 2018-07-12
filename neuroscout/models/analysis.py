@@ -37,7 +37,7 @@ class Analysis(db.Model):
 
     status = db.Column(db.Text, default='DRAFT')
     __table_args__ = (
-    	db.CheckConstraint(status.in_(['PASSED', 'FAILED', 'PENDING', 'DRAFT'])), )
+    	db.CheckConstraint(status.in_(['PASSED', 'FAILED', 'SUBMITTING', 'PENDING', 'DRAFT'])), )
 
     compile_traceback = db.Column(db.Text, default='')
     celery_id = db.Column(db.Text) # Celery task id

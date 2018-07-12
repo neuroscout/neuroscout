@@ -94,15 +94,18 @@ class CompileAnalysisResource(AnalysisBaseResource):
 	@doc(summary='Compile and lock analysis.')
 	@owner_required
 	def post(self, analysis):
-		analysis.status = 'PENDING'
+		analysis.status = 'SUBMITTING'
 		analysis.compile_traceback = ''
+		db.session.add(analysis)
+		db.session.commit()
 		task = celery_app.send_task('workflow.compile',
 				args=[*json_analysis(analysis),
 				analysis.dataset.local_path])
 		analysis.celery_id = task.id
-
+		analysis.status = 'PENDING'
 		db.session.add(analysis)
 		db.session.commit()
+
 		return analysis
 
 class AnalysisStatusResource(AnalysisBaseResource):
