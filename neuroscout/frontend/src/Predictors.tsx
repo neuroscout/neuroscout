@@ -73,14 +73,10 @@ export class PredictorSelector extends React.Component<
     const { filteredPredictors } = this.state;
     const columns = [
       {
-        title: 'ID',
-        dataIndex: 'id',
-        sorter: (a, b) => a.id - b.id,
-      },
-      {
         title: 'Name',
         dataIndex: 'name',
         sorter: (a, b) => a.name.localeCompare(b.name),
+        width: '35%'
       },
       {
         title: 'Description',
@@ -101,7 +97,7 @@ export class PredictorSelector extends React.Component<
     return (
       <div>
         <Row type="flex">
-          <Col span={16}>
+          <Col md={{span: 16}}>
             <div>
               <Input
                 placeholder="Search predictor name or description..."
@@ -117,15 +113,17 @@ export class PredictorSelector extends React.Component<
               <Table
                 columns={columns}
                 rowKey="id"
-                pagination={{position: 'bottom'}}
+                pagination={false}
+                scroll={{y: 300}}
                 size="small"
                 dataSource={this.state.filteredPredictors}
                 rowSelection={rowSelection}
+                bordered={true}
               />
             </div>
           </Col>
-          <Col span={1} />
-          <Col span={3}>
+          <Col md={{span: 1}}/>
+          <Col md={{span: 3}}>
             <p>Selected predictors:</p>
             {selectedPredictors.map(p =>
               <Tag closable={true} onClose={ev => this.removePredictor(p.id)} key={p.id}>

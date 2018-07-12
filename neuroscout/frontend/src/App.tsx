@@ -572,12 +572,12 @@ class App extends React.Component<{}, AppState> {
           <Layout>
             <div className="headerRow">
             <Row type="flex" justify="center"style={{ background: '#fff', padding: 0 }}>
-                  <Col span={9}>
+                  <Col md={{span: 9}}>
                     <h1>
                       <Link to="/">Neuroscout</Link>
                     </h1>
                   </Col>
-                  <Col span={9}>
+                  <Col md={{span: 9}}>
                     <div className="Login-col">
                     {loggedIn
                       ? <span>
@@ -642,7 +642,7 @@ class App extends React.Component<{}, AppState> {
             </Content>
             <Footer style={{ background: '#fff' }}>
               <Row type="flex" justify="center">
-                <Col span={4}>
+                <Col md={{span: 4}}>
                   <br />
                   <p>Neuroscout - Copyright 2017</p>
                 </Col>
