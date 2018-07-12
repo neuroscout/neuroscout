@@ -77,13 +77,18 @@ class CloneAnalysisResource(AnalysisBaseResource):
 
 
 def json_analysis(analysis):
+	"""" Dump an analysis object to JSON for compilation.
+	This requires querying the PredictorEvents to get all events for all runs
+	and predictors. This function is somewhat slow due to the overhead of
+	creating Python objects (and dumping through Marshmallow), tens of thousands
+	of runs."""
 	analysis_json = AnalysisFullSchema().dump(analysis)[0]
 
 	pred_ids = [p.id for p in analysis.predictors]
 	run_ids = [r.id for r in analysis.runs]
 	pes = PredictorEvent.query.filter(
 	    (PredictorEvent.predictor_id.in_(pred_ids)) & \
-	    (PredictorEvent.run_id.in_(run_ids))).all()
+	    (PredictorEvent.run_id.in_(run_ids)))
 	pes_json = PredictorEventSchema(many=True, exclude=['id']).dump(pes)[0]
 
 	resources_json = AnalysisResourcesSchema().dump(analysis)[0]
