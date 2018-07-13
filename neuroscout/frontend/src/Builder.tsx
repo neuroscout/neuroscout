@@ -618,7 +618,7 @@ export default class AnalysisBuilder extends React.Component<BuilderProps, Store
           message={'You have unsaved changes. Are you sure you want leave this page?'}
         />
         <Row type="flex" justify="center">
-          <Col lg={{span: 18}} xs={{span: 24}}>
+          <Col xxl={{span: 14}} xl={{span: 16}} lg={{span: 18}} xs={{span: 24}}>
             <h2>
               {analysis.status !== 'DRAFT' ? <Icon type="lock" /> : <Icon type="unlock" />}
               {`Analysis ID: ${analysis.analysisId || 'n/a'}`}
@@ -645,7 +645,7 @@ export default class AnalysisBuilder extends React.Component<BuilderProps, Store
           </Col>
         </Row>
         <Row type="flex" justify="center">
-          <Col lg={{span: 18}} xs={{span: 24}}>
+          <Col xxl={{span: 14}} xl={{span: 16}} lg={{span: 18}} xs={{span: 24}}>
             <Tabs activeKey={activeTab} onTabClick={newTab => this.setState({ activeTab: newTab })}>
               <TabPane tab="Overview" key="overview">
                 <OverviewTab
