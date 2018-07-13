@@ -190,7 +190,7 @@ export interface Block {
 
 export interface BlockModel {
   variables: string[];
-  hrf_variables?: string[];
+  HRF_variables?: string[];
 }
 
 export interface ModelContrast {

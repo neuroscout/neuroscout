@@ -19,7 +19,8 @@ class PredictorTable extends React.Component<TableProps<any>, any> {
 interface PredictorSelectorProps {
   availablePredictors: Predictor[]; // All available predictors to select from
   selectedPredictors: Predictor[]; // List of predicors selected by the user (when used as a controlled component)
-  updateSelection: (newPredictors: Predictor[]) => void; // Callback to parent component to update selection
+  // Callback to parent component to update selection
+  updateSelection: (newPredictors: Predictor[], filteredPredictors: Predictor[]) => void;
 }
 
 interface PredictorsSelectorState {
@@ -38,7 +39,7 @@ export class PredictorSelector extends React.Component<
     this.state = {
       searchText: '',
       filteredPredictors: availablePredictors,
-      selectedPredictors
+      selectedPredictors,
     };
   }
 
@@ -55,9 +56,10 @@ export class PredictorSelector extends React.Component<
     this.setState(newState);
   };
 
+  // only for use with sidebar showing selected predictors
   removePredictor = (predictorId: string) => {
     const newSelection = this.props.selectedPredictors.filter(p => p.id !== predictorId);
-    this.props.updateSelection(newSelection);
+    this.props.updateSelection(newSelection, this.props.selectedPredictors);
   };
 
   componentWillReceiveProps(nextProps: PredictorSelectorProps) {
@@ -70,17 +72,24 @@ export class PredictorSelector extends React.Component<
     const { availablePredictors, selectedPredictors, updateSelection } = this.props;
     const { filteredPredictors } = this.state;
     const columns = [
-      { title: 'ID', dataIndex: 'id', sorter: (a, b) => a.id - b.id},
-      { title: 'Name', dataIndex: 'name', sorter: (a, b) => a.name.localeCompare(b.name)},
-      { title: 'Description', dataIndex: 'description' }
+      {
+        title: 'Name',
+        dataIndex: 'name',
+        sorter: (a, b) => a.name.localeCompare(b.name),
+        width: '35%'
+      },
+      {
+        title: 'Description',
+        dataIndex: 'extracted_feature.description',
+      }
     ];
 
     const rowSelection: TableRowSelection<Predictor> = {
       onSelect: (record, selected, selectedRows: Predictor[]) => {
-        updateSelection(selectedRows);
+        updateSelection(selectedRows, filteredPredictors);
       },
       onSelectAll: (selected, selectedRows: Predictor[], changeRows) => {
-        updateSelection(selectedRows);
+        updateSelection(selectedRows, filteredPredictors);
       },
       selectedRowKeys: selectedPredictors.map(p => p.id)
     };
@@ -88,7 +97,7 @@ export class PredictorSelector extends React.Component<
     return (
       <div>
         <Row type="flex">
-          <Col span={16}>
+          <Col lg={{span: 16}} xs={{span: 24}}>
             <div>
               <Input
                 placeholder="Search predictor name or description..."
@@ -105,16 +114,16 @@ export class PredictorSelector extends React.Component<
                 columns={columns}
                 rowKey="id"
                 pagination={false}
-                scroll={{ y: 300 }}
+                scroll={{y: 300}}
                 size="small"
                 dataSource={this.state.filteredPredictors}
                 rowSelection={rowSelection}
+                bordered={true}
               />
             </div>
           </Col>
-          <Col span={1} />
-          <Col span={3}>
-            <p>Selected predictors:</p>
+          <Col lg={{span: 1}}/>
+          <Col lg={{span: 7}}>
             {selectedPredictors.map(p =>
               <Tag closable={true} onClose={ev => this.removePredictor(p.id)} key={p.id}>
                 {p.name}

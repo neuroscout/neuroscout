@@ -1,4 +1,4 @@
-/*
+ /*
  Top-level AnalysisBuilder component which contains all of the necessary state for editing
  an analysis.
 */
@@ -221,7 +221,7 @@ export default class AnalysisBuilder extends React.Component<BuilderProps, Store
     subjects = Array.from(new Set(subjects));
 
     /* analysis predictorIds is still being stored in its own field in database.
-     * Leave it alone in analysis object and convert Ids to names here. If the 
+     * Leave it alone in analysis object and convert Ids to names here. If the
      * predictors field in the database is dropped, predictorIds should be converted
      * to hold predictor names instead of Ids.
      */
@@ -235,6 +235,16 @@ export default class AnalysisBuilder extends React.Component<BuilderProps, Store
     });
     variables = variables.filter(x => x !== '');
 
+    let hrfVariables: string[];
+    hrfVariables = this.state.analysis.hrfPredictorIds.map(id => {
+      let found = this.state.availablePredictors.find(elem => elem.id === id);
+      if (found) {
+        return found.name;
+      }
+      return '';
+    });
+    hrfVariables = hrfVariables.filter(x => x !== '');
+
     let blocks = [
       {
         level: 'run',
@@ -243,7 +253,7 @@ export default class AnalysisBuilder extends React.Component<BuilderProps, Store
         auto_contrasts: true,
         model: {
           variables: variables,
-          HRF_variables: this.state.analysis.hrfPredictorIds
+          HRF_variables: hrfVariables
         }
       },
       {
@@ -369,8 +379,8 @@ export default class AnalysisBuilder extends React.Component<BuilderProps, Store
         if (data.model.blocks[i].contrasts) {
           data.contrasts = data.model.blocks[i].contrasts;
         }
-        if (data.model.blocks[i].model && data.model.blocks[i].model!.hrf_variables) {
-          hrfPredictorIds = data.model.blocks[i].model!.hrf_variables;
+        if (data.model.blocks[i].model && data.model.blocks[i].model!.HRF_variables) {
+          hrfPredictorIds = data.model.blocks[i].model!.HRF_variables;
         }
       }
     }
@@ -444,14 +454,63 @@ export default class AnalysisBuilder extends React.Component<BuilderProps, Store
     });
   };
 
+  updatePredictorState = (value: any, filteredPredictors: Predictor[], hrf: boolean = false) => {
+    let stateUpdate: any = {};
+    let newAnalysis = { ...this.state.analysis };
+    let filteredIds = filteredPredictors.map(x => x.id);
+    let valueIds = value.map(x => x.id);
+    let selectedPredictors = hrf ? 'selectedHRFPredictors' : 'selectedPredictors';
+    let predictorIds = hrf ? 'hrfPredictorIds' : 'predictorIds';
+
+    if (newAnalysis[predictorIds] === undefined) {
+      newAnalysis[predictorIds] = [];
+    }
+    // Discard any Ids that appear in the filtered list but have not been selected
+    newAnalysis[predictorIds] = newAnalysis[predictorIds].filter(x => {
+      return !((filteredIds.indexOf(x) > -1) && !(valueIds.indexOf(x) > -1));
+    });
+    // Add new ids that have been selected but aren't currently in the analysis predictor list
+    valueIds.map(x => newAnalysis[predictorIds].indexOf(x) === -1 ? newAnalysis[predictorIds].push(x) : null);
+
+    newAnalysis.config = getUpdatedConfig(newAnalysis.config, newAnalysis[predictorIds]);
+    stateUpdate.analysis = newAnalysis;
+    stateUpdate.transformationsActive = newAnalysis[predictorIds].length > 0;
+
+    // Update states version of the predictor list which uses whole predictor objects.
+    stateUpdate[selectedPredictors] = this.state.availablePredictors.filter(
+      (x) => {
+        return newAnalysis[predictorIds].indexOf(x.id) > -1;
+      }
+    );
+
+    // If we remove a predictor this needs to be reflected in the selected hrf predictors
+    if (!(hrf)) {
+      stateUpdate.selectedHRFPredictors = this.state.selectedHRFPredictors.filter(
+        (x) => {
+          return stateUpdate.analysis.predictorIds.indexOf(x.id) > -1;
+        }
+      );
+      stateUpdate.analysis.hrfPredictorIds = this.state.analysis.hrfPredictorIds.filter(
+        (x) => {
+          return stateUpdate.analysis.predictorIds.indexOf(x) > -1;
+        }
+      );
+    }
+
+    this.setState(stateUpdate);
+  }
+
+  updateHRFPredictorState = (value: any, filteredPredictors: Predictor[]) => {
+    return this.updatePredictorState(value, filteredPredictors, true);
+  }
+
   /* Main function to update application state. May split this up into
    smaller pieces if it gets too complex.
 
    When keepClean is true, don't set unsavedChanges to true. This is useful in situations
    like loading a new analysis (loadAnalysis function) where updateState is called but
    since state changes aren't really user edits we don't want to set unsavedChanges.
-   */
-
+  */
   updateState = (attrName: keyof Store, keepClean = false) => (value: any) => {
     const { analysis, availableRuns, availablePredictors } = this.state;
     if (analysis.status !== 'DRAFT' && !keepClean) {
@@ -493,8 +552,11 @@ export default class AnalysisBuilder extends React.Component<BuilderProps, Store
                 selectedHRFPredictors = data.filter(
                   p => updatedAnalysis.hrfPredictorIds.indexOf(p.name) > -1
                 );
+                // hrfPredictorIds comes in as a list of names from api, convert it to IDs here.
+                updatedAnalysis.hrfPredictorIds = selectedHRFPredictors.map(x => x.id);
               }
               this.setState({
+                analysis: updatedAnalysis,
                 availablePredictors: data,
                 selectedPredictors,
                 selectedHRFPredictors
@@ -518,16 +580,6 @@ export default class AnalysisBuilder extends React.Component<BuilderProps, Store
         ...analysis,
         runIds: availableRuns.filter(r => r.task.id === value).map(r => r.id)
       });
-    } else if (attrName === 'selectedPredictors') {
-      let newAnalysis = { ...this.state.analysis };
-      newAnalysis.predictorIds = (value as Predictor[]).map(p => p.id);
-      newAnalysis.config = getUpdatedConfig(newAnalysis.config, newAnalysis.predictorIds);
-      stateUpdate.analysis = newAnalysis;
-      stateUpdate.transformationsActive = newAnalysis.predictorIds.length > 0;
-    } else if (attrName === 'selectedHRFPredictors') {
-      let newAnalysis = { ...this.state.analysis };
-      newAnalysis.hrfPredictorIds = (value as Predictor[]).map(p => p.name);
-      stateUpdate.analysis = newAnalysis;
     }
 
     stateUpdate[attrName] = value;
@@ -553,6 +605,7 @@ export default class AnalysisBuilder extends React.Component<BuilderProps, Store
       selectedHRFPredictors,
       unsavedChanges
     } = this.state;
+
     const statusText: string = {
       DRAFT: 'This analysis has not yet been generated.',
       PENDING: 'This analysis has been submitted for generation and is being processed.',
@@ -565,10 +618,10 @@ export default class AnalysisBuilder extends React.Component<BuilderProps, Store
           message={'You have unsaved changes. Are you sure you want leave this page?'}
         />
         <Row type="flex" justify="center">
-          <Col span={18}>
+          <Col xxl={{span: 14}} xl={{span: 16}} lg={{span: 18}} xs={{span: 24}}>
             <h2>
               {analysis.status !== 'DRAFT' ? <Icon type="lock" /> : <Icon type="unlock" />}
-              {`Analysis ID: ${analysis.analysisId || 'Not assigned (new analysis)'}`}
+              {`Analysis ID: ${analysis.analysisId || 'n/a'}`}
               <Space />
               <Button
                 onClick={this.saveAnalysis({ compile: false })}
@@ -592,7 +645,7 @@ export default class AnalysisBuilder extends React.Component<BuilderProps, Store
           </Col>
         </Row>
         <Row type="flex" justify="center">
-          <Col span={18}>
+          <Col xxl={{span: 14}} xl={{span: 16}} lg={{span: 18}} xs={{span: 24}}>
             <Tabs activeKey={activeTab} onTabClick={newTab => this.setState({ activeTab: newTab })}>
               <TabPane tab="Overview" key="overview">
                 <OverviewTab
@@ -611,14 +664,14 @@ export default class AnalysisBuilder extends React.Component<BuilderProps, Store
                 <PredictorSelector
                   availablePredictors={availablePredictors}
                   selectedPredictors={selectedPredictors}
-                  updateSelection={this.updateState('selectedPredictors')}
+                  updateSelection={this.updatePredictorState}
                 />
                 <br/>
                 <h3>HRF Variables:</h3>
                 <PredictorSelector
                   availablePredictors={selectedPredictors}
                   selectedPredictors={selectedHRFPredictors}
-                  updateSelection={this.updateState('selectedHRFPredictors')}
+                  updateSelection={this.updateHRFPredictorState}
                 />
               </TabPane>
               <TabPane
