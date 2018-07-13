@@ -15,7 +15,7 @@ PATHS = ['sub-{subject}_[ses-{session}_]task-{task}_[acq-{acquisition}_][run-{ru
 
 def writeout_events(analysis, pes, outdir):
     """ Write event files from JSON """
-    gl = Layout(outdir)
+    gl = Layout(outdir.as_posix())
     outdir = outdir / "func"
     outdir.mkdir(exist_ok=True)
 
@@ -35,7 +35,7 @@ def writeout_events(analysis, pes, outdir):
 
         run['run'] = run.pop('number')
         entities = {r:v for r,v in run.items()
-                    if r in ['run', 'session', 'subject'] and v is not None}
+                    if r in ['run', 'session', 'subject', 'acquisition'] and v is not None}
         entities['task'] = analysis['task_name']
 
         if run_events.empty is False:
@@ -62,7 +62,7 @@ def compile(analysis, predictor_events, resources, bids_dir):
     bundle_paths = writeout_events(analysis, predictor_events, files_dir)
 
     # Load events and try applying transformations
-    bids_layout = BIDSLayout(bids_dir, config=[('bids', [bids_dir, files_dir.as_posix()])])
+    bids_layout = BIDSLayout([bids_dir, files_dir.as_posix()])
     bids_analysis = Analysis(bids_layout, deepcopy(model))
     bids_analysis.setup(derivatives='only', task=analysis['task_name'],
                         scan_length=scan_length, subject=subject)

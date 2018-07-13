@@ -1,0 +1,16 @@
+{
+  "Raiders": {
+    "dataset_address": "///labs/haxby/raiders",
+    "path": "/datasets/raiders/",
+    "tasks": {
+      "raiders": {
+        "converters": [
+        ],
+        "extractors": [
+        ],
+        "transformations":[
+        ]
+      }
+    }
+  }
+}
