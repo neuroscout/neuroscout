@@ -111,25 +111,29 @@ class App extends React.Component<{}, AppState> {
      hit api with analyses id to get status. If status change issue popup and update state
    */ 
   checkAnalysesStatus = async () => {
+    // tslint:disable-next-line:no-console
+    console.log("in check status");
     let changeFlag = false;
     let updatedAnalyses = this.state.analyses.map(async (analysis) => {
       if (['DRAFT', 'PASSED'].indexOf(analysis.status) > -1) {
         return analysis;
       }
-      await jwtFetch(`${DOMAINROOT}/api/analyses/${id}`, { method: 'get' })
+      let id = analysis.id;
+      return jwtFetch(`${DOMAINROOT}/api/analyses/${id}`, { method: 'get' })
         .then((data: ApiAnalysis) => {
           if (data.status !== analysis.status) {
-            changeFlag = True;
+            changeFlag = true;
             analysis.status = data.status;
-            return analysis;
           }
           return analysis;
       })
-      .catch(() => {return analysis});
+      .catch(() => { return analysis; });
     });
-    if (changeFlag) {
-      this.setState({ analyses: updatedAnalyses });
-    }
+    Promise.all(updatedAnalyses).then((values) => {
+      if (changeFlag) {
+        this.setState({ analyses: values});
+      }
+    });
     await timeout(5000);
   };
   
