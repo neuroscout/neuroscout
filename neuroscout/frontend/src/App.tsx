@@ -1,6 +1,8 @@
 /*
 Top-level App component containing AppState. The App component is currently responsible for:
 - Authentication (signup, login and logout)
+- Routing
+- Managing user's saved analyses (list display, clone and delete)
 */
 import * as React from 'react';
 import { Tabs, Row, Col, Layout, Button, Modal, Icon, Input, Form, message } from 'antd';
