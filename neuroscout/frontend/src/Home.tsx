@@ -20,7 +20,7 @@ class Home extends React.Component<HomeProps, {}> {
     return (
       <div>
         <Row type="flex" justify="center">
-          <Col span={18}>
+          <Col lg={{span: 18}} xs={{span: 24}}>
             <Card title="">
               <p>Welcome to Neuroscout!</p>
             </Card>
@@ -28,12 +28,12 @@ class Home extends React.Component<HomeProps, {}> {
           </Col>
         </Row>
         <Row type="flex" justify="center">
-          <Col span={4}>
+          <Col lg={{span: 4}}>
             <Button type="primary" size="large">
               <Link to="/builder">Create New Analysis</Link>
             </Button>
           </Col>
-          <Col span={4}>
+          <Col lg={{span: 4}}>
             <Button type="primary" size="large">
               <Link to="/browse">Browse Public Analyses</Link>
             </Button>
@@ -42,7 +42,7 @@ class Home extends React.Component<HomeProps, {}> {
         {loggedIn &&
           <div>
             <Row type="flex" justify="center">
-              <Col span={18}>
+              <Col lg={{span: 18}} xs={{span: 24}}>
                 {!!analyses &&
                   analyses.length > 0 &&
                   <div>
