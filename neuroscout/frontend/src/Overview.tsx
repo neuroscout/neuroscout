@@ -147,10 +147,10 @@ export class OverviewTab extends React.Component<OverviewTabProps, any> {
                 <div className="privateSwitch">
                   <Tooltip title="Should this analysis be private (only visible to you) or public?">
                     <Switch
-                      checked={analysis.private}
+                      checked={!analysis.private}
                       checkedChildren="Public"
                       unCheckedChildren="Private"
-                      onChange={checked => this.updateAnalysis('private')(checked)}
+                      onChange={checked => this.updateAnalysis('private')(!checked)}
                     />
                   </Tooltip>
                 </div>
