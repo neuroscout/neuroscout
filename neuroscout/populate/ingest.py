@@ -46,16 +46,10 @@ def add_predictor(predictor_name, dataset_id, run_id, onsets, durations, values,
 
     values = pd.Series(values, dtype='object')
     # Insert each row of Predictor as PredictorEvent
-    pes = []
-    for i, val in enumerate(values[values!='n/a']):
-        if isinstance(val, list):
-            val = val[0]
-        pe = PredictorEvent(
-            onset=onsets[i], duration = durations[i],
-            predictor_id=predictor.id, run_id = run_id,
-            value = str(val))
-        pe.append(pes)
-
+    pes = [PredictorEvent(onset=onsets[i], duration = durations[i],
+                   predictor_id=predictor.id, run_id = run_id,
+                   value = str(val))
+           for i, val in enumerate(values[values!='n/a'])]
     db.session.bulk_save_objects(pes)
     db.session.commit()
 
@@ -79,10 +73,12 @@ def add_predictor_collection(collection, ds_id, run_id, TR=None, include=None):
     for name, var in collection.variables.items():
         if include is not None and name not in include:
             break
-            values = var.values.values.tolist()
+
         if hasattr(var, 'onset'):
             onset = var.onset.tolist()
             duration = var.duration.tolist()
+            values = var.values.values.tolist()
+
         else:
             if TR is not None:
                 var = var.resample(1 / TR)
@@ -91,6 +87,7 @@ def add_predictor_collection(collection, ds_id, run_id, TR=None, include=None):
 
             onset = np.arange(0, len(var.values) * TR, TR).tolist()
             duration = [(TR)] * len(var.values)
+            values = var.values[name].values.tolist()
 
         add_predictor(name, ds_id, run_id, onset, duration, values, var.source)
 
