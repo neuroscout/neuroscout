@@ -73,10 +73,12 @@ def add_predictor_collection(collection, ds_id, run_id, TR=None, include=None):
     for name, var in collection.variables.items():
         if include is not None and name not in include:
             break
-        values = var.values.values.tolist()
+
         if hasattr(var, 'onset'):
             onset = var.onset.tolist()
             duration = var.duration.tolist()
+            values = var.values.values.tolist()
+
         else:
             if TR is not None:
                 var = var.resample(1 / TR)
@@ -85,6 +87,7 @@ def add_predictor_collection(collection, ds_id, run_id, TR=None, include=None):
 
             onset = np.arange(0, len(var.values) * TR, TR).tolist()
             duration = [(TR)] * len(var.values)
+            values = var.values[name].values.tolist()
 
         add_predictor(name, ds_id, run_id, onset, duration, values, var.source)
 
