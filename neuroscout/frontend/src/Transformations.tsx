@@ -5,7 +5,7 @@ This module comtains the following components:
  - XformEditor: component to add/edit a transformtion
 */
 import * as React from 'react';
-import { Table, Input, Button, Row, Col, Form, Select, Checkbox, Icon } from 'antd';
+import { Table, Input, InputNumber, Button, Row, Col, Form, Select, Checkbox, Icon, Radio } from 'antd';
 import {
   Analysis,
   Predictor,
@@ -26,6 +26,7 @@ for (const item of transformDefinititions) {
 }
 
 const FormItem = Form.Item;
+const RadioGroup = Radio.Group;
 
 interface XformDisplayProps {
   index: number;
@@ -37,7 +38,7 @@ interface XformDisplayProps {
 }
 
 function renderParamItems(xform: Transformation) {
-    let reserved = ['input', 'name', 'output']; 
+    let reserved = ['input', 'name', 'output'];
     let paramItems: any = [];
     Object.keys(xform).map(key => {
       if (reserved.includes(key)) {
@@ -101,6 +102,12 @@ interface ParameterFieldProps {
 }
 
 class ParameterField extends React.Component<ParameterFieldProps> {
+  updateWeight = (index: number, value: number) => {
+    let weights = [...this.props.value ];
+    weights[index] = value;
+    return weights;
+  };
+
   BooleanField = () => {
     const { name, value, onChange } = this.props;
     return (
@@ -111,7 +118,21 @@ class ParameterField extends React.Component<ParameterFieldProps> {
         <br />
       </div>
     );
-  }; 
+  };
+
+  NumberField = () => {
+    const { name, value, onChange } = this.props;
+    return (
+      <div>
+        {name}: 
+        <InputNumber
+          defaultValue={value}
+          onChange={(newValue) => newValue ? onChange(newValue) : onChange(0)}
+        />
+        <br />
+      </div>
+    );
+  };
 
   WrtField = () => {
     const {name,  onChange, value, options } = this.props;
@@ -133,12 +154,42 @@ class ParameterField extends React.Component<ParameterFieldProps> {
     );
   };
 
+  ReplaceNAField = () => {
+    const { name, value, onChange } = this.props;
+    return (
+      <div>
+      Replace missing values with 0 before/after scaling:<br/>
+      <RadioGroup 
+          onChange={(event) => onChange(event.target.value)}
+          value={value}
+      >
+        <Radio.Button value={'before'}>Before</Radio.Button>
+        <Radio.Button value={'after'}>After</Radio.Button>
+        <Radio.Button value={undefined}>Don't Replace</Radio.Button>
+      </RadioGroup>
+      </div>
+    );
+  };
+
   render() {
-    const {kind, name} = this.props;
+    const {kind, name, onChange } = this.props;
+    const options = this.props.options as Predictor[];
     return (
       <span>
+        {kind === 'number' && this.NumberField()}
         {kind === 'boolean' && this.BooleanField()}
         {name === 'other' && this.WrtField()}
+        {name === 'weights' && options && options.map((x, i) =>
+          <div key={i}>{x.name}: 
+            <InputNumber 
+              onChange={(newValue) => {
+                let newWeights = this.updateWeight(i, newValue as number);
+                onChange(newWeights);
+              }}
+            />
+          </div>
+        )}
+        {name === 'replace_na' && this.ReplaceNAField()}
       </span>
     );
   }
@@ -231,7 +282,7 @@ class XformEditor extends React.Component<XformEditorProps, XformEditorState> {
               <br />
               {availableParameters &&
                 availableParameters.map(param => {
-                  let options: Predictor[] = [];
+                  let options: Predictor[] = input; 
                   if (transformation.name === 'orthogonalize') {
                     // Special case for wrt parameter: in 'options' exclude predictors
                     // that were selected for 'inputs'

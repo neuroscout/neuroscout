@@ -79,16 +79,25 @@ interface PredictorsParam {
 
 export type Parameter = BooleanParam | PredictorsParam;
 
-export type TransformName = 'scale' | 'orthogonalize';
+export type TransformName = 'scale' | 'orthogonalize' | 'sum' | 'product' | 'threshold' 
+  | 'or' | 'and' | 'not';
 
 export type BlockLevel = 'run' | 'session' | 'subject' | 'dataset';
 
+export type ReplaceNA = 'before' | 'after' | undefined;
+
 export interface Transformation {
   name: TransformName;
+  replace_na?: ReplaceNA;
   input?: string[]; // predictor IDs
   demean?: boolean;
   rescale?: boolean;
   other?: string[];
+  weights?: number[];
+  threshold?: number;
+  binarize?: boolean;
+  above?: boolean;
+  signed?: boolean;
 }
  
 // Lookup hash of available transformations (as specified in transforms.ts) by their name
