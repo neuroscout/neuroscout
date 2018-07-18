@@ -116,3 +116,4 @@ celery_worker/src
 neuroscout/frontend/src/config.ts
 .env
 nginx/sites-enabled/local
+*.swp
