@@ -41,14 +41,29 @@ function renderParamItems(xform: Transformation) {
     let reserved = ['input', 'name', 'output'];
     let paramItems: any = [];
     Object.keys(xform).map(key => {
-      if (reserved.includes(key)) {
+      if (key === 'weights' && xform && xform.input) {
+        let weightItems: any = [];
+        xform.input.map((elem, index) => {
+          if (xform && xform.weights && xform.weights[index]) {
+            weightItems.push(<li key={index}>{elem + ': ' + xform.weights[index]}<br/></li>);
+          }
+        });
+        paramItems.push(
+          <li key={key}>{key + ':'}<br/><ul>{weightItems}</ul></li>
+        );
+      } else if (reserved.includes(key)) {
         return;
+      } else {
+        paramItems.push(
+          <li key={key}>{key + ': ' + xform[key]}</li>
+        );
       }
-      paramItems.push(
-        <li key={key}>{key + ': ' + xform[key]}</li>
-      );
     });
     return paramItems;
+}
+
+function renderWeights(xform: Transformation) {
+
 }
 
 const XformDisplay = (props: XformDisplayProps) => {
@@ -180,14 +195,23 @@ class ParameterField extends React.Component<ParameterFieldProps> {
         {kind === 'boolean' && this.BooleanField()}
         {name === 'other' && this.WrtField()}
         {name === 'weights' && options && options.map((x, i) =>
-          <div key={i}>{x.name}: 
+          <Row key={i}>
+          <div>
+            <Col span={3}>
+              <div className="weightName">
+                {x.name} weight: 
+              </div>
+            </Col>
+            <Col span={2}>
             <InputNumber 
               onChange={(newValue) => {
                 let newWeights = this.updateWeight(i, newValue as number);
                 onChange(newWeights);
               }}
             />
+            </Col>
           </div>
+          </Row>
         )}
         {name === 'replace_na' && this.ReplaceNAField()}
       </span>
