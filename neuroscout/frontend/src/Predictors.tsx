@@ -97,7 +97,7 @@ export class PredictorSelector extends React.Component<
     return (
       <div>
         <Row type="flex">
-          <Col lg={{span: 16}}>
+          <Col lg={{span: 16}} xs={{span: 24}}>
             <div>
               <Input
                 placeholder="Search predictor name or description..."
