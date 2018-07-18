@@ -62,7 +62,7 @@ def test_get_predictor(auth_client, extract_features):
     assert 'extracted_feature' in pred_p[0]
     assert pred_p[0]['extracted_feature']['description'] == 'Brightness of an image.'
     assert pred_p[0]['source'] == 'extracted'
-    assert pred_p[0]['modality'] == 'image'
+    assert pred_p[0]['extracted_feature']['modality'] == 'image'
 
 
 def test_get_rextracted(auth_client, reextract):
