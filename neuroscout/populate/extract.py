@@ -21,6 +21,14 @@ from models import (Dataset, Task, Predictor, PredictorEvent, PredictorRun,
     Run, Stimulus, RunStimulus, ExtractedFeature, ExtractedEvent)
 from .utils import hash_data
 
+stim_map = {
+    'ImageStim': 'image',
+    'VideoStim': 'video',
+    'TextStim': 'text',
+    'AudioStim': 'audio'
+}
+
+
 class FeatureSerializer(object):
     def __init__(self, schema=None, add_all=True):
         """ Serialize and annotate Pliers results using a schema.
@@ -113,8 +121,11 @@ class FeatureSerializer(object):
             "extractor_name": res.extractor.name,
             "extractor_parameters": str(dict(
                 zip(res.extractor._log_attributes, tr_attrs))),
-            "extractor_version": res.extractor.VERSION
+            "extractor_version": res.extractor.VERSION,
+            "modality": stim_map[res.extractor._input_type.__name__]
         }
+
+
         for ee, ef in annotated:
             ef.update(constants)
 
