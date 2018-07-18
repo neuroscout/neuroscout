@@ -62,21 +62,22 @@ function renderParamItems(xform: Transformation) {
     return paramItems;
 }
 
-function renderWeights(xform: Transformation) {
-
-}
-
 const XformDisplay = (props: XformDisplayProps) => {
   const { xform, index, onDelete, onMove, enableUp, enableDown } = props;
   const input = xform.input || [];
+  let paramItems = renderParamItems(xform);
   return (
     <div>
       <h3>{`${index + 1}: ${xform.name}`}</h3>
       <p>{`Inputs: ${input!.join(', ')}`}</p>
-      <p>Parameters:</p>
-      <ul>
-        {renderParamItems(xform)}
-      </ul>
+      {(paramItems.length > 0) && 
+        <div>
+        <p>Parameters:</p>
+        <ul>
+          {paramItems}
+        </ul>
+        </div>
+      }
       {enableUp &&
         <Button onClick={() => onMove(index, 'up')}>
           <Icon type="arrow-up" />
