@@ -31,7 +31,7 @@ const RadioGroup = Radio.Group;
 interface XformDisplayProps {
   index: number;
   xform: Transformation;
-  onDelete: (name: TransformName) => void;
+  onDelete: (index: number) => void;
   enableUp: boolean;
   enableDown: boolean;
   onMove: (index: number, direction: 'up' | 'down') => void;
@@ -70,7 +70,7 @@ const XformDisplay = (props: XformDisplayProps) => {
         <Button onClick={() => onMove(index, 'down')}>
           <Icon type="arrow-down" />
         </Button>}
-      <Button type="danger" onClick={() => onDelete(xform.name)}>
+      <Button type="danger" onClick={() => onDelete(index)}>
         <Icon type="delete" />
       </Button>
       <br />
@@ -337,8 +337,9 @@ export class XformsTab extends React.Component<XformsTabProps,  XformsTabState> 
     this.setState({mode:  'view' });
   };
 
-  onDeleteXform = (name: TransformName) => {
-    const newXforms = this.props.xforms.filter(x => x.name !== name);
+  onDeleteXform = (index: number) => {
+    this.props.xforms.splice(index, 1);
+    const newXforms = this.props.xforms;
     this.props.onSave(newXforms);
   };
 
