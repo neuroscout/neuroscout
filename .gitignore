@@ -113,7 +113,6 @@ jest_0
 .my-env
 .pliersenv
 celery_worker/src
-neuroscout/frontend/src/config.ts
 .env
 nginx/sites-enabled/local
 *.swp

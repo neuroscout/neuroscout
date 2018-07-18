@@ -1,6 +1,6 @@
 {
-  "HealthyMindNetwork": {
-    "path": "/datasets/HealthyMindNetwork/",
+  "HealthyBrainNetwork": {
+    "path": "/datasets/HealthyBrainNetwork/",
     "tasks": {
       "movieDM": {
         "converters": [
