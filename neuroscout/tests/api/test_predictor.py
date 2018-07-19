@@ -52,7 +52,7 @@ def test_get_predictor(auth_client, extract_features):
     pred_p = decode_json(resp)
     assert len(pred_p) == 1
     assert 'extracted_feature' not in pred_p[0]
-    assert pred_p[0]['source'] == 'event'
+    assert pred_p[0]['source'] == 'events'
 
     # Test extracted_feature
     resp = auth_client.get('/api/predictors', params={'name': 'Brightness',

@@ -28,7 +28,7 @@
     {
       "features": {
         "(vib)rance$" : {
-          "active": "false",
+          "active": false,
           "replace": "\\1",
           "description": "\\1 of an image."
         }
@@ -39,10 +39,10 @@
     {
       "features": {
         "face_landmarks_bottom_lip": {
-          "active": "true"
+          "active": true
         },
         "face_landmarks_upper_lip": {
-          "active": "true"
+          "active": true
         }
       }
     }

@@ -11,6 +11,7 @@ class ExtractedFeature(db.Model):
 	feature_name = db.Column(db.String)
 	description = db.Column(db.String)
 	active = db.Column(db.Boolean)
+	modality = db.Column(db.String)
 
 	created_at = db.Column(db.DateTime, default=datetime.datetime.utcnow)
 	extractor_version = db.Column(db.Float, default=0.1)

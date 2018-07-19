@@ -11,6 +11,7 @@ class ExtractedFeatureSchema(Schema):
     description = fields.Str(description="Feature description.")
     created_at = fields.Str(description="Extraction timestamp.")
     extractor_name = fields.Str(description="Extractor name.")
+    modality = fields.Str()
 
 class PredictorSchema(Schema):
     id = fields.Int()
@@ -18,7 +19,6 @@ class PredictorSchema(Schema):
     description = fields.Str()
     extracted_feature = fields.Nested('ExtractedFeatureSchema', skip_if=None)
     source = fields.Str()
-    modality = fields.Str()
 
     @post_dump
     def remove_null_values(self, data):
