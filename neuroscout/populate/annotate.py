@@ -5,13 +5,6 @@ import re
 import pandas as pd
 from .utils import hash_data
 
-stim_map = {
-    'ImageStim': 'image',
-    'VideoStim': 'video',
-    'TextStim': 'text',
-    'AudioStim': 'audio'
-}
-
 class Serializer(object):
     def __init__(self, schema, add_all):
         """ Serialize and annotate results using a schema.
@@ -28,38 +21,60 @@ class PredictorSerializer(Serializer):
         self.TR = TR
         super().__init__(current_app.config['PREDICTOR_SCHEMA'], add_all)
 
-    def _annotate_feature():
-        """ Annotate PredictorEvents from BIDSVariable """
-        pass
-
-    def load(self, variable, include=None, TR=None):
+    def load(self, variable):
         """" Load and annotate a BIDSVariable
         Args:
             res - BIDSVariableCollection object
         Returns a dictionary of annotated features
         """
-        annotated = {}
         if self.include is not None and variable.name not in self.include:
             return None
 
+        annotated = {}
         annotated['name'] = variable.name
+        annotated['source'] = variable.source
+
+        for pattern, attr in self.schema.items():
+            if re.compile(pattern).match(variable.name):
+                annotated['name'] = re.sub(pattern, attr['name'], variable.name) \
+                    if 'name' in attr else variable.name
+                annotated['description'] = re.sub(pattern, attr['description'], variable.name) \
+                    if 'description' in attr else None
+                break
 
         # If SparseVariable
         if hasattr(variable, 'onset'):
-            annotated['onsets'] = variable.onset.tolist()
-            annotated['durations'] = variable.duration.tolist()
-            annotated['values'] = variable.values.values.tolist()
+            onsets = variable.onset.tolist()
+            durations = variable.duration.tolist()
+            values = variable.values.values.tolist()
 
-        # If Dense, resample
+        # If Dense, resample, and sparsify
         else:
-            TR = variable.sampling_rate / 2 if TR is None else TR
+            TR = variable.sampling_rate / 2 if self.TR is None else self.TR
             variable = variable.resample(1 / TR)
 
-            annotated['onsets'] = np.arange(0, len(variable.values) * self.TR, self.TR).tolist()
-            annotated['durations'] = [(self.TR)] * len(variable.values)
-            annotated['values'] = variable.values[variable.name].values.tolist()
+            onsets = np.arange(0, len(variable.values) * self.TR, self.TR).tolist()
+            durations = [(self.TR)] * len(variable.values)
+            values = variable.values[variable.name].values.tolist()
 
-        return annotated
+        events = []
+        for i, onset in enumerate(onsets):
+            events.append(
+                {
+                    'onset': onset,
+                    'duration': durations[i],
+                    'value': values[i]
+                 }
+            )
+
+        return annotated, events
+
+stim_map = {
+    'ImageStim': 'image',
+    'VideoStim': 'video',
+    'TextStim': 'text',
+    'AudioStim': 'audio'
+}
 
 class FeatureSerializer(Serializer):
     def __init__(self, add_all=True):
@@ -76,8 +91,8 @@ class FeatureSerializer(Serializer):
             features - list of all features
             default_active - set to active by default?
         """
-        name = re.sub(pattern, schema['replace'], feat) \
-            if 'replace' in schema else feat
+        name = re.sub(pattern, schema['name'], feat) \
+            if 'name' in schema else feat
         description = re.sub(pattern, schema['description'], feat) \
             if 'description' in schema else None
 

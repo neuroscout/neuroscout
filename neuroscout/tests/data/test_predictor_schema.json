@@ -1,0 +1,6 @@
+{
+  "(r)eaction_time$": {
+    "description": "How long it takes to react!",
+    "name": "\\1t"
+  }
+}

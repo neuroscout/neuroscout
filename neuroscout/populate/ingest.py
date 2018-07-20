@@ -8,7 +8,6 @@ from pathlib import Path
 
 import pandas as pd
 import nibabel as nib
-import numpy as np
 
 from bids.grabbids import BIDSLayout
 from bids.variables import load_variables
@@ -23,59 +22,32 @@ from database import db
 from progressbar import progressbar
 from .annotate import PredictorSerializer
 
-def add_predictor(*, name, dataset_id, run_id, onsets, durations, values,
-                  source=None, **kwargs):
-    """" Adds a new Predictor to a run given a set of values
-    If Predictor already exist, use that one
-    Args:
-        name - name given to predictor_name
-        dataset_id - dataset db id
-        run_id - run db id
-        onsets - list of onsets
-        durations - list of durations
-        values - list of values
-        source - source of event
-        kwargs - additional identifiers of the Predictor
-    Output:
-        predictor id
-
-    """
-    predictor, _ = get_or_create(
-        Predictor, name=name, dataset_id=dataset_id,
-        source=source, **kwargs)
-
-    values = pd.Series(values, dtype='object')
-    # Insert each row of Predictor as PredictorEvent
-    pes = [PredictorEvent(onset=onsets[i], duration = durations[i],
-                   predictor_id=predictor.id, run_id = run_id,
-                   value = str(val))
-           for i, val in enumerate(values[values!='n/a'])]
-    db.session.bulk_save_objects(pes)
-    db.session.commit()
-
-    # Add PredictorRun
-    pr, _ = get_or_create(
-        PredictorRun, predictor_id=predictor.id, run_id = run_id)
-
-    return predictor.id
-
-
 def add_predictor_collection(collection, dataset_id, run_id, TR=None, include=None):
     """ Add a RunNode to the database.
     Args:
         collection - BIDSVariableCollection to ingest
-        ds_id - Dataset model id
-        r_id - Run model id
+        dataset_id - Dataset model id
+        run_id - Run model id
         source - source of collection. e.g "events", "recordings"
         TR - time repetiton of task
         include - list of predictors to include. all if None.
     """
-    serializer = PredictorSerializer(TR=TR, include=include)
+    pe_objects = []
     for var in collection.variables.values():
-        annotated = serializer.load(var)
+        annotated = PredictorSerializer(TR=TR, include=include).load(var)
         if annotated is not None:
-            add_predictor(dataset_id=dataset_id, run_id=run_id, **annotated)
+            pred_props, pes_props = annotated
+            predictor, _ = get_or_create(
+                Predictor,dataset_id=dataset_id, **pred_props)
+            for pe in pes_props:
+                pe_objects.append(PredictorEvent(
+                               predictor_id=predictor.id, run_id=run_id, **pe))
+            # Add PredictorRun
+            pr, _ = get_or_create(
+                PredictorRun, predictor_id=predictor.id, run_id=run_id)
 
+    db.session.bulk_save_objects(pe_objects)
+    db.session.commit()
 
 def add_group_predictors(dataset_id, participants):
     """ Adds group predictors using participants.tsv

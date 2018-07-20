@@ -7,6 +7,7 @@ class Predictor(db.Model):
 	id = db.Column(db.Integer, primary_key=True)
 	name = db.Column(db.Text, nullable=False)
 	source = db.Column(db.Text)
+	description = db.Column(db.Text)
 
 	dataset_id = db.Column(db.Integer, db.ForeignKey('dataset.id'), nullable=False)
 	ef_id = db.Column(db.Integer, db.ForeignKey('extracted_feature.id'))

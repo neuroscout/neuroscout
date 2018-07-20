@@ -7,8 +7,10 @@ def test_get_predictor(auth_client, extract_features):
     assert type(pred_list) == list
 
     # Get RT predictors
-    pred_id = [p for p in pred_list if p['name'] == 'rt'][0]['id']
-    assert 'name' in pred_list[0]
+    rt = [p for p in pred_list if p['name'] == 'rt'][0]
+    assert 'name' in rt
+    assert rt['description'] == "How long it takes to react!"
+    pred_id = rt['id']
 
     # Check that derivative event is in there
     assert len([p for p in pred_list if p['name'] == 'rating']) > 0

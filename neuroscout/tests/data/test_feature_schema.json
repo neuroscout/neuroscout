@@ -6,7 +6,7 @@
       },
       "features": {
         "brightness$" : {
-          "replace": "Brightness",
+          "name": "Brightness",
           "description": "Brightness of an image.",
           "preprocess": ["double"]
         }
@@ -18,7 +18,7 @@
       },
       "features": {
         "brightness$" : {
-          "replace": "Brightness",
+          "name": "Brightness",
           "description": "This should not match."
         }
       }
@@ -29,7 +29,7 @@
       "features": {
         "(vib)rance$" : {
           "active": false,
-          "replace": "\\1",
+          "name": "\\1",
           "description": "\\1 of an image."
         }
       }
