@@ -21,14 +21,14 @@ from models import (Dataset, Task, Run, Predictor, PredictorEvent, PredictorRun,
                     Stimulus, RunStimulus, GroupPredictor, GroupPredictorValue)
 from database import db
 from progressbar import progressbar
+from .annotate import PredictorSerializer
 
-
-def add_predictor(predictor_name, dataset_id, run_id, onsets, durations, values,
+def add_predictor(*, name, dataset_id, run_id, onsets, durations, values,
                   source=None, **kwargs):
     """" Adds a new Predictor to a run given a set of values
     If Predictor already exist, use that one
     Args:
-        predictor_name - name given to predictor_name
+        name - name given to predictor_name
         dataset_id - dataset db id
         run_id - run db id
         onsets - list of onsets
@@ -41,7 +41,7 @@ def add_predictor(predictor_name, dataset_id, run_id, onsets, durations, values,
 
     """
     predictor, _ = get_or_create(
-        Predictor, name=predictor_name, dataset_id=dataset_id,
+        Predictor, name=name, dataset_id=dataset_id,
         source=source, **kwargs)
 
     values = pd.Series(values, dtype='object')
@@ -60,7 +60,7 @@ def add_predictor(predictor_name, dataset_id, run_id, onsets, durations, values,
     return predictor.id
 
 
-def add_predictor_collection(collection, ds_id, run_id, TR=None, include=None):
+def add_predictor_collection(collection, dataset_id, run_id, TR=None, include=None):
     """ Add a RunNode to the database.
     Args:
         collection - BIDSVariableCollection to ingest
@@ -70,26 +70,11 @@ def add_predictor_collection(collection, ds_id, run_id, TR=None, include=None):
         TR - time repetiton of task
         include - list of predictors to include. all if None.
     """
-    for name, var in collection.variables.items():
-        if include is not None and name not in include:
-            break
-
-        if hasattr(var, 'onset'):
-            onset = var.onset.tolist()
-            duration = var.duration.tolist()
-            values = var.values.values.tolist()
-
-        else:
-            if TR is not None:
-                var = var.resample(1 / TR)
-            else:
-                TR = var.sampling_rate / 2
-
-            onset = np.arange(0, len(var.values) * TR, TR).tolist()
-            duration = [(TR)] * len(var.values)
-            values = var.values[name].values.tolist()
-
-        add_predictor(name, ds_id, run_id, onset, duration, values, var.source)
+    serializer = PredictorSerializer(TR=TR, include=include)
+    for var in collection.variables.values():
+        annotated = serializer.load(var)
+        if annotated is not None:
+            add_predictor(dataset_id=dataset_id, run_id=run_id, **annotated)
 
 
 def add_group_predictors(dataset_id, participants):
