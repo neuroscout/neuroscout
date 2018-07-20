@@ -17,6 +17,12 @@ class Serializer(object):
 
 class PredictorSerializer(Serializer):
     def __init__(self, add_all=True, include=None, TR=None):
+        """ Initalize serializer for ingested features.
+        Args:
+            add_all - Add all variables including those not in the schema
+            include - List of variables to include
+            TR - TR in seconds
+        """
         self.include = include
         self.TR = TR
         super().__init__(current_app.config['PREDICTOR_SCHEMA'], add_all)
@@ -41,6 +47,9 @@ class PredictorSerializer(Serializer):
                 annotated['description'] = re.sub(pattern, attr['description'], variable.name) \
                     if 'description' in attr else None
                 break
+        else:
+            if self.add_all == False:
+                return None
 
         # If SparseVariable
         if hasattr(variable, 'onset'):
