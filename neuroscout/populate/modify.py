@@ -71,17 +71,17 @@ def extend_extracted_objects(dataset_name, **selectors):
 
     create_predictors(efs, dataset_name, run_ids)
 
-def update_annotations(mode='both', name_match='original', **kwargs):
+def update_annotations(mode='predictors', name_match='original', **kwargs):
     """ Update existing annotation in accordance with schema.
     Args:
-        mode - Update 'predictors', 'features' or 'both'
+        mode - Update 'predictors', 'features'
         kwargs - Additional filters on queries
 
     Note: if regex was used to change the name of a feature, the feature
     may not match. In that case, add new entry to schema to ensure match,
     or ensure regex is inclusive
     """
-    if mode in ['predictors', 'both']:
+    if mode == 'predictors':
         schema = json.load(current_app.config['PREDICTOR_SCHEMA'])
         for pattern, attr in schema.items():
             matching = Predictor.query.filter(
@@ -94,8 +94,7 @@ def update_annotations(mode='both', name_match='original', **kwargs):
                     if 'description' in attr else None
             db.session.commit()
 
-
-    elif mode in ['features', 'both']:
+    elif mode == 'features':
         schema = json.load(current_app.config['FEATURE_SCHEMA'])
         for extractor_name, args in schema.items():
             candidate_efs = ExtractedFeature.query.filter_by(
