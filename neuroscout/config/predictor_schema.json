@@ -1,6 +1,6 @@
 {
-  "reaction_time$": {
+  "^reaction_time$": {
     "description": "How long it takes to react!",
-    "replace": "rt"
+    "name": "rt"
   }
 }

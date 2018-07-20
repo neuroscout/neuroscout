@@ -1,12 +1,12 @@
 """ Dataset modification
 Tools to modify/delete datasets already in database.
-
-TODO
- - Add tools to create new predictors from existing features
 """
 
+import json
+import re
+from flask import current_app
 from models import (Dataset, Task, Run, RunStimulus, Stimulus,
-                    ExtractedFeature, ExtractedEvent)
+                    ExtractedFeature, ExtractedEvent, Predictor)
 from database import db
 from .extract import create_predictors
 
@@ -70,3 +70,45 @@ def extend_extracted_objects(dataset_name, **selectors):
             RunStimulus).filter(RunStimulus.run_id.in_(run_ids)).all()
 
     create_predictors(efs, dataset_name, run_ids)
+
+def update_annotations(mode='both', name_match='original', **kwargs):
+    """ Update existing annotation in accordance with schema.
+    Args:
+        mode - Update 'predictors', 'features' or 'both'
+        kwargs - Additional filters on queries
+
+    Note: if regex was used to change the name of a feature, the feature
+    may not match. In that case, add new entry to schema to ensure match,
+    or ensure regex is inclusive
+    """
+    if mode in ['predictors', 'both']:
+        schema = json.load(current_app.config['PREDICTOR_SCHEMA'])
+        for pattern, attr in schema.items():
+            matching = Predictor.query.filter(
+                Predictor.name.op("~")(pattern)).filter_by(ef_id=None, **kwargs)
+
+            for match in matching:
+                match.name = re.sub(pattern, attr['name'], match.name) \
+                    if 'name' in attr else match.name
+                match.name = re.sub(pattern, attr['description'], match.name) \
+                    if 'description' in attr else None
+            db.session.commit()
+
+
+    elif mode in ['features', 'both']:
+        schema = json.load(current_app.config['FEATURE_SCHEMA'])
+        for extractor_name, args in schema.items():
+            candidate_efs = ExtractedFeature.query.filter_by(
+                extractor_name==extractor_name, **kwargs)
+            for version in args:
+                for pattern, attr in version['features']:
+                    matching = candidate_efs.filter(
+                        ExtractedFeature.feature_name.op("~")(pattern)).filter(
+                            ExtractedFeature.ef_id!=None)
+                    for match in matching:
+                        ### Warning, does not check against Extractor Parameters
+                        match.feature_name = re.sub(pattern, attr['name'], match.name) \
+                            if 'name' in attr else match.name
+                        match.name = re.sub(pattern, attr['description'], match.name) \
+                            if 'description' in attr else None
+                    db.session.commit()

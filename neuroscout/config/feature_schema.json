@@ -90,13 +90,13 @@
           "description": "Text topic: \\1"
         },
         "personality_(.*)$": {
-          "description": "Probability of speakers personality trait: //1"
+          "description": "Probability of speakers personality trait: \\1"
         },
         "persona_(.*)$": {
-          "description": "Probability of Myers-Briggs persona: //1"
+          "description": "Probability of Myers-Briggs persona: \\1"
         },
         "emotion_(.*)$": {
-          "description": "Emotion of speaker: //1"
+          "description": "Emotion of speaker: \\1"
         }
       }
     }
