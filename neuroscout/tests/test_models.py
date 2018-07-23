@@ -42,6 +42,7 @@ def test_dataset_ingestion(session, add_task):
 	predictor = Predictor.query.filter_by(name='rt').first()
 	assert predictor.predictor_events.count() == 16
 	assert predictor.source == 'events'
+	assert predictor.original_name == 'reaction_time'
 
 	# Test run summary statistics
 	assert len(predictor.run_statistics) == 4
@@ -131,8 +132,9 @@ def test_json_local_dataset(session, add_local_task_json):
 	converted_stim = [s for s in Stimulus.query if s.parent_id is not None][0]
 	assert converted_stim.converter_name == 'TesseractConverter'
 
-	assert ExtractedFeature.query.filter_by(
-		feature_name='Brightness').count() == 1
+	bright = ExtractedFeature.query.filter_by(
+		feature_name='Brightness').one()
+	assert bright.original_name == 'brightness'
 
 	num_bright = ExtractedFeature.query.filter_by(feature_name='num_bright')
 	assert num_bright.count() == 1

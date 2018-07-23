@@ -37,7 +37,7 @@ class PredictorSerializer(Serializer):
             return None
 
         annotated = {}
-        annotated['name'] = variable.name
+        annotated['original_name'] = variable.name
         annotated['source'] = variable.source
 
         for pattern, attr in self.schema.items():
@@ -48,6 +48,7 @@ class PredictorSerializer(Serializer):
                     if 'description' in attr else None
                 break
         else:
+            annotated['name'] = variable.name
             if self.add_all == False:
                 return None
 
@@ -118,6 +119,7 @@ class FeatureSerializer(Serializer):
                     {
                         'sha1_hash': hash_data(str(ext_hash) + name),
                         'feature_name': name,
+                        'original_name': feat,
                         'description': description,
                         'active': schema.get('active', default_active),
                         }
