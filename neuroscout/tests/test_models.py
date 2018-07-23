@@ -7,6 +7,7 @@ from models import (Analysis, User, Dataset, Predictor, Stimulus, Run,
 
 from numpy import isclose
 from populate.convert import ingest_text_stimuli
+from populate.modify import update_annotations
 
 def test_dataset_ingestion(session, add_task):
 	dataset_model = Dataset.query.filter_by(id=add_task).one()
@@ -240,3 +241,32 @@ def test_external_text(get_data_path, add_task):
 	assert len(data) == 2
 	assert first_stim.run_stimuli.count() == 4
 	assert 2.2 in [s.onset for s in first_stim.run_stimuli]
+
+def test_update_schema(session, add_task, extract_features):
+	bright = ExtractedFeature.query.filter_by(
+		feature_name='Brightness').one()
+	bright.feature_name = 'whatever'
+	session.commit()
+	assert 	ExtractedFeature.query.filter_by(
+			feature_name='whatever').count() == 1
+
+	update_annotations(mode='features')
+
+	assert 	ExtractedFeature.query.filter_by(
+			feature_name='whatever').count() == 0
+	bright = ExtractedFeature.query.filter_by(
+		feature_name='Brightness').one()
+	assert bright.feature_name == 'Brightness'
+	assert bright.original_name == 'brightness'
+
+	predictor = Predictor.query.filter_by(name='rt').first()
+	predictor.name = 'REACTION_TIME'
+	session.commit()
+
+	assert Predictor.query.filter_by(name='REACTION_TIME').count() == 1
+
+	update_annotations()
+
+	assert Predictor.query.filter_by(name='REACTION_TIME').count() == 0
+	predictor = Predictor.query.filter_by(name='rt').first()
+	assert predictor.name == 'rt'

@@ -122,7 +122,7 @@ def create_predictors(features, dataset_name, run_ids=None):
     all_preds = []
     for ef in features:
         all_preds.append(get_or_create(
-            Predictor, name=ef.feature_name,
+            Predictor, name=ef.feature_name, description=ef.description,
             dataset_id=Dataset.query.filter_by(name=dataset_name).one().id,
             source='extracted', ef_id=ef.id)[0])
 
