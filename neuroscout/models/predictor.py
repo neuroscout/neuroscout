@@ -6,6 +6,7 @@ class Predictor(db.Model):
 		A collection of PredictorEvents. """
 	id = db.Column(db.Integer, primary_key=True)
 	name = db.Column(db.Text, nullable=False)
+	original_name = db.Column(db.Text)
 	source = db.Column(db.Text)
 	description = db.Column(db.Text)
 

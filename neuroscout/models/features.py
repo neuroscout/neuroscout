@@ -9,6 +9,7 @@ class ExtractedFeature(db.Model):
 	extractor_name = db.Column(db.String)
 	extractor_parameters = db.Column(db.Text)
 	feature_name = db.Column(db.String)
+	original_name = db.Column(db.String) # Original feature_name
 	description = db.Column(db.String)
 	active = db.Column(db.Boolean)
 	modality = db.Column(db.String)
