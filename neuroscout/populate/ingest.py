@@ -15,7 +15,7 @@ from datalad.api import install
 from datalad.auto import AutomagicIO
 
 from .utils import remote_resource_exists, hash_stim
-from utils import listify, get_or_create
+from utils import get_or_create
 from models import (Dataset, Task, Run, Predictor, PredictorEvent, PredictorRun,
                     Stimulus, RunStimulus, GroupPredictor, GroupPredictorValue)
 from database import db
@@ -149,7 +149,11 @@ def add_task(task_name, dataset_name=None, local_path=None,
     from os.path import isfile
     assert isfile((local_path / 'dataset_description.json').as_posix())
 
-    layout = BIDSLayout(local_path.as_posix())
+    paths = [(local_path.as_posix(), 'bids')]
+    if (local_path / 'derivatives').exists():
+        paths.append(((local_path / 'derivatives').as_posix(), ['bids', 'derivatives']))
+    layout = BIDSLayout(paths, root=local_path.as_posix())
+
     if task_name not in layout.get_tasks():
         raise ValueError("Task {} not found in dataset {}".format(
             task_name, local_path))
@@ -228,12 +232,12 @@ def add_task(task_name, dataset_name=None, local_path=None,
 
         """ Extract Predictors"""
         # Assert event files exist (for DataLad)
-        for e in listify(layout.get_events(img.filename)):
+        for e in layout._get_nearest_helper(img.filename, '.tsv', type='events'):
             assert isfile(e)
 
         collection = load_variables(
-            layout, levels='run', scan_length=run_model.duration,  **entities).\
-            get_collections('run')[0]
+            layout, levels='run', scan_length=run_model.duration, **entities).\
+        get_collections('run')[0]
 
         stims = collection.variables.pop('stim_file')
 
