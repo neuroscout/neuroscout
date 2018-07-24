@@ -16,7 +16,7 @@ class ExtractedFeatureSchema(Schema):
 class PredictorSchema(Schema):
     id = fields.Int()
     name = fields.Str(description="Predictor name.")
-    description = fields.Str()
+    description = fields.Str(description="Predictor description")
     extracted_feature = fields.Nested('ExtractedFeatureSchema', skip_if=None)
     source = fields.Str()
 

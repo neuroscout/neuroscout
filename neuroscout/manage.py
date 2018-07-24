@@ -84,10 +84,5 @@ def ingest_from_json(config_file, automagic=False, update_features=False,
         config_file, automagic=automagic, update_features=update_features,
         reingest=reingest)
 
-
-@manager.command
-def update_annotations(mode, **kwargs):
-    populate.update_annotations(mode **kwargs)
-
 if __name__ == '__main__':
     manager.run()

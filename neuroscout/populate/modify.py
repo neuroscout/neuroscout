@@ -89,6 +89,8 @@ def update_annotations(mode='predictors', **kwargs):
                     if 'name' in attr else match.name
                 match.description = re.sub(pattern, attr['description'], match.original_name) \
                     if 'description' in attr else None
+                if attr.get('source') is not None:
+                    match.source = attr['source']
             db.session.commit()
 
     elif mode == 'features':

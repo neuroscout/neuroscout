@@ -1,6 +1,54 @@
 {
-  "^reaction_time$": {
-    "description": "How long it takes to react!",
+  "^(rt|reaction_time)$": {
+    "description": "Behavioral reaction time in seconds",
     "name": "rt"
+  },
+  "^(a|t)CompCor([0-9]{2})$": {
+    "description": "Noise components estimated using component based noise correction method",
+    "source": "fmriprep"
+  },
+  "^Cosine([0-9]{2})$": {
+    "description": "Cosine basis set for high-pass filtering",
+    "source": "fmriprep"
+  },
+  "^FramewiseDisplacement$": {
+    "description": "Esimated bulk-head motion",
+    "source": "fmriprep"
+  },
+  "^NonSteadyStateOutlier([0-9]{2})$": {
+    "description": "Non-steady state volume detection",
+    "source": "fmriprep"
+  },
+  "^GlobalSignal$": {
+    "description": "Global signal within whole-brain mask",
+    "source": "fmriprep"
+  },
+  "^non-stdDVARS$": {
+    "description": "Derivative of RMS variance over voxels, non-standardized",
+    "source": "fmriprep"
+  },
+  "^stdDVARS$": {
+    "description": "Derivative of RMS variance over voxels, standardized",
+    "source": "fmriprep"
+  },
+  "^vx-wisestdDVARS$": {
+    "description": "Derivative of RMS variance over voxels, voxel-wise standardized",
+    "source": "fmriprep"
+  },
+  "^CSF$": {
+    "description": "Average signal in CSF mask",
+    "source": "fmriprep"
+  },
+  "^WhiteMatter$": {
+    "description": "Average signal in White Matter mask",
+    "source": "fmriprep"
+  },
+  "^Rot([X-Z]?)$": {
+    "description": "Rigid-body transform parameter (rotation)",
+    "source": "fmriprep"
+  },
+  "^[X-Z]?$": {
+    "description": "Rigid-body transform parameter (translation)",
+    "source": "fmriprep"
   }
 }
