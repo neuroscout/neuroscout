@@ -96,11 +96,9 @@ def update_annotations(mode='predictors', **kwargs):
     elif mode == 'features':
         schema = json.load(open(current_app.config['FEATURE_SCHEMA']))
         ext_name = kwargs.pop('extractor_name') if 'extractor_name' in kwargs else None
-
         for extractor_name, args in schema.items():
-            if ext_name is not None and ext_name != 'extractor_name':
+            if ext_name is not None and ext_name != extractor_name:
                 break
-
             candidate_efs = ExtractedFeature.query.filter_by(
                 extractor_name=extractor_name, **kwargs)
 
@@ -111,7 +109,7 @@ def update_annotations(mode='predictors', **kwargs):
                         ExtractedFeature.original_name.op("~")(pattern))
                     for match in matching:
                         match.feature_name = re.sub(pattern, attr['name'], match.original_name) \
-                            if 'name' in attr else match.name
+                            if 'name' in attr else match.feature_name
                         match.description = re.sub(pattern, attr['description'], match.original_name) \
                             if 'description' in attr else None
                         for pred in match.generated_predictors:
