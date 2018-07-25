@@ -7,6 +7,7 @@ from models import (Analysis, User, Dataset, Predictor, Stimulus, Run,
 
 from numpy import isclose
 from populate.convert import ingest_text_stimuli
+from populate.modify import update_annotations
 
 def test_dataset_ingestion(session, add_task):
 	dataset_model = Dataset.query.filter_by(id=add_task).one()
@@ -42,6 +43,7 @@ def test_dataset_ingestion(session, add_task):
 	predictor = Predictor.query.filter_by(name='rt').first()
 	assert predictor.predictor_events.count() == 16
 	assert predictor.source == 'events'
+	assert predictor.original_name == 'reaction_time'
 
 	# Test run summary statistics
 	assert len(predictor.run_statistics) == 4
@@ -131,8 +133,9 @@ def test_json_local_dataset(session, add_local_task_json):
 	converted_stim = [s for s in Stimulus.query if s.parent_id is not None][0]
 	assert converted_stim.converter_name == 'TesseractConverter'
 
-	assert ExtractedFeature.query.filter_by(
-		feature_name='Brightness').count() == 1
+	bright = ExtractedFeature.query.filter_by(
+		feature_name='Brightness').one()
+	assert bright.original_name == 'brightness'
 
 	num_bright = ExtractedFeature.query.filter_by(feature_name='num_bright')
 	assert num_bright.count() == 1
@@ -238,3 +241,32 @@ def test_external_text(get_data_path, add_task):
 	assert len(data) == 2
 	assert first_stim.run_stimuli.count() == 4
 	assert 2.2 in [s.onset for s in first_stim.run_stimuli]
+
+def test_update_schema(session, add_task, extract_features):
+	bright = ExtractedFeature.query.filter_by(
+		feature_name='Brightness').one()
+	bright.feature_name = 'whatever'
+	session.commit()
+	assert 	ExtractedFeature.query.filter_by(
+			feature_name='whatever').count() == 1
+
+	update_annotations(mode='features')
+
+	assert 	ExtractedFeature.query.filter_by(
+			feature_name='whatever').count() == 0
+	bright = ExtractedFeature.query.filter_by(
+		feature_name='Brightness').one()
+	assert bright.feature_name == 'Brightness'
+	assert bright.original_name == 'brightness'
+
+	predictor = Predictor.query.filter_by(name='rt').first()
+	predictor.name = 'REACTION_TIME'
+	session.commit()
+
+	assert Predictor.query.filter_by(name='REACTION_TIME').count() == 1
+
+	update_annotations()
+
+	assert Predictor.query.filter_by(name='REACTION_TIME').count() == 0
+	predictor = Predictor.query.filter_by(name='rt').first()
+	assert predictor.name == 'rt'

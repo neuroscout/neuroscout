@@ -1,12 +1,12 @@
 """ Dataset modification
 Tools to modify/delete datasets already in database.
-
-TODO
- - Add tools to create new predictors from existing features
 """
 
+import json
+import re
+from flask import current_app
 from models import (Dataset, Task, Run, RunStimulus, Stimulus,
-                    ExtractedFeature, ExtractedEvent)
+                    ExtractedFeature, ExtractedEvent, Predictor)
 from database import db
 from .extract import create_predictors
 
@@ -70,3 +70,51 @@ def extend_extracted_objects(dataset_name, **selectors):
             RunStimulus).filter(RunStimulus.run_id.in_(run_ids)).all()
 
     create_predictors(efs, dataset_name, run_ids)
+
+def update_annotations(mode='predictors', **kwargs):
+    """ Update existing annotation in accordance with schema.
+    Args:
+        mode - Update 'predictors', 'features'
+        kwargs - Additional filters on queries
+    """
+    if mode == 'predictors':
+        schema = json.load(open(current_app.config['PREDICTOR_SCHEMA']))
+        for pattern, attr in schema.items():
+            matching = Predictor.query.filter(
+                Predictor.original_name.op("~")(pattern)).filter_by(
+                    ef_id=None, **kwargs)
+
+            for match in matching:
+                match.name = re.sub(pattern, attr['name'], match.original_name) \
+                    if 'name' in attr else match.name
+                match.description = re.sub(pattern, attr['description'], match.original_name) \
+                    if 'description' in attr else None
+                if attr.get('source') is not None:
+                    match.source = attr['source']
+            db.session.commit()
+
+    elif mode == 'features':
+        schema = json.load(open(current_app.config['FEATURE_SCHEMA']))
+        ext_name = kwargs.pop('extractor_name') if 'extractor_name' in kwargs else None
+
+        for extractor_name, args in schema.items():
+            if ext_name is not None and ext_name != 'extractor_name':
+                break
+
+            candidate_efs = ExtractedFeature.query.filter_by(
+                extractor_name=extractor_name, **kwargs)
+
+            ### Warning, does not check against Extractor Parameters
+            for version in args:
+                for pattern, attr in version['features'].items():
+                    matching = candidate_efs.filter(
+                        ExtractedFeature.original_name.op("~")(pattern))
+                    for match in matching:
+                        match.feature_name = re.sub(pattern, attr['name'], match.original_name) \
+                            if 'name' in attr else match.name
+                        match.description = re.sub(pattern, attr['description'], match.original_name) \
+                            if 'description' in attr else None
+                        for pred in match.generated_predictors:
+                            pred.name = match.feature_name
+                            pred.description = match.description
+                    db.session.commit()

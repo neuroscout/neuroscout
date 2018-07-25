@@ -7,8 +7,10 @@ def test_get_predictor(auth_client, extract_features):
     assert type(pred_list) == list
 
     # Get RT predictors
-    pred_id = [p for p in pred_list if p['name'] == 'rt'][0]['id']
-    assert 'name' in pred_list[0]
+    rt = [p for p in pred_list if p['name'] == 'rt'][0]
+    assert 'name' in rt
+    assert rt['description'] == "How long it takes to react!"
+    pred_id = rt['id']
 
     # Check that derivative event is in there
     assert len([p for p in pred_list if p['name'] == 'rating']) > 0
@@ -52,6 +54,7 @@ def test_get_predictor(auth_client, extract_features):
     pred_p = decode_json(resp)
     assert len(pred_p) == 1
     assert 'extracted_feature' not in pred_p[0]
+    assert pred_p[0]['source'] == 'events'
 
     # Test extracted_feature
     resp = auth_client.get('/api/predictors', params={'name': 'Brightness',
@@ -60,6 +63,8 @@ def test_get_predictor(auth_client, extract_features):
     pred_p = decode_json(resp)
     assert 'extracted_feature' in pred_p[0]
     assert pred_p[0]['extracted_feature']['description'] == 'Brightness of an image.'
+    assert pred_p[0]['source'] == 'extracted'
+    assert pred_p[0]['extracted_feature']['modality'] == 'image'
 
 
 def test_get_rextracted(auth_client, reextract):

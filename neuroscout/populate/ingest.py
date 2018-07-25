@@ -8,7 +8,6 @@ from pathlib import Path
 
 import pandas as pd
 import nibabel as nib
-import numpy as np
 
 from bids.grabbids import BIDSLayout
 from bids.variables import load_variables
@@ -16,81 +15,39 @@ from datalad.api import install
 from datalad.auto import AutomagicIO
 
 from .utils import remote_resource_exists, hash_stim
-from utils import listify, get_or_create
+from utils import get_or_create
 from models import (Dataset, Task, Run, Predictor, PredictorEvent, PredictorRun,
                     Stimulus, RunStimulus, GroupPredictor, GroupPredictorValue)
 from database import db
 from progressbar import progressbar
+from .annotate import PredictorSerializer
 
-
-def add_predictor(predictor_name, dataset_id, run_id, onsets, durations, values,
-                  source=None, **kwargs):
-    """" Adds a new Predictor to a run given a set of values
-    If Predictor already exist, use that one
-    Args:
-        predictor_name - name given to predictor_name
-        dataset_id - dataset db id
-        run_id - run db id
-        onsets - list of onsets
-        durations - list of durations
-        values - list of values
-        source - source of event
-        kwargs - additional identifiers of the Predictor
-    Output:
-        predictor id
-
-    """
-    predictor, _ = get_or_create(
-        Predictor, name=predictor_name, dataset_id=dataset_id,
-        source=source, **kwargs)
-
-    values = pd.Series(values, dtype='object')
-    # Insert each row of Predictor as PredictorEvent
-    pes = [PredictorEvent(onset=onsets[i], duration = durations[i],
-                   predictor_id=predictor.id, run_id = run_id,
-                   value = str(val))
-           for i, val in enumerate(values[values!='n/a'])]
-    db.session.bulk_save_objects(pes)
-    db.session.commit()
-
-    # Add PredictorRun
-    pr, _ = get_or_create(
-        PredictorRun, predictor_id=predictor.id, run_id = run_id)
-
-    return predictor.id
-
-
-def add_predictor_collection(collection, ds_id, run_id, TR=None, include=None):
+def add_predictor_collection(collection, dataset_id, run_id, TR=None, include=None):
     """ Add a RunNode to the database.
     Args:
         collection - BIDSVariableCollection to ingest
-        ds_id - Dataset model id
-        r_id - Run model id
+        dataset_id - Dataset model id
+        run_id - Run model id
         source - source of collection. e.g "events", "recordings"
         TR - time repetiton of task
         include - list of predictors to include. all if None.
     """
-    for name, var in collection.variables.items():
-        if include is not None and name not in include:
-            break
+    pe_objects = []
+    for var in collection.variables.values():
+        annotated = PredictorSerializer(TR=TR, include=include).load(var)
+        if annotated is not None:
+            pred_props, pes_props = annotated
+            predictor, _ = get_or_create(
+                Predictor,dataset_id=dataset_id, **pred_props)
+            for pe in pes_props:
+                pe_objects.append(PredictorEvent(
+                               predictor_id=predictor.id, run_id=run_id, **pe))
+            # Add PredictorRun
+            pr, _ = get_or_create(
+                PredictorRun, predictor_id=predictor.id, run_id=run_id)
 
-        if hasattr(var, 'onset'):
-            onset = var.onset.tolist()
-            duration = var.duration.tolist()
-            values = var.values.values.tolist()
-
-        else:
-            if TR is not None:
-                var = var.resample(1 / TR)
-            else:
-                TR = var.sampling_rate / 2
-
-            onset = np.arange(0, len(var.values) * TR, TR).tolist()
-            duration = [(TR)] * len(var.values)
-            values = var.values[name].values.tolist()
-
-        add_predictor(name, ds_id, run_id, onset, duration, values, var.source)
-
+    db.session.bulk_save_objects(pe_objects)
+    db.session.commit()
 
 def add_group_predictors(dataset_id, participants):
     """ Adds group predictors using participants.tsv
@@ -192,7 +149,11 @@ def add_task(task_name, dataset_name=None, local_path=None,
     from os.path import isfile
     assert isfile((local_path / 'dataset_description.json').as_posix())
 
-    layout = BIDSLayout(local_path.as_posix())
+    paths = [(local_path.as_posix(), 'bids')]
+    if (local_path / 'derivatives').exists():
+        paths.append(((local_path / 'derivatives').as_posix(), ['bids', 'derivatives']))
+    layout = BIDSLayout(paths, root=local_path.as_posix())
+
     if task_name not in layout.get_tasks():
         raise ValueError("Task {} not found in dataset {}".format(
             task_name, local_path))
@@ -271,12 +232,12 @@ def add_task(task_name, dataset_name=None, local_path=None,
 
         """ Extract Predictors"""
         # Assert event files exist (for DataLad)
-        for e in listify(layout.get_events(img.filename)):
+        for e in layout._get_nearest_helper(img.filename, '.tsv', type='events'):
             assert isfile(e)
 
         collection = load_variables(
-            layout, levels='run', scan_length=run_model.duration,  **entities).\
-            get_collections('run')[0]
+            layout, levels='run', scan_length=run_model.duration, **entities).\
+        get_collections('run')[0]
 
         stims = collection.variables.pop('stim_file')
 

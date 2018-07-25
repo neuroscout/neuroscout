@@ -29,6 +29,7 @@ class Config(object):
 
     dir_path = Path(__file__).resolve().parents[1]
     FEATURE_SCHEMA = (dir_path / 'config/feature_schema.json').as_posix()
+    PREDICTOR_SCHEMA = (dir_path / 'config/predictor_schema.json').as_posix()
     ALL_TRANSFORMERS = (dir_path / 'config/transformers.json').as_posix()
 
     STIMULUS_DIR = 'path'
@@ -47,6 +48,7 @@ class TestingConfig(Config):
     TESTING = True
     dir_path = Path(__file__).resolve().parents[1]
     FEATURE_SCHEMA = (dir_path / 'tests/data/test_feature_schema.json').as_posix()
+    PREDICTOR_SCHEMA = (dir_path / 'tests/data/test_predictor_schema.json').as_posix()
     FEATURE_DATASTORE = '/tmp/file-data/feature-tracking.csv'
 
 class DockerTestConfig(TestingConfig):
