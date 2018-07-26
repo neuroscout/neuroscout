@@ -2,10 +2,12 @@
 from models import (Dataset, ExtractedFeature, ExtractedEvent,
                     Stimulus, RunStimulus, Run, Task)
 from database import db
+from flask import current_app
 from sqlalchemy import func
 from .utils import hash_data
 from .extract import create_predictors
 import pandas as pd
+import json
 
 class Postprocessing(object):
     """ Functions applied to one or more ExtractedFeatures """
@@ -64,6 +66,19 @@ class Postprocessing(object):
         ee_df['duration'] = 1
         return ee_df[['onset', 'duration', 'value', 'stimulus_id']].to_dict('index').values()
 
+    @staticmethod
+    def _get_annotations(feature_name, ext_name):
+        """ Gets annotations from feature schema """
+        kwargs = {}
+        schema = json.load(open(current_app.config['FEATURE_SCHEMA']))
+        for version in schema.get(ext_name, []):
+            for name, attr in version['features'].items():
+                if name == feature_name:
+                    kwargs['description'] = attr.get('description')
+                    break
+
+        return kwargs
+
     def apply_transformation(self, new_name, function, func_args={}, **filter):
         """ Queries EFs, applies transformation, and saves as new EF/Predictor
         Args:
@@ -78,10 +93,13 @@ class Postprocessing(object):
         efs = self.efs.filter_by(**filter)
 
         # Create EF
-        ext_name = efs.first().extractor_name + "_trans"
+        ext_name = efs.first().extractor_name
+
         new_ef = ExtractedFeature(
             extractor_name=ext_name, feature_name=new_name,
-            active=True, sha1_hash=hash_data(ext_name + new_name))
+            active=True, sha1_hash=hash_data(ext_name + new_name),
+            transformed=True,
+            **self._get_annotations(new_name, ext_name))
         db.session.add(new_ef)
         db.session.commit()
 

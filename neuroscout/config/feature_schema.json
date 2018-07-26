@@ -141,11 +141,11 @@
     {
       "features": {
         "boundingPoly_vertex([0-9])_([xy])": {
-          "description": "Bounding polygon around face. \\3 coordinate for vertex \\2",
+          "description": "Bounding polygon around face. \\2 coordinate for vertex \\1",
           "active": false
         },
         "fdboundingPoly_vertex([0-9])_([xy])": {
-          "description": "Tight bounding polygon around face. \\3 coordinate for vertex \\2",
+          "description": "Tight bounding polygon around face. \\2 coordinate for vertex \\1",
           "active": false
         },
         "landmark_([A-Z])_[xyz]": {
@@ -186,6 +186,9 @@
         },
         "headwearLikelihood": {
           "description": "Headwear likelihood"
+        },
+        "num_faces": {
+          "description": "Number of detected faces in scene"
         }
       }
     }
@@ -265,6 +268,33 @@
       "features": {
         "subtlexusfrequency_Lg10WF": {
           "description": "Lexical frequency of words in corpus of 51 million words (log)"
+        }
+      }
+    }
+  ],
+  "ComplexTextExtractor":[
+    {
+      "features": {
+        "speech": {
+          "description": "Speech (binarized, on or off)"
+        }
+      }
+    }
+  ],
+  "GoogleVideoAPIShotDetectionExtractor":[
+    {
+      "features": {
+        "shot_change": {
+          "description": "Transitions between scene cuts in video"
+        }
+      }
+    }
+  ],
+  "GoogleVisionAPIPropertyExtractor":[
+    {
+      "features": {
+        "num_colors_0_07": {
+          "description": "Number of colors that occupy more than 7% of pixels"
         }
       }
     }
