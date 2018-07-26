@@ -160,10 +160,10 @@
         "tiltAngle": {
           "description": "Pitch angle, which indicates the upwards/downwards angle that the face is pointing relative to the image's horizontal plane"
         },
-        "detectionConfidence": {
+        "face_detectionConfidence": {
           "description": "Face detection confidence"
         },
-        "landmarkingConfidence": {
+        "face_landmarkingConfidence": {
           "description": "Face landmarking confidence"
         },
         "joyLikelihood": {
