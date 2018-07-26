@@ -98,7 +98,7 @@ def update_annotations(mode='predictors', **kwargs):
         ext_name = kwargs.pop('extractor_name') if 'extractor_name' in kwargs else None
         for extractor_name, args in schema.items():
             if ext_name is not None and ext_name != extractor_name:
-                break
+                continue
             candidate_efs = ExtractedFeature.query.filter_by(
                 extractor_name=extractor_name, **kwargs)
 
