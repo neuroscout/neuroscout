@@ -6,7 +6,7 @@ services:
     expose:
       - "8000"
     volumes:
-      - migrations:/migrations
+      - ${FILE_DATA}/migrations:/migrations
       - ./neuroscout/:/neuroscout
       - ${DATASET_DIR}:/datasets
       - ${KEY_DIR}:/keys
@@ -75,5 +75,4 @@ services:
     env_file: .env
 
 volumes:
-  migrations:
   postgres-data:
