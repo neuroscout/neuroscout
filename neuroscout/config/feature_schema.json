@@ -3,7 +3,7 @@
     {
       "features": {
         "brightness$": {
-          "description": "Brightness of an image."
+          "description": "Average luminosity of the pixels"
         }
       }
     }
@@ -12,7 +12,7 @@
     {
       "features": {
         "vibrance$": {
-          "description": "Brightness of an image."
+          "description": "Variance of color channels"
         }
       }
     }
@@ -21,7 +21,7 @@
     {
       "features": {
         "sharpness$": {
-          "description": "Brightness of an image."
+          "description": "Degree of blur/sharpness of the image"
         }
       }
     }
@@ -30,14 +30,14 @@
     {
       "features": {
         "max_saliency$" : {
-          "description": "Maximum salience in image."
+          "description": "Maximum saliency of the image using Itti & Koch (1998) algorithm"
         },
         "max_y$": {
           "description": "Y coord of maximum salience.",
           "active": false
         },
         "max_x$": {
-          "description": "Y coord of maximum salience.",
+          "description": "X coord of maximum salience.",
           "active": false
         },
         "frac_high_saliency$": {
@@ -51,7 +51,7 @@
       "attributes": { "model_name": "general-v1.3" },
       "features": {
         "(.*)": {
-          "description": "General model label class: (\\1)"
+          "description": "Clarifai image recognition label //1"
         }
       }
     },
@@ -59,7 +59,7 @@
       "attributes": { "model_name": "nsfw-v1.0" },
       "features": {
         "nsfw$": {
-          "description": "Probability of nudity"
+          "description": "Likelihood of nudity"
         }
       }
     }
@@ -105,7 +105,7 @@
     {
       "features": {
         "(.*)": {
-          "description": "Audio power at frequency band //1 Hz."
+          "description": "Audio power at frequency band //1 Hz"
         }
       }
     }
@@ -114,7 +114,7 @@
     {
       "features": {
         "mean_amplitude": {
-          "description": "Mean audio amplitude during speech."
+          "description": "Mean audio amplitude during speech"
         }
       }
     }
@@ -123,7 +123,7 @@
     {
       "features": {
         "spectral_centroid": {
-          "description": "Spectral centroids from audio."
+          "description": "Spectral centroids from audio"
         }
       }
     }
@@ -132,7 +132,7 @@
     {
       "features": {
         "rmse": {
-          "description": "Root mean square (RMS) energy from audio."
+          "description": "Root mean square (RMS) energy from audio"
         }
       }
     }
@@ -140,52 +140,55 @@
   "GoogleVisionAPIFaceExtractor": [
     {
       "features": {
-        "face([0-9]*)_boundingPoly_vertex([0-9])_([xy])": {
-          "description": "Bounding polygon around face. \\3 coordinate for vertex \\2",
+        "boundingPoly_vertex([0-9])_([xy])": {
+          "description": "Bounding polygon around face. \\2 coordinate for vertex \\1",
           "active": false
         },
-        "face([0-9]*)_fdboundingPoly_vertex([0-9])_([xy])": {
-          "description": "Tight bounding polygon around face. \\3 coordinate for vertex \\2",
+        "fdboundingPoly_vertex([0-9])_([xy])": {
+          "description": "Tight bounding polygon around face. \\2 coordinate for vertex \\1",
           "active": false
         },
-        "face([0-9]*)_landmark_([A-Z])_[xyz]": {
+        "landmark_([A-Z])_[xyz]": {
           "description": "\\3 coordinate for \\2"
         },
-        "face([0-9]*)_rollAngle": {
+        "rollAngle": {
           "description": "Clockwise/anti-clockwise rotation of the face relative to the image vertical about the axis perpendicular to the face"
         },
-        "face([0-9]*)_panAngle": {
+        "panAngle": {
           "description": "Yaw angle, which indicates the leftward/rightward angle that the face is pointing relative to the vertical plane perpendicular to the image"
         },
-        "face([0-9]*)_tiltAngle": {
+        "tiltAngle": {
           "description": "Pitch angle, which indicates the upwards/downwards angle that the face is pointing relative to the image's horizontal plane"
         },
-        "face([0-9]*)_detectionConfidence": {
+        "detectionConfidence": {
           "description": "Face detection confidence"
         },
-        "face([0-9]*)_landmarkingConfidence": {
+        "landmarkingConfidence": {
           "description": "Face landmarking confidence"
         },
-        "face([0-9]*)_joyLikelihood": {
+        "joyLikelihood": {
           "description": "Joy likelihood."
         },
-        "face([0-9]*)_sorrowLikelihood": {
+        "sorrowLikelihood": {
           "description": "Sorrow likelihood."
         },
-        "face([0-9]*)_angerLikelihood": {
+        "angerLikelihood": {
           "description": "Anger likelihood"
         },
-        "face([0-9]*)_surpriseLikelihood": {
+        "surpriseLikelihood": {
           "description": "Surprise likelihood"
         },
-        "face([0-9]*)_underExposedLikelihood": {
+        "underExposedLikelihood": {
           "description": "Under-exposed likelihood."
         },
-        "face([0-9]*)_blurredLikelihood": {
-          "description": "Blurred likelihood"
+        "blurredLikelihood": {
+          "description" : "Blurred likelihood"
         },
-        "face([0-9]*)_headwearLikelihood": {
+        "headwearLikelihood": {
           "description": "Headwear likelihood"
+        },
+        "num_faces": {
+          "description": "Number of detected faces in scene"
         }
       }
     }
@@ -197,15 +200,17 @@
           "description": "Confidence of image class \\1"
         }
       }
-
     }
   ],
   "GoogleVisionAPIPropertyExtractor": [
     {
       "features": {
         ".*": {
-          "description": "RGB Channel.",
+          "description": "RGB Channel",
           "active": false
+        },
+        "num_colors_0_07": {
+          "description": "Number of colors that occupy more than 7% of pixels"
         }
       }
     }
@@ -214,16 +219,19 @@
     {
       "features": {
         "adult": {
-          "description": "Likelihood of nudity, pornographic images or cartoons, or sexual activities."
+          "description": "Likelihood of nudity, pornographic images or cartoons, or sexual activities"
         },
         "spoof": {
           "description": "Likelihood that an modification was made to the image's canonical version to make it appear funny or offensive"
         },
         "medical": {
-          "description": "Likelihood that this is a medical image."
+          "description": "Likelihood that this is a medical image"
         },
         "violence": {
-          "description": "Likelihood that this image contains violent content."
+          "description": "Likelihood that this image contains violent content"
+        },
+        "racy": {
+          "description": "Likelihood that this image contains racy content"
           }
       }
 
@@ -233,16 +241,16 @@
     {
       "features": {
         "sentiment_compound": {
-          "description": "Overall valence."
+          "description": "Overall valence"
         },
         "sentiment_neu": {
-          "description": "Neutral sentiment."
+          "description": "Neutral sentiment"
         },
         "sentiment_pos": {
-          "description": "Positive sentiment."
+          "description": "Positive sentiment"
         },
         "sentiment_neg": {
-          "description": "Negative sentiment."
+          "description": "Negative sentiment"
         }
       }
 
@@ -261,7 +269,25 @@
     {
       "features": {
         "subtlexusfrequency_Lg10WF": {
-          "description": "log10(FREQcount+1), where FREQcount is the number of times the word appears in the corpus (i.e., on the total of 51 million words)"
+          "description": "Lexical frequency of words in corpus of 51 million words (log)"
+        }
+      }
+    }
+  ],
+  "ComplexTextExtractor":[
+    {
+      "features": {
+        "speech": {
+          "description": "Speech (binarized, on or off)"
+        }
+      }
+    }
+  ],
+  "GoogleVideoAPIShotDetectionExtractor":[
+    {
+      "features": {
+        "shot_change": {
+          "description": "Transitions between scene cuts in video"
         }
       }
     }
