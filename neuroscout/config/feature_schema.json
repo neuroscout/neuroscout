@@ -200,7 +200,6 @@
           "description": "Confidence of image class \\1"
         }
       }
-
     }
   ],
   "GoogleVisionAPIPropertyExtractor": [
@@ -209,6 +208,9 @@
         ".*": {
           "description": "RGB Channel",
           "active": false
+        },
+        "num_colors_0_07": {
+          "description": "Number of colors that occupy more than 7% of pixels"
         }
       }
     }
@@ -286,15 +288,6 @@
       "features": {
         "shot_change": {
           "description": "Transitions between scene cuts in video"
-        }
-      }
-    }
-  ],
-  "GoogleVisionAPIPropertyExtractor":[
-    {
-      "features": {
-        "num_colors_0_07": {
-          "description": "Number of colors that occupy more than 7% of pixels"
         }
       }
     }
