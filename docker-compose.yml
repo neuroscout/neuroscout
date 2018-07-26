@@ -6,7 +6,7 @@ services:
     expose:
       - "8000"
     volumes:
-      - ${FILE_DATA}/migrations:/migrations
+      - ./postgres/migrations:/migrations
       - ./neuroscout/:/neuroscout
       - ${DATASET_DIR}:/datasets
       - ${KEY_DIR}:/keys
