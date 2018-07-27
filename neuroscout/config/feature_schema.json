@@ -51,7 +51,7 @@
       "attributes": { "model_name": "general-v1.3" },
       "features": {
         "(.*)": {
-          "description": "Clarifai image recognition label //1"
+          "description": "Clarifai image recognition label: \\1"
         }
       }
     },
@@ -105,7 +105,7 @@
     {
       "features": {
         "(.*)": {
-          "description": "Audio power at frequency band //1 Hz"
+          "description": "Audio power at frequency band \\1 Hz"
         }
       }
     }
@@ -197,7 +197,7 @@
     {
       "features": {
         "(.*)": {
-          "description": "Confidence of image class \\1"
+          "description": "Confidence of image class: \\1"
         }
       }
     }
