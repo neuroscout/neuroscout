@@ -217,6 +217,9 @@ def add_task(task_name, dataset_name=None, local_path=None,
         path_patterns = ['sub-{subject}[ses-{session}/]/func/sub-{subject}_'
                          '[ses-{session}_]task-{task}_[acq-{acquisition}_]'
                          '[run-{run}_]bold_[space-{space}_]{type}.nii.gz']
+        
+        if 'run' in 'entities':
+            entities['run'] = entities['run'].zfill(2)
 
         run_model.func_path = layout.build_path(
             {'type': 'preproc', 'space': 'MNI152NLin2009cAsym', **entities},
