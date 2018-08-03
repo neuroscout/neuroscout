@@ -19,7 +19,6 @@ def test_get_predictor(auth_client, extract_features):
     assert rv.status_code == 200
     pred = decode_json(rv)
     assert pred_id == pred['id']
-    assert pred['run_statistics'][0]['mean'] == 167.25
 
     # Try getting nonexistent predictor
     resp = auth_client.get('/api/predictors/{}'.format('123'))
