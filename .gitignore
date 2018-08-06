@@ -115,3 +115,4 @@ jest_0
 celery_worker/src
 neuroscout/frontend/src/config.ts
 .env
+*.dump
