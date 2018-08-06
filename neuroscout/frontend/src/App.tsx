@@ -125,7 +125,8 @@ class App extends React.Component<{}, AppState> {
         let id = analysis.id;
         return jwtFetch(`${DOMAINROOT}/api/analyses/${id}`, { method: 'get' })
           .then((data: ApiAnalysis) => {
-            if (data.status !== analysis.status) {
+            if ((data.status !== analysis.status) 
+                && (['SUBMITTING', 'PENDING'].indexOf(data.status) === -1)) {
               changeFlag = true;
               message.info(`analysis ${id} updated from ${analysis.status} to ${data.status}`);
               analysis.status = data.status;
