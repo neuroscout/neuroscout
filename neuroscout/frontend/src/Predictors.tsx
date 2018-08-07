@@ -67,14 +67,23 @@ export class PredictorSelector extends React.Component<
 
   componentWillReceiveProps(nextProps: PredictorSelectorProps) {
     if (this.props.availablePredictors.length !== nextProps.availablePredictors.length) {
-      this.setState({ filteredPredictors: nextProps.availablePredictors, searchText: '' });
+      let filteredPredictors = nextProps.availablePredictors;
+      filteredPredictors.map(
+        (x) => {
+          if (!x.description && !x.extracted_feature) {
+            return;
+          }
+          x.description = x.description ? x.description : x.extracted_feature!.description;
+        }
+      );
+      this.setState({ filteredPredictors: filteredPredictors, searchText: '' });
     }
     this.setState({predictorsLoad: nextProps.predictorsLoad});
   }
 
   render() {
     const { availablePredictors, selectedPredictors, updateSelection } = this.props;
-    const { filteredPredictors } = this.state;
+    let { filteredPredictors } = this.state;
     const columns = [
       {
         title: 'Name',
@@ -84,7 +93,7 @@ export class PredictorSelector extends React.Component<
       },
       {
         title: 'Description',
-        dataIndex: 'extracted_feature.description',
+        dataIndex: 'description',
       }
     ];
 
