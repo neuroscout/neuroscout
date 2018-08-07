@@ -33,12 +33,36 @@ const transformDefinitions: Transformation[] = [
   {
     name: 'scale',
     demean: false,
-    rescale: true
+    rescale: true,
+    replace_na: undefined
   },
   {
     name: 'orthogonalize',
     other: []
-  }
+  },
+  {
+    name: 'sum',
+    weights: []
+  },
+  {
+   name: 'product' 
+  },
+  {
+    name: 'threshold',
+    threshold: 0,
+    above: true,
+    signed: true
+  },
+  {
+    name: 'or'
+  },
+  {
+    name: 'and'
+  },
+  {
+    name: 'not'
+  },
+
 ];
 
 export default transformDefinitions;

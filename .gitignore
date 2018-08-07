@@ -101,7 +101,6 @@ virtualenv/
 
 # Ignore web build
 neuroscout/frontend/build
-neuroscout/frontend/src/config.ts
 
 bids_test_annex
 neuroscout/src
@@ -114,3 +113,6 @@ celery_worker/src
 .env
 *.dump
 *.sql
+
+nginx/sites-enabled/local
+*.swp
