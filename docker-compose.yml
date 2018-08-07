@@ -6,7 +6,7 @@ services:
     expose:
       - "8000"
     volumes:
-      - migrations:/migrations
+      - ./postgres/migrations:/migrations
       - ./neuroscout/:/neuroscout
       - ${DATASET_DIR}:/datasets
       - ${KEY_DIR}:/keys
@@ -36,6 +36,8 @@ services:
       - '5432'
     environment:
       - POSTGRES_DB=neuroscout
+    env_file:
+      - .pliersenv
 
   swagger-ui:
     image: swaggerapi/swagger-ui
@@ -74,5 +76,4 @@ services:
     env_file: .env
 
 volumes:
-  migrations:
   postgres-data:

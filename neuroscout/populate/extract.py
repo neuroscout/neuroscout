@@ -4,10 +4,8 @@ the associated predictors
 """
 from flask import current_app
 from database import db
-import json
 import socket
-import re
-import pandas as pd
+
 from pathlib import Path
 import datetime
 from progressbar import progressbar
@@ -19,153 +17,45 @@ from pliers.extractors import merge_results
 
 from models import (Dataset, Task, Predictor, PredictorEvent, PredictorRun,
     Run, Stimulus, RunStimulus, ExtractedFeature, ExtractedEvent)
-from .utils import hash_data
+from .annotate import FeatureSerializer
 
-class FeatureSerializer(object):
-    def __init__(self, schema=None, add_all=True):
-        """ Serialize and annotate Pliers results using a schema.
-        Args:
-            schema - json schema file
-            add_all - serialize features that are not in the schema
-        """
-        if schema is None:
-            schema = current_app.config['FEATURE_SCHEMA']
-        self.schema = json.load(open(schema, 'r'))
-        self.add_all=True
+socket.setdefaulttimeout(10000)
 
-    def _annotate_feature(self, pattern, schema, feat, ext_hash, sub_df,
-                          default_active=True):
-        """ Annotate a single pliers extracted result
-        Args:
-            pattern - regex pattern to match feature name
-            schema - sub-schema that matches feature name
-            feat - feature name from pliers
-            ext_hash - hash of the extractor
-            features - list of all features
-            default_active - set to active by default?
-        """
-        name = re.sub(pattern, schema['replace'], feat) \
-            if 'replace' in schema else feat
-        description = re.sub(pattern, schema['description'], feat) \
-            if 'description' in schema else None
-
-        annotated = []
-        for i, v in sub_df[sub_df.value.notnull()].iterrows():
-            annotated.append(
-                (
-                    {
-                        'value': v['value'],
-                        'onset': v['onset'] if not pd.isnull(v['onset']) else None,
-                        'duration': v['duration'] if not pd.isnull(v['duration']) else None,
-                        'object_id': v['object_id']
-                        },
-                    {
-                        'sha1_hash': hash_data(str(ext_hash) + name),
-                        'feature_name': name,
-                        'description': description,
-                        'active': schema.get('active', default_active),
-                        }
-                    )
-                )
-
-        return annotated
-
-    def load(self, res):
-        """" Load and annotate features in an extractor result object.
-        Args:
-            res - Pliers ExtractorResult object
-        Returns a dictionary of annotated features
-        """
-        res_df = res.to_df(format='long')
-        features = res_df['feature'].unique().tolist()
-        ext_hash = res.extractor.__hash__()
-
-        # Find matching extractor schema + attribute combination
-        # Entries with no attributes will match any
-        ext_schema = {}
-        for candidate in self.schema.get(res.extractor.name, []):
-            for name, value in candidate.get("attributes", {}).items():
-                if getattr(res.extractor, name) != value:
-                    break
-            else:
-                ext_schema = candidate
-
-        annotated = []
-        # Add all features in schema, popping features that match
-        for pattern, schema in ext_schema.get('features', {}).items():
-            matching = list(filter(re.compile(pattern).match, features))
-            features = set(features) - set(matching)
-            for feat in matching:
-                annotated += self._annotate_feature(
-                    pattern, schema, feat, ext_hash, res_df[res_df.feature == feat])
-
-        # Add all remaining features
-        if self.add_all is True:
-            for feat in features:
-                annotated += self._annotate_feature(
-                    ".*", {}, feat, ext_hash,
-                    res_df[res_df.feature == feat], default_active=False)
-
-        # Add extractor constants
-        tr_attrs = [getattr(res.extractor, a) \
-                    for a in res.extractor._log_attributes]
-        constants = {
-            "extractor_name": res.extractor.name,
-            "extractor_parameters": str(dict(
-                zip(res.extractor._log_attributes, tr_attrs))),
-            "extractor_version": res.extractor.VERSION
-        }
-        for ee, ef in annotated:
-            ef.update(constants)
-
-        return annotated
-
-
-def load_stim_objects(dataset_name, task_name):
+def _load_stim_models(dataset_name, task_name):
     """ Given a dataset and task, load all available stimuli as Pliers
     stimuli, and pair them with original database stim object. """
-    stim_objects = Stimulus.query.filter_by(active=True).join(
+    stim_models = Stimulus.query.filter_by(active=True).join(
         RunStimulus).join(Run).join(Task).filter_by(name=task_name).join(
             Dataset).filter_by(name=dataset_name)
 
     stims = []
-    for stim_object in stim_objects:
-        if stim_object.path is None:
-             # Append both ways for Text stimuli
-            stims.append((stim_object, ComplexTextStim(text=stim_object.content)))
-            stims.append((stim_object, TextStim(text=stims[-1][1].data)))
+    for stim_model in stim_models:
+        if stim_model.path is None:
+             # Load both ways for Text stimuli
+            stims.append((stim_model, ComplexTextStim(text=stim_model.content)))
+            stims.append((stim_model, TextStim(text=stims[-1][1].data)))
         else:
-            stims.append((stim_object, load_stims(stim_object.path)))
+            stims.append((stim_model, load_stims(stim_model.path)))
 
     return stims
 
 
-def extract_features(dataset_name, task_name, extractors):
-    """ Extract features using pliers for a dataset/task
-        Args:
-            dataset_name - dataset name
-            task_name - task name
-            extractors - dictionary of extractor names to parameters
-        Output:
-            list of db ids of extracted features
-    """
-    socket.setdefaulttimeout(10000)
-    # Load all active stimuli for task
-    stims = load_stim_objects(dataset_name, task_name)
-
+def _extract(extractors, stims):
     results = []
     for name, parameters in extractors:
         # For every extractor, extract from matching stims
         current_app.logger.info("Extractor: {}".format(name))
         ext = get_transformer(name, **parameters)
-        for so, s in stims:
-            if ext._stim_matches_input_types(s):
+        for stim_model, stim in stims:
+            if ext._stim_matches_input_types(stim):
                 ### Hacky workaround. Look for compatible AVI
                 if 'GoogleVideoAPIShotDetectionExtractor' in str(ext.__class__):
-                    s.filename = Path(s.filename).with_suffix('.avi').as_posix()
-                results.append((so, ext.transform(s)))
+                    stim.filename = Path(stim.filename).with_suffix('.avi').as_posix()
+                results.append((stim_model, ext.transform(stim)))
+    return results
 
-    # Save results to file
+def _to_csv(results, dataset_name, task_name):
+    """ Save extracted Pliers results to file. """
     if results != [] and 'EXTRACTION_DIR' in current_app.config.get('EXTRACTION_DIR'):
         results_df = merge_results(list(zip(*results))[1])
         outfile = Path(
@@ -176,12 +66,25 @@ def extract_features(dataset_name, task_name, extractors):
         outfile.parents[0].mkdir(exist_ok=True)
         results_df.to_csv(outfile)
 
-    serializer = FeatureSerializer()
+def extract_features(dataset_name, task_name, extractors):
+    """ Extract features using pliers for a dataset/task
+        Args:
+            dataset_name - dataset name
+            task_name - task name
+            extractors - dictionary of extractor names to parameters
+        Output:
+            list of db ids of extracted features
+    """
+    stims = _load_stim_models(dataset_name, task_name)
+
+    results = _extract(extractors, stims)
+
+    _to_csv(results, dataset_name, task_name)
+
     ext_feats = {}
-    for so, res in progressbar(results):
+    for stim_object, result in progressbar(results):
         bulk_ees = []
-        for ee_props, ef_props in serializer.load(res):
-            """" Add new ExtractedFeature """
+        for ee_props, ef_props in FeatureSerializer().load(result):
             # Hash extractor name + feature name
             feat_hash = ef_props['sha1_hash']
 
@@ -193,23 +96,17 @@ def extract_features(dataset_name, task_name, extractors):
                 db.session.commit()
                 ext_feats[feat_hash] = ef_model
 
-            """" Add ExtractedEvents """
-            # Get or create ExtractedEvent
+            # Create ExtractedEvents
             bulk_ees.append(
-                ExtractedEvent(stimulus_id=so.id,
-                               history=res.history.string,
+                ExtractedEvent(stimulus_id=stim_object.id,
+                               history=result.history.string,
                                ef_id=ext_feats[feat_hash].id,
                                **ee_props))
         db.session.bulk_save_objects(bulk_ees)
         db.session.commit()
 
-    create_predictors(
-        [ef for ef in ext_feats.values() if ef.active],
-        dataset_name
-        )
-
-    return list(ext_feats.values())
-
+    return create_predictors([ef for ef in ext_feats.values() if ef.active],
+                             dataset_name)
 
 def create_predictors(features, dataset_name, run_ids=None):
     """ Create Predictors from Extracted Features.
@@ -225,7 +122,7 @@ def create_predictors(features, dataset_name, run_ids=None):
     all_preds = []
     for ef in features:
         all_preds.append(get_or_create(
-            Predictor, name=ef.feature_name,
+            Predictor, name=ef.feature_name, description=ef.description,
             dataset_id=Dataset.query.filter_by(name=dataset_name).one().id,
             source='extracted', ef_id=ef.id)[0])
 
@@ -261,3 +158,5 @@ def create_predictors(features, dataset_name, run_ids=None):
                   for pred_id, run_id in set(all_rs)]
         db.session.bulk_save_objects(all_pes + all_rs)
         db.session.commit()
+
+    return [p.id for p in all_preds]

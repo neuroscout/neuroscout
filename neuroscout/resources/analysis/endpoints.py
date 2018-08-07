@@ -3,12 +3,12 @@ from flask_apispec import MethodResource, marshal_with, use_kwargs, doc
 from flask_jwt import current_identity
 from worker import celery_app
 from database import db
+from sqlalchemy.dialects import postgresql
 from models import Analysis, PredictorEvent
 from os.path import exists
 
 from utils.db import put_record
 from ..utils import owner_required, auth_required, fetch_analysis, abort
-from ..predictor import PredictorEventSchema
 from .schemas import (AnalysisSchema, AnalysisFullSchema,
 					 AnalysisResourcesSchema, AnalysisCompiledSchema)
 
@@ -75,6 +75,20 @@ class CloneAnalysisResource(AnalysisBaseResource):
 		db.session.commit()
 		return cloned
 
+def dump_pe(pes):
+	""" Custom function to serialize PredictorEvent, build for *SPEED*
+	Uses Core SQL queries. Warning: relies on attributes being in correct
+	order. """
+	statement = str(pes.statement.compile(dialect=postgresql.dialect()))
+	params = pes.statement.compile(dialect=postgresql.dialect()).params
+	res = db.session.connection().execute(statement, params)
+	return [{
+	  'onset': r[1],
+	  'duration': r[2],
+	  'value':  r[3],
+	  'run_id': r[5],
+	  'predictor_id': r[6]
+	  } for r in res]
 
 def json_analysis(analysis):
 	"""" Dump an analysis object to JSON for compilation.
@@ -89,7 +103,7 @@ def json_analysis(analysis):
 	pes = PredictorEvent.query.filter(
 	    (PredictorEvent.predictor_id.in_(pred_ids)) & \
 	    (PredictorEvent.run_id.in_(run_ids)))
-	pes_json = PredictorEventSchema(many=True, exclude=['id']).dump(pes)[0]
+	pes_json = dump_pe(pes)
 
 	resources_json = AnalysisResourcesSchema().dump(analysis)[0]
 

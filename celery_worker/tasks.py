@@ -57,15 +57,16 @@ def compile(analysis, predictor_events, resources, bids_dir):
     model = analysis.pop('model')
     scan_length = analysis['runs'][0]['duration']
     subject = [model['input']['subject'][0]]
+    run = model['input']['run'][0] if 'run' in model['input'] else None
 
     # Write out events
     bundle_paths = writeout_events(analysis, predictor_events, files_dir)
 
     # Load events and try applying transformations
-    bids_layout = BIDSLayout([bids_dir, files_dir.as_posix()])
+    bids_layout = BIDSLayout([bids_dir, files_dir.as_posix()], exclude='derivatives/')
     bids_analysis = Analysis(bids_layout, deepcopy(model))
-    bids_analysis.setup(derivatives='only', task=analysis['task_name'],
-                        scan_length=scan_length, subject=subject)
+    bids_analysis.setup(task=analysis['task_name'], scan_length=scan_length,
+                        subject=subject, run=run)
 
     # Sidecar:
     sidecar = {"RepetitionTime": analysis['TR']}
