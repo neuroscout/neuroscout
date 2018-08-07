@@ -46,6 +46,7 @@ const defaultConfig: AnalysisConfig = { smoothing: DEFAULT_SMOOTHING, predictorC
 const initializeStore = (): Store => ({
   activeTab: 'overview',
   predictorsActive: false,
+  predictorsLoad: false,
   transformationsActive: false,
   contrastsActive: false,
   modelingActive: true,
@@ -538,35 +539,7 @@ export default class AnalysisBuilder extends React.Component<BuilderProps, Store
         // If there was any change in selection of runs, fetch the associated predictors
         const runIds = updatedAnalysis.runIds.join(',');
         if (runIds) {
-          jwtFetch(`${domainRoot}/api/predictors?run_id=${runIds}`)
-            // .then(response => response.json())
-            .then((data: Predictor[]) => {
-              message.success(
-                `Fetched ${data.length} predictors associated with the selected runs`
-              );
-              const selectedPredictors = data.filter(
-                p => updatedAnalysis.predictorIds.indexOf(p.id) > -1
-              );
-              let selectedHRFPredictors: Predictor[] = [];
-              if (updatedAnalysis.hrfPredictorIds) {
-                selectedHRFPredictors = data.filter(
-                  p => updatedAnalysis.hrfPredictorIds.indexOf(p.name) > -1
-                );
-                // hrfPredictorIds comes in as a list of names from api, convert it to IDs here.
-                updatedAnalysis.hrfPredictorIds = selectedHRFPredictors.map(x => x.id);
-              }
-              this.setState({
-                analysis: updatedAnalysis,
-                availablePredictors: data,
-                selectedPredictors,
-                selectedHRFPredictors
-              });
-              updatedAnalysis.config = getUpdatedConfig(
-                updatedAnalysis.config,
-                selectedPredictors.map(p => p.id)
-              );
-            })
-            .catch(displayError);
+          stateUpdate.predictorsLoad = true;
         } else {
           stateUpdate.availablePredictors = [];
         }
@@ -586,6 +559,42 @@ export default class AnalysisBuilder extends React.Component<BuilderProps, Store
     if (!keepClean) stateUpdate.unsavedChanges = true;
     this.setState(stateUpdate);
   };
+
+  tabChange = (activeKey) => {
+    if (activeKey === 'overview' || this.state.predictorsLoad === false) {
+      return;
+    }
+    const analysis = this.state.analysis;
+    jwtFetch(`${domainRoot}/api/predictors?run_id=${analysis.runIds}`)
+    .then((data: Predictor[]) => {
+      message.success(
+        `Fetched ${data.length} predictors associated with the selected runs`
+      );
+      const selectedPredictors = data.filter(
+        p => analysis.predictorIds.indexOf(p.id) > -1
+      );
+      let selectedHRFPredictors: Predictor[] = [];
+      if (analysis.hrfPredictorIds) {
+        selectedHRFPredictors = data.filter(
+          p => analysis.hrfPredictorIds.indexOf(p.name) > -1
+        );
+        // hrfPredictorIds comes in as a list of names from api, convert it to IDs here.
+        analysis.hrfPredictorIds = selectedHRFPredictors.map(x => x.id);
+      }
+      this.setState({
+        analysis: analysis,
+        availablePredictors: data,
+        selectedPredictors,
+        selectedHRFPredictors,
+        predictorsLoad: false
+      });
+      analysis.config = getUpdatedConfig(
+        analysis.config,
+        selectedPredictors.map(p => p.id)
+      );
+    })
+    .catch(displayError);
+  }
 
   render() {
     const {
@@ -646,7 +655,11 @@ export default class AnalysisBuilder extends React.Component<BuilderProps, Store
         </Row>
         <Row type="flex" justify="center">
           <Col xxl={{span: 14}} xl={{span: 16}} lg={{span: 18}} xs={{span: 24}}>
-            <Tabs activeKey={activeTab} onTabClick={newTab => this.setState({ activeTab: newTab })}>
+            <Tabs
+              activeKey={activeTab}
+              onTabClick={newTab => this.setState({ activeTab: newTab })}
+              onChange={this.tabChange}
+            >
               <TabPane tab="Overview" key="overview">
                 <OverviewTab
                   analysis={analysis}
@@ -657,7 +670,7 @@ export default class AnalysisBuilder extends React.Component<BuilderProps, Store
                   predictorsActive={predictorsActive}
                   updateAnalysis={this.updateState('analysis')}
                   updateSelectedTaskId={this.updateState('selectedTaskId')}
-                  goToNextTab={() => this.setState({ activeTab: 'predictors' })}
+                  goToNextTab={() => {this.setState({ activeTab: 'predictors' }); this.tabChange('predictors'); }}
                 />
               </TabPane>
               <TabPane tab="Predictors" key="predictors" disabled={!predictorsActive}>

@@ -113,6 +113,7 @@ export interface Store {
     | 'review'
     | 'status';
   predictorsActive: boolean;
+  predictorsLoad: boolean;
   transformationsActive: boolean;
   contrastsActive: boolean;
   modelingActive: boolean;
