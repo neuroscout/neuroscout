@@ -502,6 +502,7 @@ export default class AnalysisBuilder extends React.Component<BuilderProps, Store
       );
     }
 
+    stateUpdate.unsavedChanges = true;
     this.setState(stateUpdate);
   }
 
