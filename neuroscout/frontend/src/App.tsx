@@ -6,7 +6,7 @@ Top-level App component containing AppState. The App component is currently resp
 */
 import * as React from 'react';
 import { Tabs, Row, Col, Layout, Button, Modal, Icon, Input, Form, message } from 'antd';
-import { displayError, jwtFetch } from './utils';
+import { displayError, jwtFetch, timeout } from './utils';
 import { Space } from './HelperComponents';
 import { ApiUser, ApiAnalysis, AppAnalysis } from './coretypes';
 import Home from './Home';
@@ -76,7 +76,10 @@ class App extends React.Component<{}, AppState> {
       loggingOut: false,
       token: null
     };
-    if (jwt) this.loadAnalyses();
+    if (jwt) {
+      this.loadAnalyses();
+      this.checkAnalysesStatus();
+    }
     this.loadPublicAnalyses();
   }
 
@@ -109,6 +112,38 @@ class App extends React.Component<{}, AppState> {
       })
       .catch(displayError);
 
+  /* short polling function checking api for inprocess analyses to see if 
+   * there have been any changes
+   */
+  checkAnalysesStatus = async () => {
+    while (true) {
+      let changeFlag = false;
+      let updatedAnalyses = this.state.analyses.map(async (analysis) => {
+        if (['DRAFT', 'PASSED'].indexOf(analysis.status) > -1) {
+          return analysis;
+        }
+        let id = analysis.id;
+        return jwtFetch(`${DOMAINROOT}/api/analyses/${id}`, { method: 'get' })
+          .then((data: ApiAnalysis) => {
+            if ((data.status !== analysis.status) 
+                && (['SUBMITTING', 'PENDING'].indexOf(data.status) === -1)) {
+              changeFlag = true;
+              message.info(`analysis ${id} updated from ${analysis.status} to ${data.status}`);
+              analysis.status = data.status;
+            }
+            return analysis;
+        })
+        .catch(() => { return analysis; });
+      });
+      Promise.all(updatedAnalyses).then((values) => {
+        if (changeFlag) {
+          this.setState({ analyses: values});
+        }
+      });
+      await timeout(10000);
+    }
+  };
+  
   // Authenticate the user with the server. This function is called from login()
   authenticate = () =>
     new Promise((resolve, reject) => {
