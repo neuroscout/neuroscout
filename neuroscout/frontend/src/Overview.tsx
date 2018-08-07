@@ -37,9 +37,10 @@ export class OverviewTab extends React.Component<OverviewTabProps, any> {
     this.props.updateAnalysis(newAnalysis);
   };
 
-  updateAnalysisFromEvent = (attrName: string) => (event: React.FormEvent<HTMLInputElement>) => {
-    this.updateAnalysis(attrName)(event.currentTarget.value);
-  };
+  updateAnalysisFromEvent = (attrName: string) => 
+    (event: (React.FormEvent<HTMLInputElement> | React.FormEvent<HTMLTextAreaElement>)) => {
+      this.updateAnalysis(attrName)(event.currentTarget.value);
+    };
 
   render() {
     const {
@@ -162,7 +163,7 @@ export class OverviewTab extends React.Component<OverviewTabProps, any> {
               placeholder="Description of your analysis"
               value={analysis.description}
               autosize={{ minRows: 3, maxRows: 20 }}
-              onPressEnter={this.updateAnalysisFromEvent('description')}
+              onChange={this.updateAnalysisFromEvent('description')}
             />
           </FormItem>
           <FormItem label="Predictions:">
@@ -170,7 +171,7 @@ export class OverviewTab extends React.Component<OverviewTabProps, any> {
               placeholder="Enter your preditions about what you expect the results to look like"
               value={analysis.predictions}
               autosize={{ minRows: 3, maxRows: 20 }}
-              onPressEnter={this.updateAnalysisFromEvent('description')}
+              onChange={this.updateAnalysisFromEvent('predictions')}
             />
           </FormItem>
           <p>Select a dataset:</p>
