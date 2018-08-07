@@ -21,12 +21,14 @@ interface PredictorSelectorProps {
   selectedPredictors: Predictor[]; // List of predicors selected by the user (when used as a controlled component)
   // Callback to parent component to update selection
   updateSelection: (newPredictors: Predictor[], filteredPredictors: Predictor[]) => void;
+  predictorsLoad?: boolean;
 }
 
 interface PredictorsSelectorState {
   searchText: string;  // Search term entered in search box
   filteredPredictors: Predictor[]; // Subset of available preditors whose name or description match the search term
   selectedPredictors: Predictor[]; // List of selected predictors (when used as an uncontrolled component)
+  predictorsLoad?: boolean;
 }
 
 export class PredictorSelector extends React.Component<
@@ -35,11 +37,12 @@ export class PredictorSelector extends React.Component<
 > {
   constructor(props: PredictorSelectorProps) {
     super(props);
-    const { availablePredictors, selectedPredictors } = props;
+    const { availablePredictors, selectedPredictors, predictorsLoad } = props;
     this.state = {
       searchText: '',
       filteredPredictors: availablePredictors,
       selectedPredictors,
+      predictorsLoad: predictorsLoad
     };
   }
 
@@ -66,6 +69,7 @@ export class PredictorSelector extends React.Component<
     if (this.props.availablePredictors.length !== nextProps.availablePredictors.length) {
       this.setState({ filteredPredictors: nextProps.availablePredictors, searchText: '' });
     }
+    this.setState({predictorsLoad: nextProps.predictorsLoad});
   }
 
   render() {
@@ -119,6 +123,7 @@ export class PredictorSelector extends React.Component<
                 dataSource={this.state.filteredPredictors}
                 rowSelection={rowSelection}
                 bordered={true}
+                loading={this.state.predictorsLoad}
               />
             </div>
           </Col>

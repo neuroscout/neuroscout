@@ -539,7 +539,7 @@ export default class AnalysisBuilder extends React.Component<BuilderProps, Store
         // If there was any change in selection of runs, fetch the associated predictors
         const runIds = updatedAnalysis.runIds.join(',');
         if (runIds) {
-          stateUpdate.predictorsLoad = true;
+          this.setState({predictorsLoad: true});
         } else {
           stateUpdate.availablePredictors = [];
         }
@@ -678,6 +678,7 @@ export default class AnalysisBuilder extends React.Component<BuilderProps, Store
                   availablePredictors={availablePredictors}
                   selectedPredictors={selectedPredictors}
                   updateSelection={this.updatePredictorState}
+                  predictorsLoad={this.state.predictorsLoad}
                 />
                 <br/>
                 <h3>HRF Variables:</h3>
