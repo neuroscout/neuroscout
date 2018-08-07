@@ -101,6 +101,7 @@ virtualenv/
 
 # Ignore web build
 neuroscout/frontend/build
+neuroscout/frontend/src/config.ts
 
 bids_test_annex
 neuroscout/src
