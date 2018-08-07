@@ -96,9 +96,6 @@ ENV/
 
 virtualenv/
 
-# Temporarily ignore migration files
-neuroscout/migrations
-
 # IDEs
 .vscode/
 
@@ -114,5 +111,8 @@ jest_0
 .pliersenv
 celery_worker/src
 .env
+*.dump
+*.sql
+
 nginx/sites-enabled/local
 *.swp

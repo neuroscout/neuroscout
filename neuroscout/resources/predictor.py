@@ -11,12 +11,14 @@ class ExtractedFeatureSchema(Schema):
     description = fields.Str(description="Feature description.")
     created_at = fields.Str(description="Extraction timestamp.")
     extractor_name = fields.Str(description="Extractor name.")
+    modality = fields.Str()
 
 class PredictorSchema(Schema):
     id = fields.Int()
     name = fields.Str(description="Predictor name.")
-    description = fields.Str()
+    description = fields.Str(description="Predictor description")
     extracted_feature = fields.Nested('ExtractedFeatureSchema', skip_if=None)
+    source = fields.Str()
 
     @post_dump
     def remove_null_values(self, data):
@@ -51,7 +53,7 @@ class PredictorListResource(MethodResource):
     @marshal_with(PredictorSchema(many=True))
     @use_kwargs({
         'dataset_id': wa.fields.DelimitedList(
-            fields.Int(), description="Dataset id(s). If set, ignores run ids"),
+            fields.Int(), description="Dataset id(s)."),
         'run_id': wa.fields.DelimitedList(
             fields.Int(), description="Run id(s). Warning, slow query."),
         'name': wa.fields.DelimitedList(fields.Str(),
@@ -68,15 +70,13 @@ class PredictorListResource(MethodResource):
             predictor_ids = db.session.query(Predictor.id)
 
         if 'dataset_id' in kwargs:
-            dataset_id = kwargs.pop('dataset_id')
-            if 'run_id' in kwargs: kwargs.pop('run_id')
-            predictor_ids.filter(Predictor.dataset_id.in_(dataset_id))
+            predictor_ids.filter(
+                Predictor.dataset_id.in_(kwargs.pop('dataset_id')))
 
         if 'run_id' in kwargs:
-            run_id = kwargs.pop('run_id')
-            # This following JOIN is quite slow
+            # This following JOIN can be slow
             predictor_ids = predictor_ids.join(PredictorEvent).filter(
-                PredictorEvent.run_id.in_(run_id))
+                PredictorEvent.run_id.in_(kwargs.pop('run_id')))
 
         query = Predictor.query.filter(Predictor.id.in_(predictor_ids))
         for param in kwargs:

@@ -1,6 +1,7 @@
 {
   "Life": {
     "dataset_address": "///labs/haxby/life",
+    "preproc_address": "https://github.com/neuroscout-datasets/life",
     "path": "/datasets/life/",
     "tasks": {
       "life": {

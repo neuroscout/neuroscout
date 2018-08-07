@@ -73,8 +73,6 @@ def extract_features(local_path, task, graph_spec, filters='{}'):
     populate.extract_features(
         local_path, task, graph_spec, **json.loads(filters))
 
-## Need to modify or create new function for updating dataset
-## e.g. dealing w/ IncompleteResultsError if cloning into existing dir
 @manager.command
 def ingest_from_json(config_file, automagic=False, update_features=False,
                      reingest=False):
@@ -85,7 +83,6 @@ def ingest_from_json(config_file, automagic=False, update_features=False,
     populate.ingest_from_json(
         config_file, automagic=automagic, update_features=update_features,
         reingest=reingest)
-
 
 if __name__ == '__main__':
     manager.run()

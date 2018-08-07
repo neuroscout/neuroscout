@@ -1,5 +1,6 @@
 from database import db
 import datetime
+from sqlalchemy.dialects.postgresql import JSONB
 
 class ExtractedFeature(db.Model):
 	""" Events extracted from a Stimulus using an Extractor"""
@@ -7,10 +8,13 @@ class ExtractedFeature(db.Model):
 	# Hash of next three variables
 	sha1_hash = db.Column(db.Text, nullable=False)
 	extractor_name = db.Column(db.String)
-	extractor_parameters = db.Column(db.Text)
+	extractor_parameters = db.Column(JSONB)
 	feature_name = db.Column(db.String)
+	original_name = db.Column(db.String) # Original feature_name
 	description = db.Column(db.String)
 	active = db.Column(db.Boolean)
+	modality = db.Column(db.String)
+	transformed = db.Column(db.Boolean, default=False)
 
 	created_at = db.Column(db.DateTime, default=datetime.datetime.utcnow)
 	extractor_version = db.Column(db.Float, default=0.1)
