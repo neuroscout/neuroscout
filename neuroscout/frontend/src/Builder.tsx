@@ -326,6 +326,7 @@ export default class AnalysisBuilder extends React.Component<BuilderProps, Store
       // Submit for compilation
       url = `${domainRoot}/api/analyses/${analysis.analysisId}/compile`;
       method = 'post';
+      this.setState({analysis: {...analysis, status: 'SUBMITTING'}});
     } else if (!compile && analysis.analysisId) {
       // Save existing analysis
       url = `${domainRoot}/api/analyses/${analysis.analysisId}`;
@@ -343,8 +344,12 @@ export default class AnalysisBuilder extends React.Component<BuilderProps, Store
     jwtFetch(url, { method, body: JSON.stringify(apiAnalysis) })
       // .then(response => response.json())
       .then((data: ApiAnalysis & { statusCode: number }) => {
-        if (data.statusCode !== 200)
+        if (data.statusCode !== 200) {
+          if (compile) {
+            this.setState({analysis: {...analysis, status: 'DRAFT'}});
+          }
           throw new Error('Oops...something went wrong. Analysis was not saved.');
+        }
         message.success(compile ? 'Analysis submitted for generation' : 'Analysis saved');
         this.setState({
           analysis: {
