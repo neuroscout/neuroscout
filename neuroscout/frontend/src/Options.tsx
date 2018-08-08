@@ -20,8 +20,8 @@ const FormItem = Form.Item;
 const Panel = Collapse.Panel;
 const Option = Select.Option;
 
-const SMOOTHING_MIN = 10;
-const SMOOTHING_MAX = 100;
+const SMOOTHING_MIN = 0;
+const SMOOTHING_MAX = 10;
 
 interface OptionsTabProps {
   analysis: Analysis;

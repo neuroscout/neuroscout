@@ -38,7 +38,7 @@ const { Footer, Content } = Layout;
 const domainRoot = config.server_url;
 const EMAIL = 'user@example.com';
 const PASSWORD = 'string';
-const DEFAULT_SMOOTHING = 50;
+const DEFAULT_SMOOTHING = 5;
 
 const defaultConfig: AnalysisConfig = { smoothing: DEFAULT_SMOOTHING, predictorConfigs: {} };
 
