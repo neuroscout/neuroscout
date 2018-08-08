@@ -94,6 +94,12 @@ export class PredictorSelector extends React.Component<
       {
         title: 'Description',
         dataIndex: 'description',
+        width: '35%'
+      },
+      {
+        title: 'Extractor',
+        dataIndex: 'extracted_feature.extractor_name',
+        width: '30%'
       }
     ];
 
@@ -110,7 +116,7 @@ export class PredictorSelector extends React.Component<
     return (
       <div>
         <Row type="flex">
-          <Col lg={{span: 16}} xs={{span: 24}}>
+          <Col xl={{span: 16}} lg={{span: 24}}>
             <div>
               <Input
                 placeholder="Search predictor name or description..."
@@ -136,8 +142,8 @@ export class PredictorSelector extends React.Component<
               />
             </div>
           </Col>
-          <Col lg={{span: 1}}/>
-          <Col lg={{span: 7}}>
+          <Col xl={{span: 1}}/>
+          <Col xl={{span: 7}}>
             {selectedPredictors.map(p =>
               <Tag closable={true} onClose={ev => this.removePredictor(p.id)} key={p.id}>
                 {p.name}
