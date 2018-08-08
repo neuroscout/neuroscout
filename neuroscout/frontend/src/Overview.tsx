@@ -127,7 +127,12 @@ export class OverviewTab extends React.Component<OverviewTabProps, any> {
         this.updateAnalysis('runIds')(selectedRows.map(x => x.id));
       },
       onSelectAll: (selected, selectedRows: any, changeRows) => {
-        this.updateAnalysis('runIds')(selectedRows.map(x => x.id));
+        if (selected) {
+          this.updateAnalysis('runIds')
+            (this.props.availableRuns.filter(r => r.task.id === selectedTaskId).map(x => x.id));
+        } else {
+          this.updateAnalysis('runIds')([]);
+        }
       },
       selectedRowKeys: analysis.runIds
     };
