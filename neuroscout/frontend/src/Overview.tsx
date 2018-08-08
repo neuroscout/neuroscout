@@ -104,7 +104,7 @@ export class OverviewTab extends React.Component<OverviewTabProps, any> {
 
     const runColumns = [
       {
-        title: 'Run ID',
+        title: 'Run Number',
         dataIndex: 'number',
         defaultOrder: 'ascend' as 'ascend',
         sorter: (a, b) => a.number - b.number,
