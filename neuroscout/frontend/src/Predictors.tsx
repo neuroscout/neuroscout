@@ -74,10 +74,12 @@ export class PredictorSelector extends React.Component<
       let filteredPredictors = nextProps.availablePredictors;
       filteredPredictors.map(
         (x) => {
-          if (!x.description && !x.extracted_feature) {
-            return;
+          if (!x.description && x.extracted_feature && x.extracted_feature.description) {
+            x.description = x.extracted_feature.description;
           }
-          x.description = x.description ? x.description : x.extracted_feature!.description;
+          if (x.extracted_feature && x.extracted_feature.extractor_name) {
+            x.source = x.extracted_feature.extractor_name;
+          }
         }
       );
       this.setState({ filteredPredictors: filteredPredictors, searchText: '' });
@@ -101,8 +103,8 @@ export class PredictorSelector extends React.Component<
         width: '35%'
       },
       {
-        title: 'Extractor',
-        dataIndex: 'extracted_feature.extractor_name',
+        title: 'Source',
+        dataIndex: 'source',
         width: '30%'
       }
     ];
@@ -134,6 +136,7 @@ export class PredictorSelector extends React.Component<
               <p>{`Select predictors (displaying ${filteredPredictors.length} 
             out of ${availablePredictors.length} total predictors):`}</p>
               <Table
+                locale={{ emptyText: this.state.searchText ? 'No results found' : 'No data'}}
                 columns={columns}
                 rowKey="id"
                 pagination={false}
