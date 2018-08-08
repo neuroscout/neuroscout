@@ -52,8 +52,12 @@ export class PredictorSelector extends React.Component<
     const searchRegex = new RegExp(searchText.trim(), 'i');
     const newState = { searchText, filteredPredictors: availablePredictors };
     if (searchText.length > 2) {
-      newState.filteredPredictors = availablePredictors.filter(p =>
-        searchRegex.test(p.name + (p.description || ''))
+      newState.filteredPredictors = availablePredictors.filter(p => {
+        let targetText = p.name + (p.description || '');
+        if (p.extracted_feature)
+          targetText = [targetText, p.extracted_feature.extractor_name].join(' ');
+        return searchRegex.test(targetText);
+        }
       );
     }
     this.setState(newState);

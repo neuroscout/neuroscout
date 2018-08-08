@@ -57,6 +57,7 @@ export interface Predictor {
 
 export interface ExtractedFeature {
   description: string;
+  extractor_name: string;
 }
 
 export interface AnalysisConfig {
