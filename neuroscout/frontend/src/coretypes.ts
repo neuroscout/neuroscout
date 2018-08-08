@@ -52,6 +52,7 @@ export interface Task {
 export interface Predictor {
   id: string;
   name: string;
+  source: string | null;
   description: string | null;
   extracted_feature?: ExtractedFeature;
 }
