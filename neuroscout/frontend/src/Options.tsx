@@ -27,6 +27,7 @@ interface OptionsTabProps {
   analysis: Analysis;
   selectedPredictors: Predictor[];
   updateConfig: (newConfig: AnalysisConfig) => void;
+  updateAnalysis: (value: any) => void;
 }
 
 interface OptionsTabState {}
@@ -35,7 +36,7 @@ export default class OptionsTab extends React.Component<OptionsTabProps, Options
   state = {};
 
   updateGlobalConfig = (key: keyof AnalysisConfig) => (value: any) => {
-    const { analysis, updateConfig } = this.props;
+    const { analysis, updateConfig, updateAnalysis } = this.props;
     const newConfig: AnalysisConfig = { ...analysis.config };
     newConfig[key] = value;
     updateConfig(newConfig);
@@ -48,6 +49,12 @@ export default class OptionsTab extends React.Component<OptionsTabProps, Options
     newPredictorConfig[id][key] = value;
     newConfig.predictorConfigs = newPredictorConfig;
     updateConfig(newConfig);
+  };
+
+  updateAnalysis = (attrName: string) => (value: any) => {
+    let newAnalysis = { ...this.props.analysis };
+    newAnalysis[attrName] = value;
+    this.props.updateAnalysis(newAnalysis);
   };
 
   render() {
@@ -77,6 +84,14 @@ export default class OptionsTab extends React.Component<OptionsTabProps, Options
                   value={analysis.config.smoothing}
                 />
               </Col>
+            </Row>
+            <Row>
+              <Checkbox
+                checked={analysis.autoContrast}
+                onChange={() => this.updateAnalysis('autoContrast')(!analysis.autoContrast)}
+              >
+                {'Auto Contrast'}
+              </Checkbox>
             </Row>
           </FormItem>
           <h3>Per-Predictor Configurations</h3>

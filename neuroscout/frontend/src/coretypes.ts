@@ -22,6 +22,7 @@ export interface Analysis {
   transformations: Transformation[];
   contrasts: Contrast[];
   model?: BidsModel;
+  autoContrast: boolean;
 }
 
 // Normalized dataset object in Analysis Builder

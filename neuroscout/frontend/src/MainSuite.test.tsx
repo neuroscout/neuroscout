@@ -43,7 +43,8 @@ it('Overview tab renders without errors', () => {
     status: 'DRAFT',
     config: { smoothing: 10, predictorConfigs: {} },
     transformations: [],
-    contrasts: []
+    contrasts: [],
+    autoContrast: true
   };
   const tab = mount(
     <OverviewTab

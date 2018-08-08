@@ -65,6 +65,7 @@ const initializeStore = (): Store => ({
     config: defaultConfig,
     transformations: [],
     contrasts: [],
+    autoContrast: true,
     model: {
       blocks: [{
         level: 'run',
@@ -251,7 +252,7 @@ export default class AnalysisBuilder extends React.Component<BuilderProps, Store
         level: 'run',
         transformations: this.state.analysis.transformations,
         contrasts: this.state.analysis.contrasts,
-        auto_contrasts: true,
+        auto_contrasts: this.state.analysis.autoContrast,
         model: {
           variables: variables,
           HRF_variables: hrfVariables
@@ -407,7 +408,8 @@ export default class AnalysisBuilder extends React.Component<BuilderProps, Store
       hrfPredictorIds: hrfPredictorIds,
       config: data.config || defaultConfig,
       transformations: data.transformations,
-      contrasts: data.contrasts || []
+      contrasts: data.contrasts || [],
+      autoContrast: true
     };
 
     if (analysis.runIds.length > 0) {
@@ -717,6 +719,7 @@ export default class AnalysisBuilder extends React.Component<BuilderProps, Store
                   analysis={analysis}
                   selectedPredictors={selectedPredictors}
                   updateConfig={this.updateConfig}
+                  updateAnalysis={this.updateState('analysis')}
                 />
               </TabPane>
               <TabPane tab="Review" key="review" disabled={!reviewActive}>
