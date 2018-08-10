@@ -54,8 +54,7 @@ export class PredictorSelector extends React.Component<
     if (searchText.length > 2) {
       newState.filteredPredictors = availablePredictors.filter(p => {
         let targetText = p.name + (p.description || '');
-        if (p.extracted_feature)
-          targetText = [targetText, p.extracted_feature.extractor_name].join(' ');
+        targetText += ' ' + p.source;
         return searchRegex.test(targetText);
         }
       );
@@ -87,6 +86,12 @@ export class PredictorSelector extends React.Component<
     this.setState({predictorsLoad: nextProps.predictorsLoad});
   }
 
+  sourceCmp = (a, b) => {
+    let x = a.source + a.name;
+    let y = b.source + b.name;
+    return x.localeCompare(y);
+  }
+
   render() {
     const { availablePredictors, selectedPredictors, updateSelection } = this.props;
     let { filteredPredictors } = this.state;
@@ -98,14 +103,16 @@ export class PredictorSelector extends React.Component<
         width: '35%'
       },
       {
+        title: 'Source',
+        dataIndex: 'source',
+        sorter: this.sourceCmp,
+        defaultSortOrder: 'ascend' as 'ascend',
+        width: '30%'
+      },
+      {
         title: 'Description',
         dataIndex: 'description',
         width: '35%'
-      },
-      {
-        title: 'Source',
-        dataIndex: 'source',
-        width: '30%'
       }
     ];
 
