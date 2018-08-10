@@ -37,9 +37,10 @@ export class OverviewTab extends React.Component<OverviewTabProps, any> {
     this.props.updateAnalysis(newAnalysis);
   };
 
-  updateAnalysisFromEvent = (attrName: string) => (event: React.FormEvent<HTMLInputElement>) => {
-    this.updateAnalysis(attrName)(event.currentTarget.value);
-  };
+  updateAnalysisFromEvent = (attrName: string) => 
+    (event: (React.FormEvent<HTMLInputElement> | React.FormEvent<HTMLTextAreaElement>)) => {
+      this.updateAnalysis(attrName)(event.currentTarget.value);
+    };
 
   render() {
     const {
@@ -103,10 +104,10 @@ export class OverviewTab extends React.Component<OverviewTabProps, any> {
 
     const runColumns = [
       {
-        title: 'ID',
-        dataIndex: 'id',
+        title: 'Run Number',
+        dataIndex: 'number',
         defaultOrder: 'ascend' as 'ascend',
-        sorter: (a, b) => a.id - b.id
+        sorter: (a, b) => a.number - b.number,
       },
       {
         title: 'Subject',
@@ -126,7 +127,12 @@ export class OverviewTab extends React.Component<OverviewTabProps, any> {
         this.updateAnalysis('runIds')(selectedRows.map(x => x.id));
       },
       onSelectAll: (selected, selectedRows: any, changeRows) => {
-        this.updateAnalysis('runIds')(selectedRows.map(x => x.id));
+        if (selected) {
+          this.updateAnalysis('runIds')
+            (this.props.availableRuns.filter(r => r.task.id === selectedTaskId).map(x => x.id));
+        } else {
+          this.updateAnalysis('runIds')([]);
+        }
       },
       selectedRowKeys: analysis.runIds
     };
@@ -162,7 +168,7 @@ export class OverviewTab extends React.Component<OverviewTabProps, any> {
               placeholder="Description of your analysis"
               value={analysis.description}
               autosize={{ minRows: 3, maxRows: 20 }}
-              onPressEnter={this.updateAnalysisFromEvent('description')}
+              onChange={this.updateAnalysisFromEvent('description')}
             />
           </FormItem>
           <FormItem label="Predictions:">
@@ -170,7 +176,7 @@ export class OverviewTab extends React.Component<OverviewTabProps, any> {
               placeholder="Enter your preditions about what you expect the results to look like"
               value={analysis.predictions}
               autosize={{ minRows: 3, maxRows: 20 }}
-              onPressEnter={this.updateAnalysisFromEvent('description')}
+              onChange={this.updateAnalysisFromEvent('predictions')}
             />
           </FormItem>
           <p>Select a dataset:</p>

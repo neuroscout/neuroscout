@@ -198,12 +198,12 @@ class ParameterField extends React.Component<ParameterFieldProps> {
         {name === 'weights' && options && options.map((x, i) =>
           <Row key={i}>
           <div>
-            <Col span={3}>
+            <Col span={12}>
               <div className="weightName">
                 {x.name} weight: 
               </div>
             </Col>
-            <Col span={2}>
+            <Col span={4}>
             <InputNumber 
               onChange={(newValue) => {
                 let newWeights = this.updateWeight(i, newValue as number);
@@ -286,15 +286,19 @@ class XformEditor extends React.Component<XformEditorProps, XformEditorState> {
     return (
       <div>
         <Form layout="horizontal">
-          <FormItem label="Transformation:">
-            <Select style={{ width: 120 }} value={name} onChange={this.updateXformType}>
-              {allowedXformNames.map(x =>
-                <Option value={x} key={x}>
-                  {x}
-                </Option>
-              )}
-            </Select>
-          </FormItem>
+          <Row type="flex">
+            <Col lg={{span: 16}} xs={{span: 24}}>
+              <FormItem label="Transformation:">
+                <Select value={name} onChange={this.updateXformType}>
+                  {allowedXformNames.map(x =>
+                    <Option value={x} key={x}>
+                      {x}
+                    </Option>
+                  )}
+                </Select>
+              </FormItem>
+            </Col>
+          </Row>
           {name &&
             <div>
               <p>Select inputs:</p>

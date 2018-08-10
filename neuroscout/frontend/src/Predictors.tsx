@@ -21,12 +21,14 @@ interface PredictorSelectorProps {
   selectedPredictors: Predictor[]; // List of predicors selected by the user (when used as a controlled component)
   // Callback to parent component to update selection
   updateSelection: (newPredictors: Predictor[], filteredPredictors: Predictor[]) => void;
+  predictorsLoad?: boolean;
 }
 
 interface PredictorsSelectorState {
   searchText: string;  // Search term entered in search box
   filteredPredictors: Predictor[]; // Subset of available preditors whose name or description match the search term
   selectedPredictors: Predictor[]; // List of selected predictors (when used as an uncontrolled component)
+  predictorsLoad?: boolean;
 }
 
 export class PredictorSelector extends React.Component<
@@ -35,11 +37,12 @@ export class PredictorSelector extends React.Component<
 > {
   constructor(props: PredictorSelectorProps) {
     super(props);
-    const { availablePredictors, selectedPredictors } = props;
+    const { availablePredictors, selectedPredictors, predictorsLoad } = props;
     this.state = {
       searchText: '',
       filteredPredictors: availablePredictors,
       selectedPredictors,
+      predictorsLoad: predictorsLoad
     };
   }
 
@@ -49,8 +52,11 @@ export class PredictorSelector extends React.Component<
     const searchRegex = new RegExp(searchText.trim(), 'i');
     const newState = { searchText, filteredPredictors: availablePredictors };
     if (searchText.length > 2) {
-      newState.filteredPredictors = availablePredictors.filter(p =>
-        searchRegex.test(p.name + (p.description || ''))
+      newState.filteredPredictors = availablePredictors.filter(p => {
+        let targetText = p.name + (p.description || '');
+        targetText += ' ' + p.source;
+        return searchRegex.test(targetText);
+        }
       );
     }
     this.setState(newState);
@@ -64,13 +70,31 @@ export class PredictorSelector extends React.Component<
 
   componentWillReceiveProps(nextProps: PredictorSelectorProps) {
     if (this.props.availablePredictors.length !== nextProps.availablePredictors.length) {
-      this.setState({ filteredPredictors: nextProps.availablePredictors, searchText: '' });
+      let filteredPredictors = nextProps.availablePredictors;
+      filteredPredictors.map(
+        (x) => {
+          if (!x.description && x.extracted_feature && x.extracted_feature.description) {
+            x.description = x.extracted_feature.description;
+          }
+          if (x.extracted_feature && x.extracted_feature.extractor_name) {
+            x.source = x.extracted_feature.extractor_name;
+          }
+        }
+      );
+      this.setState({ filteredPredictors: filteredPredictors, searchText: '' });
     }
+    this.setState({predictorsLoad: nextProps.predictorsLoad});
+  }
+
+  sourceCmp = (a, b) => {
+    let x = a.source + a.name;
+    let y = b.source + b.name;
+    return x.localeCompare(y);
   }
 
   render() {
     const { availablePredictors, selectedPredictors, updateSelection } = this.props;
-    const { filteredPredictors } = this.state;
+    let { filteredPredictors } = this.state;
     const columns = [
       {
         title: 'Name',
@@ -79,8 +103,16 @@ export class PredictorSelector extends React.Component<
         width: '35%'
       },
       {
+        title: 'Source',
+        dataIndex: 'source',
+        sorter: this.sourceCmp,
+        defaultSortOrder: 'ascend' as 'ascend',
+        width: '30%'
+      },
+      {
         title: 'Description',
-        dataIndex: 'extracted_feature.description',
+        dataIndex: 'description',
+        width: '35%'
       }
     ];
 
@@ -97,7 +129,7 @@ export class PredictorSelector extends React.Component<
     return (
       <div>
         <Row type="flex">
-          <Col lg={{span: 16}} xs={{span: 24}}>
+          <Col xl={{span: 16}} lg={{span: 24}}>
             <div>
               <Input
                 placeholder="Search predictor name or description..."
@@ -111,6 +143,7 @@ export class PredictorSelector extends React.Component<
               <p>{`Select predictors (displaying ${filteredPredictors.length} 
             out of ${availablePredictors.length} total predictors):`}</p>
               <Table
+                locale={{ emptyText: this.state.searchText ? 'No results found' : 'No data'}}
                 columns={columns}
                 rowKey="id"
                 pagination={false}
@@ -119,11 +152,12 @@ export class PredictorSelector extends React.Component<
                 dataSource={this.state.filteredPredictors}
                 rowSelection={rowSelection}
                 bordered={true}
+                loading={this.state.predictorsLoad}
               />
             </div>
           </Col>
-          <Col lg={{span: 1}}/>
-          <Col lg={{span: 7}}>
+          <Col xl={{span: 1}}/>
+          <Col xl={{span: 7}}>
             {selectedPredictors.map(p =>
               <Tag closable={true} onClose={ev => this.removePredictor(p.id)} key={p.id}>
                 {p.name}

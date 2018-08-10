@@ -40,7 +40,7 @@ const ContrastDisplay = (props: ContrastDisplayProps) => {
       <h3>{`${index + 1}: ${contrast.name}`}</h3>
       <p>Weights:</p>
       <ul>
-        {contrast.condition_list.map((predictor, i) =>
+        {contrast.condition_list && contrast.condition_list.map((predictor, i) =>
           <li key={i}>
             {predictor + ': ' + contrast.weights[i]}
           </li>

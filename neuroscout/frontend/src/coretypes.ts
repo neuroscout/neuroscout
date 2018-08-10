@@ -22,6 +22,7 @@ export interface Analysis {
   transformations: Transformation[];
   contrasts: Contrast[];
   model?: BidsModel;
+  autoContrast: boolean;
 }
 
 // Normalized dataset object in Analysis Builder
@@ -51,7 +52,14 @@ export interface Task {
 export interface Predictor {
   id: string;
   name: string;
+  source: string | null;
   description: string | null;
+  extracted_feature?: ExtractedFeature;
+}
+
+export interface ExtractedFeature {
+  description: string;
+  extractor_name: string;
 }
 
 export interface AnalysisConfig {
@@ -122,6 +130,7 @@ export interface Store {
     | 'review'
     | 'status';
   predictorsActive: boolean;
+  predictorsLoad: boolean;
   transformationsActive: boolean;
   contrastsActive: boolean;
   modelingActive: boolean;
