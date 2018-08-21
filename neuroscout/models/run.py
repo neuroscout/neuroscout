@@ -15,7 +15,7 @@ class Run(db.Model):
     acquisition = db.Column(db.Text)
 
     subject = db.Column(db.Text)
-    number = db.Column(db.Text)
+    number = db.Column(db.Integer)
 
     duration = db.Column(db.Float)
     func_path = db.Column(db.Text) # Relative to fmriprep root

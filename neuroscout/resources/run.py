@@ -9,7 +9,7 @@ class RunSchema(Schema):
 	session = fields.Str(description='Session number')
 	acquisition = fields.Str(description='Acquisition')
 	subject = fields.Str(description='Subject id')
-	number = fields.Str(description='Run id')
+	number = fields.Int(description='Run id')
 	duration = fields.Number(description='Total run duration in seconds.')
 	dataset_id = fields.Int(description='Dataset run belongs to.')
 	task = fields.Nested('TaskSchema', only=['id', 'name'],
@@ -29,7 +29,7 @@ class RunListResource(MethodResource):
     @use_kwargs({
     	'session': wa.fields.DelimitedList(fields.Str(),
                                         description='Session number(s).'),
-        'number': wa.fields.DelimitedList(fields.Str(),
+        'number': wa.fields.DelimitedList(fields.Int(),
                                           description='Run number(s).'),
         'task_id': wa.fields.DelimitedList(fields.Int(),
                                         description='Task id(s).'),
