@@ -116,3 +116,6 @@ celery_worker/src
 
 nginx/sites-enabled/local
 *.swp
+
+nginx/certs
+nginx/certs-data
