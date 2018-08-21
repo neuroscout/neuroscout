@@ -1,3 +1,3 @@
 export const config =  {
-  'server_url': 'http://alpha.neuroscout.org'
+  'server_url': 'https://alpha.neuroscout.org'
 };
