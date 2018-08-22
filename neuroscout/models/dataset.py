@@ -7,6 +7,8 @@ class Dataset(db.Model):
 	""" A BIDS dataset """
 	id = db.Column(db.Integer, primary_key=True)
 	description = db.Column(JSONB) # BIDS description
+	summary = db.Column(db.Text) # Hand crafted summary 
+	active = db.Column(db.Boolean, default=True)
 	name = db.Column(db.Text, unique=True, nullable=False)
 	runs = db.relationship('Run', backref='dataset',
 	                        lazy='dynamic')

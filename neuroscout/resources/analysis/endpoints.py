@@ -44,7 +44,7 @@ class AnalysisResource(AnalysisBaseResource):
 	@owner_required
 	def put(self, analysis, **kwargs):
 		if analysis.status not in ['DRAFT', 'FAILED']:
-			exceptions = ['private']
+			exceptions = ['private', 'description']
 			kwargs = {k: v for k, v in kwargs.items() if k in exceptions}
 			if not kwargs:
 				abort(422, "Analysis is not editable. Try cloning it.")

@@ -87,7 +87,7 @@ interface PredictorsParam {
 
 export type Parameter = BooleanParam | PredictorsParam;
 
-export type TransformName = 'scale' | 'orthogonalize' | 'sum' | 'product' | 'threshold' 
+export type TransformName = 'scale' | 'orthogonalize' | 'sum' | 'product' | 'threshold'
   | 'or' | 'and' | 'not';
 
 export type BlockLevel = 'run' | 'session' | 'subject' | 'dataset';
@@ -107,7 +107,7 @@ export interface Transformation {
   above?: boolean;
   signed?: boolean;
 }
- 
+
 // Lookup hash of available transformations (as specified in transforms.ts) by their name
 export interface XformRules {
   [name: string]: Transformation;
@@ -158,6 +158,7 @@ export interface ApiDataset {
     Description: string;
     URL: string;
   };
+  summary: string;
 }
 
 export interface ApiRun {

@@ -37,7 +37,7 @@ export class OverviewTab extends React.Component<OverviewTabProps, any> {
     this.props.updateAnalysis(newAnalysis);
   };
 
-  updateAnalysisFromEvent = (attrName: string) => 
+  updateAnalysisFromEvent = (attrName: string) =>
     (event: (React.FormEvent<HTMLInputElement> | React.FormEvent<HTMLTextAreaElement>)) => {
       this.updateAnalysis(attrName)(event.currentTarget.value);
     };
@@ -57,11 +57,11 @@ export class OverviewTab extends React.Component<OverviewTabProps, any> {
       {
         title: 'Name',
         dataIndex: 'name',
-        width: 100,
+        width: 130,
         sorter: (a, b) => a.name.localeCompare(b.name)
       },
-      { title: 'Description', dataIndex: 'description', width: 100 },
-      { title: 'Author(s)', dataIndex: 'authors', width: 100 },
+      { title: 'Description', dataIndex: 'description'},
+      { title: 'Author(s)', dataIndex: 'authors', width: 280 },
     ];
 
     const selectedDatasetId: string[] = analysis.datasetId ? [analysis.datasetId.toString()] : [];

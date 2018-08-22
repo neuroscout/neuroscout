@@ -1,6 +1,7 @@
 {
   "HealthyBrainNetwork": {
     "path": "/datasets/HealthyBrainNetwork/",
+    "summary": "Movie watching paradigms from the Healthy Brain Network brain development study",
     "tasks": {
       "movieDM": {
         "converters": [
