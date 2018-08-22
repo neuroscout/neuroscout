@@ -15,6 +15,7 @@ addons:
 cache: yarn
 before_script:
   - cp neuroscout/config/example_app.py neuroscout/config/app.py
+  - cp neuroscout/frontend/src/config.ts.example neuroscout/frontend/src/config.ts
   - psql -c 'create database travis_ci_test;' -U postgres
   - CI=""; cd neuroscout/frontend && yarn install --concurrency=1 && yarn build --concurrency=1
   - CI="true"; cd ../
