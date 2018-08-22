@@ -112,7 +112,7 @@ class App extends React.Component<{}, AppState> {
       })
       .catch(displayError);
 
-  /* short polling function checking api for inprocess analyses to see if 
+  /* short polling function checking api for inprocess analyses to see if
    * there have been any changes
    */
   checkAnalysesStatus = async () => {
@@ -125,7 +125,7 @@ class App extends React.Component<{}, AppState> {
         let id = analysis.id;
         return jwtFetch(`${DOMAINROOT}/api/analyses/${id}`, { method: 'get' })
           .then((data: ApiAnalysis) => {
-            if ((data.status !== analysis.status) 
+            if ((data.status !== analysis.status)
                 && (['SUBMITTING', 'PENDING'].indexOf(data.status) === -1)) {
               changeFlag = true;
               message.info(`analysis ${id} updated from ${analysis.status} to ${data.status}`);
@@ -143,7 +143,7 @@ class App extends React.Component<{}, AppState> {
       await timeout(10000);
     }
   };
-  
+
   // Authenticate the user with the server. This function is called from login()
   authenticate = () =>
     new Promise((resolve, reject) => {
@@ -675,14 +675,6 @@ class App extends React.Component<{}, AppState> {
                   <Browse analyses={publicAnalyses} cloneAnalysis={this.cloneAnalysis} />}
               />
             </Content>
-            <Footer style={{ background: '#fff' }}>
-              <Row type="flex" justify="center">
-                <Col md={{span: 4}}>
-                  <br />
-                  <p>Neuroscout - Copyright 2017</p>
-                </Col>
-              </Row>
-            </Footer>
           </Layout>
         </div>
       </Router>
