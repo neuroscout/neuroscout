@@ -116,7 +116,7 @@ def add_stimulus(stim_hash, dataset_id, parent_id=None, path=None, content=None,
 
 def add_task(task_name, dataset_name=None, local_path=None,
              dataset_address=None, preproc_address=None, include_predictors=None,
-             reingest=False, scan_length=1000, automagic=False, **kwargs):
+             reingest=False, scan_length=1000, automagic=False, summary=None, **kwargs):
     """ Adds a BIDS dataset task to the database.
         Args:
             task_name - task to add
@@ -166,6 +166,7 @@ def add_task(task_name, dataset_name=None, local_path=None,
 
     if new_ds:
         dataset_model.description = layout.description
+        dataset_model.summary = summary,
         dataset_model.dataset_address = dataset_address
         dataset_model.preproc_address = preproc_address
         dataset_model.local_path = local_path.as_posix()
@@ -217,7 +218,7 @@ def add_task(task_name, dataset_name=None, local_path=None,
         path_patterns = ['sub-{subject}[ses-{session}/]/func/sub-{subject}_'
                          '[ses-{session}_]task-{task}_[acq-{acquisition}_]'
                          '[run-{run}_]bold_[space-{space}_]{type}.nii.gz']
-        
+
         if 'run' in 'entities':
             entities['run'] = entities['run'].zfill(2)
 

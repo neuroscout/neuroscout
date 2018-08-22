@@ -8,7 +8,8 @@ class DatasetSchema(Schema):
 	""" Dataset validation schema. """
 	id = fields.Int()
 	name = fields.Str(description='Dataset name')
-	description = fields.Dict()
+	description = fields.Dict(description='Dataset description from BIDS dataset')
+	summary = fields.Str(description='Dataset summary description')
 	mimetypes = fields.List(fields.Str(),
                          description='Dataset mimetypes/modalities')
 	runs = fields.Nested('RunSchema', many=True, only=['id'])
