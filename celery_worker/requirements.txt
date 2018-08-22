@@ -2,8 +2,8 @@ celery
 flower
 redis
 docopt
-grabbit==0.2.1
-pybids==0.6.3
+grabbit==0.2.3
+pybids==0.6.5
 duecredit
 pandas
 patsy

@@ -55,18 +55,20 @@ def writeout_events(analysis, pes, outdir):
 def compile(analysis, predictor_events, resources, bids_dir):
     files_dir = Path(mkdtemp())
     model = analysis.pop('model')
-    scan_length = analysis['runs'][0]['duration']
-    subject = [model['input']['subject'][0]]
-    run = model['input']['run'][0] if 'run' in model['input'] else None
+
+    kwargs = {'scan_length': analysis['runs'][0]['duration'],
+              'subject': [model['input']['subject'][0]],
+              'task': analysis['task_name']}
+    if 'run' in model['input']:
+        kwargs['run'] = model['input']['run'][0]
 
     # Write out events
     bundle_paths = writeout_events(analysis, predictor_events, files_dir)
-
+    logger.info(model['input'])
     # Load events and try applying transformations
-    bids_layout = BIDSLayout([bids_dir, files_dir.as_posix()], exclude='derivatives/')
+    bids_layout = BIDSLayout([(bids_dir, 'bids'), (files_dir.as_posix(), ['bids', 'derivatives'])], exclude='derivatives/')
     bids_analysis = Analysis(bids_layout, deepcopy(model))
-    bids_analysis.setup(task=analysis['task_name'], scan_length=scan_length,
-                        subject=subject, run=run)
+    bids_analysis.setup(**kwargs)
 
     # Sidecar:
     sidecar = {"RepetitionTime": analysis['TR']}
