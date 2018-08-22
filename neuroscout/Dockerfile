@@ -15,7 +15,7 @@ RUN apt-key adv --recv-keys --keyserver hkp://keyserver.ubuntu.com:80 0xA5D32F01
 RUN curl -sL https://deb.nodesource.com/setup_6.x | bash -
 
 RUN apt-get install -yq datalad python-nipype python-opencv
-RUN pip install -e git+https://github.com/datalad/datalad.git#egg=datalad
+RUN pip install datalad
 
 RUN apt-get install -yq nodejs
 RUN npm install -g yarn
