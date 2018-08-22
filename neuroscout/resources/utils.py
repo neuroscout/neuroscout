@@ -40,62 +40,11 @@ def update_analysis_status(analysis, commit=True):
             db.session.commit()
     return analysis
 
-def add_default_model(analysis, commit=True):
-    if analysis.model == {} and analysis.predictors != [] and analysis.status == 'DRAFT':
-        features = [p.name for p in analysis.predictors]
-        confounds = ["FramewiseDisplacement",
-                     "X", "Y", "Z",
-                     "RotX", "RotY", "RotZ",
-                     "aCompCor00", "aCompCor01", "aCompCor02",
-                     "aCompCor03", "aCompCor04","aCompCor05"]
-
-        model = {
-            "name": analysis.name,
-            "description": analysis.description,
-            "input": {
-                "task": analysis.task_name,
-                "subject": analysis.subject,
-                },
-            "blocks": [
-                {
-                    "level": "run",
-                    "model": {
-                        "variables": features + confounds,
-                        "HRF_variables": features ,
-                        },
-                    "transformations": [
-                        {
-                            "name": "scale",
-                            "input": features
-                            }
-                        ]
-                    },
-                {
-                    "level": "dataset",
-                    "model": {
-                        "variables": features
-                        }
-                    }
-                ],
-            }
-
-        if analysis.session is not None:
-            model['input']['session'] = analysis.session
-        if analysis.run is not None:
-            model['input']['run'] = analysis.run
-        analysis.model = model
-
-        if commit is True:
-            db.session.commit()
-
-    return analysis
-
 def fetch_analysis(function):
     """ Given kwarg analysis_id, fetch analysis model and insert as kwargs """
     def wrapper(*args, **kwargs):
         analysis = first_or_404(
             Analysis.query.filter_by(hash_id=kwargs.pop('analysis_id')))
-        analysis = add_default_model(analysis)
         analysis = update_analysis_status(analysis)
         kwargs['analysis'] = analysis
         return function(*args, **kwargs)
