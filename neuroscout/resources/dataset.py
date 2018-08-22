@@ -26,7 +26,7 @@ class DatasetResource(MethodResource):
 class DatasetListResource(MethodResource):
 	@doc(tags=['dataset'], summary='Returns list of datasets.')
 	@marshal_with(DatasetSchema(many=True,
-								exclude=['mimetypes', 'dataset_address', 'preproc_address']))
+								exclude=['dataset_address', 'preproc_address']))
 	@use_kwargs({
 	    'active_only': wa.fields.Boolean(missing=True,
 	                description="Return only active Datasets")
