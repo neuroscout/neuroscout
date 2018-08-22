@@ -101,6 +101,6 @@ def update_hash(mapper, connection, target):
     analysis_table = mapper.local_table
     connection.execute(
           analysis_table.update().
-              values(hash_id=Hashids(current_app.config['HASH_SALT']).encode(target.id)).
+              values(hash_id=Hashids(current_app.config['HASH_SALT'], min_length=5).encode(target.id)).
               where(analysis_table.c.id==target.id)
     )
