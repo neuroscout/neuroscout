@@ -11,6 +11,10 @@ db.init_app(app)
 from flask_mail import Mail
 mail = Mail(app)
 
+from flask_caching import Cache
+cache = Cache(config={'CACHE_TYPE': 'filesystem', 'CACHE_DIR': '/file-data/cache'})
+cache.init_app(app)
+
 from flask_jwt import JWT
 from flask_security import Security
 from flask_security.confirmable import confirm_email_token_status, confirm_user

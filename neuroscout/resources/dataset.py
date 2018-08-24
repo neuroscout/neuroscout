@@ -3,6 +3,7 @@ import webargs as wa
 from marshmallow import Schema, fields
 from models import Dataset
 from .utils import first_or_404
+from core import cache
 
 class DatasetSchema(Schema):
 	""" Dataset validation schema. """
@@ -18,20 +19,22 @@ class DatasetSchema(Schema):
 	preproc_address = fields.Str(description='Preprocessed data remote address')
 
 class DatasetResource(MethodResource):
-    @doc(tags=['dataset'], summary='Get dataset by id.')
-    @marshal_with(DatasetSchema)
-    def get(self, dataset_id):
-    	return first_or_404(Dataset.query.filter_by(id=dataset_id))
+	@doc(tags=['dataset'], summary='Get dataset by id.')
+	@cache.memoize(50)
+	@marshal_with(DatasetSchema)
+	def get(self, dataset_id):
+		return first_or_404(Dataset.query.filter_by(id=dataset_id))
 
 class DatasetListResource(MethodResource):
 	@doc(tags=['dataset'], summary='Returns list of datasets.')
-	@marshal_with(DatasetSchema(many=True,
-								exclude=['dataset_address', 'preproc_address']))
 	@use_kwargs({
 	    'active_only': wa.fields.Boolean(missing=True,
 	                description="Return only active Datasets")
 	    },
 	    locations=['query'])
+	@cache.memoize(50)
+	@marshal_with(DatasetSchema(many=True,
+								exclude=['dataset_address', 'preproc_address']))
 	def get(self, **kwargs):
 		query = {}
 		if kwargs.pop('active_only'):
