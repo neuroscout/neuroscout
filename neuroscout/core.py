@@ -12,7 +12,7 @@ from flask_mail import Mail
 mail = Mail(app)
 
 from flask_caching import Cache
-cache = Cache(config={'CACHE_TYPE': 'filesystem', 'CACHE_DIR': '/file-data/cache'})
+cache = Cache(config={'CACHE_TYPE': 'filesystem', 'CACHE_DIR': app.config['CACHE_DIR']})
 cache.init_app(app)
 
 from flask_jwt import JWT

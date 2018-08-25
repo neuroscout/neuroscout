@@ -43,6 +43,7 @@ class DevelopmentConfig(Config):
     MIGRATIONS_DIR = '/migrations/migrations'
     DATASET_DIR = '/file-data/datasets'
     FEATURE_DATASTORE = '/file-data/feature-tracking.csv'
+    CACHE_DIR = '/file-data/cache'
 
 class TestingConfig(Config):
     TESTING = True
@@ -50,6 +51,7 @@ class TestingConfig(Config):
     FEATURE_SCHEMA = (dir_path / 'tests/data/test_feature_schema.json').as_posix()
     PREDICTOR_SCHEMA = (dir_path / 'tests/data/test_predictor_schema.json').as_posix()
     FEATURE_DATASTORE = '/tmp/file-data/feature-tracking.csv'
+    CACHE_DIR = '/tmp/cache'
 
 class DockerTestConfig(TestingConfig):
     SQLALCHEMY_DATABASE_URI = 'postgres://postgres@postgres:5432/scout_test'
@@ -64,6 +66,7 @@ class TravisConfig(TestingConfig):
     FEATURE_DATASTORE = './tmp/datastore.csv'
     STIMULUS_DIR = './tmp/stims'
     EXTRACTED_DIR = './tmp/extracted'
+    CACHE_DIR = './tmp/cache'
 
 class HomeConfig(Config):
     SQLALCHEMY_DATABASE_URI = 'postgresql://zorro:dbpass@localhost:5432/neuroscout'
