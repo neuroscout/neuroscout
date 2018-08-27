@@ -11,7 +11,10 @@ app.config.update(
     FEATURE_DATASTORE = str(app.config['FILE_DIR'] / 'feature-tracking.csv'),
     CACHE_DIR = str(app.config['FILE_DIR'] / 'cache'),
     STIMULUS_DIR = str(app.config['FILE_DIR'] / 'stimuli'),
-    EXTRACTION_DIR = str(app.config['FILE_DIR'] / 'extracted')
+    EXTRACTION_DIR = str(app.config['FILE_DIR'] / 'extracted'),
+    FEATURE_SCHEMA = str(app.config['CONFIG_PATH'] / 'feature_schema.json'),
+    PREDICTOR_SCHEMA = str(app.config['CONFIG_PATH'] / 'predictor_schema.json'),
+    ALL_TRANSFORMERS = str(app.config['CONFIG_PATH'] / 'transformers.json')
 )
 
 

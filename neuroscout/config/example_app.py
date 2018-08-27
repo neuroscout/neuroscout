@@ -27,13 +27,10 @@ class Config(object):
     CONFIRM_USERS = True
     SEND_REGISTER_EMAIL = True
 
-    config_path = Path(__file__).resolve().parents[1] / 'config'
-    FEATURE_SCHEMA = str(config_path / 'feature_schema.json')
-    PREDICTOR_SCHEMA = str(config_path / 'predictor_schema.json')
-    ALL_TRANSFORMERS = str(config_path / 'transformers.json')
-
+    CONFIG_PATH = Path(__file__).resolve().parents[1] / 'config'
     FILE_DIR = Path('/file-data')
 
+    CACHE_DEFAULT_TIMEOUT = 0
 
 class DevelopmentConfig(Config):
     ENV = 'development'
@@ -42,10 +39,7 @@ class DevelopmentConfig(Config):
 
 class TestingConfig(Config):
     TESTING = True
-    config_path = Path(__file__).resolve().parents[1] / 'tests' / 'data'
-    FEATURE_SCHEMA = str(config_path / 'test_feature_schema.json')
-    PREDICTOR_SCHEMA = str(config_path / 'test_predictor_schema.json')
-    ALL_TRANSFORMERS = str(config_path / 'transformers.json')
+    CONFIG_PATH = Path(__file__).resolve().parents[1] / 'tests' / 'data'
 
 class DockerTestConfig(TestingConfig):
     SQLALCHEMY_DATABASE_URI = 'postgres://postgres@postgres:5432/scout_test'
