@@ -3,19 +3,20 @@ from pathlib import Path
 
 class Config(object):
     SERVER_NAME = 'external_host'
-    DEBUG = False
-    TESTING = False
-    CSRF_ENABLED = True
+    ENV = 'production'
+    WTF_CSRF_ENABLED = False
+
     SECRET_KEY = 'A_SECRET!'
     SECURITY_PASSWORD_HASH = 'pbkdf2_sha512'
     SECURITY_PASSWORD_SALT = 'A_SECRET'
-    WTF_CSRF_ENABLED = False
     JWT_EXPIRATION_DELTA = datetime.timedelta(days=7)
     JWT_AUTH_URL_RULE = '/api/auth'
     JWT_AUTH_USERNAME_KEY = 'email'
+
     SQLALCHEMY_TRACK_MODIFICATIONS = False
+    MIGRATIONS_DIR = '/migrations/migrations'
+
     HASH_SALT = 'dfdfdf'
-    MIGRATIONS_DIR = 'A_SECRET'
     APISPEC_SWAGGER_UI_URL = None
 
     MAIL_SERVER = 'smtp.mailgun.com'
@@ -23,52 +24,39 @@ class Config(object):
     MAIL_PASSWORD = 'mypass'
     MAIL_DEFAULT_SENDER = 'no-reply@neuroscout.org'
     SECURITY_EMAIL_SENDER = 'no-reply@neuroscout.org'
-
     CONFIRM_USERS = True
     SEND_REGISTER_EMAIL = True
 
-    dir_path = Path(__file__).resolve().parents[1]
-    FEATURE_SCHEMA = (dir_path / 'config/feature_schema.json').as_posix()
-    PREDICTOR_SCHEMA = (dir_path / 'config/predictor_schema.json').as_posix()
-    ALL_TRANSFORMERS = (dir_path / 'config/transformers.json').as_posix()
+    config_path = Path(__file__).resolve().parents[1] / 'config'
+    FEATURE_SCHEMA = str(config_path / 'feature_schema.json')
+    PREDICTOR_SCHEMA = str(config_path / 'predictor_schema.json')
+    ALL_TRANSFORMERS = str(config_path / 'transformers.json')
 
-    STIMULUS_DIR = 'path'
-    EXTRACTION_DIR = 'path'
+    file_dir = Path('/file-data')
 
+    def _init(self):
+        self.DATASET_DIR = str(self.file_dir / 'datasets')
+        self.FEATURE_DATASTORE = str(self.file_dir / 'feature-tracking.csv')
+        self.CACHE_DIR = str(self.file_dir / 'cache')
+        self.STIMULUS_DIR = str(self.file_dir / 'stimuli')
+        self.EXTRACTION_DIR = str(self.file_dir / 'extracted')
 
 class DevelopmentConfig(Config):
-    DEBUG = True
+    ENV = 'development'
     SQLALCHEMY_DATABASE_URI = 'postgres://postgres@postgres:5432/neuroscout'
     PROPAGATE_EXCEPTIONS = True
-    MIGRATIONS_DIR = '/migrations/migrations'
-    DATASET_DIR = '/file-data/datasets'
-    FEATURE_DATASTORE = '/file-data/feature-tracking.csv'
-    CACHE_DIR = '/file-data/cache'
 
 class TestingConfig(Config):
     TESTING = True
-    dir_path = Path(__file__).resolve().parents[1]
-    FEATURE_SCHEMA = (dir_path / 'tests/data/test_feature_schema.json').as_posix()
-    PREDICTOR_SCHEMA = (dir_path / 'tests/data/test_predictor_schema.json').as_posix()
-    FEATURE_DATASTORE = '/tmp/file-data/feature-tracking.csv'
-    CACHE_DIR = '/tmp/cache'
+    config_path = Path(__file__).resolve().parents[1] / 'tests' / 'data'
+    FEATURE_SCHEMA = str(config_path / 'test_feature_schema.json')
+    PREDICTOR_SCHEMA = str(config_path / 'test_predictor_schema.json')
+    ALL_TRANSFORMERS = str(config_path / 'transformers.json')
 
 class DockerTestConfig(TestingConfig):
     SQLALCHEMY_DATABASE_URI = 'postgres://postgres@postgres:5432/scout_test'
-    DATASET_DIR = '/tmp/file-data'
-
-class HomeTestingConfig(TestingConfig):
-    SQLALCHEMY_DATABASE_URI = 'postgresql://zorro:dbpass@localhost:5432/scout_test'
+    FILE_DIR = Path('/tmp/file-data')
 
 class TravisConfig(TestingConfig):
     SQLALCHEMY_DATABASE_URI = "postgresql://postgres@localhost/travis_ci_test"
-    DATASET_DIR = './tmp/file-data'
-    FEATURE_DATASTORE = './tmp/datastore.csv'
-    STIMULUS_DIR = './tmp/stims'
-    EXTRACTED_DIR = './tmp/extracted'
-    CACHE_DIR = './tmp/cache'
-
-class HomeConfig(Config):
-    SQLALCHEMY_DATABASE_URI = 'postgresql://zorro:dbpass@localhost:5432/neuroscout'
-    PROPAGATE_EXCEPTIONS = True
-    DEBUG = True
+    FILE_DIR = Path('./tmp/file-data')
