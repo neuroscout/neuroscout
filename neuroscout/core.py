@@ -6,10 +6,26 @@ from database import db
 
 app = Flask(__name__, static_folder='/static')
 app.config.from_object(os.environ['APP_SETTINGS'])
+app.config.update(
+    DATASET_DIR = str(app.config['FILE_DIR'] / 'datasets'),
+    FEATURE_DATASTORE = str(app.config['FILE_DIR'] / 'feature-tracking.csv'),
+    CACHE_DIR = str(app.config['FILE_DIR'] / 'cache'),
+    STIMULUS_DIR = str(app.config['FILE_DIR'] / 'stimuli'),
+    EXTRACTION_DIR = str(app.config['FILE_DIR'] / 'extracted'),
+    FEATURE_SCHEMA = str(app.config['CONFIG_PATH'] / 'feature_schema.json'),
+    PREDICTOR_SCHEMA = str(app.config['CONFIG_PATH'] / 'predictor_schema.json'),
+    ALL_TRANSFORMERS = str(app.config['CONFIG_PATH'] / 'transformers.json')
+)
+
+
 db.init_app(app)
 
 from flask_mail import Mail
 mail = Mail(app)
+
+from flask_caching import Cache
+cache = Cache(config={'CACHE_TYPE': 'filesystem', 'CACHE_DIR': app.config['CACHE_DIR']})
+cache.init_app(app)
 
 from flask_jwt import JWT
 from flask_security import Security

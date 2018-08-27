@@ -3,6 +3,7 @@ Set of methods to extract features from stimuli in a dataset and generate
 the associated predictors
 """
 from flask import current_app
+from core import cache
 from database import db
 import socket
 
@@ -75,6 +76,7 @@ def extract_features(dataset_name, task_name, extractors):
         Output:
             list of db ids of extracted features
     """
+    cache.clear()
     stims = _load_stim_models(dataset_name, task_name)
 
     results = _extract(extractors, stims)

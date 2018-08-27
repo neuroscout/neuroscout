@@ -14,10 +14,10 @@ from .schemas import (AnalysisSchema, AnalysisFullSchema,
 
 @doc(tags=['analysis'])
 @marshal_with(AnalysisSchema)
-class AnalysisBaseResource(MethodResource):
+class AnalysisMethodResource(MethodResource):
 	pass
 
-class AnalysisRootResource(AnalysisBaseResource):
+class AnalysisRootResource(AnalysisMethodResource):
 	"""" Resource for root address """
 	@marshal_with(AnalysisSchema(many=True))
 	@doc(summary='Returns list of public analyses.')
@@ -33,7 +33,7 @@ class AnalysisRootResource(AnalysisBaseResource):
 		db.session.commit()
 		return new
 
-class AnalysisResource(AnalysisBaseResource):
+class AnalysisResource(AnalysisMethodResource):
 	@doc(summary='Get analysis by id.')
 	@fetch_analysis
 	def get(self, analysis):
@@ -60,7 +60,7 @@ class AnalysisResource(AnalysisBaseResource):
 
 		return {'message' : 'deleted!'}
 
-class CloneAnalysisResource(AnalysisBaseResource):
+class CloneAnalysisResource(AnalysisMethodResource):
 	@doc(summary='Clone analysis.')
 	@auth_required
 	@fetch_analysis
@@ -109,7 +109,7 @@ def json_analysis(analysis):
 
 	return analysis_json, pes_json, resources_json
 
-class CompileAnalysisResource(AnalysisBaseResource):
+class CompileAnalysisResource(AnalysisMethodResource):
 	@doc(summary='Compile and lock analysis.')
 	@owner_required
 	def post(self, analysis):
@@ -127,21 +127,21 @@ class CompileAnalysisResource(AnalysisBaseResource):
 
 		return analysis
 
-class AnalysisStatusResource(AnalysisBaseResource):
+class AnalysisStatusResource(AnalysisMethodResource):
 	@marshal_with(AnalysisCompiledSchema)
 	@doc(summary='Check if analysis has compiled.')
 	@fetch_analysis
 	def get(self, analysis):
 		return analysis
 
-class AnalysisFullResource(AnalysisBaseResource):
+class AnalysisFullResource(AnalysisMethodResource):
 	@marshal_with(AnalysisFullSchema)
 	@doc(summary='Get analysis (including nested fields).')
 	@fetch_analysis
 	def get(self, analysis):
 		return analysis
 
-class AnalysisResourcesResource(AnalysisBaseResource):
+class AnalysisResourcesResource(AnalysisMethodResource):
 	@marshal_with(AnalysisResourcesSchema)
 	@doc(summary='Get analysis resources.')
 	@fetch_analysis

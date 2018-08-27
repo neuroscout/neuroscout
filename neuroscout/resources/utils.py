@@ -90,3 +90,6 @@ def handle_request_parsing_error(err):
     code = getattr(err, 'status_code', 400)
     msg = getattr(err, 'messages', 'Invalid Request')
     abort(code, msg)
+
+def make_cache_key(*args, **kwargs):
+    return request.url
