@@ -6,6 +6,15 @@ from database import db
 
 app = Flask(__name__, static_folder='/static')
 app.config.from_object(os.environ['APP_SETTINGS'])
+app.config.update(
+    DATASET_DIR = str(app.config['FILE_DIR'] / 'datasets'),
+    FEATURE_DATASTORE = str(app.config['FILE_DIR'] / 'feature-tracking.csv'),
+    CACHE_DIR = str(app.config['FILE_DIR'] / 'cache'),
+    STIMULUS_DIR = str(app.config['FILE_DIR'] / 'stimuli'),
+    EXTRACTION_DIR = str(app.config['FILE_DIR'] / 'extracted')
+)
+
+
 db.init_app(app)
 
 from flask_mail import Mail

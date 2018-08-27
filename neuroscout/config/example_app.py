@@ -32,14 +32,8 @@ class Config(object):
     PREDICTOR_SCHEMA = str(config_path / 'predictor_schema.json')
     ALL_TRANSFORMERS = str(config_path / 'transformers.json')
 
-    file_dir = Path('/file-data')
+    FILE_DIR = Path('/file-data')
 
-    def _init(self):
-        self.DATASET_DIR = str(self.file_dir / 'datasets')
-        self.FEATURE_DATASTORE = str(self.file_dir / 'feature-tracking.csv')
-        self.CACHE_DIR = str(self.file_dir / 'cache')
-        self.STIMULUS_DIR = str(self.file_dir / 'stimuli')
-        self.EXTRACTION_DIR = str(self.file_dir / 'extracted')
 
 class DevelopmentConfig(Config):
     ENV = 'development'
