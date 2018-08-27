@@ -45,7 +45,7 @@ services:
   swagger-ui:
     image: swaggerapi/swagger-ui
     environment:
-      - "API_URL=http://localhost/swagger/"
+      - "API_URL=https://alpha.neuroscout.org/swagger/"
     expose:
       - '8080'
 

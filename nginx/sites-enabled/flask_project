@@ -1,12 +1,17 @@
 server {
 
-    listen 80;
-    server_name localhost;
+    server_name alpha.neuroscout.org;
     charset utf-8;
+    listen      443           ssl http2;
+    listen [::]:443           ssl http2;
 
     root /neuroscout/frontend/build;
 
-    ssl_protocols TLSv1.3;# Requires nginx >= 1.13.0 else use TLSv1.2
+    ssl_certificate           /etc/letsencrypt/live/alpha.neuroscout.org/fullchain.pem;
+    ssl_certificate_key       /etc/letsencrypt/live/alpha.neuroscout.org/privkey.pem;
+    ssl_trusted_certificate   /etc/letsencrypt/live/alpha.neuroscout.org/chain.pem;
+
+    ssl_protocols TLSv1.2;# Requires nginx >= 1.13.0 else use TLSv1.2
     ssl_prefer_server_ciphers on;
     ssl_dhparam /etc/nginx/dhparam.pem; # openssl dhparam -out /etc/nginx/dhparam.pem 4096
     ssl_ciphers ECDHE-RSA-AES256-GCM-SHA512:DHE-RSA-AES256-GCM-SHA512:ECDHE-RSA-AES256-GCM-SHA384:DHE-RSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-SHA384;

@@ -1,0 +1,10 @@
+server {
+     server_name alpha.neuroscout.org;
+
+     location /.well-known {
+         allow all;
+         root  /data/letsencrypt/;
+     }
+     listen 80;
+
+}
