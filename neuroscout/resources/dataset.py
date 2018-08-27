@@ -32,7 +32,7 @@ class DatasetListResource(MethodResource):
 	                description="Return only active Datasets")
 	    },
 	    locations=['query'])
-	@cache.memoize(50)
+	@cache.cached(key_prefix=make_cache_key)
 	@marshal_with(DatasetSchema(many=True,
 								exclude=['dataset_address', 'preproc_address']))
 	def get(self, **kwargs):

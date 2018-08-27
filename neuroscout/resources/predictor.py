@@ -62,7 +62,7 @@ class PredictorListResource(MethodResource):
                     description="Return only newest Predictor by name")
         },
         locations=['query'])
-    @cache.cached(50, key_prefix=make_cache_key)
+    @cache.cached(key_prefix=make_cache_key)
     @marshal_with(PredictorSchema(many=True))
     def get(self, **kwargs):
         if kwargs.pop('newest'):
@@ -90,7 +90,7 @@ class PredictorListResource(MethodResource):
 class PredictorEventListResource(MethodResource):
     @doc(tags=['predictors'], summary='Get events for predictor(s)',)
     @marshal_with(PredictorEventSchema(many=True, exclude=['predictor']))
-    @cache.memoize(50)
+    @cache.cached(key_prefix=make_cache_key)
     @use_kwargs({
         'run_id': wa.fields.DelimitedList(fields.Int(),
                                           description="Run id(s)"),
