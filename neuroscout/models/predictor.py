@@ -1,5 +1,6 @@
 from database import db
 import statistics
+from sqlalchemy import func, Numeric, cast
 
 class Predictor(db.Model):
 	""" Instantiation of a predictor in a dataset.
@@ -17,6 +18,37 @@ class Predictor(db.Model):
 								lazy='dynamic')
 
 	run_statistics = db.relationship('PredictorRun')
+
+	@property
+	def non_null(self):
+		return self.predictor_events.filter(
+			~PredictorEvent.value.in_(['nan', 'n/a']))
+
+	@property
+	def num_na(self):
+		return self.predictor_events.filter(
+			PredictorEvent.value.in_(['nan', 'n/a'])).count()
+
+	@property
+	def max(self):
+		return self.non_null.with_entities(
+			func.max(PredictorEvent.value)).scalar()
+
+	@property
+	def min(self):
+		return self.predictor_events.with_entities(
+			func.min(PredictorEvent.value)).scalar()
+
+	@property
+	def mean(self):
+		return self.non_null.with_entities(
+			func.avg(cast(PredictorEvent.value, Numeric))).scalar()
+
+	@property
+	def stddev(self):
+		return self.non_null.with_entities(
+			func.stddev(cast(PredictorEvent.value, Numeric))).scalar()
+
 
 	def __repr__(self):
 	    return '<models.Predictor[name=%s]>' % self.name
