@@ -19,7 +19,7 @@ class PredictorSchema(Schema):
     name = fields.Str(description="Predictor name.")
     description = fields.Str(description="Predictor description")
     extracted_feature = fields.Nested('ExtractedFeatureSchema', skip_if=None)
-    # source = fields.Str()
+    source = fields.Str()
 
     max = fields.Float(description="Maximum value")
     min = fields.Float(description="Minimum value")
