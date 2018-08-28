@@ -565,6 +565,7 @@ export default class AnalysisBuilder extends React.Component<BuilderProps, Store
 
     stateUpdate[attrName] = value;
     if (!keepClean) stateUpdate.unsavedChanges = true;
+
     this.setState(stateUpdate);
   };
 
@@ -573,6 +574,7 @@ export default class AnalysisBuilder extends React.Component<BuilderProps, Store
       return;
     }
     const analysis = this.state.analysis;
+
     jwtFetch(`${domainRoot}/api/predictors?run_id=${analysis.runIds}`)
     .then((data: Predictor[]) => {
       message.success(
@@ -581,14 +583,16 @@ export default class AnalysisBuilder extends React.Component<BuilderProps, Store
       const selectedPredictors = data.filter(
         p => analysis.predictorIds.indexOf(p.id) > -1
       );
+
       let selectedHRFPredictors: Predictor[] = [];
       if (analysis.hrfPredictorIds) {
         selectedHRFPredictors = data.filter(
-          p => analysis.hrfPredictorIds.indexOf(p.name) > -1
+          p => analysis.hrfPredictorIds.indexOf(p.id) > -1
         );
         // hrfPredictorIds comes in as a list of names from api, convert it to IDs here.
         analysis.hrfPredictorIds = selectedHRFPredictors.map(x => x.id);
       }
+
       this.setState({
         analysis: analysis,
         availablePredictors: data,
