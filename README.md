@@ -17,10 +17,10 @@ In addition, configure where file keys (such as for Google) are located:
     KEY_DIR=/home/me/.keys
     export KEY_DIR
 
-Build the containers and start the services:
+Build the containers and start services using the development configuration:
 
     docker-compose build
-    docker-compose up -d
+    docker-compose -f docker-compose.yml -f docker-compose.dev.yml up -d
 
 The server should now be running at http://localhost/
 
