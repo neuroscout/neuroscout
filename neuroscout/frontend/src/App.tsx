@@ -31,9 +31,9 @@ interface AppState {
   loginError: string;
   signupError: string;
   resetError: string;
-  email: string | null;
-  name: string | null;
-  password: string | null;
+  email: string | undefined;
+  name: string | undefined;
+  password: string | undefined;
   token: string | null;
   jwt: string | null;
   nextURL: string | null; // will probably remove this and find a better solution to login redirects
@@ -56,7 +56,8 @@ class App extends React.Component<{}, AppState> {
   constructor(props) {
     super(props);
     const jwt = localStorage.getItem('jwt');
-    const email = localStorage.getItem('email');
+    let _email = localStorage.getItem('email');
+    let email = _email == null ? undefined : _email;
     this.state = {
       loggedIn: !!jwt,
       openLogin: false,
@@ -67,7 +68,7 @@ class App extends React.Component<{}, AppState> {
       signupError: '',
       resetError: '',
       email: email,
-      name: null,
+      name: undefined,
       jwt: jwt,
       password: '',
       nextURL: null,
@@ -248,9 +249,8 @@ class App extends React.Component<{}, AppState> {
     localStorage.removeItem('email');
     this.setState({
       loggedIn: false,
-      name: null,
-      email: null,
-      jwt: null,
+      name: undefined,
+      email: undefined, jwt: null,
       analyses: [],
       loggingOut: true
     });
