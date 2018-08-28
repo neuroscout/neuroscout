@@ -32,7 +32,7 @@ const transformationSchema = {
 const transformDefinitions: Transformation[] = [
   {
     name: 'scale',
-    demean: false,
+    demean: true,
     rescale: true,
     replace_na: undefined
   },
