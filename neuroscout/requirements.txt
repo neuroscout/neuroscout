@@ -23,4 +23,5 @@ python_magic==0.4.15
 pliers==0.2.3
 progressbar2==3.38.0
 pybids==0.6.5
+psycopg2==2.7.1
 webargs==4.0.0
