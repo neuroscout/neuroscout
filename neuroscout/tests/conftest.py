@@ -12,7 +12,7 @@ from flask import current_app
 """
 Session / db managment tools
 """
-@pytest.fixture(scope='session')
+@pytest.yield_fixture(scope='session')
 def app():
     """Session-wide test `Flask` application."""
     if 'APP_SETTINGS' not in environ:
@@ -26,7 +26,7 @@ def app():
 
     ctx.pop()
 
-@pytest.fixture(scope='session')
+@pytest.yield_fixture(scope='session')
 def db(app):
     """Session-wide test database."""
     _db.init_app(app)
@@ -37,7 +37,7 @@ def db(app):
     _db.session.remove()
     _db.drop_all()
 
-@pytest.fixture(scope='function')
+@pytest.yield_fixture(scope='function')
 def session(db):
     """Creates a new db session for a test. Changes in session are rolled back"""
     connection = db.engine.connect()
@@ -119,7 +119,7 @@ def add_users(app, db, session):
     session.commit()
     id_2 = user_datastore.find_user(email=user2).id
 
-    yield (id_1, id_2), ((user1, pass1), (user2, pass2))
+    return (id_1, id_2), ((user1, pass1), (user2, pass2))
 
 
 @pytest.fixture(scope="function")
