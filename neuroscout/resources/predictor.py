@@ -21,6 +21,12 @@ class PredictorSchema(Schema):
     extracted_feature = fields.Nested('ExtractedFeatureSchema', skip_if=None)
     source = fields.Str()
 
+    max = fields.Float(description="Maximum value")
+    min = fields.Float(description="Minimum value")
+    mean = fields.Float(description="Mean value")
+    stddev = fields.Float(description="Standard deviation of value")
+    num_na = fields.Int(description="Number of missing values")
+
     @post_dump
     def remove_null_values(self, data):
         if data.get('extracted_feature', True) is None:
