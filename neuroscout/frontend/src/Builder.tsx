@@ -23,6 +23,7 @@ import {
   Transformation,
   Contrast,
   Block,
+  BlockModel,
   BidsModel,
   ImageInput,
 } from './coretypes';
@@ -237,17 +238,7 @@ export default class AnalysisBuilder extends React.Component<BuilderProps, Store
     });
     variables = variables.filter(x => x !== '');
 
-    let hrfVariables: string[];
-    hrfVariables = this.state.analysis.hrfPredictorIds.map(id => {
-      let found = this.state.availablePredictors.find(elem => elem.id === id);
-      if (found) {
-        return found.name;
-      }
-      return '';
-    });
-    hrfVariables = hrfVariables.filter(x => x !== '');
-
-    let blocks = [
+    let blocks: Block[] = [
       {
         level: 'run',
         transformations: this.state.analysis.transformations,
@@ -255,7 +246,6 @@ export default class AnalysisBuilder extends React.Component<BuilderProps, Store
         auto_contrasts: this.state.analysis.autoContrast,
         model: {
           variables: variables,
-          HRF_variables: hrfVariables
         }
       },
       {
@@ -263,6 +253,20 @@ export default class AnalysisBuilder extends React.Component<BuilderProps, Store
         auto_contrasts: true
       }
     ];
+
+    if (this.state.analysis.hrfPredictorIds) {
+      let hrfVariables: string[];
+      hrfVariables = this.state.analysis.hrfPredictorIds.map(id => {
+        let found = this.state.availablePredictors.find(elem => elem.id === id);
+        if (found) {
+          return found.name;
+        }
+        return '';
+      });
+      hrfVariables = hrfVariables.filter(x => x !== '');
+      blocks[0].model!.HRF_variables = hrfVariables;
+    }
+
     let imgInput: ImageInput = {};
     if (runs.length > 0) {
       imgInput.run = runs;
