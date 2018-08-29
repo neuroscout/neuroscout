@@ -40,6 +40,7 @@ const domainRoot = config.server_url;
 const EMAIL = 'user@example.com';
 const PASSWORD = 'string';
 const DEFAULT_SMOOTHING = 5;
+const editableStatus = ['DRAFT', 'FAILED'];
 
 const defaultConfig: AnalysisConfig = { smoothing: DEFAULT_SMOOTHING, predictorConfigs: {} };
 
@@ -197,8 +198,8 @@ export default class AnalysisBuilder extends React.Component<BuilderProps, Store
       .catch(displayError);
   }
 
-  saveEnabled = (): boolean => this.state.unsavedChanges && this.state.analysis.status === 'DRAFT';
-  submitEnabled = (): boolean => this.state.analysis.status === 'DRAFT';
+  saveEnabled = (): boolean => this.state.unsavedChanges && editableStatus.includes(this.state.analysis.status);
+  submitEnabled = (): boolean => editableStatus.includes(this.state.analysis.status);
 
   buildModel = (): BidsModel => {
 
@@ -526,7 +527,7 @@ export default class AnalysisBuilder extends React.Component<BuilderProps, Store
   */
   updateState = (attrName: keyof Store, keepClean = false) => (value: any) => {
     const { analysis, availableRuns, availablePredictors } = this.state;
-    if (analysis.status !== 'DRAFT' && !keepClean) {
+    if (!editableStatus.includes(analysis.status) && !keepClean) {
       message.warning('This analysis is locked and cannot be edited');
       return;
     }
