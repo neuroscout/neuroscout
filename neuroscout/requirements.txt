@@ -1,4 +1,4 @@
-Flask==0.11.1
+Flask==1.0.2
 Flask_JWT==0.3.2
 Flask_Security==1.7.5
 Flask_SQLAlchemy==2.1
@@ -10,7 +10,7 @@ flask_caching==1.4.0
 flask_cors==3.0.6
 marshmallow==2.10.3
 celery==3.1.20
-pandas==0.19.2
+pandas==0.23.4
 pytest==2.9.2
 requests==2.9.1
 SQLAlchemy==1.0.15
