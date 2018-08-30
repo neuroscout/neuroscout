@@ -189,6 +189,7 @@ export default class AnalysisBuilder extends React.Component<BuilderProps, Store
         .then((data: ApiAnalysis) => this.loadAnalysis(data))
         .catch(displayError);
     }
+
     jwtFetch(domainRoot + '/api/datasets')
       // .then(response => response.json())
       .then(data => {
@@ -542,8 +543,9 @@ export default class AnalysisBuilder extends React.Component<BuilderProps, Store
             message.success(`Fetched ${data.length} runs associated with the selected dataset`);
             this.setState({
               availableRuns: data,
-              availableTasks: getTasks(data)
-              // availablePredictors: []
+              availableTasks: getTasks(data),
+              availablePredictors: [],
+              selectedPredictors: []
             });
           })
           .catch(displayError);
