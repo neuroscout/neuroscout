@@ -58,8 +58,6 @@ class PredictorResource(MethodResource):
 class PredictorListResource(MethodResource):
     @doc(tags=['predictors'], summary='Get list of predictors.',)
     @use_kwargs({
-        'dataset_id': wa.fields.DelimitedList(
-            fields.Int(), description="Dataset id(s)."),
         'run_id': wa.fields.DelimitedList(
             fields.Int(), description="Run id(s). Warning, slow query."),
         'name': wa.fields.DelimitedList(fields.Str(),
@@ -77,10 +75,6 @@ class PredictorListResource(MethodResource):
         else:
             predictor_ids = db.session.query(Predictor.id)
 
-        if 'dataset_id' in kwargs:
-            predictor_ids.filter(
-                Predictor.dataset_id.in_(kwargs.pop('dataset_id')))
-
         if 'run_id' in kwargs:
             # This following JOIN can be slow
             predictor_ids = predictor_ids.join(PredictorEvent).filter(
@@ -90,13 +84,12 @@ class PredictorListResource(MethodResource):
         for param in kwargs:
             query = query.filter(getattr(Predictor, param).in_(kwargs[param]))
 
-        # Cannot use marshal_with and cache
         return query.all()
 
 class PredictorEventListResource(MethodResource):
     @doc(tags=['predictors'], summary='Get events for predictor(s)',)
     @marshal_with(PredictorEventSchema(many=True, exclude=['predictor']))
-    @cache.cached(key_prefix=make_cache_key)
+    @cache.cached(60 * 60 * 24 * 300, key_prefix=make_cache_key)
     @use_kwargs({
         'run_id': wa.fields.DelimitedList(fields.Int(),
                                           description="Run id(s)"),
