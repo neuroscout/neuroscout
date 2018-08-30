@@ -2,7 +2,7 @@
  ContrastEditor module for adding/editing a contrast (used in the Contrasts tab)
 */
 import * as React from 'react';
-import { Form, Input, Button, Radio, message, Modal, Alert } from 'antd';
+import { Form, Input, InputNumber, Button, Radio, message, Modal, Alert } from 'antd';
 import { Analysis, Predictor, Contrast } from './coretypes';
 import { PredictorSelector } from './Predictors';
 import { Space } from './HelperComponents';
@@ -89,6 +89,13 @@ export default class ContrastEditor extends React.Component<
     this.setState({ weights });
   };
 
+  parseInput = (val: string) => {
+    if (val === '-') { val = '-0'; }
+    // tslint:disable-next-line:no-console
+    console.log(val);
+    return parseInt(val, 10);
+  }
+
   render() {
     const { name, condition_list, selectedPredictors, weights, contrastType, errors } = this.state;
     const { availablePredictors } = this.props;
@@ -140,11 +147,9 @@ export default class ContrastEditor extends React.Component<
               labelCol={{ span: 4 }}
               wrapperCol={{ span: 2 }}
             >
-              <Input
+              <InputNumber
                 value={weights[i]}
-                type="number"
-                onChange={(event: React.FormEvent<HTMLInputElement>) =>
-                  this.updateWeight(i, parseInt(event.currentTarget.value, 10))}
+                onChange={(this.updateWeight.bind(this, i))}
               />
             </FormItem>
           )}
