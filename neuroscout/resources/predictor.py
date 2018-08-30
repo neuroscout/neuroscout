@@ -58,8 +58,6 @@ class PredictorResource(MethodResource):
 class PredictorListResource(MethodResource):
     @doc(tags=['predictors'], summary='Get list of predictors.',)
     @use_kwargs({
-        'dataset_id': wa.fields.DelimitedList(
-            fields.Int(), description="Dataset id(s)."),
         'run_id': wa.fields.DelimitedList(
             fields.Int(), description="Run id(s). Warning, slow query."),
         'name': wa.fields.DelimitedList(fields.Str(),
@@ -76,10 +74,6 @@ class PredictorListResource(MethodResource):
                 func.max(Predictor.id)).group_by(Predictor.name)
         else:
             predictor_ids = db.session.query(Predictor.id)
-
-        if 'dataset_id' in kwargs:
-            predictor_ids.filter(
-                Predictor.dataset_id.in_(kwargs.pop('dataset_id')))
 
         if 'run_id' in kwargs:
             # This following JOIN can be slow
