@@ -1,9 +1,11 @@
 from database import db
 import statistics
+from sqlalchemy import func, Numeric, cast
 
 class Predictor(db.Model):
 	""" Instantiation of a predictor in a dataset.
 		A collection of PredictorEvents. """
+
 	id = db.Column(db.Integer, primary_key=True)
 	name = db.Column(db.Text, nullable=False)
 	original_name = db.Column(db.Text)
@@ -17,6 +19,38 @@ class Predictor(db.Model):
 								lazy='dynamic')
 
 	run_statistics = db.relationship('PredictorRun')
+
+	@property
+	def non_null(self):
+		return self.predictor_events.filter(
+			~PredictorEvent.value.in_(['nan', 'n/a', 'NaN']))
+
+	@property
+	def num_na(self):
+		return self.predictor_events.filter(
+			PredictorEvent.value.in_(['nan', 'n/a', 'NaN'])).count()
+
+	def apply_func(self, method):
+		""" Apply function to non-null Numeric castable values """
+		return self.non_null.with_entities(
+			getattr(func, method)(cast(func.nullif(func.regexp_replace(
+				PredictorEvent.value, "\\D*", ""), ""), Numeric))).scalar()
+
+	@property
+	def max(self):
+		return self.apply_func('max')
+
+	@property
+	def min(self):
+		return self.apply_func('min')
+
+	@property
+	def mean(self):
+		return self.apply_func('avg')
+
+	@property
+	def stddev(self):
+		return self.apply_func('stddev')
 
 	def __repr__(self):
 	    return '<models.Predictor[name=%s]>' % self.name

@@ -12,6 +12,13 @@ def test_get_predictor(auth_client, extract_features):
     assert rt['description'] == "How long it takes to react!"
     pred_id = rt['id']
 
+    # Test auto-calculated properties
+    assert  rt['mean'] == 173.625
+    assert  rt['max'] == 230.0
+    assert  rt['min'] == 120.0
+    assert  round(rt['stddev']) == 41
+    assert  rt['num_na'] == 0
+
     # Check that derivative event is in there
     assert len([p for p in pred_list if p['name'] == 'rating']) > 0
 
