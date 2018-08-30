@@ -84,7 +84,6 @@ class PredictorListResource(MethodResource):
         for param in kwargs:
             query = query.filter(getattr(Predictor, param).in_(kwargs[param]))
 
-        # Cannot use marshal_with and cache
         return query.all()
 
 class PredictorEventListResource(MethodResource):
