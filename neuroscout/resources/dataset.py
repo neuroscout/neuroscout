@@ -20,7 +20,7 @@ class DatasetSchema(Schema):
 
 class DatasetResource(MethodResource):
 	@doc(tags=['dataset'], summary='Get dataset by id.')
-	@cache.cached(key_prefix=make_cache_key)
+	@cache.cached(60 * 60 * 24 * 300, key_prefix=make_cache_key)
 	@marshal_with(DatasetSchema)
 	def get(self, dataset_id):
 		return first_or_404(Dataset.query.filter_by(id=dataset_id))
@@ -32,7 +32,7 @@ class DatasetListResource(MethodResource):
 	                description="Return only active Datasets")
 	    },
 	    locations=['query'])
-	@cache.cached(key_prefix=make_cache_key)
+	@cache.cached(60 * 60 * 24 * 300, key_prefix=make_cache_key)
 	@marshal_with(DatasetSchema(many=True,
 								exclude=['dataset_address', 'preproc_address']))
 	def get(self, **kwargs):
