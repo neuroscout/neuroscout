@@ -102,23 +102,37 @@ export class OverviewTab extends React.Component<OverviewTabProps, any> {
       selectedRowKeys: selectedTaskId ? [selectedTaskId] : []
     };
 
-    const runColumns = [
-      {
-        title: 'Run Number',
-        dataIndex: 'number',
-        defaultOrder: 'ascend' as 'ascend',
-        sorter: (a, b) => a.number - b.number,
-      },
-      {
-        title: 'Subject',
-        dataIndex: 'subject',
-        sorter: (a, b) => a.subject.localeCompare(b.subject, undefined, {numeric: true}),
-      },
-      {
-        title: 'Session',
-        dataIndex: 'session',
-        sorter: (a, b) => a.session.localeCompare(b.session, undefined, {numeric: true}),
+    /* Run column settings were largely similar, this function creates them.
+       The cast to String before sort is to account for run numbers being a 
+       numeric type. 
+    */
+    let makeCol = (title: string, _key: string) => {
+      let extractKey: string[] = availableRuns.filter(x => x !== null).map(x => String(x[_key]));
+      let unique = Array.from(
+        new Set(extractKey)
+      ).sort((a, b) => a.localeCompare(b, undefined, {numeric: true})) as string[];
+
+      let col: ColumnProps<any> = {
+        title: title,
+        dataIndex: _key,
+        sorter: (a, b) => String(a[_key]).localeCompare(String(b[_key]), undefined, {numeric: true}),
+      };
+      if (unique.length > 0) {
+        col.filters = unique.map((x) => {return {'text': x, 'value': x}; });
+        col.onFilter = (value, record) => value === String(record[_key]);
       }
+      return col;
+    };
+
+    let subCol = makeCol('Subject', 'subject');
+    let sesCol = makeCol('Session', 'session');
+    let runCol = makeCol('Run Number', 'number');
+    runCol.defaultSortOrder = 'ascend' as 'ascend';
+
+    const runColumns = [
+      runCol,
+      subCol,
+      sesCol
     ];
 
     const runRowSelection: TableRowSelection<Run> = {
