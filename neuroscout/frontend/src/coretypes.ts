@@ -205,6 +205,7 @@ export interface Block {
   transformations?: Transformation[];
   contrasts?: Contrast[];
   level: string;
+  auto_contrasts?: boolean;
 }
 
 export interface BlockModel {

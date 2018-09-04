@@ -1,0 +1,9 @@
+version: "2"
+services:
+  nginx:
+    volumes:
+      - ./nginx/nginx.dev.conf:/etc/nginx/nginx.conf:ro
+
+  swagger-ui:
+    environment:
+      - "API_URL=https://127.0.0.1/swagger/"

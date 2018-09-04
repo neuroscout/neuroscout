@@ -23,6 +23,7 @@ import {
   Transformation,
   Contrast,
   Block,
+  BlockModel,
   BidsModel,
   ImageInput,
 } from './coretypes';
@@ -39,6 +40,7 @@ const domainRoot = config.server_url;
 const EMAIL = 'user@example.com';
 const PASSWORD = 'string';
 const DEFAULT_SMOOTHING = 5;
+const editableStatus = ['DRAFT', 'FAILED'];
 
 const defaultConfig: AnalysisConfig = { smoothing: DEFAULT_SMOOTHING, predictorConfigs: {} };
 
@@ -187,6 +189,7 @@ export default class AnalysisBuilder extends React.Component<BuilderProps, Store
         .then((data: ApiAnalysis) => this.loadAnalysis(data))
         .catch(displayError);
     }
+
     jwtFetch(domainRoot + '/api/datasets')
       // .then(response => response.json())
       .then(data => {
@@ -196,8 +199,8 @@ export default class AnalysisBuilder extends React.Component<BuilderProps, Store
       .catch(displayError);
   }
 
-  saveEnabled = (): boolean => this.state.unsavedChanges && this.state.analysis.status === 'DRAFT';
-  submitEnabled = (): boolean => this.state.analysis.status === 'DRAFT';
+  saveEnabled = (): boolean => this.state.unsavedChanges && editableStatus.includes(this.state.analysis.status);
+  submitEnabled = (): boolean => editableStatus.includes(this.state.analysis.status);
 
   buildModel = (): BidsModel => {
 
@@ -237,17 +240,7 @@ export default class AnalysisBuilder extends React.Component<BuilderProps, Store
     });
     variables = variables.filter(x => x !== '');
 
-    let hrfVariables: string[];
-    hrfVariables = this.state.analysis.hrfPredictorIds.map(id => {
-      let found = this.state.availablePredictors.find(elem => elem.id === id);
-      if (found) {
-        return found.name;
-      }
-      return '';
-    });
-    hrfVariables = hrfVariables.filter(x => x !== '');
-
-    let blocks = [
+    let blocks: Block[] = [
       {
         level: 'run',
         transformations: this.state.analysis.transformations,
@@ -255,7 +248,6 @@ export default class AnalysisBuilder extends React.Component<BuilderProps, Store
         auto_contrasts: this.state.analysis.autoContrast,
         model: {
           variables: variables,
-          HRF_variables: hrfVariables
         }
       },
       {
@@ -263,6 +255,20 @@ export default class AnalysisBuilder extends React.Component<BuilderProps, Store
         auto_contrasts: true
       }
     ];
+
+    if (this.state.analysis.hrfPredictorIds) {
+      let hrfVariables: string[];
+      hrfVariables = this.state.analysis.hrfPredictorIds.map(id => {
+        let found = this.state.availablePredictors.find(elem => elem.id === id);
+        if (found) {
+          return found.name;
+        }
+        return '';
+      });
+      hrfVariables = hrfVariables.filter(x => x !== '');
+      blocks[0].model!.HRF_variables = hrfVariables;
+    }
+
     let imgInput: ImageInput = {};
     if (runs.length > 0) {
       imgInput.run = runs;
@@ -522,7 +528,7 @@ export default class AnalysisBuilder extends React.Component<BuilderProps, Store
   */
   updateState = (attrName: keyof Store, keepClean = false) => (value: any) => {
     const { analysis, availableRuns, availablePredictors } = this.state;
-    if (analysis.status !== 'DRAFT' && !keepClean) {
+    if (!editableStatus.includes(analysis.status) && !keepClean) {
       message.warning('This analysis is locked and cannot be edited');
       return;
     }
@@ -537,8 +543,9 @@ export default class AnalysisBuilder extends React.Component<BuilderProps, Store
             message.success(`Fetched ${data.length} runs associated with the selected dataset`);
             this.setState({
               availableRuns: data,
-              availableTasks: getTasks(data)
-              // availablePredictors: []
+              availableTasks: getTasks(data),
+              availablePredictors: [],
+              selectedPredictors: []
             });
           })
           .catch(displayError);
@@ -565,6 +572,7 @@ export default class AnalysisBuilder extends React.Component<BuilderProps, Store
 
     stateUpdate[attrName] = value;
     if (!keepClean) stateUpdate.unsavedChanges = true;
+
     this.setState(stateUpdate);
   };
 
@@ -573,6 +581,7 @@ export default class AnalysisBuilder extends React.Component<BuilderProps, Store
       return;
     }
     const analysis = this.state.analysis;
+
     jwtFetch(`${domainRoot}/api/predictors?run_id=${analysis.runIds}`)
     .then((data: Predictor[]) => {
       message.success(
@@ -581,14 +590,16 @@ export default class AnalysisBuilder extends React.Component<BuilderProps, Store
       const selectedPredictors = data.filter(
         p => analysis.predictorIds.indexOf(p.id) > -1
       );
+
       let selectedHRFPredictors: Predictor[] = [];
       if (analysis.hrfPredictorIds) {
         selectedHRFPredictors = data.filter(
-          p => analysis.hrfPredictorIds.indexOf(p.name) > -1
+          p => analysis.hrfPredictorIds.indexOf(p.id) > -1
         );
         // hrfPredictorIds comes in as a list of names from api, convert it to IDs here.
         analysis.hrfPredictorIds = selectedHRFPredictors.map(x => x.id);
       }
+
       this.setState({
         analysis: analysis,
         availablePredictors: data,
