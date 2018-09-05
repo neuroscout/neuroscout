@@ -42,6 +42,22 @@ export class OverviewTab extends React.Component<OverviewTabProps, any> {
       this.updateAnalysis(attrName)(event.currentTarget.value);
     };
 
+  // Number column can be a mixture of ints and strings sometimes, hencd the cast to string
+  // number is stored as text in postgres, should see about treating it consistently in app
+  _sortRuns = (keys, a, b) => {
+    for (var i = 0; i < keys.length; i++) {
+      let _a = String(a[keys[i]]);
+      let _b = String(b[keys[i]]);
+      let cmp = _a.localeCompare(_b, undefined, {numeric: true});
+      if (cmp !== 0) { return cmp; }
+    }
+    return 0;
+  }
+
+  sortSub = this._sortRuns.bind(null, ['subject', 'number', 'session']);
+  sortNum = this._sortRuns.bind(null, ['number', 'subject',  'session']);
+  sortSes = this._sortRuns.bind(null, ['session', 'subject', 'number']);
+
   render() {
     const {
       analysis,
@@ -106,34 +122,40 @@ export class OverviewTab extends React.Component<OverviewTabProps, any> {
        The cast to String before sort is to account for run numbers being a 
        numeric type. 
     */
-    let makeCol = (title: string, _key: string) => {
+    let makeCol = (title: string, _key: string, sortFn) => {
       let extractKey: string[] = availableRuns.filter(x => x !== null).map(x => String(x[_key]));
+
       let unique = Array.from(
         new Set(extractKey)
       ).sort((a, b) => a.localeCompare(b, undefined, {numeric: true})) as string[];
+      unique = unique.filter((x) => (x !== undefined && x !== null && x !== 'null'));
 
       let col: ColumnProps<any> = {
         title: title,
         dataIndex: _key,
-        sorter: (a, b) => String(a[_key]).localeCompare(String(b[_key]), undefined, {numeric: true}),
+        sorter: sortFn
       };
       if (unique.length > 0) {
         col.filters = unique.map((x) => {return {'text': x, 'value': x}; });
         col.onFilter = (value, record) => value === String(record[_key]);
+      } else {
+        return;
       }
       return col;
     };
 
-    let subCol = makeCol('Subject', 'subject');
-    let sesCol = makeCol('Session', 'session');
-    let runCol = makeCol('Run Number', 'number');
-    runCol.defaultSortOrder = 'ascend' as 'ascend';
+    let subCol = makeCol('Subject', 'subject', this.sortSub);
+    let sesCol = makeCol('Session', 'session', this.sortSes);
+    let runCol = makeCol('Run Number', 'number', this.sortNum);
 
-    const runColumns = [
-      runCol,
+    let _runColumns = [
       subCol,
+      runCol,
       sesCol
     ];
+
+    let runColumns = _runColumns.filter(x => x !== undefined) as ColumnProps<any>[];
+    if (runColumns[0]) { runColumns[0].defaultSortOrder = 'ascend' as 'ascend'; }
 
     const runRowSelection: TableRowSelection<Run> = {
       type: 'checkbox',
@@ -226,7 +248,7 @@ export class OverviewTab extends React.Component<OverviewTabProps, any> {
                 columns={runColumns}
                 rowKey="id"
                 size="small"
-                dataSource={availableRuns.filter(r => r.task.id === selectedTaskId)}
+                dataSource={availableRuns.filter(r => r.task.id === selectedTaskId).sort(this.sortSub)}
                 pagination={(availableRuns.length > 20) ? {'position': 'bottom'} : false}
                 rowSelection={runRowSelection}
               />
