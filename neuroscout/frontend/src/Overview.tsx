@@ -42,6 +42,16 @@ export class OverviewTab extends React.Component<OverviewTabProps, any> {
       this.updateAnalysis(attrName)(event.currentTarget.value);
     };
 
+  tableChange = (pagination, filters, sorter) => {
+    // let newRunIds: string[] = [];
+    let newRunIds = this.props.availableRuns;
+    Object.keys(filters).map(key => {
+      if (filters[key] === null || filters[key].length === 0) { return; }
+      newRunIds = newRunIds.filter((x) => {return filters[key].includes(String(x[key])); });
+    });
+    this.updateAnalysis('runIds')(newRunIds.map(x => x.id));
+  };
+
   // Number column can be a mixture of ints and strings sometimes, hencd the cast to string
   // number is stored as text in postgres, should see about treating it consistently in app
   _sortRuns = (keys, a, b) => {
@@ -59,14 +69,14 @@ export class OverviewTab extends React.Component<OverviewTabProps, any> {
   sortSes = this._sortRuns.bind(null, ['session', 'subject', 'number']);
 
   render() {
-    const {
+    let {
       analysis,
       datasets,
       availableTasks,
       availableRuns,
       selectedTaskId,
       goToNextTab,
-      predictorsActive
+      predictorsActive,
     } = this.props;
 
     const datasetColumns = [
@@ -81,15 +91,7 @@ export class OverviewTab extends React.Component<OverviewTabProps, any> {
     ];
 
     const selectedDatasetId: string[] = analysis.datasetId ? [analysis.datasetId.toString()] : [];
-    // let datasetSelections: any = [];
-    // if (analysis.datasetId) {
-    //   datasetSelections = [{
-    //     key: analysis.datasetId.toString(),
-    //     text: 'Dataset Id',
-    //     onSelect: (keys) => {return;}
-    //   }]
-    // }
-    // console.log(`selected data set Id = ${selectedDatasetId}`);
+
     const datasetRowSelection: TableRowSelection<Dataset> = {
       type: 'radio',
       onSelect: (record, selected, selectedRows) => {
@@ -137,7 +139,9 @@ export class OverviewTab extends React.Component<OverviewTabProps, any> {
       };
       if (unique.length > 0) {
         col.filters = unique.map((x) => {return {'text': x, 'value': x}; });
-        col.onFilter = (value, record) => value === String(record[_key]);
+        col.onFilter = (value, record) => {
+          return value === String(record[_key]);
+        };
       } else {
         return;
       }
@@ -244,6 +248,9 @@ export class OverviewTab extends React.Component<OverviewTabProps, any> {
             <div>
               <p>Select runs:</p>
               <br />
+              <span style={{ marginLeft: 8 }}>
+                {`Selected ${ analysis.runIds.length } items`}
+              </span>
               <Table
                 columns={runColumns}
                 rowKey="id"
@@ -251,6 +258,7 @@ export class OverviewTab extends React.Component<OverviewTabProps, any> {
                 dataSource={availableRuns.filter(r => r.task.id === selectedTaskId).sort(this.sortSub)}
                 pagination={(availableRuns.length > 20) ? {'position': 'bottom'} : false}
                 rowSelection={runRowSelection}
+                onChange={this.tableChange}
               />
               <br />
             </div>}
