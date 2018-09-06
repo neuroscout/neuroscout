@@ -90,7 +90,7 @@ class UserTriggerResetResource(MethodResource):
         return {'message' : 'Password reset token sent'}, 200
 
 # @doc(tags=['auth'], summary='Reset user password using a token.')
-@use_kwargs(UserCreationSchema(only=['token', 'password']))
+@use_kwargs(UserResetSchema(only=['token', 'password']))
 class UserResetSubmitResource(MethodResource):
     def post(self, **kwargs):
         expired, invalid, user = reset_password_token_status(kwargs['token'])

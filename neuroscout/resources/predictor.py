@@ -88,7 +88,7 @@ class PredictorListResource(MethodResource):
 
 class PredictorEventListResource(MethodResource):
     @doc(tags=['predictors'], summary='Get events for predictor(s)',)
-    @marshal_with(PredictorEventSchema(many=True, exclude=['predictor']))
+    @marshal_with(PredictorEventSchema(many=True))
     @cache.cached(60 * 60 * 24 * 300, key_prefix=make_cache_key)
     @use_kwargs({
         'run_id': wa.fields.DelimitedList(fields.Int(),
