@@ -1,11 +1,10 @@
-from marshmallow import Schema, fields, validates, ValidationError, post_load
+from marshmallow import Schema, fields, validates, ValidationError, post_load, pre_load
 from models import  Dataset, Run, Predictor
 
 class AnalysisSchema(Schema):
 	""" Primary analysis schema """
 	hash_id = fields.Str(dump_only=True, description='Hashed analysis id.')
 	parent_id = fields.Str(dump_only=True, description="Parent analysis, if cloned.")
-	user_id = fields.Int(dump_only=True)
 
 	name = fields.Str(required=True, description='Analysis name.')
 	description = fields.Str()
@@ -24,20 +23,18 @@ class AnalysisSchema(Schema):
 	status = fields.Str(description='PASSED, FAILED, PENDING, or DRAFT.',
 		dump_only=True)
 	compile_traceback = fields.Str(
-		description='Traceback of compilation error.')
+		description='Traceback of compilation error.',
+		dump_only=True)
 
 	private = fields.Bool(description='Analysis private or discoverable?')
 
-	data = fields.Dict()
-
 	predictors = fields.Nested(
-		'PredictorSchema', many=True, only=['id'],
+		'PredictorSchema', many=True, only='id',
         description='Predictor id(s) associated with analysis')
 
 	runs = fields.Nested(
-		'RunSchema', many=True, only=['id'],
+		'RunSchema', many=True, only='id',
         description='Runs associated with analysis')
-
 
 	@validates('dataset_id')
 	def validate_dsid(self, value):
@@ -57,6 +54,15 @@ class AnalysisSchema(Schema):
 			[Predictor.query.filter_by(**r).one() for r in value]
 		except:
 			raise ValidationError('Invalid predictor id.')
+
+	@pre_load
+	def fix_nesting(self, in_data):
+		if 'runs' in in_data:
+		    in_data['runs'] = [{"id": r} for r in in_data['runs']]
+		if 'predictors' in in_data:
+			in_data['predictors'] = [{"id": r} for r in in_data['predictors']]
+
+		return in_data
 
 	@post_load
 	def nested_object(self, args):
