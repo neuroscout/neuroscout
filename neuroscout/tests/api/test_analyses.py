@@ -202,7 +202,7 @@ def test_put(auth_client, add_analysis, add_task, session):
 	assert new_analysis['runs'] == [{'id' :	Run.query.first().id }]
 
 	# Test adding an invalid run id
-	analysis_json['runs'] = [{'id' : 9999 }]
+	analysis_json['runs'] = [9999]
 
 	resp = auth_client.put('/api/analyses/{}'.format(analysis.hash_id),
 						data=analysis_json)
@@ -221,7 +221,7 @@ def test_put(auth_client, add_analysis, add_task, session):
 	analysis_json = decode_json(resp)
 
 	# Test adding a run_id
-	analysis_json['runs'] = [{'id' : Run.query.first().id }]
+	analysis_json['runs'] = [Run.query.first().id]
 
 	resp = auth_client.put('/api/analyses/{}'.format(analysis_json['hash_id']),
 						data=analysis_json)

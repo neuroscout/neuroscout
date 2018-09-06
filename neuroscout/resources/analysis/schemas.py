@@ -56,7 +56,7 @@ class AnalysisSchema(Schema):
 			raise ValidationError('Invalid predictor id.')
 
 	@pre_load
-	def fix_nesting(self, in_data):
+	def unflatten(self, in_data):
 		if 'runs' in in_data:
 		    in_data['runs'] = [{"id": r} for r in in_data['runs']]
 		if 'predictors' in in_data:
