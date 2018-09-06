@@ -13,7 +13,7 @@ class DatasetSchema(Schema):
 	summary = fields.Str(description='Dataset summary description')
 	mimetypes = fields.List(fields.Str(),
                          description='Dataset mimetypes/modalities')
-	runs = fields.Nested('RunSchema', many=True, only=['id'])
+	runs = fields.Nested('RunSchema', many=True, only='id')
 	tasks = fields.Nested('TaskSchema', many=True, only=['id', 'name'])
 	dataset_address = fields.Str(description='BIDS Dataset remote address')
 	preproc_address = fields.Str(description='Preprocessed data remote address')
