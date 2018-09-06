@@ -35,7 +35,7 @@ def test_get_predictor(auth_client, extract_features):
     ds = decode_json(
         auth_client.get('/api/datasets'))
     dataset_id = ds[0]['id']
-    run_id = str(ds[0]['runs'][0]['id'])
+    run_id = str(ds[0]['runs'][0])
 
     resp = auth_client.get('/api/predictors', params={'run_id' : run_id})
     assert resp.status_code == 200
