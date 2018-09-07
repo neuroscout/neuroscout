@@ -44,6 +44,7 @@ export class OverviewTab extends React.Component<OverviewTabProps, OverviewTabSt
       runColumns: []
     };
   }
+
   updateAnalysis = (attrName: string) => (value: any) => {
     let newAnalysis = { ...this.props.analysis };
     newAnalysis[attrName] = value;
@@ -140,6 +141,16 @@ export class OverviewTab extends React.Component<OverviewTabProps, OverviewTabSt
     return col;
   };
 
+  clearFilters = () => {
+    let newRunCols = this.state.runColumns;
+    newRunCols = newRunCols.map((x) => {
+      x.filteredValue = [];
+      return x;
+    });
+    this.setState({runColumns: newRunCols});
+    this.updateAnalysis('runIds')([]);
+  };
+  
   render() {
     let {
       analysis,
@@ -279,9 +290,12 @@ export class OverviewTab extends React.Component<OverviewTabProps, OverviewTabSt
             <div>
               <p>Select runs:</p>
               <br />
-              <span style={{ marginLeft: 8 }}>
+              <span>
                 {`Selected ${ analysis.runIds.length } items`}
               </span>
+              <div>
+                <Button onClick={this.clearFilters}>Clear Selection</Button>
+              </div>
               <Table
                 columns={this.state.runColumns}
                 rowKey="id"
