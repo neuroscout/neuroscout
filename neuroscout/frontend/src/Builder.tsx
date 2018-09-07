@@ -544,6 +544,7 @@ export default class AnalysisBuilder extends React.Component<BuilderProps, Store
             let availTasks = getTasks(data);
             if (availTasks.length === 1) {
                 this.setState({selectedTaskId: availTasks[0].id});
+                updatedAnalysis.runIds = data.map(x => x.id);
             }
             this.setState({
               availableRuns: data,
