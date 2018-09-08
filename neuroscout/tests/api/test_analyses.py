@@ -227,11 +227,31 @@ def test_put(auth_client, add_analysis, add_task, session):
 						data=analysis_json)
 	assert resp.status_code == 200
 
+	# Lock analysis
+	analysis = Analysis.query.filter_by(hash_id=analysis_json['hash_id']).one()
+	analysis.locked = True
+	session.commit()
+
+	# Try editing locked analysis
+	analysis_json['description'] = "new!"
+
+	resp = auth_client.put('/api/analyses/{}'.format(analysis_json['hash_id']),
+						data=analysis_json)
+	assert resp.status_code == 422
+
+	# Try deleting locked analysis
+	delresp = auth_client.delete('/api/analyses/{}'.format(analysis_json['hash_id']))
+	assert delresp.status_code == 422
+
+	# Unlock and delete
+	analysis.locked = False
+	session.commit()
+
 	# Try deleting anlaysis
 	delresp = auth_client.delete('/api/analyses/{}'.format(analysis_json['hash_id']))
 	assert delresp.status_code == 200
+	assert Analysis.query.filter_by(hash_id=analysis_json['hash_id']).count() == 0
 
-	assert Analysis.query.filter_by(hash_id=decode_json(resp)['hash_id']).count() == 0
 
 @pytest.mark.skipif('CELERY_BROKER_URL' not in os.environ,
                     reason="requires redis")

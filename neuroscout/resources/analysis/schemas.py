@@ -18,13 +18,14 @@ class AnalysisSchema(Schema):
 
 	created_at = fields.Time(dump_only=True)
 	modified_at = fields.Time(dump_only=True)
-	compiled_at = fields.Time(description='Timestamp of when analysis was compiled',
-							dump_only=True)
-	status = fields.Str(description='PASSED, FAILED, PENDING, or DRAFT.',
-		dump_only=True)
+	compiled_at = fields.Time(
+		description='Timestamp of when analysis was compiled', dump_only=True)
+	status = fields.Str(
+		description='PASSED, FAILED, PENDING, or DRAFT.', dump_only=True)
+	locked = fields.Bool(
+		description='Is analysis locked by admins?', dump_only=True)
 	compile_traceback = fields.Str(
-		description='Traceback of compilation error.',
-		dump_only=True)
+		description='Traceback of compilation error.', dump_only=True)
 
 	private = fields.Bool(description='Analysis private or discoverable?')
 
