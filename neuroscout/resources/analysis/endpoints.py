@@ -43,6 +43,8 @@ class AnalysisResource(AnalysisMethodResource):
 	@use_kwargs(AnalysisSchema)
 	@owner_required
 	def put(self, analysis, **kwargs):
+		if analysis.locked == True:
+			abort(422, "Analysis is locked. It cannot be edited.")
 		if analysis.status not in ['DRAFT', 'FAILED']:
 			exceptions = ['private', 'description']
 			kwargs = {k: v for k, v in kwargs.items() if k in exceptions}
@@ -53,8 +55,8 @@ class AnalysisResource(AnalysisMethodResource):
 	@doc(summary='Delete analysis.')
 	@owner_required
 	def delete(self, analysis):
-		if analysis.status != 'DRAFT':
-			abort(422, "Analysis is not editable, too bad!")
+		if analysis.status != 'DRAFT' or analysis.locked == True:
+			abort(422, "Analysis not editable, cannot delete.")
 		db.session.delete(analysis)
 		db.session.commit()
 
