@@ -177,8 +177,8 @@ export interface ApiAnalysis {
   status: AnalysisStatus;
   private?: boolean;
   dataset_id: number;
-  runs?: { id: string }[];
-  predictors?: { id: string }[];
+  runs?: string[];
+  predictors?: string[];
   transformations?: Transformation[];
   contrasts?: Contrast[];
   config: AnalysisConfig;

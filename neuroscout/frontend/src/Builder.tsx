@@ -318,8 +318,8 @@ export default class AnalysisBuilder extends React.Component<BuilderProps, Store
       private: analysis.private,
       dataset_id: analysis.datasetId,
       status: analysis.status,
-      runs: analysis.runIds.map(id => ({ id })),
-      predictors: analysis.predictorIds.map(id => ({ id })),
+      runs: analysis.runIds,
+      predictors: analysis.predictorIds,
       transformations: analysis.transformations,
       contrasts: analysis.contrasts,
       config: analysis.config
@@ -376,6 +376,7 @@ export default class AnalysisBuilder extends React.Component<BuilderProps, Store
   // Decode data returned by '/api/analyses/<id>' (ApiAnalysis) to convert it to the right shape (Analysis)
   // and fetch the associated runs
   loadAnalysis = (data: ApiAnalysis): Promise<Analysis> => {
+
     data.transformations = [];
 
     // Extract transformations and contrasts from within block object of response.
@@ -409,8 +410,8 @@ export default class AnalysisBuilder extends React.Component<BuilderProps, Store
       status: data.status,
       analysisId: data.hash_id,
       datasetId: data.dataset_id,
-      runIds: data.runs!.map(({ id }) => id),
-      predictorIds: data.predictors!.map(({ id }) => id),
+      runIds: data.runs ? data.runs : [],
+      predictorIds: data.predictors ? data.predictors : [],
       hrfPredictorIds: hrfPredictorIds,
       config: data.config || defaultConfig,
       transformations: data.transformations,
