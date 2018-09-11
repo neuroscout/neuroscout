@@ -106,7 +106,6 @@ const getJwt = () =>
         .then(response => {
           response.json().then((data: { access_token: string }) => {
             if (data.access_token) {
-              message.success('Authentication successful');
               window.localStorage.setItem('jwt', data.access_token);
               resolve(data.access_token);
             }
@@ -541,11 +540,14 @@ export default class AnalysisBuilder extends React.Component<BuilderProps, Store
         jwtFetch(`${domainRoot}/api/runs?dataset_id=${updatedAnalysis.datasetId}`)
           // .then(response => response.json())
           .then((data: Run[]) => {
-            message.success(`Fetched ${data.length} runs associated with the selected dataset`);
             let availTasks = getTasks(data);
             if (availTasks.length === 1) {
-                this.setState({selectedTaskId: availTasks[0].id});
-                updatedAnalysis.runIds = data.map(x => x.id);
+              updatedAnalysis.runIds = data.map(x => x.id);
+              this.setState({
+                selectedTaskId: availTasks[0].id,
+                predictorsLoad: true,
+                predictorsActive: true
+              });
             }
             this.setState({
               availableRuns: data,
@@ -590,9 +592,6 @@ export default class AnalysisBuilder extends React.Component<BuilderProps, Store
 
     jwtFetch(`${domainRoot}/api/predictors?run_id=${analysis.runIds}`)
     .then((data: Predictor[]) => {
-      message.success(
-        `Fetched ${data.length} predictors associated with the selected runs`
-      );
       const selectedPredictors = data.filter(
         p => analysis.predictorIds.indexOf(p.id) > -1
       );

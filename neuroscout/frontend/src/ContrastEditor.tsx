@@ -91,8 +91,6 @@ export default class ContrastEditor extends React.Component<
 
   parseInput = (val: string) => {
     if (val === '-') { val = '-0'; }
-    // tslint:disable-next-line:no-console
-    console.log(val);
     return parseInt(val, 10);
   }
 

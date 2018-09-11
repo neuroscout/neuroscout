@@ -308,10 +308,9 @@ export class OverviewTab extends React.Component<OverviewTabProps, OverviewTabSt
               <br />
             </div>}
         </Form>
-        {predictorsActive &&
-          <Button type="primary" onClick={goToNextTab}>
+          <Button type="primary" onClick={goToNextTab} disabled={!predictorsActive}>
             Next: Select Predictors
-          </Button>}
+          </Button>
       </div>
     );
   }

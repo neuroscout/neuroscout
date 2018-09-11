@@ -189,7 +189,6 @@ class App extends Reflux.Component {
                 });
 
               } else {
-                message.success('Logged in.');
                 localStorage.setItem('jwt', token);
                 localStorage.setItem('email', email!);
                 resolve(token);
