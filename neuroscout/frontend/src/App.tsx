@@ -57,7 +57,8 @@ const ApiToAppAnalysis = (data: ApiAnalysis): AppAnalysis => ({
 });
 
 // Top-level App component
-class App extends React.Component<{}, AppState> {
+// <authStore, {}, AppState>
+class App extends Reflux.Component {
   constructor(props) {
     super(props);
     const jwt = localStorage.getItem('jwt');
@@ -83,6 +84,7 @@ class App extends React.Component<{}, AppState> {
       token: null,
       listeners: []
     };
+    this.store = authStore;
     if (jwt) {
       this.loadAnalyses();
       this.checkAnalysesStatus();
@@ -210,6 +212,9 @@ class App extends React.Component<{}, AppState> {
           nextURL: null,
           loginError: ''
         });
+        // tslint:disable-next-line:no-console
+        console.log(authActions);
+        authActions.update({jwt: jwt, email: email});
       })
       .then(() => this.loadAnalyses())
       .catch(displayError);
@@ -634,6 +639,7 @@ class App extends React.Component<{}, AppState> {
                   <Col lg={{span: 9}} xs={{span: 12}}>
                     <h1>
                       <Link to="/">Neuroscout</Link>
+                      !{this.state.auth.jwt}!
                     </h1>
                   </Col>
                   <Col lg={{span: 9}} xs={{span: 12}}>
