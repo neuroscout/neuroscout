@@ -5,16 +5,20 @@ Top-level App component containing AppState. The App component is currently resp
 - Managing user's saved analyses (list display, clone and delete)
 */
 import * as React from 'react';
-import { Tabs, Row, Col, Layout, Button, Modal, Icon, Input, Form, message } from 'antd';
-import { displayError, jwtFetch, timeout } from './utils';
-import { Space } from './HelperComponents';
-import { ApiUser, ApiAnalysis, AppAnalysis } from './coretypes';
-import Home from './Home';
-import AnalysisBuilder from './Builder';
-import Browse from './Browse';
 import { BrowserRouter as Router, Route, Link, Redirect } from 'react-router-dom';
+import Reflux from 'reflux';
+import { Tabs, Row, Col, Layout, Button, Modal, Icon, Input, Form, message } from 'antd';
+
 import './App.css';
+import AnalysisBuilder from './Builder';
+import { ApiUser, ApiAnalysis, AppAnalysis, AuthStoreState } from './coretypes';
+import Browse from './Browse';
 import { config } from './config';
+import Home from './Home';
+import { Space } from './HelperComponents';
+import { displayError, jwtFetch, timeout } from './utils';
+import { authStore } from './auth.store';
+import { authActions } from './auth.actions';
 
 const FormItem = Form.Item;
 const DOMAINROOT = config.server_url;
@@ -40,6 +44,7 @@ interface AppState {
   analyses: AppAnalysis[]; // List of analyses belonging to the user
   publicAnalyses: AppAnalysis[]; // List of public analyses
   loggingOut: boolean; // flag set on logout to know to redirect after logout
+  listeners: Function[];
 }
 
 // Convert analyses returned by API to the shape expected by the frontend
@@ -75,7 +80,8 @@ class App extends React.Component<{}, AppState> {
       analyses: [],
       publicAnalyses: [],
       loggingOut: false,
-      token: null
+      token: null,
+      listeners: []
     };
     if (jwt) {
       this.loadAnalyses();
@@ -372,13 +378,31 @@ class App extends React.Component<{}, AppState> {
 
   // Clone existing analysis
   cloneAnalysis = (id): void => {
-    jwtFetch(`${DOMAINROOT}/api/analyses/${id}/clone`, { method: 'post' })
+    // tslint:disable-next-line:no-console
+    console.log(authActions);
+    authActions.jwtFetch.triggerAsync(`${DOMAINROOT}/api/analyses/${id}/clone`, { method: 'post' })
       .then((data: ApiAnalysis) => {
         const analysis = ApiToAppAnalysis(data);
         this.setState({ analyses: this.state.analyses.concat([analysis]) });
       })
       .catch(displayError);
   };
+
+  updateAuth = (data: AuthStoreState) => {
+    // tslint:disable-next-line:no-console
+    console.log('listener worked');
+    this.setState({ ...data });
+  }
+
+  componentDidMount(): void {
+    this.state.listeners.push(authStore.listen(this.updateAuth, this));
+  }
+
+  componentWillUnmount(): void {
+    /*
+    this.state.listeners.map((listener) => { listener.stop(); });
+    */
+  }
 
   render() {
     const {

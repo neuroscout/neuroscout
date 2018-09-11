@@ -236,3 +236,12 @@ export interface AppAnalysis {
   status: AnalysisStatus;
   modifiedAt?: string;
 }
+
+export interface AuthStoreState {
+  jwt: string;
+  password: string; 
+  loggedIn: boolean;
+  openLogin: boolean;
+  nextURL: string;
+  loginError: string;
+}
