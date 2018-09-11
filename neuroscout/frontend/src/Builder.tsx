@@ -322,7 +322,7 @@ export default class AnalysisBuilder extends React.Component<BuilderProps, Store
       predictors: analysis.predictorIds,
       transformations: analysis.transformations,
       contrasts: analysis.contrasts,
-      config: analysis.config
+      config: analysis.config,
     };
 
     apiAnalysis.model = this.buildModel();
@@ -381,6 +381,7 @@ export default class AnalysisBuilder extends React.Component<BuilderProps, Store
 
     // Extract transformations and contrasts from within block object of response.
     let contrasts;
+    let autoContrast;
     let hrfPredictorIds;
     if (data && data.model && data.model.blocks) {
       for (var i = 0; i < data.model.blocks.length; i++) {
@@ -395,6 +396,9 @@ export default class AnalysisBuilder extends React.Component<BuilderProps, Store
         }
         if (data.model.blocks[i].model && data.model.blocks[i].model!.HRF_variables) {
           hrfPredictorIds = data.model.blocks[i].model!.HRF_variables;
+        }
+        if (data.model.blocks[i].auto_contrasts) {
+          autoContrast = data.model.blocks[i].auto_contrasts;
         }
       }
     }
@@ -416,7 +420,7 @@ export default class AnalysisBuilder extends React.Component<BuilderProps, Store
       config: data.config || defaultConfig,
       transformations: data.transformations,
       contrasts: data.contrasts || [],
-      autoContrast: true
+      autoContrast: autoContrast
     };
 
     if (analysis.runIds.length > 0) {
@@ -464,7 +468,7 @@ export default class AnalysisBuilder extends React.Component<BuilderProps, Store
 
   updateContrasts = (contrasts: Contrast[]): void => {
     this.setState({
-      analysis: { ...this.state.analysis, contrasts },
+      analysis: { ...this.state.analysis },
       unsavedChanges: true
     });
   };
@@ -726,9 +730,11 @@ export default class AnalysisBuilder extends React.Component<BuilderProps, Store
               </TabPane>
               <TabPane tab="Contrasts" key="contrasts" disabled={!transformationsActive}>
                 <ContrastsTab
+                  analysis={analysis}
                   contrasts={analysis.contrasts}
                   predictors={selectedPredictors}
                   onSave={this.updateContrasts}
+                  updateAnalysis={this.updateState('analysis')}
                 />
               </TabPane>
               <TabPane tab="Options" key="modeling" disabled={!modelingActive}>
