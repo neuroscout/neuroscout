@@ -544,8 +544,12 @@ export default class AnalysisBuilder extends React.Component<BuilderProps, Store
             message.success(`Fetched ${data.length} runs associated with the selected dataset`);
             let availTasks = getTasks(data);
             if (availTasks.length === 1) {
-                this.setState({selectedTaskId: availTasks[0].id});
-                updatedAnalysis.runIds = data.map(x => x.id);
+              updatedAnalysis.runIds = data.map(x => x.id);
+              this.setState({
+                selectedTaskId: availTasks[0].id,
+                predictorsLoad: true,
+                predictorsActive: true
+              });
             }
             this.setState({
               availableRuns: data,
