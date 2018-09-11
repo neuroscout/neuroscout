@@ -120,7 +120,7 @@ export class ContrastsTab extends React.Component<ContrastsTabProps, ContrastsTa
             checked={this.props.analysis.autoContrast}
             onChange={() => this.updateAnalysis('autoContrast')(!this.props.analysis.autoContrast)}
           >
-            {'Generate Auto Contrast'}
+            {'Automatically generate identity contrasts'}
           </Checkbox>
         <br />
         {contrasts.length
