@@ -149,6 +149,12 @@
     "@types/prop-types" "*"
     csstype "^2.2.0"
 
+"@types/reflux@^6.4.1":
+  version "6.4.1"
+  resolved "https://registry.yarnpkg.com/@types/reflux/-/reflux-6.4.1.tgz#f2efd1639d9e8029a85a57873dc122da9539a26f"
+  dependencies:
+    "@types/react" "*"
+
 abab@^2.0.0:
   version "2.0.0"
   resolved "https://registry.yarnpkg.com/abab/-/abab-2.0.0.tgz#aba0ab4c5eee2d4c79d3487d85450fb2376ebb0f"
