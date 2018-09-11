@@ -6,7 +6,7 @@
 */
 import * as React from 'react';
 import { Table, Input, Button, Row, Col, Form, Select, Checkbox, Icon } from 'antd';
-import { Predictor, Contrast } from './coretypes';
+import { Analysis, Predictor, Contrast } from './coretypes';
 import { displayError, moveItem } from './utils';
 import { Space } from './HelperComponents';
 import { PredictorSelector } from './Predictors';
@@ -17,6 +17,8 @@ interface ContrastsTabProps {
   predictors: Predictor[];
   contrasts: Contrast[];
   onSave: (contrasts: Contrast[]) => void;
+  analysis: Analysis;
+  updateAnalysis: (value: any) => void;
 }
 
 interface ContrastsTabState {
@@ -87,6 +89,12 @@ export class ContrastsTab extends React.Component<ContrastsTabProps, ContrastsTa
     this.props.onSave(newContrasts);
   };
 
+  updateAnalysis = (attrName: string) => (value: any) => {
+    let newAnalysis = { ...this.props.analysis };
+    newAnalysis[attrName] = value;
+    this.props.updateAnalysis(newAnalysis);
+  };
+
   render() {
     const { contrasts, predictors } = this.props;
     const { mode } = this.state;
@@ -108,6 +116,12 @@ export class ContrastsTab extends React.Component<ContrastsTabProps, ContrastsTa
         <h2>
           {'Contrasts'}
         </h2>
+          <Checkbox
+            checked={this.props.analysis.autoContrast}
+            onChange={() => this.updateAnalysis('autoContrast')(!this.props.analysis.autoContrast)}
+          >
+            {'Generate Auto Contrast'}
+          </Checkbox>
         <br />
         {contrasts.length
           ? contrasts.map((contrast, index) =>
