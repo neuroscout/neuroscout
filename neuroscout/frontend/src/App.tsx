@@ -354,7 +354,7 @@ class App extends React.Component<{}, AppState> {
   // Delete analysis if the necessary conditions are met
   onDelete = (analysis: AppAnalysis) => {
     const { deleteAnalysis } = this;
-    if (analysis.status && analysis.status !== 'DRAFT') {
+    if (analysis.status && ['DRAFT', 'FAILED'].includes(analysis.status) === false) {
       message.warning('This analysis has already been submitted and cannot be deleted.');
       return;
     }
