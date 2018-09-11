@@ -1,5 +1,5 @@
 /*
-Resuable AnalysisList component used for displaying a list of analyses, e.g. on 
+Resuable AnalysisList component used for displaying a list of analyses, e.g. on
 the home page or on the 'browse public analysis' page
 */
 import * as React from 'react';
@@ -28,9 +28,9 @@ const AnalysisList = (props: AnalysisListProps) => {
   // Delete button: only if not a public list and analysis is in draft mode
   // Clone button: any analysis
   const analysisTableColumns = [
-    { 
+    {
       title: 'ID',
-      dataIndex: 'id', 
+      dataIndex: 'id',
       sorter: (a, b) => a.id.localeCompare(b.id)
     },
     {
@@ -63,7 +63,7 @@ const AnalysisList = (props: AnalysisListProps) => {
           </Button>
           <Space />
           {!publicList &&
-            record.status === 'DRAFT' &&
+            ['DRAFT', 'FAILED'].includes(record.status) &&
             <Button type="danger" ghost={true} onClick={() => onDelete!(record)}>
               Delete
             </Button>}
@@ -87,7 +87,7 @@ const AnalysisList = (props: AnalysisListProps) => {
     </div>
   );
 
-  /* Old card-based interface - Leaving it here but commented out in case we 
+  /* Old card-based interface - Leaving it here but commented out in case we
    * decide to go back to using cards instead of a table
   return (
     <Row type="flex" justify="center">
