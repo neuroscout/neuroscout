@@ -6,7 +6,7 @@ import json
 from pathlib import Path
 from tempfile import mkdtemp
 from bids.analysis import Analysis
-from bids.grabbids import BIDSLayout
+from bids.layout import BIDSLayout
 from grabbit import Layout
 from copy import deepcopy
 
@@ -66,7 +66,7 @@ def compile(analysis, predictor_events, resources, bids_dir):
     bundle_paths = writeout_events(analysis, predictor_events, files_dir)
     logger.info(model['input'])
     # Load events and try applying transformations
-    bids_layout = BIDSLayout([(bids_dir, 'bids'), (files_dir.as_posix(), ['bids', 'derivatives'])], exclude='derivatives/')
+    bids_layout = BIDSLayout([(bids_dir, 'bids'), (files_dir.as_posix(), 'derivatives')])
     bids_analysis = Analysis(bids_layout, deepcopy(model))
     bids_analysis.setup(**kwargs)
 

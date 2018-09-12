@@ -9,7 +9,7 @@ from pathlib import Path
 import pandas as pd
 import nibabel as nib
 
-from bids.grabbids import BIDSLayout
+from bids.layout import BIDSLayout
 from bids.variables import load_variables
 from datalad.api import install
 from datalad.auto import AutomagicIO
@@ -153,7 +153,7 @@ def add_task(task_name, dataset_name=None, local_path=None,
 
     paths = [(local_path.as_posix(), 'bids')]
     if (local_path / 'derivatives').exists():
-        paths.append(((local_path / 'derivatives').as_posix(), ['bids', 'derivatives']))
+        paths.append(((local_path / 'derivatives').as_posix(), 'derivatives'))
     layout = BIDSLayout(paths, root=local_path.as_posix())
 
     if task_name not in layout.get_tasks():
@@ -191,7 +191,7 @@ def add_task(task_name, dataset_name=None, local_path=None,
     stims_processed = {}
     """ Parse every Run """
     current_app.logger.info("Parsing runs")
-    all_runs = layout.get(task=task_name, type='bold', extensions='.nii.gz',
+    all_runs = layout.get(task=task_name, suffix='bold', extensions='.nii.gz',
                           **kwargs)
     for img in progressbar(all_runs):
         """ Extract Run information """
@@ -219,16 +219,16 @@ def add_task(task_name, dataset_name=None, local_path=None,
 
         path_patterns = ['sub-{subject}[ses-{session}/]/func/sub-{subject}_'
                          '[ses-{session}_]task-{task}_[acq-{acquisition}_]'
-                         '[run-{run}_]bold_[space-{space}_]{type}.nii.gz']
+                         '[run-{run}_]bold_[space-{space}_]{suffix}.nii.gz']
 
         if 'run' in 'entities':
             entities['run'] = entities['run'].zfill(2)
 
         run_model.func_path = layout.build_path(
-            {'type': 'preproc', 'space': 'MNI152NLin2009cAsym', **entities},
+            {'suffix': 'preproc', 'space': 'MNI152NLin2009cAsym', **entities},
             path_patterns=path_patterns)
         run_model.mask_path = layout.build_path(
-            {'type': 'brainmask', 'space': 'MNI152NLin2009cAsym', **entities},
+            {'suffix': 'brainmask', 'space': 'MNI152NLin2009cAsym', **entities},
             path_patterns=path_patterns)
 
         # Confirm remote address exists:
@@ -238,7 +238,7 @@ def add_task(task_name, dataset_name=None, local_path=None,
 
         """ Extract Predictors"""
         # Assert event files exist (for DataLad)
-        for e in layout._get_nearest_helper(img.filename, '.tsv', type='events'):
+        for e in layout._get_nearest_helper(img.filename, '.tsv', suffix='events'):
             assert isfile(e)
 
         collection = load_variables(
