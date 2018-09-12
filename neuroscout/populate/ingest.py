@@ -117,7 +117,7 @@ def add_stimulus(stim_hash, dataset_id, parent_id=None, path=None, content=None,
 
 def add_task(task_name, dataset_name=None, local_path=None,
              dataset_address=None, preproc_address=None, include_predictors=None,
-             reingest=False, scan_length=1000, automagic=False, summary=None, **kwargs):
+             reingest=False, scan_length=1000, summary=None, **kwargs):
     """ Adds a BIDS dataset task to the database.
         Args:
             task_name - task to add
@@ -128,7 +128,6 @@ def add_task(task_name, dataset_name=None, local_path=None,
             include_predictors - set of predictors to ingest
             reingest - force reingesting even if dataset already exists
             scan_length - default scan length in case it cant be found in image
-            automagic - force enable DataLad automagic
             kwargs - arguments to filter runs by
         Output:
             dataset model id
@@ -141,12 +140,8 @@ def add_task(task_name, dataset_name=None, local_path=None,
             path=(Path(
                 current_app.config['DATASET_DIR']) / dataset_name).as_posix()
             ).path
-        automagic = True
 
     local_path = Path(local_path)
-    if automagic:
-        automagic = AutomagicIO()
-        automagic.activate()
 
     from os.path import isfile
     assert isfile((local_path / 'dataset_description.json').as_posix())
@@ -174,8 +169,6 @@ def add_task(task_name, dataset_name=None, local_path=None,
         dataset_model.local_path = local_path.as_posix()
         db.session.commit()
     elif not reingest:
-        if automagic:
-            automagic.deactivate()
         return dataset_model.id
 
     # Get or create task
@@ -278,8 +271,5 @@ def add_task(task_name, dataset_name=None, local_path=None,
     """ Add GroupPredictors """
     current_app.logger.info("Adding group predictors")
     add_group_predictors(dataset_model.id, local_path / 'participants.tsv')
-
-    if automagic:
-        automagic.deactivate()
 
     return dataset_model.id

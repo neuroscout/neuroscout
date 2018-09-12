@@ -49,18 +49,16 @@ def add_user(email, password, confirm=True):
     db.session.commit()
 
 @manager.command
-def add_task(local_path, task, automagic=False,
-             skip_predictors=False, filters='{}'):
+def add_task(local_path, task, skip_predictors=False, filters='{}'):
     """ Add BIDS dataset to database.
     local_path - Path to local_path directory
     task - Task name
-    automagic - Force enable datalad automagic
     skip_predictors - Skip original Predictors
     filters - string JSON object with optional run filters
     """
     populate.add_task(
         task, local_path=local_path, skip_predictors=skip_predictors,
-        automagic=automagic, **json.loads(filters))
+        **json.loads(filters))
 
 @manager.command
 def extract_features(local_path, task, graph_spec, filters='{}'):
@@ -74,14 +72,13 @@ def extract_features(local_path, task, graph_spec, filters='{}'):
         local_path, task, graph_spec, **json.loads(filters))
 
 @manager.command
-def ingest_from_json(config_file, automagic=False, update_features=False,
-                     reingest=False):
+def ingest_from_json(config_file, update_features=False, reingest=False):
     """ Ingest/update datasets and extracted features from a json config file.
     config_file - json config file detailing datasets and pliers graph_json
     automagic - Force enable datalad automagic
     """
     populate.ingest_from_json(
-        config_file, automagic=automagic, update_features=update_features,
+        config_file, update_features=update_features,
         reingest=reingest)
 
 if __name__ == '__main__':
