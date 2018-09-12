@@ -17,7 +17,7 @@ import { config } from './config';
 import Home from './Home';
 import { Space } from './HelperComponents';
 import { displayError, jwtFetch, timeout } from './utils';
-import { authStore } from './auth.store';
+import { AuthStore } from './auth.store';
 import { authActions } from './auth.actions';
 
 const FormItem = Form.Item;
@@ -39,12 +39,13 @@ interface AppState {
   name: string | undefined;
   password: string | undefined;
   token: string | null;
-  jwt: string | null;
+  jwt?: string | null;
   nextURL: string | null; // will probably remove this and find a better solution to login redirects
   analyses: AppAnalysis[]; // List of analyses belonging to the user
   publicAnalyses: AppAnalysis[]; // List of public analyses
   loggingOut: boolean; // flag set on logout to know to redirect after logout
   listeners: Function[];
+  auth?: AuthStoreState;
 }
 
 // Convert analyses returned by API to the shape expected by the frontend
@@ -58,7 +59,7 @@ const ApiToAppAnalysis = (data: ApiAnalysis): AppAnalysis => ({
 
 // Top-level App component
 // <authStore, {}, AppState>
-class App extends Reflux.Component {
+class App extends Reflux.Component<any, {}, AppState> {
   constructor(props) {
     super(props);
     const jwt = localStorage.getItem('jwt');
@@ -75,7 +76,7 @@ class App extends Reflux.Component {
       resetError: '',
       email: email,
       name: undefined,
-      jwt: jwt,
+      // jwt: jwt,
       password: '',
       nextURL: null,
       analyses: [],
@@ -84,7 +85,7 @@ class App extends Reflux.Component {
       token: null,
       listeners: []
     };
-    this.store = authStore;
+    this.store = AuthStore;
     if (jwt) {
       this.loadAnalyses();
       this.checkAnalysesStatus();
@@ -211,9 +212,6 @@ class App extends Reflux.Component {
           nextURL: null,
           loginError: ''
         });
-        // tslint:disable-next-line:no-console
-        console.log(authActions);
-        authActions.update({jwt: jwt, email: email});
       })
       .then(() => this.loadAnalyses())
       .catch(displayError);
@@ -382,8 +380,6 @@ class App extends Reflux.Component {
 
   // Clone existing analysis
   cloneAnalysis = (id): void => {
-    // tslint:disable-next-line:no-console
-    console.log(authActions);
     authActions.jwtFetch.triggerAsync(`${DOMAINROOT}/api/analyses/${id}/clone`, { method: 'post' })
       .then((data: ApiAnalysis) => {
         const analysis = ApiToAppAnalysis(data);
@@ -391,22 +387,6 @@ class App extends Reflux.Component {
       })
       .catch(displayError);
   };
-
-  updateAuth = (data: AuthStoreState) => {
-    // tslint:disable-next-line:no-console
-    console.log('listener worked');
-    this.setState({ ...data });
-  }
-
-  componentDidMount(): void {
-    this.state.listeners.push(authStore.listen(this.updateAuth, this));
-  }
-
-  componentWillUnmount(): void {
-    /*
-    this.state.listeners.map((listener) => { listener.stop(); });
-    */
-  }
 
   render() {
     const {
@@ -638,7 +618,6 @@ class App extends Reflux.Component {
                   <Col lg={{span: 9}} xs={{span: 12}}>
                     <h1>
                       <Link to="/">Neuroscout</Link>
-                      !{this.state.auth.jwt}!
                     </h1>
                   </Col>
                   <Col lg={{span: 9}} xs={{span: 12}}>

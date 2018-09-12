@@ -239,9 +239,11 @@ export interface AppAnalysis {
 
 export interface AuthStoreState {
   jwt: string;
+  /*
   password: string; 
   loggedIn: boolean;
   openLogin: boolean;
   nextURL: string;
   loginError: string;
+  */
 }

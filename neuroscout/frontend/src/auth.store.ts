@@ -1,4 +1,4 @@
-import { message } from 'antd';
+import { Modal, message } from 'antd';
 import Reflux from 'reflux';
 
 import { authActions } from './auth.actions';
@@ -7,40 +7,57 @@ import { displayError } from './utils';
 
 const DOMAINROOT = config.server_url;
 
-const authStore = Reflux.createStore({
-  init: function() {
-    let data = {
-      email: '',
-      password: '',
-      jwt: ''
+/*
+export class AuthStore extends Reflux.Store {
+    Actions = authActions;
+    // typescript just relax okay?
+    // setState: any;
+    // listen: any;
+    state = {
+        counter: 0
     };
-  },
 
-  getInitialState: function() {
-    return this.data;
-  },
+    constructor() {
+      super();
+      this.state = {counter: 0};
+      // tslint:disable-next-line:no-console
+      console.log(this.state);
+    }
 
-  // data ------------------------------------------------------------------------------
+    onIncrementSomething() {
+        this.setState({
+            counter: ++this.state.counter
+        });
+    }
+}
+*/
 
-  data: {},
+export class AuthStore extends Reflux.Store {
+  constructor() {
+    super();
+    let jwt = localStorage.getItem('jwt');
+    this.setState({auth: {jwt: jwt ? jwt : ''}});
+  }
 
-  update: function(data, callback) {
+  auth = {};
+
+  update(data) {
     // tslint:disable-next-line:no-console
     console.log(data);
     if (data) {
       for (let prop in data) {
         if (data.hasownProperty(prop)) {
-          this.data[prop] = data[prop];
+          this.auth[prop] = data[prop];
         }
       }
-      this.trigger(this.data, callback);
+      this.trigger(this.auth);
     }
-  },
+  }
 
   // Wrapper around the standard 'fetch' that takes care of:
   // - Adding jwt to request header
   // - Decoding JSON response and adding the response status code to decoded JSON object
-  jwtFetch: async function(path: string, options?: object) {
+  async jwtFetch(path: string, options?: object) {
     const jwt = window.localStorage.getItem('jwt');
     if (jwt === null) {
       const error = 'JWT not found in local storage. You must be logged in.';
@@ -76,10 +93,10 @@ const authStore = Reflux.createStore({
       });
       return copy;
     });
-  },
+  }
 
   // Authenticate the user with the server. This function is called from login()
-  authenticate: function() {
+  authenticate() {
     new Promise((resolve, reject) => {
       const { email, password } = this.state.data;
       const { accountconfirmError } = this;
@@ -124,6 +141,26 @@ const authStore = Reflux.createStore({
         ).catch(displayError);
       });
     }
-});
 
-export { authStore };
+  // Display modal to resend confirmation link
+  accountconfirmError = (jwt): void => {
+    const that = this;
+    Modal.confirm({
+      title: 'Account is not confirmed!',
+      content: 'Your account has not been confirmed. \
+        To continue, please follow the instructions sent to your email address.',
+      okText: 'Resend confirmation',
+      cancelText: 'Close',
+      onOk() {
+        fetch(DOMAINROOT + '/api/user/resend_confirmation', {
+          method: 'post',
+          headers: {
+            'Content-type': 'application/json',
+            'authorization': 'JWT ' + jwt
+          }
+        })
+        .catch(displayError);
+      },
+    });
+  }
+}
