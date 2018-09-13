@@ -56,12 +56,10 @@ def load_update_config(config_file, update=False):
 
     return config_dict
 
-def ingest_from_json(config_file, automagic=False,
-                     update_features=False, reingest=False):
+def ingest_from_json(config_file, update_features=False, reingest=False):
     """ Adds a datasets from a JSON configuration file
         Args:
             config_file - a path to a json file
-            automagic - force enable DataLad automagic
             update_features - re-extracted updated extractors
             reingest - force reingest dataset
         Output:
@@ -93,7 +91,6 @@ def ingest_from_json(config_file, automagic=False,
                                   dataset_name=dataset_name,
                                   local_path=local_path,
                                   dataset_address=dataset_address,
-                                  automagic=automagic,
                                   preproc_address=preproc_address,
                                   reingest=reingest,
             					  **dp)
