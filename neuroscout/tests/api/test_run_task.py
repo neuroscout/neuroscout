@@ -58,4 +58,4 @@ def test_get_run(auth_client, add_task):
 
 	# Test task route filtering
 	resp = auth_client.get('/api/tasks', params={'dataset_id' : add_task})
-	assert 'description' in decode_json(resp)[0]
+	assert 'summary' in decode_json(resp)[0]
