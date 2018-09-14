@@ -7,12 +7,12 @@ from .utils import first_or_404
 class TaskSchema(Schema):
     id = fields.Int()
     name = fields.Str()
-    description = fields.Dict(description='BIDS task description')
 
     dataset_id = fields.Int()
     runs = fields.Nested('RunSchema', only=['id'])
     num_runs = fields.Int(description='Number of runs.')
     TR = fields.Number()
+    summary = fields.Str(description='Task summary description')
 
 class TaskResource(MethodResource):
     @doc(tags=['run'], summary='Get task by id.')

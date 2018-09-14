@@ -4,8 +4,10 @@
     "preproc_address": "https://s3.amazonaws.com/openneuro.outputs/ba961fb8708c04f8f181206ab03d6548/60dd91b5-e059-4be8-a75d-de3910eb2635/fmriprep/",
     "path": "/datasets/generic_object_decoding/",
     "summary": "Subjects viewed object images (image presentation experiment) from various categories, over a total of 1,200 images.",
+    "external": "https://openneuro.org/datasets/ds001246/",
     "tasks": {
       "perception": {
+        "summary": "Visual Image perception",
         "extractors": [
           ["BrightnessExtractor", {}],
           ["VibranceExtractor", {}]

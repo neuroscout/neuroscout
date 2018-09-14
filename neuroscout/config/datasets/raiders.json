@@ -3,8 +3,10 @@
     "dataset_address": "///labs/haxby/raiders",
     "path": "/datasets/raiders/",
     "summary": "Raiders of the Lost Art movie watching paradigm",
+    "external": "https://github.com/HaxbyLab/raiders_data",
     "tasks": {
       "raiders": {
+        "summary": "AV Presentation",
         "converters": [
         ],
         "extractors": [

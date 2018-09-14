@@ -4,8 +4,10 @@
     "preproc_address": "https://github.com/neuroscout-datasets/life",
     "path": "/datasets/life/",
     "summary": "Four segments of the Life nature documentary narrated by David Attenborough",
+    "external": "http://datasets.datalad.org/?dir=/labs/haxby/life",
     "tasks": {
       "life": {
+        "summary": "AV Presentation",
         "converters": [
         ],
         "extractors": [

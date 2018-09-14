@@ -16,6 +16,7 @@ class Task(db.Model):
 
     runs = db.relationship('Run', backref='task', cascade="delete")
     TR = db.Column(db.Float)
+    summary = db.Column(db.Text) # Summary annotation
 
     @hybrid_property
     def num_runs(self):

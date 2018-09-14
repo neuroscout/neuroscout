@@ -1,6 +1,8 @@
 {
   "bids_test": {
     "dataset_address": "https://github.com/adelavega/bids_test.git",
+    "summary": "A test dataset",
+    "external": "https://github.com/adelavega/bids_test",
     "tasks": {
       "bidstest": {
         "extractors": [
