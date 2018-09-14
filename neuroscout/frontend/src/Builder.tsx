@@ -31,6 +31,7 @@ import { displayError, jwtFetch } from './utils';
 import { Space } from './HelperComponents';
 import Status from './Status';
 import { config } from './config';
+import { authActions } from './auth.actions';
 
 const { TabPane } = Tabs;
 const { Footer, Content } = Layout;
@@ -86,48 +87,6 @@ const initializeStore = (): Store => ({
   unsavedChanges: false,
   currentLevel: 'run'
 });
-
-const getJwt = () =>
-  new Promise((resolve, reject) => {
-    /* Returns an access token (JWT) as a promise, either straight from local
-     storage or by fetching from the server (/auth) with username/password and
-     caching it to local storage. */
-    const jwt = window.localStorage.getItem('jwt');
-    if (jwt) {
-      resolve(jwt);
-    } else {
-      fetch(domainRoot + '/api/auth', {
-        method: 'post',
-        body: JSON.stringify({ email: EMAIL, password: PASSWORD }),
-        headers: {
-          'Content-type': 'application/json'
-        }
-      })
-        .then(response => {
-          response.json().then((data: { access_token: string }) => {
-            if (data.access_token) {
-              window.localStorage.setItem('jwt', data.access_token);
-              resolve(data.access_token);
-            }
-          });
-        })
-        .catch(displayError);
-    }
-  });
-
-// Wrapper around 'fetch' to add JWT authorization header and authenticate first if necessary
-const authorizeAndFetch = (path: string, options?: object) => {
-  return getJwt().then((jwt: string) => {
-    const newOptions = {
-      ...options,
-      headers: {
-        'Content-type': 'application/json',
-        Authorization: 'JWT ' + jwt
-      }
-    };
-    return fetch(path, newOptions);
-  });
-};
 
 // Normalize dataset object returned by /api/datasets
 const normalizeDataset = (d: ApiDataset): Dataset => {

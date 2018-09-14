@@ -1,4 +1,5 @@
 import { message } from 'antd';
+import { authActions } from './auth.actions';
 
 // Display error to user as a UI notification and log it to console
 export const displayError = (error: Error) => {
@@ -49,6 +50,16 @@ export const jwtFetch = (path: string, options?: object) => {
     }
   };
   return fetch(path, newOptions).then(response => {
+    // Need to figure this response out. openLogin triggers modal to popup,
+    // but in next cycle. Keep track of request, and after submit on modal
+    // run jwt fetch again?
+    if (response.status === 401) {
+      authActions.update({
+        openLogin: true,
+        loggedIn: false,
+      });
+      return;
+    }
     if (response.status !== 200) {
       displayError(new Error(`HTTP ${response.status} on ${path}`));
     }

@@ -239,11 +239,18 @@ export interface AppAnalysis {
 
 export interface AuthStoreState {
   jwt: string;
-  /*
-  password: string; 
   loggedIn: boolean;
   openLogin: boolean;
-  nextURL: string;
+  openSignup: boolean;
+  openReset: boolean;
+  openEnterResetToken: boolean;
   loginError: string;
-  */
+  signupError: string;
+  resetError: string;
+  email: string | undefined;
+  name: string | undefined;
+  password: string | undefined;
+  token: string | null;
+  loggingOut: boolean; // flag set on logout to know to redirect after logout
+  nextURL: string | null; // will probably remove this and find a better solution to login redirects
 }
