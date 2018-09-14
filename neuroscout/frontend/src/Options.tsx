@@ -85,14 +85,6 @@ export default class OptionsTab extends React.Component<OptionsTabProps, Options
                 />
               </Col>
             </Row>
-            <Row>
-              <Checkbox
-                checked={analysis.autoContrast}
-                onChange={() => this.updateAnalysis('autoContrast')(!analysis.autoContrast)}
-              >
-                {'Auto Contrast'}
-              </Checkbox>
-            </Row>
           </FormItem>
           <h3>Per-Predictor Configurations</h3>
           <br />

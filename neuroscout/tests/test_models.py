@@ -69,46 +69,6 @@ def test_dataset_ingestion(session, add_task):
 	assert gpv.count() == 4
 	assert 'F' in [v.value for v in gpv]
 
-@pytest.mark.skipif(os.environ.get("TRAVIS") == "true",
-	reason="Skipping this test on Travis CI.")
-def test_remote_dataset(session, add_task_remote):
-	dataset_model = Dataset.query.filter_by(id=add_task_remote).one()
-
-	# Test mimetypes
-	assert 'image/jpeg' in dataset_model.mimetypes
-	assert 'bidstest' == dataset_model.tasks[0].name
-
-	# Test properties of Run
-	assert Run.query.filter_by(dataset_id=add_task_remote).count() \
-			== dataset_model.runs.count() == 1
-	predictor = Predictor.query.filter_by(name='rt').first()
-	assert predictor.predictor_events.count() == 4
-
-	# Test that Stimiuli were extracted
-	assert Stimulus.query.count() == 5
-
-	# Test participants.tsv ingestion
-	assert GroupPredictor.query.filter_by(
-			dataset_id=add_task_remote).count() == 3
-
-	fre = ExtractedFeature.query.filter_by(
-		extractor_name='FaceRecognitionFaceLandmarksExtractor')
-
-	assert fre.count() == 9
-	fre_ids = [ef.id for ef in fre]
-
-	ef = ExtractedFeature.query.filter_by(
-			extractor_name='FaceRecognitionFaceLandmarksExtractor',
-			feature_name='face_landmarks_bottom_lip').first()
-
-	assert ef.extracted_events.count() == 5
-
-	# Test that predictor was made, (only this feature should be active)
-	preds = Predictor.query.filter(Predictor.ef_id.in_(fre_ids))
-	assert preds.count() == 1
-
-	assert preds.first().predictor_events.count() == 5
-
 def test_json_local_dataset(session, add_local_task_json):
 	dataset_model = Dataset.query.filter_by(id=add_local_task_json).one()
 

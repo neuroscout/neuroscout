@@ -55,7 +55,7 @@ class AnalysisResource(AnalysisMethodResource):
 	@doc(summary='Delete analysis.')
 	@owner_required
 	def delete(self, analysis):
-		if analysis.status != 'DRAFT' or analysis.locked == True:
+		if analysis.status not in ['DRAFT', 'FAILED'] or analysis.locked == True:
 			abort(422, "Analysis not editable, cannot delete.")
 		db.session.delete(analysis)
 		db.session.commit()
