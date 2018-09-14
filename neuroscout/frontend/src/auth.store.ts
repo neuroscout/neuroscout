@@ -1,104 +1,92 @@
 import { Modal, message } from 'antd';
 import Reflux from 'reflux';
 
+import jwt_decode from 'jwt-decode';
+
 import { authActions } from './auth.actions';
 import { config } from './config';
+import { AuthStoreState } from './coretypes';
 import { displayError } from './utils';
 
 const DOMAINROOT = config.server_url;
 
-/*
 export class AuthStore extends Reflux.Store {
-    Actions = authActions;
-    // typescript just relax okay?
-    // setState: any;
-    // listen: any;
-    state = {
-        counter: 0
-    };
 
-    constructor() {
-      super();
-      this.state = {counter: 0};
-      // tslint:disable-next-line:no-console
-      console.log(this.state);
-    }
-
-    onIncrementSomething() {
-        this.setState({
-            counter: ++this.state.counter
-        });
-    }
-}
-*/
-
-export class AuthStore extends Reflux.Store {
   constructor() {
     super();
-    let jwt = localStorage.getItem('jwt');
-    this.setState({auth: {jwt: jwt ? jwt : ''}});
+    this.listenToMany(authActions);
+    this.setState(this.getInitialState());
   }
 
-  auth = {};
+  getInitialState() {
+    let jwt = localStorage.getItem('jwt');
+    try {
+      let jwt_ob = jwt_decode(jwt);
+      if (jwt_ob.exp * 1000 < Date.now()) {
+        localStorage.removeItem('jwt');
+        jwt = '';
+      }
+    } catch {
+      jwt = '';
+    }
+    let _email = localStorage.getItem('email');
+    let email = _email == null ? undefined : _email;
+    return { auth: {
+      jwt: jwt ? jwt : '',
+      loggedIn: jwt ? true : false,
+      nextURL: null,
+      loginError: '',
+      signupError: '',
+      resetError: '',
+      email: email,
+      name: undefined,
+      password: '',
+      openLogin: false,
+      openSignup: false,
+      openReset: false,
+      openEnterResetToken: false,
+      loggingOut: false,
+      token: null,
+    }};
+  }
 
-  update(data) {
-    // tslint:disable-next-line:no-console
-    console.log(data);
+  update(data: any) {
+    let newAuth = this.state.auth;
     if (data) {
       for (let prop in data) {
-        if (data.hasownProperty(prop)) {
-          this.auth[prop] = data[prop];
+        if (this.state.auth.hasOwnProperty(prop)) {
+          newAuth[prop] = data[prop];
         }
       }
-      this.trigger(this.auth);
+      this.setState({auth: newAuth});
     }
   }
 
-  // Wrapper around the standard 'fetch' that takes care of:
-  // - Adding jwt to request header
-  // - Decoding JSON response and adding the response status code to decoded JSON object
-  async jwtFetch(path: string, options?: object) {
-    const jwt = window.localStorage.getItem('jwt');
-    if (jwt === null) {
-      const error = 'JWT not found in local storage. You must be logged in.';
-      message.error(error);
-    }
-    const newOptions = {
-      ...options,
-      headers: {
-        'Content-type': 'application/json',
-        Authorization: 'JWT ' + jwt
+  updateFromInput(name: keyof AuthStoreState, event: React.FormEvent<HTMLInputElement>) {
+      const newState = {};
+      if (event && event.currentTarget) {
+        newState[name] = event.currentTarget.value;
+        this.update(newState);
       }
-    };
-    let response = await fetch(path, newOptions);
-    if (response.status !== 401) {
-      
+  }
+
+  // check to see if JWT is expired
+  checkJWT(jwt) {
+    try {
+      let jwt_ob = jwt_decode(jwt);
+      if (jwt_ob.exp * 1000 < Date.now()) {
+        localStorage.removeItem('jwt');
+        this.update({jwt: ''});
+      }
+    } catch {
+        this.update({jwt: ''});
     }
-    if (response.status !== 200) {
-      displayError(new Error(`HTTP ${response.status} on ${path}`));
-    }
-    let copy = await fetch(path, newOptions).then(_response => {
-      return _response.json().then(json => {
-        // Always add statusCode to the data object or array returned by response.json()
-        let _copy: any;
-        if ('length' in json) {
-          // array
-          _copy = [...json];
-          (_copy as any).statusCode = _response.status;
-        } else {
-          // object
-          _copy = { ...json, statusCode: _response.status };
-        }
-        return _copy;
-      });
-      return copy;
-    });
   }
 
   // Authenticate the user with the server. This function is called from login()
-  authenticate() {
-    new Promise((resolve, reject) => {
-      const { email, password } = this.state.data;
+  authenticate(): Promise<string> {
+    return new Promise((resolve, reject) => {
+      const { email, password } = this.state.auth;
       const { accountconfirmError } = this;
       fetch(DOMAINROOT + '/api/auth', {
         method: 'post',
@@ -110,7 +98,7 @@ export class AuthStore extends Reflux.Store {
         .then(response => response.json())
         .then((data: { status_code: number; access_token?: string; description?: string }) => {
           if (data.status_code === 401) {
-            this.setState({ loginError: data.description || '' });
+            this.update({ loginError: data.description || '' });
             reject('Authentication failed');
           } else if (data.access_token) {
             const token = data.access_token;
@@ -142,6 +130,85 @@ export class AuthStore extends Reflux.Store {
       });
     }
 
+  // Log user in
+  login = () => {
+    const { email, password, loggedIn, openLogin, nextURL } = this.state;
+    // tslint:disable-next-line:no-console
+    console.log(this.authenticate());
+    return this.authenticate()
+      .then((jwt: string) => {
+        this.update({
+          jwt: jwt,
+          password: '',
+          loggedIn: true,
+          openLogin: false,
+          nextURL: null,
+          loginError: ''
+        });
+      }).catch(displayError);
+  };
+
+  // Sign up for a new account
+  signup = () => {
+    const { name, email, password, openSignup } = this.state;
+    fetch(DOMAINROOT + '/api/user', {
+      method: 'post',
+      body: JSON.stringify({ email: email, password: password, name: name }),
+      headers: {
+        'Content-type': 'application/json'
+      }
+    })
+      .then(response => response.json().then(json => ({ ...json, statusCode: response.status })))
+      .then((data: any) => {
+        if (data.statusCode !== 200) {
+          let errorMessage = '';
+          Object.keys(data.message).forEach(key => {
+            errorMessage += data.message[key];
+          });
+          this.update({
+            signupError: errorMessage
+          });
+          throw new Error('Signup failed!');
+        }
+        this.update({ name, email, openSignup: false, signupError: '' });
+        Modal.success({
+          title: 'Account created!',
+          content: 'Your account has been sucessfully created. \
+          You will receive a confirmation email shortly. Please follow the instructions to activate your account\
+          and start using Neuroscout. ',
+          okText: 'Okay',
+        });
+      })
+      .catch(displayError);
+  };
+
+  // Log user out
+  logout = () => {
+    localStorage.removeItem('jwt');
+    localStorage.removeItem('email');
+    this.update({
+      loggedIn: false,
+      name: undefined,
+      email: undefined, jwt: null,
+      analyses: [],
+      loggingOut: true
+    });
+  };
+
+  // Display modal to confirm logout
+  confirmLogout = (): void => {
+    const that = this;
+    Modal.confirm({
+      title: 'Are you sure you want to log out?',
+      content: 'If you have any unsaved changes they will be discarded.',
+      okText: 'Yes',
+      cancelText: 'No',
+      onOk() {
+        that.logout();
+      }
+    });
+  };
+
   // Display modal to resend confirmation link
   accountconfirmError = (jwt): void => {
     const that = this;
@@ -162,5 +229,50 @@ export class AuthStore extends Reflux.Store {
         .catch(displayError);
       },
     });
-  }
+  };
+
+  // Reset password function
+  resetPassword = (): void => {
+    const { email } = this.state;
+    fetch(DOMAINROOT + '/api/user/reset_password', {
+      method: 'post',
+      body: JSON.stringify({ email: email}),
+      headers: {
+        'Content-type': 'application/json'
+      }
+    })
+    .catch(displayError)
+    .then(() => {
+      this.update({ openEnterResetToken: true, openReset: false });
+    });
+  };
+
+  // Reset password function
+  submitToken = (): void => {
+    const { token, password } = this.state;
+    const that = this;
+    fetch(DOMAINROOT + '/api/user/submit_token', {
+      method: 'post',
+      body: JSON.stringify({ token: token, password: password}),
+      headers: {
+        'Content-type': 'application/json'
+      }
+    })
+    .then((response) =>  {
+      if (response.ok) {
+        this.update({ openEnterResetToken: false});
+        this.login();
+      } else {
+        response.json().then(json => ({ ... json }))
+        .then((data: any) => {
+          let errorMessage = '';
+          Object.keys(data.message).forEach(key => {
+            errorMessage += data.message[key];
+          });
+          that.update({resetError: errorMessage});
+      });
+    }
+  })
+    .catch(displayError);
+  };
 }
