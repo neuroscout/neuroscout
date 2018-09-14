@@ -3,7 +3,7 @@
     "dataset_address": "https://github.com/adelavega/studyforrest-data-phase2",
     "path": "/datasets/studyforrest-data-phase2/",
     "summary": "Forrest Gump movie watching task, in German",
-    "external": "http://studyforrest.org/",
+    "url": "http://studyforrest.org/",
     "tasks": {
       "movie": {
         "summary": "Audio Visual Presentation (German)",

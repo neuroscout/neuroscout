@@ -92,7 +92,7 @@ def ingest_from_json(config_file, update_features=False, reingest=False):
                                   dataset_address=dataset_address,
                                   preproc_address=preproc_address,
                                   reingest=reingest,
-                                  external=items.get('external'),
+                                  url=items.get('url'),
                                   dataset_summary=items.get('summary'),
                                   task_summary=params.get('summary'),
             					  **dp)

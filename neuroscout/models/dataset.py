@@ -8,7 +8,7 @@ class Dataset(db.Model):
 	id = db.Column(db.Integer, primary_key=True)
 	description = db.Column(JSONB) # BIDS description
 	summary = db.Column(db.Text) # Hand crafted summary
-	external = db.Column(db.Text) # External resource / link
+	url = db.Column(db.Text) # External resource / link
 	active = db.Column(db.Boolean, default=True)
 	name = db.Column(db.Text, unique=True, nullable=False)
 	runs = db.relationship('Run', backref='dataset',
