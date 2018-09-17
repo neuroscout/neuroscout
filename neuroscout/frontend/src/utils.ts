@@ -42,6 +42,7 @@ export const jwtFetch = (path: string, options?: object) => {
     const error = 'JWT not found in local storage. You must be logged in.';
     message.error(error);
   }
+
   const newOptions = {
     ...options,
     headers: {
@@ -49,6 +50,7 @@ export const jwtFetch = (path: string, options?: object) => {
       Authorization: 'JWT ' + jwt
     }
   };
+
   return fetch(path, newOptions).then(response => {
     // Need to figure this response out. openLogin triggers modal to popup,
     // but in next cycle. Keep track of request, and after submit on modal

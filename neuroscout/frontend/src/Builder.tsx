@@ -583,6 +583,10 @@ export default class AnalysisBuilder extends React.Component<BuilderProps, Store
     .catch(displayError);
   }
 
+  componentDidUpdate(prevProps, prevState) {
+    authActions.checkJWT();
+  }
+
   render() {
     const {
       predictorsActive,

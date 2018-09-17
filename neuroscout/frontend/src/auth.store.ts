@@ -1,7 +1,7 @@
 import { Modal, message } from 'antd';
 import Reflux from 'reflux';
 
-import jwt_decode from 'jwt-decode';
+var jwtDecode = require('jwt-decode');
 
 import { authActions } from './auth.actions';
 import { config } from './config';
@@ -21,7 +21,7 @@ export class AuthStore extends Reflux.Store {
   getInitialState() {
     let jwt = localStorage.getItem('jwt');
     try {
-      let jwt_ob = jwt_decode(jwt);
+      let jwt_ob = jwtDecode(jwt);
       if (jwt_ob.exp * 1000 < Date.now()) {
         localStorage.removeItem('jwt');
         jwt = '';
@@ -72,14 +72,18 @@ export class AuthStore extends Reflux.Store {
 
   // check to see if JWT is expired
   checkJWT(jwt) {
+    if (this.state.auth.loggedIn === false) { return false; }
     try {
-      let jwt_ob = jwt_decode(jwt);
+      let jwt_ob = jwtDecode(jwt);
       if (jwt_ob.exp * 1000 < Date.now()) {
         localStorage.removeItem('jwt');
-        this.update({jwt: ''});
+        this.update({jwt: '', loggedIn: false, openLogin: true});
+        return false;
       }
+      return true;
     } catch {
-        this.update({jwt: ''});
+        this.update({jwt: '', loggedIn: false, openLogin: true});
+        return false;
     }
   }
 
@@ -133,8 +137,6 @@ export class AuthStore extends Reflux.Store {
   // Log user in
   login = () => {
     const { email, password, loggedIn, openLogin, nextURL } = this.state;
-    // tslint:disable-next-line:no-console
-    console.log(this.authenticate());
     return this.authenticate()
       .then((jwt: string) => {
         this.update({

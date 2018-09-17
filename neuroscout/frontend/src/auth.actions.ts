@@ -10,7 +10,8 @@ var authActions = Reflux.createActions({
   'resetPassword': {},
   'submitToken': {},
   'getInitialState': {},
-  'updateFromInput': {}
+  'updateFromInput': {},
+  'checkJWT': {}
 });
 
 export { authActions };
