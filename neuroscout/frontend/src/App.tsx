@@ -1,5 +1,4 @@
 /*
-    console.log(this.state);
 Top-level App component containing AppState. The App component is currently responsible for:
 - Authentication (signup, login and logout)
 - Routing
@@ -28,6 +27,7 @@ const { localStorage } = window;
 const { Footer, Content, Header } = Layout;
 
 interface AppState {
+  loadAnalyses: boolean;
   analyses: AppAnalysis[]; // List of analyses belonging to the user
   publicAnalyses: AppAnalysis[]; // List of public analyses
   auth: AuthStoreState;
@@ -48,6 +48,7 @@ class App extends Reflux.Component<any, {}, AppState> {
   constructor(props) {
     super(props);
     this.state = {
+      loadAnalyses: true,
       analyses: [],
       publicAnalyses: [],
       auth: authActions.getInitialState()
@@ -90,6 +91,7 @@ class App extends Reflux.Component<any, {}, AppState> {
    */
   checkAnalysesStatus = async () => {
     while (true) {
+      if (!(this.state.auth.loggedIn)) { return; }
       let changeFlag = false;
       let updatedAnalyses = this.state.analyses.map(async (analysis) => {
         if (['DRAFT', 'PASSED'].indexOf(analysis.status) > -1) {
@@ -152,7 +154,7 @@ class App extends Reflux.Component<any, {}, AppState> {
 
   // Clone existing analysis
   cloneAnalysis = (id): void => {
-    jwtFetch.triggerAsync(`${DOMAINROOT}/api/analyses/${id}/clone`, { method: 'post' })
+    jwtFetch(`${DOMAINROOT}/api/analyses/${id}/clone`, { method: 'post' })
       .then((data: ApiAnalysis) => {
         const analysis = ApiToAppAnalysis(data);
         this.setState({ analyses: this.state.analyses.concat([analysis]) });
@@ -161,8 +163,6 @@ class App extends Reflux.Component<any, {}, AppState> {
   };
 
   render() {
-    // tslint:disable-next-line:no-console
-    console.log(this.state);
     const {
       loggedIn,
       email,
@@ -476,9 +476,11 @@ class App extends Reflux.Component<any, {}, AppState> {
   componentDidUpdate(prevProps, prevState) {
     // Need to do this so logout redirect only happens once, otherwise it'd be an infinite loop
     if (this.state.auth.loggingOut) authActions.update({ loggingOut: false });
-    if (prevState.auth.jwt !== this.state.auth.jwt) {
+    if ((prevState.auth.jwt !== this.state.auth.jwt)
+      || (this.state.auth.loggedIn && this.state.loadAnalyses)) {
       this.loadAnalyses();
       this.checkAnalysesStatus();
+      this.setState({loadAnalyses: false});
     }
   }
 }
