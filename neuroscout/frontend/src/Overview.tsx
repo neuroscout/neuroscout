@@ -171,6 +171,7 @@ export class OverviewTab extends React.Component<OverviewTabProps, OverviewTabSt
       },
       { title: 'Description', dataIndex: 'description'},
       { title: 'Author(s)', dataIndex: 'authors', width: 280 },
+      { title: 'URL', dataIndex: 'url', width: 50}
     ];
 
     const selectedDatasetId: string[] = analysis.datasetId ? [analysis.datasetId.toString()] : [];
@@ -187,7 +188,7 @@ export class OverviewTab extends React.Component<OverviewTabProps, OverviewTabSt
     const taskColumns = [
       { title: 'Name', dataIndex: 'name', sorter: (a, b) => a.name.localeCompare(b.name)},
 
-      { title: 'Description', dataIndex: 'description' },
+      { title: 'Summary', dataIndex: 'summary' },
       {
         title: '#Runs',
         dataIndex: 'numRuns',

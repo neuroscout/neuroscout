@@ -47,6 +47,7 @@ export interface Task {
   name: string;
   description?: string;
   numRuns: number;
+  summary?: string;
 }
 
 export interface Predictor {
