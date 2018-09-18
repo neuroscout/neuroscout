@@ -12,7 +12,6 @@ import nibabel as nib
 from bids.layout import BIDSLayout
 from bids.variables import load_variables
 from datalad.api import install
-from datalad.auto import AutomagicIO
 
 from core import cache
 from .utils import remote_resource_exists, hash_stim
