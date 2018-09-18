@@ -41,8 +41,7 @@ def test_get_run(auth_client, add_task):
 	resp = auth_client.get('/api/runs', params={'dataset_id' : add_task,
 											'all_fields' : 'True'})
 	assert 'task' in decode_json(resp)[0]
-	assert len(decode_json(resp)[0]['task']) == 2
-	task_id = decode_json(resp)[0]['task']['id']
+	task_id = decode_json(resp)[0]['task']
 
 	# Test filtering by multiple parameters
 	resp = auth_client.get('/api/runs', params={'number': '1,2',
