@@ -159,6 +159,7 @@ export interface ApiDataset {
     Description: string;
     URL: string;
   };
+  url: string;
   summary: string;
 }
 

@@ -161,6 +161,8 @@ export class OverviewTab extends React.Component<OverviewTabProps, OverviewTabSt
       goToNextTab,
       predictorsActive,
     } = this.props;
+    // tslint:disable-next-line:no-console
+    console.log(datasets);
 
     const datasetColumns = [
       {

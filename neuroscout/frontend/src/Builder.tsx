@@ -133,7 +133,7 @@ const authorizeAndFetch = (path: string, options?: object) => {
 const normalizeDataset = (d: ApiDataset): Dataset => {
   const authors = d.description.Authors ? d.description.Authors.join(', ') : 'No authors listed';
   const description = d.summary;
-  const url = d.description.URL;
+  const url = d.url;
   const id = d.id.toString();
   const { name } = d;
   return { id, name, authors, url, description };
