@@ -9,7 +9,6 @@ class TaskSchema(Schema):
     name = fields.Str()
 
     dataset_id = fields.Int()
-    runs = fields.Nested('RunSchema', only=['id'])
     num_runs = fields.Int(description='Number of runs.')
     TR = fields.Number()
     summary = fields.Str(description='Task summary description')
