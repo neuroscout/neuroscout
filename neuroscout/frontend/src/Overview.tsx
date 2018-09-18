@@ -169,11 +169,12 @@ export class OverviewTab extends React.Component<OverviewTabProps, OverviewTabSt
         title: 'Name',
         dataIndex: 'name',
         width: 130,
-        sorter: (a, b) => a.name.localeCompare(b.name)
+        sorter: (a, b) => a.name.localeCompare(b.name),
+        render: (text, record) => <a href={record.url}>{text}</a>,
       },
       { title: 'Description', dataIndex: 'description'},
       { title: 'Author(s)', dataIndex: 'authors', width: 280 },
-      { title: 'URL', dataIndex: 'url', width: 50}
+      // { title: 'URL', dataIndex: 'url', width: 50 }
     ];
 
     const selectedDatasetId: string[] = analysis.datasetId ? [analysis.datasetId.toString()] : [];
