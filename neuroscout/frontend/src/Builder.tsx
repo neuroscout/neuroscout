@@ -77,7 +77,6 @@ const initializeStore = (): Store => ({
     }
   },
   datasets: [],
-  availableTasks: [],
   availableRuns: [],
   selectedTaskId: null,
   availablePredictors: [],
@@ -87,70 +86,26 @@ const initializeStore = (): Store => ({
   currentLevel: 'run'
 });
 
-const getJwt = () =>
-  new Promise((resolve, reject) => {
-    /* Returns an access token (JWT) as a promise, either straight from local
-     storage or by fetching from the server (/auth) with username/password and
-     caching it to local storage. */
-    const jwt = window.localStorage.getItem('jwt');
-    if (jwt) {
-      resolve(jwt);
-    } else {
-      fetch(domainRoot + '/api/auth', {
-        method: 'post',
-        body: JSON.stringify({ email: EMAIL, password: PASSWORD }),
-        headers: {
-          'Content-type': 'application/json'
-        }
-      })
-        .then(response => {
-          response.json().then((data: { access_token: string }) => {
-            if (data.access_token) {
-              window.localStorage.setItem('jwt', data.access_token);
-              resolve(data.access_token);
-            }
-          });
-        })
-        .catch(displayError);
-    }
-  });
-
-// Wrapper around 'fetch' to add JWT authorization header and authenticate first if necessary
-const authorizeAndFetch = (path: string, options?: object) => {
-  return getJwt().then((jwt: string) => {
-    const newOptions = {
-      ...options,
-      headers: {
-        'Content-type': 'application/json',
-        Authorization: 'JWT ' + jwt
-      }
-    };
-    return fetch(path, newOptions);
-  });
-};
-
 // Normalize dataset object returned by /api/datasets
 const normalizeDataset = (d: ApiDataset): Dataset => {
   const authors = d.description.Authors ? d.description.Authors.join(', ') : 'No authors listed';
   const description = d.summary;
   const url = d.url;
   const id = d.id.toString();
-  const { name } = d;
-  return { id, name, authors, url, description };
+  const { name, tasks } = d;
+  return { id, name, authors, url, description, tasks };
 };
 
-// Get array of unique tasks from a list of runs, and count the number of runs associated with each
-const getTasks = (runs: Run[]): Task[] => {
-  let taskMap: Map<string, Task> = new Map();
-  for (let run of runs) {
-    const key = run.task.id;
-    if (taskMap.has(key)) {
-      taskMap.get(key)!.numRuns += 1;
-    } else {
-      taskMap.set(key, { ...run.task, numRuns: 1 });
+// Get list of tasks from a given dataset
+export const getTasks = (datasets: Dataset[], datasetId: string | null): Task[] => {
+    let curDataset = datasets.find((x) => { 
+      return x.id === datasetId;
+    });
+
+    if (curDataset !== undefined) {
+      return curDataset.tasks;
     }
-  }
-  return Array.from(taskMap.values());
+    return [] as Task[];
 };
 
 // Given an updated list of predictor IDs, create an updated version of analysis config.
@@ -204,8 +159,9 @@ export default class AnalysisBuilder extends React.Component<BuilderProps, Store
   buildModel = (): BidsModel => {
 
     let availableRuns = this.state.availableRuns;
+    let availableTasks = getTasks(this.state.datasets, this.state.analysis.datasetId);
 
-    let task: string[] = this.state.availableTasks.filter(
+    let task: string[] = availableTasks.filter(
       x => x.id === this.state.selectedTaskId
     ).map(y => y.name);
 
@@ -315,7 +271,7 @@ export default class AnalysisBuilder extends React.Component<BuilderProps, Store
       description: analysis.description,
       predictions: analysis.predictions,
       private: analysis.private,
-      dataset_id: analysis.datasetId,
+      dataset_id: analysis.datasetId.toString(),
       status: analysis.status,
       runs: analysis.runIds,
       predictors: analysis.predictorIds,
@@ -412,7 +368,7 @@ export default class AnalysisBuilder extends React.Component<BuilderProps, Store
       predictions: data.predictions,
       status: data.status,
       analysisId: data.hash_id,
-      datasetId: data.dataset_id,
+      datasetId: data.dataset_id.toString(),
       runIds: data.runs ? data.runs : [],
       predictorIds: data.predictors ? data.predictors : [],
       hrfPredictorIds: hrfPredictorIds,
@@ -531,7 +487,7 @@ export default class AnalysisBuilder extends React.Component<BuilderProps, Store
    since state changes aren't really user edits we don't want to set unsavedChanges.
   */
   updateState = (attrName: keyof Store, keepClean = false) => (value: any) => {
-    const { analysis, availableRuns, availablePredictors } = this.state;
+    const { analysis, availableRuns, availablePredictors, datasets } = this.state;
     if (!editableStatus.includes(analysis.status) && !keepClean) {
       message.warning('This analysis is locked and cannot be edited');
       return;
@@ -544,7 +500,7 @@ export default class AnalysisBuilder extends React.Component<BuilderProps, Store
         jwtFetch(`${domainRoot}/api/runs?dataset_id=${updatedAnalysis.datasetId}`)
           // .then(response => response.json())
           .then((data: Run[]) => {
-            let availTasks = getTasks(data);
+            let availTasks = getTasks(datasets, updatedAnalysis.datasetId);
             if (availTasks.length === 1) {
               updatedAnalysis.runIds = data.map(x => x.id);
               this.setState({
@@ -553,9 +509,9 @@ export default class AnalysisBuilder extends React.Component<BuilderProps, Store
                 predictorsActive: true
               });
             }
+            
             this.setState({
               availableRuns: data,
-              availableTasks: availTasks,
               availablePredictors: [],
               selectedPredictors: []
             });
@@ -578,7 +534,7 @@ export default class AnalysisBuilder extends React.Component<BuilderProps, Store
       // When a different task is selected, autoselect all its associated run IDs
       this.updateState('analysis')({
         ...analysis,
-        runIds: availableRuns.filter(r => r.task.id === value).map(r => r.id)
+        runIds: availableRuns.filter(r => r.task === value).map(r => r.id)
       });
     }
 
@@ -634,7 +590,6 @@ export default class AnalysisBuilder extends React.Component<BuilderProps, Store
       activeTab,
       analysis,
       datasets,
-      availableTasks,
       availableRuns,
       selectedTaskId,
       availablePredictors,
@@ -692,7 +647,6 @@ export default class AnalysisBuilder extends React.Component<BuilderProps, Store
                 <OverviewTab
                   analysis={analysis}
                   datasets={datasets}
-                  availableTasks={availableTasks}
                   availableRuns={availableRuns}
                   selectedTaskId={selectedTaskId}
                   predictorsActive={predictorsActive}

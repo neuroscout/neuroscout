@@ -10,7 +10,7 @@ export interface Analysis {
   analysisId: string | undefined;
   name: string;
   description: string;
-  datasetId: number | null; // ID of selected dataset
+  datasetId: string | null; // ID of selected dataset
   runIds: string[]; // IDs of selected runs
   predictions: string;
   predictorIds: string[]; // IDs of selected predictors
@@ -32,6 +32,21 @@ export interface Dataset {
   authors: string;
   url: string;
   description: string;
+  tasks: Task[];
+}
+
+// Dataset object as returned by /api/datasets
+export interface ApiDataset {
+  id: number;
+  name: string;
+  description: {
+    Authors: string[];
+    Description: string;
+    URL: string;
+  };
+  url: string;
+  summary: string;
+  tasks: Task[];
 }
 
 export interface Run {
@@ -39,7 +54,7 @@ export interface Run {
   number: string;
   session: string | null;
   subject: string | null;
-  task: { id: string; name: string };
+  task: string;
 }
 
 export interface Task {
@@ -138,7 +153,6 @@ export interface Store {
   reviewActive: boolean;
   analysis: Analysis;
   datasets: Dataset[];
-  availableTasks: Task[];
   availableRuns: Run[];
   selectedTaskId: string | null;
   availablePredictors: Predictor[];
@@ -148,19 +162,6 @@ export interface Store {
   selectedHRFPredictors: Predictor[];
   unsavedChanges: boolean;
   currentLevel: BlockLevel;
-}
-
-// Dataset object as returned by /api/datasets
-export interface ApiDataset {
-  id: number;
-  name: string;
-  description: {
-    Authors: string[];
-    Description: string;
-    URL: string;
-  };
-  url: string;
-  summary: string;
 }
 
 export interface ApiRun {
@@ -178,7 +179,7 @@ export interface ApiAnalysis {
   predictions: string;
   status: AnalysisStatus;
   private?: boolean;
-  dataset_id: number;
+  dataset_id: string;
   runs?: string[];
   predictors?: string[];
   transformations?: Transformation[];
