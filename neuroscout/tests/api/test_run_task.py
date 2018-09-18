@@ -17,7 +17,6 @@ def test_get_run(auth_client, add_task):
 	run = decode_json(resp)
 	assert first_run_id == run['id']
 	assert 'task' in run
-	assert 'id' in run['task']
 
 	assert run['dataset_id'] == add_task
 	assert run['subject'] == '01'
