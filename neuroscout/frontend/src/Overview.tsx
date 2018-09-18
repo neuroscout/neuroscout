@@ -174,7 +174,9 @@ export class OverviewTab extends React.Component<OverviewTabProps, OverviewTabSt
       },
       { title: 'Description', dataIndex: 'description'},
       { title: 'Author(s)', dataIndex: 'authors', width: 280 },
-      // { title: 'URL', dataIndex: 'url', width: 50 }
+      { title: 'URL', dataIndex: 'url', width: 50,
+        render: text => <a href={text}>Link</a>,
+      }
     ];
 
     const selectedDatasetId: string[] = analysis.datasetId ? [analysis.datasetId.toString()] : [];
