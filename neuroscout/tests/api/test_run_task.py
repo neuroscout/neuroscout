@@ -17,7 +17,6 @@ def test_get_run(auth_client, add_task):
 	run = decode_json(resp)
 	assert first_run_id == run['id']
 	assert 'task' in run
-	assert 'id' in run['task']
 
 	assert run['dataset_id'] == add_task
 	assert run['subject'] == '01'
@@ -42,8 +41,7 @@ def test_get_run(auth_client, add_task):
 	resp = auth_client.get('/api/runs', params={'dataset_id' : add_task,
 											'all_fields' : 'True'})
 	assert 'task' in decode_json(resp)[0]
-	assert len(decode_json(resp)[0]['task']) == 2
-	task_id = decode_json(resp)[0]['task']['id']
+	task_id = decode_json(resp)[0]['task']
 
 	# Test filtering by multiple parameters
 	resp = auth_client.get('/api/runs', params={'number': '1,2',
@@ -54,8 +52,7 @@ def test_get_run(auth_client, add_task):
 
 	# Test task route
 	resp = auth_client.get('/api/tasks/{}'.format(task_id))
-	assert 'description' in decode_json(resp)
 
 	# Test task route filtering
 	resp = auth_client.get('/api/tasks', params={'dataset_id' : add_task})
-	assert 'description' in decode_json(resp)[0]
+	assert 'summary' in decode_json(resp)[0]

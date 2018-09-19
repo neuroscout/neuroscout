@@ -64,7 +64,7 @@ def ingest_from_json(config_file, update_features=False, reingest=False):
             reingest - force reingest dataset
         Output:
             list of dataset model ids
-     """
+    """
     dataset_config = load_update_config(config_file, update=update_features)
     if update_features:
         if not (dataset_config or reingest):
@@ -86,13 +86,15 @@ def ingest_from_json(config_file, update_features=False, reingest=False):
             """ Add task to database"""
             dp = params.get('ingest_args', {})
             dp.update(params.get('filters', {}))
-
             dataset_id = add_task(task_name,
                                   dataset_name=dataset_name,
                                   local_path=local_path,
                                   dataset_address=dataset_address,
                                   preproc_address=preproc_address,
                                   reingest=reingest,
+                                  url=items.get('url'),
+                                  dataset_summary=items.get('summary'),
+                                  task_summary=params.get('summary'),
             					  **dp)
             dataset_ids.append(dataset_id)
             dataset_name = Dataset.query.filter_by(id=dataset_id).one().name
