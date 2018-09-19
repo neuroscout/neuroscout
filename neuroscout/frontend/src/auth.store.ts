@@ -85,8 +85,6 @@ export class AuthStore extends Reflux.Store {
       }
       return true;
     } catch (e) {
-        // tslint:disable-next-line:no-console
-        console.log(e);
         this.update({jwt: '', loggedIn: false, openLogin: true});
         return false;
     }

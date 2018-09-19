@@ -79,9 +79,3 @@ test('Homepage has 4 buttons with user is not logged in', () => {
   const wrapper = mount(<App />);
   expect(wrapper.find('button').length).toBe(4);
 });
-
-test('Homepage has 3 buttons with user is logged in', () => {
-  window.localStorage.setItem('jwt', 'fakeJWT');
-  const wrapper = mount(<App />);
-  expect(wrapper.find('button').length).toBe(3);
-});
