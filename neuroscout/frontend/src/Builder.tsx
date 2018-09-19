@@ -31,6 +31,7 @@ import { displayError, jwtFetch } from './utils';
 import { Space } from './HelperComponents';
 import Status from './Status';
 import { config } from './config';
+import { authActions } from './auth.actions';
 
 const { TabPane } = Tabs;
 const { Footer, Content } = Layout;
@@ -578,6 +579,10 @@ export default class AnalysisBuilder extends React.Component<BuilderProps, Store
       );
     })
     .catch(displayError);
+  }
+
+  componentDidUpdate(prevProps, prevState) {
+    authActions.checkJWT();
   }
 
   render() {

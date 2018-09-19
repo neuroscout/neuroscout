@@ -5,16 +5,20 @@ Top-level App component containing AppState. The App component is currently resp
 - Managing user's saved analyses (list display, clone and delete)
 */
 import * as React from 'react';
-import { Tabs, Row, Col, Layout, Button, Modal, Icon, Input, Form, message } from 'antd';
-import { displayError, jwtFetch, timeout } from './utils';
-import { Space } from './HelperComponents';
-import { ApiUser, ApiAnalysis, AppAnalysis } from './coretypes';
-import Home from './Home';
-import AnalysisBuilder from './Builder';
-import Browse from './Browse';
 import { BrowserRouter as Router, Route, Link, Redirect } from 'react-router-dom';
+import Reflux from 'reflux';
+import { Tabs, Row, Col, Layout, Button, Modal, Icon, Input, Form, message } from 'antd';
+
 import './App.css';
+import AnalysisBuilder from './Builder';
+import { ApiUser, ApiAnalysis, AppAnalysis, AuthStoreState } from './coretypes';
+import Browse from './Browse';
 import { config } from './config';
+import Home from './Home';
+import { Space } from './HelperComponents';
+import { displayError, jwtFetch, timeout } from './utils';
+import { AuthStore } from './auth.store';
+import { authActions } from './auth.actions';
 
 const FormItem = Form.Item;
 const DOMAINROOT = config.server_url;
@@ -23,23 +27,10 @@ const { localStorage } = window;
 const { Footer, Content, Header } = Layout;
 
 interface AppState {
-  loggedIn: boolean;
-  openLogin: boolean;
-  openSignup: boolean;
-  openReset: boolean;
-  openEnterResetToken: boolean;
-  loginError: string;
-  signupError: string;
-  resetError: string;
-  email: string | undefined;
-  name: string | undefined;
-  password: string | undefined;
-  token: string | null;
-  jwt: string | null;
-  nextURL: string | null; // will probably remove this and find a better solution to login redirects
+  loadAnalyses: boolean;
   analyses: AppAnalysis[]; // List of analyses belonging to the user
   publicAnalyses: AppAnalysis[]; // List of public analyses
-  loggingOut: boolean; // flag set on logout to know to redirect after logout
+  auth: AuthStoreState;
 }
 
 // Convert analyses returned by API to the shape expected by the frontend
@@ -52,41 +43,23 @@ const ApiToAppAnalysis = (data: ApiAnalysis): AppAnalysis => ({
 });
 
 // Top-level App component
-class App extends React.Component<{}, AppState> {
+// <authStore, {}, AppState>
+class App extends Reflux.Component<any, {}, AppState> {
   constructor(props) {
     super(props);
-    const jwt = localStorage.getItem('jwt');
-    let _email = localStorage.getItem('email');
-    let email = _email == null ? undefined : _email;
     this.state = {
-      loggedIn: !!jwt,
-      openLogin: false,
-      openSignup: false,
-      openReset: false,
-      openEnterResetToken: false,
-      loginError: '',
-      signupError: '',
-      resetError: '',
-      email: email,
-      name: undefined,
-      jwt: jwt,
-      password: '',
-      nextURL: null,
+      loadAnalyses: true,
       analyses: [],
       publicAnalyses: [],
-      loggingOut: false,
-      token: null
+      auth: authActions.getInitialState()
     };
-    if (jwt) {
-      this.loadAnalyses();
-      this.checkAnalysesStatus();
-    }
+    this.store = AuthStore;
     this.loadPublicAnalyses();
   }
 
   // Load user's saved analyses from the server
   loadAnalyses = () => {
-    if (this.state.jwt) {
+    if (this.state.auth.loggedIn) {
       return jwtFetch(`${DOMAINROOT}/api/user`)
         .then((data: ApiUser) => {
           this.setState({
@@ -118,6 +91,7 @@ class App extends React.Component<{}, AppState> {
    */
   checkAnalysesStatus = async () => {
     while (true) {
+      if (!(this.state.auth.loggedIn)) { return; }
       let changeFlag = false;
       let updatedAnalyses = this.state.analyses.map(async (analysis) => {
         if (['DRAFT', 'PASSED'].indexOf(analysis.status) > -1) {
@@ -143,197 +117,6 @@ class App extends React.Component<{}, AppState> {
       });
       await timeout(10000);
     }
-  };
-
-  // Authenticate the user with the server. This function is called from login()
-  authenticate = () =>
-    new Promise((resolve, reject) => {
-      const { email, password } = this.state;
-      const { accountconfirmError } = this;
-      fetch(DOMAINROOT + '/api/auth', {
-        method: 'post',
-        body: JSON.stringify({ email: email, password: password }),
-        headers: {
-          'Content-type': 'application/json'
-        }
-      })
-        .then(response => response.json())
-        .then((data: { status_code: number; access_token?: string; description?: string }) => {
-          if (data.status_code === 401) {
-            this.setState({ loginError: data.description || '' });
-            reject('Authentication failed');
-          } else if (data.access_token) {
-            const token = data.access_token;
-            fetch(DOMAINROOT + '/api/user', {
-              method: 'get',
-              headers: {
-                'Content-type': 'application/json',
-                'authorization': 'JWT ' + data.access_token
-              }
-            })
-            .then((response) => {
-              if (response.status === 401) {
-                response.json().then((missing_data: {message: string}) => {
-                  if (missing_data.message === 'Your account has not been confirmed.') {
-                    accountconfirmError(token);
-                  }
-                  reject('Authentication failed');
-                });
-
-              } else {
-                localStorage.setItem('jwt', token);
-                localStorage.setItem('email', email!);
-                resolve(token);
-              }
-            }).catch(displayError);
-          }}
-        ).catch(displayError);
-      });
-
-  // Log user in
-  login = () => {
-    const { email, password, loggedIn, openLogin, nextURL } = this.state;
-    return this.authenticate()
-      .then((jwt: string) => {
-        this.setState({
-          jwt: jwt,
-          password: '',
-          loggedIn: true,
-          openLogin: false,
-          nextURL: null,
-          loginError: ''
-        });
-      })
-      .then(() => this.loadAnalyses())
-      .catch(displayError);
-  };
-
-  // Sign up for a new account
-  signup = () => {
-    const { name, email, password, openSignup } = this.state;
-    fetch(DOMAINROOT + '/api/user', {
-      method: 'post',
-      body: JSON.stringify({ email: email, password: password, name: name }),
-      headers: {
-        'Content-type': 'application/json'
-      }
-    })
-      .then(response => response.json().then(json => ({ ...json, statusCode: response.status })))
-      .then((data: any) => {
-        if (data.statusCode !== 200) {
-          let errorMessage = '';
-          Object.keys(data.message).forEach(key => {
-            errorMessage += data.message[key];
-          });
-          this.setState({
-            signupError: errorMessage
-          });
-          throw new Error('Signup failed!');
-        }
-        this.setState({ name, email, openSignup: false, signupError: '' });
-        Modal.success({
-          title: 'Account created!',
-          content: 'Your account has been sucessfully created. \
-          You will receive a confirmation email shortly. Please follow the instructions to activate your account\
-          and start using Neuroscout. ',
-          okText: 'Okay',
-        });
-      })
-      .catch(displayError);
-  };
-
-  // Log user out
-  logout = () => {
-    localStorage.removeItem('jwt');
-    localStorage.removeItem('email');
-    this.setState({
-      loggedIn: false,
-      name: undefined,
-      email: undefined, jwt: null,
-      analyses: [],
-      loggingOut: true
-    });
-  };
-
-  // Display modal to confirm logout
-  confirmLogout = (): void => {
-    const that = this;
-    Modal.confirm({
-      title: 'Are you sure you want to log out?',
-      content: 'If you have any unsaved changes they will be discarded.',
-      okText: 'Yes',
-      cancelText: 'No',
-      onOk() {
-        that.logout();
-      }
-    });
-  };
-
-  // Display modal to resend confirmation link
-  accountconfirmError = (jwt): void => {
-    const that = this;
-    Modal.confirm({
-      title: 'Account is not confirmed!',
-      content: 'Your account has not been confirmed. \
-        To continue, please follow the instructions sent to your email address.',
-      okText: 'Resend confirmation',
-      cancelText: 'Close',
-      onOk() {
-        fetch(DOMAINROOT + '/api/user/resend_confirmation', {
-          method: 'post',
-          headers: {
-            'Content-type': 'application/json',
-            'authorization': 'JWT ' + jwt
-          }
-        })
-        .catch(displayError);
-      },
-    });
-  };
-
-  // Reset password function
-  resetPassword = (): void => {
-    const { email } = this.state;
-    fetch(DOMAINROOT + '/api/user/reset_password', {
-      method: 'post',
-      body: JSON.stringify({ email: email}),
-      headers: {
-        'Content-type': 'application/json'
-      }
-    })
-    .catch(displayError)
-    .then(() => {
-      this.setState({ openEnterResetToken: true, openReset: false });
-    });
-  };
-
-  // Reset password function
-  submitToken = (): void => {
-    const { token, password } = this.state;
-    const that = this;
-    fetch(DOMAINROOT + '/api/user/submit_token', {
-      method: 'post',
-      body: JSON.stringify({ token: token, password: password}),
-      headers: {
-        'Content-type': 'application/json'
-      }
-    })
-    .then((response) =>  {
-      if (response.ok) {
-        this.setState({ openEnterResetToken: false});
-        this.login();
-      } else {
-        response.json().then(json => ({ ... json }))
-        .then((data: any) => {
-          let errorMessage = '';
-          Object.keys(data.message).forEach(key => {
-            errorMessage += data.message[key];
-          });
-          that.setState({resetError: errorMessage});
-      });
-    }
-  })
-    .catch(displayError);
   };
 
   setStateFromInput = (name: keyof AppState) => (event: React.FormEvent<HTMLInputElement>) => {
@@ -393,9 +176,12 @@ class App extends React.Component<{}, AppState> {
       loginError,
       signupError,
       password,
+      loggingOut
+    } = this.state.auth;
+
+    const {
       analyses,
       publicAnalyses,
-      loggingOut
     } = this.state;
     if (loggingOut)
       return (
@@ -411,7 +197,7 @@ class App extends React.Component<{}, AppState> {
         footer={null}
         maskClosable={true}
         onCancel={e => {
-          this.setState({ openReset: false });
+          authActions.update({openReset: false});
         }}
       >
         <p>
@@ -420,7 +206,7 @@ class App extends React.Component<{}, AppState> {
         <Form
           onSubmit={e => {
             e.preventDefault();
-            this.resetPassword();
+            authActions.resetPassword();
           }}
         >
           <FormItem>
@@ -430,7 +216,7 @@ class App extends React.Component<{}, AppState> {
               type="email"
               size="large"
               value={email}
-              onChange={this.setStateFromInput('email')}
+              onChange={authActions.updateFromInput('email')}
             />
           </FormItem>
           <FormItem>
@@ -449,7 +235,7 @@ class App extends React.Component<{}, AppState> {
         footer={null}
         maskClosable={true}
         onCancel={e => {
-          this.setState({ openEnterResetToken: false });
+          authActions.update({ openEnterResetToken: false });
         }}
       >
         <p>
@@ -459,7 +245,7 @@ class App extends React.Component<{}, AppState> {
         <Form
           onSubmit={e => {
             e.preventDefault();
-            this.submitToken();
+            authActions.submitToken();
           }}
         >
           <FormItem>
@@ -468,7 +254,8 @@ class App extends React.Component<{}, AppState> {
               placeholder="Token"
               type="token"
               size="large"
-              onChange={this.setStateFromInput('token')}
+              onChange={authActions.updateFromInput('token')}
+
             />
           </FormItem>
           <FormItem>
@@ -477,7 +264,7 @@ class App extends React.Component<{}, AppState> {
               placeholder="Password"
               type="password"
               size="large"
-              onChange={this.setStateFromInput('password')}
+              onChange={authActions.updateFromInput('password')}
             />
           </FormItem>
           <FormItem>
@@ -496,11 +283,11 @@ class App extends React.Component<{}, AppState> {
     const loginModal = () => (
       <Modal
         title="Log into Neuroscout"
-        visible={openLogin}
+        visible={this.state.auth.openLogin}
         footer={null}
         maskClosable={true}
         onCancel={e => {
-          this.setState({ openLogin: false });
+          authActions.update({ openLogin: false });
         }}
       >
         <p>
@@ -510,7 +297,7 @@ class App extends React.Component<{}, AppState> {
         <Form
           onSubmit={e => {
             e.preventDefault();
-            this.login();
+            authActions.login();
           }}
         >
           <FormItem>
@@ -520,7 +307,9 @@ class App extends React.Component<{}, AppState> {
               type="email"
               size="large"
               value={email}
-              onChange={this.setStateFromInput('email')}
+              onChange={(e) => {
+                authActions.updateFromInput('email', e);
+              }}
             />
           </FormItem>
           <FormItem>
@@ -528,12 +317,12 @@ class App extends React.Component<{}, AppState> {
               prefix={<Icon type="lock" style={{ fontSize: 13 }}/>}
               placeholder="Password"
               type="password"
-              value={password}
-              onChange={this.setStateFromInput('password')}
+              value={this.state.auth.password}
+              onChange={(e) => authActions.updateFromInput('password', e)}
             />
           </FormItem>
           <FormItem>
-           <a onClick={e => {this.setState( { openLogin: false, openReset: true}); }}>Forgot password</a><br/>
+           <a onClick={e => {authActions.update( { openLogin: false, openReset: true}); }}>Forgot password</a><br/>
             <Button style={{ width: '100%' }} htmlType="submit" type="primary">
               Log in
             </Button>
@@ -548,18 +337,16 @@ class App extends React.Component<{}, AppState> {
         visible={openSignup}
         footer={null}
         maskClosable={true}
-        onCancel={e => {
-          this.setState({ openSignup: false });
-        }}
+        onCancel={e => authActions.update({ openSignup: false }, e)}
       >
         <p>
-          {signupError}
+          {this.state.auth.signupError}
         </p>
         <br />
         <Form
           onSubmit={e => {
             e.preventDefault();
-            this.signup();
+            authActions.signup();
           }}
         >
           <FormItem>
@@ -567,7 +354,7 @@ class App extends React.Component<{}, AppState> {
               placeholder="Full name"
               size="large"
               value={name}
-              onChange={this.setStateFromInput('name')}
+              onChange={(e) => authActions.updateFromInput('name', e)}
             />
           </FormItem>
           <FormItem>
@@ -576,7 +363,7 @@ class App extends React.Component<{}, AppState> {
               type="email"
               size="large"
               value={email}
-              onChange={this.setStateFromInput('email')}
+              onChange={(e) => authActions.updateFromInput('email', e)}
             />
           </FormItem>
           <FormItem>
@@ -584,7 +371,7 @@ class App extends React.Component<{}, AppState> {
               placeholder="Password"
               type="password"
               value={password}
-              onChange={this.setStateFromInput('password')}
+              onChange={(e) => authActions.updateFromInput('password', e)}
             />
           </FormItem>
           <FormItem>
@@ -602,7 +389,7 @@ class App extends React.Component<{}, AppState> {
           {openLogin && loginModal()}
           {openReset && resetPasswordModal()}
           {openSignup && signupModal()}
-          {openEnterResetToken && enterResetTokenModal()}
+          {openEnterResetToken && authActions.enterResetTokenModal()}
           <Layout>
             <div className="headerRow">
             <Row type="flex" justify="center"style={{ background: '#fff', padding: 0 }}>
@@ -613,18 +400,24 @@ class App extends React.Component<{}, AppState> {
                   </Col>
                   <Col lg={{span: 9}} xs={{span: 12}}>
                     <div className="Login-col">
-                    {loggedIn
+                    {this.state.auth.loggedIn
                       ? <span>
                           {`${email}`}
                           <Space />
-                          <Button onClick={e => this.confirmLogout()}>Log out</Button>
+                          <Button 
+                            onClick={(e) => {
+                              return authActions.confirmLogout();
+                            }}
+                          >
+                            Log out
+                          </Button>
                         </span>
                       : <span>
-                          <Button onClick={e => this.setState({ openLogin: true })}>
+                          <Button onClick={e => authActions.update({ openLogin: true })}>
                             Log in
                           </Button>
                           <Space />
-                          <Button onClick={e => this.setState({ openSignup: true })}>
+                          <Button onClick={e => authActions.update({ openSignup: true })}>
                             Sign up
                           </Button>
                         </span>}
@@ -639,7 +432,7 @@ class App extends React.Component<{}, AppState> {
                 render={props =>
                   <Home
                     analyses={analyses}
-                    loggedIn={loggedIn}
+                    loggedIn={this.state.auth.loggedIn}
                     cloneAnalysis={this.cloneAnalysis}
                     onDelete={this.onDelete}
                   />}
@@ -652,7 +445,7 @@ class App extends React.Component<{}, AppState> {
                   // Longer term to automatically redirect the user to the target URL after login we
                   // need to implement something like the auth workflow example here:
                   // https://reacttraining.com/react-router/web/example/auth-workflow
-                  if (loggedIn) {
+                  if (loggedIn || this.state.auth.openLogin) {
                     return <AnalysisBuilder updatedAnalysis={() => this.loadAnalyses()} />;
                   }
                   message.warning('Please log in first and try again');
@@ -680,9 +473,15 @@ class App extends React.Component<{}, AppState> {
     );
   }
 
-  componentDidUpdate() {
+  componentDidUpdate(prevProps, prevState) {
     // Need to do this so logout redirect only happens once, otherwise it'd be an infinite loop
-    if (this.state.loggingOut) this.setState({ loggingOut: false });
+    if (this.state.auth.loggingOut) authActions.update({ loggingOut: false });
+    if ((prevState.auth.jwt !== this.state.auth.jwt)
+      || (this.state.auth.loggedIn && this.state.loadAnalyses)) {
+      this.loadAnalyses();
+      this.checkAnalysesStatus();
+      this.setState({loadAnalyses: false});
+    }
   }
 }
 
