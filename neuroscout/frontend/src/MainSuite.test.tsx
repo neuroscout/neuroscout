@@ -50,7 +50,6 @@ it('Overview tab renders without errors', () => {
     <OverviewTab
       analysis={analysis}
       datasets={[]}
-      availableTasks={[]}
       availableRuns={[]}
       selectedTaskId={null}
       predictorsActive={true}

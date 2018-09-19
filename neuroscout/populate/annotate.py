@@ -38,7 +38,10 @@ class PredictorSerializer(Serializer):
 
         annotated = {}
         annotated['original_name'] = variable.name
-        annotated['source'] = variable.source
+        source = variable.source
+        if source == 'confounds':
+            source = 'fmriprep'
+        annotated['source'] = source
 
         for pattern, attr in self.schema.items():
             if re.compile(pattern).match(variable.name):
