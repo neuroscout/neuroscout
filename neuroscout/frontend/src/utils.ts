@@ -60,7 +60,7 @@ export const jwtFetch = (path: string, options?: object) => {
         openLogin: true,
         loggedIn: false,
       });
-      return;
+      throw new Error('Please Login Again');
     }
     if (response.status !== 200) {
       displayError(new Error(`HTTP ${response.status} on ${path}`));

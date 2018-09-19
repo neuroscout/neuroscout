@@ -59,7 +59,7 @@ class App extends Reflux.Component<any, {}, AppState> {
 
   // Load user's saved analyses from the server
   loadAnalyses = () => {
-    if (this.state.auth.jwt) {
+    if (this.state.auth.loggedIn) {
       return jwtFetch(`${DOMAINROOT}/api/user`)
         .then((data: ApiUser) => {
           this.setState({
@@ -445,7 +445,7 @@ class App extends Reflux.Component<any, {}, AppState> {
                   // Longer term to automatically redirect the user to the target URL after login we
                   // need to implement something like the auth workflow example here:
                   // https://reacttraining.com/react-router/web/example/auth-workflow
-                  if (loggedIn) {
+                  if (loggedIn || this.state.auth.openLogin) {
                     return <AnalysisBuilder updatedAnalysis={() => this.loadAnalyses()} />;
                   }
                   message.warning('Please log in first and try again');
