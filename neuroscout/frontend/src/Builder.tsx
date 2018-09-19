@@ -223,8 +223,10 @@ export default class AnalysisBuilder extends React.Component<BuilderProps, Store
         return '';
       });
       hrfVariables = hrfVariables.filter(x => x !== '');
-      let hrfTransforms = {'name': 'hrf' as TransformName, 'input': hrfVariables};
-      blocks[0].transformations!.push(hrfTransforms);
+      if (hrfVariables.length > 0) {
+        let hrfTransforms = {'name': 'hrf' as TransformName, 'input': hrfVariables};
+        blocks[0].transformations!.push(hrfTransforms);
+      }
     }
 
     let imgInput: ImageInput = {};
@@ -340,7 +342,7 @@ export default class AnalysisBuilder extends React.Component<BuilderProps, Store
     // Extract transformations and contrasts from within block object of response.
     let contrasts;
     let autoContrast;
-    let hrfPredictorIds;
+    let hrfPredictorIds: string[] = [];
     if (data && data.model && data.model.blocks) {
       for (var i = 0; i < data.model.blocks.length; i++) {
         if (data.model.blocks[i].level !== this.state.currentLevel) {
@@ -353,16 +355,13 @@ export default class AnalysisBuilder extends React.Component<BuilderProps, Store
           let hrfTransforms = data.model.blocks[i].transformations!.filter((x) => {
             return x.name === 'hrf' as TransformName;
           });
-          hrfPredictorIds = hrfTransforms.map(x => x.name);
+          if (hrfTransforms.length > 0) {
+            hrfTransforms.map(x => x.input ? x.input.map(y => hrfPredictorIds.push(y)) : null);
+          }
         }
         if (data.model.blocks[i].contrasts) {
           data.contrasts = data.model.blocks[i].contrasts;
         }
-        /*
-        if (data.model.blocks[i].model && data.model.blocks[i].model!.HRF_variables) {
-          hrfPredictorIds = data.model.blocks[i].model!.HRF_variables;
-        }
-        */
         if (data.model.blocks[i].auto_contrasts) {
           autoContrast = data.model.blocks[i].auto_contrasts;
         }
@@ -570,10 +569,10 @@ export default class AnalysisBuilder extends React.Component<BuilderProps, Store
       let selectedHRFPredictors: Predictor[] = [];
       if (analysis.hrfPredictorIds) {
         selectedHRFPredictors = data.filter(
-          p => analysis.hrfPredictorIds.indexOf(p.id) > -1
+          p => analysis.hrfPredictorIds.indexOf(p.name) > -1
         );
         // hrfPredictorIds comes in as a list of names from api, convert it to IDs here.
-        analysis.hrfPredictorIds = selectedHRFPredictors.map(x => x.id);
+        // analysis.hrfPredictorIds = selectedHRFPredictors.map(x => x.id);
       }
 
       this.setState({
@@ -686,7 +685,7 @@ export default class AnalysisBuilder extends React.Component<BuilderProps, Store
               >
                 <XformsTab
                   predictors={selectedPredictors}
-                  xforms={analysis.transformations}
+                  xforms={analysis.transformations.filter(x => x.name !== 'hrf')}
                   onSave={xforms => this.updateTransformations(xforms)}
                 />
               </TabPane>
