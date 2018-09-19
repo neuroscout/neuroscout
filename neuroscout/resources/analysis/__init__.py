@@ -2,8 +2,9 @@
 
 from .endpoints import (AnalysisResource, AnalysisRootResource,
                        AnalysisBundleResource, CloneAnalysisResource,
-                       CompileAnalysisResource, AnalysisFullResource,
+                       AnalysisFullResource,
                        AnalysisResourcesResource, AnalysisStatusResource)
+from .reports import CompileAnalysisResource
 
 __all__ = [
     'AnalysisResource',
