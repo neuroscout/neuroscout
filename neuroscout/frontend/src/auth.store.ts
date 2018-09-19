@@ -72,6 +72,9 @@ export class AuthStore extends Reflux.Store {
 
   // check to see if JWT is expired
   checkJWT(jwt) {
+    if (jwt === undefined) {
+      jwt = localStorage.getItem('jwt');
+    }
     if (this.state.auth.loggedIn === false) { return false; }
     try {
       let jwt_ob = jwtDecode(jwt);
@@ -81,7 +84,9 @@ export class AuthStore extends Reflux.Store {
         return false;
       }
       return true;
-    } catch {
+    } catch (e) {
+        // tslint:disable-next-line:no-console
+        console.log(e);
         this.update({jwt: '', loggedIn: false, openLogin: true});
         return false;
     }
