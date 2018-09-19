@@ -173,7 +173,7 @@ export class OverviewTab extends React.Component<OverviewTabProps, OverviewTabSt
       { title: 'Description', dataIndex: 'description'},
       { title: 'Author(s)', dataIndex: 'authors', width: 280 },
       { dataIndex: 'url', width: 50,
-        render: text => <a href={text}><Icon type="link" /></a>,
+        render: text => <a href={text} target="_blank" rel="noopener"><Icon type="link" /></a>,
       }
     ];
 
