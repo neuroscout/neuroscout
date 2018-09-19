@@ -116,7 +116,8 @@ def add_stimulus(stim_hash, dataset_id, parent_id=None, path=None, content=None,
 
 def add_task(task_name, dataset_name=None, local_path=None,
              dataset_address=None, preproc_address=None, include_predictors=None,
-             reingest=False, scan_length=1000, summary=None, **kwargs):
+             reingest=False, scan_length=1000, dataset_summary=None,
+             url=None, task_summary=None, **kwargs):
     """ Adds a BIDS dataset task to the database.
         Args:
             task_name - task to add
@@ -127,6 +128,9 @@ def add_task(task_name, dataset_name=None, local_path=None,
             include_predictors - set of predictors to ingest
             reingest - force reingesting even if dataset already exists
             scan_length - default scan length in case it cant be found in image
+            dataset_summary - Dataset summary description,
+            url - Dataset external link,
+            task_summary - Task summary description,
             kwargs - arguments to filter runs by
         Output:
             dataset model id
@@ -162,7 +166,8 @@ def add_task(task_name, dataset_name=None, local_path=None,
 
     if new_ds:
         dataset_model.description = layout.description
-        dataset_model.summary = summary,
+        dataset_model.summary = dataset_summary,
+        dataset_model.url = url,
         dataset_model.dataset_address = dataset_address
         dataset_model.preproc_address = preproc_address
         dataset_model.local_path = local_path.as_posix()
@@ -177,6 +182,7 @@ def add_task(task_name, dataset_name=None, local_path=None,
     if new_task:
         task_model.description = json.load(
             (local_path / 'task-{}_bold.json'.format(task_name)).open())
+        task_model.summary = task_summary,
         task_model.TR = task_model.description['RepetitionTime']
         db.session.commit()
 

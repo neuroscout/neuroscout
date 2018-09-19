@@ -2,12 +2,13 @@
  OverviewTab component
 */
 import * as React from 'react';
-import { Col, Form, Input, AutoComplete, Row, Table, Tooltip, Switch, Button } from 'antd';
+import { Col, Form, Icon, Input, AutoComplete, Row, Table, Tooltip, Switch, Button } from 'antd';
 import { ColumnProps, TableRowSelection } from 'antd/lib/table';
 
 const FormItem = Form.Item;
 const InputGroup = Input.Group;
 
+import { getTasks } from './Builder';
 import { Analysis, Dataset, Run, Task } from './coretypes';
 
 /*
@@ -21,7 +22,6 @@ class DataTable extends React.Component<any> {
 interface OverviewTabProps {
   analysis: Analysis;
   datasets: Dataset[];
-  availableTasks: Task[];
   availableRuns: Run[];
   selectedTaskId: string | null;
   predictorsActive: boolean;
@@ -155,22 +155,26 @@ export class OverviewTab extends React.Component<OverviewTabProps, OverviewTabSt
     let {
       analysis,
       datasets,
-      availableTasks,
       availableRuns,
       selectedTaskId,
       goToNextTab,
       predictorsActive,
     } = this.props;
 
+    let availableTasks = getTasks(datasets, analysis.datasetId);
+
     const datasetColumns = [
       {
         title: 'Name',
         dataIndex: 'name',
         width: 130,
-        sorter: (a, b) => a.name.localeCompare(b.name)
+        sorter: (a, b) => a.name.localeCompare(b.name),
       },
       { title: 'Description', dataIndex: 'description'},
       { title: 'Author(s)', dataIndex: 'authors', width: 280 },
+      { dataIndex: 'url', width: 50,
+        render: text => <a href={text} target="_blank" rel="noopener"><Icon type="link" /></a>,
+      }
     ];
 
     const selectedDatasetId: string[] = analysis.datasetId ? [analysis.datasetId.toString()] : [];
@@ -187,10 +191,10 @@ export class OverviewTab extends React.Component<OverviewTabProps, OverviewTabSt
     const taskColumns = [
       { title: 'Name', dataIndex: 'name', sorter: (a, b) => a.name.localeCompare(b.name)},
 
-      { title: 'Description', dataIndex: 'description' },
+      { title: 'Summary', dataIndex: 'summary' },
       {
         title: '#Runs',
-        dataIndex: 'numRuns',
+        dataIndex: 'num_runs',
         sorter: (a, b) => a.numRuns - b.numRuns
       }
     ];
@@ -211,7 +215,7 @@ export class OverviewTab extends React.Component<OverviewTabProps, OverviewTabSt
       onSelectAll: (selected, selectedRows: any, changeRows) => {
         if (selected) {
           this.updateAnalysis('runIds')
-            (this.props.availableRuns.filter(r => r.task.id === selectedTaskId).map(x => x.id));
+            (this.props.availableRuns.filter(r => r.task === selectedTaskId).map(x => x.id));
         } else {
           this.updateAnalysis('runIds')([]);
         }
@@ -300,7 +304,7 @@ export class OverviewTab extends React.Component<OverviewTabProps, OverviewTabSt
                 columns={this.state.runColumns}
                 rowKey="id"
                 size="small"
-                dataSource={availableRuns.filter(r => r.task.id === selectedTaskId).sort(this.sortSub)}
+                dataSource={availableRuns.filter(r => r.task === selectedTaskId).sort(this.sortSub)}
                 pagination={(availableRuns.length > 20) ? {'position': 'bottom'} : false}
                 rowSelection={runRowSelection}
                 onChange={this.tableChange}
