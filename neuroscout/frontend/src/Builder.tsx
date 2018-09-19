@@ -26,6 +26,7 @@ import {
   BlockModel,
   BidsModel,
   ImageInput,
+  TransformName
 } from './coretypes';
 import { displayError, jwtFetch } from './utils';
 import { Space } from './HelperComponents';
@@ -221,7 +222,8 @@ export default class AnalysisBuilder extends React.Component<BuilderProps, Store
         return '';
       });
       hrfVariables = hrfVariables.filter(x => x !== '');
-      blocks[0].model!.HRF_variables = hrfVariables;
+      let hrfTransforms = {'name': 'hrf' as TransformName, 'input': hrfVariables};
+      blocks[0].transformations!.push(hrfTransforms);
     }
 
     let imgInput: ImageInput = {};
@@ -344,14 +346,22 @@ export default class AnalysisBuilder extends React.Component<BuilderProps, Store
           continue;
         }
         if (data.model.blocks[i].transformations) {
-          data.transformations = data.model.blocks[i].transformations;
+          data.transformations = data.model.blocks[i].transformations!.filter((x) => {
+            return x.name !== 'hrf' as TransformName;
+          });
+          let hrfTransforms = data.model.blocks[i].transformations!.filter((x) => {
+            return x.name === 'hrf' as TransformName;
+          });
+          hrfPredictorIds = hrfTransforms.map(x => x.name);
         }
         if (data.model.blocks[i].contrasts) {
           data.contrasts = data.model.blocks[i].contrasts;
         }
+        /*
         if (data.model.blocks[i].model && data.model.blocks[i].model!.HRF_variables) {
           hrfPredictorIds = data.model.blocks[i].model!.HRF_variables;
         }
+        */
         if (data.model.blocks[i].auto_contrasts) {
           autoContrast = data.model.blocks[i].auto_contrasts;
         }
@@ -663,12 +673,6 @@ export default class AnalysisBuilder extends React.Component<BuilderProps, Store
                   predictorsLoad={this.state.predictorsLoad}
                 />
                 <br/>
-                <h3>HRF Variables:</h3>
-                <PredictorSelector
-                  availablePredictors={selectedPredictors}
-                  selectedPredictors={selectedHRFPredictors}
-                  updateSelection={this.updateHRFPredictorState}
-                />
               </TabPane>
               <TabPane
                 tab="Transformations"
@@ -681,20 +685,20 @@ export default class AnalysisBuilder extends React.Component<BuilderProps, Store
                   onSave={xforms => this.updateTransformations(xforms)}
                 />
               </TabPane>
+              <TabPane tab="HRF" key="hrf" disabled={!transformationsActive}>
+                <h3>HRF Variables:</h3>
+                <PredictorSelector
+                  availablePredictors={selectedPredictors}
+                  selectedPredictors={selectedHRFPredictors}
+                  updateSelection={this.updateHRFPredictorState}
+                />
+              </TabPane>
               <TabPane tab="Contrasts" key="contrasts" disabled={!transformationsActive}>
                 <ContrastsTab
                   analysis={analysis}
                   contrasts={analysis.contrasts}
                   predictors={selectedPredictors}
                   onSave={this.updateContrasts}
-                  updateAnalysis={this.updateState('analysis')}
-                />
-              </TabPane>
-              <TabPane tab="Options" key="modeling" disabled={!modelingActive}>
-                <OptionsTab
-                  analysis={analysis}
-                  selectedPredictors={selectedPredictors}
-                  updateConfig={this.updateConfig}
                   updateAnalysis={this.updateState('analysis')}
                 />
               </TabPane>
@@ -718,3 +722,14 @@ export default class AnalysisBuilder extends React.Component<BuilderProps, Store
     );
   }
 }
+
+/* Can't comment out inline in render
+<TabPane tab="Options" key="modeling" disabled={!modelingActive}>
+  <OptionsTab
+  analysis={analysis}
+  selectedPredictors={selectedPredictors}
+  updateConfig={this.updateConfig}
+  updateAnalysis={this.updateState('analysis')}
+/>
+</TabPane>
+*/
