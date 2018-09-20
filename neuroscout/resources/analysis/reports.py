@@ -24,12 +24,11 @@ def dump_pe(pes):
 	  'predictor_id': r[6]
 	  } for r in res]
 
-def json_analysis(analysis_json, run_id=None):
-	"""" Dump an analysis  object to JSON for compilation.
+def json_pes(analysis_json, run_id=None):
+	"""" Serialize to JSON and analysis's predictor events
 	This requires querying the PredictorEvents to get all events for all runs
-	and predictors. This function is somewhat slow due to the overhead of
-	creating Python objects (and dumping through Marshmallow), tens of thousands
-	of events."""
+	and predictors.
+    """
 	pred_ids = [p['id'] for p in analysis_json['predictors']]
 	run_ids = [r['id'] for r in analysis_json['runs']]
 
@@ -56,11 +55,11 @@ class CompileAnalysisResource(AnalysisMethodResource):
 
         analysis_json = AnalysisFullSchema().dump(analysis)[0]
         resources_json = AnalysisResourcesSchema().dump(analysis)[0]
-        pes_json = json_analysis(analysis_json)
+        pes_json = json_pes(analysis_json)
         task = celery_app.send_task('workflow.compile',
         		args=[analysis_json, pes_json, resources_json,
         		analysis.dataset.local_path])
-        analysis.celery_id = task.id
+        analysis.compile_task_id = task.id
         analysis.status = 'PENDING'
         db.session.add(analysis)
         db.session.commit()
