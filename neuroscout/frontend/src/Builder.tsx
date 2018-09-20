@@ -26,6 +26,7 @@ import {
   BlockModel,
   BidsModel,
   ImageInput,
+  TransformName
 } from './coretypes';
 import { displayError, jwtFetch } from './utils';
 import { Space } from './HelperComponents';
@@ -222,7 +223,10 @@ export default class AnalysisBuilder extends React.Component<BuilderProps, Store
         return '';
       });
       hrfVariables = hrfVariables.filter(x => x !== '');
-      blocks[0].model!.HRF_variables = hrfVariables;
+      if (hrfVariables.length > 0) {
+        let hrfTransforms = {'name': 'hrf' as TransformName, 'input': hrfVariables};
+        blocks[0].transformations!.push(hrfTransforms);
+      }
     }
 
     let imgInput: ImageInput = {};
@@ -338,20 +342,25 @@ export default class AnalysisBuilder extends React.Component<BuilderProps, Store
     // Extract transformations and contrasts from within block object of response.
     let contrasts;
     let autoContrast;
-    let hrfPredictorIds;
+    let hrfPredictorIds: string[] = [];
     if (data && data.model && data.model.blocks) {
       for (var i = 0; i < data.model.blocks.length; i++) {
         if (data.model.blocks[i].level !== this.state.currentLevel) {
           continue;
         }
         if (data.model.blocks[i].transformations) {
-          data.transformations = data.model.blocks[i].transformations;
+          data.transformations = data.model.blocks[i].transformations!.filter((x) => {
+            return x.name !== 'hrf' as TransformName;
+          });
+          let hrfTransforms = data.model.blocks[i].transformations!.filter((x) => {
+            return x.name === 'hrf' as TransformName;
+          });
+          if (hrfTransforms.length > 0) {
+            hrfTransforms.map(x => x.input ? x.input.map(y => hrfPredictorIds.push(y)) : null);
+          }
         }
         if (data.model.blocks[i].contrasts) {
           data.contrasts = data.model.blocks[i].contrasts;
-        }
-        if (data.model.blocks[i].model && data.model.blocks[i].model!.HRF_variables) {
-          hrfPredictorIds = data.model.blocks[i].model!.HRF_variables;
         }
         if (data.model.blocks[i].auto_contrasts) {
           autoContrast = data.model.blocks[i].auto_contrasts;
@@ -560,10 +569,10 @@ export default class AnalysisBuilder extends React.Component<BuilderProps, Store
       let selectedHRFPredictors: Predictor[] = [];
       if (analysis.hrfPredictorIds) {
         selectedHRFPredictors = data.filter(
-          p => analysis.hrfPredictorIds.indexOf(p.id) > -1
+          p => analysis.hrfPredictorIds.indexOf(p.name) > -1
         );
         // hrfPredictorIds comes in as a list of names from api, convert it to IDs here.
-        analysis.hrfPredictorIds = selectedHRFPredictors.map(x => x.id);
+        // analysis.hrfPredictorIds = selectedHRFPredictors.map(x => x.id);
       }
 
       this.setState({
@@ -668,12 +677,6 @@ export default class AnalysisBuilder extends React.Component<BuilderProps, Store
                   predictorsLoad={this.state.predictorsLoad}
                 />
                 <br/>
-                <h3>HRF Variables:</h3>
-                <PredictorSelector
-                  availablePredictors={selectedPredictors}
-                  selectedPredictors={selectedHRFPredictors}
-                  updateSelection={this.updateHRFPredictorState}
-                />
               </TabPane>
               <TabPane
                 tab="Transformations"
@@ -682,8 +685,16 @@ export default class AnalysisBuilder extends React.Component<BuilderProps, Store
               >
                 <XformsTab
                   predictors={selectedPredictors}
-                  xforms={analysis.transformations}
+                  xforms={analysis.transformations.filter(x => x.name !== 'hrf')}
                   onSave={xforms => this.updateTransformations(xforms)}
+                />
+              </TabPane>
+              <TabPane tab="HRF" key="hrf" disabled={!transformationsActive}>
+                <PredictorSelector
+                  availablePredictors={selectedPredictors}
+                  selectedPredictors={selectedHRFPredictors}
+                  updateSelection={this.updateHRFPredictorState}
+                  selectedText="to be convolved with HRF "
                 />
               </TabPane>
               <TabPane tab="Contrasts" key="contrasts" disabled={!transformationsActive}>
@@ -692,14 +703,6 @@ export default class AnalysisBuilder extends React.Component<BuilderProps, Store
                   contrasts={analysis.contrasts}
                   predictors={selectedPredictors}
                   onSave={this.updateContrasts}
-                  updateAnalysis={this.updateState('analysis')}
-                />
-              </TabPane>
-              <TabPane tab="Options" key="modeling" disabled={!modelingActive}>
-                <OptionsTab
-                  analysis={analysis}
-                  selectedPredictors={selectedPredictors}
-                  updateConfig={this.updateConfig}
                   updateAnalysis={this.updateState('analysis')}
                 />
               </TabPane>
@@ -723,3 +726,14 @@ export default class AnalysisBuilder extends React.Component<BuilderProps, Store
     );
   }
 }
+
+/* Can't comment out inline in render
+<TabPane tab="Options" key="modeling" disabled={!modelingActive}>
+  <OptionsTab
+  analysis={analysis}
+  selectedPredictors={selectedPredictors}
+  updateConfig={this.updateConfig}
+  updateAnalysis={this.updateState('analysis')}
+/>
+</TabPane>
+*/

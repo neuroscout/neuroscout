@@ -47,7 +47,7 @@ export const jwtFetch = (path: string, options?: object) => {
     ...options,
     headers: {
       'Content-type': 'application/json',
-      Authorization: 'JWT ' + jwt
+      Authorization: 'JWT ' + jwt,
     }
   };
 
