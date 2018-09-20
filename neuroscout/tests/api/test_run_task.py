@@ -19,7 +19,6 @@ def test_get_run(auth_client, add_task):
 	assert 'task' in run
 
 	assert run['dataset_id'] == add_task
-	assert run['subject'] == '01'
 
 	# Try getting nonexistent run
 	resp = auth_client.get('/api/runs/{}'.format('123'))
