@@ -690,11 +690,11 @@ export default class AnalysisBuilder extends React.Component<BuilderProps, Store
                 />
               </TabPane>
               <TabPane tab="HRF" key="hrf" disabled={!transformationsActive}>
-                <h3>HRF Variables:</h3>
                 <PredictorSelector
                   availablePredictors={selectedPredictors}
                   selectedPredictors={selectedHRFPredictors}
                   updateSelection={this.updateHRFPredictorState}
+                  selectedText="to be convolved with HRF "
                 />
               </TabPane>
               <TabPane tab="Contrasts" key="contrasts" disabled={!transformationsActive}>

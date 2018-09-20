@@ -4,7 +4,7 @@ predictors. The component includes a table of predictors as well as search box t
 filter the table down to predictors whose name or description match the entered search term
 */
 import * as React from 'react';
-import { Table, Input, Button, Row, Col, Tag } from 'antd';
+import { Layout, Table, Input, Button, Row, Col, Tag } from 'antd';
 import { TableRowSelection } from 'antd/lib/table';
 import { Analysis, Predictor } from './coretypes';
 
@@ -22,6 +22,7 @@ interface PredictorSelectorProps {
   // Callback to parent component to update selection
   updateSelection: (newPredictors: Predictor[], filteredPredictors: Predictor[]) => void;
   predictorsLoad?: boolean;
+  selectedText?: string;
 }
 
 interface PredictorsSelectorState {
@@ -29,6 +30,7 @@ interface PredictorsSelectorState {
   filteredPredictors: Predictor[]; // Subset of available preditors whose name or description match the search term
   selectedPredictors: Predictor[]; // List of selected predictors (when used as an uncontrolled component)
   predictorsLoad?: boolean;
+  selectedText?: string;
 }
 
 export class PredictorSelector extends React.Component<
@@ -37,12 +39,13 @@ export class PredictorSelector extends React.Component<
 > {
   constructor(props: PredictorSelectorProps) {
     super(props);
-    const { availablePredictors, selectedPredictors, predictorsLoad } = props;
+    const { availablePredictors, selectedPredictors, predictorsLoad, selectedText } = props;
     this.state = {
       searchText: '',
       filteredPredictors: availablePredictors,
       selectedPredictors,
-      predictorsLoad: predictorsLoad
+      predictorsLoad: predictorsLoad,
+      selectedText: selectedText ? selectedText : ''
     };
   }
 
@@ -129,7 +132,7 @@ export class PredictorSelector extends React.Component<
     return (
       <div>
         <Row type="flex">
-          <Col xl={{span: 16}} lg={{span: 24}}>
+          <Col xl={{span: 18}} lg={{span: 24}}>
             <div>
               <Input
                 placeholder="Search predictor name or description..."
@@ -140,14 +143,14 @@ export class PredictorSelector extends React.Component<
               <br />
             </div>
             <div>
-              <p>{`Select predictors (displaying ${filteredPredictors.length} 
+              <p>{`Select predictors ${this.state.selectedText}(displaying ${filteredPredictors.length} 
             out of ${availablePredictors.length} total predictors):`}</p>
               <Table
                 locale={{ emptyText: this.state.searchText ? 'No results found' : 'No data'}}
                 columns={columns}
                 rowKey="id"
                 pagination={false}
-                scroll={{y: 300}}
+                scroll={{y: 500}}
                 size="small"
                 dataSource={this.state.filteredPredictors}
                 rowSelection={rowSelection}
@@ -157,7 +160,7 @@ export class PredictorSelector extends React.Component<
             </div>
           </Col>
           <Col xl={{span: 1}}/>
-          <Col xl={{span: 7}}>
+          <Col xl={{span: 5}}>
             {selectedPredictors.map(p =>
               <Tag closable={true} onClose={ev => this.removePredictor(p.id)} key={p.id}>
                 {p.name}
