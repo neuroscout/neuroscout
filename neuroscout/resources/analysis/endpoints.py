@@ -4,6 +4,7 @@ from flask_jwt import current_identity
 from database import db
 from models import Analysis
 from os.path import exists
+import datetime
 
 from utils.db import put_record
 from ..utils import owner_required, auth_required, fetch_analysis, abort
@@ -48,6 +49,7 @@ class AnalysisResource(AnalysisMethodResource):
 			kwargs = {k: v for k, v in kwargs.items() if k in exceptions}
 			if not kwargs:
 				abort(422, "Analysis is not editable. Try cloning it.")
+		kwargs['modified_at'] = datetime.datetime.utcnow()
 		return put_record(kwargs, analysis)
 
 	@doc(summary='Delete analysis.')
