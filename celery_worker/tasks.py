@@ -128,8 +128,8 @@ def compile(analysis, predictor_events, resources, bids_dir, run_ids):
 
 @celery_app.task(name='workflow.generate_dm')
 def generate_dm(analysis, predictor_events, bids_dir, run_ids):
-    _, _, bids_analysis = _build_analysis(
-        analysis, predictor_events, bids_dir, run_ids)
+    # _, _, bids_analysis = _build_analysis(
+    #     analysis, predictor_events, bids_dir, run_ids)
 
     ## Get design matrix
 
