@@ -130,7 +130,7 @@ def compile(analysis, predictor_events, resources, bids_dir, run_ids):
 def generate_report(analysis, predictor_events, bids_dir, run_ids):
     _, _, bids_analysis = _build_analysis(
         analysis, predictor_events, bids_dir, run_ids)
-    outdir = Path('/file-data')
+    outdir = Path('/file-data/reports')
     (outdir/ analysis['hash_id']).mkdir(exist_ok=True)
     gl = Layout(str(outdir))
 
