@@ -14,6 +14,7 @@ from app import celery_app
 
 logger = get_task_logger(__name__)
 PATHS = ['sub-{subject}_[ses-{session}_]task-{task}_[acq-{acquisition}_][run-{run}_]events.tsv']
+REPORT_PATHS = ['{hashid}/sub-{subject}_[ses-{session}_]task-{task}_[acq-{acquisition}_][run-{run}_]{type}.{extension}']
 
 def _get_entities(run):
     """ Get BIDS-entities from run object """
@@ -23,12 +24,13 @@ def _get_entities(run):
         if r in ['number', 'session', 'subject', 'acquisition'] and v is not None
         }
 
-    entities['run'] = entities.pop('number')
+    if 'number' in entities:
+        entities['run'] = entities.pop('number')
     return entities
 
 def _writeout_events(analysis, pes, outdir):
     """ Writeout predictor_events into BIDS event files """
-    gl = Layout(outdir.as_posix())
+    gl = Layout(str(outdir))
     outdir = outdir / "func"
     outdir.mkdir(exist_ok=True)
 
@@ -124,14 +126,25 @@ def compile(analysis, predictor_events, resources, bids_dir, run_ids):
 
     return {'bundle_path': bundle_path}
 
-@celery_app.task(name='workflow.generate_dm')
+@celery_app.task(name='workflow.generate_report')
 def generate_report(analysis, predictor_events, bids_dir, run_ids):
     _, _, bids_analysis = _build_analysis(
         analysis, predictor_events, bids_dir, run_ids)
+    outdir = Path('/file-data')
+    (outdir/ analysis['hash_id']).mkdir(exist_ok=True)
+    gl = Layout(str(outdir))
 
-    ## Get design matrix
+    first_level = bids_analysis.blocks[0]
 
-    ## Plot and save
-    dm_path = 'some_path'
+    dm_paths = []
+    for dm in first_level.get_design_matrix():
+        # Writeout design matrix
+        out = gl.build_path(
+            {**dm.entities,
+             'type':'design_matrix', 'extension':'tsv',
+             'hashid': analysis['hash_id']},
+            path_patterns=REPORT_PATHS)
+        dm.dense.to_csv(str(outdir / out))
+        dm_paths.append(out)
 
-    return {'dm_path': dm_path}
+    return {'design_matrix': dm_paths}

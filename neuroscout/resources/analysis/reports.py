@@ -12,8 +12,8 @@ import celery.states as states
 from utils import put_record
 
 def dump_pe(pes):
-	""" Custom function to serialize PredictorEvent, build for *SPEED*
-	Uses Core SQL queries. Relies on attributes being in correct order. """
+	""" Serialize PredictorEvents, with *SPEED*, using core SQL.
+	Warning: relies on attributes being in correct order. """
 	statement = str(pes.statement.compile(dialect=postgresql.dialect()))
 	params = pes.statement.compile(dialect=postgresql.dialect()).params
 	res = db.session.connection().execute(statement, params)
@@ -26,22 +26,25 @@ def dump_pe(pes):
 	  } for r in res]
 
 def jsonify_analysis(analysis, run_id=None):
-    """" Serialize to JSON analysis's predictor events
-    Queries PredictorEvents to get all events for all runs and predictors. """
-    analysis_json = AnalysisFullSchema().dump(analysis)[0]
-    pred_ids = [p['id'] for p in analysis_json['predictors']]
-    all_runs = [r['id'] for r in analysis_json['runs']]
+	"""" Serialize to JSON analysis's predictor events
+	Queries PredictorEvents to get all events for all runs and predictors. """
 
-    if run_id is None:
-    	run_id = all_runs
-    if not set(run_id) <= set(all_runs):
-    	raise ValueError("Incorrect run id specified")
 
-    pes = PredictorEvent.query.filter(
-        (PredictorEvent.predictor_id.in_(pred_ids)) & \
-        (PredictorEvent.run_id.in_(run_id)))
 
-    return analysis_json, dump_pe(pes)
+	analysis_json = AnalysisFullSchema().dump(analysis)[0]
+	pred_ids = [p['id'] for p in analysis_json['predictors']]
+	all_runs = [r['id'] for r in analysis_json['runs']]
+
+	if run_id is None:
+		run_id = all_runs
+	if not set(run_id) <= set(all_runs):
+		raise ValueError("Incorrect run id specified")
+
+	pes = PredictorEvent.query.filter(
+	    (PredictorEvent.predictor_id.in_(pred_ids)) & \
+	    (PredictorEvent.run_id.in_(run_id)))
+
+	return analysis_json, dump_pe(pes)
 
 @doc(tags=['analysis'])
 @marshal_with(AnalysisCompiledSchema)
