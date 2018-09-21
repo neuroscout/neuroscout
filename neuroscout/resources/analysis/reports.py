@@ -1,5 +1,6 @@
 from flask_apispec import doc, use_kwargs, MethodResource, marshal_with
 from database import db
+from flask import current_app
 from sqlalchemy.dialects import postgresql
 from models import PredictorEvent, Report
 from worker import celery_app
@@ -85,7 +86,8 @@ class ReportResource(MethodResource):
 
 		task = celery_app.send_task('workflow.generate_report',
 				args=[analysis_json, pes_json,
-				analysis.dataset.local_path, run_id])
+				analysis.dataset.local_path, run_id,
+				current_app.config['SERVER_NAME']])
 
 		# Create new Report
 		report = Report(
