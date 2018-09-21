@@ -1,8 +1,7 @@
-from app import celery_app
-from celery.utils.log import get_task_logger
-import pandas as pd
 import tarfile
 import json
+import pandas as pd
+from collections import defaultdict
 from pathlib import Path
 from tempfile import mkdtemp
 from bids.analysis import Analysis
@@ -10,8 +9,8 @@ from bids.layout import BIDSLayout
 from grabbit import Layout
 from copy import deepcopy
 from celery.contrib import rdb
-
-from collections import defaultdict
+from celery.utils.log import get_task_logger
+from app import celery_app
 
 logger = get_task_logger(__name__)
 PATHS = ['sub-{subject}_[ses-{session}_]task-{task}_[acq-{acquisition}_][run-{run}_]events.tsv']
@@ -105,7 +104,6 @@ def compile(analysis, predictor_events, resources, bids_dir, run_ids):
     tmp_dir, bundle_paths, bids_analysis = _build_analysis(
         analysis, predictor_events, bids_dir, run_ids)
 
-
     sidecar = {"RepetitionTime": analysis['TR']}
     # Write out JSON files
     for obj, name in [
@@ -127,9 +125,9 @@ def compile(analysis, predictor_events, resources, bids_dir, run_ids):
     return {'bundle_path': bundle_path}
 
 @celery_app.task(name='workflow.generate_dm')
-def generate_dm(analysis, predictor_events, bids_dir, run_ids):
-    # _, _, bids_analysis = _build_analysis(
-    #     analysis, predictor_events, bids_dir, run_ids)
+def generate_report(analysis, predictor_events, bids_dir, run_ids):
+    _, _, bids_analysis = _build_analysis(
+        analysis, predictor_events, bids_dir, run_ids)
 
     ## Get design matrix
 

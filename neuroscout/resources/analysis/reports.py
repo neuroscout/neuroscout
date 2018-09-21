@@ -47,19 +47,15 @@ def jsonify_analysis(analysis, run_id=None):
 @marshal_with(AnalysisCompiledSchema)
 class CompileAnalysisResource(MethodResource):
     @doc(summary='Compile and lock analysis.')
-    @use_kwargs({
-    	'run_id': wa.fields.DelimitedList(fields.Int(),
-                                        description='Run id(s).')
-    }, locations=['query'])
     @owner_required
-    def post(self, analysis, run_id=None):
+    def post(self, analysis):
         put_record({'status': 'SUBMITTING'}, analysis)
 
         task = celery_app.send_task(
                 'workflow.compile',
                 args=[*jsonify_analysis(analysis),
                       AnalysisResourcesSchema().dump(analysis)[0],
-                      analysis.dataset.local_path, run_id]
+                      analysis.dataset.local_path, None]
                 )
 
         put_record({'status': 'PENDING', 'compile_task_id': task.id}, analysis)
