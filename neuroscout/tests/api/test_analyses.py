@@ -265,11 +265,11 @@ def test_compile(auth_client, add_analysis, add_analysis_fail):
 	locked_analysis = decode_json(resp)
 
 	# Test status after some time
-	resp = auth_client.get('/api/analyses/{}/status'.format(analysis_bad.hash_id))
+	resp = auth_client.get('/api/analyses/{}/compile'.format(analysis_bad.hash_id))
 	timeout = time.time() + 60*1   # 1 minute timeout
 	while decode_json(resp)['status'] == 'PENDING':
 		time.sleep(0.2)
-		resp = auth_client.get('/api/analyses/{}/status'.format(analysis_bad.hash_id))
+		resp = auth_client.get('/api/analyses/{}/compile'.format(analysis_bad.hash_id))
 		if time.time() > timeout:
 			assert 0
 			break
@@ -288,12 +288,13 @@ def test_compile(auth_client, add_analysis, add_analysis_fail):
 	locked_analysis = decode_json(resp)
 
 	assert locked_analysis['status'] == 'PENDING'
-	assert locked_analysis['compiled_at'] != ''
+	assert 'compiled_at' not in locked_analysis
 
-	# Test editing locked
-	resp = auth_client.put('/api/analyses/{}'.format(analysis.hash_id),
-						data={'name' : "New name should not be allowed"})
-	assert resp.status_code == 422
+	# Get full
+	resp = auth_client.get('/api/analyses/{}'.format(analysis.hash_id))
+	assert resp.status_code == 200
+	locked_analysis = decode_json(resp)
+	assert locked_analysis['status'] == 'PENDING'
 
 	# Test editing status
 	locked_analysis['private'] = False
@@ -305,14 +306,14 @@ def test_compile(auth_client, add_analysis, add_analysis_fail):
 	assert decode_json(resp)['name'] != "Should not change to this"
 
 	# Test status after some time
-	resp = auth_client.get('/api/analyses/{}/status'.format(analysis.hash_id))
+	resp = auth_client.get('/api/analyses/{}/compile'.format(analysis.hash_id))
 	timeout = time.time() + 60*1   # 1 minute timeout
 	while decode_json(resp)['status'] == 'PENDING':
 		time.sleep(0.2)
 		if time.time() > timeout:
 			assert 0
 			break
-		resp = auth_client.get('/api/analyses/{}/status'.format(analysis.hash_id))
+		resp = auth_client.get('/api/analyses/{}/compile'.format(analysis.hash_id))
 
 	if decode_json(resp)['status'] != 'PASSED':
 		assert 0

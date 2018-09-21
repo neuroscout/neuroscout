@@ -9,7 +9,7 @@ import datetime
 from utils.db import put_record
 from ..utils import owner_required, auth_required, fetch_analysis, abort
 from .schemas import (AnalysisSchema, AnalysisFullSchema,
-					 AnalysisResourcesSchema, AnalysisCompiledSchema)
+					 AnalysisResourcesSchema)
 
 @doc(tags=['analysis'])
 @marshal_with(AnalysisSchema)
@@ -90,15 +90,6 @@ class AnalysisResourcesResource(AnalysisMethodResource):
 	@fetch_analysis
 	def get(self, analysis):
 		return analysis
-
-
-class AnalysisStatusResource(AnalysisMethodResource):
-	@marshal_with(AnalysisCompiledSchema)
-	@doc(summary='Check if analysis has compiled.')
-	@fetch_analysis
-	def get(self, analysis):
-		return analysis
-
 
 class AnalysisBundleResource(MethodResource):
 	@doc(tags=['analysis'], summary='Get analysis tarball bundle.',

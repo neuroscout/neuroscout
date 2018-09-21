@@ -3,8 +3,7 @@
 from .analysis import (AnalysisResource, AnalysisRootResource,
                        CloneAnalysisResource, CompileAnalysisResource,
                        AnalysisBundleResource, AnalysisFullResource,
-                       AnalysisResourcesResource, AnalysisStatusResource,
-                       ReportResource)
+                       AnalysisResourcesResource, ReportResource)
 from .dataset import DatasetSchema, DatasetResource, DatasetListResource
 from .predictor import (PredictorEventSchema, PredictorSchema,
                         PredictorListResource, PredictorResource,
@@ -22,7 +21,6 @@ __all__ = [
     'AnalysisBundleResource',
     'AnalysisFullResource',
     'AnalysisResourcesResource',
-    'AnalysisStatusResource',
     'ReportResource',
     'DatasetSchema',
     'DatasetResource',
