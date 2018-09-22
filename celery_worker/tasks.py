@@ -11,6 +11,9 @@ from copy import deepcopy
 from celery.contrib import rdb
 from celery.utils.log import get_task_logger
 from app import celery_app
+from matplotlib import pyplot as plt
+from nistats.reporting import plot_design_matrix
+from fitlins.viz import plot_and_save
 
 logger = get_task_logger(__name__)
 PATHS = ['sub-{subject}_[ses-{session}_]task-{task}_[acq-{acquisition}_][run-{run}_]events.tsv']
@@ -126,28 +129,40 @@ def compile(analysis, predictor_events, resources, bids_dir, run_ids):
 
     return {'bundle_path': bundle_path}
 
-def _format_url(domain, hash_id, file):
-    return '{}/reports/{}/{}'.format(domain, hash_id, file)
+def _build_paths(layout, outdir, domain, hash_id, entities, type, extension):
+    file = layout.build_path({**entities, 'type':type, 'extension':extension},
+                             path_patterns=REPORT_PATHS)
+    outfile = str(outdir / file)
+    return outfile, '{}/reports/{}/{}'.format(domain, hash_id, file)
 
 @celery_app.task(name='workflow.generate_report')
 def generate_report(analysis, predictor_events, bids_dir, run_ids, domain):
     _, _, bids_analysis = _build_analysis(
         analysis, predictor_events, bids_dir, run_ids)
-    outdir = Path('/file-data/reports') / analysis['hash_id']
+    hash = analysis['hash_id']
+    outdir = Path('/file-data/reports') / hash
     outdir.mkdir(exist_ok=True)
     gl = Layout(str(outdir))
 
-    first_level = bids_analysis.blocks[0]
+    first = bids_analysis.blocks[0]
 
     dm_urls = []
-    for dm in first_level.get_design_matrix():
+    dmplot_urls = []
+    for dm in first.get_design_matrix(
+        mode='dense', force=True, entities=False, sampling_rate=0.5):
         # Writeout design matrix
-        out = gl.build_path(
-            {**dm.entities,
-             'type':'design_matrix', 'extension':'tsv'},
-            path_patterns=REPORT_PATHS)
-        dm.dense.to_csv(str(outdir / out))
-        logger.info(str(outdir / out))
-        dm_urls.append(_format_url(domain, analysis['hash_id'], out))
+        out, url = _build_paths(
+            gl, outdir, domain, hash, dm.entities, 'design_matrix', 'tsv')
+        dm.dense.to_csv(out, index=False)
+        dm_urls.append(url)
 
-    return {'design_matrix': dm_urls}
+        out, url = _build_paths(
+            gl, outdir, domain, hash, dm.entities, 'design_matrix_plot', 'png')
+
+        dmplot_urls.append(url)
+        plt.set_cmap('viridis')
+        plot_and_save(out, plot_design_matrix, dm.dense)
+        logger.info(out)
+
+    return {'design_matrix': dm_urls,
+            'design_matrix_plot': dmplot_urls}
