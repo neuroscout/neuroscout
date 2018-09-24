@@ -42,7 +42,7 @@ class Analysis(db.Model):
     locked = db.Column(db.Boolean, default=False)
 
     compile_traceback = db.Column(db.Text, default='')
-    celery_id = db.Column(db.Text) # Celery task id
+    compile_task_id = db.Column(db.Text) # Celery task id
     bundle_path = db.Column(db.Text)
 
     dataset_id = db.Column(db.Integer, db.ForeignKey('dataset.id'),
@@ -103,6 +103,22 @@ def update_hash(mapper, connection, target):
     analysis_table = mapper.local_table
     connection.execute(
           analysis_table.update().
-              values(hash_id=Hashids(current_app.config['HASH_SALT'], min_length=5).encode(target.id)).
+              values(hash_id=Hashids(current_app.config['HASH_SALT'],
+                                     min_length=5).encode(target.id)).
               where(analysis_table.c.id==target.id)
     )
+
+
+class Report(db.Model):
+    """" Report generation table"""
+    id = db.Column(db.Integer, primary_key=True)
+    analysis_id = db.Column(db.Text, db.ForeignKey('analysis.hash_id'))
+    runs = db.Column(JSONB, default=None)
+    generated_at = db.Column(db.DateTime, default=datetime.datetime.utcnow)
+    task_id = db.Column(db.Text) # Celery task id
+    result = db.Column(JSONB) # JSON result from Celery (once finished)
+    traceback = db.Column(db.Text)
+
+    status = db.Column(db.Text, default='PENDING')
+    __table_args__ = (
+    	db.CheckConstraint(status.in_(['OK', 'FAILED', 'PENDING'])), )

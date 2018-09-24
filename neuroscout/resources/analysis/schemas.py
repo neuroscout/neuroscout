@@ -107,3 +107,11 @@ class AnalysisCompiledSchema(Schema):
 		dump_only=True)
 	compile_traceback = fields.Str(
 		description='Traceback of compilation error.')
+
+class ReportSchema(Schema):
+	""" Schema for report results """
+	generated_at = fields.Time(description='Time report was generated')
+	result = fields.Dict(description='Links to report resources')
+	status = fields.Str(description='Report status')
+	traceback = fields.Str(
+		description='Traceback of generation error.')
