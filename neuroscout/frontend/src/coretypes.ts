@@ -162,6 +162,7 @@ export interface Store {
   selectedHRFPredictors: Predictor[];
   unsavedChanges: boolean;
   currentLevel: BlockLevel;
+  model: BidsModel;
 }
 
 export interface ApiRun {

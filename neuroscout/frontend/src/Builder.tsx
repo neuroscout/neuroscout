@@ -9,6 +9,7 @@ import { OverviewTab } from './Overview';
 import { PredictorSelector } from './Predictors';
 import { ContrastsTab } from './Contrasts';
 import { XformsTab } from './Transformations';
+import { Review } from './Review';
 import OptionsTab from './Options';
 import {
   Store,
@@ -47,7 +48,7 @@ const editableStatus = ['DRAFT', 'FAILED'];
 const defaultConfig: AnalysisConfig = { smoothing: DEFAULT_SMOOTHING, predictorConfigs: {} };
 
 // Create initialized app state (used in the constructor of the top-level App component)
-const initializeStore = (): Store => ({
+let initializeStore = (): Store => ({
   activeTab: 'overview',
   predictorsActive: false,
   predictorsLoad: false,
@@ -85,7 +86,15 @@ const initializeStore = (): Store => ({
   selectedPredictors: [],
   selectedHRFPredictors: [],
   unsavedChanges: false,
-  currentLevel: 'run'
+  currentLevel: 'run',
+  model: {
+    blocks: [{
+      level: 'run',
+      transformations: [],
+      contrasts: []
+    }]
+  }
+
 });
 
 // Normalize dataset object returned by /api/datasets
@@ -143,10 +152,11 @@ export default class AnalysisBuilder extends React.Component<BuilderProps, Store
       jwtFetch(`${domainRoot}/api/analyses/${props.id}`)
         // .then(response => response.json() as Promise<ApiAnalysis>)
         .then((data: ApiAnalysis) => this.loadAnalysis(data))
+        .then(() => this.setState({model: this.buildModel()}))
         .catch(displayError);
     }
 
-    jwtFetch(domainRoot + '/api/datasets')
+    jwtFetch(domainRoot + '/api/datasets?active_only=true')
       // .then(response => response.json())
       .then(data => {
         const datasets: Dataset[] = data.map(d => normalizeDataset(d));
@@ -225,6 +235,8 @@ export default class AnalysisBuilder extends React.Component<BuilderProps, Store
       hrfVariables = hrfVariables.filter(x => x !== '');
       if (hrfVariables.length > 0) {
         let hrfTransforms = {'name': 'hrf' as TransformName, 'input': hrfVariables};
+        // Right now we only want one HRF transform, remove all others to prevent duplicates
+        blocks[0].transformations = blocks[0].transformations!.filter(x => x.name !== 'hrf');
         blocks[0].transformations!.push(hrfTransforms);
       }
     }
@@ -256,6 +268,7 @@ export default class AnalysisBuilder extends React.Component<BuilderProps, Store
 
   // Save analysis to server, either with lock=false (just save), or lock=true (save & submit)
   saveAnalysis = ({ compile = false }) => (): void => {
+    this.setState({activeTab: 'status'});
     if ((!compile && !this.saveEnabled()) || (compile && !this.submitEnabled())) {
       return;
     }
@@ -309,6 +322,7 @@ export default class AnalysisBuilder extends React.Component<BuilderProps, Store
       displayError(error);
       throw error;
     }
+    /*
     jwtFetch(url, { method, body: JSON.stringify(apiAnalysis) })
       // .then(response => response.json())
       .then((data: ApiAnalysis & { statusCode: number }) => {
@@ -331,11 +345,14 @@ export default class AnalysisBuilder extends React.Component<BuilderProps, Store
         this.props.updatedAnalysis();
       })
       .catch(displayError);
+    */
   };
 
   // Decode data returned by '/api/analyses/<id>' (ApiAnalysis) to convert it to the right shape (Analysis)
   // and fetch the associated runs
   loadAnalysis = (data: ApiAnalysis): Promise<Analysis> => {
+    // tslint:disable-next-line:no-console
+    console.log(data);
 
     data.transformations = [];
 
@@ -418,6 +435,19 @@ export default class AnalysisBuilder extends React.Component<BuilderProps, Store
     });
   };
 
+  generateButton = () => {
+      return (
+        <Button
+          hidden={!this.state.analysis.analysisId}
+          onClick={this.confirmSubmission}
+          type={'primary'}
+          disabled={!this.submitEnabled()}
+        >
+          {this.state.unsavedChanges ? 'Save & Generate' : 'Generate'}
+        </Button>
+      );
+  };
+
   updateConfig = (newConfig: AnalysisConfig): void => {
     const newAnalysis = { ...this.state.analysis };
     newAnalysis.config = newConfig;
@@ -433,7 +463,7 @@ export default class AnalysisBuilder extends React.Component<BuilderProps, Store
 
   updateContrasts = (contrasts: Contrast[]): void => {
     this.setState({
-      analysis: { ...this.state.analysis },
+      analysis: { ...this.state.analysis, contrasts },
       unsavedChanges: true
     });
   };
@@ -555,10 +585,15 @@ export default class AnalysisBuilder extends React.Component<BuilderProps, Store
   };
 
   tabChange = (activeKey) => {
+    const analysis = this.state.analysis;
+    if (activeKey === 'review') {
+      // this.updateState('analysis')({ ...analysis, model: this.buildModel()});
+      this.setState({model: this.buildModel()});
+    }
+
     if (activeKey === 'overview' || this.state.predictorsLoad === false) {
       return;
     }
-    const analysis = this.state.analysis;
 
     jwtFetch(`${domainRoot}/api/predictors?run_id=${analysis.runIds}`)
     .then((data: Predictor[]) => {
@@ -571,8 +606,6 @@ export default class AnalysisBuilder extends React.Component<BuilderProps, Store
         selectedHRFPredictors = data.filter(
           p => analysis.hrfPredictorIds.indexOf(p.name) > -1
         );
-        // hrfPredictorIds comes in as a list of names from api, convert it to IDs here.
-        // analysis.hrfPredictorIds = selectedHRFPredictors.map(x => x.id);
       }
 
       this.setState({
@@ -637,15 +670,6 @@ export default class AnalysisBuilder extends React.Component<BuilderProps, Store
                 Save
               </Button>
               <Space />
-              <Button
-                hidden={!this.state.analysis.analysisId}
-                onClick={this.confirmSubmission}
-                type={'primary'}
-                disabled={!this.submitEnabled()}
-              >
-                {unsavedChanges ? 'Save & Generate' : 'Generate'}
-              </Button>
-              <Space />
             </h2>
             <br />
           </Col>
@@ -707,9 +731,13 @@ export default class AnalysisBuilder extends React.Component<BuilderProps, Store
                 />
               </TabPane>
               <TabPane tab="Review" key="review" disabled={!reviewActive}>
-                <p>
-                  {JSON.stringify(analysis)}
-                </p>
+                {this.state.model &&
+                  <Review
+                    model={this.state.model}
+                    unsavedChanges={this.state.unsavedChanges}
+                    generateButton={this.generateButton()}
+                  />
+                }
               </TabPane>
               <TabPane tab="Status" key="status" disabled={false}>
                 <Status status={analysis.status} />

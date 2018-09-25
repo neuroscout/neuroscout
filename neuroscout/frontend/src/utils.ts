@@ -84,3 +84,7 @@ export const jwtFetch = (path: string, options?: object) => {
 export const timeout = (ms: number) => {
       return new Promise(resolve => setTimeout(resolve, ms));
 };
+
+export const alphaSort = (x: string[]) => {
+  return x.sort((a, b) => a.localeCompare(b));
+};
