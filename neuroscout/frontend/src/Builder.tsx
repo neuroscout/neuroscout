@@ -351,8 +351,6 @@ export default class AnalysisBuilder extends React.Component<BuilderProps, Store
   // Decode data returned by '/api/analyses/<id>' (ApiAnalysis) to convert it to the right shape (Analysis)
   // and fetch the associated runs
   loadAnalysis = (data: ApiAnalysis): Promise<Analysis> => {
-    // tslint:disable-next-line:no-console
-    console.log(data);
 
     data.transformations = [];
 
@@ -402,12 +400,12 @@ export default class AnalysisBuilder extends React.Component<BuilderProps, Store
       config: data.config || defaultConfig,
       transformations: data.transformations,
       contrasts: data.contrasts || [],
+      model: data.model,
       autoContrast: autoContrast
     };
 
     if (analysis.runIds.length > 0) {
       jwtFetch(`${domainRoot}/api/runs/${analysis.runIds[0]}`)
-        // .then(response => response.json() as Promise<Run>)
         .then(fetch_data => {
           this.setState({ selectedTaskId: fetch_data.task.id });
           this.updateState('analysis', true)(analysis);
@@ -519,6 +517,27 @@ export default class AnalysisBuilder extends React.Component<BuilderProps, Store
     return this.updatePredictorState(value, filteredPredictors, true);
   }
 
+  runIdsFromModel = (availableRuns: Run[], input: ImageInput) => {
+    let runIds: Run[] = availableRuns; 
+    if (!this.state.model || !this.state.model.input) {
+      return [];
+    }
+    let keys = ['subject', 'session', 'run'];
+    keys.map(key => {
+      if (!input[key]) {return; }
+      runIds = runIds.filter((x) => {
+        if ((key !== 'run' && x[key] === undefined) || (key === 'run' && x.number === undefined)) {
+          return true;
+        }
+        if (key === 'run') {
+          return input[key]!.indexOf(parseInt(x.number, 10)) > -1;
+        }
+        return input[key].indexOf(x[key]) > -1;
+      });
+    });
+    return runIds.map(x => x.id);
+  }
+
   /* Main function to update application state. May split this up into
    smaller pieces if it gets too complex.
 
@@ -541,8 +560,14 @@ export default class AnalysisBuilder extends React.Component<BuilderProps, Store
           // .then(response => response.json())
           .then((data: Run[]) => {
             let availTasks = getTasks(datasets, updatedAnalysis.datasetId);
-            if (availTasks.length === 1) {
+
+            if (updatedAnalysis.model && updatedAnalysis.model.input) {
+              updatedAnalysis.runIds = this.runIdsFromModel(data, updatedAnalysis.model.input);
+            } else {
               updatedAnalysis.runIds = data.map(x => x.id);
+            }
+
+            if (availTasks.length === 1) {
               this.setState({
                 selectedTaskId: availTasks[0].id,
                 predictorsLoad: true,
