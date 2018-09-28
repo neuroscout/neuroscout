@@ -114,6 +114,7 @@ export interface Transformation {
   name: TransformName;
   replace_na?: ReplaceNA;
   input?: string[]; // predictor IDs
+  output?: string[];
   demean?: boolean;
   rescale?: boolean;
   other?: string[];

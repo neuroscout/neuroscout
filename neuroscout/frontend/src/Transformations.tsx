@@ -273,6 +273,7 @@ class XformEditor extends React.Component<XformEditorProps, XformEditorState> {
       displayError(new Error('Please select at least one input for the transformation'));
       return;
     }
+    transformation.output = transformation.input;
     this.props.onSave(transformation);
   };
 

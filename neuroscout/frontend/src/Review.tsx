@@ -29,6 +29,7 @@ interface ReviewProps {
   model: BidsModel;
   unsavedChanges: boolean;
   generateButton: any;
+  availablePredictors: Predictor[];
 }
 
 class ModelInput extends React.Component<{model: BidsModel}, {}> {
@@ -106,6 +107,21 @@ class ModelBlocks extends React.Component<{blocks: Block[]}, {}> {
   }
 }
 
+// In the future this will include the new named outputs from transformations.
+class Variables extends React.Component<{model: BidsModel, available: Predictor[]}, {}> {
+  render() {
+    let { model, available } = this.props;
+    let modelVars: string[] = [];
+    if (model.blocks && model.blocks[0] && model.blocks[0].model && model.blocks[0].model!.variables) {
+      modelVars = model.blocks[0].model!.variables;
+    }
+    let displayVars = available.filter(x => modelVars.indexOf('' + x.name) > -1);
+    let display: any[] = [];
+    displayVars.map((x, i) => display.push(<div key={i}><h3>{x.name}:</h3><pre>{x.description}</pre></div>));
+    return (<div>{display}</div>);
+  }
+}
+
 export class Review extends React.Component<ReviewProps, {}> {
   render() {
     let model = this.props.model;
@@ -141,6 +157,9 @@ export class Review extends React.Component<ReviewProps, {}> {
         <Panel header="Transformations" key="xforms"><ReviewObjects input={xforms}/></Panel>
         <Panel header="Contrasts" key="contrasts">
           <ReviewObjects input={contrasts} autoContrasts={autoContrasts}/>
+        </Panel>
+        <Panel header="Variables" key="variables">
+          <Variables model={this.props.model} available={this.props.availablePredictors}/>
         </Panel>
         <Panel header="JSON Model" key="model"><pre>{JSON.stringify(this.props.model, null, 2)}</pre></Panel>
         </Collapse>

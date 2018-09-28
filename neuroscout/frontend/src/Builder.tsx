@@ -10,6 +10,7 @@ import { PredictorSelector } from './Predictors';
 import { ContrastsTab } from './Contrasts';
 import { XformsTab } from './Transformations';
 import { Review } from './Review';
+import { Report } from './Report';
 import OptionsTab from './Options';
 import {
   Store,
@@ -308,6 +309,7 @@ export default class AnalysisBuilder extends React.Component<BuilderProps, Store
       url = `${domainRoot}/api/analyses/${analysis.analysisId}/compile`;
       method = 'post';
       this.setState({analysis: {...analysis, status: 'SUBMITTING'}});
+      this.generateReport();
     } else if (!compile && analysis.analysisId) {
       // Save existing analysis
       url = `${domainRoot}/api/analyses/${analysis.analysisId}`;
@@ -322,7 +324,6 @@ export default class AnalysisBuilder extends React.Component<BuilderProps, Store
       displayError(error);
       throw error;
     }
-    /*
     jwtFetch(url, { method, body: JSON.stringify(apiAnalysis) })
       // .then(response => response.json())
       .then((data: ApiAnalysis & { statusCode: number }) => {
@@ -345,7 +346,6 @@ export default class AnalysisBuilder extends React.Component<BuilderProps, Store
         this.props.updatedAnalysis();
       })
       .catch(displayError);
-    */
   };
 
   // Decode data returned by '/api/analyses/<id>' (ApiAnalysis) to convert it to the right shape (Analysis)
@@ -415,6 +415,17 @@ export default class AnalysisBuilder extends React.Component<BuilderProps, Store
       this.updateState('analysis', true)(analysis);
     }
     return Promise.resolve(analysis);
+  };
+
+  generateReport = (): void => {
+    let id = this.state.analysis.analysisId;
+    let runIds = this.state.analysis.runIds.join(',');
+    let url = `${domainRoot}/api/analyses/${id}/report?run_id=${runIds}`;
+    jwtFetch(url, { method: 'POST' })
+    .then((res) => {
+      // tslint:disable-next-line:no-console
+      console.log(res);
+    });
   };
 
   confirmSubmission = (): void => {
@@ -761,16 +772,13 @@ export default class AnalysisBuilder extends React.Component<BuilderProps, Store
                     model={this.state.model}
                     unsavedChanges={this.state.unsavedChanges}
                     generateButton={this.generateButton()}
+                    availablePredictors={this.state.availablePredictors}
                   />
                 }
               </TabPane>
               <TabPane tab="Status" key="status" disabled={false}>
                 <Status status={analysis.status} />
-                <br />
-                <br />
-                <p>
-                  {statusText}
-                </p>
+                <Report analysisId={analysis.analysisId} />
               </TabPane>
             </Tabs>
           </Col>

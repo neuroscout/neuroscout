@@ -91,6 +91,7 @@ class App extends Reflux.Component<any, {}, AppState> {
    */
   checkAnalysesStatus = async () => {
     while (true) {
+    /*
       if (!(this.state.auth.loggedIn)) { return; }
       let changeFlag = false;
       let updatedAnalyses = this.state.analyses.map(async (analysis) => {
@@ -115,6 +116,7 @@ class App extends Reflux.Component<any, {}, AppState> {
           this.setState({ analyses: values});
         }
       });
+    */
       await timeout(10000);
     }
   };
