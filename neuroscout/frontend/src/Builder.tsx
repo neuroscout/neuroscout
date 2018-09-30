@@ -1,4 +1,5 @@
  /*
+
  Top-level AnalysisBuilder component which contains all of the necessary state for editing
  an analysis.
 */
@@ -32,7 +33,6 @@ import {
 } from './coretypes';
 import { displayError, jwtFetch } from './utils';
 import { Space } from './HelperComponents';
-import Status from './Status';
 import { config } from './config';
 import { authActions } from './auth.actions';
 
@@ -777,7 +777,6 @@ export default class AnalysisBuilder extends React.Component<BuilderProps, Store
                 }
               </TabPane>
               <TabPane tab="Status" key="status" disabled={false}>
-                <Status status={analysis.status} />
                 <Report analysisId={analysis.analysisId} />
               </TabPane>
             </Tabs>
