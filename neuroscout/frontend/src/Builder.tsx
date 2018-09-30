@@ -776,7 +776,7 @@ export default class AnalysisBuilder extends React.Component<BuilderProps, Store
                   />
                 }
               </TabPane>
-              <TabPane tab="Status" key="status" disabled={false}>
+              <TabPane tab="Reports" key="reports" disabled={false}>
                 <Report analysisId={analysis.analysisId} />
               </TabPane>
             </Tabs>
