@@ -59,7 +59,7 @@ class ReviewObjects extends React.Component<{input: (Transformation | Contrast)[
     let input = this.props.input;
     let display: any[] = [];
     if (this.props.autoContrasts !== undefined) {
-      display.push(<div key="ac"><h3>Auto Contrasts:</h3>{this.props.autoContrasts}</div>);
+      display.push(<div key="ac"><h3>Auto Contrasts:</h3>{'' + this.props.autoContrasts}</div>);
     }
     input.map((x, i) => display.push(<div key={i}><h3>{x.name}:</h3><pre>{JSON.stringify(x, null, 2)}</pre></div>));
 
