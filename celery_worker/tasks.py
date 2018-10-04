@@ -97,7 +97,8 @@ def _build_analysis(analysis, predictor_events, bids_dir, run_id=None):
     # Load events and try applying transformations
 
     bids_layout = BIDSLayout(
-        [(bids_dir, 'bids'), (str(tmp_dir), ['bids', 'derivatives'])])
+        [(bids_dir, 'bids'), (str(tmp_dir), ['bids', 'derivatives'])],
+        exclude='derivatives/') # Need to exclude original fmriprep files
     bids_analysis = Analysis(
         bids_layout, deepcopy(analysis.get('model')))
     bids_analysis.setup(**entities)
@@ -135,6 +136,15 @@ def _build_paths(layout, outdir, domain, hash_id, entities, type, extension):
     outfile = str(outdir / file)
     return outfile, '{}/reports/{}/{}'.format(domain, hash_id, file)
 
+def _plot_save_dm(dm, outfile):
+    plt.set_cmap('viridis')
+    fig = plt.figure(figsize=(8, 9))
+    axes = plt.gca()
+    plt.xticks(fontsize=10, rotation=90)
+    plot_design_matrix(dm, ax=axes)
+    fig.savefig(outfile, bbox_inches='tight')
+    plt.close(fig)
+
 @celery_app.task(name='workflow.generate_report')
 def generate_report(analysis, predictor_events, bids_dir, run_ids, domain):
     _, _, bids_analysis = _build_analysis(
@@ -149,7 +159,7 @@ def generate_report(analysis, predictor_events, bids_dir, run_ids, domain):
     dm_urls = []
     dmplot_urls = []
     for dm in first.get_design_matrix(
-        mode='dense', force=True, entities=False, sampling_rate=0.5):
+        mode='dense', force=True, entities=False, sampling_rate=5):
         # Writeout design matrix
         out, url = _build_paths(
             gl, outdir, domain, hash, dm.entities, 'design_matrix', 'tsv')
@@ -160,9 +170,7 @@ def generate_report(analysis, predictor_events, bids_dir, run_ids, domain):
             gl, outdir, domain, hash, dm.entities, 'design_matrix_plot', 'png')
 
         dmplot_urls.append(url)
-        plt.set_cmap('viridis')
-        plot_and_save(out, plot_design_matrix, dm.dense)
-        logger.info(out)
+        _plot_save_dm(dm.dense, out)
 
     return {'design_matrix': dm_urls,
             'design_matrix_plot': dmplot_urls}
