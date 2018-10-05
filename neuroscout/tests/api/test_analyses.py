@@ -252,6 +252,36 @@ def test_put(auth_client, add_analysis, add_task, session):
 	assert delresp.status_code == 200
 	assert Analysis.query.filter_by(hash_id=analysis_json['hash_id']).count() == 0
 
+@pytest.mark.skipif('CELERY_BROKER_URL' not in os.environ,
+                    reason="requires redis")
+def test_reports(auth_client, add_analysis):
+	analysis  = Analysis.query.filter_by(id=add_analysis).first()
+	# Test compiling
+	resp = auth_client.post('/api/analyses/{}/report'.format(analysis.hash_id))
+	assert resp.status_code == 200
+
+	# Get report
+	resp = auth_client.get('/api/analyses/{}/report'.format(analysis.hash_id))
+	assert resp.status_code == 200
+
+	timeout = time.time() + 60*1   # 1 minute timeout
+
+	while decode_json(resp)['status'] == 'PENDING':
+		time.sleep(0.2)
+		resp = auth_client.get('/api/analyses/{}/report'.format(analysis.hash_id))
+		if time.time() > timeout:
+			assert 0
+			break
+
+	if decode_json(resp)['status'] != 'PASSED':
+		assert 0
+
+	result = decode_json(resp)['result']
+
+	for f in ['contrast_plot', 'design_matrix', 'design_matrix_corrplot', 'design_matrix_plot']:
+		assert f in result
+
+	assert len(result['design_matrix']) == 4
 
 @pytest.mark.skipif('CELERY_BROKER_URL' not in os.environ,
                     reason="requires redis")
