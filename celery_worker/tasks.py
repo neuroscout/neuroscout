@@ -135,7 +135,9 @@ def _plot_save(dm, plotter, outfile, **kwargs):
     plt.xticks(fontsize=10)
     plt.yticks(fontsize=10)
 
-    plotter(dm, ax=axes, **kwargs)
+    ax = plotter(dm, ax=axes, **kwargs)
+    xtl = ax.get_xticklabels()
+    ax.set_xticklabels(xtl, rotation=90, fontsize=10)
     fig.savefig(outfile, bbox_inches='tight')
     plt.close(fig)
 
