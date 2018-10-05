@@ -12,7 +12,7 @@ from celery.utils.log import get_task_logger
 from app import celery_app
 from matplotlib import pyplot as plt
 from nistats.reporting import plot_design_matrix
-from fitlins.viz.corr import plot_corr_matrix
+from fitlins.viz import plot_corr_matrix, plot_contrast_matrix
 
 plt.set_cmap('viridis')
 logger = get_task_logger(__name__)
@@ -160,11 +160,13 @@ def generate_report(analysis, predictor_events, bids_dir, run_ids, domain):
     outdir = Path('/file-data/reports') / analysis['hash_id']
     outdir.mkdir(exist_ok=True)
 
+    first = bids_analysis.blocks[0]
     results = {'design_matrix': [],
                'design_matrix_plot': [],
-               'design_matrix_corrplot': []}
+               'design_matrix_corrplot': [],
+               'contrast_plot': []}
 
-    for dm in bids_analysis.blocks[0].get_design_matrix(
+    for dm in first.get_design_matrix(
         mode='dense', force=True, entities=False, sampling_rate=5):
         builder = PathBuilder(outdir, domain, analysis['hash_id'], dm.entities)
         # Writeout design matrix
@@ -179,5 +181,11 @@ def generate_report(analysis, predictor_events, bids_dir, run_ids, domain):
         out, url = builder.build('design_matrix_corrplot', 'png')
         results['design_matrix_corrplot'].append(url)
         _plot_save(dm.dense.corr(), plot_corr_matrix, out, n_evs=None, partial=None)
+
+    for cm in first.get_contrasts():
+        builder = PathBuilder(outdir, domain, analysis['hash_id'], cm.entities)
+        out, url = builder.build('contrast_matrix', 'png')
+        _plot_save(cm.data, plot_contrast_matrix, out)
+        results['contrast_plot'].append(url)
 
     return results
