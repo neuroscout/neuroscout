@@ -124,6 +124,6 @@ class ReportResource(MethodResource):
 					{'status': 'FAILED', 'traceback': res.traceback}, report)
 			elif res.state == states.SUCCESS:
 				put_record(
-					{'status': 'OK', 'result': res.result}, report)
+					{'status': 'PASSED', 'result': res.result}, report)
 
 		return report
