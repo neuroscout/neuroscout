@@ -1,16 +1,15 @@
 from flask import send_file
 from flask_apispec import MethodResource, marshal_with, use_kwargs, doc
 from flask_jwt import current_identity
-from worker import celery_app
 from database import db
-from sqlalchemy.dialects import postgresql
-from models import Analysis, PredictorEvent
+from models import Analysis
 from os.path import exists
+import datetime
 
 from utils.db import put_record
 from ..utils import owner_required, auth_required, fetch_analysis, abort
 from .schemas import (AnalysisSchema, AnalysisFullSchema,
-					 AnalysisResourcesSchema, AnalysisCompiledSchema)
+					 AnalysisResourcesSchema)
 
 @doc(tags=['analysis'])
 @marshal_with(AnalysisSchema)
@@ -50,6 +49,7 @@ class AnalysisResource(AnalysisMethodResource):
 			kwargs = {k: v for k, v in kwargs.items() if k in exceptions}
 			if not kwargs:
 				abort(422, "Analysis is not editable. Try cloning it.")
+		kwargs['modified_at'] = datetime.datetime.utcnow()
 		return put_record(kwargs, analysis)
 
 	@doc(summary='Delete analysis.')
@@ -76,65 +76,6 @@ class CloneAnalysisResource(AnalysisMethodResource):
 		db.session.add(cloned)
 		db.session.commit()
 		return cloned
-
-def dump_pe(pes):
-	""" Custom function to serialize PredictorEvent, build for *SPEED*
-	Uses Core SQL queries. Warning: relies on attributes being in correct
-	order. """
-	statement = str(pes.statement.compile(dialect=postgresql.dialect()))
-	params = pes.statement.compile(dialect=postgresql.dialect()).params
-	res = db.session.connection().execute(statement, params)
-	return [{
-	  'onset': r[1],
-	  'duration': r[2],
-	  'value':  r[3],
-	  'run_id': r[5],
-	  'predictor_id': r[6]
-	  } for r in res]
-
-def json_analysis(analysis):
-	"""" Dump an analysis object to JSON for compilation.
-	This requires querying the PredictorEvents to get all events for all runs
-	and predictors. This function is somewhat slow due to the overhead of
-	creating Python objects (and dumping through Marshmallow), tens of thousands
-	of runs."""
-	analysis_json = AnalysisFullSchema().dump(analysis)[0]
-
-	pred_ids = [p.id for p in analysis.predictors]
-	run_ids = [r.id for r in analysis.runs]
-	pes = PredictorEvent.query.filter(
-	    (PredictorEvent.predictor_id.in_(pred_ids)) & \
-	    (PredictorEvent.run_id.in_(run_ids)))
-	pes_json = dump_pe(pes)
-
-	resources_json = AnalysisResourcesSchema().dump(analysis)[0]
-
-	return analysis_json, pes_json, resources_json
-
-class CompileAnalysisResource(AnalysisMethodResource):
-	@doc(summary='Compile and lock analysis.')
-	@owner_required
-	def post(self, analysis):
-		analysis.status = 'SUBMITTING'
-		analysis.compile_traceback = ''
-		db.session.add(analysis)
-		db.session.commit()
-		task = celery_app.send_task('workflow.compile',
-				args=[*json_analysis(analysis),
-				analysis.dataset.local_path])
-		analysis.celery_id = task.id
-		analysis.status = 'PENDING'
-		db.session.add(analysis)
-		db.session.commit()
-
-		return analysis
-
-class AnalysisStatusResource(AnalysisMethodResource):
-	@marshal_with(AnalysisCompiledSchema)
-	@doc(summary='Check if analysis has compiled.')
-	@fetch_analysis
-	def get(self, analysis):
-		return analysis
 
 class AnalysisFullResource(AnalysisMethodResource):
 	@marshal_with(AnalysisFullSchema)

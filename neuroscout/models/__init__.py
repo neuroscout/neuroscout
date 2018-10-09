@@ -1,6 +1,6 @@
 ''' Model hierarchy. '''
 
-from .analysis import Analysis, analysis_predictor
+from .analysis import Analysis, Report, analysis_predictor
 from .auth import User, Role, roles_users, user_datastore
 from .group import GroupPredictor, GroupPredictorValue
 from .dataset import Dataset
@@ -27,6 +27,7 @@ __all__ = [
     'PredictorEvent',
     'PredictorRun',
     'Result',
+    'Report',
     'Run',
     'analysis_run',
     'Stimulus',
