@@ -183,9 +183,9 @@ def generate_report(analysis, predictor_events, bids_dir, run_ids, domain):
         _plot_save(dm.dense.corr(), plot_corr_matrix, out, n_evs=None, partial=None)
 
     for cm in first.get_contrasts():
-        builder = PathBuilder(outdir, domain, analysis['hash_id'], cm.entities)
+        builder = PathBuilder(outdir, domain, analysis['hash_id'], cm[0].entities)
         out, url = builder.build('contrast_matrix', 'png')
-        _plot_save(cm.data, plot_contrast_matrix, out)
+        _plot_save(cm[0].weights, plot_contrast_matrix, out)
         results['contrast_plot'].append(url)
 
     return results
