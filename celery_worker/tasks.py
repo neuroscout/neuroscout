@@ -95,9 +95,7 @@ def _build_analysis(analysis, predictor_events, bids_dir, run_id=None):
     paths = _writeout_events(analysis, predictor_events, tmp_dir)
     # Load events and try applying transformations
 
-    bids_layout = BIDSLayout(
-        [(bids_dir, 'bids'), (str(tmp_dir), ['bids', 'derivatives'])],
-        exclude='derivatives/') # Need to exclude original fmriprep files
+    bids_layout = BIDSLayout(bids_dir, derivatives=str(tmp_dir))
     bids_analysis = Analysis(
         bids_layout, deepcopy(analysis.get('model')))
     bids_analysis.setup(**entities)
