@@ -36,7 +36,7 @@ def _writeout_events(analysis, pes, outdir):
     outdir = outdir / "func"
     outdir.mkdir(exist_ok=True)
 
-    desc = {'Name': 'Events', 'BIDSVersion': '1.0'}
+    desc = {'Name': 'Events', 'BIDSVersion': '1.0', "PipelineDescription.Name": "Neuroscout"}
     json.dump(desc, (outdir / 'dataset_description.json').open('w'))
     # Load events and rename columns to human-readable
     pes = pd.DataFrame(pes)
@@ -95,7 +95,7 @@ def _build_analysis(analysis, predictor_events, bids_dir, run_id=None):
     paths = _writeout_events(analysis, predictor_events, tmp_dir)
     # Load events and try applying transformations
 
-    bids_layout = BIDSLayout(bids_dir, derivatives=str(tmp_dir))
+    bids_layout = BIDSLayout(bids_dir, derivatives=str(tmp_dir), validate=False)
     bids_analysis = Analysis(
         bids_layout, deepcopy(analysis.get('model')))
     bids_analysis.setup(**entities)

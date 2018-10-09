@@ -194,10 +194,6 @@ def add_analysis(session, add_users, add_task, extract_features):
               }
             ],
             "model": {
-              "HRF_variables": [
-                "Brightness",
-                "rt"
-              ],
               "variables": [
                 "Brightness",
                 "rt"
@@ -219,18 +215,12 @@ def add_analysis(session, add_users, add_task, extract_features):
             ]
           },
           {
-            "level": "session",
-          },
-          {
             "level": "subject",
             "model": {
               "variables": [
                 "BvsRT"
               ]
             },
-          },
-          {
-            "level": "dataset"
           }
         ]
       }
