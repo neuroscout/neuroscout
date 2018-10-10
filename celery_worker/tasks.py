@@ -6,15 +6,15 @@ from pathlib import Path
 from tempfile import mkdtemp
 from bids.analysis import Analysis
 from bids.layout import BIDSLayout
-from grabbit import Layout
+from grabbit.extensions.writable import build_path
 from copy import deepcopy
-from celery.contrib import rdb
 from celery.utils.log import get_task_logger
 from app import celery_app
 from matplotlib import pyplot as plt
 from nistats.reporting import plot_design_matrix
-from fitlins.viz import plot_and_save
+from fitlins.viz import plot_corr_matrix, plot_contrast_matrix
 
+plt.set_cmap('viridis')
 logger = get_task_logger(__name__)
 PATHS = ['sub-{subject}_[ses-{session}_]task-{task}_[acq-{acquisition}_][run-{run}_]events.tsv']
 REPORT_PATHS = ['sub-{subject}_[ses-{session}_]task-{task}_[acq-{acquisition}_][run-{run}_]{type}.{extension}']
@@ -33,7 +33,6 @@ def _get_entities(run):
 
 def _writeout_events(analysis, pes, outdir):
     """ Writeout predictor_events into BIDS event files """
-    gl = Layout(str(outdir))
     outdir = outdir / "func"
     outdir.mkdir(exist_ok=True)
 
@@ -58,7 +57,7 @@ def _writeout_events(analysis, pes, outdir):
                 df_col = df_col.reset_index().rename(columns={'value': name})
 
                 # Write out BIDS path
-                fname = outdir / name / gl.build_path(entities, path_patterns=PATHS)
+                fname = outdir / name / build_path(entities, path_patterns=PATHS)
                 fname.parent.mkdir(exist_ok=True)
                 paths.append((fname.as_posix(), 'events/{}/{}'.format(name,fname.name)))
                 df_col.to_csv(fname, sep='\t', index=False)
@@ -97,7 +96,8 @@ def _build_analysis(analysis, predictor_events, bids_dir, run_id=None):
     # Load events and try applying transformations
 
     bids_layout = BIDSLayout(
-        [(bids_dir, 'bids'), (str(tmp_dir), ['bids', 'derivatives'])])
+        [(bids_dir, 'bids'), (str(tmp_dir), ['bids', 'derivatives'])],
+        exclude='derivatives/') # Need to exclude original fmriprep files
     bids_analysis = Analysis(
         bids_layout, deepcopy(analysis.get('model')))
     bids_analysis.setup(**entities)
@@ -129,40 +129,65 @@ def compile(analysis, predictor_events, resources, bids_dir, run_ids):
 
     return {'bundle_path': bundle_path}
 
-def _build_paths(layout, outdir, domain, hash_id, entities, type, extension):
-    file = layout.build_path({**entities, 'type':type, 'extension':extension},
-                             path_patterns=REPORT_PATHS)
-    outfile = str(outdir / file)
-    return outfile, '{}/reports/{}/{}'.format(domain, hash_id, file)
+def _plot_save(dm, plotter, outfile, **kwargs):
+    fig = plt.figure(figsize=(9, 9))
+    axes = plt.gca()
+    plt.xticks(fontsize=10)
+    plt.yticks(fontsize=10)
+
+    ax = plotter(dm, ax=axes, **kwargs)
+    xtl = ax.get_xticklabels()
+    ax.set_xticklabels(xtl, rotation=90, fontsize=10)
+    fig.savefig(outfile, bbox_inches='tight')
+    plt.close(fig)
+
+class PathBuilder():
+    def __init__(self, outdir, domain, hash, entities):
+        self.outdir = outdir
+        self.domain = domain
+        self.hash = hash
+        self.entities = entities
+
+    def build(self, type, extension):
+        file = build_path(
+            {**self.entities, 'type': type, 'extension': extension},
+            path_patterns=REPORT_PATHS)
+        outfile = str(self.outdir / file)
+        return outfile, '{}/reports/{}/{}'.format(self.domain, self.hash, file)
 
 @celery_app.task(name='workflow.generate_report')
 def generate_report(analysis, predictor_events, bids_dir, run_ids, domain):
     _, _, bids_analysis = _build_analysis(
         analysis, predictor_events, bids_dir, run_ids)
-    hash = analysis['hash_id']
-    outdir = Path('/file-data/reports') / hash
+    outdir = Path('/file-data/reports') / analysis['hash_id']
     outdir.mkdir(exist_ok=True)
-    gl = Layout(str(outdir))
 
     first = bids_analysis.blocks[0]
+    results = {'design_matrix': [],
+               'design_matrix_plot': [],
+               'design_matrix_corrplot': [],
+               'contrast_plot': []}
 
-    dm_urls = []
-    dmplot_urls = []
     for dm in first.get_design_matrix(
-        mode='dense', force=True, entities=False, sampling_rate=0.5):
+        mode='dense', force=True, entities=False, sampling_rate=5):
+        builder = PathBuilder(outdir, domain, analysis['hash_id'], dm.entities)
         # Writeout design matrix
-        out, url = _build_paths(
-            gl, outdir, domain, hash, dm.entities, 'design_matrix', 'tsv')
+        out, url = builder.build('design_matrix', 'tsv')
+        results['design_matrix'].append(url)
         dm.dense.to_csv(out, index=False)
-        dm_urls.append(url)
 
-        out, url = _build_paths(
-            gl, outdir, domain, hash, dm.entities, 'design_matrix_plot', 'png')
+        out, url = builder.build('design_matrix_plot', 'png')
+        results['design_matrix_plot'].append(url)
+        _plot_save(dm.dense, plot_design_matrix, out)
 
-        dmplot_urls.append(url)
-        plt.set_cmap('viridis')
-        plot_and_save(out, plot_design_matrix, dm.dense)
-        logger.info(out)
+        out, url = builder.build('design_matrix_corrplot', 'png')
+        results['design_matrix_corrplot'].append(url)
+        _plot_save(dm.dense.corr(), plot_corr_matrix, out, n_evs=None, partial=None)
 
-    return {'design_matrix': dm_urls,
-            'design_matrix_plot': dmplot_urls}
+    for cm in first.get_contrasts():
+        builder = PathBuilder(outdir, domain, analysis['hash_id'], cm.entities)
+        out, url = builder.build('contrast_matrix', 'png')
+        _plot_save(cm.data, plot_contrast_matrix, out)
+        results['contrast_plot'].append(url)
+
+    return results
