@@ -39,16 +39,18 @@ class ModelInput extends React.Component<{model: BidsModel}, {}> {
     }
     let input = this.props.model.input;
     let runs = input.run ? input.run.sort().map(x => <li key={x}>{x}</li>) : [];
-    let subjects = input.subject ? alphaSort(input.subject).map(x => <li key={x}>{x}</li>) : [];
-    let sessions = input.subject ? alphaSort(input.subject).map(x => <li key={x}>{x}</li>) : [];
+    let subjects = input.subject ? alphaSort(input.subject).join(', ') : [];
+    let sessions = input.session ? alphaSort(input.session).join(', ') : [];
 
+    // tslint:disable-next-line:no-console
+    console.log(sessions !== []);
     return (
-      <Collapse>
-        <Panel header="Task" key="task">{input.task ? input.task : ''}</Panel>
-        <Panel header="Runs" key="runs"><ul>{runs}</ul></Panel>
-        <Panel header="Subjects" key="subjects"><ul>{subjects}</ul></Panel>
-        <Panel header="Sessions" key="sessions"><ul>{sessions}</ul></Panel>
-      </Collapse>
+      <div>
+        <Card title="Task" key="task">{input.task ? input.task : ''}</Card>
+        {(runs.length > 0) && <Card title="Runs" key="runs"><ul>{runs}</ul></Card>}
+        {(subjects.length > 0) && <Card title="Subjects" key="subjects"><p>{subjects}</p></Card>}
+        {(sessions.length > 0) && <Card title="Sessions" key="sessions"><p>{sessions}</p></Card>}
+      </div>
     );
   }
 }
@@ -148,18 +150,18 @@ export class Review extends React.Component<ReviewProps, {}> {
 
     return (
       <Card
-        title={name ? name : 'No Name'}
+        title={'Overview of ' + (name ? name : 'No Name')}
         extra={this.props.generateButton}
       >
         <p>{description ? description : 'No description.'}</p>
         <Collapse>
         <Panel header="Inputs" key="inputs"><ModelInput model={model}/></Panel>
+        <Panel header="Variables" key="variables">
+          <Variables model={this.props.model} available={this.props.availablePredictors}/>
+        </Panel>
         <Panel header="Transformations" key="xforms"><ReviewObjects input={xforms}/></Panel>
         <Panel header="Contrasts" key="contrasts">
           <ReviewObjects input={contrasts} autoContrasts={autoContrasts}/>
-        </Panel>
-        <Panel header="Variables" key="variables">
-          <Variables model={this.props.model} available={this.props.availablePredictors}/>
         </Panel>
         <Panel header="JSON Model" key="model"><pre>{JSON.stringify(this.props.model, null, 2)}</pre></Panel>
         </Collapse>
