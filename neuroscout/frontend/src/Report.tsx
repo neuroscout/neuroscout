@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { message, Button, Collapse, Card, Icon, Tag } from 'antd';
+import { message, Button, Collapse, Card, Icon, Spin, Tag } from 'antd';
 import { config } from './config';
 
 import {
@@ -21,7 +21,7 @@ import {
   TransformName
 } from './coretypes';
 
-import { displayError, jwtFetch, alphaSort } from './utils';
+import { displayError, jwtFetch, alphaSort, timeout } from './utils';
 
 const domainRoot = config.server_url;
 
@@ -71,7 +71,6 @@ let getSub = (x: string) => {
     sub = _sub[0];
   }
   return sub;
-
 };
 
 class Plots extends React.Component<{plots: string[]}, {}> {
@@ -79,12 +78,14 @@ class Plots extends React.Component<{plots: string[]}, {}> {
       let display: any[] = [];
       let plots = this.props.plots.map((x) => {
         let url = x;
-        let sub = getSub(x);
+        // urls generated for localhost have None instead of localhost in url
         if (x.indexOf('None') === 0) {
           url = x.slice(4);
+          url = domainRoot + url;
         }
-        url = domainRoot + url;
-        display.push(<Panel header={sub} key={url}><img src={url}/></Panel>);
+        display.push(
+          <Panel header={<a href={url}>{url}</a>} key={url}><img src={url} style={{width: '100%'}}/></Panel>
+        );
       });
       return(
         <Collapse>
@@ -116,8 +117,8 @@ class Tracebacks extends React.Component<{reportTraceback: string, compileTraceb
     render() {
       return(
       <div>
-        {this.props.reportTraceback}<br />
-        {this.props.compileTraceback}
+        <p>{this.props.reportTraceback}</p>
+        <p>{this.props.compileTraceback}</p>
       </div>
       );
     }
@@ -125,6 +126,7 @@ class Tracebacks extends React.Component<{reportTraceback: string, compileTraceb
 
 interface ReportProps {
   analysisId?: string;
+  runIds: string[];
 }
 
 interface ReportState {
@@ -134,6 +136,7 @@ interface ReportState {
   reportTraceback: string;
   compileTraceback: string;
   reportsLoaded: boolean;
+  reportsPosted: boolean;
   compileLoaded: boolean;
   status?: string;
 }
@@ -146,6 +149,7 @@ export class Report extends React.Component<ReportProps, ReportState> {
       plots: [],
       reportTimestamp: '', 
       reportsLoaded: false,
+      reportsPosted: false,
       compileLoaded: false,
       reportTraceback: '',
       compileTraceback: ''
@@ -153,32 +157,69 @@ export class Report extends React.Component<ReportProps, ReportState> {
     this.state = state;
   }
 
-  componentDidMount() {
+  generateReport = (runIds?: string[]): void => {
     let id = this.props.analysisId;
-    if (this.state.reportsLoaded === false) {
-      let state = {...this.state};
-      jwtFetch(`${domainRoot}/api/analyses/${id}/report`)
-      .then((res) => {
-        if (res.status === 'OK') {
-          if (res.result === undefined) {
-            return;
-          }
-          state.matrices = res.result.design_matrix;
-          state.plots = res.result.design_matrix_plot;
-          state.reportTimestamp = res.generated_at;
-          if (res.traceback) {
-            state.reportTraceback = res.traceback;
-          } 
-        } else if (res.status === 'FAILED') {
-          state.reportTraceback = res.traceback;
-        } else {
+    if (runIds === undefined) {
+      runIds = [this.props.runIds[0]];
+    }
+    let url = `${domainRoot}/api/analyses/${id}/report?run_id=${runIds}`;
+    jwtFetch(url, { method: 'POST' })
+    .then((res) => {
+      // tslint:disable-next-line:no-console
+      console.log(res);
+    });
+  };
+
+  checkReportStatus = async () => {
+    while (!this.state.reportsLoaded) {
+      this.loadReports();
+      await timeout(3000);
+    }
+  };
+
+  loadReports = () => {
+    let id = this.props.analysisId;
+
+    // can't load anything without an ID
+    if (id === undefined) {
+      return;
+    }
+    if (this.state.reportsLoaded === true) {
+      return;
+    }
+    let state = {...this.state};
+    jwtFetch(`${domainRoot}/api/analyses/${id}/report`)
+    .then((res) => {
+      if (res.status === 'OK') {
+        if (res.result === undefined) {
           return;
         }
-        state.reportsLoaded = true;
-        this.setState({...state});
-      });
+        state.matrices = res.result.design_matrix;
+        state.plots = res.result.design_matrix_plot;
+        state.reportTimestamp = res.generated_at;
+        if (res.traceback) {
+          state.reportTraceback = res.traceback;
+        } 
+      } else if (res.status === 'FAILED') {
+        state.reportTraceback = res.traceback;
+      } else if (res.statusCode === 404 && !this.state.reportsPosted) {
+        this.generateReport();
+        this.setState({reportsPosted: true});
+        return;
+      } else {
+        return;
+      }
+      state.reportsLoaded = true;
+      this.setState({...state});
+    });
+  }
+
+  componentDidMount() {
+    if (this.state.reportsLoaded === false) {
+      this.checkReportStatus();
     }
     if (this.state.compileLoaded === false) {
+      let id = this.props.analysisId;
       let state = {...this.state};
       jwtFetch(`${domainRoot}/api/analyses/${id}/compile`)
       .then((res) => {
@@ -195,12 +236,18 @@ export class Report extends React.Component<ReportProps, ReportState> {
 
   render() {
     return (
-      <Card>
-        <Status status={this.state.status} analysisId={this.props.analysisId} />
-        <Collapse>
-        <Panel header="Matrix Design Plots" key="plots"><Plots plots={this.state.plots} /></Panel>
-        <Panel header="Matrix Design Downloads" key="matrices"><Matrices matrices={this.state.matrices} /></Panel>
-        </Collapse>
+      <div>
+        <Card title="Matrix Design Plots" key="plots">
+          <Spin spinning={!this.state.reportsLoaded}>
+            <Plots plots={this.state.plots} />
+          </Spin>
+        </Card>
+        <br/>
+        <Card title="Matrix Design Downloads" key="matrices">
+          <Spin spinning={!this.state.reportsLoaded}>
+            <Matrices matrices={this.state.matrices} />
+          </Spin>
+        </Card>
         <br/>
         {(this.state.reportTraceback || this.state.compileTraceback) &&
         <Card title="Errors" key="errors">
@@ -208,8 +255,9 @@ export class Report extends React.Component<ReportProps, ReportState> {
             reportTraceback={this.state.reportTraceback}
             compileTraceback={this.state.compileTraceback}
           />
-      </Card>}
-      </Card>
+        </Card>}
+      </div>
     );
   }
 }
+// <Status status={this.state.status} analysisId={this.props.analysisId} />
