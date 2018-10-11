@@ -13,6 +13,7 @@ import { ContrastsTab } from './Contrasts';
 import { XformsTab } from './Transformations';
 import { Review } from './Review';
 import { Report } from './Report';
+import { Status } from './Status';
 import OptionsTab from './Options';
 import {
   Store,
@@ -771,7 +772,7 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
                 }
               </TabPane>
               <TabPane tab="Submit" key="submit" disabled={false}>
-                wat
+                <Status status="" analysisId={analysis.analysisId}/>
               </TabPane>
             </Tabs>
           </Col>

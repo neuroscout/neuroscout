@@ -1,22 +1,41 @@
 import * as React from 'react';
 import { Tag, Icon } from 'antd';
+import { config } from './config';
 
-// Status component to display the color-coded analysis status with a locked/unlocked icon
-const Status = (props: { status: string }) => {
-  const { status } = props;
-  const color: string = {
-    DRAFT: 'blue',
-    PENDING: 'orange',
-    COMPILED: 'green'
-  }[status];
-  return (
-    <span>
-      <Tag color={color}>
-        {status === 'DRAFT' ? <Icon type="unlock" /> : <Icon type="lock" />}
-        {' ' + status}
-      </Tag>
-    </span>
-  );
-};
+const domainRoot = config.server_url;
 
-export default Status;
+export class Status extends React.Component<{status?: string, analysisId?: string}, {}> {
+
+    render() {
+      let { analysisId, status } = this.props;
+      if (status === undefined) {
+        status = 'DRAFT';
+      }
+      const color: string = {
+        DRAFT: 'blue',
+        PENDING: 'orange',
+        FAILED: 'red',
+        PASSED: 'green'
+      }[status];
+
+      let bundleLink;
+      if (status === 'PASSED' && analysisId) {
+        bundleLink = `${domainRoot}/analyses/${analysisId}_bundle.tar.gz`;
+      }
+
+      return(
+        <div>
+          <span>
+            <Tag color={color}>
+              {status === 'DRAFT' ? <Icon type="unlock" /> : <Icon type="lock" />}
+              {' ' + status}
+            </Tag>
+          </span>
+          <br/>
+          <span>
+            <a href={bundleLink}>Download</a>
+          </span>
+        </div>
+      );
+    }
+}
