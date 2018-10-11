@@ -1,8 +1,9 @@
  /*
-
  Top-level AnalysisBuilder component which contains all of the necessary state for editing
  an analysis.
 */
+import { RouteComponentProps } from 'react-router';
+import { createBrowserHistory } from 'history';
 import * as React from 'react';
 import { Tabs, Row, Col, Layout, Button, Modal, Icon, message } from 'antd';
 import { Prompt } from 'react-router-dom';
@@ -38,6 +39,8 @@ import { authActions } from './auth.actions';
 
 const { TabPane } = Tabs;
 const { Footer, Content } = Layout;
+
+const history = createBrowserHistory();
 
 // const logo = require('./logo.svg');
 const domainRoot = config.server_url;
@@ -144,7 +147,7 @@ type BuilderProps = {
   updatedAnalysis: () => void;
 };
 
-export default class AnalysisBuilder extends React.Component<BuilderProps, Store> {
+export default class AnalysisBuilder extends React.Component<BuilderProps & RouteComponentProps<{}>, Store> {
   constructor(props: BuilderProps) {
     super(props);
     this.state = initializeStore();
@@ -269,7 +272,6 @@ export default class AnalysisBuilder extends React.Component<BuilderProps, Store
 
   // Save analysis to server, either with lock=false (just save), or lock=true (save & submit)
   saveAnalysis = ({ compile = false }) => (): void => {
-    this.setState({activeTab: 'status'});
     if ((!compile && !this.saveEnabled()) || (compile && !this.submitEnabled())) {
       return;
     }
@@ -309,7 +311,6 @@ export default class AnalysisBuilder extends React.Component<BuilderProps, Store
       url = `${domainRoot}/api/analyses/${analysis.analysisId}/compile`;
       method = 'post';
       this.setState({analysis: {...analysis, status: 'SUBMITTING'}});
-      this.generateReport();
     } else if (!compile && analysis.analysisId) {
       // Save existing analysis
       url = `${domainRoot}/api/analyses/${analysis.analysisId}`;
@@ -344,6 +345,7 @@ export default class AnalysisBuilder extends React.Component<BuilderProps, Store
           unsavedChanges: false
         });
         this.props.updatedAnalysis();
+        history.push('/builder/' + data.hash_id);
       })
       .catch(displayError);
   };
@@ -415,17 +417,6 @@ export default class AnalysisBuilder extends React.Component<BuilderProps, Store
       this.updateState('analysis', true)(analysis);
     }
     return Promise.resolve(analysis);
-  };
-
-  generateReport = (): void => {
-    let id = this.state.analysis.analysisId;
-    let runIds = this.state.analysis.runIds.join(',');
-    let url = `${domainRoot}/api/analyses/${id}/report?run_id=${runIds}`;
-    jwtFetch(url, { method: 'POST' })
-    .then((res) => {
-      // tslint:disable-next-line:no-console
-      console.log(res);
-    });
   };
 
   confirmSubmission = (): void => {
@@ -768,16 +759,19 @@ export default class AnalysisBuilder extends React.Component<BuilderProps, Store
               </TabPane>
               <TabPane tab="Review" key="review" disabled={!reviewActive}>
                 {this.state.model &&
-                  <Review
-                    model={this.state.model}
-                    unsavedChanges={this.state.unsavedChanges}
-                    generateButton={this.generateButton()}
-                    availablePredictors={this.state.availablePredictors}
-                  />
+                  <div>
+                    <Report analysisId={analysis.analysisId} runIds={analysis.runIds} />
+                    <Review
+                      model={this.state.model}
+                      unsavedChanges={this.state.unsavedChanges}
+                      generateButton={this.generateButton()}
+                      availablePredictors={this.state.availablePredictors}
+                    />
+                  </div>
                 }
               </TabPane>
-              <TabPane tab="Reports" key="reports" disabled={false}>
-                <Report analysisId={analysis.analysisId} />
+              <TabPane tab="Submit" key="submit" disabled={false}>
+                wat
               </TabPane>
             </Tabs>
           </Col>
