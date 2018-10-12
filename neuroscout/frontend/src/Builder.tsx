@@ -49,6 +49,7 @@ const EMAIL = 'user@example.com';
 const PASSWORD = 'string';
 const DEFAULT_SMOOTHING = 5;
 const editableStatus = ['DRAFT', 'FAILED'];
+const tabOrder = ['overview', 'predictors', 'transformations', 'hrf', 'contrasts', 'review', 'submit'];
 
 const defaultConfig: AnalysisConfig = { smoothing: DEFAULT_SMOOTHING, predictorConfigs: {} };
 
@@ -92,6 +93,7 @@ let initializeStore = (): Store => ({
   selectedHRFPredictors: [],
   unsavedChanges: false,
   currentLevel: 'run',
+  postReports: false,
   model: {
     blocks: [{
       level: 'run',
@@ -449,6 +451,10 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
       );
   };
 
+  nextTab = () => {
+    // tabOrder
+  };
+
   updateConfig = (newConfig: AnalysisConfig): void => {
     const newAnalysis = { ...this.state.analysis };
     newAnalysis.config = newConfig;
@@ -761,11 +767,14 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
               <TabPane tab="Review" key="review" disabled={!reviewActive}>
                 {this.state.model &&
                   <div>
-                    <Report analysisId={analysis.analysisId} runIds={analysis.runIds} />
+                    <Report
+                      analysisId={analysis.analysisId}
+                      runIds={analysis.runIds}
+                      postReports={this.state.postReports}
+                    />
                     <Review
                       model={this.state.model}
                       unsavedChanges={this.state.unsavedChanges}
-                      generateButton={this.generateButton()}
                       availablePredictors={this.state.availablePredictors}
                     />
                   </div>
@@ -781,14 +790,3 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
     );
   }
 }
-
-/* Can't comment out inline in render
-<TabPane tab="Options" key="modeling" disabled={!modelingActive}>
-  <OptionsTab
-  analysis={analysis}
-  selectedPredictors={selectedPredictors}
-  updateConfig={this.updateConfig}
-  updateAnalysis={this.updateState('analysis')}
-/>
-</TabPane>
-*/

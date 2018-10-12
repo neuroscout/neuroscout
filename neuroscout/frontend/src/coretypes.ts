@@ -163,6 +163,7 @@ export interface Store {
   selectedHRFPredictors: Predictor[];
   unsavedChanges: boolean;
   currentLevel: BlockLevel;
+  postReports: boolean;
   model: BidsModel;
 }
 

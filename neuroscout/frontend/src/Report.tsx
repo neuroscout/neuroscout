@@ -91,6 +91,7 @@ class Tracebacks extends React.Component<{reportTraceback: string, compileTraceb
 interface ReportProps {
   analysisId?: string;
   runIds: string[];
+  postReports: boolean;
 }
 
 interface ReportState {
@@ -103,6 +104,7 @@ interface ReportState {
   reportsPosted: boolean;
   compileLoaded: boolean;
   status?: string;
+  selectedRunIds: string[];
 }
 
 export class Report extends React.Component<ReportProps, ReportState> {
@@ -116,17 +118,15 @@ export class Report extends React.Component<ReportProps, ReportState> {
       reportsPosted: false,
       compileLoaded: false,
       reportTraceback: '',
-      compileTraceback: ''
+      compileTraceback: '',
+      selectedRunIds: [this.props.runIds[0]]
     };
     this.state = state;
   }
 
-  generateReport = (runIds?: string[]): void => {
+  generateReport = (): void => {
     let id = this.props.analysisId;
-    if (runIds === undefined) {
-      runIds = [this.props.runIds[0]];
-    }
-    let url = `${domainRoot}/api/analyses/${id}/report?run_id=${runIds}`;
+    let url = `${domainRoot}/api/analyses/${id}/report?run_id=${this.state.selectedRunIds}`;
     jwtFetch(url, { method: 'POST' })
     .then((res) => {
       // tslint:disable-next-line:no-console
@@ -142,6 +142,8 @@ export class Report extends React.Component<ReportProps, ReportState> {
   };
 
   loadReports = () => {
+    // tslint:disable-next-line:no-console
+    console.log('in load reports');
     let id = this.props.analysisId;
 
     // can't load anything without an ID
@@ -198,7 +200,21 @@ export class Report extends React.Component<ReportProps, ReportState> {
     }
   }
 
+  componentWillReceiveProps(nextProps: ReportProps) {
+    if (nextProps.postReports) {
+      this.setState(
+        {
+          reportsLoaded: false,
+          reportsPosted: false,
+        },
+        () => this.checkReportStatus()
+      );
+    }
+  }
+
   render() {
+    // tslint:disable-next-line:no-console
+    console.log(this.state);
     return (
       <div>
         <Card title="Matrix Design Plots" key="plots">
