@@ -28,7 +28,6 @@ const Panel = Collapse.Panel;
 interface ReviewProps {
   model: BidsModel;
   unsavedChanges: boolean;
-  generateButton: any;
   availablePredictors: Predictor[];
 }
 
@@ -151,7 +150,6 @@ export class Review extends React.Component<ReviewProps, {}> {
     return (
       <Card
         title={'Overview of ' + (name ? name : 'No Name')}
-        extra={this.props.generateButton}
       >
         <p>{description ? description : 'No description.'}</p>
         <Collapse>
