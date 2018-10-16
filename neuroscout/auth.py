@@ -38,46 +38,58 @@ def send_confirmation(user):
     else:
         return False
 
-def create_user(**kwargs):
-    user = user_datastore.create_user(**kwargs)
-    user_datastore.commit()
-    return user
-
 def register_user(**kwargs):
     """ Register new user and password """
-    user = create_user(**kwargs)
+    user = user_datastore.create_user(**kwargs)
+    user_datastore.commit()
     send_confirmation(user)
     return user
 
-def authenticate_google(token):
+def _authenticate_google(token):
+    """ Authenticate google JWT token """
     try:
-        idinfo = id_token.verify_oauth2_token(token, requests.Request(), current_app.config['GOOGLE_CLIENT_ID'])
-        if idinfo['iss'] not in ['accounts.google.com', 'https://accounts.google.com']:
+        ginfo = id_token.verify_oauth2_token(
+                token, requests.Request(), current_app.config['GOOGLE_CLIENT_ID'])
+        if ginfo['iss'] not in ['accounts.google.com', 'https://accounts.google.com']:
             raise ValueError('Wrong issuer.')
-        return idinfo
+        return ginfo
 
     except ValueError:
         return None
 
-# JWT Token authentication
-def authenticate(username, password):
-    """ Authenticate user and password combination """
-    if username == 'GOOGLE':
-        ginfo = authenticate_google(password)
-        if ginfo is not None:
-            user = user_datastore.find_user(google_id=ginfo['sub'])
-            if user is None:
-                # Check if user exists with same email
-                user = user_datastore.find_user(email=ginfo['email'])
-                if user is None:
-                    # Create user
-                    confirmed_at = datetime.datetime.utcnow() if ginfo['email_verified'] else None
-                    user = create_user(email=ginfo['email'], google_id=ginfo['sub'],
-                                       confirmed_at=confirmed_at)
+def _find_create_google(ginfo):
+    """ Find google user in db, or create new user if none found """
+    # Find user Google ID
+    user = user_datastore.find_user(google_id=ginfo['sub'])
+    if user is not None:
+        return user
 
-                    # Could also pull other user info here
-            # Might need to worry about edge cases in which email changes
-            return user
+    # Find using email
+    user = user_datastore.find_user(email=ginfo['email'])
+    confirmed_at = datetime.datetime.utcnow() if ginfo['email_verified'] else None
+
+    if user is not None:
+        if user.confirmed_at is None:
+            user.confirmed_at = confirmed_at
+        return user
+
+    # Create new user
+    user = user_datastore.create_user(
+            email=ginfo['email'],
+            google_id=ginfo['sub'],
+            confirmed_at=confirmed_at)
+    user_datastore.commit()
+
+    # Might need to worry about edge cases in which email changes
+    return user
+
+def authenticate(username, password):
+    """ Authenticate user and password combination
+    Returns user object if succesful, otherwise None """
+    if username == 'GOOGLE':
+        ginfo = _authenticate_google(password)
+        if ginfo:
+            return _find_create_google(ginfo)
     else:
         user = user_datastore.find_user(email=username)
         if user and username == user.email and verify_password(password, user.password):
