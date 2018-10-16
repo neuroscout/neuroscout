@@ -105,3 +105,8 @@ def confirm(token):
 def index(path):
     ''' Serve index '''
     return send_file("frontend/build/index.html")
+
+@app.route('/google')
+def google():
+    ''' Serve index '''
+    return render_template('google.html')

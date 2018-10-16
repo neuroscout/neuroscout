@@ -1,11 +1,12 @@
 <body>
 <script src="https://apis.google.com/js/platform.js" async defer></script>
-<meta name="google-signin-client_id" content="66127382167-p1ka0iiq74lp86989t3vo5eekas9m2fl.apps.googleusercontent.com">
+<meta name="google-signin-client_id" content="66127382167-v83riq5etne59h7v9ghqqs5t6a3i0rta.apps.googleusercontent.com">
 <div class="g-signin2" data-onsuccess="onSignIn"></div>
 
 <script>
 function onSignIn(googleUser) {
   var profile = googleUser.getBasicProfile();
+  console.log(googleUser.getAuthResponse().id_token)
   console.log('ID: ' + profile.getId()); // Do not send to your backend! Use an ID token instead.
   console.log('Name: ' + profile.getName());
   console.log('Image URL: ' + profile.getImageUrl());
