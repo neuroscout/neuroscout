@@ -1,10 +1,13 @@
 """ Auth related functions """
+import datetime
 from models.auth import user_datastore, User
 from flask_security.utils import verify_password
 from flask_security.confirmable import generate_confirmation_token
 from flask_security.recoverable import generate_reset_password_token
 from flask import current_app, url_for
 from mail import send_confirm_mail, send_reset_mail
+from google.oauth2 import id_token
+from google.auth.transport import requests
 
 def generate_confirmation_link(user):
     """ For a given user, generates confirmation link and token.
@@ -35,23 +38,50 @@ def send_confirmation(user):
     else:
         return False
 
+def create_user(**kwargs):
+    user = user_datastore.create_user(**kwargs)
+    user_datastore.commit()
+    return user
 
 def register_user(**kwargs):
     """ Register new user and password """
-    confirmation_link, token = None, None
-    user = user_datastore.create_user(**kwargs)
-    user_datastore.commit()
-
-    _  = send_confirmation(user)
-
+    user = create_user(**kwargs)
+    send_confirmation(user)
     return user
+
+def authenticate_google(token):
+    try:
+        idinfo = id_token.verify_oauth2_token(token, requests.Request(), current_app.config['GOOGLE_CLIENT_ID'])
+        if idinfo['iss'] not in ['accounts.google.com', 'https://accounts.google.com']:
+            raise ValueError('Wrong issuer.')
+        return idinfo
+
+    except ValueError:
+        return None
 
 # JWT Token authentication
 def authenticate(username, password):
     """ Authenticate user and password combination """
-    user = user_datastore.find_user(email=username)
-    if user and username == user.email and verify_password(password, user.password):
-        return user
+    if username == 'GOOGLE':
+        ginfo = authenticate_google(password)
+        if ginfo is not None:
+            user = user_datastore.find_user(google_id=ginfo['sub'])
+            if user is None:
+                # Check if user exists with same email
+                user = user_datastore.find_user(email=ginfo['email'])
+                if user is None:
+                    # Create user
+                    confirmed_at = datetime.datetime.utcnow() if ginfo['email_verified'] else None
+                    user = create_user(email=ginfo['email'], google_id=ginfo['sub'],
+                                       confirmed_at=confirmed_at)
+
+                    # Could also pull other user info here
+            # Might need to worry about edge cases in which email changes
+            return user
+    else:
+        user = user_datastore.find_user(email=username)
+        if user and username == user.email and verify_password(password, user.password):
+            return user
     return None
 
 def load_user(payload):

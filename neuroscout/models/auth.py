@@ -10,6 +10,7 @@ roles_users = db.Table('roles_users',
 class User(db.Model, UserMixin):
     """" User model class """
     id = db.Column(db.Integer, primary_key=True)
+    google_id = db.Column(db.Text)
     email = db.Column(db.String(100), unique=True)
     password = db.Column(db.String(255))
 
