@@ -13,6 +13,7 @@ class User(db.Model, UserMixin):
     google_id = db.Column(db.Text)
     email = db.Column(db.String(100), unique=True)
     password = db.Column(db.String(255))
+    picture = db.Column(db.Text)
 
     name = db.Column(db.String(40))
     active = db.Column(db.Boolean()) # If set to disabled, cannot access.

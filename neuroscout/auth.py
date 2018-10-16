@@ -77,7 +77,10 @@ def _find_create_google(ginfo):
     user = user_datastore.create_user(
             email=ginfo['email'],
             google_id=ginfo['sub'],
-            confirmed_at=confirmed_at)
+            confirmed_at=confirmed_at,
+            name=ginfo['name'],
+            picture=ginfo['picture']
+            )
     user_datastore.commit()
 
     # Might need to worry about edge cases in which email changes
