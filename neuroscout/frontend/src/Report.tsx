@@ -129,8 +129,6 @@ export class Report extends React.Component<ReportProps, ReportState> {
     let url = `${domainRoot}/api/analyses/${id}/report?run_id=${this.state.selectedRunIds}`;
     jwtFetch(url, { method: 'POST' })
     .then((res) => {
-      // tslint:disable-next-line:no-console
-      console.log(res);
     });
   };
 
@@ -142,8 +140,6 @@ export class Report extends React.Component<ReportProps, ReportState> {
   };
 
   loadReports = () => {
-    // tslint:disable-next-line:no-console
-    console.log('in load reports');
     let id = this.props.analysisId;
 
     // can't load anything without an ID
@@ -194,7 +190,6 @@ export class Report extends React.Component<ReportProps, ReportState> {
         if (res.compile_traceback) {
           state.compileTraceback = res.compile_traceback;
         }
-          
         this.setState({...state});
       });
     }
@@ -213,8 +208,6 @@ export class Report extends React.Component<ReportProps, ReportState> {
   }
 
   render() {
-    // tslint:disable-next-line:no-console
-    console.log(this.state);
     return (
       <div>
         <Card title="Matrix Design Plots" key="plots">

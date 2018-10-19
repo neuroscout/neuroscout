@@ -130,6 +130,15 @@ export interface XformRules {
   [name: string]: Transformation;
 }
 
+export type TabName =
+    | 'overview'
+    | 'predictors'
+    | 'transformations'
+    | 'contrasts'
+    | 'modeling'
+    | 'review'
+    | 'submit';
+
 export interface Contrast {
   name: string;
   condition_list: string[];
@@ -138,20 +147,15 @@ export interface Contrast {
 }
 
 export interface Store {
-  activeTab:
-    | 'overview'
-    | 'predictors'
-    | 'transformations'
-    | 'contrasts'
-    | 'modeling'
-    | 'review'
-    | 'status';
+  activeTab: TabName;
   predictorsActive: boolean;
   predictorsLoad: boolean;
   transformationsActive: boolean;
   contrastsActive: boolean;
-  modelingActive: boolean;
+  hrfActive: boolean;
   reviewActive: boolean;
+  submitActive: boolean;
+  modelingActive: boolean;
   analysis: Analysis;
   datasets: Dataset[];
   availableRuns: Run[];
