@@ -63,7 +63,7 @@ export const jwtFetch = (path: string, options?: object) => {
       throw new Error('Please Login Again');
     }
     if (response.status !== 200) {
-      displayError(new Error(`HTTP ${response.status} on ${path}`));
+      // displayError(new Error(`HTTP ${response.status} on ${path}`));
     }
     return response.json().then(json => {
       // Always add statusCode to the data object or array returned by response.json()
