@@ -464,6 +464,17 @@ class App extends Reflux.Component<any, {}, AppState> {
               />
               <Route
                 exact={true}
+                path="/browse/:id"
+                render={props =>
+                  <AnalysisBuilder 
+                    id={props.match.params.id}
+                    updatedAnalysis={() => this.loadAnalyses()}
+                  />
+                }
+              />
+
+              <Route
+                exact={true}
                 path="/browse"
                 render={props =>
                   <Browse analyses={publicAnalyses} cloneAnalysis={this.cloneAnalysis} />}
