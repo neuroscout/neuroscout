@@ -162,7 +162,9 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
       jwtFetch(`${domainRoot}/api/analyses/${props.id}`)
         // .then(response => response.json() as Promise<ApiAnalysis>)
         .then((data: ApiAnalysis) => this.loadAnalysis(data))
-        .then(() => this.setState({model: this.buildModel()}))
+        .then(() => {
+          this.setState({model: this.buildModel()});
+        })
         .catch(displayError);
     }
 
@@ -699,8 +701,8 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
       PENDING: 'This analysis has been submitted for generation and is being processed.',
       COMPILED: 'This analysis has been successfully generated'
     }[analysis.status];
-    // default to tab with compilation results if we aren't in draft mode
-    if (analysis.status !== 'DRAFT') {
+    // Jump to submit/results tab if no longer a draft.
+    if (analysis.status !== 'DRAFT' && activeTab === 'overview') {
       activeTab = 'submit';
     }
     return (
@@ -817,7 +819,7 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
                   </div>
                 }
               </TabPane>
-              <TabPane tab="Results" key="submit" disabled={!submitActive}>
+              <TabPane tab="Results" key="submit" disabled={!submitActive && analysis.status === 'DRAFT'}>
                 <Results
                   status={analysis.status}
                   analysisId={analysis.analysisId}
