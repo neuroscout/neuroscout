@@ -813,6 +813,7 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
                       unsavedChanges={this.state.unsavedChanges}
                       availablePredictors={this.state.availablePredictors}
                     />
+                    <br/>
                     <Button type="primary" onClick={this.nextTab}>
                       Next: Submit 
                     </Button>
@@ -824,6 +825,7 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
                   status={analysis.status}
                   analysisId={analysis.analysisId}
                   confirmSubmission={this.confirmSubmission}
+                  private={analysis.private || false}
                 />
               </TabPane>
             </Tabs>

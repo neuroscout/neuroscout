@@ -54,13 +54,18 @@ export class DLLink extends React.Component<{status?: string, analysisId?: strin
     }
 }
 
-type submitProps = {status?: string, analysisId?: string, confirmSubmission: () => void};
+type submitProps = {
+  status?: string,
+  analysisId?: string,
+  confirmSubmission: () => void,
+  private: boolean
+};
 export class Submit extends React.Component<submitProps, {tosAgree: boolean}> {
   constructor(props) {
     super(props);
     
     this.state = {
-      tosAgree: (status !== 'DRAFT')
+      tosAgree: (this.props.status !== 'DRAFT')
     };
   }
 
@@ -80,13 +85,17 @@ export class Submit extends React.Component<submitProps, {tosAgree: boolean}> {
         <ul>
           <li>I agree that once I submit my analysis, I will not be able to delete or edit it.</li>
           <li>I agree to use the "clone" feature to create any forked versions of the current analysis</li>
+            {this.props.private &&
+            <li>
+              I understand that although my analysis is currently private, anyone with the analysis 
+              ID may view this analysis, and subsequent uploaded results.
+            </li>
+            }
+            {!this.props.private &&
           <li>
-            If private: I understand that although my analysis is currently private, anyone with the analysis 
-            ID may view this analysis, and subsequent uploaded results.
+              I understand that my analysis is currently public and will be searchable by other users.
           </li>
-          <li>
-            If public: I understand that my analysis is currently public and will be searchable by other users.
-          </li>
+            }
         </ul>
         <Checkbox onChange={onChange} checked={this.state.tosAgree}>
           I have read and agree to Neuroscout's terms of service.
@@ -144,6 +153,7 @@ export class Results extends React.Component<submitProps, {compileTraceback: str
           status={this.props.status}
           analysisId={this.props.analysisId}
           confirmSubmission={this.props.confirmSubmission}
+          private={this.props.private}
         />
       }
       {(this.props.status === 'FAILED') &&
