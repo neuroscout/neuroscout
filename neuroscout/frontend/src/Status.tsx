@@ -145,6 +145,15 @@ export class Results extends React.Component<submitProps, {compileTraceback: str
       {(this.props.status === 'PASSED') && 
         <div>
           <h3>Analysis Passed</h3>
+          <p>
+            Congratulations! Your analysis is finished compiling and is ready to be executed.
+            Once you have installed neuroscout-cli you may run your analysis like this:
+          </p>
+          <pre>docker run -it -v /local/outputdirectory:/out neuroscout-cli run /out {this.props.analysisId}</pre>
+          <p>
+            See the <a href="https://github.com/neuroscout/neuroscout-cli">neuroscout-cli documentation </a>
+             for more information on how to install and run analyses.
+          </p>
           <DLLink status={this.props.status} analysisId={this.props.analysisId}/>
         </div>
       }
@@ -159,10 +168,20 @@ export class Results extends React.Component<submitProps, {compileTraceback: str
       {(this.props.status === 'FAILED') &&
         <div>
           <h3>Analysis Failed to Compile</h3>
+          <p>
+            Oh no! It looks like your analysis failed to compile.
+            Please clone and edit your analysis to try again.
+            If the issue remains, please file a
+            <a href="https://github.com/neuroscout/neuroscout/issues"> bugreport</a>.
+          </p>
           <Card title="Errors" key="errors">
             <pre>{this.state.compileTraceback}</pre>
           </Card>
         </div>
+      }
+      {(this.props.status === 'PENDING' || this.props.status === 'SUBMITTING') &&
+        <h3>Analysis Pending Generation</h3>
+        <p>Analysis generation may take some time. This page will update when complete.</p>
       }
       </div>
     );
