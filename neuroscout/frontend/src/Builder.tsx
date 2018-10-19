@@ -13,7 +13,7 @@ import { ContrastsTab } from './Contrasts';
 import { XformsTab } from './Transformations';
 import { Review } from './Review';
 import { Report } from './Report';
-import { Status } from './Status';
+import { Status, Submit, Results } from './Status';
 import OptionsTab from './Options';
 import {
   Store,
@@ -31,7 +31,8 @@ import {
   BlockModel,
   BidsModel,
   ImageInput,
-  TransformName
+  TransformName,
+  TabName
 } from './coretypes';
 import { displayError, jwtFetch } from './utils';
 import { Space } from './HelperComponents';
@@ -60,8 +61,10 @@ let initializeStore = (): Store => ({
   predictorsLoad: false,
   transformationsActive: false,
   contrastsActive: false,
+  hrfActive: false,
+  submitActive: false,
   modelingActive: true,
-  reviewActive: true,
+  reviewActive: false,
   analysis: {
     analysisId: undefined,
     name: '',
@@ -241,7 +244,7 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
       });
       hrfVariables = hrfVariables.filter(x => x !== '');
       if (hrfVariables.length > 0) {
-        let hrfTransforms = {'name': 'hrf' as TransformName, 'input': hrfVariables};
+        let hrfTransforms = {'name': 'ConvolveHRF' as TransformName, 'input': hrfVariables};
         // Right now we only want one HRF transform, remove all others to prevent duplicates
         blocks[0].transformations = blocks[0].transformations!.filter(x => x.name !== 'convolve_HRF');
         blocks[0].transformations!.push(hrfTransforms);
@@ -348,7 +351,9 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
           unsavedChanges: false
         });
         this.props.updatedAnalysis();
-        history.push('/builder/' + data.hash_id);
+        if (data.hash_id !== undefined) {
+          history.push('/builder/' + data.hash_id);
+        }
       })
       .catch(displayError);
   };
@@ -452,7 +457,15 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
   };
 
   nextTab = () => {
-    // tabOrder
+    let nextIndex = tabOrder.indexOf(this.state.activeTab) + 1;
+    let nextTab = tabOrder[nextIndex];
+    let update = {activeTab: nextTab as TabName};
+    update[nextTab + 'Active' ] = true;
+    if (nextTab === 'review') {
+      this.saveAnalysis({compile: false})();
+    }
+    this.setState(update);
+    this.tabChange(nextTab);
   };
 
   updateConfig = (newConfig: AnalysisConfig): void => {
@@ -666,8 +679,10 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
       predictorsActive,
       transformationsActive,
       contrastsActive,
-      modelingActive,
+      hrfActive,
       reviewActive,
+      submitActive,
+      modelingActive,
       activeTab,
       analysis,
       datasets,
@@ -734,6 +749,9 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
                   updateSelection={this.updatePredictorState}
                   predictorsLoad={this.state.predictorsLoad}
                 />
+                <Button type="primary" onClick={this.nextTab} disabled={selectedPredictors.length === 0}>
+                  Next: Create Transformations
+                </Button>
                 <br/>
               </TabPane>
               <TabPane
@@ -746,16 +764,24 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
                   xforms={analysis.transformations.filter(x => x.name !== 'convolve_HRF')}
                   onSave={xforms => this.updateTransformations(xforms)}
                 />
+                <br/>
+                <Button type="primary" onClick={this.nextTab} disabled={!predictorsActive}>
+                  Next: Select HRF Convolutions
+                </Button>
               </TabPane>
-              <TabPane tab="HRF" key="hrf" disabled={!transformationsActive}>
+              <TabPane tab="HRF" key="hrf" disabled={!hrfActive}>
                 <PredictorSelector
                   availablePredictors={selectedPredictors}
                   selectedPredictors={selectedHRFPredictors}
                   updateSelection={this.updateHRFPredictorState}
                   selectedText="to be convolved with HRF "
                 />
+                <br/>
+                <Button type="primary" onClick={this.nextTab}>
+                  Next: Create Contrasts
+                </Button>
               </TabPane>
-              <TabPane tab="Contrasts" key="contrasts" disabled={!transformationsActive}>
+              <TabPane tab="Contrasts" key="contrasts" disabled={!contrastsActive}>
                 <ContrastsTab
                   analysis={analysis}
                   contrasts={analysis.contrasts}
@@ -763,8 +789,12 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
                   onSave={this.updateContrasts}
                   updateAnalysis={this.updateState('analysis')}
                 />
+                <br/>
+                <Button type="primary" onClick={this.nextTab}>
+                  Next: Review Design
+                </Button>
               </TabPane>
-              <TabPane tab="Review" key="review" disabled={!reviewActive}>
+              <TabPane tab="Review" key="review" disabled={!predictorsActive && !!analysis.analysisId}>
                 {this.state.model &&
                   <div>
                     <Report
@@ -777,11 +807,18 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
                       unsavedChanges={this.state.unsavedChanges}
                       availablePredictors={this.state.availablePredictors}
                     />
+                    <Button type="primary" onClick={this.nextTab}>
+                      Next: Submit 
+                    </Button>
                   </div>
                 }
               </TabPane>
-              <TabPane tab="Submit" key="submit" disabled={false}>
-                <Status status="" analysisId={analysis.analysisId}/>
+              <TabPane tab="Results" key="submit" disabled={!submitActive && (analysis.status === 'DRAFT')}>
+                <Results
+                  status={analysis.status}
+                  analysisId={analysis.analysisId}
+                  confirmSubmission={this.confirmSubmission}
+                />
               </TabPane>
             </Tabs>
           </Col>
