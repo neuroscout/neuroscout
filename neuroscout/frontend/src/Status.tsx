@@ -180,8 +180,10 @@ export class Results extends React.Component<submitProps, {compileTraceback: str
         </div>
       }
       {(this.props.status === 'PENDING' || this.props.status === 'SUBMITTING') &&
-        <h3>Analysis Pending Generation</h3>
-        <p>Analysis generation may take some time. This page will update when complete.</p>
+        <div>
+          <h3>Analysis Pending Generation</h3>
+          <p>Analysis generation may take some time. This page will update when complete.</p>
+        </div>
       }
       </div>
     );
