@@ -675,7 +675,7 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
   }
 
   render() {
-    const {
+    let {
       predictorsActive,
       transformationsActive,
       contrastsActive,
@@ -699,6 +699,10 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
       PENDING: 'This analysis has been submitted for generation and is being processed.',
       COMPILED: 'This analysis has been successfully generated'
     }[analysis.status];
+    // default to tab with compilation results if we aren't in draft mode
+    if (analysis.status !== 'DRAFT') {
+      activeTab = 'submit';
+    }
     return (
       <div className="App">
         <Prompt
@@ -730,7 +734,7 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
               onTabClick={newTab => this.setState({ activeTab: newTab })}
               onChange={this.tabChange}
             >
-              <TabPane tab="Overview" key="overview">
+              <TabPane tab="Overview" key="overview" disabled={analysis.status !== 'DRAFT'}>
                 <OverviewTab
                   analysis={analysis}
                   datasets={datasets}
@@ -742,7 +746,7 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
                   goToNextTab={() => {this.setState({ activeTab: 'predictors' }); this.tabChange('predictors'); }}
                 />
               </TabPane>
-              <TabPane tab="Predictors" key="predictors" disabled={!predictorsActive}>
+              <TabPane tab="Predictors" key="predictors" disabled={!predictorsActive || analysis.status !== 'DRAFT'}>
                 <PredictorSelector
                   availablePredictors={availablePredictors}
                   selectedPredictors={selectedPredictors}
@@ -757,7 +761,7 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
               <TabPane
                 tab="Transformations"
                 key="transformations"
-                disabled={!transformationsActive}
+                disabled={!transformationsActive || analysis.status !== 'DRAFT'}
               >
                 <XformsTab
                   predictors={selectedPredictors}
@@ -769,7 +773,7 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
                   Next: Select HRF Convolutions
                 </Button>
               </TabPane>
-              <TabPane tab="HRF" key="hrf" disabled={!hrfActive}>
+              <TabPane tab="HRF" key="hrf" disabled={!hrfActive || analysis.status !== 'DRAFT'}>
                 <PredictorSelector
                   availablePredictors={selectedPredictors}
                   selectedPredictors={selectedHRFPredictors}
@@ -781,7 +785,7 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
                   Next: Create Contrasts
                 </Button>
               </TabPane>
-              <TabPane tab="Contrasts" key="contrasts" disabled={!contrastsActive}>
+              <TabPane tab="Contrasts" key="contrasts" disabled={!contrastsActive || analysis.status !== 'DRAFT'}>
                 <ContrastsTab
                   analysis={analysis}
                   contrasts={analysis.contrasts}
@@ -813,7 +817,7 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
                   </div>
                 }
               </TabPane>
-              <TabPane tab="Results" key="submit" disabled={!submitActive && (analysis.status === 'DRAFT')}>
+              <TabPane tab="Results" key="submit" disabled={!submitActive}>
                 <Results
                   status={analysis.status}
                   analysisId={analysis.analysisId}

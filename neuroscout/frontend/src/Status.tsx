@@ -133,7 +133,6 @@ export class Results extends React.Component<submitProps, {compileTraceback: str
   render() {
     return(
       <div>
-      "{this.props.status}"
       {(this.props.status === 'PASSED') && 
         <div>
           <h3>Analysis Passed</h3>
@@ -149,7 +148,7 @@ export class Results extends React.Component<submitProps, {compileTraceback: str
       }
       {(this.props.status === 'FAILED') &&
         <div>
-          <h3>Analysiis Failed to Compile</h3>
+          <h3>Analysis Failed to Compile</h3>
           <Card title="Errors" key="errors">
             <pre>{this.state.compileTraceback}</pre>
           </Card>
