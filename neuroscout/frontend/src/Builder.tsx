@@ -821,7 +821,7 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
                   </div>
                 }
               </TabPane>
-              <TabPane tab="Results" key="submit" disabled={!submitActive && isDraft}>
+              <TabPane tab={isDraft ? 'Run' : 'Results'} key="submit" disabled={!submitActive && isDraft}>
                 <Results
                   status={analysis.status}
                   analysisId={analysis.analysisId}
