@@ -29,13 +29,13 @@ class Home extends React.Component<HomeProps, {}> {
         </Row>
         <Row type="flex" justify="center">
           <Col lg={{span: 4}}>
-            <Button type="primary" size="large">
-              <Link to="/builder">Create New Analysis</Link>
+            <Button type="primary" size="large" href="/builder">
+              Create New Analysis
             </Button>
           </Col>
           <Col lg={{span: 4}}>
-            <Button type="primary" size="large">
-              <Link to="/browse">Browse Public Analyses</Link>
+            <Button type="primary" size="large" href="/browse">
+              Browse Public Analyses
             </Button>
           </Col>
         </Row>
