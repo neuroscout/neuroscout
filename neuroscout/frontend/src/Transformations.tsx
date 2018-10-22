@@ -246,7 +246,7 @@ class XformEditor extends React.Component<XformEditorProps, XformEditorState> {
     const {transformation} = this.state;
     const inputIds = new Set(input.map(x => x.name));
     let newXform = transformation;
-    if (transformation.name === 'orthogonalize') {
+    if (transformation.name === 'Orthogonalize') {
         if (transformation.other) {
           newXform.other = transformation.other.filter(x => !inputIds.has(x));
         }
@@ -313,7 +313,7 @@ class XformEditor extends React.Component<XformEditorProps, XformEditorState> {
               {availableParameters &&
                 availableParameters.map(param => {
                   let options: Predictor[] = input; 
-                  if (transformation.name === 'orthogonalize') {
+                  if (transformation.name === 'Orthogonalize') {
                     // Special case for wrt parameter: in 'options' exclude predictors
                     // that were selected for 'inputs'
                     const inputIds = new Set(input.map(x => x.name));

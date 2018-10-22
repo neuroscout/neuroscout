@@ -11,14 +11,6 @@ const InputGroup = Input.Group;
 import { getTasks } from './Builder';
 import { Analysis, Dataset, Run, Task } from './coretypes';
 
-/*
-class DataTable extends React.Component<any> {
-  render() {
-    return <Table {...this.props} />;
-  }
-}
-*/
-
 interface OverviewTabProps {
   analysis: Analysis;
   datasets: Dataset[];

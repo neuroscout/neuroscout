@@ -248,7 +248,7 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
       if (hrfVariables.length > 0) {
         let hrfTransforms = {'name': 'ConvolveHRF' as TransformName, 'input': hrfVariables};
         // Right now we only want one HRF transform, remove all others to prevent duplicates
-        blocks[0].transformations = blocks[0].transformations!.filter(x => x.name !== 'convolve_HRF');
+        blocks[0].transformations = blocks[0].transformations!.filter(x => x.name !== 'ConvolveHRF');
         blocks[0].transformations!.push(hrfTransforms);
       }
     }
@@ -377,10 +377,10 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
         }
         if (data.model.blocks[i].transformations) {
           data.transformations = data.model.blocks[i].transformations!.filter((x) => {
-            return x.name !== 'convolve_HRF' as TransformName;
+            return x.name !== 'ConvolveHRF' as TransformName;
           });
           let hrfTransforms = data.model.blocks[i].transformations!.filter((x) => {
-            return x.name === 'convolve_HRF' as TransformName;
+            return x.name === 'ConvolveHRF' as TransformName;
           });
           if (hrfTransforms.length > 0) {
             hrfTransforms.map(x => x.input ? x.input.map(y => hrfPredictorIds.push(y)) : null);
@@ -768,7 +768,7 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
               >
                 <XformsTab
                   predictors={selectedPredictors}
-                  xforms={analysis.transformations.filter(x => x.name !== 'convolve_HRF')}
+                  xforms={analysis.transformations.filter(x => x.name !== 'ConvolveHRF')}
                   onSave={xforms => this.updateTransformations(xforms)}
                 />
                 <br/>
