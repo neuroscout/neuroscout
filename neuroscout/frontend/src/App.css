@@ -33,6 +33,13 @@ body {
     background-color: white;
 }
 
+pre {
+    padding: 10px;
+    border-radius: 10px;
+    color: white;
+    background-color: black;
+}
+
 .privateSwitch {
     text-align: center;
 }
@@ -44,3 +51,4 @@ body {
 .ant-layout {
     background-color: white;
 }
+

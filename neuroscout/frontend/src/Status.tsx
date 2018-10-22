@@ -149,12 +149,15 @@ export class Results extends React.Component<submitProps, {compileTraceback: str
             Congratulations! Your analysis is finished compiling and is ready to be executed.
             Once you have installed neuroscout-cli you may run your analysis like this:
           </p>
-          <pre>docker run -it -v /local/outputdirectory:/out neuroscout-cli run /out {this.props.analysisId}</pre>
+          <pre>
+            <code>
+              docker run -it -v /local/outputdirectory:/out neuroscout-cli run /out {this.props.analysisId}
+            </code>
+          </pre>
           <p>
             See the <a href="https://github.com/neuroscout/neuroscout-cli">neuroscout-cli documentation </a>
              for more information on how to install and run analyses.
           </p>
-          <DLLink status={this.props.status} analysisId={this.props.analysisId}/>
         </div>
       }
       {(this.props.status === 'DRAFT') &&
