@@ -705,6 +705,7 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
     if (analysis.status !== 'DRAFT' && activeTab === 'overview') {
       activeTab = 'submit';
     }
+    let isDraft = analysis.status === 'DRAFT';
     return (
       <div className="App">
         <Prompt
@@ -714,7 +715,7 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
         <Row type="flex" justify="center">
           <Col xxl={{span: 14}} xl={{span: 16}} lg={{span: 18}} xs={{span: 24}}>
             <h2>
-              {analysis.status !== 'DRAFT' ? <Icon type="lock" /> : <Icon type="unlock" />}
+              {!isDraft ? <Icon type="lock" /> : <Icon type="unlock" />}
               {`Analysis ID: ${analysis.analysisId || 'n/a'}`}
               <Space />
               <Button
@@ -736,7 +737,7 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
               onTabClick={newTab => this.setState({ activeTab: newTab })}
               onChange={this.tabChange}
             >
-              <TabPane tab="Overview" key="overview" disabled={analysis.status !== 'DRAFT'}>
+              {isDraft && <TabPane tab="Overview" key="overview" disabled={!isDraft}>
                 <OverviewTab
                   analysis={analysis}
                   datasets={datasets}
@@ -747,8 +748,8 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
                   updateSelectedTaskId={this.updateState('selectedTaskId')}
                   goToNextTab={() => {this.setState({ activeTab: 'predictors' }); this.tabChange('predictors'); }}
                 />
-              </TabPane>
-              <TabPane tab="Predictors" key="predictors" disabled={!predictorsActive || analysis.status !== 'DRAFT'}>
+              </TabPane>}
+              {isDraft && <TabPane tab="Predictors" key="predictors" disabled={!predictorsActive || !isDraft}>
                 <PredictorSelector
                   availablePredictors={availablePredictors}
                   selectedPredictors={selectedPredictors}
@@ -759,11 +760,11 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
                   Next: Create Transformations
                 </Button>
                 <br/>
-              </TabPane>
-              <TabPane
+              </TabPane>}
+              {isDraft && <TabPane
                 tab="Transformations"
                 key="transformations"
-                disabled={!transformationsActive || analysis.status !== 'DRAFT'}
+                disabled={!transformationsActive || !isDraft}
               >
                 <XformsTab
                   predictors={selectedPredictors}
@@ -774,8 +775,8 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
                 <Button type="primary" onClick={this.nextTab} disabled={!predictorsActive}>
                   Next: Select HRF Convolutions
                 </Button>
-              </TabPane>
-              <TabPane tab="HRF" key="hrf" disabled={!hrfActive || analysis.status !== 'DRAFT'}>
+              </TabPane>}
+              {isDraft && <TabPane tab="HRF" key="hrf" disabled={!hrfActive || !isDraft}>
                 <PredictorSelector
                   availablePredictors={selectedPredictors}
                   selectedPredictors={selectedHRFPredictors}
@@ -786,8 +787,8 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
                 <Button type="primary" onClick={this.nextTab}>
                   Next: Create Contrasts
                 </Button>
-              </TabPane>
-              <TabPane tab="Contrasts" key="contrasts" disabled={!contrastsActive || analysis.status !== 'DRAFT'}>
+              </TabPane>}
+              {isDraft && <TabPane tab="Contrasts" key="contrasts" disabled={!contrastsActive || !isDraft}>
                 <ContrastsTab
                   analysis={analysis}
                   contrasts={analysis.contrasts}
@@ -799,7 +800,7 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
                 <Button type="primary" onClick={this.nextTab}>
                   Next: Review Design
                 </Button>
-              </TabPane>
+              </TabPane>}
               <TabPane tab="Review" key="review" disabled={!predictorsActive && !!analysis.analysisId}>
                 {this.state.model &&
                   <div>
@@ -820,7 +821,7 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
                   </div>
                 }
               </TabPane>
-              <TabPane tab="Results" key="submit" disabled={!submitActive && analysis.status === 'DRAFT'}>
+              <TabPane tab="Results" key="submit" disabled={!submitActive && isDraft}>
                 <Results
                   status={analysis.status}
                   analysisId={analysis.analysisId}
