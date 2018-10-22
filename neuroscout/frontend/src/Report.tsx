@@ -40,7 +40,7 @@ let getSub = (x: string) => {
 class Plots extends React.Component<{plots: string[]}, {}> {
     render() {
       let display: any[] = [];
-      let plots = this.props.plots.map((x) => {
+      let plots = this.props.plots.map((x, i) => {
         let url = x;
         // urls generated for localhost have None instead of localhost in url
         if (x.indexOf('None') === 0) {
@@ -48,11 +48,11 @@ class Plots extends React.Component<{plots: string[]}, {}> {
           url = domainRoot + url;
         }
         display.push(
-          <Panel header={<a href={url}>{url}</a>} key={url}><img src={url} style={{width: '100%'}}/></Panel>
+          <Panel header={<a href={url}>{url}</a>} key={'' + i}><img src={url} style={{width: '100%'}}/></Panel>
         );
       });
       return(
-        <Collapse>
+        <Collapse defaultActiveKey={['0']}>
           {display}
         </Collapse>
       );
@@ -210,15 +210,9 @@ export class Report extends React.Component<ReportProps, ReportState> {
   render() {
     return (
       <div>
-        <Card title="Matrix Design Plots" key="plots">
+        <Card title="Design Matrix" key="plots">
           <Spin spinning={!this.state.reportsLoaded}>
             <Plots plots={this.state.plots} />
-          </Spin>
-        </Card>
-        <br/>
-        <Card title="Matrix Design Downloads" key="matrices">
-          <Spin spinning={!this.state.reportsLoaded}>
-            <Matrices matrices={this.state.matrices} />
           </Spin>
         </Card>
         <br/>
