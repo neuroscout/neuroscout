@@ -41,7 +41,7 @@ class Plots extends React.Component<{plots: string[]}, {}> {
     render() {
       let display: any[] = [];
       let plots = this.props.plots.map((x, i) => {
-        let url = x;
+        let url = 'http://' + x;
         // urls generated for localhost have None instead of localhost in url
         if (x.indexOf('None') === 0) {
           url = x.slice(4);

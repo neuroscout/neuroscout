@@ -41,8 +41,6 @@ class ModelInput extends React.Component<{model: BidsModel}, {}> {
     let subjects = input.subject ? alphaSort(input.subject).join(', ') : [];
     let sessions = input.session ? alphaSort(input.session).join(', ') : [];
 
-    // tslint:disable-next-line:no-console
-    console.log(sessions !== []);
     return (
       <div>
         <Card title="Task" key="task">{input.task ? input.task : ''}</Card>

@@ -52,3 +52,6 @@ pre {
     background-color: white;
 }
 
+.statusHeader {
+    float: right;
+}
