@@ -142,6 +142,9 @@ export class Results extends React.Component<submitProps, {compileTraceback: str
   render() {
     return(
       <div>
+      <div className="statusHeader">
+        <Status status={this.props.status} analysisId={this.props.analysisId} />
+      </div>
       {(this.props.status === 'PASSED') && 
         <div>
           <h3>Analysis Passed</h3>
