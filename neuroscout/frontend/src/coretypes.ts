@@ -103,8 +103,8 @@ interface PredictorsParam {
 
 export type Parameter = BooleanParam | PredictorsParam;
 
-export type TransformName = 'scale' | 'orthogonalize' | 'sum' | 'product' | 'threshold'
-  | 'or' | 'and' | 'not' | 'convolve_HRF';
+export type TransformName = 'Scale' | 'Orthogonalize' | 'Sum' | 'Product' | 'Threshold'
+  | 'Or' | 'And' | 'Not' | 'ConvolveHRF' | 'Replace';
 
 export type BlockLevel = 'run' | 'session' | 'subject' | 'dataset';
 
