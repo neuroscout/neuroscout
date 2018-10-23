@@ -458,12 +458,26 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
       );
   };
 
-  nextTab = () => {
-    let nextIndex = tabOrder.indexOf(this.state.activeTab) + 1;
+  nextTab = (direction = 1) => {
+    return (e) => {
+      let nextIndex = tabOrder.indexOf(this.state.activeTab) + direction;
+      let nextTab = tabOrder[nextIndex];
+      let update = {activeTab: nextTab as TabName};
+      update[nextTab + 'Active' ] = true;
+      if (nextTab === 'review' && this.state.analysis.status === 'DRAFT') {
+        this.saveAnalysis({compile: false})();
+      }
+      this.setState(update);
+      this.tabChange(nextTab);
+    };
+  };
+
+  prevTab = (e) => {
+    let nextIndex = tabOrder.indexOf(this.state.activeTab) - 1;
     let nextTab = tabOrder[nextIndex];
     let update = {activeTab: nextTab as TabName};
     update[nextTab + 'Active' ] = true;
-    if (nextTab === 'review') {
+    if (nextTab === 'review' && this.state.analysis.status === 'DRAFT') {
       this.saveAnalysis({compile: false})();
     }
     this.setState(update);
@@ -672,8 +686,30 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
     .catch(displayError);
   }
 
+  nextButton = () => {
+    return (
+      <Button color="green-6" type="primary" onClick={this.nextTab()} className="nextButton">
+        Next
+      </Button>
+    );
+  }
+
+  navButtons = () => {
+    return (
+      <div>
+        <Button type="primary" onClick={this.nextTab(-1)}>
+          Previous
+        </Button>
+        {this.nextButton()}
+      </div>
+    );
+  }
+
   componentDidUpdate(prevProps, prevState) {
-    authActions.checkJWT();
+    // we really only need a valid JWT when creating the analysis
+    if (this.state.analysis.status === 'DRAFT') {
+      authActions.checkJWT();
+    }
   }
 
   render() {
@@ -748,6 +784,7 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
                   updateSelectedTaskId={this.updateState('selectedTaskId')}
                   goToNextTab={() => {this.setState({ activeTab: 'predictors' }); this.tabChange('predictors'); }}
                 />
+                {this.nextButton()}
               </TabPane>}
               {isDraft && <TabPane tab="Predictors" key="predictors" disabled={!predictorsActive || !isDraft}>
                 <PredictorSelector
@@ -756,9 +793,7 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
                   updateSelection={this.updatePredictorState}
                   predictorsLoad={this.state.predictorsLoad}
                 />
-                <Button type="primary" onClick={this.nextTab} disabled={selectedPredictors.length === 0}>
-                  Next: Create Transformations
-                </Button>
+                {this.navButtons()}
                 <br/>
               </TabPane>}
               {isDraft && <TabPane
@@ -772,9 +807,7 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
                   onSave={xforms => this.updateTransformations(xforms)}
                 />
                 <br/>
-                <Button type="primary" onClick={this.nextTab} disabled={!predictorsActive}>
-                  Next: Select HRF Convolutions
-                </Button>
+                {this.navButtons()}
               </TabPane>}
               {isDraft && <TabPane tab="HRF" key="hrf" disabled={!hrfActive || !isDraft}>
                 <PredictorSelector
@@ -784,9 +817,7 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
                   selectedText="to be convolved with HRF "
                 />
                 <br/>
-                <Button type="primary" onClick={this.nextTab}>
-                  Next: Create Contrasts
-                </Button>
+                {this.navButtons()}
               </TabPane>}
               {isDraft && <TabPane tab="Contrasts" key="contrasts" disabled={!contrastsActive || !isDraft}>
                 <ContrastsTab
@@ -797,9 +828,7 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
                   updateAnalysis={this.updateState('analysis')}
                 />
                 <br/>
-                <Button type="primary" onClick={this.nextTab}>
-                  Next: Review Design
-                </Button>
+                {this.navButtons()}
               </TabPane>}
               <TabPane tab="Review" key="review" disabled={!predictorsActive && !!analysis.analysisId}>
                 {this.state.model &&
@@ -815,9 +844,7 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
                       availablePredictors={this.state.availablePredictors}
                     />
                     <br/>
-                    <Button type="primary" onClick={this.nextTab}>
-                      Next: Submit 
-                    </Button>
+                    {isDraft ? this.navButtons() : this.nextButton()}
                   </div>
                 }
               </TabPane>

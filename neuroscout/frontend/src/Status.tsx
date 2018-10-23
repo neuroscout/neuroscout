@@ -18,11 +18,6 @@ export class Status extends React.Component<{status?: string, analysisId?: strin
       PASSED: 'green'
     }[status];
 
-    let bundleLink;
-    if (status === 'PASSED' && analysisId) {
-      bundleLink = `${domainRoot}/analyses/${analysisId}_bundle.tar.gz`;
-    }
-
     return(
       <span>
         <Tag color={color}>

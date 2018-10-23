@@ -29,6 +29,10 @@
   float: right;
 }
 
+.nextButton {
+  float: right;
+}
+
 body {
     background-color: white;
 }
