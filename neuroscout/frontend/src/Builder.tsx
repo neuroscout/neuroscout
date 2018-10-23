@@ -782,7 +782,6 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
                   predictorsActive={predictorsActive}
                   updateAnalysis={this.updateState('analysis')}
                   updateSelectedTaskId={this.updateState('selectedTaskId')}
-                  goToNextTab={() => {this.setState({ activeTab: 'predictors' }); this.tabChange('predictors'); }}
                 />
                 {this.nextButton()}
               </TabPane>}

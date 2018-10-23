@@ -19,7 +19,6 @@ interface OverviewTabProps {
   predictorsActive: boolean;
   updateAnalysis: (value: any) => void;
   updateSelectedTaskId: (value: string) => void;
-  goToNextTab: () => void;
 }
 
 interface OverviewTabState {
@@ -149,7 +148,6 @@ export class OverviewTab extends React.Component<OverviewTabProps, OverviewTabSt
       datasets,
       availableRuns,
       selectedTaskId,
-      goToNextTab,
       predictorsActive,
     } = this.props;
 
