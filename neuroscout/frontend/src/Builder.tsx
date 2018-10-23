@@ -792,8 +792,8 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
                   updateSelection={this.updatePredictorState}
                   predictorsLoad={this.state.predictorsLoad}
                 />
-                {this.navButtons()}
                 <br/>
+                {this.navButtons()}
               </TabPane>}
               {isDraft && <TabPane
                 tab="Transformations"
