@@ -55,7 +55,6 @@ it('Overview tab renders without errors', () => {
       predictorsActive={true}
       updateAnalysis={() => {}}
       updateSelectedTaskId={() => {}}
-      goToNextTab={() => {}}
     />
   );
 });
