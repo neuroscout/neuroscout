@@ -47,7 +47,6 @@ progressbar2
 py==1.4.33
 grabbit==0.2.3
 pybids==0.6.5
--e git+https://github.com/INCF/pybids.git@lets-break-stuff#egg=pybids
 PyJWT==1.4.2
 pyparsing==2.2.0
 pytest==3.0.7
