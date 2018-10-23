@@ -25,6 +25,7 @@ import {
   ApiDataset,
   ApiAnalysis,
   AnalysisConfig,
+  AnalysisStatus,
   Transformation,
   Contrast,
   Block,
@@ -34,7 +35,7 @@ import {
   TransformName,
   TabName
 } from './coretypes';
-import { displayError, jwtFetch } from './utils';
+import { displayError, jwtFetch, timeout } from './utils';
 import { Space } from './HelperComponents';
 import { config } from './config';
 import { authActions } from './auth.actions';
@@ -103,8 +104,8 @@ let initializeStore = (): Store => ({
       transformations: [],
       contrasts: []
     }]
-  }
-
+  },
+  poll: true
 });
 
 // Normalize dataset object returned by /api/datasets
@@ -278,6 +279,31 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
     };
   };
 
+  // A one off poll for when the analysis is submitted.
+  checkAnalysisStatus = async () => {
+    while (this.state.poll) {
+      let id = this.state.analysis.analysisId;
+      if (id === undefined || this.state.analysis.status === undefined) {
+        return;
+      }
+      jwtFetch(`${domainRoot}/api/analyses/${id}`, { method: 'get' })
+        .then((data: ApiAnalysis) => {
+          if (this.state.analysis.status !== data.status) {
+            this.updateStatus(data.status);
+            if (['DRAFT', 'SUBMITTING', 'PENDING'].indexOf(data.status) === -1) {
+              this.setState({poll: false});
+            }
+          }
+      })
+      .catch(() => {
+        // if fetch throws an error lets bail out. Redirect maybe?
+        this.setState({poll: false});
+        return;
+      });
+      await timeout(5000);
+    }
+  };
+
   // Save analysis to server, either with lock=false (just save), or lock=true (save & submit)
   saveAnalysis = ({ compile = false }) => (): void => {
     if ((!compile && !this.saveEnabled()) || (compile && !this.submitEnabled())) {
@@ -319,6 +345,7 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
       url = `${domainRoot}/api/analyses/${analysis.analysisId}/compile`;
       method = 'post';
       this.setState({analysis: {...analysis, status: 'SUBMITTING'}});
+      this.checkAnalysisStatus();
     } else if (!compile && analysis.analysisId) {
       // Save existing analysis
       url = `${domainRoot}/api/analyses/${analysis.analysisId}`;
@@ -343,10 +370,14 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
           throw new Error('Oops...something went wrong. Analysis was not saved.');
         }
         message.success(compile ? 'Analysis submitted for generation' : 'Analysis saved');
+        let analysisId = this.state.analysis.analysisId;
+        if (data.hash_id !== undefined) {
+          analysisId = data.hash_id;
+        }
         this.setState({
           analysis: {
             ...analysis,
-            analysisId: data.hash_id,
+            analysisId: analysisId,
             status: data.status,
             modifiedAt: data.modified_at
           },
@@ -439,7 +470,7 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
       okText: 'Yes',
       cancelText: 'No',
       onOk() {
-        saveAnalysis({ compile: false})();
+        // saveAnalysis({ compile: false})();
         saveAnalysis({ compile: true })();
       }
     });
@@ -501,6 +532,12 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
     this.setState({
       analysis: { ...this.state.analysis, contrasts },
       unsavedChanges: true
+    });
+  };
+
+  updateStatus = (status: string): void => {
+    this.setState({
+      analysis: { ...this.state.analysis, status: (status as AnalysisStatus)},
     });
   };
 
@@ -853,6 +890,7 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
                   analysisId={analysis.analysisId}
                   confirmSubmission={this.confirmSubmission}
                   private={analysis.private || false}
+                  updateStatus={this.updateStatus}
                 />
               </TabPane>
             </Tabs>

@@ -3,7 +3,7 @@
  The data models below are largely UI agonstic. This module is a good starting point to understand the
  shape of the data in the frontend app. All resusable type definitions should go into this module.
 */
-type AnalysisStatus = 'DRAFT' | 'PENDING' | 'PASSED' | 'FAILED' | 'SUBMITTING';
+export type AnalysisStatus = 'DRAFT' | 'PENDING' | 'PASSED' | 'FAILED' | 'SUBMITTING';
 
 // Analysis type in Analysis Builder
 export interface Analysis {
@@ -170,6 +170,7 @@ export interface Store {
   currentLevel: BlockLevel;
   postReports: boolean;
   model: BidsModel;
+  poll: boolean;
 }
 
 export interface ApiRun {

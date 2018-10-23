@@ -2,6 +2,7 @@ import * as React from 'react';
 import { Button, Card, Checkbox, Tag, Icon } from 'antd';
 import { config } from './config';
 import { displayError, jwtFetch, alphaSort, timeout } from './utils';
+import { ApiAnalysis } from './coretypes';
 
 const domainRoot = config.server_url;
 
@@ -53,8 +54,10 @@ type submitProps = {
   status?: string,
   analysisId?: string,
   confirmSubmission: () => void,
-  private: boolean
+  private: boolean,
+  updateStatus?: (any) => void
 };
+
 export class Submit extends React.Component<submitProps, {tosAgree: boolean}> {
   constructor(props) {
     super(props);
@@ -113,7 +116,7 @@ export class Results extends React.Component<submitProps, {compileTraceback: str
   constructor(props) {
     super(props);
     this.state = {
-      compileTraceback: ''
+      compileTraceback: '',
     };
     this.getTraceback();
   }
