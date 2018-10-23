@@ -37,6 +37,10 @@ body {
     background-color: white;
 }
 
+.builderTabs {
+    padding-bottom: 50px;
+}
+
 pre {
     padding: 10px;
     border-radius: 10px;

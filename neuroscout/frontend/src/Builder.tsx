@@ -809,6 +809,7 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
               activeKey={activeTab}
               onTabClick={newTab => this.setState({ activeTab: newTab })}
               onChange={this.tabChange}
+              className="builderTabs"
             >
               {isDraft && <TabPane tab="Overview" key="overview" disabled={!isDraft}>
                 <OverviewTab
@@ -821,6 +822,7 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
                   updateSelectedTaskId={this.updateState('selectedTaskId')}
                 />
                 {this.nextButton()}
+                <br/>
               </TabPane>}
               {isDraft && <TabPane tab="Predictors" key="predictors" disabled={!predictorsActive || !isDraft}>
                 <PredictorSelector
@@ -831,6 +833,7 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
                 />
                 <br/>
                 {this.navButtons()}
+                <br/>
               </TabPane>}
               {isDraft && <TabPane
                 tab="Transformations"
@@ -844,6 +847,7 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
                 />
                 <br/>
                 {this.navButtons()}
+                <br/>
               </TabPane>}
               {isDraft && <TabPane tab="HRF" key="hrf" disabled={!hrfActive || !isDraft}>
                 <PredictorSelector
@@ -854,6 +858,7 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
                 />
                 <br/>
                 {this.navButtons()}
+                <br/>
               </TabPane>}
               {isDraft && <TabPane tab="Contrasts" key="contrasts" disabled={!contrastsActive || !isDraft}>
                 <ContrastsTab
@@ -865,8 +870,9 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
                 />
                 <br/>
                 {this.navButtons()}
+                <br/>
               </TabPane>}
-              <TabPane tab="Review" key="review" disabled={!predictorsActive && !!analysis.analysisId}>
+              <TabPane tab="Review" key="review" disabled={!reviewActive && !!analysis.analysisId}>
                 {this.state.model &&
                   <div>
                     <Report
@@ -881,6 +887,7 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
                     />
                     <br/>
                     {isDraft ? this.navButtons() : this.nextButton()}
+                    <br/>
                   </div>
                 }
               </TabPane>
