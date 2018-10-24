@@ -70,7 +70,7 @@ const XformDisplay = (props: XformDisplayProps) => {
     <div>
       <h3>{`${index + 1}: ${xform.name}`}</h3>
       <p>{`Inputs: ${input!.join(', ')}`}</p>
-      {(paramItems.length > 0) && 
+      {(paramItems.length > 0) &&
         <div>
         <p>Parameters:</p>
         <ul>
@@ -87,7 +87,7 @@ const XformDisplay = (props: XformDisplayProps) => {
           <Icon type="arrow-down" />
         </Button>}
       <Button type="danger" onClick={() => onDelete(index)}>
-        <Icon type="delete" />
+        <Icon type="delete" /> Remove
       </Button>
       <br />
       <br />
@@ -140,7 +140,7 @@ class ParameterField extends React.Component<ParameterFieldProps> {
     const { name, value, onChange } = this.props;
     return (
       <div>
-        {name}: 
+        {name}:
         <InputNumber
           defaultValue={value}
           onChange={(newValue) => newValue ? onChange(newValue) : onChange(0)}
@@ -175,7 +175,7 @@ class ParameterField extends React.Component<ParameterFieldProps> {
     return (
       <div>
       Replace missing values with 0 before/after scaling:<br/>
-      <RadioGroup 
+      <RadioGroup
           onChange={(event) => onChange(event.target.value)}
           value={value}
       >
@@ -200,11 +200,11 @@ class ParameterField extends React.Component<ParameterFieldProps> {
           <div>
             <Col span={12}>
               <div className="weightName">
-                {x.name} weight: 
+                {x.name} weight:
               </div>
             </Col>
             <Col span={4}>
-            <InputNumber 
+            <InputNumber
               onChange={(newValue) => {
                 let newWeights = this.updateWeight(i, newValue as number);
                 onChange(newWeights);
@@ -228,10 +228,10 @@ class XformEditor extends React.Component<XformEditorProps, XformEditorState> {
     this.setState({
       transformation: updatedXform
     });
-  }; 
+  };
 
   constructor(props: XformEditorProps) {
-    super(props); 
+    super(props);
     const {xform,  availableInputs } = props;
     this.state = {
       transformation: xform,
@@ -266,7 +266,7 @@ class XformEditor extends React.Component<XformEditorProps, XformEditorState> {
     const {xform} = this.props;
     const {name,  input, transformation} = this.state;
     if (!name) {
-      displayError(new Error('Please select a transformation')); 
+      displayError(new Error('Please select a transformation'));
       return;
     }
     if (input.length < 1) {
@@ -312,7 +312,7 @@ class XformEditor extends React.Component<XformEditorProps, XformEditorState> {
               <br />
               {availableParameters &&
                 availableParameters.map(param => {
-                  let options: Predictor[] = input; 
+                  let options: Predictor[] = input;
                   if (transformation.name === 'Orthogonalize') {
                     // Special case for wrt parameter: in 'options' exclude predictors
                     // that were selected for 'inputs'
@@ -357,7 +357,7 @@ interface XformsTabState {
 
 export class XformsTab extends React.Component<XformsTabProps,  XformsTabState> {
   constructor(props:  XformsTabProps) {
-    super(props); 
+    super(props);
     this.state = {mode:  'view' };
   }
 
@@ -418,8 +418,8 @@ export class XformsTab extends React.Component<XformsTabProps,  XformsTabState> 
               {'You haven\'t created any transformations'}
             </p>}
         <br />
-        <Button type="primary" onClick={() => this.setState({ mode: 'add' })}>
-          Add new transformation
+        <Button type="default" onClick={() => this.setState({ mode: 'add' })}>
+          <Icon type="plus" /> Add Transformation
         </Button>
       </div>
     );

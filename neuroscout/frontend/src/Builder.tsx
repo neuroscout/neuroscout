@@ -120,7 +120,7 @@ const normalizeDataset = (d: ApiDataset): Dataset => {
 
 // Get list of tasks from a given dataset
 export const getTasks = (datasets: Dataset[], datasetId: string | null): Task[] => {
-    let curDataset = datasets.find((x) => { 
+    let curDataset = datasets.find((x) => {
       return x.id === datasetId;
     });
 
@@ -589,7 +589,7 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
   }
 
   runIdsFromModel = (availableRuns: Run[], input: ImageInput) => {
-    let runIds: Run[] = availableRuns; 
+    let runIds: Run[] = availableRuns;
     if (!this.state.model || !this.state.model.input) {
       return [];
     }
@@ -645,7 +645,7 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
                 predictorsActive: true
               });
             }
-            
+
             this.setState({
               availableRuns: data,
               availablePredictors: [],
@@ -786,6 +786,7 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
             <h2>
               {!isDraft ? <Icon type="lock" /> : <Icon type="unlock" />}
               {`Analysis ID: ${analysis.analysisId || 'n/a'}`}
+              <Space />
               <Space />
               <Button
                 onClick={this.saveAnalysis({ compile: false })}
