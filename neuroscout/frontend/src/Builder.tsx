@@ -42,6 +42,7 @@ import { authActions } from './auth.actions';
 
 const { TabPane } = Tabs;
 const { Footer, Content } = Layout;
+const tabOrder = ['overview', 'predictors', 'transformations', 'hrf', 'contrasts', 'review', 'submit'];
 
 const history = createBrowserHistory();
 
@@ -51,7 +52,6 @@ const EMAIL = 'user@example.com';
 const PASSWORD = 'string';
 const DEFAULT_SMOOTHING = 5;
 const editableStatus = ['DRAFT', 'FAILED'];
-const tabOrder = ['overview', 'predictors', 'transformations', 'hrf', 'contrasts', 'review', 'submit'];
 
 const defaultConfig: AnalysisConfig = { smoothing: DEFAULT_SMOOTHING, predictorConfigs: {} };
 
@@ -501,18 +501,6 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
       this.setState(update);
       this.tabChange(nextTab);
     };
-  };
-
-  prevTab = (e) => {
-    let nextIndex = tabOrder.indexOf(this.state.activeTab) - 1;
-    let nextTab = tabOrder[nextIndex];
-    let update = {activeTab: nextTab as TabName};
-    update[nextTab + 'Active' ] = true;
-    if (nextTab === 'review' && this.state.analysis.status === 'DRAFT') {
-      this.saveAnalysis({compile: false})();
-    }
-    this.setState(update);
-    this.tabChange(nextTab);
   };
 
   updateConfig = (newConfig: AnalysisConfig): void => {
