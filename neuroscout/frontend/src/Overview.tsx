@@ -214,7 +214,7 @@ export class OverviewTab extends React.Component<OverviewTabProps, OverviewTabSt
     };
 
     return (
-      <div>
+      <div className="builderCol">
         <Form layout="vertical">
           <FormItem label="Analysis name:" required={true}>
             <Row type="flex" justify="space-between">

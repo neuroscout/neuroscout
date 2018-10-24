@@ -391,14 +391,9 @@ class App extends Reflux.Component<any, {}, AppState> {
           {openSignup && signupModal()}
           {openEnterResetToken && authActions.enterResetTokenModal()}
           <Layout>
-            <div className="headerRow">
             <Row type="flex" justify="center"style={{ background: '#fff', padding: 0 }}>
-                  <Col lg={{span: 9}} xs={{span: 12}}>
-                    <h1>
-                      <Link to="/">Neuroscout</Link>
-                    </h1>
-                  </Col>
-                  <Col lg={{span: 9}} xs={{span: 12}}>
+                <Col xxl={{span: 14}} xl={{span: 16}} lg={{span: 18}} xs={{span: 24}} className="mainCol">
+            <div className="headerRow">
                     <div className="Login-col">
                     {this.state.auth.loggedIn
                       ? <span>
@@ -422,8 +417,9 @@ class App extends Reflux.Component<any, {}, AppState> {
                           </Button>
                         </span>}
                     </div>
-                  </Col>
-              </Row>
+                    <h1>
+                      <Link to="/">Neuroscout</Link>
+                    </h1>
               </div>
             <Content style={{ background: '#fff' }}>
               <Route
@@ -478,6 +474,8 @@ class App extends Reflux.Component<any, {}, AppState> {
                   <Browse analyses={publicAnalyses} cloneAnalysis={this.cloneAnalysis} />}
               />
             </Content>
+                  </Col>
+              </Row>
           </Layout>
         </div>
       </Router>
