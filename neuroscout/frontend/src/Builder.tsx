@@ -76,7 +76,7 @@ let initializeStore = (): Store => ({
     predictorIds: [],
     hrfPredictorIds: [],
     status: 'DRAFT',
-    private: true,
+    private: false,
     config: defaultConfig,
     transformations: [],
     contrasts: [],
