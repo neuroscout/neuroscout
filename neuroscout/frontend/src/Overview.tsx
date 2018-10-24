@@ -216,13 +216,15 @@ export class OverviewTab extends React.Component<OverviewTabProps, OverviewTabSt
     return (
       <div>
         <Form layout="vertical">
-          <FormItem label="Analysis name:">
+          <FormItem label="Analysis name:" required={true}>
             <Row type="flex" justify="space-between">
               <Col xs={24} md={21}>
                 <Input
                   placeholder="Analysis name"
                   value={analysis.name}
                   onChange={this.updateAnalysisFromEvent('name')}
+                  required={true}
+                  min={1}
                 />
               </Col>
               <Col md={3}>

@@ -498,6 +498,14 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
       if (nextTab === 'review' && this.state.analysis.status === 'DRAFT') {
         this.saveAnalysis({compile: false})();
       }
+      if (this.state.activeTab === 'overview') {
+        // need name and runids
+        if (this.state.analysis.name.length < 1) {
+          // how 
+        }
+        if (this.state.analysis.runIds.length < 1) {
+        }
+      }
       this.setState(update);
       this.tabChange(nextTab);
     };
@@ -792,7 +800,7 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
           </Col>
         </Row>
         <Row type="flex" justify="center">
-          <Col xxl={{span: 14}} xl={{span: 16}} lg={{span: 18}} xs={{span: 24}}>
+          <Col xxl={{span: 14}} xl={{span: 16}} lg={{span: 18}} xs={{span: 24}} className="builderCol">
             <Tabs
               activeKey={activeTab}
               onTabClick={newTab => this.setState({ activeTab: newTab })}
