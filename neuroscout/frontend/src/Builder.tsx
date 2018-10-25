@@ -868,7 +868,7 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
                   {this.navButtons()}
                   <br/>
                 </TabPane>}
-                <TabPane tab="Review" key="review" disabled={!reviewActive || !analysis.analysisId}>
+                <TabPane tab="Review" key="review" disabled={((!reviewActive || !analysis.analysisId) && isDraft)}>
                   {this.state.model &&
                     <div>
                       <Report
