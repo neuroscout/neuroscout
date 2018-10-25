@@ -29,6 +29,10 @@
   float: right;
 }
 
+.homeBtn {
+    justify-content: center;
+}
+
 .nextButton {
   float: right;
 }

@@ -393,7 +393,7 @@ class App extends Reflux.Component<any, {}, AppState> {
           <Layout>
             <Row type="flex" justify="center"style={{ background: '#fff', padding: 0 }}>
                 <Col xxl={{span: 14}} xl={{span: 16}} lg={{span: 18}} xs={{span: 24}} className="mainCol">
-            <div className="headerRow">
+                  <div className="headerRow">
                     <div className="Login-col">
                     {this.state.auth.loggedIn
                       ? <span>
@@ -420,7 +420,9 @@ class App extends Reflux.Component<any, {}, AppState> {
                     <h1>
                       <Link to="/">Neuroscout</Link>
                     </h1>
-              </div>
+                    </div>
+                  </Col>
+              </Row>
             <Content style={{ background: '#fff' }}>
               <Route
                 exact={true}
@@ -474,8 +476,6 @@ class App extends Reflux.Component<any, {}, AppState> {
                   <Browse analyses={publicAnalyses} cloneAnalysis={this.cloneAnalysis} />}
               />
             </Content>
-                  </Col>
-              </Row>
           </Layout>
         </div>
       </Router>

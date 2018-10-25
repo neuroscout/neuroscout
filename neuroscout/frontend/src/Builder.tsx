@@ -642,7 +642,6 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
               this.setState({
                 selectedTaskId: availTasks[0].id,
                 predictorsLoad: true,
-                predictorsActive: true
               });
             }
 
@@ -777,130 +776,130 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
     let isDraft = analysis.status === 'DRAFT';
     return (
       <div className="App">
-        <Prompt
-          when={unsavedChanges}
-          message={'You have unsaved changes. Are you sure you want leave this page?'}
-        />
-        <Row type="flex">
-          <Col>
-            <h2>
-              {!isDraft ? <Icon type="lock" /> : <Icon type="unlock" />}
-              {`Analysis ID: ${analysis.analysisId || 'n/a'}`}
-              <Space />
-              <Space />
-              <Button
-                onClick={this.saveAnalysis({ compile: false })}
-                disabled={!this.saveEnabled()}
-                type={'primary'}
+          <Prompt
+            when={unsavedChanges}
+            message={'You have unsaved changes. Are you sure you want leave this page?'}
+          />
+      <Row type="flex" justify="center"style={{ background: '#fff', padding: 0 }}>
+        <Col xxl={{span: 14}} xl={{span: 16}} lg={{span: 18}} xs={{span: 24}} className="mainCol">
+              <h2>
+                {!isDraft ? <Icon type="lock" /> : <Icon type="unlock" />}
+                {`Analysis ID: ${analysis.analysisId || 'n/a'}`}
+                <Space />
+                <Space />
+                <Button
+                  onClick={this.saveAnalysis({ compile: false })}
+                  disabled={!this.saveEnabled()}
+                  type={'primary'}
+                >
+                  Save
+                </Button>
+                <Space />
+              </h2>
+              <br />
+            </Col>
+          </Row>
+          <Row type="flex" justify="center"style={{ background: '#fff', padding: 0 }}>
+            <Col xxl={{span: 14}} xl={{span: 16}} lg={{span: 18}} xs={{span: 24}} className="mainCol">
+              <Tabs
+                activeKey={activeTab}
+                onTabClick={newTab => this.setState({ activeTab: newTab })}
+                onChange={this.tabChange}
+                className="builderTabs"
               >
-                Save
-              </Button>
-              <Space />
-            </h2>
-            <br />
-          </Col>
-        </Row>
-        <Row type="flex" justify="center">
-          <Col>
-            <Tabs
-              activeKey={activeTab}
-              onTabClick={newTab => this.setState({ activeTab: newTab })}
-              onChange={this.tabChange}
-              className="builderTabs"
-            >
-              {isDraft && <TabPane tab="Overview" key="overview" disabled={!isDraft}>
-                <OverviewTab
-                  analysis={analysis}
-                  datasets={datasets}
-                  availableRuns={availableRuns}
-                  selectedTaskId={selectedTaskId}
-                  predictorsActive={predictorsActive}
-                  updateAnalysis={this.updateState('analysis')}
-                  updateSelectedTaskId={this.updateState('selectedTaskId')}
-                />
-                {this.nextButton(!(!!this.state.analysis.name && this.state.analysis.runIds.length > 0))}
-                <br/>
-              </TabPane>}
-              {isDraft && <TabPane tab="Predictors" key="predictors" disabled={!predictorsActive || !isDraft}>
-                <PredictorSelector
-                  availablePredictors={availablePredictors}
-                  selectedPredictors={selectedPredictors}
-                  updateSelection={this.updatePredictorState}
-                  predictorsLoad={this.state.predictorsLoad}
-                />
-                <br/>
-                {this.navButtons(!(selectedPredictors.length > 0))}
-                <br/>
-              </TabPane>}
-              {isDraft && <TabPane
-                tab="Transformations"
-                key="transformations"
-                disabled={!transformationsActive || !isDraft}
-              >
-                <XformsTab
-                  predictors={selectedPredictors}
-                  xforms={analysis.transformations.filter(x => x.name !== 'ConvolveHRF')}
-                  onSave={xforms => this.updateTransformations(xforms)}
-                />
-                <br/>
-                {this.navButtons()}
-                <br/>
-              </TabPane>}
-              {isDraft && <TabPane tab="HRF" key="hrf" disabled={!hrfActive || !isDraft}>
-                <PredictorSelector
-                  availablePredictors={selectedPredictors}
-                  selectedPredictors={selectedHRFPredictors}
-                  updateSelection={this.updateHRFPredictorState}
-                  selectedText="to be convolved with HRF "
-                />
-                <br/>
-                {this.navButtons()}
-                <br/>
-              </TabPane>}
-              {isDraft && <TabPane tab="Contrasts" key="contrasts" disabled={!contrastsActive || !isDraft}>
-                <ContrastsTab
-                  analysis={analysis}
-                  contrasts={analysis.contrasts}
-                  predictors={selectedPredictors}
-                  onSave={this.updateContrasts}
-                  updateAnalysis={this.updateState('analysis')}
-                />
-                <br/>
-                {this.navButtons()}
-                <br/>
-              </TabPane>}
-              <TabPane tab="Review" key="review" disabled={!reviewActive || !analysis.analysisId}>
-                {this.state.model &&
-                  <div>
-                    <Report
-                      analysisId={analysis.analysisId}
-                      runIds={analysis.runIds}
-                      postReports={this.state.postReports}
-                    />
-                    <Review
-                      model={this.state.model}
-                      unsavedChanges={this.state.unsavedChanges}
-                      availablePredictors={this.state.availablePredictors}
-                    />
-                    <br/>
-                    {isDraft ? this.navButtons() : this.nextButton()}
-                    <br/>
-                  </div>
-                }
-              </TabPane>
-              <TabPane tab={isDraft ? 'Run' : 'Results'} key="submit" disabled={!submitActive && isDraft}>
-                <Results
-                  status={analysis.status}
-                  analysisId={analysis.analysisId}
-                  confirmSubmission={this.confirmSubmission}
-                  private={analysis.private || false}
-                  updateStatus={this.updateStatus}
-                />
-              </TabPane>
-            </Tabs>
-          </Col>
-        </Row>
-      </div>
+                {isDraft && <TabPane tab="Overview" key="overview" disabled={!isDraft}>
+                  <OverviewTab
+                    analysis={analysis}
+                    datasets={datasets}
+                    availableRuns={availableRuns}
+                    selectedTaskId={selectedTaskId}
+                    predictorsActive={predictorsActive}
+                    updateAnalysis={this.updateState('analysis')}
+                    updateSelectedTaskId={this.updateState('selectedTaskId')}
+                  />
+                  {this.nextButton(!(!!this.state.analysis.name && this.state.analysis.runIds.length > 0))}
+                  <br/>
+                </TabPane>}
+                {isDraft && <TabPane tab="Predictors" key="predictors" disabled={!predictorsActive || !isDraft}>
+                  <PredictorSelector
+                    availablePredictors={availablePredictors}
+                    selectedPredictors={selectedPredictors}
+                    updateSelection={this.updatePredictorState}
+                    predictorsLoad={this.state.predictorsLoad}
+                  />
+                  <br/>
+                  {this.navButtons(!(selectedPredictors.length > 0))}
+                  <br/>
+                </TabPane>}
+                {isDraft && <TabPane
+                  tab="Transformations"
+                  key="transformations"
+                  disabled={!transformationsActive || !isDraft}
+                >
+                  <XformsTab
+                    predictors={selectedPredictors}
+                    xforms={analysis.transformations.filter(x => x.name !== 'ConvolveHRF')}
+                    onSave={xforms => this.updateTransformations(xforms)}
+                  />
+                  <br/>
+                  {this.navButtons()}
+                  <br/>
+                </TabPane>}
+                {isDraft && <TabPane tab="HRF" key="hrf" disabled={!hrfActive || !isDraft}>
+                  <PredictorSelector
+                    availablePredictors={selectedPredictors}
+                    selectedPredictors={selectedHRFPredictors}
+                    updateSelection={this.updateHRFPredictorState}
+                    selectedText="to be convolved with HRF "
+                  />
+                  <br/>
+                  {this.navButtons()}
+                  <br/>
+                </TabPane>}
+                {isDraft && <TabPane tab="Contrasts" key="contrasts" disabled={!contrastsActive || !isDraft}>
+                  <ContrastsTab
+                    analysis={analysis}
+                    contrasts={analysis.contrasts}
+                    predictors={selectedPredictors}
+                    onSave={this.updateContrasts}
+                    updateAnalysis={this.updateState('analysis')}
+                  />
+                  <br/>
+                  {this.navButtons()}
+                  <br/>
+                </TabPane>}
+                <TabPane tab="Review" key="review" disabled={!reviewActive || !analysis.analysisId}>
+                  {this.state.model &&
+                    <div>
+                      <Report
+                        analysisId={analysis.analysisId}
+                        runIds={analysis.runIds}
+                        postReports={this.state.postReports}
+                      />
+                      <Review
+                        model={this.state.model}
+                        unsavedChanges={this.state.unsavedChanges}
+                        availablePredictors={this.state.availablePredictors}
+                      />
+                      <br/>
+                      {isDraft ? this.navButtons() : this.nextButton()}
+                      <br/>
+                    </div>
+                  }
+                </TabPane>
+                <TabPane tab={isDraft ? 'Run' : 'Results'} key="submit" disabled={!submitActive && isDraft}>
+                  <Results
+                    status={analysis.status}
+                    analysisId={analysis.analysisId}
+                    confirmSubmission={this.confirmSubmission}
+                    private={analysis.private || false}
+                    updateStatus={this.updateStatus}
+                  />
+                </TabPane>
+              </Tabs>
+            </Col>
+          </Row>
+        </div>
     );
   }
 }
