@@ -76,5 +76,5 @@ test('App renders without crashing and homepage looks ok', () => {
 test('Homepage has 4 buttons with user is not logged in', () => {
   window.localStorage.removeItem('jwt');
   const wrapper = mount(<App />);
-  expect(wrapper.find('button').length).toBe(4);
+  expect(wrapper.find('button').length).toBe(2);
 });
