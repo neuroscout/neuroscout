@@ -2,11 +2,12 @@
  OverviewTab component
 */
 import * as React from 'react';
-import { Col, Form, Icon, Input, AutoComplete, Row, Table, Tooltip, Switch, Button } from 'antd';
+import { Col, Collapse, Form, Icon, Input, AutoComplete, Row, Table, Tooltip, Switch, Button } from 'antd';
 import { ColumnProps, TableRowSelection } from 'antd/lib/table';
 
 const FormItem = Form.Item;
 const InputGroup = Input.Group;
+const Panel = Collapse.Panel;
 
 import { getTasks } from './Builder';
 import { Analysis, Dataset, Run, Task } from './coretypes';
@@ -216,11 +217,11 @@ export class OverviewTab extends React.Component<OverviewTabProps, OverviewTabSt
     return (
       <div className="builderCol">
         <Form layout="vertical">
-          <FormItem label="Analysis name:" required={true}>
+          <FormItem label="Name" required={true}>
             <Row type="flex" justify="space-between">
               <Col xs={24} md={21}>
                 <Input
-                  placeholder="Analysis name"
+                  placeholder="Name your analysis"
                   value={analysis.name}
                   onChange={this.updateAnalysisFromEvent('name')}
                   required={true}
@@ -241,7 +242,7 @@ export class OverviewTab extends React.Component<OverviewTabProps, OverviewTabSt
               </Col>
             </Row>
           </FormItem>
-          <FormItem label="Description:">
+          <FormItem label="Description">
             <Input.TextArea
               placeholder="Description of your analysis"
               value={analysis.description}
@@ -249,7 +250,7 @@ export class OverviewTab extends React.Component<OverviewTabProps, OverviewTabSt
               onChange={this.updateAnalysisFromEvent('description')}
             />
           </FormItem>
-          <FormItem label="Predictions:">
+          <FormItem label="Predictions">
             <Input.TextArea
               placeholder="Enter your preditions about what you expect the results to look like"
               value={analysis.predictions}
@@ -257,8 +258,7 @@ export class OverviewTab extends React.Component<OverviewTabProps, OverviewTabSt
               onChange={this.updateAnalysisFromEvent('predictions')}
             />
           </FormItem>
-          <p>Select a dataset:</p>
-          <br />
+          <p>Select dataset</p>
           <Table
             columns={datasetColumns}
             rowKey="id"
@@ -270,39 +270,34 @@ export class OverviewTab extends React.Component<OverviewTabProps, OverviewTabSt
           <br />
           {availableRuns.length > 0 &&
             <div>
-              <p>Select a task:</p>
-              <br />
-              <Table
-                columns={taskColumns}
-                rowKey="id"
-                size="small"
-                dataSource={availableTasks}
-                rowSelection={taskRowSelection}
-                pagination={(datasets.length > 10) ? {'position': 'bottom'} : false}
-              />
-              <br />
-            </div>}
-          {selectedTaskId &&
-            <div>
-              <p>Select runs:</p>
-              <br />
-              <span>
-                {`Selected ${ analysis.runIds.length } items`}
-              </span>
-              <div>
-                <Button onClick={this.clearFilters}>Clear Selection</Button>
-              </div>
-              <Table
-                columns={this.state.runColumns}
-                rowKey="id"
-                size="small"
-                dataSource={availableRuns.filter(r => r.task === selectedTaskId).sort(this.sortSub)}
-                pagination={(availableRuns.length > 10) ? {'position': 'bottom'} : false}
-                rowSelection={runRowSelection}
-                onChange={this.tableChange}
-              />
-              <br />
-            </div>}
+            <Collapse accordion={true} bordered={false} defaultActiveKey={['task']}>
+              <Panel header="Select task" key="task">
+                  <Table
+                    columns={taskColumns}
+                    rowKey="id"
+                    size="small"
+                    dataSource={availableTasks}
+                    rowSelection={taskRowSelection}
+                    pagination={(datasets.length > 10) ? {'position': 'bottom'} : false}
+                  />
+              </Panel>
+              <Panel header="Select runs" key="runs">
+                <Table
+                  columns={this.state.runColumns}
+                  rowKey="id"
+                  size="small"
+                  dataSource={availableRuns.filter(r => r.task === selectedTaskId).sort(this.sortSub)}
+                  pagination={(availableRuns.length > 10) ? {'position': 'bottom'} : false}
+                  rowSelection={runRowSelection}
+                  onChange={this.tableChange}
+                />
+                <div>
+                  <Button onClick={this.clearFilters}>Clear Filters</Button>
+                </div>
+              </Panel>
+            </Collapse>
+          </div>}
+          <br />
         </Form>
       </div>
     );
