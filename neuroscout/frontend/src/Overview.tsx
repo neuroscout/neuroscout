@@ -214,6 +214,13 @@ export class OverviewTab extends React.Component<OverviewTabProps, OverviewTabSt
       selectedRowKeys: analysis.runIds
     };
 
+    let runMsg;
+    if (analysis.runIds.length === this.props.availableRuns.length) {
+      runMsg = 'Runs: All selected';
+    } else {
+      runMsg = 'Runs: ${analysis.runIds.length}/${this.props.availableRuns.length} selected';
+    }
+
     return (
       <div className="builderCol">
         <Form layout="vertical">
@@ -281,7 +288,7 @@ export class OverviewTab extends React.Component<OverviewTabProps, OverviewTabSt
                     pagination={(datasets.length > 10) ? {'position': 'bottom'} : false}
                   />
               </Panel>
-              <Panel header="Select runs" key="runs">
+              <Panel header={runMsg} key="runs">
                 <Table
                   columns={this.state.runColumns}
                   rowKey="id"
