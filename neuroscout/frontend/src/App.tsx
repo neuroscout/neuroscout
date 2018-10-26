@@ -391,6 +391,19 @@ class App extends Reflux.Component<any, {}, AppState> {
           {openSignup && signupModal()}
           {openEnterResetToken && authActions.enterResetTokenModal()}
           <Layout>
+           <Header>
+             <Link to="/">Neuroscout</Link>
+             <Menu
+                theme="dark"
+                mode="horizontal"
+                defaultSelectedKeys={['2']}
+                style={{ lineHeight: '64px' }}
+              >
+                <Menu.Item key="1">nav 1</Menu.Item>
+                <Menu.Item key="2">nav 2</Menu.Item>
+                <Menu.Item key="3">nav 3</Menu.Item>
+              </Menu>
+            </Header>
             <Row type="flex" justify="center"style={{ background: '#fff', padding: 0 }}>
                 <Col xxl={{span: 14}} xl={{span: 16}} lg={{span: 18}} xs={{span: 24}} className="mainCol">
                   <div className="headerRow">
@@ -399,7 +412,7 @@ class App extends Reflux.Component<any, {}, AppState> {
                       ? <span>
                           {`${email}`}
                           <Space />
-                          <Button 
+                          <Button
                             onClick={(e) => {
                               return authActions.confirmLogout();
                             }}
@@ -462,7 +475,7 @@ class App extends Reflux.Component<any, {}, AppState> {
                 exact={true}
                 path="/browse/:id"
                 render={props =>
-                  <AnalysisBuilder 
+                  <AnalysisBuilder
                     id={props.match.params.id}
                     updatedAnalysis={() => this.loadAnalyses()}
                   />
