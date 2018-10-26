@@ -2,6 +2,8 @@
  Top-level AnalysisBuilder component which contains all of the necessary state for editing
  an analysis.
 */
+import { RouteComponentProps } from 'react-router';
+import { createBrowserHistory } from 'history';
 import * as React from 'react';
 import { Tabs, Row, Col, Layout, Button, Modal, Icon, message } from 'antd';
 import { Prompt } from 'react-router-dom';
@@ -9,6 +11,9 @@ import { OverviewTab } from './Overview';
 import { PredictorSelector } from './Predictors';
 import { ContrastsTab } from './Contrasts';
 import { XformsTab } from './Transformations';
+import { Review } from './Review';
+import { Report } from './Report';
+import { Status, Submit, Results } from './Status';
 import OptionsTab from './Options';
 import {
   Store,
@@ -20,22 +25,26 @@ import {
   ApiDataset,
   ApiAnalysis,
   AnalysisConfig,
+  AnalysisStatus,
   Transformation,
   Contrast,
   Block,
   BlockModel,
   BidsModel,
   ImageInput,
-  TransformName
+  TransformName,
+  TabName
 } from './coretypes';
-import { displayError, jwtFetch } from './utils';
+import { displayError, jwtFetch, timeout } from './utils';
 import { Space } from './HelperComponents';
-import Status from './Status';
 import { config } from './config';
 import { authActions } from './auth.actions';
 
 const { TabPane } = Tabs;
 const { Footer, Content } = Layout;
+const tabOrder = ['overview', 'predictors', 'transformations', 'hrf', 'contrasts', 'review', 'submit'];
+
+const history = createBrowserHistory();
 
 // const logo = require('./logo.svg');
 const domainRoot = config.server_url;
@@ -47,14 +56,16 @@ const editableStatus = ['DRAFT', 'FAILED'];
 const defaultConfig: AnalysisConfig = { smoothing: DEFAULT_SMOOTHING, predictorConfigs: {} };
 
 // Create initialized app state (used in the constructor of the top-level App component)
-const initializeStore = (): Store => ({
+let initializeStore = (): Store => ({
   activeTab: 'overview',
   predictorsActive: false,
   predictorsLoad: false,
   transformationsActive: false,
   contrastsActive: false,
+  hrfActive: false,
+  submitActive: false,
   modelingActive: true,
-  reviewActive: true,
+  reviewActive: false,
   analysis: {
     analysisId: undefined,
     name: '',
@@ -65,7 +76,7 @@ const initializeStore = (): Store => ({
     predictorIds: [],
     hrfPredictorIds: [],
     status: 'DRAFT',
-    private: true,
+    private: false,
     config: defaultConfig,
     transformations: [],
     contrasts: [],
@@ -85,7 +96,16 @@ const initializeStore = (): Store => ({
   selectedPredictors: [],
   selectedHRFPredictors: [],
   unsavedChanges: false,
-  currentLevel: 'run'
+  currentLevel: 'run',
+  postReports: false,
+  model: {
+    blocks: [{
+      level: 'run',
+      transformations: [],
+      contrasts: []
+    }]
+  },
+  poll: true
 });
 
 // Normalize dataset object returned by /api/datasets
@@ -100,7 +120,7 @@ const normalizeDataset = (d: ApiDataset): Dataset => {
 
 // Get list of tasks from a given dataset
 export const getTasks = (datasets: Dataset[], datasetId: string | null): Task[] => {
-    let curDataset = datasets.find((x) => { 
+    let curDataset = datasets.find((x) => {
       return x.id === datasetId;
     });
 
@@ -134,7 +154,7 @@ type BuilderProps = {
   updatedAnalysis: () => void;
 };
 
-export default class AnalysisBuilder extends React.Component<BuilderProps, Store> {
+export default class AnalysisBuilder extends React.Component<BuilderProps & RouteComponentProps<{}>, Store> {
   constructor(props: BuilderProps) {
     super(props);
     this.state = initializeStore();
@@ -143,10 +163,13 @@ export default class AnalysisBuilder extends React.Component<BuilderProps, Store
       jwtFetch(`${domainRoot}/api/analyses/${props.id}`)
         // .then(response => response.json() as Promise<ApiAnalysis>)
         .then((data: ApiAnalysis) => this.loadAnalysis(data))
+        .then(() => {
+          this.setState({model: this.buildModel()});
+        })
         .catch(displayError);
     }
 
-    jwtFetch(domainRoot + '/api/datasets')
+    jwtFetch(domainRoot + '/api/datasets?active_only=true')
       // .then(response => response.json())
       .then(data => {
         const datasets: Dataset[] = data.map(d => normalizeDataset(d));
@@ -224,7 +247,9 @@ export default class AnalysisBuilder extends React.Component<BuilderProps, Store
       });
       hrfVariables = hrfVariables.filter(x => x !== '');
       if (hrfVariables.length > 0) {
-        let hrfTransforms = {'name': 'hrf' as TransformName, 'input': hrfVariables};
+        let hrfTransforms = {'name': 'ConvolveHRF' as TransformName, 'input': hrfVariables};
+        // Right now we only want one HRF transform, remove all others to prevent duplicates
+        blocks[0].transformations = blocks[0].transformations!.filter(x => x.name !== 'ConvolveHRF');
         blocks[0].transformations!.push(hrfTransforms);
       }
     }
@@ -252,6 +277,31 @@ export default class AnalysisBuilder extends React.Component<BuilderProps, Store
       input: imgInput,
       blocks: blocks,
     };
+  };
+
+  // A one off poll for when the analysis is submitted.
+  checkAnalysisStatus = async () => {
+    while (this.state.poll) {
+      let id = this.state.analysis.analysisId;
+      if (id === undefined || this.state.analysis.status === undefined) {
+        return;
+      }
+      jwtFetch(`${domainRoot}/api/analyses/${id}`, { method: 'get' })
+        .then((data: ApiAnalysis) => {
+          if (this.state.analysis.status !== data.status) {
+            this.updateStatus(data.status);
+            if (['DRAFT', 'SUBMITTING', 'PENDING'].indexOf(data.status) === -1) {
+              this.setState({poll: false});
+            }
+          }
+      })
+      .catch(() => {
+        // if fetch throws an error lets bail out. Redirect maybe?
+        this.setState({poll: false});
+        return;
+      });
+      await timeout(5000);
+    }
   };
 
   // Save analysis to server, either with lock=false (just save), or lock=true (save & submit)
@@ -295,6 +345,7 @@ export default class AnalysisBuilder extends React.Component<BuilderProps, Store
       url = `${domainRoot}/api/analyses/${analysis.analysisId}/compile`;
       method = 'post';
       this.setState({analysis: {...analysis, status: 'SUBMITTING'}});
+      this.checkAnalysisStatus();
     } else if (!compile && analysis.analysisId) {
       // Save existing analysis
       url = `${domainRoot}/api/analyses/${analysis.analysisId}`;
@@ -319,16 +370,23 @@ export default class AnalysisBuilder extends React.Component<BuilderProps, Store
           throw new Error('Oops...something went wrong. Analysis was not saved.');
         }
         message.success(compile ? 'Analysis submitted for generation' : 'Analysis saved');
+        let analysisId = this.state.analysis.analysisId;
+        if (data.hash_id !== undefined) {
+          analysisId = data.hash_id;
+        }
         this.setState({
           analysis: {
             ...analysis,
-            analysisId: data.hash_id,
+            analysisId: analysisId,
             status: data.status,
             modifiedAt: data.modified_at
           },
           unsavedChanges: false
         });
         this.props.updatedAnalysis();
+        if (data.hash_id !== undefined) {
+          history.push('/builder/' + data.hash_id);
+        }
       })
       .catch(displayError);
   };
@@ -350,10 +408,10 @@ export default class AnalysisBuilder extends React.Component<BuilderProps, Store
         }
         if (data.model.blocks[i].transformations) {
           data.transformations = data.model.blocks[i].transformations!.filter((x) => {
-            return x.name !== 'hrf' as TransformName;
+            return x.name !== 'ConvolveHRF' as TransformName;
           });
           let hrfTransforms = data.model.blocks[i].transformations!.filter((x) => {
-            return x.name === 'hrf' as TransformName;
+            return x.name === 'ConvolveHRF' as TransformName;
           });
           if (hrfTransforms.length > 0) {
             hrfTransforms.map(x => x.input ? x.input.map(y => hrfPredictorIds.push(y)) : null);
@@ -385,12 +443,12 @@ export default class AnalysisBuilder extends React.Component<BuilderProps, Store
       config: data.config || defaultConfig,
       transformations: data.transformations,
       contrasts: data.contrasts || [],
+      model: data.model,
       autoContrast: autoContrast
     };
 
     if (analysis.runIds.length > 0) {
       jwtFetch(`${domainRoot}/api/runs/${analysis.runIds[0]}`)
-        // .then(response => response.json() as Promise<Run>)
         .then(fetch_data => {
           this.setState({ selectedTaskId: fetch_data.task.id });
           this.updateState('analysis', true)(analysis);
@@ -412,10 +470,45 @@ export default class AnalysisBuilder extends React.Component<BuilderProps, Store
       okText: 'Yes',
       cancelText: 'No',
       onOk() {
-        saveAnalysis({ compile: false})();
+        // saveAnalysis({ compile: false})();
         saveAnalysis({ compile: true })();
       }
     });
+  };
+
+  generateButton = () => {
+      return (
+        <Button
+          hidden={!this.state.analysis.analysisId}
+          onClick={this.confirmSubmission}
+          type={'primary'}
+          disabled={!this.submitEnabled()}
+        >
+          {this.state.unsavedChanges ? 'Save & Generate' : 'Generate'}
+        </Button>
+      );
+  };
+
+  nextTab = (direction = 1) => {
+    return (e) => {
+      let nextIndex = tabOrder.indexOf(this.state.activeTab) + direction;
+      let nextTab = tabOrder[nextIndex];
+      let update = {activeTab: nextTab as TabName};
+      update[nextTab + 'Active' ] = true;
+      if (nextTab === 'review' && this.state.analysis.status === 'DRAFT') {
+        this.saveAnalysis({compile: false})();
+      }
+      if (this.state.activeTab === 'overview') {
+        // need name and runids
+        if (this.state.analysis.name.length < 1) {
+          // how 
+        }
+        if (this.state.analysis.runIds.length < 1) {
+        }
+      }
+      this.setState(update);
+      this.tabChange(nextTab);
+    };
   };
 
   updateConfig = (newConfig: AnalysisConfig): void => {
@@ -433,8 +526,14 @@ export default class AnalysisBuilder extends React.Component<BuilderProps, Store
 
   updateContrasts = (contrasts: Contrast[]): void => {
     this.setState({
-      analysis: { ...this.state.analysis },
+      analysis: { ...this.state.analysis, contrasts },
       unsavedChanges: true
+    });
+  };
+
+  updateStatus = (status: string): void => {
+    this.setState({
+      analysis: { ...this.state.analysis, status: (status as AnalysisStatus)},
     });
   };
 
@@ -489,6 +588,27 @@ export default class AnalysisBuilder extends React.Component<BuilderProps, Store
     return this.updatePredictorState(value, filteredPredictors, true);
   }
 
+  runIdsFromModel = (availableRuns: Run[], input: ImageInput) => {
+    let runIds: Run[] = availableRuns;
+    if (!this.state.model || !this.state.model.input) {
+      return [];
+    }
+    let keys = ['subject', 'session', 'run'];
+    keys.map(key => {
+      if (!input[key]) {return; }
+      runIds = runIds.filter((x) => {
+        if ((key !== 'run' && x[key] === undefined) || (key === 'run' && x.number === undefined)) {
+          return true;
+        }
+        if (key === 'run') {
+          return input[key]!.indexOf(parseInt(x.number, 10)) > -1;
+        }
+        return input[key].indexOf(x[key]) > -1;
+      });
+    });
+    return runIds.map(x => x.id);
+  }
+
   /* Main function to update application state. May split this up into
    smaller pieces if it gets too complex.
 
@@ -511,15 +631,20 @@ export default class AnalysisBuilder extends React.Component<BuilderProps, Store
           // .then(response => response.json())
           .then((data: Run[]) => {
             let availTasks = getTasks(datasets, updatedAnalysis.datasetId);
-            if (availTasks.length === 1) {
+
+            if (updatedAnalysis.model && updatedAnalysis.model.input) {
+              updatedAnalysis.runIds = this.runIdsFromModel(data, updatedAnalysis.model.input);
+            } else {
               updatedAnalysis.runIds = data.map(x => x.id);
+            }
+
+            if (availTasks.length === 1) {
               this.setState({
                 selectedTaskId: availTasks[0].id,
                 predictorsLoad: true,
-                predictorsActive: true
               });
             }
-            
+
             this.setState({
               availableRuns: data,
               availablePredictors: [],
@@ -555,10 +680,15 @@ export default class AnalysisBuilder extends React.Component<BuilderProps, Store
   };
 
   tabChange = (activeKey) => {
+    const analysis = this.state.analysis;
+    if (activeKey === 'review') {
+      // this.updateState('analysis')({ ...analysis, model: this.buildModel()});
+      this.setState({model: this.buildModel()});
+    }
+
     if (activeKey === 'overview' || this.state.predictorsLoad === false) {
       return;
     }
-    const analysis = this.state.analysis;
 
     jwtFetch(`${domainRoot}/api/predictors?run_id=${analysis.runIds}`)
     .then((data: Predictor[]) => {
@@ -571,8 +701,6 @@ export default class AnalysisBuilder extends React.Component<BuilderProps, Store
         selectedHRFPredictors = data.filter(
           p => analysis.hrfPredictorIds.indexOf(p.name) > -1
         );
-        // hrfPredictorIds comes in as a list of names from api, convert it to IDs here.
-        // analysis.hrfPredictorIds = selectedHRFPredictors.map(x => x.id);
       }
 
       this.setState({
@@ -590,17 +718,41 @@ export default class AnalysisBuilder extends React.Component<BuilderProps, Store
     .catch(displayError);
   }
 
+  nextButton = (disabled = false) => {
+    return (
+      <Button type="primary" onClick={this.nextTab()} className="nextButton" disabled={disabled}>
+        Next
+      </Button>
+    );
+  }
+
+  navButtons = (disabled = false) => {
+    return (
+      <div>
+        <Button type="primary" onClick={this.nextTab(-1)}>
+          Previous
+        </Button>
+        {this.nextButton(disabled)}
+      </div>
+    );
+  }
+
   componentDidUpdate(prevProps, prevState) {
-    authActions.checkJWT();
+    // we really only need a valid JWT when creating the analysis
+    if (this.state.analysis.status === 'DRAFT') {
+      authActions.checkJWT();
+    }
   }
 
   render() {
-    const {
+    let {
       predictorsActive,
       transformationsActive,
       contrastsActive,
-      modelingActive,
+      hrfActive,
       reviewActive,
+      submitActive,
+      modelingActive,
       activeTab,
       analysis,
       datasets,
@@ -617,123 +769,137 @@ export default class AnalysisBuilder extends React.Component<BuilderProps, Store
       PENDING: 'This analysis has been submitted for generation and is being processed.',
       COMPILED: 'This analysis has been successfully generated'
     }[analysis.status];
+    // Jump to submit/results tab if no longer a draft.
+    if (analysis.status !== 'DRAFT' && activeTab === 'overview') {
+      activeTab = 'submit';
+    }
+    let isDraft = analysis.status === 'DRAFT';
     return (
       <div className="App">
-        <Prompt
-          when={unsavedChanges}
-          message={'You have unsaved changes. Are you sure you want leave this page?'}
-        />
-        <Row type="flex" justify="center">
-          <Col xxl={{span: 14}} xl={{span: 16}} lg={{span: 18}} xs={{span: 24}}>
-            <h2>
-              {analysis.status !== 'DRAFT' ? <Icon type="lock" /> : <Icon type="unlock" />}
-              {`Analysis ID: ${analysis.analysisId || 'n/a'}`}
-              <Space />
-              <Button
-                onClick={this.saveAnalysis({ compile: false })}
-                disabled={!this.saveEnabled()}
-                type={'primary'}
+          <Prompt
+            when={unsavedChanges}
+            message={'You have unsaved changes. Are you sure you want leave this page?'}
+          />
+      <Row type="flex" justify="center"style={{ background: '#fff', padding: 0 }}>
+        <Col xxl={{span: 14}} xl={{span: 16}} lg={{span: 18}} xs={{span: 24}} className="mainCol">
+              <h2>
+                {!isDraft ? <Icon type="lock" /> : <Icon type="unlock" />}
+                {`Analysis ID: ${analysis.analysisId || 'n/a'}`}
+                <Space />
+                <Space />
+                <Button
+                  onClick={this.saveAnalysis({ compile: false })}
+                  disabled={!this.saveEnabled()}
+                  type={'primary'}
+                >
+                  Save
+                </Button>
+                <Space />
+              </h2>
+              <br />
+            </Col>
+          </Row>
+          <Row type="flex" justify="center"style={{ background: '#fff', padding: 0 }}>
+            <Col xxl={{span: 14}} xl={{span: 16}} lg={{span: 18}} xs={{span: 24}} className="mainCol">
+              <Tabs
+                activeKey={activeTab}
+                onTabClick={newTab => this.setState({ activeTab: newTab })}
+                onChange={this.tabChange}
+                className="builderTabs"
               >
-                Save
-              </Button>
-              <Space />
-              <Button
-                hidden={!this.state.analysis.analysisId}
-                onClick={this.confirmSubmission}
-                type={'primary'}
-                disabled={!this.submitEnabled()}
-              >
-                {unsavedChanges ? 'Save & Generate' : 'Generate'}
-              </Button>
-              <Space />
-            </h2>
-            <br />
-          </Col>
-        </Row>
-        <Row type="flex" justify="center">
-          <Col xxl={{span: 14}} xl={{span: 16}} lg={{span: 18}} xs={{span: 24}}>
-            <Tabs
-              activeKey={activeTab}
-              onTabClick={newTab => this.setState({ activeTab: newTab })}
-              onChange={this.tabChange}
-            >
-              <TabPane tab="Overview" key="overview">
-                <OverviewTab
-                  analysis={analysis}
-                  datasets={datasets}
-                  availableRuns={availableRuns}
-                  selectedTaskId={selectedTaskId}
-                  predictorsActive={predictorsActive}
-                  updateAnalysis={this.updateState('analysis')}
-                  updateSelectedTaskId={this.updateState('selectedTaskId')}
-                  goToNextTab={() => {this.setState({ activeTab: 'predictors' }); this.tabChange('predictors'); }}
-                />
-              </TabPane>
-              <TabPane tab="Predictors" key="predictors" disabled={!predictorsActive}>
-                <PredictorSelector
-                  availablePredictors={availablePredictors}
-                  selectedPredictors={selectedPredictors}
-                  updateSelection={this.updatePredictorState}
-                  predictorsLoad={this.state.predictorsLoad}
-                />
-                <br/>
-              </TabPane>
-              <TabPane
-                tab="Transformations"
-                key="transformations"
-                disabled={!transformationsActive}
-              >
-                <XformsTab
-                  predictors={selectedPredictors}
-                  xforms={analysis.transformations.filter(x => x.name !== 'hrf')}
-                  onSave={xforms => this.updateTransformations(xforms)}
-                />
-              </TabPane>
-              <TabPane tab="HRF" key="hrf" disabled={!transformationsActive}>
-                <PredictorSelector
-                  availablePredictors={selectedPredictors}
-                  selectedPredictors={selectedHRFPredictors}
-                  updateSelection={this.updateHRFPredictorState}
-                  selectedText="to be convolved with HRF "
-                />
-              </TabPane>
-              <TabPane tab="Contrasts" key="contrasts" disabled={!transformationsActive}>
-                <ContrastsTab
-                  analysis={analysis}
-                  contrasts={analysis.contrasts}
-                  predictors={selectedPredictors}
-                  onSave={this.updateContrasts}
-                  updateAnalysis={this.updateState('analysis')}
-                />
-              </TabPane>
-              <TabPane tab="Review" key="review" disabled={!reviewActive}>
-                <p>
-                  {JSON.stringify(analysis)}
-                </p>
-              </TabPane>
-              <TabPane tab="Status" key="status" disabled={false}>
-                <Status status={analysis.status} />
-                <br />
-                <br />
-                <p>
-                  {statusText}
-                </p>
-              </TabPane>
-            </Tabs>
-          </Col>
-        </Row>
-      </div>
+                {isDraft && <TabPane tab="Overview" key="overview" disabled={!isDraft}>
+                  <OverviewTab
+                    analysis={analysis}
+                    datasets={datasets}
+                    availableRuns={availableRuns}
+                    selectedTaskId={selectedTaskId}
+                    predictorsActive={predictorsActive}
+                    updateAnalysis={this.updateState('analysis')}
+                    updateSelectedTaskId={this.updateState('selectedTaskId')}
+                  />
+                  {this.nextButton(!(!!this.state.analysis.name && this.state.analysis.runIds.length > 0))}
+                  <br/>
+                </TabPane>}
+                {isDraft && <TabPane tab="Predictors" key="predictors" disabled={!predictorsActive || !isDraft}>
+                  <PredictorSelector
+                    availablePredictors={availablePredictors}
+                    selectedPredictors={selectedPredictors}
+                    updateSelection={this.updatePredictorState}
+                    predictorsLoad={this.state.predictorsLoad}
+                  />
+                  <br/>
+                  {this.navButtons(!(selectedPredictors.length > 0))}
+                  <br/>
+                </TabPane>}
+                {isDraft && <TabPane
+                  tab="Transformations"
+                  key="transformations"
+                  disabled={!transformationsActive || !isDraft}
+                >
+                  <XformsTab
+                    predictors={selectedPredictors}
+                    xforms={analysis.transformations.filter(x => x.name !== 'ConvolveHRF')}
+                    onSave={xforms => this.updateTransformations(xforms)}
+                  />
+                  <br/>
+                  {this.navButtons()}
+                  <br/>
+                </TabPane>}
+                {isDraft && <TabPane tab="HRF" key="hrf" disabled={!hrfActive || !isDraft}>
+                  <PredictorSelector
+                    availablePredictors={selectedPredictors}
+                    selectedPredictors={selectedHRFPredictors}
+                    updateSelection={this.updateHRFPredictorState}
+                    selectedText="to be convolved with HRF "
+                  />
+                  <br/>
+                  {this.navButtons()}
+                  <br/>
+                </TabPane>}
+                {isDraft && <TabPane tab="Contrasts" key="contrasts" disabled={!contrastsActive || !isDraft}>
+                  <ContrastsTab
+                    analysis={analysis}
+                    contrasts={analysis.contrasts}
+                    predictors={selectedPredictors}
+                    onSave={this.updateContrasts}
+                    updateAnalysis={this.updateState('analysis')}
+                  />
+                  <br/>
+                  {this.navButtons()}
+                  <br/>
+                </TabPane>}
+                <TabPane tab="Review" key="review" disabled={((!reviewActive || !analysis.analysisId) && isDraft)}>
+                  {this.state.model &&
+                    <div>
+                      <Report
+                        analysisId={analysis.analysisId}
+                        runIds={analysis.runIds}
+                        postReports={this.state.postReports}
+                      />
+                      <Review
+                        model={this.state.model}
+                        unsavedChanges={this.state.unsavedChanges}
+                        availablePredictors={this.state.availablePredictors}
+                      />
+                      <br/>
+                      {isDraft ? this.navButtons() : this.nextButton()}
+                      <br/>
+                    </div>
+                  }
+                </TabPane>
+                <TabPane tab={isDraft ? 'Run' : 'Results'} key="submit" disabled={!submitActive && isDraft}>
+                  <Results
+                    status={analysis.status}
+                    analysisId={analysis.analysisId}
+                    confirmSubmission={this.confirmSubmission}
+                    private={analysis.private || false}
+                    updateStatus={this.updateStatus}
+                  />
+                </TabPane>
+              </Tabs>
+            </Col>
+          </Row>
+        </div>
     );
   }
 }
-
-/* Can't comment out inline in render
-<TabPane tab="Options" key="modeling" disabled={!modelingActive}>
-  <OptionsTab
-  analysis={analysis}
-  selectedPredictors={selectedPredictors}
-  updateConfig={this.updateConfig}
-  updateAnalysis={this.updateState('analysis')}
-/>
-</TabPane>
-*/

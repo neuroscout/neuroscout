@@ -31,37 +31,41 @@ const transformationSchema = {
 
 const transformDefinitions: Transformation[] = [
   {
-    name: 'scale',
+    name: 'Scale',
     demean: true,
     rescale: true,
     replace_na: undefined
   },
   {
-    name: 'orthogonalize',
+    name: 'Orthogonalize',
     other: []
   },
   {
-    name: 'sum',
+    name: 'Sum',
     weights: []
   },
   {
-   name: 'product' 
+   name: 'Product' 
   },
   {
-    name: 'threshold',
+    name: 'Threshold',
     threshold: 0,
     above: true,
     signed: true
   },
   {
-    name: 'or'
+    name: 'Or'
   },
   {
-    name: 'and'
+    name: 'And'
   },
   {
-    name: 'not'
+    name: 'Not'
   },
+  {
+    name: 'Replace',
+    replace: {}
+  }
 
 ];
 

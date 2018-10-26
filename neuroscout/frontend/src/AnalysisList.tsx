@@ -6,7 +6,7 @@ import * as React from 'react';
 import { Button, Table } from 'antd';
 import { Space } from './HelperComponents';
 import { AppAnalysis } from './coretypes';
-import Status from './Status';
+import { Status } from './Status';
 import { Link } from 'react-router-dom';
 
 export interface AnalysisListProps {

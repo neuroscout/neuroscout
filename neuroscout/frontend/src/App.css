@@ -29,8 +29,35 @@
   float: right;
 }
 
+.homeBtn {
+    justify-content: center;
+}
+
+.nextButton {
+  float: right;
+}
+
 body {
     background-color: white;
+}
+
+.builderTabs {
+    padding-bottom: 50px;
+}
+
+.builderCol {
+    padding: 0 10px 0 10px;
+}
+
+.mainCol {
+    padding: 0 0px 0 0px;
+}
+
+pre {
+    padding: 10px;
+    border-radius: 10px;
+    color: white;
+    background-color: black;
 }
 
 .privateSwitch {
@@ -43,4 +70,8 @@ body {
 
 .ant-layout {
     background-color: white;
+}
+
+.statusHeader {
+    float: right;
 }

@@ -1,6 +1,6 @@
 /*
  This module includes the following components:
- 
+
  - ContrastsTab: parent component for the contrast tab of the analysis builder
  - ContrastDisplay: component to display a single contrast
 */
@@ -58,7 +58,7 @@ const ContrastDisplay = (props: ContrastDisplayProps) => {
           <Icon type="arrow-down" />
         </Button>}
       <Button type="danger" onClick={() => onDelete(index)}>
-        <Icon type="delete" />
+        <Icon type="delete" /> Remove
       </Button>
       <br />
       <br />
@@ -139,8 +139,8 @@ export class ContrastsTab extends React.Component<ContrastsTabProps, ContrastsTa
               {'You haven\'t added any contrasts'}
             </p>}
         <br />
-        <Button type="primary" onClick={() => this.setState({ mode: 'add' })}>
-          Add new contrast
+        <Button type="default" onClick={() => this.setState({ mode: 'add' })}>
+          <Icon type="plus" /> Add Contrast
         </Button>
       </div>
     );

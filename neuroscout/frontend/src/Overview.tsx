@@ -11,14 +11,6 @@ const InputGroup = Input.Group;
 import { getTasks } from './Builder';
 import { Analysis, Dataset, Run, Task } from './coretypes';
 
-/*
-class DataTable extends React.Component<any> {
-  render() {
-    return <Table {...this.props} />;
-  }
-}
-*/
-
 interface OverviewTabProps {
   analysis: Analysis;
   datasets: Dataset[];
@@ -27,7 +19,6 @@ interface OverviewTabProps {
   predictorsActive: boolean;
   updateAnalysis: (value: any) => void;
   updateSelectedTaskId: (value: string) => void;
-  goToNextTab: () => void;
 }
 
 interface OverviewTabState {
@@ -103,8 +94,8 @@ export class OverviewTab extends React.Component<OverviewTabProps, OverviewTabSt
   sortSes = this._sortRuns.bind(null, ['session', 'subject', 'number']);
 
   /* Run column settings were largely similar, this function creates them.
-     The cast to String before sort is to account for run numbers being a 
-     numeric type. 
+     The cast to String before sort is to account for run numbers being a
+     numeric type.
   */
   makeCol = (title: string, _key: string, sortFn) => {
     let extractKey: string[] = this.props.availableRuns.filter(x => x !== null).map(x => String(x[_key]));
@@ -150,14 +141,13 @@ export class OverviewTab extends React.Component<OverviewTabProps, OverviewTabSt
     this.setState({runColumns: newRunCols});
     this.updateAnalysis('runIds')([]);
   };
-  
+
   render() {
     let {
       analysis,
       datasets,
       availableRuns,
       selectedTaskId,
-      goToNextTab,
       predictorsActive,
     } = this.props;
 
@@ -224,15 +214,17 @@ export class OverviewTab extends React.Component<OverviewTabProps, OverviewTabSt
     };
 
     return (
-      <div>
+      <div className="builderCol">
         <Form layout="vertical">
-          <FormItem label="Analysis name:">
+          <FormItem label="Analysis name:" required={true}>
             <Row type="flex" justify="space-between">
               <Col xs={24} md={21}>
                 <Input
                   placeholder="Analysis name"
                   value={analysis.name}
                   onChange={this.updateAnalysisFromEvent('name')}
+                  required={true}
+                  min={1}
                 />
               </Col>
               <Col md={3}>
@@ -253,7 +245,7 @@ export class OverviewTab extends React.Component<OverviewTabProps, OverviewTabSt
             <Input.TextArea
               placeholder="Description of your analysis"
               value={analysis.description}
-              autosize={{ minRows: 3, maxRows: 20 }}
+              autosize={{ minRows: 2, maxRows: 10 }}
               onChange={this.updateAnalysisFromEvent('description')}
             />
           </FormItem>
@@ -261,7 +253,7 @@ export class OverviewTab extends React.Component<OverviewTabProps, OverviewTabSt
             <Input.TextArea
               placeholder="Enter your preditions about what you expect the results to look like"
               value={analysis.predictions}
-              autosize={{ minRows: 3, maxRows: 20 }}
+              autosize={{ minRows: 2, maxRows: 10 }}
               onChange={this.updateAnalysisFromEvent('predictions')}
             />
           </FormItem>
@@ -286,7 +278,7 @@ export class OverviewTab extends React.Component<OverviewTabProps, OverviewTabSt
                 size="small"
                 dataSource={availableTasks}
                 rowSelection={taskRowSelection}
-                pagination={(datasets.length > 20) ? {'position': 'bottom'} : false}
+                pagination={(datasets.length > 10) ? {'position': 'bottom'} : false}
               />
               <br />
             </div>}
@@ -305,16 +297,13 @@ export class OverviewTab extends React.Component<OverviewTabProps, OverviewTabSt
                 rowKey="id"
                 size="small"
                 dataSource={availableRuns.filter(r => r.task === selectedTaskId).sort(this.sortSub)}
-                pagination={(availableRuns.length > 20) ? {'position': 'bottom'} : false}
+                pagination={(availableRuns.length > 10) ? {'position': 'bottom'} : false}
                 rowSelection={runRowSelection}
                 onChange={this.tableChange}
               />
               <br />
             </div>}
         </Form>
-          <Button type="primary" onClick={goToNextTab} disabled={!predictorsActive}>
-            Next: Select Predictors
-          </Button>
       </div>
     );
   }
