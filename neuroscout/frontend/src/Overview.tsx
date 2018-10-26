@@ -218,7 +218,7 @@ export class OverviewTab extends React.Component<OverviewTabProps, OverviewTabSt
     if (analysis.runIds.length === this.props.availableRuns.length) {
       runMsg = 'Runs: All selected';
     } else {
-      runMsg = 'Runs: ${analysis.runIds.length}/${this.props.availableRuns.length} selected';
+      runMsg = 'Runs: ' + analysis.runIds.length + '/' + this.props.availableRuns.length + ' selected';
     }
 
     return (
