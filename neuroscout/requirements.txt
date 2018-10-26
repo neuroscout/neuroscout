@@ -46,7 +46,7 @@ psycopg2==2.7.1
 progressbar2
 py==1.4.33
 grabbit==0.2.3
--e git+https://github.com/INCF/pybids.git@lets-break-stuff#egg=pybids
+pybids==0.6.5
 PyJWT==1.4.2
 pyparsing==2.2.0
 pytest==3.0.7

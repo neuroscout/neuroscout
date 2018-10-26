@@ -118,13 +118,15 @@ export default class ContrastEditor extends React.Component<
             <br />
           </div>}
         <Form>
-          <FormItem>
+          <FormItem required={true} label={'Name of Contrast:'}>
             <Input
               placeholder="Name of contrast"
               value={name}
               onChange={(event: React.FormEvent<HTMLInputElement>) =>
                 this.setState({ name: event.currentTarget.value })}
               type="text"
+              required={true}
+              min={1}
             />
           </FormItem>
         </Form>
@@ -144,10 +146,13 @@ export default class ContrastEditor extends React.Component<
               key={i}
               labelCol={{ span: 4 }}
               wrapperCol={{ span: 2 }}
+              required={true}
             >
               <InputNumber
                 value={weights[i]}
                 onChange={(this.updateWeight.bind(this, i))}
+                required={true}
+                min={1}
               />
             </FormItem>
           )}
@@ -165,7 +170,14 @@ export default class ContrastEditor extends React.Component<
             </RadioGroup>
           </FormItem>
         </Form>
-        <Button type="primary" onClick={this.onSave}>
+        <Button
+          type="primary"
+          onClick={this.onSave}
+          disabled={
+            !(this.state.name && this.state.condition_list.length > 0 
+            && this.state.condition_list.length === this.state.weights.length)
+          }
+        >
           OK{' '}
         </Button>
         <Space />

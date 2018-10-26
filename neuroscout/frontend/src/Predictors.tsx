@@ -1,5 +1,5 @@
-/* 
-PredictorSelector component used anywhere we need to select among a list of available 
+/*
+PredictorSelector component used anywhere we need to select among a list of available
 predictors. The component includes a table of predictors as well as search box to instantly
 filter the table down to predictors whose name or description match the entered search term
 */
@@ -143,14 +143,14 @@ export class PredictorSelector extends React.Component<
               <br />
             </div>
             <div>
-              <p>{`Select predictors ${this.state.selectedText}(displaying ${filteredPredictors.length} 
+              <p>{`Select predictors ${this.state.selectedText}(displaying ${filteredPredictors.length}
             out of ${availablePredictors.length} total predictors):`}</p>
               <Table
                 locale={{ emptyText: this.state.searchText ? 'No results found' : 'No data'}}
                 columns={columns}
                 rowKey="id"
                 pagination={false}
-                scroll={{y: 500}}
+                scroll={{y: 465}}
                 size="small"
                 dataSource={this.state.filteredPredictors}
                 rowSelection={rowSelection}
