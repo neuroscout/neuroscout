@@ -7,7 +7,7 @@ Top-level App component containing AppState. The App component is currently resp
 import * as React from 'react';
 import { BrowserRouter as Router, Route, Link, Redirect } from 'react-router-dom';
 import Reflux from 'reflux';
-import { Tabs, Row, Col, Layout, Button, Modal, Icon, Input, Form, message } from 'antd';
+import { Avatar, Tabs, Row, Col, Layout, Button, Modal, Menu, Icon, Input, Form, message } from 'antd';
 
 import './App.css';
 import AnalysisBuilder from './Builder';
@@ -24,7 +24,7 @@ const FormItem = Form.Item;
 const DOMAINROOT = config.server_url;
 const { localStorage } = window;
 
-const { Footer, Content, Header } = Layout;
+const { Header, Content, Footer, Sider } = Layout;
 
 interface AppState {
   loadAnalyses: boolean;
@@ -391,52 +391,40 @@ class App extends Reflux.Component<any, {}, AppState> {
           {openSignup && signupModal()}
           {openEnterResetToken && authActions.enterResetTokenModal()}
           <Layout>
-           <Header>
-             <Link to="/">Neuroscout</Link>
-             <Menu
+
+          <Header>
+              <div className="logo" />
+              <Menu
                 theme="dark"
                 mode="horizontal"
-                defaultSelectedKeys={['2']}
+                defaultSelectedKeys={['1']}
                 style={{ lineHeight: '64px' }}
               >
-                <Menu.Item key="1">nav 1</Menu.Item>
-                <Menu.Item key="2">nav 2</Menu.Item>
-                <Menu.Item key="3">nav 3</Menu.Item>
+                <Menu.Item key="home">
+                  <span className="nav-text" style={{fontSize: 20}}>
+                  Neuroscout</span></Menu.Item>
+                <Menu.Item key="create">
+                  <Icon type="plus" />
+                  <span className="nav-text">Create Analysis</span></Menu.Item>
+                <Menu.Item key="mine">
+                  <Icon type="bars" />
+                  <span className="nav-text">My Analyses</span></Menu.Item>
+
+                <Menu.SubMenu style={{float: 'right'}} title={<Avatar shape="square" icon="user" />}>
+                   <Menu.ItemGroup title="email@email.com">
+                     <Menu.Item key="profile">My Profile</Menu.Item>
+                     <Menu.Item key="signout">Sign Out</Menu.Item>
+                   </Menu.ItemGroup>
+                 </Menu.SubMenu>
+                 <Menu.Item style={{float: 'right'}} key="browse">
+                   <Icon type="search" />
+                   <span className="nav-text">Browse</span></Menu.Item>
+                 <Menu.Item  style={{float: 'right'}} key="help">
+                   <Icon type="question-circle" /><span className="nav-text">Help</span></Menu.Item>
               </Menu>
             </Header>
-            <Row type="flex" justify="center"style={{ background: '#fff', padding: 0 }}>
-                <Col xxl={{span: 14}} xl={{span: 16}} lg={{span: 18}} xs={{span: 24}} className="mainCol">
-                  <div className="headerRow">
-                    <div className="Login-col">
-                    {this.state.auth.loggedIn
-                      ? <span>
-                          {`${email}`}
-                          <Space />
-                          <Button
-                            onClick={(e) => {
-                              return authActions.confirmLogout();
-                            }}
-                          >
-                            Log out
-                          </Button>
-                        </span>
-                      : <span>
-                          <Button onClick={e => authActions.update({ openLogin: true })}>
-                            Log in
-                          </Button>
-                          <Space />
-                          <Button onClick={e => authActions.update({ openSignup: true })}>
-                            Sign up
-                          </Button>
-                        </span>}
-                    </div>
-                    <h1>
-                      <Link to="/">Neuroscout</Link>
-                    </h1>
-                    </div>
-                  </Col>
-              </Row>
             <Content style={{ background: '#fff' }}>
+              <br />
               <Route
                 exact={true}
                 path="/"
