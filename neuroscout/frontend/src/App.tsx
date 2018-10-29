@@ -393,32 +393,32 @@ class App extends Reflux.Component<any, {}, AppState> {
           <Layout>
 
             <Content style={{ background: '#fff' }}>
-            <Row type="flex" justify="center">
+            <Row type="flex" justify="center" style={{ background: '#001529' }}>
               <Col xxl={{span: 14}} xl={{span: 16}} lg={{span: 18}} xs={{span: 24}} className="mainCol">
                 <Menu
                   mode="horizontal"
                   defaultSelectedKeys={['1']}
                   style={{ lineHeight: '64px'}}
+                  theme="dark"
                 >
                   <Menu.Item key="home">
-                    <span className="nav-text" style={{fontSize: 20}}>
+                    <span className="nav-text" style={{fontSize: 21}}>
                     Neuroscout</span></Menu.Item>
                   <Menu.Item key="create">
                     <Icon type="plus" />
-                    <span className="nav-text">Create Analysis</span></Menu.Item>
+                    <span className="nav-text">Build Analysis</span></Menu.Item>
                   <Menu.Item key="mine">
                     <Icon type="bars" />
                     <span className="nav-text">My Analyses</span></Menu.Item>
+                    <Menu.Item key="browse">
+                      <Icon type="search"/>
+                      <span className="nav-text">Browse</span></Menu.Item>
 
-                  <Menu.SubMenu style={{float: 'right'}} title={<Avatar shape="square" icon="user" />}>
+                  <Menu.SubMenu style={{float: 'right'}} title={<Avatar shape="circle" icon="user" />}>
                      <Menu.ItemGroup title="email@email.com">
-                       <Menu.Item key="profile">My Profile</Menu.Item>
                        <Menu.Item key="signout">Sign Out</Menu.Item>
                      </Menu.ItemGroup>
                    </Menu.SubMenu>
-                   <Menu.Item style={{float: 'right'}} key="browse">
-                     <Icon type="search" />
-                     <span className="nav-text">Browse</span></Menu.Item>
                    <Menu.Item  style={{float: 'right'}} key="help">
                      <Icon type="question-circle" /><span className="nav-text">Help</span></Menu.Item>
                 </Menu>
