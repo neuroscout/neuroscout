@@ -9,9 +9,6 @@ const Browse = (props: AnalysisListProps) => {
     <div>
       <Row type="flex" justify="center">
         <Col xxl={{span: 14}} xl={{span: 16}} lg={{span: 18}} xs={{span: 24}} className="mainCol">
-          <h2>
-            {'Public Analyses'}
-          </h2>
           <br />
           <AnalysisList {...listProps} />
         </Col>
