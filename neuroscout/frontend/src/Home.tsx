@@ -28,19 +28,6 @@ class Home extends React.Component<HomeProps, {}> {
           <br />
         </Col>
       </Row>
-      <Row type="flex" justify="center"style={{ background: '#fff', padding: 0 }}>
-        <Col lg={{span: 6, offset: 2}}>
-          <Button type="primary" size="large" href="/builder" disabled={!loggedIn}>
-            Create New Analysis
-          </Button>
-        </Col>
-        <Col lg={0} md={1}/>
-        <Col lg={{span: 6, offset: 2}}>
-          <Button type="primary" size="large" href="/browse">
-            Browse Public Analyses
-          </Button>
-        </Col>
-      </Row>
       {loggedIn &&
         <div>
           <Row type="flex" justify="center"style={{ background: '#fff', padding: 0 }}>

@@ -393,32 +393,56 @@ class App extends Reflux.Component<any, {}, AppState> {
           <Layout>
 
             <Content style={{ background: '#fff' }}>
-            <Row type="flex" justify="center" style={{ background: '#001529' }}>
+            <Row type="flex" justify="center" style={{ padding: 0 }}>
               <Col xxl={{span: 14}} xl={{span: 16}} lg={{span: 18}} xs={{span: 24}} className="mainCol">
                 <Menu
                   mode="horizontal"
-                  defaultSelectedKeys={['1']}
-                  style={{ lineHeight: '64px'}}
-                  theme="dark"
+                  style={{ lineHeight: '60px'}}
                 >
                   <Menu.Item key="home">
-                    <span className="nav-text" style={{fontSize: 21}}>
-                    Neuroscout</span></Menu.Item>
-                  <Menu.Item key="create">
-                    <Icon type="plus" />
-                    <span className="nav-text">Build Analysis</span></Menu.Item>
-                  <Menu.Item key="mine">
-                    <Icon type="bars" />
-                    <span className="nav-text">My Analyses</span></Menu.Item>
+                    <span className="nav-text" style={{fontSize: 20}}>Neuroscout</span></Menu.Item>
+                    {this.state.auth.loggedIn &&
+                      <Menu.Item key="create" >
+                        <Link to="/builder">
+                        <Icon type="plus" />
+                        Build Analysis</Link></Menu.Item>
+                    }
+                    {this.state.auth.loggedIn &&
+                      <Menu.Item key="mine">
+                      <Link to="/">
+                        <Icon type="bars" />
+                      My Analyses</Link></Menu.Item>
+                    }
                     <Menu.Item key="browse">
+                    <Link to="/browse">
                       <Icon type="search"/>
-                      <span className="nav-text">Browse</span></Menu.Item>
+                      Browse</Link></Menu.Item>
 
-                  <Menu.SubMenu style={{float: 'right'}} title={<Avatar shape="circle" icon="user" />}>
-                     <Menu.ItemGroup title="email@email.com">
-                       <Menu.Item key="signout">Sign Out</Menu.Item>
-                     </Menu.ItemGroup>
-                   </Menu.SubMenu>
+                  {this.state.auth.loggedIn ?
+                    <Menu.SubMenu style={{float: 'right'}} title={<Avatar shape="circle" icon="user" />}>
+                       <Menu.ItemGroup title={`${email}`}>
+                         <Menu.Item
+                          key="signout"
+                          onClick={(e) => {return authActions.confirmLogout(); }}
+                         >
+                          Sign Out
+                         </Menu.Item>
+                       </Menu.ItemGroup>
+                     </Menu.SubMenu>
+                     :
+                      <Menu.Item key="signup" style={{float: 'right'}} disabled="true">
+                      <Button size="large" type="primary" onClick={e => authActions.update({ openSignup: true })}>
+                        Sign up</Button></Menu.Item>
+                   }
+                   {this.state.auth.loggedIn === false &&
+                       <Menu.Item
+                        onClick={e => authActions.update({ openLogin: true })}
+                        key="signin"
+                        style={{float: 'right'}}
+                       >
+                         Sign in
+                       </Menu.Item>
+                    }
                    <Menu.Item  style={{float: 'right'}} key="help">
                      <Icon type="question-circle" /><span className="nav-text">Help</span></Menu.Item>
                 </Menu>

@@ -501,7 +501,7 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
       if (this.state.activeTab === 'overview') {
         // need name and runids
         if (this.state.analysis.name.length < 1) {
-          // how 
+          // how
         }
         if (this.state.analysis.runIds.length < 1) {
         }
@@ -787,6 +787,7 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
                 {`Analysis ID: ${analysis.analysisId || 'n/a'}`}
                 <Space />
                 <Space />
+                <Space />
                 <Button
                   onClick={this.saveAnalysis({ compile: false })}
                   disabled={!this.saveEnabled()}
@@ -799,7 +800,7 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
               <br />
             </Col>
           </Row>
-          <Row type="flex" justify="center"style={{ background: '#fff', padding: 0 }}>
+          <Row type="flex" justify="center" style={{ background: '#fff', padding: 0 }}>
             <Col xxl={{span: 14}} xl={{span: 16}} lg={{span: 18}} xs={{span: 24}} className="mainCol">
               <Tabs
                 activeKey={activeTab}
