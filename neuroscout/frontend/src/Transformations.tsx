@@ -284,8 +284,6 @@ class XformEditor extends React.Component<XformEditorProps, XformEditorState> {
     const editMode = !!xform;
     const allowedXformNames = Object.keys(xformRules);
     const availableParameters = name ? Object.keys(xformRules[name]) : undefined;
-    // tslint:disable-next-line:no-console
-    console.log(this.state);
     return (
       <div>
         <Form layout="horizontal">
