@@ -52,6 +52,7 @@ export class OverviewTab extends React.Component<OverviewTabProps, OverviewTabSt
 
   tableChange = (pagination, filters, sorter) => {
     let newRunIds = this.props.availableRuns;
+    newRunIds = newRunIds.filter((x) => this.props.analysis.runIds.indexOf(x.id) > -1);
     let newRunColumns = this.state.runColumns;
     Object.keys(filters).map(key => {
       if (filters[key] === null || filters[key].length === 0) { return; }
