@@ -398,6 +398,7 @@ class App extends Reflux.Component<any, {}, AppState> {
                 <Menu
                   mode="horizontal"
                   style={{ lineHeight: '64px'}}
+                  selectedKeys={[]}
                 >
                   <Menu.Item key="home">
                      <Link to="/" style={{fontSize: 20}}>Neuroscout</Link></Menu.Item>
