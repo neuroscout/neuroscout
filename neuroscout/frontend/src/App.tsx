@@ -393,34 +393,29 @@ class App extends Reflux.Component<any, {}, AppState> {
           <Layout>
 
             <Content style={{ background: '#fff' }}>
-            <Row type="flex" justify="center" style={{ padding: 0 }}>
+            <Row type="flex" justify="center" style={{padding: 0 }}>
               <Col xxl={{span: 14}} xl={{span: 16}} lg={{span: 18}} xs={{span: 24}} className="mainCol">
                 <Menu
                   mode="horizontal"
-                  style={{ lineHeight: '60px'}}
+                  style={{ lineHeight: '64px'}}
                 >
                   <Menu.Item key="home">
                     <span className="nav-text" style={{fontSize: 20}}>Neuroscout</span></Menu.Item>
-                    {this.state.auth.loggedIn &&
-                      <Menu.Item key="create" >
-                        <Link to="/builder">
-                        <Icon type="plus" />
-                        Build Analysis</Link></Menu.Item>
-                    }
-                    {this.state.auth.loggedIn &&
-                      <Menu.Item key="mine">
-                      <Link to="/">
-                        <Icon type="bars" />
-                      My Analyses</Link></Menu.Item>
-                    }
-                    <Menu.Item key="browse">
-                    <Link to="/browse">
-                      <Icon type="search"/>
-                      Browse</Link></Menu.Item>
-
+                    
                   {this.state.auth.loggedIn ?
                     <Menu.SubMenu style={{float: 'right'}} title={<Avatar shape="circle" icon="user" />}>
                        <Menu.ItemGroup title={`${email}`}>
+                         <Menu.Item
+                          key="mine"
+                         >
+                          My Analyses
+                         </Menu.Item>
+                         <Menu.Item
+                          key="profile"
+                         >
+                          My Profile
+                         </Menu.Item>
+                         <Menu.Divider/>
                          <Menu.Item
                           key="signout"
                           onClick={(e) => {return authActions.confirmLogout(); }}
@@ -445,6 +440,18 @@ class App extends Reflux.Component<any, {}, AppState> {
                     }
                    <Menu.Item  style={{float: 'right'}} key="help">
                      <Icon type="question-circle" /><span className="nav-text">Help</span></Menu.Item>
+
+                     <Menu.Item key="browse" style={{float: 'right'}}>
+                     <Link to="/browse">
+                       <Icon type="search"/>
+                       Browse</Link></Menu.Item>
+                   {this.state.auth.loggedIn &&
+                     <Menu.Item key="create" style={{float: 'right'}}>
+                       <Link to="/builder">
+                       <Icon type="plus" />
+                       New Analysis</Link></Menu.Item>
+                   }
+
                 </Menu>
               </Col>
             </Row>

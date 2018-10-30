@@ -782,21 +782,19 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
           />
       <Row type="flex" justify="center"style={{ background: '#fff', padding: 0 }}>
         <Col xxl={{span: 14}} xl={{span: 16}} lg={{span: 18}} xs={{span: 24}} className="mainCol">
-              <h2>
-                {!isDraft ? <Icon type="lock" /> : <Icon type="unlock" />}
-                {`Analysis ID: ${analysis.analysisId || 'n/a'}`}
-                <Space />
-                <Space />
-                <Space />
-                <Button
-                  onClick={this.saveAnalysis({ compile: false })}
-                  disabled={!this.saveEnabled()}
-                  type={'primary'}
-                >
-                  Save
-                </Button>
-                <Space />
-              </h2>
+        <h3>
+
+              <Button
+                onClick={this.saveAnalysis({ compile: false })}
+                disabled={!this.saveEnabled()}
+                type={'primary'}
+              >
+                Save
+              </Button>
+
+                {`ID: ${analysis.analysisId || 'n/a'}`}
+
+              </h3>
               <br />
             </Col>
           </Row>
@@ -807,6 +805,7 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
                 onTabClick={newTab => this.setState({ activeTab: newTab })}
                 onChange={this.tabChange}
                 className="builderTabs"
+                tabPosition="left"
               >
                 {isDraft && <TabPane tab="Overview" key="overview" disabled={!isDraft}>
                   <OverviewTab
