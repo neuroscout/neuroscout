@@ -401,9 +401,12 @@ class App extends Reflux.Component<any, {}, AppState> {
                 >
                   <Menu.Item key="home">
                     <span className="nav-text" style={{fontSize: 20}}>Neuroscout</span></Menu.Item>
-                    
+
                   {this.state.auth.loggedIn ?
-                    <Menu.SubMenu style={{float: 'right'}} title={<Avatar shape="circle" icon="user" />}>
+                    <Menu.SubMenu
+                      style={{float: 'right'}}
+                      title={<Avatar shape="circle" icon="user" />}
+                    >
                        <Menu.ItemGroup title={`${email}`}>
                          <Menu.Item
                           key="mine"
@@ -423,11 +426,11 @@ class App extends Reflux.Component<any, {}, AppState> {
                           Sign Out
                          </Menu.Item>
                        </Menu.ItemGroup>
-                     </Menu.SubMenu>
-                     :
-                      <Menu.Item key="signup" style={{float: 'right'}} disabled="true">
-                      <Button size="large" type="primary" onClick={e => authActions.update({ openSignup: true })}>
-                        Sign up</Button></Menu.Item>
+                    </Menu.SubMenu>
+                   :
+                    <Menu.Item key="signup" style={{float: 'right'}} disabled="true">
+                    <Button size="large" type="primary" onClick={e => authActions.update({ openSignup: true })}>
+                      Sign up</Button></Menu.Item>
                    }
                    {this.state.auth.loggedIn === false &&
                        <Menu.Item
