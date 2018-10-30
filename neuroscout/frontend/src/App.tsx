@@ -8,6 +8,7 @@ import * as React from 'react';
 import { BrowserRouter as Router, Route, Link, Redirect } from 'react-router-dom';
 import Reflux from 'reflux';
 import { Tabs, Row, Col, Layout, Button, Modal, Icon, Input, Form, message } from 'antd';
+import { GoogleLogin } from 'react-google-login';
 
 import './App.css';
 import AnalysisBuilder from './Builder';
@@ -328,10 +329,33 @@ class App extends Reflux.Component<any, {}, AppState> {
             </Button>
           </FormItem>
         </Form>
+        <GoogleLogin
+          clientId="188773200209-13crlel7ir10mnm169l8sv2unt2q78p4.apps.googleusercontent.com"
+          buttonText="Login"
+          onSuccess={(e) => {
+            if (e.hasOwnProperty('getAuthResponse')) {
+              authActions.update({email: 'GOOGLE', password: (e as any).getAuthResponse().access_token});
+            } 
+            if (e.hasOwnProperty('accessToken')) {
+              // tslint:disable-next-line:no-console
+              console.log('in if');
+              authActions.update({email: 'GOOGLE', password: (e as any).tokenId});
+            }
+            // tslint:disable-next-line:no-console
+            console.log(e);
+            return '';
+          }}
+          onFailure={(e) => {
+            // tslint:disable-next-line:no-console
+            console.log(e);
+            return '';
+          }}
+        />
+
       </Modal>
     );
 
-    const signupModal = () => (
+    const signupModal = (
       <Modal
         title="Sign up for a Neuroscout account"
         visible={openSignup}
@@ -388,7 +412,7 @@ class App extends Reflux.Component<any, {}, AppState> {
         <div>
           {openLogin && loginModal()}
           {openReset && resetPasswordModal()}
-          {openSignup && signupModal()}
+          {openSignup && signupModal}
           {openEnterResetToken && authActions.enterResetTokenModal()}
           <Layout>
             <Row type="flex" justify="center"style={{ background: '#fff', padding: 0 }}>
