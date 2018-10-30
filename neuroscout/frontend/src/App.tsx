@@ -427,7 +427,7 @@ class App extends Reflux.Component<any, {}, AppState> {
                        </Menu.ItemGroup>
                     </Menu.SubMenu>
                    :
-                    <Menu.Item key="signup" style={{float: 'right'}} disabled="true">
+                    <Menu.Item key="signup" style={{float: 'right'}}>
                     <Button size="large" type="primary" onClick={e => authActions.update({ openSignup: true })}>
                       Sign up</Button></Menu.Item>
                    }
