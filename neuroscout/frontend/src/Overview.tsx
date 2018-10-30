@@ -25,6 +25,7 @@ interface OverviewTabProps {
 interface OverviewTabState {
   filteredVal: any[];
   runColumns: ColumnProps<any>[];
+  taskMsg: string;
 }
 
 export class OverviewTab extends React.Component<OverviewTabProps, OverviewTabState> {
@@ -33,7 +34,8 @@ export class OverviewTab extends React.Component<OverviewTabProps, OverviewTabSt
     super(props);
     this.state = {
       filteredVal: [],
-      runColumns: []
+      runColumns: [],
+      taskMsg: 'Please Select'
     };
   }
 
@@ -50,6 +52,7 @@ export class OverviewTab extends React.Component<OverviewTabProps, OverviewTabSt
 
   tableChange = (pagination, filters, sorter) => {
     let newRunIds = this.props.availableRuns;
+    newRunIds = newRunIds.filter((x) => this.props.analysis.runIds.indexOf(x.id) > -1);
     let newRunColumns = this.state.runColumns;
     Object.keys(filters).map(key => {
       if (filters[key] === null || filters[key].length === 0) { return; }
@@ -99,7 +102,9 @@ export class OverviewTab extends React.Component<OverviewTabProps, OverviewTabSt
      numeric type.
   */
   makeCol = (title: string, _key: string, sortFn) => {
-    let extractKey: string[] = this.props.availableRuns.filter(x => x !== null).map(x => String(x[_key]));
+    let extractKey: string[] = this.props.availableRuns.filter((x) => {
+      return (x !== null) && (this.props.analysis.runIds.indexOf(x.id) > -1);
+    }).map(x => String(x[_key]));
 
     let unique = Array.from(
       new Set(extractKey)
@@ -120,12 +125,10 @@ export class OverviewTab extends React.Component<OverviewTabProps, OverviewTabSt
 
       if (this.props.analysis.runIds.length === this.props.availableRuns.length) {
         col.filteredValue = unique;
-        /*
         col.filteredValue = this.state.filteredVal[_key];
         let newFilteredVal = this.state.filteredVal;
         newFilteredVal[_key] = unique;
         this.setState({filteredVal: newFilteredVal});
-        */
       }
     } else {
       return;
@@ -214,11 +217,21 @@ export class OverviewTab extends React.Component<OverviewTabProps, OverviewTabSt
       selectedRowKeys: analysis.runIds
     };
 
+    // these should be able to live outside of render:
     let runMsg;
     if (analysis.runIds.length === this.props.availableRuns.length) {
       runMsg = 'Runs: All selected';
     } else {
-      runMsg = 'Runs: ${analysis.runIds.length}/${this.props.availableRuns.length} selected';
+      runMsg = 'Runs: ' + analysis.runIds.length + '/' + this.props.availableRuns.length + ' selected';
+    }
+    // This one almost could live in state set by task selection function, but the first selectedTaskId 
+    //  is being set in builder, and doesn't trip the selection function in the table.
+    let taskMsg = '';
+    if (this.props.selectedTaskId && availableTasks) {
+      let tasks = availableTasks.filter((x) => x.id === this.props.selectedTaskId);
+      if (tasks.length === 1) {
+        taskMsg = tasks[0].name;
+      }
     }
 
     return (
@@ -278,7 +291,7 @@ export class OverviewTab extends React.Component<OverviewTabProps, OverviewTabSt
           {availableRuns.length > 0 &&
             <div>
             <Collapse accordion={true} bordered={false} defaultActiveKey={['task']}>
-              <Panel header="Select task" key="task">
+              <Panel header={`Task: ${taskMsg}`} key="task">
                   <Table
                     columns={taskColumns}
                     rowKey="id"
