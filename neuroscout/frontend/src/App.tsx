@@ -400,8 +400,7 @@ class App extends Reflux.Component<any, {}, AppState> {
                   style={{ lineHeight: '64px'}}
                 >
                   <Menu.Item key="home">
-                    <span className="nav-text" style={{fontSize: 20}}>Neuroscout</span></Menu.Item>
-
+                     <Link to="/" style={{fontSize: 20}}>Neuroscout</Link></Menu.Item>
                   {this.state.auth.loggedIn ?
                     <Menu.SubMenu
                       style={{float: 'right'}}

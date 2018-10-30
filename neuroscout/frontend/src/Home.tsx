@@ -36,7 +36,7 @@ class Home extends React.Component<HomeProps, {}> {
                 analyses.length > 0 &&
                 <div>
                   <br />
-                  <h2>Your saved analyses:</h2>
+                  <h3>Your saved analyses</h3>
                   <br />
                   <AnalysisList {...listProps} />
                 </div>}
