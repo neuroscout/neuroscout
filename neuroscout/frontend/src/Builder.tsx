@@ -55,6 +55,12 @@ const editableStatus = ['DRAFT', 'FAILED'];
 
 const defaultConfig: AnalysisConfig = { smoothing: DEFAULT_SMOOTHING, predictorConfigs: {} };
 
+class AnalysisId extends React.Component<{id: undefined | string}, {}> {
+  render() {
+    return (<div>ID: {this.props.id ? this.props.id : 'n/a'}</div>);
+  }
+}
+
 // Create initialized app state (used in the constructor of the top-level App component)
 let initializeStore = (): Store => ({
   activeTab: 'overview',
@@ -734,6 +740,10 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
   }
 
   navButtons = (disabled = false, prev = true) => {
+    let analysisId: string | undefined = undefined;
+    if (this.state.analysis && this.state.analysis.analysisId) {
+      analysisId = this.state.analysis.analysisId;
+    }
     return (
       <div>
         <Button
@@ -744,7 +754,7 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
           Save
         </Button>
         <Space/>
-        <Tag>{`ID: n/a`}</Tag>
+        <Tag><AnalysisId id={analysisId}/></Tag>
         {this.nextbackButtons(disabled, prev)}
       </div>
     );
