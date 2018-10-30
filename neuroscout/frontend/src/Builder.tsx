@@ -718,12 +718,14 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
     .catch(displayError);
   }
 
-  nextbackButtons = (disabled = false) => {
+  nextbackButtons = (disabled = false, prev = true) => {
     return (
       <Button.Group style={{'float': 'right'}}>
-        <Button type="primary" onClick={this.nextTab(-1)}>
-          Previous
-        </Button>
+        {prev &&
+          <Button type="primary" onClick={this.nextTab(-1)}>
+            Previous
+          </Button>
+        }
         <Button type="primary" onClick={this.nextTab()} className="nextButton" disabled={disabled}>
           Next
         </Button>
@@ -731,7 +733,7 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
     );
   }
 
-  navButtons = (disabled = false) => {
+  navButtons = (disabled = false, prev = true) => {
     return (
       <div>
         <Button
@@ -743,7 +745,7 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
         </Button>
         <Space/>
         <Tag>{`ID: n/a`}</Tag>
-        {this.nextbackButtons(disabled)}
+        {this.nextbackButtons(disabled, prev)}
       </div>
     );
   }
@@ -810,7 +812,7 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
                     updateAnalysis={this.updateState('analysis')}
                     updateSelectedTaskId={this.updateState('selectedTaskId')}
                   />
-                  {this.navButtons(!(!!this.state.analysis.name && this.state.analysis.runIds.length > 0))}
+                  {this.navButtons(!(!!this.state.analysis.name && this.state.analysis.runIds.length > 0), false)}
                   <br/>
                 </TabPane>}
                 {isDraft && <TabPane tab="Predictors" key="predictors" disabled={!predictorsActive || !isDraft}>
