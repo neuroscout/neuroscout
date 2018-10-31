@@ -5,7 +5,7 @@
 import { RouteComponentProps } from 'react-router';
 import { createBrowserHistory } from 'history';
 import * as React from 'react';
-import { Tabs, Row, Col, Layout, Button, Modal, Icon, message } from 'antd';
+import { Tag, Tabs, Row, Col, Layout, Button, Modal, Icon, message } from 'antd';
 import { Prompt } from 'react-router-dom';
 import { OverviewTab } from './Overview';
 import { PredictorSelector } from './Predictors';
@@ -54,6 +54,12 @@ const DEFAULT_SMOOTHING = 5;
 const editableStatus = ['DRAFT', 'FAILED'];
 
 const defaultConfig: AnalysisConfig = { smoothing: DEFAULT_SMOOTHING, predictorConfigs: {} };
+
+class AnalysisId extends React.Component<{id: undefined | string}, {}> {
+  render() {
+    return (<div>ID: {this.props.id ? this.props.id : 'n/a'}</div>);
+  }
+}
 
 // Create initialized app state (used in the constructor of the top-level App component)
 let initializeStore = (): Store => ({
@@ -501,7 +507,7 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
       if (this.state.activeTab === 'overview') {
         // need name and runids
         if (this.state.analysis.name.length < 1) {
-          // how 
+          // how
         }
         if (this.state.analysis.runIds.length < 1) {
         }
@@ -718,21 +724,38 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
     .catch(displayError);
   }
 
-  nextButton = (disabled = false) => {
+  nextbackButtons = (disabled = false, prev = true) => {
     return (
-      <Button type="primary" onClick={this.nextTab()} className="nextButton" disabled={disabled}>
-        Next
-      </Button>
+      <Button.Group style={{'float': 'right'}}>
+        {prev &&
+          <Button type="primary" onClick={this.nextTab(-1)}>
+            Previous
+          </Button>
+        }
+        <Button type="primary" onClick={this.nextTab()} className="nextButton" disabled={disabled}>
+          Next
+        </Button>
+      </Button.Group>
     );
   }
 
-  navButtons = (disabled = false) => {
+  navButtons = (disabled = false, prev = true) => {
+    let analysisId: string | undefined = undefined;
+    if (this.state.analysis && this.state.analysis.analysisId) {
+      analysisId = this.state.analysis.analysisId;
+    }
     return (
       <div>
-        <Button type="primary" onClick={this.nextTab(-1)}>
-          Previous
+        <Button
+          onClick={this.saveAnalysis({ compile: false })}
+          disabled={!this.saveEnabled()}
+          type={'primary'}
+        >
+          Save
         </Button>
-        {this.nextButton(disabled)}
+        <Space/>
+        <Tag><AnalysisId id={analysisId}/></Tag>
+        {this.nextbackButtons(disabled, prev)}
       </div>
     );
   }
@@ -780,32 +803,14 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
             when={unsavedChanges}
             message={'You have unsaved changes. Are you sure you want leave this page?'}
           />
-      <Row type="flex" justify="center"style={{ background: '#fff', padding: 0 }}>
-        <Col xxl={{span: 14}} xl={{span: 16}} lg={{span: 18}} xs={{span: 24}} className="mainCol">
-              <h2>
-                {!isDraft ? <Icon type="lock" /> : <Icon type="unlock" />}
-                {`Analysis ID: ${analysis.analysisId || 'n/a'}`}
-                <Space />
-                <Space />
-                <Button
-                  onClick={this.saveAnalysis({ compile: false })}
-                  disabled={!this.saveEnabled()}
-                  type={'primary'}
-                >
-                  Save
-                </Button>
-                <Space />
-              </h2>
-              <br />
-            </Col>
-          </Row>
-          <Row type="flex" justify="center"style={{ background: '#fff', padding: 0 }}>
+          <Row type="flex" justify="center" style={{ background: '#fff', padding: 0 }}>
             <Col xxl={{span: 14}} xl={{span: 16}} lg={{span: 18}} xs={{span: 24}} className="mainCol">
               <Tabs
                 activeKey={activeTab}
                 onTabClick={newTab => this.setState({ activeTab: newTab })}
                 onChange={this.tabChange}
                 className="builderTabs"
+                tabPosition="left"
               >
                 {isDraft && <TabPane tab="Overview" key="overview" disabled={!isDraft}>
                   <OverviewTab
@@ -817,7 +822,7 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
                     updateAnalysis={this.updateState('analysis')}
                     updateSelectedTaskId={this.updateState('selectedTaskId')}
                   />
-                  {this.nextButton(!(!!this.state.analysis.name && this.state.analysis.runIds.length > 0))}
+                  {this.navButtons(!(!!this.state.analysis.name && this.state.analysis.runIds.length > 0), false)}
                   <br/>
                 </TabPane>}
                 {isDraft && <TabPane tab="Predictors" key="predictors" disabled={!predictorsActive || !isDraft}>
@@ -882,7 +887,7 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
                         availablePredictors={this.state.availablePredictors}
                       />
                       <br/>
-                      {isDraft ? this.navButtons() : this.nextButton()}
+                      {this.navButtons()}
                       <br/>
                     </div>
                   }

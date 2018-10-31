@@ -28,19 +28,6 @@ class Home extends React.Component<HomeProps, {}> {
           <br />
         </Col>
       </Row>
-      <Row type="flex" justify="center"style={{ background: '#fff', padding: 0 }}>
-        <Col lg={{span: 6, offset: 2}}>
-          <Button type="primary" size="large" href="/builder" disabled={!loggedIn}>
-            Create New Analysis
-          </Button>
-        </Col>
-        <Col lg={0} md={1}/>
-        <Col lg={{span: 6, offset: 2}}>
-          <Button type="primary" size="large" href="/browse">
-            Browse Public Analyses
-          </Button>
-        </Col>
-      </Row>
       {loggedIn &&
         <div>
           <Row type="flex" justify="center"style={{ background: '#fff', padding: 0 }}>
@@ -49,7 +36,7 @@ class Home extends React.Component<HomeProps, {}> {
                 analyses.length > 0 &&
                 <div>
                   <br />
-                  <h2>Your saved analyses:</h2>
+                  <h3>Your saved analyses</h3>
                   <br />
                   <AnalysisList {...listProps} />
                 </div>}
