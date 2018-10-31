@@ -346,7 +346,7 @@ class App extends Reflux.Component<any, {}, AppState> {
         <Form
           onSubmit={e => {
             e.preventDefault();
-            authActions.signUp();
+            authActions.signup();
           }}
         >
           <FormItem>

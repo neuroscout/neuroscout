@@ -154,8 +154,8 @@ export class AuthStore extends Reflux.Store {
   };
 
   // Sign up for a new account
-  signup = () => {
-    const { name, email, password, openSignup } = this.state;
+  signup() {
+    const { name, email, password, openSignup } = this.state.auth;
     fetch(DOMAINROOT + '/api/user', {
       method: 'post',
       body: JSON.stringify({ email: email, password: password, name: name }),
@@ -185,7 +185,7 @@ export class AuthStore extends Reflux.Store {
         });
       })
       .catch(displayError);
-  };
+  }
 
   // Log user out
   logout = () => {
