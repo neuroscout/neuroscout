@@ -148,7 +148,9 @@ export class Results extends React.Component<submitProps, {compileTraceback: str
           <h3>Analysis Passed</h3>
           <p>
             Congratulations! Your analysis is finished compiling and is ready to be executed.
-            Once you have installed neuroscout-cli you may run your analysis like this:
+            Once you have installed neuroscout-cli you may run your analysis with the following command, 
+            replacing '/local/outputdirectory' with the directory on your local computer where results 
+            should be stored:
           </p>
           <pre>
             <code>
