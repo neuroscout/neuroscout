@@ -7,7 +7,7 @@ Top-level App component containing AppState. The App component is currently resp
 import * as React from 'react';
 import { BrowserRouter as Router, Route, Link, Redirect } from 'react-router-dom';
 import Reflux from 'reflux';
-import { Divider, Tabs, Row, Col, Layout, Button, Modal, Icon, Input, Form, message } from 'antd';
+import { Avatar, Divider, Tabs, Row, Col, Layout, Button, Menu, Modal, Icon, Input, Form, message } from 'antd';
 import { GoogleLogin } from 'react-google-login';
 
 import './App.css';
@@ -25,7 +25,7 @@ const FormItem = Form.Item;
 const DOMAINROOT = config.server_url;
 const { localStorage } = window;
 
-const { Footer, Content, Header } = Layout;
+const { Header, Content, Footer, Sider } = Layout;
 
 interface AppState {
   loadAnalyses: boolean;
@@ -422,39 +422,74 @@ class App extends Reflux.Component<any, {}, AppState> {
           {openSignup && signupModal}
           {openEnterResetToken && authActions.enterResetTokenModal()}
           <Layout>
-            <Row type="flex" justify="center"style={{ background: '#fff', padding: 0 }}>
-                <Col xxl={{span: 14}} xl={{span: 16}} lg={{span: 18}} xs={{span: 24}} className="mainCol">
-                  <div className="headerRow">
-                    <div className="Login-col">
-                    {this.state.auth.loggedIn
-                      ? <span>
-                          {`${gAuth ? gAuth.w3.U3 : email}`}
-                          <Space />
-                          <Button 
-                            onClick={(e) => {
-                              return authActions.confirmLogout();
-                            }}
-                          >
-                            Log out
-                          </Button>
-                        </span>
-                      : <span>
-                          <Button onClick={e => authActions.update({ openLogin: true })}>
-                            Log in
-                          </Button>
-                          <Space />
-                          <Button onClick={e => authActions.update({ openSignup: true })}>
-                            Sign up
-                          </Button>
-                        </span>}
-                    </div>
-                    <h1>
-                      <Link to="/">Neuroscout</Link>
-                    </h1>
-                    </div>
-                  </Col>
-              </Row>
+
             <Content style={{ background: '#fff' }}>
+            <Row type="flex" justify="center" style={{padding: 0 }}>
+              <Col xxl={{span: 14}} xl={{span: 16}} lg={{span: 18}} xs={{span: 24}} className="mainCol">
+                <Menu
+                  mode="horizontal"
+                  style={{ lineHeight: '64px'}}
+                  selectedKeys={[]}
+                >
+                  <Menu.Item key="home">
+                     <Link to="/" style={{fontSize: 20}}>Neuroscout</Link></Menu.Item>
+                  {this.state.auth.loggedIn ?
+                    <Menu.SubMenu
+                      style={{float: 'right'}}
+                      title={<Avatar shape="circle" icon="user" />}
+                    >
+                       <Menu.ItemGroup title={`${email}`}>
+                         <Menu.Item
+                          key="mine"
+                         >
+                          My Analyses
+                         </Menu.Item>
+                         <Menu.Item
+                          key="profile"
+                         >
+                          My Profile
+                         </Menu.Item>
+                         <Menu.Divider/>
+                         <Menu.Item
+                          key="signout"
+                          onClick={(e) => {return authActions.confirmLogout(); }}
+                         >
+                          Sign Out
+                         </Menu.Item>
+                       </Menu.ItemGroup>
+                    </Menu.SubMenu>
+                   :
+                    <Menu.Item key="signup" style={{float: 'right'}}>
+                    <Button size="large" type="primary" onClick={e => authActions.update({ openSignup: true })}>
+                      Sign up</Button></Menu.Item>
+                   }
+                   {this.state.auth.loggedIn === false &&
+                       <Menu.Item
+                        onClick={e => authActions.update({ openLogin: true })}
+                        key="signin"
+                        style={{float: 'right'}}
+                       >
+                         Sign in
+                       </Menu.Item>
+                    }
+                   <Menu.Item  style={{float: 'right'}} key="help">
+                     <Icon type="question-circle" /><span className="nav-text">Help</span></Menu.Item>
+
+                     <Menu.Item key="browse" style={{float: 'right'}}>
+                     <Link to="/browse">
+                       <Icon type="search"/>
+                       Browse</Link></Menu.Item>
+                   {this.state.auth.loggedIn &&
+                     <Menu.Item key="create" style={{float: 'right'}}>
+                       <Link to="/builder">
+                       <Icon type="plus" />
+                       New Analysis</Link></Menu.Item>
+                   }
+
+                </Menu>
+              </Col>
+            </Row>
+              <br />
               <Route
                 exact={true}
                 path="/"
@@ -493,7 +528,7 @@ class App extends Reflux.Component<any, {}, AppState> {
                 exact={true}
                 path="/browse/:id"
                 render={props =>
-                  <AnalysisBuilder 
+                  <AnalysisBuilder
                     id={props.match.params.id}
                     updatedAnalysis={() => this.loadAnalyses()}
                   />

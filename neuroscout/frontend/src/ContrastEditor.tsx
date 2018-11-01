@@ -152,7 +152,6 @@ export default class ContrastEditor extends React.Component<
                 value={weights[i]}
                 onChange={(this.updateWeight.bind(this, i))}
                 required={true}
-                min={1}
               />
             </FormItem>
           )}
