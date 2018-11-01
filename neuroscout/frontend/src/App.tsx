@@ -7,7 +7,7 @@ Top-level App component containing AppState. The App component is currently resp
 import * as React from 'react';
 import { BrowserRouter as Router, Route, Link, Redirect } from 'react-router-dom';
 import Reflux from 'reflux';
-import { Tabs, Row, Col, Layout, Button, Modal, Icon, Input, Form, message } from 'antd';
+import { Divider, Tabs, Row, Col, Layout, Button, Modal, Icon, Input, Form, message } from 'antd';
 import { GoogleLogin } from 'react-google-login';
 
 import './App.css';
@@ -116,7 +116,7 @@ class App extends Reflux.Component<any, {}, AppState> {
           this.setState({ analyses: values});
         }
       });
-      await timeout(10000);
+      await timeout(1000000);
     }
   };
 
@@ -177,7 +177,8 @@ class App extends Reflux.Component<any, {}, AppState> {
       loginError,
       signupError,
       password,
-      loggingOut
+      loggingOut,
+      gAuth
     } = this.state.auth;
 
     const {
@@ -329,17 +330,23 @@ class App extends Reflux.Component<any, {}, AppState> {
             </Button>
           </FormItem>
         </Form>
+        <Divider> Or log in with Google </Divider>
         <GoogleLogin
           clientId="188773200209-13crlel7ir10mnm169l8sv2unt2q78p4.apps.googleusercontent.com"
-          buttonText="Login"
+          render={renderProps => (
+            <Button style={{ width: '100%' }} htmlType="submit" type="primary" ghost={true}>
+              <Icon type="google" /> Log in 
+            </Button>
+          )}
+          buttonText="Log in"
           onSuccess={(e) => {
-            if (e.hasOwnProperty('getAuthResponse')) {
-              authActions.update({email: 'GOOGLE', password: (e as any).getAuthResponse().access_token});
-            } 
             if (e.hasOwnProperty('accessToken')) {
-              // tslint:disable-next-line:no-console
-              console.log('in if');
-              authActions.update({email: 'GOOGLE', password: (e as any).tokenId});
+              authActions.update({
+                email: 'GOOGLE',
+                password: (e as any).tokenId,
+                gAuth: e
+              });
+              authActions.login();
             }
             // tslint:disable-next-line:no-console
             console.log(e);
@@ -421,7 +428,7 @@ class App extends Reflux.Component<any, {}, AppState> {
                     <div className="Login-col">
                     {this.state.auth.loggedIn
                       ? <span>
-                          {`${email}`}
+                          {`${gAuth ? gAuth.w3.U3 : email}`}
                           <Space />
                           <Button 
                             onClick={(e) => {

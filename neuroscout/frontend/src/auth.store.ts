@@ -47,6 +47,7 @@ export class AuthStore extends Reflux.Store {
       openEnterResetToken: false,
       loggingOut: false,
       token: null,
+      gAuth: null
     }};
   }
 

@@ -265,4 +265,5 @@ export interface AuthStoreState {
   token: string | null;
   loggingOut: boolean; // flag set on logout to know to redirect after logout
   nextURL: string | null; // will probably remove this and find a better solution to login redirects
+  gAuth: any;
 }
