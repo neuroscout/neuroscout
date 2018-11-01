@@ -451,6 +451,11 @@ class App extends Reflux.Component<any, {}, AppState> {
                      >
                       FAQ
                      </Menu.Item>
+                     <Menu.Item
+                      key="guide"
+                     >
+                      User's Guide
+                     </Menu.Item>
                    </Menu.SubMenu>
 
                      <Menu.Item key="browse" style={{float: 'right'}}>
