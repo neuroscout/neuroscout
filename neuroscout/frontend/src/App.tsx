@@ -23,6 +23,7 @@ import { authActions } from './auth.actions';
 
 const FormItem = Form.Item;
 const DOMAINROOT = config.server_url;
+const GOOGLECLIENTID = config.google_client_id;
 const { localStorage } = window;
 
 const { Header, Content, Footer, Sider } = Layout;
@@ -332,10 +333,16 @@ class App extends Reflux.Component<any, {}, AppState> {
         </Form>
         <Divider> Or log in with Google </Divider>
         <GoogleLogin
-          clientId="188773200209-13crlel7ir10mnm169l8sv2unt2q78p4.apps.googleusercontent.com"
+          clientId={GOOGLECLIENTID}
           render={renderProps => (
-            <Button style={{ width: '100%' }} htmlType="submit" type="primary" ghost={true}>
-              <Icon type="google" /> Log in 
+            <Button
+              onClick={renderProps && renderProps.onClick}
+              style={{ width: '100%' }}
+              htmlType="submit"
+              type="primary"
+              ghost={true}
+            >
+              <Icon type="google" />
             </Button>
           )}
           buttonText="Log in"
@@ -436,9 +443,15 @@ class App extends Reflux.Component<any, {}, AppState> {
                   {this.state.auth.loggedIn ?
                     <Menu.SubMenu
                       style={{float: 'right'}}
-                      title={<Avatar shape="circle" icon="user" />}
+                      title={
+                        <Avatar
+                          shape="circle"
+                          icon="user"
+                          src={gAuth ? gAuth.profileObj.imageUrl : ''}
+                        />
+                      }
                     >
-                       <Menu.ItemGroup title={`${email}`}>
+                       <Menu.ItemGroup title={`${gAuth ? gAuth.profileObj.email : email}`}>
                          <Menu.Item
                           key="mine"
                          >
