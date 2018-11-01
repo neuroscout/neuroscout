@@ -113,7 +113,7 @@ export class Submit extends React.Component<submitProps, {tosAgree: boolean}> {
   }
 }
 
-export class Results extends React.Component<submitProps, {compileTraceback: string}> {
+export class StatusTab extends React.Component<submitProps, {compileTraceback: string}> {
   constructor(props) {
     super(props);
     this.state = {

@@ -13,7 +13,7 @@ import { ContrastsTab } from './Contrasts';
 import { XformsTab } from './Transformations';
 import { Review } from './Review';
 import { Report } from './Report';
-import { Status, Submit, Results } from './Status';
+import { Status, Submit, StatusTab } from './Status';
 import OptionsTab from './Options';
 import {
   Store,
@@ -893,7 +893,7 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
                   }
                 </TabPane>
                 <TabPane tab={isDraft ? 'Run' : 'Results'} key="submit" disabled={!submitActive && isDraft}>
-                  <Results
+                  <StatusTab
                     status={analysis.status}
                     analysisId={analysis.analysisId}
                     confirmSubmission={this.confirmSubmission}
