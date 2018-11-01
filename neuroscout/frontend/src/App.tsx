@@ -441,8 +441,17 @@ class App extends Reflux.Component<any, {}, AppState> {
                          Sign in
                        </Menu.Item>
                     }
-                   <Menu.Item  style={{float: 'right'}} key="help">
-                     <Icon type="question-circle" /><span className="nav-text">Help</span></Menu.Item>
+                   <Menu.SubMenu
+                    style={{float: 'right'}}
+                    key="help"
+                    title={<span><Icon type="question-circle"/>Help</span>}
+                   >
+                     <Menu.Item
+                      key="faq"
+                     >
+                      FAQ
+                     </Menu.Item>
+                   </Menu.SubMenu>
 
                      <Menu.Item key="browse" style={{float: 'right'}}>
                      <Link to="/browse">
