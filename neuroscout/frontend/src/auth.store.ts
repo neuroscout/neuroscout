@@ -195,9 +195,11 @@ export class AuthStore extends Reflux.Store {
     this.update({
       loggedIn: false,
       name: undefined,
-      email: undefined, jwt: null,
+      email: undefined,
+      jwt: null,
       analyses: [],
-      loggingOut: true
+      loggingOut: true,
+      gAuth: null
     });
   };
 
