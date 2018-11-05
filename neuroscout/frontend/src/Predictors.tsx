@@ -161,6 +161,7 @@ export class PredictorSelector extends React.Component<
           </Col>
           <Col xl={{span: 1}}/>
           <Col xl={{span: 5}}>
+            <h4>Selected Predictors:</h4>
             {selectedPredictors.map(p =>
               <Tag closable={true} onClose={ev => this.removePredictor(p.id)} key={p.id}>
                 {p.name}
