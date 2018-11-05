@@ -142,6 +142,7 @@ export class StatusTab extends React.Component<submitProps, {compileTraceback: s
     return(
       <div>
       <div className="statusHeader">
+        {this.props.children}
         <Status status={this.props.status} analysisId={this.props.analysisId} />
       </div>
       {(this.props.status === 'PASSED') &&

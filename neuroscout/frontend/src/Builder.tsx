@@ -5,7 +5,7 @@
 import { RouteComponentProps } from 'react-router';
 import { createBrowserHistory } from 'history';
 import * as React from 'react';
-import { Tag, Tabs, Row, Col, Layout, Button, Modal, Icon, message } from 'antd';
+import { Tag, Tabs, Row, Col, Layout, Button, Modal, Icon, message, Tooltip, Switch } from 'antd';
 import { Prompt } from 'react-router-dom';
 import { OverviewTab } from './Overview';
 import { PredictorSelector } from './Predictors';
@@ -899,7 +899,18 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
                     confirmSubmission={this.confirmSubmission}
                     private={analysis.private || false}
                     updateStatus={this.updateStatus}
-                  />
+                  >
+                    <div className="privateSwitch">
+                      <Tooltip title="Should this analysis be private (only visible to you) or public?">
+                        <Switch
+                          checked={!analysis.private}
+                          checkedChildren="Public"
+                          unCheckedChildren="Private"
+                          onChange={checked => this.updateState('analysis')({'private': !checked})}
+                        />
+                      </Tooltip>
+                    </div>
+                  </StatusTab>
                 </TabPane>
               </Tabs>
             </Col>
