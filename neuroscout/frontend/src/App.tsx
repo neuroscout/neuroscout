@@ -19,6 +19,7 @@ import { Space } from './HelperComponents';
 import { displayError, jwtFetch, timeout } from './utils';
 import { AuthStore } from './auth.store';
 import { authActions } from './auth.actions';
+import FAQ from './FAQ';
 
 const FormItem = Form.Item;
 const DOMAINROOT = config.server_url;
@@ -115,7 +116,7 @@ class App extends Reflux.Component<any, {}, AppState> {
           this.setState({ analyses: values});
         }
       });
-      await timeout(1000000);
+      await timeout(10000);
     }
   };
 
@@ -523,6 +524,11 @@ class App extends Reflux.Component<any, {}, AppState> {
                 path="/browse"
                 render={props =>
                   <Browse analyses={publicAnalyses} cloneAnalysis={this.cloneAnalysis} />}
+              />
+              <Route
+                exact={true}
+                path="/faq"
+                render={() => <FAQ/>}
               />
             </Content>
           </Layout>

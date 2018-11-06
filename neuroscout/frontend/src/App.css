@@ -61,7 +61,9 @@ pre {
 }
 
 .privateSwitch {
+    float: left;
     text-align: center;
+    padding-right: 10px;
 }
 
 .headerRow {
