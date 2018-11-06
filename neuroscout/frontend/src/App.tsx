@@ -450,7 +450,9 @@ class App extends Reflux.Component<any, {}, AppState> {
                      <Menu.Item
                       key="faq"
                      >
-                      FAQ
+                      <Link to="/faq">
+                        FAQ
+                      </Link>
                      </Menu.Item>
                      <Menu.Item
                       key="guide"
