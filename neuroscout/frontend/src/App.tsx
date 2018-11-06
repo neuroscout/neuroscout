@@ -467,9 +467,12 @@ class App extends Reflux.Component<any, {}, AppState> {
                        Browse</Link></Menu.Item>
                    {this.state.auth.loggedIn &&
                      <Menu.Item key="create" style={{float: 'right'}}>
-                       <Link to="/builder">
-                       <Icon type="plus" />
-                       New Analysis</Link></Menu.Item>
+                       <Link
+                         to={{pathname: '/builder'}}
+                       >
+                         <Icon type="plus" /> New Analysis
+                       </Link>
+                     </Menu.Item>
                    }
 
                 </Menu>
@@ -496,7 +499,7 @@ class App extends Reflux.Component<any, {}, AppState> {
                   // need to implement something like the auth workflow example here:
                   // https://reacttraining.com/react-router/web/example/auth-workflow
                   if (loggedIn || this.state.auth.openLogin) {
-                    return <AnalysisBuilder updatedAnalysis={() => this.loadAnalyses()} />;
+                    return <AnalysisBuilder updatedAnalysis={() => this.loadAnalyses()} key={props.location.key}/>;
                   }
                   message.warning('Please log in first and try again');
                   return <Redirect to="/" />;
