@@ -239,7 +239,7 @@ export class OverviewTab extends React.Component<OverviewTabProps, OverviewTabSt
         <Form layout="vertical">
           <FormItem label="Name" required={true}>
             <Row type="flex" justify="space-between">
-              <Col xs={24} md={21}>
+              <Col xs={24}>
                 <Input
                   placeholder="Name your analysis"
                   value={analysis.name}
@@ -247,18 +247,6 @@ export class OverviewTab extends React.Component<OverviewTabProps, OverviewTabSt
                   required={true}
                   min={1}
                 />
-              </Col>
-              <Col md={3}>
-                <div className="privateSwitch">
-                  <Tooltip title="Should this analysis be private (only visible to you) or public?">
-                    <Switch
-                      checked={!analysis.private}
-                      checkedChildren="Public"
-                      unCheckedChildren="Private"
-                      onChange={checked => this.updateAnalysis('private')(!checked)}
-                    />
-                  </Tooltip>
-                </div>
               </Col>
             </Row>
           </FormItem>
