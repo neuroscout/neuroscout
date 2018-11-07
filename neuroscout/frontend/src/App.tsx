@@ -483,7 +483,10 @@ class App extends Reflux.Component<any, {}, AppState> {
                 path="/"
                 render={props =>
                   <Home
-                    analyses={analyses}
+                    analyses={this.state.auth.loggedIn ?
+                      analyses
+                    :
+                      publicAnalyses}
                     loggedIn={this.state.auth.loggedIn}
                     cloneAnalysis={this.cloneAnalysis}
                     onDelete={this.onDelete}

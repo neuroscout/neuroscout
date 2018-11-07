@@ -16,14 +16,14 @@ interface HomeProps extends AnalysisListProps {
 class Home extends React.Component<HomeProps, {}> {
   render() {
     const { analyses, cloneAnalysis, onDelete, loggedIn, publicList } = this.props;
-    const listProps: AnalysisListProps = { ...this.props, publicList: !loggedIn };
+    const listProps: AnalysisListProps = { ...this.props, publicList: loggedIn === false };
     return (
       <div>
       <Row type="flex" justify="center" style={{ background: '#fff', padding: 0 }}>
         <MainCol>
         <div>
          <img className="splashLogo" src="/Neuroscout_Simple_Wide.svg"/><br/>
-         <p className="splashText">A platform for fast and flexible re-analysis of (naturalistic) fMRI data
+         <p className="splashText">A platform for fast and flexible re-analysis of (naturalistic) fMRI studies
 </p>
          </div>
         </MainCol>
@@ -37,14 +37,16 @@ class Home extends React.Component<HomeProps, {}> {
                 <div>
                   <br />
                   {loggedIn ?
-                    <h3>Your saved analyses</h3>
+                    <h3>Your saved analyses:</h3>
                   :
-                    <h3>Publicly shared analyses</h3>
+                    <h3>Browse public analyses:</h3>
                   }
 
                   <br />
                   <AnalysisList {...listProps} />
                 </div>}
+               {loggedIn && analyses.length === 0 &&
+                <p> WTF NO Analyses mate</p>}
             </div>
        </MainCol>
       </Row>
