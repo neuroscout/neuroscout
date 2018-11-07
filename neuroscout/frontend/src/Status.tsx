@@ -61,7 +61,7 @@ type submitProps = {
 export class Submit extends React.Component<submitProps, {tosAgree: boolean}> {
   constructor(props) {
     super(props);
-    
+
     this.state = {
       tosAgree: (this.props.status !== 'DRAFT')
     };
@@ -82,10 +82,11 @@ export class Submit extends React.Component<submitProps, {tosAgree: boolean}> {
         <h3>Terms for analysis generation:</h3>
         <ul>
           <li>I agree that once I submit my analysis, I will not be able to delete or edit it.</li>
-          <li>I agree to use the "clone" feature to create any forked versions of the current analysis</li>
+          <li>I agree if I publish results stemming from this analysis,
+          I must make public, and cite all relevant analyses.</li>
             {this.props.private &&
             <li>
-              I understand that although my analysis is currently private, anyone with the analysis 
+              I understand that although my analysis is currently private, anyone with the analysis
               ID may view this analysis, and subsequent uploaded results.
             </li>
             }
@@ -112,7 +113,7 @@ export class Submit extends React.Component<submitProps, {tosAgree: boolean}> {
   }
 }
 
-export class Results extends React.Component<submitProps, {compileTraceback: string}> {
+export class StatusTab extends React.Component<submitProps, {compileTraceback: string}> {
   constructor(props) {
     super(props);
     this.state = {
@@ -141,15 +142,16 @@ export class Results extends React.Component<submitProps, {compileTraceback: str
     return(
       <div>
       <div className="statusHeader">
+        {this.props.children}
         <Status status={this.props.status} analysisId={this.props.analysisId} />
       </div>
-      {(this.props.status === 'PASSED') && 
+      {(this.props.status === 'PASSED') &&
         <div>
           <h3>Analysis Passed</h3>
           <p>
             Congratulations! Your analysis is finished compiling and is ready to be executed.
-            Once you have installed neuroscout-cli you may run your analysis with the following command, 
-            replacing '/local/outputdirectory' with the directory on your local computer where results 
+            Once you have installed neuroscout-cli you may run your analysis with the following command,
+            replacing '/local/outputdirectory' with the directory on your local computer where results
             should be stored:
           </p>
           <pre>

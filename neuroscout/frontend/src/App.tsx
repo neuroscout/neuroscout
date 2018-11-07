@@ -16,10 +16,11 @@ import { ApiUser, ApiAnalysis, AppAnalysis, AuthStoreState } from './coretypes';
 import Browse from './Browse';
 import { config } from './config';
 import Home from './Home';
-import { Space } from './HelperComponents';
+import { MainCol, Space } from './HelperComponents';
 import { displayError, jwtFetch, timeout } from './utils';
 import { AuthStore } from './auth.store';
 import { authActions } from './auth.actions';
+import FAQ from './FAQ';
 
 const FormItem = Form.Item;
 const DOMAINROOT = config.server_url;
@@ -432,14 +433,15 @@ class App extends Reflux.Component<any, {}, AppState> {
 
             <Content style={{ background: '#fff' }}>
             <Row type="flex" justify="center" style={{padding: 0 }}>
-              <Col xxl={{span: 14}} xl={{span: 16}} lg={{span: 18}} xs={{span: 24}} className="mainCol">
+              <MainCol>
                 <Menu
                   mode="horizontal"
                   style={{ lineHeight: '64px'}}
                   selectedKeys={[]}
                 >
                   <Menu.Item key="home">
-                     <Link to="/" style={{fontSize: 20}}>Neuroscout</Link></Menu.Item>
+                     <Link to="/" style={{fontSize: 20}}>Neuroscout</Link>
+                  </Menu.Item>
                   {this.state.auth.loggedIn ?
                     <Menu.SubMenu
                       style={{float: 'right'}}
@@ -452,11 +454,6 @@ class App extends Reflux.Component<any, {}, AppState> {
                       }
                     >
                        <Menu.ItemGroup title={`${gAuth ? gAuth.profileObj.email : email}`}>
-                         <Menu.Item
-                          key="mine"
-                         >
-                          My Analyses
-                         </Menu.Item>
                          <Menu.Item
                           key="profile"
                          >
@@ -485,22 +482,44 @@ class App extends Reflux.Component<any, {}, AppState> {
                          Sign in
                        </Menu.Item>
                     }
-                   <Menu.Item  style={{float: 'right'}} key="help">
-                     <Icon type="question-circle" /><span className="nav-text">Help</span></Menu.Item>
+                   <Menu.SubMenu
+                    style={{float: 'right'}}
+                    key="help"
+                    title={<span><Icon type="question-circle"/>Help</span>}
+                   >
+                     <Menu.Item
+                      key="faq"
+                     >
+                      <Link to="/faq">
+                        FAQ
+                      </Link>
+                     </Menu.Item>
+                     <Menu.Item
+                      key="guide"
+                     >
+                      User's Guide
+                     </Menu.Item>
+                   </Menu.SubMenu>
 
+                   {this.state.auth.loggedIn &&
                      <Menu.Item key="browse" style={{float: 'right'}}>
                      <Link to="/browse">
                        <Icon type="search"/>
                        Browse</Link></Menu.Item>
+                   }
+
                    {this.state.auth.loggedIn &&
                      <Menu.Item key="create" style={{float: 'right'}}>
-                       <Link to="/builder">
-                       <Icon type="plus" />
-                       New Analysis</Link></Menu.Item>
+                       <Link
+                         to={{pathname: '/builder'}}
+                       >
+                         <Icon type="plus" /> New Analysis
+                       </Link>
+                     </Menu.Item>
                    }
 
                 </Menu>
-              </Col>
+              </MainCol>
             </Row>
               <br />
               <Route
@@ -508,7 +527,10 @@ class App extends Reflux.Component<any, {}, AppState> {
                 path="/"
                 render={props =>
                   <Home
-                    analyses={analyses}
+                    analyses={this.state.auth.loggedIn ?
+                      analyses
+                    :
+                      publicAnalyses}
                     loggedIn={this.state.auth.loggedIn}
                     cloneAnalysis={this.cloneAnalysis}
                     onDelete={this.onDelete}
@@ -523,7 +545,7 @@ class App extends Reflux.Component<any, {}, AppState> {
                   // need to implement something like the auth workflow example here:
                   // https://reacttraining.com/react-router/web/example/auth-workflow
                   if (loggedIn || this.state.auth.openLogin) {
-                    return <AnalysisBuilder updatedAnalysis={() => this.loadAnalyses()} />;
+                    return <AnalysisBuilder updatedAnalysis={() => this.loadAnalyses()} key={props.location.key}/>;
                   }
                   message.warning('Please log in first and try again');
                   return <Redirect to="/" />;
@@ -553,6 +575,11 @@ class App extends Reflux.Component<any, {}, AppState> {
                 path="/browse"
                 render={props =>
                   <Browse analyses={publicAnalyses} cloneAnalysis={this.cloneAnalysis} />}
+              />
+              <Route
+                exact={true}
+                path="/faq"
+                render={() => <FAQ/>}
               />
             </Content>
           </Layout>

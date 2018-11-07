@@ -9,7 +9,7 @@ import { Space } from './HelperComponents';
 
 const FormItem = Form.Item;
 const RadioGroup = Radio.Group;
-const CONTRAST_TYPE_OPTIONS: ('T' | 'F')[] = ['T', 'F'];
+const CONTRAST_TYPE_OPTIONS: ('T')[] = ['T'];
 
 /*
 Contrast editor component to add new contrasts. May extend this in the future 
