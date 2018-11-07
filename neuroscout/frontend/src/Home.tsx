@@ -4,7 +4,7 @@
 import * as React from 'react';
 import { Tabs, Row, Col, Button, Card } from 'antd';
 import { displayError } from './utils';
-import { Space } from './HelperComponents';
+import { MainCol, Space } from './HelperComponents';
 import { AppAnalysis } from './coretypes';
 import { Link } from 'react-router-dom';
 import AnalysisList, { AnalysisListProps } from './AnalysisList';
@@ -21,17 +21,17 @@ class Home extends React.Component<HomeProps, {}> {
       <div>
 
       <Row type="flex" justify="center"style={{ background: '#fff', padding: 0 }}>
-        <Col xxl={{span: 14}} xl={{span: 16}} lg={{span: 18}} xs={{span: 24}} className="mainCol">
+        <MainCol>
           <Card title="">
             <p>Welcome to Neuroscout!</p>
           </Card>
           <br />
-        </Col>
+        </MainCol>
       </Row>
       {loggedIn &&
         <div>
           <Row type="flex" justify="center"style={{ background: '#fff', padding: 0 }}>
-            <Col xxl={{span: 14}} xl={{span: 16}} lg={{span: 18}} xs={{span: 24}} className="mainCol">
+            <MainCol>
               {!!analyses &&
                 analyses.length > 0 &&
                 <div>
@@ -40,7 +40,7 @@ class Home extends React.Component<HomeProps, {}> {
                   <br />
                   <AnalysisList {...listProps} />
                 </div>}
-            </Col>
+            </MainCol>
           </Row>
         </div>}
       </div>

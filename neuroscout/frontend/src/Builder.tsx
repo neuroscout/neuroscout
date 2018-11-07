@@ -36,7 +36,7 @@ import {
   TabName
 } from './coretypes';
 import { displayError, jwtFetch, timeout } from './utils';
-import { Space } from './HelperComponents';
+import { MainCol, Space } from './HelperComponents';
 import { config } from './config';
 import { authActions } from './auth.actions';
 
@@ -804,7 +804,7 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
             message={'You have unsaved changes. Are you sure you want leave this page?'}
           />
           <Row type="flex" justify="center" style={{ background: '#fff', padding: 0 }}>
-            <Col xxl={{span: 14}} xl={{span: 16}} lg={{span: 18}} xs={{span: 24}} className="mainCol">
+            <MainCol>
               <Tabs
                 activeKey={activeTab}
                 onTabClick={newTab => this.setState({ activeTab: newTab })}
@@ -913,7 +913,7 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
                   </StatusTab>
                 </TabPane>
               </Tabs>
-            </Col>
+            </MainCol>
           </Row>
         </div>
     );

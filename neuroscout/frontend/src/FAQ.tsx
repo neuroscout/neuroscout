@@ -1,12 +1,13 @@
 import * as React from 'react';
 import { Col, Divider, Row } from 'antd';
+import { MainCol } from './HelperComponents';
 
 export default class FAQ extends React.Component<{}, {}> {
 
   render() {
     return (
       <Row type="flex" justify="center" style={{padding: 0 }}>
-        <Col xxl={{span: 14}} xl={{span: 16}} lg={{span: 18}} xs={{span: 24}} className="mainCol">
+        <MainCol>
           <Divider orientation="left">
             How do I get started?
           </Divider>
@@ -83,7 +84,7 @@ export default class FAQ extends React.Component<{}, {}> {
             multimodal feature extraction. In Proceedings of the 23rd ACM SIGKDD International Conference on Knowledge
             Discovery and Data Mining (pp. 1567-1574). ACM.
             </cite>
-        </Col>
+        </MainCol>
       </Row>
     );
   }

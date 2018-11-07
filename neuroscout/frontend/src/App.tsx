@@ -15,7 +15,7 @@ import { ApiUser, ApiAnalysis, AppAnalysis, AuthStoreState } from './coretypes';
 import Browse from './Browse';
 import { config } from './config';
 import Home from './Home';
-import { Space } from './HelperComponents';
+import { MainCol, Space } from './HelperComponents';
 import { displayError, jwtFetch, timeout } from './utils';
 import { AuthStore } from './auth.store';
 import { authActions } from './auth.actions';
@@ -395,7 +395,7 @@ class App extends Reflux.Component<any, {}, AppState> {
 
             <Content style={{ background: '#fff' }}>
             <Row type="flex" justify="center" style={{padding: 0 }}>
-              <Col xxl={{span: 14}} xl={{span: 16}} lg={{span: 18}} xs={{span: 24}} className="mainCol">
+              <MainCol>
                 <Menu
                   mode="horizontal"
                   style={{ lineHeight: '64px'}}
@@ -476,7 +476,7 @@ class App extends Reflux.Component<any, {}, AppState> {
                    }
 
                 </Menu>
-              </Col>
+              </MainCol>
             </Row>
               <br />
               <Route
