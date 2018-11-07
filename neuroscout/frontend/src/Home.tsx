@@ -2,7 +2,7 @@
  Home component for the homepage
 */
 import * as React from 'react';
-import { Tabs, Row, Col, Button, Card } from 'antd';
+import { Icon, Tabs, Row, Col, Button, Card } from 'antd';
 import { displayError } from './utils';
 import { MainCol, Space } from './HelperComponents';
 import { AppAnalysis } from './coretypes';
@@ -45,8 +45,19 @@ class Home extends React.Component<HomeProps, {}> {
                   <br />
                   <AnalysisList {...listProps} />
                 </div>}
+                <br/>
+
                {loggedIn && analyses.length === 0 &&
-                <p> WTF NO Analyses mate</p>}
+                 <div>
+                   <Button className="splashButton" type="primary" size="large">
+                     <Link
+                       to={{pathname: '/builder'}}
+                     >
+                     Build an analysis to get started!
+                     </Link>
+                   </Button>
+                 </div>
+              }
             </div>
        </MainCol>
       </Row>
