@@ -5,7 +5,7 @@
 import { RouteComponentProps } from 'react-router';
 import { createBrowserHistory } from 'history';
 import * as React from 'react';
-import { Tag, Tabs, Row, Col, Layout, Button, Modal, Icon, message } from 'antd';
+import { Tag, Tabs, Row, Col, Layout, Button, Modal, Icon, message, Tooltip, Switch } from 'antd';
 import { Prompt } from 'react-router-dom';
 import { OverviewTab } from './Overview';
 import { PredictorSelector } from './Predictors';
@@ -13,7 +13,7 @@ import { ContrastsTab } from './Contrasts';
 import { XformsTab } from './Transformations';
 import { Review } from './Review';
 import { Report } from './Report';
-import { Status, Submit, Results } from './Status';
+import { Status, Submit, StatusTab } from './Status';
 import OptionsTab from './Options';
 import {
   Store,
@@ -36,7 +36,7 @@ import {
   TabName
 } from './coretypes';
 import { displayError, jwtFetch, timeout } from './utils';
-import { Space } from './HelperComponents';
+import { MainCol, Space } from './HelperComponents';
 import { config } from './config';
 import { authActions } from './auth.actions';
 
@@ -804,7 +804,7 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
             message={'You have unsaved changes. Are you sure you want leave this page?'}
           />
           <Row type="flex" justify="center" style={{ background: '#fff', padding: 0 }}>
-            <Col xxl={{span: 14}} xl={{span: 16}} lg={{span: 18}} xs={{span: 24}} className="mainCol">
+            <MainCol>
               <Tabs
                 activeKey={activeTab}
                 onTabClick={newTab => this.setState({ activeTab: newTab })}
@@ -893,16 +893,27 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
                   }
                 </TabPane>
                 <TabPane tab={isDraft ? 'Run' : 'Results'} key="submit" disabled={!submitActive && isDraft}>
-                  <Results
+                  <StatusTab
                     status={analysis.status}
                     analysisId={analysis.analysisId}
                     confirmSubmission={this.confirmSubmission}
                     private={analysis.private || false}
                     updateStatus={this.updateStatus}
-                  />
+                  >
+                    <div className="privateSwitch">
+                      <Tooltip title="Should this analysis be private (only visible to you) or public?">
+                        <Switch
+                          checked={!analysis.private}
+                          checkedChildren="Public"
+                          unCheckedChildren="Private"
+                          onChange={checked => this.updateState('analysis')({...analysis, 'private': !checked})}
+                        />
+                      </Tooltip>
+                    </div>
+                  </StatusTab>
                 </TabPane>
               </Tabs>
-            </Col>
+            </MainCol>
           </Row>
         </div>
     );

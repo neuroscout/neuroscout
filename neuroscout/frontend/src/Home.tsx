@@ -2,9 +2,9 @@
  Home component for the homepage
 */
 import * as React from 'react';
-import { Tabs, Row, Col, Button, Card } from 'antd';
+import { Icon, Tabs, Row, Col, Button, Card } from 'antd';
 import { displayError } from './utils';
-import { Space } from './HelperComponents';
+import { MainCol, Space } from './HelperComponents';
 import { AppAnalysis } from './coretypes';
 import { Link } from 'react-router-dom';
 import AnalysisList, { AnalysisListProps } from './AnalysisList';
@@ -16,34 +16,52 @@ interface HomeProps extends AnalysisListProps {
 class Home extends React.Component<HomeProps, {}> {
   render() {
     const { analyses, cloneAnalysis, onDelete, loggedIn, publicList } = this.props;
-    const listProps: AnalysisListProps = { ...this.props, publicList: false };
+    const listProps: AnalysisListProps = { ...this.props, publicList: loggedIn === false };
     return (
       <div>
-
-      <Row type="flex" justify="center"style={{ background: '#fff', padding: 0 }}>
-        <Col xxl={{span: 14}} xl={{span: 16}} lg={{span: 18}} xs={{span: 24}} className="mainCol">
-          <Card title="">
-            <p>Welcome to Neuroscout!</p>
-          </Card>
-          <br />
-        </Col>
-      </Row>
-      {loggedIn &&
+      <Row type="flex" justify="center" style={{ background: '#fff', padding: 0 }}>
+        <MainCol>
         <div>
-          <Row type="flex" justify="center"style={{ background: '#fff', padding: 0 }}>
-            <Col xxl={{span: 14}} xl={{span: 16}} lg={{span: 18}} xs={{span: 24}} className="mainCol">
+         <img className="splashLogo" src="/Neuroscout_Simple_Wide.svg"/><br/>
+         <p className="splashText">A platform for fast and flexible re-analysis of (naturalistic) fMRI studies
+</p>
+         </div>
+        </MainCol>
+        </Row>
+
+        <Row type="flex" justify="center" style={{ background: '#fff', padding: 0 }}>
+          <MainCol>
+            <div>
               {!!analyses &&
                 analyses.length > 0 &&
                 <div>
                   <br />
-                  <h3>Your saved analyses</h3>
+                  {loggedIn ?
+                    <h3>Your saved analyses:</h3>
+                  :
+                    <h3>Browse public analyses:</h3>
+                  }
+
                   <br />
                   <AnalysisList {...listProps} />
                 </div>}
-            </Col>
-          </Row>
-        </div>}
-      </div>
+                <br/>
+
+               {loggedIn && analyses.length === 0 &&
+                 <div>
+                   <Button className="splashButton" type="primary" size="large">
+                     <Link
+                       to={{pathname: '/builder'}}
+                     >
+                     Build an analysis to get started!
+                     </Link>
+                   </Button>
+                 </div>
+              }
+            </div>
+       </MainCol>
+      </Row>
+     </div>
     );
   }
 }

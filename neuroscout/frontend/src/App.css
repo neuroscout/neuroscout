@@ -61,7 +61,9 @@ pre {
 }
 
 .privateSwitch {
+    float: left;
     text-align: center;
+    padding-right: 10px;
 }
 
 .headerRow {
@@ -74,4 +76,24 @@ pre {
 
 .statusHeader {
     float: right;
+}
+
+.splashLogo {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  width: 30%;
+}
+
+.splashText {
+  text-align: center;
+  font-size: 22px;
+}
+
+.splashButton {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  width: 30%;
+  font-size: 19px;
 }

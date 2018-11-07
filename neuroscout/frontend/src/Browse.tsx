@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { Tabs, Row, Col, Layout, Button, Card } from 'antd';
 import AnalysisList, { AnalysisListProps } from './AnalysisList';
+import { MainCol } from './HelperComponents';
 
 // Interface to browse public analyses
 const Browse = (props: AnalysisListProps) => {
@@ -8,13 +9,13 @@ const Browse = (props: AnalysisListProps) => {
   return (
     <div>
       <Row type="flex" justify="center">
-        <Col xxl={{span: 14}} xl={{span: 16}} lg={{span: 18}} xs={{span: 24}} className="mainCol">
+        <MainCol>
         <h3>
           {'Public Analyses'}
         </h3>
           <br />
           <AnalysisList {...listProps} />
-        </Col>
+        </MainCol>
       </Row>
     </div>
   );
