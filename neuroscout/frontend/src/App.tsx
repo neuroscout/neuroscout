@@ -402,7 +402,9 @@ class App extends Reflux.Component<any, {}, AppState> {
                   selectedKeys={[]}
                 >
                   <Menu.Item key="home">
-                     <Link to="/" style={{fontSize: 20}}>Neuroscout</Link></Menu.Item>
+                     <Link to="/" style={{fontSize: 20}}>Neuroscout</Link>
+                  </Menu.Item>
+                   <img className="headerLogo" src="/Neuroscout_Simple_Wide.svg"/>
                   {this.state.auth.loggedIn ?
                     <Menu.SubMenu
                       style={{float: 'right'}}
