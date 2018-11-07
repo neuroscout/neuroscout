@@ -16,34 +16,39 @@ interface HomeProps extends AnalysisListProps {
 class Home extends React.Component<HomeProps, {}> {
   render() {
     const { analyses, cloneAnalysis, onDelete, loggedIn, publicList } = this.props;
-    const listProps: AnalysisListProps = { ...this.props, publicList: false };
+    const listProps: AnalysisListProps = { ...this.props, publicList: !loggedIn };
     return (
       <div>
-
-      <Row type="flex" justify="center"style={{ background: '#fff', padding: 0 }}>
+      <Row type="flex" justify="center" style={{ background: '#fff', padding: 0 }}>
         <MainCol>
-          <Card title="">
-            <p>Welcome to Neuroscout!</p>
-          </Card>
-          <br />
-        </MainCol>
-      </Row>
-      {loggedIn &&
         <div>
-          <Row type="flex" justify="center"style={{ background: '#fff', padding: 0 }}>
-            <MainCol>
+         <img className="splashLogo" src="/Neuroscout_Simple_Wide.svg"/><br/>
+         <p className="splashText">A platform for fast and flexible re-analysis of (naturalistic) fMRI data
+</p>
+         </div>
+        </MainCol>
+        </Row>
+
+        <Row type="flex" justify="center" style={{ background: '#fff', padding: 0 }}>
+          <MainCol>
+            <div>
               {!!analyses &&
                 analyses.length > 0 &&
                 <div>
                   <br />
-                  <h3>Your saved analyses</h3>
+                  {loggedIn ?
+                    <h3>Your saved analyses</h3>
+                  :
+                    <h3>Publicly shared analyses</h3>
+                  }
+
                   <br />
                   <AnalysisList {...listProps} />
                 </div>}
-            </MainCol>
-          </Row>
-        </div>}
-      </div>
+            </div>
+       </MainCol>
+      </Row>
+     </div>
     );
   }
 }

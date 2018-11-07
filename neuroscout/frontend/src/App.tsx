@@ -404,18 +404,12 @@ class App extends Reflux.Component<any, {}, AppState> {
                   <Menu.Item key="home">
                      <Link to="/" style={{fontSize: 20}}>Neuroscout</Link>
                   </Menu.Item>
-                   <img className="headerLogo" src="/Neuroscout_Simple_Wide.svg"/>
                   {this.state.auth.loggedIn ?
                     <Menu.SubMenu
                       style={{float: 'right'}}
                       title={<Avatar shape="circle" icon="user" />}
                     >
                        <Menu.ItemGroup title={`${email}`}>
-                         <Menu.Item
-                          key="mine"
-                         >
-                          My Analyses
-                         </Menu.Item>
                          <Menu.Item
                           key="profile"
                          >
@@ -463,10 +457,13 @@ class App extends Reflux.Component<any, {}, AppState> {
                      </Menu.Item>
                    </Menu.SubMenu>
 
+                   {this.state.auth.loggedIn &&
                      <Menu.Item key="browse" style={{float: 'right'}}>
                      <Link to="/browse">
                        <Icon type="search"/>
                        Browse</Link></Menu.Item>
+                   }
+
                    {this.state.auth.loggedIn &&
                      <Menu.Item key="create" style={{float: 'right'}}>
                        <Link

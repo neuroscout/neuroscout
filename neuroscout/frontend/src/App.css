@@ -78,5 +78,14 @@ pre {
     float: right;
 }
 
-.headerLogo {
+.splashLogo {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  width: 28%;
+}
+
+.splashText {
+  text-align: center;
+  font-size: 22px;
 }
