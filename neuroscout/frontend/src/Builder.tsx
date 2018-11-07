@@ -906,7 +906,7 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
                           checked={!analysis.private}
                           checkedChildren="Public"
                           unCheckedChildren="Private"
-                          onChange={checked => this.updateState('analysis')({'private': !checked})}
+                          onChange={checked => this.updateState('analysis')({...analysis, 'private': !checked})}
                         />
                       </Tooltip>
                     </div>
