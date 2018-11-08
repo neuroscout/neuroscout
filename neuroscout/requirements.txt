@@ -47,7 +47,7 @@ psycopg2==2.7.1
 progressbar2
 py==1.4.33
 grabbit==0.2.3
--e git+https://github.com/INCF/pybids.git@refactor-derivs#egg=pybids
+-e git+https://github.com/bids-standard/pybids.git#egg=pybids
 PyJWT==1.4.2
 pyparsing==2.2.0
 pytest==3.0.7
@@ -55,7 +55,7 @@ python-dateutil==2.6.0
 python-magic==0.4.13
 pytz==2017.2
 redis
-requests==2.13.0
+requests==2.20.0
 scipy==0.19.0
 SQLAlchemy==1.1.9
 tqdm==4.11.2

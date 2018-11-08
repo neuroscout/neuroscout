@@ -7,7 +7,7 @@ Top-level App component containing AppState. The App component is currently resp
 import * as React from 'react';
 import { BrowserRouter as Router, Route, Link, Redirect } from 'react-router-dom';
 import Reflux from 'reflux';
-import { Tabs, Row, Col, Layout, Button, Modal, Icon, Input, Form, message } from 'antd';
+import { Avatar, Tabs, Row, Col, Layout, Button, Modal, Menu, Icon, Input, Form, message } from 'antd';
 
 import './App.css';
 import AnalysisBuilder from './Builder';
@@ -15,16 +15,17 @@ import { ApiUser, ApiAnalysis, AppAnalysis, AuthStoreState } from './coretypes';
 import Browse from './Browse';
 import { config } from './config';
 import Home from './Home';
-import { Space } from './HelperComponents';
+import { MainCol, Space } from './HelperComponents';
 import { displayError, jwtFetch, timeout } from './utils';
 import { AuthStore } from './auth.store';
 import { authActions } from './auth.actions';
+import FAQ from './FAQ';
 
 const FormItem = Form.Item;
 const DOMAINROOT = config.server_url;
 const { localStorage } = window;
 
-const { Footer, Content, Header } = Layout;
+const { Header, Content, Footer, Sider } = Layout;
 
 interface AppState {
   loadAnalyses: boolean;
@@ -391,47 +392,101 @@ class App extends Reflux.Component<any, {}, AppState> {
           {openSignup && signupModal()}
           {openEnterResetToken && authActions.enterResetTokenModal()}
           <Layout>
-            <div className="headerRow">
-            <Row type="flex" justify="center"style={{ background: '#fff', padding: 0 }}>
-                  <Col lg={{span: 9}} xs={{span: 12}}>
-                    <h1>
-                      <Link to="/">Neuroscout</Link>
-                    </h1>
-                  </Col>
-                  <Col lg={{span: 9}} xs={{span: 12}}>
-                    <div className="Login-col">
-                    {this.state.auth.loggedIn
-                      ? <span>
-                          {`${email}`}
-                          <Space />
-                          <Button 
-                            onClick={(e) => {
-                              return authActions.confirmLogout();
-                            }}
-                          >
-                            Log out
-                          </Button>
-                        </span>
-                      : <span>
-                          <Button onClick={e => authActions.update({ openLogin: true })}>
-                            Log in
-                          </Button>
-                          <Space />
-                          <Button onClick={e => authActions.update({ openSignup: true })}>
-                            Sign up
-                          </Button>
-                        </span>}
-                    </div>
-                  </Col>
-              </Row>
-              </div>
+
             <Content style={{ background: '#fff' }}>
+            <Row type="flex" justify="center" style={{padding: 0 }}>
+              <MainCol>
+                <Menu
+                  mode="horizontal"
+                  style={{ lineHeight: '64px'}}
+                  selectedKeys={[]}
+                >
+                  <Menu.Item key="home">
+                     <Link to="/" style={{fontSize: 20}}>Neuroscout</Link>
+                  </Menu.Item>
+                  {this.state.auth.loggedIn ?
+                    <Menu.SubMenu
+                      style={{float: 'right'}}
+                      title={<Avatar shape="circle" icon="user" />}
+                    >
+                       <Menu.ItemGroup title={`${email}`}>
+                         <Menu.Item
+                          key="profile"
+                         >
+                          My Profile
+                         </Menu.Item>
+                         <Menu.Divider/>
+                         <Menu.Item
+                          key="signout"
+                          onClick={(e) => {return authActions.confirmLogout(); }}
+                         >
+                          Sign Out
+                         </Menu.Item>
+                       </Menu.ItemGroup>
+                    </Menu.SubMenu>
+                   :
+                    <Menu.Item key="signup" style={{float: 'right'}}>
+                    <Button size="large" type="primary" onClick={e => authActions.update({ openSignup: true })}>
+                      Sign up</Button></Menu.Item>
+                   }
+                   {this.state.auth.loggedIn === false &&
+                       <Menu.Item
+                        onClick={e => authActions.update({ openLogin: true })}
+                        key="signin"
+                        style={{float: 'right'}}
+                       >
+                         Sign in
+                       </Menu.Item>
+                    }
+                   <Menu.SubMenu
+                    style={{float: 'right'}}
+                    key="help"
+                    title={<span><Icon type="question-circle"/>Help</span>}
+                   >
+                     <Menu.Item
+                      key="faq"
+                     >
+                      <Link to="/faq">
+                        FAQ
+                      </Link>
+                     </Menu.Item>
+                     <Menu.Item
+                      key="guide"
+                     >
+                      User's Guide
+                     </Menu.Item>
+                   </Menu.SubMenu>
+
+                   {this.state.auth.loggedIn &&
+                     <Menu.Item key="browse" style={{float: 'right'}}>
+                     <Link to="/browse">
+                       <Icon type="search"/>
+                       Browse</Link></Menu.Item>
+                   }
+
+                   {this.state.auth.loggedIn &&
+                     <Menu.Item key="create" style={{float: 'right'}}>
+                       <Link
+                         to={{pathname: '/builder'}}
+                       >
+                         <Icon type="plus" /> New Analysis
+                       </Link>
+                     </Menu.Item>
+                   }
+
+                </Menu>
+              </MainCol>
+            </Row>
+              <br />
               <Route
                 exact={true}
                 path="/"
                 render={props =>
                   <Home
-                    analyses={analyses}
+                    analyses={this.state.auth.loggedIn ?
+                      analyses
+                    :
+                      publicAnalyses}
                     loggedIn={this.state.auth.loggedIn}
                     cloneAnalysis={this.cloneAnalysis}
                     onDelete={this.onDelete}
@@ -446,7 +501,7 @@ class App extends Reflux.Component<any, {}, AppState> {
                   // need to implement something like the auth workflow example here:
                   // https://reacttraining.com/react-router/web/example/auth-workflow
                   if (loggedIn || this.state.auth.openLogin) {
-                    return <AnalysisBuilder updatedAnalysis={() => this.loadAnalyses()} />;
+                    return <AnalysisBuilder updatedAnalysis={() => this.loadAnalyses()} key={props.location.key}/>;
                   }
                   message.warning('Please log in first and try again');
                   return <Redirect to="/" />;
@@ -462,9 +517,25 @@ class App extends Reflux.Component<any, {}, AppState> {
               />
               <Route
                 exact={true}
+                path="/browse/:id"
+                render={props =>
+                  <AnalysisBuilder
+                    id={props.match.params.id}
+                    updatedAnalysis={() => this.loadAnalyses()}
+                  />
+                }
+              />
+
+              <Route
+                exact={true}
                 path="/browse"
                 render={props =>
                   <Browse analyses={publicAnalyses} cloneAnalysis={this.cloneAnalysis} />}
+              />
+              <Route
+                exact={true}
+                path="/faq"
+                render={() => <FAQ/>}
               />
             </Content>
           </Layout>

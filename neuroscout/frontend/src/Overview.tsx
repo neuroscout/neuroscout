@@ -2,22 +2,15 @@
  OverviewTab component
 */
 import * as React from 'react';
-import { Col, Form, Icon, Input, AutoComplete, Row, Table, Tooltip, Switch, Button } from 'antd';
+import { Col, Collapse, Form, Icon, Input, AutoComplete, Row, Table, Tooltip, Switch, Button } from 'antd';
 import { ColumnProps, TableRowSelection } from 'antd/lib/table';
 
 const FormItem = Form.Item;
 const InputGroup = Input.Group;
+const Panel = Collapse.Panel;
 
 import { getTasks } from './Builder';
 import { Analysis, Dataset, Run, Task } from './coretypes';
-
-/*
-class DataTable extends React.Component<any> {
-  render() {
-    return <Table {...this.props} />;
-  }
-}
-*/
 
 interface OverviewTabProps {
   analysis: Analysis;
@@ -27,12 +20,12 @@ interface OverviewTabProps {
   predictorsActive: boolean;
   updateAnalysis: (value: any) => void;
   updateSelectedTaskId: (value: string) => void;
-  goToNextTab: () => void;
 }
 
 interface OverviewTabState {
   filteredVal: any[];
   runColumns: ColumnProps<any>[];
+  taskMsg: string;
 }
 
 export class OverviewTab extends React.Component<OverviewTabProps, OverviewTabState> {
@@ -41,7 +34,8 @@ export class OverviewTab extends React.Component<OverviewTabProps, OverviewTabSt
     super(props);
     this.state = {
       filteredVal: [],
-      runColumns: []
+      runColumns: [],
+      taskMsg: 'Please Select'
     };
   }
 
@@ -58,6 +52,7 @@ export class OverviewTab extends React.Component<OverviewTabProps, OverviewTabSt
 
   tableChange = (pagination, filters, sorter) => {
     let newRunIds = this.props.availableRuns;
+    newRunIds = newRunIds.filter((x) => this.props.analysis.runIds.indexOf(x.id) > -1);
     let newRunColumns = this.state.runColumns;
     Object.keys(filters).map(key => {
       if (filters[key] === null || filters[key].length === 0) { return; }
@@ -103,11 +98,13 @@ export class OverviewTab extends React.Component<OverviewTabProps, OverviewTabSt
   sortSes = this._sortRuns.bind(null, ['session', 'subject', 'number']);
 
   /* Run column settings were largely similar, this function creates them.
-     The cast to String before sort is to account for run numbers being a 
-     numeric type. 
+     The cast to String before sort is to account for run numbers being a
+     numeric type.
   */
   makeCol = (title: string, _key: string, sortFn) => {
-    let extractKey: string[] = this.props.availableRuns.filter(x => x !== null).map(x => String(x[_key]));
+    let extractKey: string[] = this.props.availableRuns.filter((x) => {
+      return (x !== null) && (this.props.analysis.runIds.indexOf(x.id) > -1);
+    }).map(x => String(x[_key]));
 
     let unique = Array.from(
       new Set(extractKey)
@@ -128,12 +125,10 @@ export class OverviewTab extends React.Component<OverviewTabProps, OverviewTabSt
 
       if (this.props.analysis.runIds.length === this.props.availableRuns.length) {
         col.filteredValue = unique;
-        /*
         col.filteredValue = this.state.filteredVal[_key];
         let newFilteredVal = this.state.filteredVal;
         newFilteredVal[_key] = unique;
         this.setState({filteredVal: newFilteredVal});
-        */
       }
     } else {
       return;
@@ -150,14 +145,13 @@ export class OverviewTab extends React.Component<OverviewTabProps, OverviewTabSt
     this.setState({runColumns: newRunCols});
     this.updateAnalysis('runIds')([]);
   };
-  
+
   render() {
     let {
       analysis,
       datasets,
       availableRuns,
       selectedTaskId,
-      goToNextTab,
       predictorsActive,
     } = this.props;
 
@@ -223,50 +217,56 @@ export class OverviewTab extends React.Component<OverviewTabProps, OverviewTabSt
       selectedRowKeys: analysis.runIds
     };
 
+    // these should be able to live outside of render:
+    let runMsg;
+    if (analysis.runIds.length === this.props.availableRuns.length) {
+      runMsg = 'Runs: All selected';
+    } else {
+      runMsg = 'Runs: ' + analysis.runIds.length + '/' + this.props.availableRuns.length + ' selected';
+    }
+    // This one almost could live in state set by task selection function, but the first selectedTaskId 
+    //  is being set in builder, and doesn't trip the selection function in the table.
+    let taskMsg = '';
+    if (this.props.selectedTaskId && availableTasks) {
+      let tasks = availableTasks.filter((x) => x.id === this.props.selectedTaskId);
+      if (tasks.length === 1) {
+        taskMsg = tasks[0].name;
+      }
+    }
+
     return (
-      <div>
+      <div className="builderCol">
         <Form layout="vertical">
-          <FormItem label="Analysis name:">
+          <FormItem label="Name" required={true}>
             <Row type="flex" justify="space-between">
-              <Col xs={24} md={21}>
+              <Col xs={24}>
                 <Input
-                  placeholder="Analysis name"
+                  placeholder="Name your analysis"
                   value={analysis.name}
                   onChange={this.updateAnalysisFromEvent('name')}
+                  required={true}
+                  min={1}
                 />
-              </Col>
-              <Col md={3}>
-                <div className="privateSwitch">
-                  <Tooltip title="Should this analysis be private (only visible to you) or public?">
-                    <Switch
-                      checked={!analysis.private}
-                      checkedChildren="Public"
-                      unCheckedChildren="Private"
-                      onChange={checked => this.updateAnalysis('private')(!checked)}
-                    />
-                  </Tooltip>
-                </div>
               </Col>
             </Row>
           </FormItem>
-          <FormItem label="Description:">
+          <FormItem label="Description">
             <Input.TextArea
               placeholder="Description of your analysis"
               value={analysis.description}
-              autosize={{ minRows: 3, maxRows: 20 }}
+              autosize={{ minRows: 2, maxRows: 10 }}
               onChange={this.updateAnalysisFromEvent('description')}
             />
           </FormItem>
-          <FormItem label="Predictions:">
+          <FormItem label="Predictions">
             <Input.TextArea
               placeholder="Enter your preditions about what you expect the results to look like"
               value={analysis.predictions}
-              autosize={{ minRows: 3, maxRows: 20 }}
+              autosize={{ minRows: 2, maxRows: 10 }}
               onChange={this.updateAnalysisFromEvent('predictions')}
             />
           </FormItem>
-          <p>Select a dataset:</p>
-          <br />
+          <p>Select dataset</p>
           <Table
             columns={datasetColumns}
             rowKey="id"
@@ -278,43 +278,35 @@ export class OverviewTab extends React.Component<OverviewTabProps, OverviewTabSt
           <br />
           {availableRuns.length > 0 &&
             <div>
-              <p>Select a task:</p>
-              <br />
-              <Table
-                columns={taskColumns}
-                rowKey="id"
-                size="small"
-                dataSource={availableTasks}
-                rowSelection={taskRowSelection}
-                pagination={(datasets.length > 20) ? {'position': 'bottom'} : false}
-              />
-              <br />
-            </div>}
-          {selectedTaskId &&
-            <div>
-              <p>Select runs:</p>
-              <br />
-              <span>
-                {`Selected ${ analysis.runIds.length } items`}
-              </span>
-              <div>
-                <Button onClick={this.clearFilters}>Clear Selection</Button>
-              </div>
-              <Table
-                columns={this.state.runColumns}
-                rowKey="id"
-                size="small"
-                dataSource={availableRuns.filter(r => r.task === selectedTaskId).sort(this.sortSub)}
-                pagination={(availableRuns.length > 20) ? {'position': 'bottom'} : false}
-                rowSelection={runRowSelection}
-                onChange={this.tableChange}
-              />
-              <br />
-            </div>}
+            <Collapse accordion={true} bordered={false} defaultActiveKey={['task']}>
+              <Panel header={`Task: ${taskMsg}`} key="task">
+                  <Table
+                    columns={taskColumns}
+                    rowKey="id"
+                    size="small"
+                    dataSource={availableTasks}
+                    rowSelection={taskRowSelection}
+                    pagination={(datasets.length > 10) ? {'position': 'bottom'} : false}
+                  />
+              </Panel>
+              <Panel header={runMsg} key="runs">
+                <Table
+                  columns={this.state.runColumns}
+                  rowKey="id"
+                  size="small"
+                  dataSource={availableRuns.filter(r => r.task === selectedTaskId).sort(this.sortSub)}
+                  pagination={(availableRuns.length > 10) ? {'position': 'bottom'} : false}
+                  rowSelection={runRowSelection}
+                  onChange={this.tableChange}
+                />
+                <div>
+                  <Button onClick={this.clearFilters}>Clear Filters</Button>
+                </div>
+              </Panel>
+            </Collapse>
+          </div>}
+          <br />
         </Form>
-          <Button type="primary" onClick={goToNextTab} disabled={!predictorsActive}>
-            Next: Select Predictors
-          </Button>
       </div>
     );
   }

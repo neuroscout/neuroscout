@@ -14,4 +14,8 @@ sklearn
 networkx==1.9
 nibabel
 scipy
+matplotlib
+nistats
+nilearn
 fitlins
+sklearn

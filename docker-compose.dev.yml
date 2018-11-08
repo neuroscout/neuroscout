@@ -7,3 +7,6 @@ services:
   swagger-ui:
     environment:
       - "API_URL=http://localhost/swagger/"
+
+  monitor:
+    restart: "no"

@@ -3,7 +3,7 @@
  The data models below are largely UI agonstic. This module is a good starting point to understand the
  shape of the data in the frontend app. All resusable type definitions should go into this module.
 */
-type AnalysisStatus = 'DRAFT' | 'PENDING' | 'PASSED' | 'FAILED' | 'SUBMITTING';
+export type AnalysisStatus = 'DRAFT' | 'PENDING' | 'PASSED' | 'FAILED' | 'SUBMITTING';
 
 // Analysis type in Analysis Builder
 export interface Analysis {
@@ -103,8 +103,8 @@ interface PredictorsParam {
 
 export type Parameter = BooleanParam | PredictorsParam;
 
-export type TransformName = 'scale' | 'orthogonalize' | 'sum' | 'product' | 'threshold'
-  | 'or' | 'and' | 'not' | 'hrf';
+export type TransformName = 'Scale' | 'Orthogonalize' | 'Sum' | 'Product' | 'Threshold'
+  | 'Or' | 'And' | 'Not' | 'ConvolveHRF' | 'Replace';
 
 export type BlockLevel = 'run' | 'session' | 'subject' | 'dataset';
 
@@ -114,6 +114,7 @@ export interface Transformation {
   name: TransformName;
   replace_na?: ReplaceNA;
   input?: string[]; // predictor IDs
+  output?: string[];
   demean?: boolean;
   rescale?: boolean;
   other?: string[];
@@ -122,12 +123,22 @@ export interface Transformation {
   binarize?: boolean;
   above?: boolean;
   signed?: boolean;
+  replace?: any;
 }
 
 // Lookup hash of available transformations (as specified in transforms.ts) by their name
 export interface XformRules {
   [name: string]: Transformation;
 }
+
+export type TabName =
+    | 'overview'
+    | 'predictors'
+    | 'transformations'
+    | 'contrasts'
+    | 'modeling'
+    | 'review'
+    | 'submit';
 
 export interface Contrast {
   name: string;
@@ -137,20 +148,15 @@ export interface Contrast {
 }
 
 export interface Store {
-  activeTab:
-    | 'overview'
-    | 'predictors'
-    | 'transformations'
-    | 'contrasts'
-    | 'modeling'
-    | 'review'
-    | 'status';
+  activeTab: TabName;
   predictorsActive: boolean;
   predictorsLoad: boolean;
   transformationsActive: boolean;
   contrastsActive: boolean;
-  modelingActive: boolean;
+  hrfActive: boolean;
   reviewActive: boolean;
+  submitActive: boolean;
+  modelingActive: boolean;
   analysis: Analysis;
   datasets: Dataset[];
   availableRuns: Run[];
@@ -162,6 +168,9 @@ export interface Store {
   selectedHRFPredictors: Predictor[];
   unsavedChanges: boolean;
   currentLevel: BlockLevel;
+  postReports: boolean;
+  model: BidsModel;
+  poll: boolean;
 }
 
 export interface ApiRun {

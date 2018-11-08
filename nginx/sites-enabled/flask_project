@@ -33,7 +33,11 @@ server {
 
     location /reports {
            alias /file-data/reports;
-       }
+    }
+
+    location /analyses {
+           alias /file-data/analyses;
+    }
 
     location / {
         proxy_pass http://neuroscout:8000;

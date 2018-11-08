@@ -154,8 +154,8 @@ export class AuthStore extends Reflux.Store {
   };
 
   // Sign up for a new account
-  signup = () => {
-    const { name, email, password, openSignup } = this.state;
+  signup() {
+    const { name, email, password, openSignup } = this.state.auth;
     fetch(DOMAINROOT + '/api/user', {
       method: 'post',
       body: JSON.stringify({ email: email, password: password, name: name }),
@@ -163,29 +163,29 @@ export class AuthStore extends Reflux.Store {
         'Content-type': 'application/json'
       }
     })
-      .then(response => response.json().then(json => ({ ...json, statusCode: response.status })))
-      .then((data: any) => {
-        if (data.statusCode !== 200) {
-          let errorMessage = '';
-          Object.keys(data.message).forEach(key => {
-            errorMessage += data.message[key];
-          });
-          this.update({
-            signupError: errorMessage
-          });
-          throw new Error('Signup failed!');
-        }
-        this.update({ name, email, openSignup: false, signupError: '' });
-        Modal.success({
-          title: 'Account created!',
-          content: 'Your account has been sucessfully created. \
-          You will receive a confirmation email shortly. Please follow the instructions to activate your account\
-          and start using Neuroscout. ',
-          okText: 'Okay',
+    .then(response => response.json().then(json => ({ ...json, statusCode: response.status })))
+    .then((data: any) => {
+      if (data.statusCode !== 200) {
+        let errorMessage = '';
+        Object.keys(data.message).forEach(key => {
+          errorMessage += data.message[key];
         });
-      })
-      .catch(displayError);
-  };
+        this.update({
+          signupError: errorMessage
+        });
+        throw new Error('Signup failed!');
+      }
+      this.update({ name, email, openSignup: false, signupError: '' });
+      Modal.success({
+        title: 'Account created!',
+        content: 'Your account has been sucessfully created. \
+        You will receive a confirmation email shortly. Please follow the instructions to activate your account\
+        and start using Neuroscout. ',
+        okText: 'Okay',
+      });
+    })
+    .catch(displayError);
+  }
 
   // Log user out
   logout = () => {

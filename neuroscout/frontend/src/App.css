@@ -29,12 +29,41 @@
   float: right;
 }
 
+.homeBtn {
+    justify-content: center;
+}
+
+.nextButton {
+  float: right;
+}
+
 body {
     background-color: white;
 }
 
+.builderTabs {
+    padding-bottom: 50px;
+}
+
+.builderCol {
+    padding: 0 10px 0 10px;
+}
+
+.mainCol {
+    padding: 0 0px 0 0px;
+}
+
+pre {
+    padding: 10px;
+    border-radius: 10px;
+    color: white;
+    background-color: black;
+}
+
 .privateSwitch {
+    float: left;
     text-align: center;
+    padding-right: 10px;
 }
 
 .headerRow {
@@ -43,4 +72,28 @@ body {
 
 .ant-layout {
     background-color: white;
+}
+
+.statusHeader {
+    float: right;
+}
+
+.splashLogo {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  width: 30%;
+}
+
+.splashText {
+  text-align: center;
+  font-size: 22px;
+}
+
+.splashButton {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  width: 30%;
+  font-size: 19px;
 }
