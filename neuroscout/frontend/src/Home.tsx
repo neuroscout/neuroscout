@@ -22,7 +22,7 @@ class Home extends React.Component<HomeProps, {}> {
       <Row type="flex" justify="center" style={{ background: '#fff', padding: 0 }}>
         <MainCol>
         <div>
-         <img className="splashLogo" src="/Neuroscout_Simple_Wide.svg"/><br/>
+         <img className="splashLogo" src="/static/Neuroscout_Simple_Wide.svg"/><br/>
          <p className="splashText">A platform for fast and flexible re-analysis of (naturalistic) fMRI studies
 </p>
          </div>
