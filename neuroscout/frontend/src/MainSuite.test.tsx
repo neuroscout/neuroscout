@@ -70,11 +70,11 @@ test('App renders without crashing and homepage looks ok', () => {
   window.localStorage.removeItem('jwt');
   const wrapper = mount(<App />);
   // Create new analysis button
-  expect(wrapper.text().toLowerCase()).toContain('create new analysis');
+  expect(wrapper.text().toLowerCase()).toContain('neuroscoutsign upsign in');
 });
 
-test('Homepage has 4 buttons with user is not logged in', () => {
+test('Homepage has 1 buttons with user is not logged in', () => {
   window.localStorage.removeItem('jwt');
   const wrapper = mount(<App />);
-  expect(wrapper.find('button').length).toBe(2);
+  expect(wrapper.find('button').length).toBe(1);
 });
