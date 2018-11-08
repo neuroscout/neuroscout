@@ -2,8 +2,8 @@ celery
 flower
 redis
 docopt
--e git+https://github.com/grabbles/grabbit.git#egg=grabbit
--e git+https://github.com/bids-standard/pybids.git@refactor-derivs#egg=pybids
+grabbit
+-e git+https://github.com/bids-standard/pybids.git#egg=pybids
 duecredit
 pandas
 patsy

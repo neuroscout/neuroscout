@@ -54,62 +54,58 @@ def test_post(auth_client, add_task, add_predictor):
 	"name" : "some analysis",
 	"description" : "pretty damn innovative",
 	"model" : {
-	  "name": "test_model1",
-	  "description": "this is a sample",
-	  "input": {
+	  "Name": "test_model1",
+	  "Description": "this is a sample",
+	  "Input": {
 	    "task": "bidstest"
 	  },
-	  "blocks": [
+	  "Steps": [
 	    {
-	      "level": "run",
-	      "transformations": [
+	      "Level": "Run",
+	      "Transformations": [
 	        {
-	          "name": "scale",
-	          "input": [
+	          "Name": "Scale",
+	          "Input": [
 	            "BrightnessExtractor.brightness"
 	          ]
 	        }
 	      ],
-	      "model": {
-	        "HRF_variables": [
-	          "BrightnessExtractor.brightness",
-	          "VibranceExtractor.vibrance"
-	        ],
-	        "variables": [
+	      "Model": {
+	        "X": [
 	          "BrightnessExtractor.brightness",
 	          "VibranceExtractor.vibrance"
 	        ]
 	      },
-	      "contrasts": [
+	      "Contrasts": [
 	        {
-	          "name": "BvsV",
-	          "condition_list": [
+	          "Mame": "BvsV",
+	          "ConditionList": [
 	            "BrightnessExtractor.brightness",
 	            "VibranceExtractor.vibrance"
 	          ],
-	          "weights": [
+	          "Weights": [
 	            1,
 	            -1
 	          ],
-	          "type": "T"
+	          "Type": "T"
 	        }
 	      ]
 	    },
 	    {
-	      "level": "session",
+	      "Level": "Session",
 	    },
 	    {
-	      "level": "subject",
-	      "model": {
-	        "variables": [
+	      "Level": "Subject",
+	      "Model": {
+	        "X": [
 	          "BvsV"
 	        ]
 	      },
 	    },
 	    {
-	      "level": "dataset",
-	      "model": {
-	        "variables": [
+	      "Level": "Dataset",
+	      "Model": {
+	        "X": [
 	          "session_diff"
 	        ]
 	      },

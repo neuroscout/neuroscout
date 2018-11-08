@@ -160,7 +160,7 @@ def generate_report(analysis, predictor_events, bids_dir, run_ids, domain):
     outdir = Path('/file-data/reports') / analysis['hash_id']
     outdir.mkdir(exist_ok=True)
 
-    first = bids_analysis.blocks[0]
+    first = bids_analysis.steps[0]
     results = {'design_matrix': [],
                'design_matrix_plot': [],
                'design_matrix_corrplot': [],
