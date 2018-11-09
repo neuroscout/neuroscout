@@ -97,3 +97,7 @@ pre {
   width: 30%;
   font-size: 19px;
 }
+
+.headerAvatar>.anticon {
+  margin-right: 0px;
+}

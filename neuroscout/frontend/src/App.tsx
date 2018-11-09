@@ -29,6 +29,25 @@ const { localStorage } = window;
 
 const { Header, Content, Footer, Sider } = Layout;
 
+type JWTChangeProps = {
+  loadAnalyses:  () => any;
+  checkAnalysesStatus: (key: number) => any;
+};
+
+let checkCount = 0;
+
+class JWTChange extends React.Component<JWTChangeProps, {}> {
+  constructor(props) {
+    super(props);
+    props.loadAnalyses();
+    checkCount += 1;
+    props.checkAnalysesStatus(checkCount);
+  }
+
+  render() { return null; }
+
+}
+
 interface AppState {
   loadAnalyses: boolean;
   analyses: AppAnalysis[]; // List of analyses belonging to the user
@@ -73,6 +92,7 @@ class App extends Reflux.Component<any, {}, AppState> {
         })
         .catch(displayError);
     }
+    return;
     return Promise.reject('You are not logged in');
   };
 
@@ -92,8 +112,9 @@ class App extends Reflux.Component<any, {}, AppState> {
   /* short polling function checking api for inprocess analyses to see if
    * there have been any changes
    */
-  checkAnalysesStatus = async () => {
+  checkAnalysesStatus = async (key: number) => {
     while (true) {
+      if (key < checkCount) { return; }
       if (!(this.state.auth.loggedIn)) { return; }
       let changeFlag = false;
       let updatedAnalyses = this.state.analyses.map(async (analysis) => {
@@ -118,7 +139,7 @@ class App extends Reflux.Component<any, {}, AppState> {
           this.setState({ analyses: values});
         }
       });
-      await timeout(1000000);
+      await timeout(10000);
     }
   };
 
@@ -183,7 +204,7 @@ class App extends Reflux.Component<any, {}, AppState> {
       gAuth
     } = this.state.auth;
 
-    const {
+    let {
       analyses,
       publicAnalyses,
     } = this.state;
@@ -356,13 +377,9 @@ class App extends Reflux.Component<any, {}, AppState> {
               });
               authActions.login();
             }
-            // tslint:disable-next-line:no-console
-            console.log(e);
             return '';
           }}
           onFailure={(e) => {
-            // tslint:disable-next-line:no-console
-            console.log(e);
             return '';
           }}
         />
@@ -425,6 +442,11 @@ class App extends Reflux.Component<any, {}, AppState> {
     return (
       <Router>
         <div>
+          <JWTChange
+            loadAnalyses={this.loadAnalyses}
+            checkAnalysesStatus={this.checkAnalysesStatus}
+            key={this.state.auth.jwt}
+          />
           {openLogin && loginModal()}
           {openReset && resetPasswordModal()}
           {openSignup && signupModal}
@@ -450,9 +472,11 @@ class App extends Reflux.Component<any, {}, AppState> {
                           shape="circle"
                           icon="user"
                           src={gAuth ? gAuth.profileObj.imageUrl : ''}
+                          className="headerAvatar"
                         />
                       }
                     >
+
                        <Menu.ItemGroup title={`${gAuth ? gAuth.profileObj.email : email}`}>
                          <Menu.Item
                           key="profile"
@@ -591,12 +615,6 @@ class App extends Reflux.Component<any, {}, AppState> {
   componentDidUpdate(prevProps, prevState) {
     // Need to do this so logout redirect only happens once, otherwise it'd be an infinite loop
     if (this.state.auth.loggingOut) authActions.update({ loggingOut: false });
-    if ((prevState.auth.jwt !== this.state.auth.jwt)
-      || (this.state.auth.loggedIn && this.state.loadAnalyses)) {
-      this.loadAnalyses();
-      this.checkAnalysesStatus();
-      this.setState({loadAnalyses: false});
-    }
   }
 }
 
