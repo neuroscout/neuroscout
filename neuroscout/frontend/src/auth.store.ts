@@ -29,6 +29,7 @@ export class AuthStore extends Reflux.Store {
     } catch {
       jwt = '';
     }
+
     let _email = localStorage.getItem('email');
     let email = _email == null ? undefined : _email;
     return { auth: {
@@ -94,8 +95,8 @@ export class AuthStore extends Reflux.Store {
   // Authenticate the user with the server. This function is called from login()
   authenticate(): Promise<string> {
     return new Promise((resolve, reject) => {
-      const { email, password } = this.state.auth;
-      const { accountconfirmError } = this;
+      let { email, password } = this.state.auth;
+      let { accountconfirmError } = this;
       fetch(DOMAINROOT + '/api/auth', {
         method: 'post',
         body: JSON.stringify({ email: email, password: password }),
@@ -109,7 +110,7 @@ export class AuthStore extends Reflux.Store {
             this.update({ loginError: data.description || '' });
             reject('Authentication failed');
           } else if (data.access_token) {
-            const token = data.access_token;
+            let token = data.access_token;
             fetch(DOMAINROOT + '/api/user', {
               method: 'get',
               headers: {
@@ -140,7 +141,7 @@ export class AuthStore extends Reflux.Store {
 
   // Log user in
   login = () => {
-    const { email, password, loggedIn, openLogin, nextURL } = this.state;
+    let { email, password, loggedIn, openLogin, nextURL } = this.state;
     return this.authenticate()
       .then((jwt: string) => {
         this.update({
