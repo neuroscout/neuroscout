@@ -15,7 +15,7 @@ class UserSchema(Schema):
     name = fields.Str(required=True, description='User full name')
     password = fields.Str(load_only=True,
                           description='Password. Minimum 6 characters.')
-
+    picture = fields.Str()
     analyses = fields.Nested('AnalysisSchema', only=['hash_id', 'name', 'status',
                                                      'description', 'modified_at'],
                              many=True, dump_only=True)
