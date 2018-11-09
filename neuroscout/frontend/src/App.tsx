@@ -49,6 +49,45 @@ class JWTChange extends React.Component<JWTChangeProps, {}> {
 
 }
 
+class GoogleLoginBtn extends React.Component<{}, {}> {
+
+  render() {
+    return (
+      <GoogleLogin
+        clientId={GOOGLECLIENTID}
+        render={renderProps => (
+          <Button
+            onClick={renderProps && renderProps.onClick}
+            style={{ width: '100%' }}
+            htmlType="submit"
+            type="primary"
+            ghost={true}
+          >
+            <Icon type="google" />
+          </Button>
+        )}
+        buttonText="Log in"
+        onSuccess={(e) => {
+          if (e.hasOwnProperty('accessToken')) {
+            authActions.update({
+              email: 'GOOGLE',
+              password: (e as any).tokenId,
+              gAuth: e,
+              openSignup: false,
+              openLogin: false
+            });
+            authActions.login();
+          }
+          return '';
+        }}
+        onFailure={(e) => {
+          return '';
+        }}
+      />
+    );
+  }
+}
+
 interface AppState {
   loadAnalyses: boolean;
   analyses: AppAnalysis[]; // List of analyses belonging to the user
@@ -66,7 +105,6 @@ const ApiToAppAnalysis = (data: ApiAnalysis): AppAnalysis => ({
 });
 
 // Top-level App component
-// <authStore, {}, AppState>
 class App extends Reflux.Component<any, {}, AppState> {
   constructor(props) {
     super(props);
@@ -354,36 +392,7 @@ class App extends Reflux.Component<any, {}, AppState> {
           </FormItem>
         </Form>
         <Divider> Or log in with Google </Divider>
-        <GoogleLogin
-          clientId={GOOGLECLIENTID}
-          render={renderProps => (
-            <Button
-              onClick={renderProps && renderProps.onClick}
-              style={{ width: '100%' }}
-              htmlType="submit"
-              type="primary"
-              ghost={true}
-            >
-              <Icon type="google" />
-            </Button>
-          )}
-          buttonText="Log in"
-          onSuccess={(e) => {
-            if (e.hasOwnProperty('accessToken')) {
-              authActions.update({
-                email: 'GOOGLE',
-                password: (e as any).tokenId,
-                gAuth: e
-              });
-              authActions.login();
-            }
-            return '';
-          }}
-          onFailure={(e) => {
-            return '';
-          }}
-        />
-
+        <GoogleLoginBtn />
       </Modal>
     );
 
@@ -436,6 +445,8 @@ class App extends Reflux.Component<any, {}, AppState> {
             </Button>
           </FormItem>
         </Form>
+        <Divider> Or sign up using a Google account </Divider>
+        <GoogleLoginBtn />
       </Modal>
     );
 
