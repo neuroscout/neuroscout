@@ -34,6 +34,7 @@ type JWTChangeProps = {
   checkAnalysesStatus: (key: number) => any;
 };
 
+// This global var lets the dumb polling loops know when to exit.
 let checkCount = 0;
 
 class JWTChange extends React.Component<JWTChangeProps, {}> {
@@ -93,7 +94,6 @@ class App extends Reflux.Component<any, {}, AppState> {
         .catch(displayError);
     }
     return;
-    return Promise.reject('You are not logged in');
   };
 
   // Load public analyses from the server
@@ -590,6 +590,7 @@ class App extends Reflux.Component<any, {}, AppState> {
                   <AnalysisBuilder
                     id={props.match.params.id}
                     updatedAnalysis={() => this.loadAnalyses()}
+                    userOwns={this.state.analyses.indexOf(props.match.params.id) > 1}
                   />
                 }
               />

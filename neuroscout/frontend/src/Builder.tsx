@@ -158,6 +158,7 @@ const getUpdatedConfig = (old_config: AnalysisConfig, predictorIds: string[]): A
 type BuilderProps = {
   id?: string;
   updatedAnalysis: () => void;
+  userOwns?: boolean;
 };
 
 export default class AnalysisBuilder extends React.Component<BuilderProps & RouteComponentProps<{}>, Store> {
@@ -900,15 +901,16 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
                     private={analysis.private || false}
                     updateStatus={this.updateStatus}
                   >
-                    <div className="privateSwitch">
-                      <Tooltip title="Should this analysis be private (only visible to you) or public?">
+                   <div className="privateSwitch">
+                      {this.props.userOwns &&
+                        <Tooltip title="Should this analysis be private (only visible to you) or public?">
                         <Switch
                           checked={!analysis.private}
                           checkedChildren="Public"
                           unCheckedChildren="Private"
                           onChange={checked => this.updateState('analysis')({...analysis, 'private': !checked})}
                         />
-                      </Tooltip>
+                      </Tooltip>}
                     </div>
                   </StatusTab>
                 </TabPane>
