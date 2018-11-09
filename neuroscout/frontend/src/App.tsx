@@ -123,6 +123,11 @@ class App extends Reflux.Component<any, {}, AppState> {
     if (this.state.auth.loggedIn) {
       return jwtFetch(`${DOMAINROOT}/api/user`)
         .then((data: ApiUser) => {
+          authActions.update({
+            name: (data.name || []),
+            email: (data.email || []),
+            avatar: (data.picture || [])
+          });
           this.setState({
             analyses: (data.analyses || [])
               .filter(x => !!x.status) // Ignore analyses with missing status
@@ -239,6 +244,7 @@ class App extends Reflux.Component<any, {}, AppState> {
       signupError,
       password,
       loggingOut,
+      avatar,
       gAuth
     } = this.state.auth;
 
@@ -482,7 +488,7 @@ class App extends Reflux.Component<any, {}, AppState> {
                         <Avatar
                           shape="circle"
                           icon="user"
-                          src={gAuth ? gAuth.profileObj.imageUrl : ''}
+                          src={avatar ? avatar : gAuth ? gAuth.profileObj.imageUrl : ''}
                           className="headerAvatar"
                         />
                       }

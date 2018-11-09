@@ -6,7 +6,7 @@ var jwtDecode = require('jwt-decode');
 import { authActions } from './auth.actions';
 import { config } from './config';
 import { AuthStoreState } from './coretypes';
-import { displayError } from './utils';
+import { displayError, jwtFetch } from './utils';
 
 const DOMAINROOT = config.server_url;
 
@@ -32,6 +32,7 @@ export class AuthStore extends Reflux.Store {
 
     let _email = localStorage.getItem('email');
     let email = _email == null ? undefined : _email;
+
     return { auth: {
       jwt: jwt ? jwt : '',
       loggedIn: jwt ? true : false,
@@ -39,6 +40,7 @@ export class AuthStore extends Reflux.Store {
       loginError: '',
       signupError: '',
       resetError: '',
+      avatar: '',
       email: email,
       name: undefined,
       password: '',
@@ -197,6 +199,7 @@ export class AuthStore extends Reflux.Store {
       loggedIn: false,
       name: undefined,
       email: undefined,
+      avatar: undefined,
       jwt: null,
       analyses: [],
       loggingOut: true,

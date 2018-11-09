@@ -236,6 +236,7 @@ export interface ModelContrast {
 export interface ApiUser {
   email: string;
   name: string;
+  picture: string;
   analyses: ApiAnalysis[];
 }
 
@@ -266,4 +267,5 @@ export interface AuthStoreState {
   loggingOut: boolean; // flag set on logout to know to redirect after logout
   nextURL: string | null; // will probably remove this and find a better solution to login redirects
   gAuth: any;
+  avatar: string;
 }
