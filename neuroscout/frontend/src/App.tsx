@@ -135,6 +135,8 @@ class App extends Reflux.Component<any, {}, AppState> {
           });
         })
         .catch(displayError);
+    } else {
+      this.setState({analyses: []});
     }
     return;
   };
@@ -598,6 +600,7 @@ class App extends Reflux.Component<any, {}, AppState> {
                   <AnalysisBuilder
                     id={props.match.params.id}
                     updatedAnalysis={() => this.loadAnalyses()}
+                    userOwns={this.state.analyses.filter((x) => x.id === props.match.params.id).length > 0}
                   />}
               />
               <Route
@@ -607,7 +610,7 @@ class App extends Reflux.Component<any, {}, AppState> {
                   <AnalysisBuilder
                     id={props.match.params.id}
                     updatedAnalysis={() => this.loadAnalyses()}
-                    userOwns={this.state.analyses.indexOf(props.match.params.id) > 1}
+                    userOwns={this.state.analyses.filter((x) => x.id === props.match.params.id).length > 0}
                   />
                 }
               />
