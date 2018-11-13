@@ -888,7 +888,7 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
                         availablePredictors={this.state.availablePredictors}
                       />
                       <br/>
-                      {this.navButtons()}
+                      {this.navButtons(false, isDraft)}
                       <br/>
                     </div>
                   }
