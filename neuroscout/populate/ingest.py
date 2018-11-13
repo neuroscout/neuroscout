@@ -3,6 +3,7 @@ Tools to populate database from BIDS datasets
 """
 import json
 import magic
+from os.path import isfile
 from flask import current_app
 from pathlib import Path
 
@@ -146,14 +147,9 @@ def add_task(task_name, dataset_name=None, local_path=None,
 
     local_path = Path(local_path)
 
-    from os.path import isfile
-    assert isfile((local_path / 'dataset_description.json').as_posix())
+    assert isfile(str(local_path / 'dataset_description.json'))
 
-    paths = [(local_path.as_posix(), 'bids')]
-    if (local_path / 'derivatives').exists():
-        paths.append(((local_path / 'derivatives').as_posix(), 'derivatives'))
-    layout = BIDSLayout(paths, root=local_path.as_posix())
-
+    layout = BIDSLayout(str(local_path), derivatives=True)
     if task_name not in layout.get_tasks():
         raise ValueError("Task {} not found in dataset {}".format(
             task_name, local_path))

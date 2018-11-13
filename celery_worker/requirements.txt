@@ -2,11 +2,15 @@ celery
 flower
 redis
 docopt
-grabbit==0.2.3
-pybids==0.6.5
+grabbit
+-e git+https://github.com/bids-standard/pybids.git#egg=pybids
 duecredit
 pandas
 patsy
+matplotlib
+nistats
+nilearn
+sklearn
 networkx==1.9
 nibabel
 scipy

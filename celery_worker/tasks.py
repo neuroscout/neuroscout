@@ -36,7 +36,7 @@ def _writeout_events(analysis, pes, outdir):
     outdir = outdir / "func"
     outdir.mkdir(exist_ok=True)
 
-    desc = {'Name': 'Events', 'BIDSVersion': '1.0'}
+    desc = {'Name': 'Events', 'BIDSVersion': '1.0', "PipelineDescription.Name": "Neuroscout"}
     json.dump(desc, (outdir / 'dataset_description.json').open('w'))
     # Load events and rename columns to human-readable
     pes = pd.DataFrame(pes)
@@ -95,9 +95,7 @@ def _build_analysis(analysis, predictor_events, bids_dir, run_id=None):
     paths = _writeout_events(analysis, predictor_events, tmp_dir)
     # Load events and try applying transformations
 
-    bids_layout = BIDSLayout(
-        [(bids_dir, 'bids'), (str(tmp_dir), ['bids', 'derivatives'])],
-        exclude='derivatives/') # Need to exclude original fmriprep files
+    bids_layout = BIDSLayout(bids_dir, derivatives=str(tmp_dir), validate=False)
     bids_analysis = Analysis(
         bids_layout, deepcopy(analysis.get('model')))
     bids_analysis.setup(**entities)
@@ -162,7 +160,7 @@ def generate_report(analysis, predictor_events, bids_dir, run_ids, domain):
     outdir = Path('/file-data/reports') / analysis['hash_id']
     outdir.mkdir(exist_ok=True)
 
-    first = bids_analysis.blocks[0]
+    first = bids_analysis.steps[0]
     results = {'design_matrix': [],
                'design_matrix_plot': [],
                'design_matrix_corrplot': [],
@@ -185,9 +183,9 @@ def generate_report(analysis, predictor_events, bids_dir, run_ids, domain):
         _plot_save(dm.dense.corr(), plot_corr_matrix, out, n_evs=None, partial=None)
 
     for cm in first.get_contrasts():
-        builder = PathBuilder(outdir, domain, analysis['hash_id'], cm.entities)
+        builder = PathBuilder(outdir, domain, analysis['hash_id'], cm[0].entities)
         out, url = builder.build('contrast_matrix', 'png')
-        _plot_save(cm.data, plot_contrast_matrix, out)
+        _plot_save(cm[0].weights, plot_contrast_matrix, out)
         results['contrast_plot'].append(url)
 
     return results
