@@ -176,61 +176,51 @@ def add_analysis(session, add_users, add_task, extract_features):
                                                  Predictor.name.in_(['Brightness', 'rt'])).all()
 
     analysis.model = {
-        "name": "test_model1",
-        "description": "this is a sample",
-        "input": {
+        "Name": "test_model1",
+        "Description": "this is a sample",
+        "Input": {
           "task": "bidstest",
           "subject": ["01", "02"]
         },
-        "blocks": [
+        "Steps": [
           {
-            "level": "run",
-            "transformations": [
+            "Level": "Run",
+            "Transformations": [
               {
-                "name": "scale",
-                "input": [
+                "Name": "Scale",
+                "Input": [
                   "Brightness"
                 ]
               }
             ],
-            "model": {
-              "HRF_variables": [
-                "Brightness",
-                "rt"
-              ],
-              "variables": [
+            "Model": {
+              "X": [
                 "Brightness",
                 "rt"
               ]
             },
-            "contrasts": [
+            "Contrasts": [
               {
-                "name": "BvsRT",
-                "condition_list": [
+                "Name": "BvsRT",
+                "ConditionList": [
                   "Brightness",
                   "rt"
                 ],
-                "weights": [
+                "Weights": [
                   1,
                   -1
                 ],
-                "type": "T"
+                "Type": "T"
               }
             ]
           },
           {
-            "level": "session",
-          },
-          {
-            "level": "subject",
-            "model": {
-              "variables": [
+            "Level": "Subject",
+            "Model": {
+              "X": [
                 "BvsRT"
               ]
             },
-          },
-          {
-            "level": "dataset"
           }
         ]
       }
