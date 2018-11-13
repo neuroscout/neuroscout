@@ -793,7 +793,7 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
       PENDING: 'This analysis has been submitted for generation and is being processed.',
       COMPILED: 'This analysis has been successfully generated'
     }[analysis.status];
-    // Jump to submit/results tab if no longer a draft.
+    // Jump to submit/status tab if no longer a draft.
     if (analysis.status !== 'DRAFT' && activeTab === 'overview') {
       activeTab = 'submit';
     }
@@ -893,7 +893,7 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
                     </div>
                   }
                 </TabPane>
-                <TabPane tab={isDraft ? 'Run' : 'Results'} key="submit" disabled={!submitActive && isDraft}>
+                <TabPane tab={isDraft ? 'Run' : 'Status'} key="submit" disabled={!submitActive && isDraft}>
                   <StatusTab
                     status={analysis.status}
                     analysisId={analysis.analysisId}
