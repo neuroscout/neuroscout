@@ -184,7 +184,7 @@ class App extends Reflux.Component<any, {}, AppState> {
           this.setState({ analyses: values});
         }
       });
-      await timeout(100000000);
+      await timeout(10000);
     }
   };
 
