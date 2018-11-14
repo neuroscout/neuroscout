@@ -88,10 +88,10 @@ let initializeStore = (): Store => ({
     contrasts: [],
     autoContrast: true,
     model: {
-      steps: [{
-        level: 'run',
-        transformations: [],
-        contrasts: []
+      Steps: [{
+        Level: 'Run',
+        Transformations: [],
+        Contrasts: []
       }]
     }
   },
@@ -102,13 +102,13 @@ let initializeStore = (): Store => ({
   selectedPredictors: [],
   selectedHRFPredictors: [],
   unsavedChanges: false,
-  currentLevel: 'run',
+  currentLevel: 'Run',
   postReports: false,
   model: {
-    steps: [{
-      level: 'run',
-      transformations: [],
-      contrasts: []
+    Steps: [{
+      Level: 'Run',
+      Transformations: [],
+      Contrasts: []
     }]
   },
   poll: true
@@ -255,33 +255,33 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
       if (hrfX.length > 0) {
         let hrfTransforms = {'Name': 'Convolve' as TransformName, 'Input': hrfX};
         // Right now we only want one HRF transform, remove all others to prevent duplicates
-        steps[0].transformations = steps[0].transformations!.filter(x => x.name !== 'Convolve');
-        steps[0].transformations!.push(hrfTransforms);
+        steps[0].Transformations = steps[0].Transformations!.filter(x => x.Name !== 'Convolve');
+        steps[0].Transformations!.push(hrfTransforms);
       }
     }
 
     let imgInput: ImageInput = {};
     if (runs.length > 0) {
-      imgInput.run = runs;
+      imgInput.Run = runs;
     }
 
     if (sessions.length > 0) {
-      imgInput.session = sessions;
+      imgInput.Session = sessions;
     }
 
     if (subjects.length >  0) {
-      imgInput.subject = subjects;
+      imgInput.Subject = subjects;
     }
 
     if (task[0]) {
-      imgInput.task = task[0];
+      imgInput.Task = task[0];
     }
 
     return {
-      name: this.state.analysis.name,
-      description: this.state.analysis.description,
-      input: imgInput,
-      steps: steps,
+      Name: this.state.analysis.name,
+      Description: this.state.analysis.description,
+      Input: imgInput,
+      Steps: steps,
     };
   };
 
@@ -407,27 +407,27 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
     let contrasts;
     let autoContrast;
     let hrfPredictorIds: string[] = [];
-    if (data && data.model && data.model.steps) {
-      for (var i = 0; i < data.model.steps.length; i++) {
-        if (data.model.steps[i].level !== this.state.currentLevel) {
+    if (data && data.model && data.model.Steps) {
+      for (var i = 0; i < data.model.Steps.length; i++) {
+        if (data.model.Steps[i].Level !== this.state.currentLevel) {
           continue;
         }
-        if (data.model.steps[i].transformations) {
-          data.transformations = data.model.steps[i].transformations!.filter((x) => {
-            return x.name !== 'Convolve' as TransformName;
+        if (data.model.Steps[i].Transformations) {
+          data.transformations = data.model.Steps[i].Transformations!.filter((x) => {
+            return x.Name !== 'Convolve' as TransformName;
           });
-          let hrfTransforms = data.model.steps[i].transformations!.filter((x) => {
-            return x.name === 'Convolve' as TransformName;
+          let hrfTransforms = data.model.Steps[i].Transformations!.filter((x) => {
+            return x.Name === 'Convolve' as TransformName;
           });
           if (hrfTransforms.length > 0) {
-            hrfTransforms.map(x => x.input ? x.input.map(y => hrfPredictorIds.push(y)) : null);
+            hrfTransforms.map(x => x.Input ? x.Input.map(y => hrfPredictorIds.push(y)) : null);
           }
         }
-        if (data.model.steps[i].contrasts) {
-          data.contrasts = data.model.steps[i].contrasts;
+        if (data.model.Steps[i].Contrasts) {
+          data.contrasts = data.model.Steps[i].Contrasts;
         }
-        if (data.model.steps[i].AutoContrasts) {
-          autoContrast = data.model.steps[i].AutoContrasts;
+        if (data.model.Steps[i].AutoContrasts) {
+          autoContrast = data.model.Steps[i].AutoContrasts;
         }
       }
     }
@@ -596,7 +596,7 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
 
   runIdsFromModel = (availableRuns: Run[], input: ImageInput) => {
     let runIds: Run[] = availableRuns;
-    if (!this.state.model || !this.state.model.input) {
+    if (!this.state.model || !this.state.model.Input) {
       return [];
     }
     let keys = ['Subject', 'Session', 'Run'];
@@ -638,8 +638,8 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
           .then((data: Run[]) => {
             let availTasks = getTasks(datasets, updatedAnalysis.datasetId);
 
-            if (updatedAnalysis.model && updatedAnalysis.model.input) {
-              updatedAnalysis.runIds = this.runIdsFromModel(data, updatedAnalysis.model.input);
+            if (updatedAnalysis.model && updatedAnalysis.model.Input) {
+              updatedAnalysis.runIds = this.runIdsFromModel(data, updatedAnalysis.model.Input);
             } else {
               updatedAnalysis.runIds = data.map(x => x.id);
             }
@@ -843,7 +843,7 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
                 >
                   <XformsTab
                     predictors={selectedPredictors}
-                    xforms={analysis.transformations.filter(x => x.name !== 'Convolve')}
+                    xforms={analysis.transformations.filter(x => x.Name !== 'Convolve')}
                     onSave={xforms => this.updateTransformations(xforms)}
                   />
                   <br/>

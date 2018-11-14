@@ -106,24 +106,24 @@ export type Parameter = BooleanParam | PredictorsParam;
 export type TransformName = 'Scale' | 'Orthogonalize' | 'Sum' | 'Product' | 'Threshold'
   | 'Or' | 'And' | 'Not' | 'Convolve' | 'Replace';
 
-export type StepLevel = 'run' | 'session' | 'subject' | 'dataset';
+export type StepLevel = 'Run' | 'Session' | 'Subject' | 'Dataset';
 
 export type ReplaceNA = 'before' | 'after' | undefined;
 
 export interface Transformation {
-  name: TransformName;
-  replace_na?: ReplaceNA;
-  input?: string[]; // predictor IDs
-  output?: string[];
-  demean?: boolean;
-  rescale?: boolean;
-  other?: string[];
-  weights?: number[];
-  threshold?: number;
-  binarize?: boolean;
-  above?: boolean;
-  signed?: boolean;
-  replace?: any;
+  Name: TransformName;
+  ReplaceNa?: ReplaceNA;
+  Input?: string[]; // predictor IDs
+  Output?: string[];
+  Demean?: boolean;
+  Rescale?: boolean;
+  Other?: string[];
+  Weights?: number[];
+  Threshold?: number;
+  Binarize?: boolean;
+  Above?: boolean;
+  Signed?: boolean;
+  Replace?: any;
 }
 
 // Lookup hash of available transformations (as specified in transforms.ts) by their name
@@ -141,10 +141,10 @@ export type TabName =
     | 'submit';
 
 export interface Contrast {
-  name: string;
-  condition_list: string[];
-  weights: number[];
-  contrastType: 't' | 'F';
+  Name: string;
+  ConditionList: string[];
+  Weights: number[];
+  ContrastType: 't' | 'F';
 }
 
 export interface Store {

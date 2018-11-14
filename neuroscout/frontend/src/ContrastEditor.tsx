@@ -12,7 +12,7 @@ const RadioGroup = Radio.Group;
 const CONTRAST_TYPE_OPTIONS: ('T')[] = ['T'];
 
 /*
-Contrast editor component to add new contrasts. May extend this in the future 
+Contrast editor component to add new contrasts. May extend this in the future
 to also add edit functionality.
 */
 interface ContrastEditorProps {
@@ -35,10 +35,10 @@ export default class ContrastEditor extends React.Component<
     super(props);
     const { contrast, availablePredictors } = props;
     this.state = {
-      condition_list: [],
-      name: contrast ? contrast.name : '',
-      weights: contrast ? contrast.weights : [],
-      contrastType: 't',
+      ConditionList: [],
+      Name: contrast ? contrast.Name : '',
+      Weights: contrast ? contrast.Weights : [],
+      ContrastType: 't',
       errors: [],
       selectedPredictors: []
     };
@@ -46,15 +46,15 @@ export default class ContrastEditor extends React.Component<
 
   // Validate and save contrast
   onSave = (): void => {
-    const { name, condition_list, weights, contrastType } = this.state;
+    const { Name, ConditionList, Weights, ContrastType } = this.state;
     let errors: string[] = [];
     if (!name) {
       errors.push('Please specify a name for the contrast');
     }
-    if (condition_list.length !== weights.length) {
+    if (ConditionList.length !== Weights.length) {
       errors.push('Please enter a numeric weight for each predictor');
     }
-    weights.forEach((value, index) => {
+    Weights.forEach((value, index) => {
       if (typeof value !== 'number')
         errors.push(`Weight at position ${index} must be a numeric value`);
     });
@@ -62,31 +62,31 @@ export default class ContrastEditor extends React.Component<
       this.setState({ errors });
       return;
     }
-    const newContrast: Contrast = { name, condition_list, weights, contrastType };
+    const newContrast: Contrast = { Name, ConditionList, Weights, ContrastType };
     this.props.onSave(newContrast);
   };
 
   updatePredictors = (selectedPredictors: Predictor[]): void => {
     const that = this;
-    // Warn user if they have already entered weights but are now changing the predictors
+    // Warn user if they have already entered Weights but are now changing the predictors
     let updatedPredictors = selectedPredictors.map(x => x.name);
-    if (this.state.weights.length > 0) {
+    if (this.state.Weights.length > 0) {
       Modal.confirm({
         title: 'Are you sure?',
-        content: 'You have already entered some weights. Changing the selection will discard that.',
+        content: 'You have already entered some Weights. Changing the selection will discard that.',
         okText: 'Yes',
         cancelText: 'No',
-        onOk: () => that.setState({ selectedPredictors, weights: [], condition_list: updatedPredictors})
+        onOk: () => that.setState({ selectedPredictors, Weights: [], ConditionList: updatedPredictors})
       });
       return;
     }
-    this.setState({ selectedPredictors, condition_list: updatedPredictors});
+    this.setState({ selectedPredictors, ConditionList: updatedPredictors});
   };
 
   updateWeight = (index: number, value: number) => {
-    let weights = [...this.state.weights];
-    weights[index] = value;
-    this.setState({ weights });
+    let Weights = [...this.state.Weights];
+    Weights[index] = value;
+    this.setState({ Weights });
   };
 
   parseInput = (val: string) => {
@@ -95,7 +95,7 @@ export default class ContrastEditor extends React.Component<
   }
 
   render() {
-    const { name, condition_list, selectedPredictors, weights, contrastType, errors } = this.state;
+    const { Name, ConditionList, selectedPredictors, Weights, ContrastType, errors } = this.state;
     const { availablePredictors } = this.props;
     return (
       <div>
@@ -123,7 +123,7 @@ export default class ContrastEditor extends React.Component<
               placeholder="Name of contrast"
               value={name}
               onChange={(event: React.FormEvent<HTMLInputElement>) =>
-                this.setState({ name: event.currentTarget.value })}
+                this.setState({ Name: event.currentTarget.value })}
               type="text"
               required={true}
               min={1}
@@ -137,10 +137,10 @@ export default class ContrastEditor extends React.Component<
           updateSelection={this.updatePredictors}
         />
         <br />
-        <p>Enter weights for the selected predictors:</p>
+        <p>Enter Weights for the selected predictors:</p>
         <br />
         <Form layout="horizontal">
-          {condition_list.map((predictor, i) =>
+          {ConditionList.map((predictor, i) =>
             <FormItem
               label={predictor}
               key={i}
@@ -149,7 +149,7 @@ export default class ContrastEditor extends React.Component<
               required={true}
             >
               <InputNumber
-                value={weights[i]}
+                value={Weights[i]}
                 onChange={(this.updateWeight.bind(this, i))}
                 required={true}
               />
@@ -157,9 +157,9 @@ export default class ContrastEditor extends React.Component<
           )}
           <FormItem label={'Contrast type:'}>
             <RadioGroup
-              value={contrastType}
+              value={ContrastType}
               onChange={(event: any) =>
-                this.setState({ contrastType: event.target.value as 't' | 'F' })}
+                this.setState({ ContrastType: event.target.value as 't' | 'F' })}
             >
               {CONTRAST_TYPE_OPTIONS.map(x =>
                 <Radio key={x} value={x}>
@@ -173,8 +173,8 @@ export default class ContrastEditor extends React.Component<
           type="primary"
           onClick={this.onSave}
           disabled={
-            !(this.state.name && this.state.condition_list.length > 0 
-            && this.state.condition_list.length === this.state.weights.length)
+            !(this.state.Name && this.state.ConditionList.length > 0
+            && this.state.ConditionList.length === this.state.Weights.length)
           }
         >
           OK{' '}

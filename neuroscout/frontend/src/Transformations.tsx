@@ -22,7 +22,7 @@ const Option = Select.Option;
 
 let xformRules: XformRules = {};
 for (const item of transformDefinititions) {
-  xformRules[item.name] = item;
+  xformRules[item.Name] = item;
 }
 
 const FormItem = Form.Item;
@@ -41,11 +41,11 @@ function renderParamItems(xform: Transformation) {
     let reserved = ['input', 'name', 'output'];
     let paramItems: any = [];
     Object.keys(xform).map(key => {
-      if (key === 'weights' && xform && xform.input) {
+      if (key === 'weights' && xform && xform.Input) {
         let weightItems: any = [];
-        xform.input.map((elem, index) => {
-          if (xform && xform.weights && xform.weights[index]) {
-            weightItems.push(<li key={index}>{elem + ': ' + xform.weights[index]}<br/></li>);
+        xform.Input.map((elem, index) => {
+          if (xform && xform.Weights && xform.Weights[index]) {
+            weightItems.push(<li key={index}>{elem + ': ' + xform.Weights[index]}<br/></li>);
           }
         });
         paramItems.push(
@@ -64,11 +64,11 @@ function renderParamItems(xform: Transformation) {
 
 const XformDisplay = (props: XformDisplayProps) => {
   const { xform, index, onDelete, onMove, enableUp, enableDown } = props;
-  const input = xform.input || [];
+  const input = xform.Input || [];
   let paramItems = renderParamItems(xform);
   return (
     <div>
-      <h3>{`${index + 1}: ${xform.name}`}</h3>
+      <h3>{`${index + 1}: ${xform.Name}`}</h3>
       <p>{`Inputs: ${input!.join(', ')}`}</p>
       {(paramItems.length > 0) &&
         <div>
@@ -236,7 +236,7 @@ class XformEditor extends React.Component<XformEditorProps, XformEditorState> {
     this.state = {
       transformation: xform,
       input: [],
-      name: xform ? xform.name : '',
+      name: xform ? xform.Name : '',
     };
   }
 
@@ -246,12 +246,12 @@ class XformEditor extends React.Component<XformEditorProps, XformEditorState> {
     const {transformation} = this.state;
     const inputIds = new Set(input.map(x => x.name));
     let newXform = transformation;
-    if (transformation.name === 'Orthogonalize') {
-        if (transformation.other) {
-          newXform.other = transformation.other.filter(x => !inputIds.has(x));
+    if (transformation.Name === 'Orthogonalize') {
+        if (transformation.Other) {
+          newXform.Other = transformation.Other.filter(x => !inputIds.has(x));
         }
     }
-    newXform.input = Array.from(inputIds);
+    newXform.Input = Array.from(inputIds);
     this.setState({input,  transformation: newXform});
   };
 
@@ -273,7 +273,7 @@ class XformEditor extends React.Component<XformEditorProps, XformEditorState> {
       displayError(new Error('Please select at least one input for the transformation'));
       return;
     }
-    transformation.output = transformation.input;
+    transformation.Output = transformation.Input;
     this.props.onSave(transformation);
   };
 
@@ -313,7 +313,7 @@ class XformEditor extends React.Component<XformEditorProps, XformEditorState> {
               {availableParameters &&
                 availableParameters.map(param => {
                   let options: Predictor[] = input;
-                  if (transformation.name === 'Orthogonalize') {
+                  if (transformation.Name === 'Orthogonalize') {
                     // Special case for wrt parameter: in 'options' exclude predictors
                     // that were selected for 'inputs'
                     const inputIds = new Set(input.map(x => x.name));
