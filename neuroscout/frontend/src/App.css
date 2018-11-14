@@ -79,7 +79,7 @@ pre {
 }
 
 .splashLogo {
-  display: block;
+  display: step;
   margin-left: auto;
   margin-right: auto;
   width: 30%;
@@ -91,7 +91,7 @@ pre {
 }
 
 .splashButton {
-  display: block;
+  display: step;
   margin-left: auto;
   margin-right: auto;
   width: 30%;

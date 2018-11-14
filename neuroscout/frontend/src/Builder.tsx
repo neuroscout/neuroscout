@@ -28,8 +28,8 @@ import {
   AnalysisStatus,
   Transformation,
   Contrast,
-  Block,
-  BlockModel,
+  Step,
+  StepModel,
   BidsModel,
   ImageInput,
   TransformName,
@@ -88,7 +88,7 @@ let initializeStore = (): Store => ({
     contrasts: [],
     autoContrast: true,
     model: {
-      blocks: [{
+      steps: [{
         level: 'run',
         transformations: [],
         contrasts: []
@@ -105,7 +105,7 @@ let initializeStore = (): Store => ({
   currentLevel: 'run',
   postReports: false,
   model: {
-    blocks: [{
+    steps: [{
       level: 'run',
       transformations: [],
       contrasts: []
@@ -226,7 +226,7 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
     });
     variables = variables.filter(x => x !== '');
 
-    let blocks: Block[] = [
+    let steps: Step[] = [
       {
         level: 'run',
         transformations: this.state.analysis.transformations,
@@ -255,8 +255,8 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
       if (hrfVariables.length > 0) {
         let hrfTransforms = {'name': 'ConvolveHRF' as TransformName, 'input': hrfVariables};
         // Right now we only want one HRF transform, remove all others to prevent duplicates
-        blocks[0].transformations = blocks[0].transformations!.filter(x => x.name !== 'ConvolveHRF');
-        blocks[0].transformations!.push(hrfTransforms);
+        steps[0].transformations = steps[0].transformations!.filter(x => x.name !== 'ConvolveHRF');
+        steps[0].transformations!.push(hrfTransforms);
       }
     }
 
@@ -281,7 +281,7 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
       name: this.state.analysis.name,
       description: this.state.analysis.description,
       input: imgInput,
-      blocks: blocks,
+      steps: steps,
     };
   };
 
@@ -403,31 +403,31 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
 
     data.transformations = [];
 
-    // Extract transformations and contrasts from within block object of response.
+    // Extract transformations and contrasts from within step object of response.
     let contrasts;
     let autoContrast;
     let hrfPredictorIds: string[] = [];
-    if (data && data.model && data.model.blocks) {
-      for (var i = 0; i < data.model.blocks.length; i++) {
-        if (data.model.blocks[i].level !== this.state.currentLevel) {
+    if (data && data.model && data.model.steps) {
+      for (var i = 0; i < data.model.steps.length; i++) {
+        if (data.model.steps[i].level !== this.state.currentLevel) {
           continue;
         }
-        if (data.model.blocks[i].transformations) {
-          data.transformations = data.model.blocks[i].transformations!.filter((x) => {
+        if (data.model.steps[i].transformations) {
+          data.transformations = data.model.steps[i].transformations!.filter((x) => {
             return x.name !== 'ConvolveHRF' as TransformName;
           });
-          let hrfTransforms = data.model.blocks[i].transformations!.filter((x) => {
+          let hrfTransforms = data.model.steps[i].transformations!.filter((x) => {
             return x.name === 'ConvolveHRF' as TransformName;
           });
           if (hrfTransforms.length > 0) {
             hrfTransforms.map(x => x.input ? x.input.map(y => hrfPredictorIds.push(y)) : null);
           }
         }
-        if (data.model.blocks[i].contrasts) {
-          data.contrasts = data.model.blocks[i].contrasts;
+        if (data.model.steps[i].contrasts) {
+          data.contrasts = data.model.steps[i].contrasts;
         }
-        if (data.model.blocks[i].auto_contrasts) {
-          autoContrast = data.model.blocks[i].auto_contrasts;
+        if (data.model.steps[i].auto_contrasts) {
+          autoContrast = data.model.steps[i].auto_contrasts;
         }
       }
     }

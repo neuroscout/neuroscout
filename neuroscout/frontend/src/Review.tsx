@@ -14,8 +14,8 @@ import {
   AnalysisConfig,
   Transformation,
   Contrast,
-  Block,
-  BlockModel,
+  Step,
+  StepModel,
   BidsModel,
   ImageInput,
   TransformName
@@ -68,13 +68,13 @@ class ReviewObjects extends React.Component<{input: (Transformation | Contrast)[
   }
 }
 
-class ModelBlock extends React.Component<{block: Block}, {}> {
+class ModelStep extends React.Component<{step: Step}, {}> {
   render() {
-    let block = this.props.block;    
+    let step = this.props.step;
     let xforms: any = '';
-    if (block.transformations !== undefined) {
+    if (step.transformations !== undefined) {
         xforms = (
-          <ReviewObjects input={block.transformations}/>
+          <ReviewObjects input={step.transformations}/>
         );
     }
     return (
@@ -86,17 +86,17 @@ class ModelBlock extends React.Component<{block: Block}, {}> {
   }
 }
 
-// <Panel header="Blocks" key="blocks"><ModelBlocks blocks={blocks as Block[]}/></Panel>
-// Only displaying run level block right now so this is unused.
-class ModelBlocks extends React.Component<{blocks: Block[]}, {}> {
+// <Panel header="Steps" key="steps"><ModelSteps steps={steps as Step[]}/></Panel>
+// Only displaying run level step right now so this is unused.
+class ModelSteps extends React.Component<{steps: Step[]}, {}> {
   render() {
-      if (this.props.blocks === undefined) {
+      if (this.props.steps === undefined) {
         return;
       }
-      let blocks = this.props.blocks;
+      let steps = this.props.steps;
       let display: any[] = [];
-      blocks.map((x, i) => display.push(
-        <Panel header={`${x.level} Level`} key={i.toString()}><ModelBlock block={x}/></Panel>)
+      steps.map((x, i) => display.push(
+        <Panel header={`${x.level} Level`} key={i.toString()}><ModelStep step={x}/></Panel>)
       );
       return (
         <Collapse>
@@ -111,8 +111,8 @@ class Variables extends React.Component<{model: BidsModel, available: Predictor[
   render() {
     let { model, available } = this.props;
     let modelVars: string[] = [];
-    if (model.blocks && model.blocks[0] && model.blocks[0].model && model.blocks[0].model!.variables) {
-      modelVars = model.blocks[0].model!.variables;
+    if (model.steps && model.steps[0] && model.steps[0].model && model.steps[0].model!.variables) {
+      modelVars = model.steps[0].model!.variables;
     }
     let displayVars = available.filter(x => modelVars.indexOf('' + x.name) > -1);
     let display: any[] = [];
@@ -124,25 +124,25 @@ class Variables extends React.Component<{model: BidsModel, available: Predictor[
 export class Review extends React.Component<ReviewProps, {}> {
   render() {
     let model = this.props.model;
-    let { name, description, blocks, input } = model;
+    let { name, description, steps, input } = model;
     if (model && model.name) { name = model.name; }
-    if (model && model.blocks) { blocks = model.blocks; }
+    if (model && model.steps) { steps = model.steps; }
 
     // Only looking at run level transfomraitons right now.
     let xforms: Transformation[] = [];
-    if (blocks && blocks[0] && blocks[0].transformations) {
-      xforms = blocks[0].transformations!;
+    if (steps && steps[0] && steps[0].transformations) {
+      xforms = steps[0].transformations!;
     }
 
     // Only looking at run level transfomraitons right now.
     let contrasts: Contrast[] = [];
-    if (blocks && blocks[0] && blocks[0].contrasts) {
-      contrasts = blocks[0].contrasts!;
+    if (steps && steps[0] && steps[0].contrasts) {
+      contrasts = steps[0].contrasts!;
     }
 
     let autoContrasts: boolean = false;
-    if (blocks && blocks[0] && blocks[0].auto_contrasts) {
-      autoContrasts = blocks[0].auto_contrasts!;
+    if (steps && steps[0] && steps[0].auto_contrasts) {
+      autoContrasts = steps[0].auto_contrasts!;
     }
 
     return (

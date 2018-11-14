@@ -106,7 +106,7 @@ export type Parameter = BooleanParam | PredictorsParam;
 export type TransformName = 'Scale' | 'Orthogonalize' | 'Sum' | 'Product' | 'Threshold'
   | 'Or' | 'And' | 'Not' | 'ConvolveHRF' | 'Replace';
 
-export type BlockLevel = 'run' | 'session' | 'subject' | 'dataset';
+export type StepLevel = 'run' | 'session' | 'subject' | 'dataset';
 
 export type ReplaceNA = 'before' | 'after' | undefined;
 
@@ -167,7 +167,7 @@ export interface Store {
   selectedPredictors: Predictor[];
   selectedHRFPredictors: Predictor[];
   unsavedChanges: boolean;
-  currentLevel: BlockLevel;
+  currentLevel: StepLevel;
   postReports: boolean;
   model: BidsModel;
   poll: boolean;
@@ -200,7 +200,7 @@ export interface ApiAnalysis {
 
 export interface BidsModel {
   input?: ImageInput;
-  blocks?: Block[] | never[];
+  steps?: Step[] | never[];
   name?: string;
   description?: string;
 }
@@ -212,15 +212,15 @@ export interface ImageInput {
   subject?: string[];
 }
 
-export interface Block {
-  model?: BlockModel;
+export interface Step {
+  model?: StepModel;
   transformations?: Transformation[];
   contrasts?: Contrast[];
   level: string;
   auto_contrasts?: boolean;
 }
 
-export interface BlockModel {
+export interface StepModel {
   variables: string[];
   HRF_variables?: string[];
 }
