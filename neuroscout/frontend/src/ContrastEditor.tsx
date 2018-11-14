@@ -48,7 +48,7 @@ export default class ContrastEditor extends React.Component<
   onSave = (): void => {
     const { Name, ConditionList, Weights, ContrastType } = this.state;
     let errors: string[] = [];
-    if (!name) {
+    if (!Name) {
       errors.push('Please specify a name for the contrast');
     }
     if (ConditionList.length !== Weights.length) {
@@ -121,7 +121,7 @@ export default class ContrastEditor extends React.Component<
           <FormItem required={true} label={'Name of Contrast:'}>
             <Input
               placeholder="Name of contrast"
-              value={name}
+              value={Name}
               onChange={(event: React.FormEvent<HTMLInputElement>) =>
                 this.setState({ Name: event.currentTarget.value })}
               type="text"
