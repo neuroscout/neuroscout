@@ -5,7 +5,7 @@
 import { RouteComponentProps } from 'react-router';
 import { createBrowserHistory } from 'history';
 import * as React from 'react';
-import { Tag, Tabs, Row, Col, Layout, Button, Modal, Icon, message, Tooltip, Switch } from 'antd';
+import { Tag, Tabs, Row, Col, Layout, Button, Modal, Icon, message, Tooltip, Switch, Form, Input } from 'antd';
 import { Prompt } from 'react-router-dom';
 import { OverviewTab } from './Overview';
 import { PredictorSelector } from './Predictors';
@@ -42,6 +42,7 @@ import { authActions } from './auth.actions';
 
 const { TabPane } = Tabs;
 const { Footer, Content } = Layout;
+const FormItem = Form.Item;
 const tabOrder = ['overview', 'predictors', 'transformations', 'hrf', 'contrasts', 'review', 'submit'];
 
 const history = createBrowserHistory();
@@ -135,6 +136,60 @@ export const getTasks = (datasets: Dataset[], datasetId: string | null): Task[] 
     }
     return [] as Task[];
 };
+
+type editNameDescProps = {name: string, description: string};
+type editNameDescState = {newName: string, newDescription: string, visible: boolean};
+class EditNameDesc extends React.Component<editNameDescProps, editNameDescState> {
+  constructor(props: editNameDescProps) {
+    super(props);
+    this.state = this.init(props);
+  }
+
+  init(props: editNameDescProps) {
+    return {newName: props.name, newDescription: props.description, visible: false};
+  }
+
+  render() {
+    return (
+      <div>
+      <Button type="primary" onClick={() => {this.setState({visible: !this.state.visible}); }}>
+        Edit Name/Description
+      </Button>
+      <Modal
+        okText="Save Changes"
+        onOk={() => {
+          this.setState({visible: false});
+        }}
+        cancelText="Cancel"
+        onCancel={() => {
+          this.setState(this.init(this.props));
+        }}
+        visible={this.state.visible}
+      >
+        <Form layout="vertical">
+          <FormItem label="Name" required={true}>
+            <Input
+              placeholder="Name your analysis"
+              value={this.state.newName}
+              onChange={(e) => this.setState({newName: e.currentTarget.value})}
+              required={true}
+              min={1}
+            />
+          </FormItem>
+          <FormItem label="Description">
+            <Input.TextArea
+              placeholder="Description of your analysis"
+              value={this.state.newDescription}
+              autosize={{ minRows: 2, maxRows: 10 }}
+              onChange={(e) => this.setState({newDescription: e.currentTarget.value})}
+            />
+          </FormItem>
+        </Form>
+      </Modal>
+      </div>
+    );
+  }
+}
 
 // Given an updated list of predictor IDs, create an updated version of analysis config.
 // preserving the existing predictor configs, and adding/removing new/old ones as necessary
@@ -623,12 +678,14 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
    like loading a new analysis (loadAnalysis function) where updateState is called but
    since state changes aren't really user edits we don't want to set unsavedChanges.
   */
-  updateState = (attrName: keyof Store, keepClean = false) => (value: any) => {
+  updateState = (attrName: keyof Store, keepClean = false, saveToAPI = false) => (value: any) => {
     const { analysis, availableRuns, availablePredictors, datasets } = this.state;
+    /*
     if (!editableStatus.includes(analysis.status) && !keepClean) {
       message.warning('This analysis is locked and cannot be edited');
       return;
     }
+    */
     let stateUpdate: any = {};
     if (attrName === 'analysis') {
       const updatedAnalysis: Analysis = value;
@@ -684,6 +741,9 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
     if (!keepClean) stateUpdate.unsavedChanges = true;
 
     this.setState(stateUpdate);
+    if (saveToAPI) {
+      this.saveAnalysis({compile: false});
+    }
   };
 
   tabChange = (activeKey) => {
@@ -901,8 +961,12 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
                     private={analysis.private || false}
                     updateStatus={this.updateStatus}
                   >
-                   <div className="privateSwitch">
-                      {this.props.userOwns &&
+                  {this.props.userOwns &&
+                    <div>
+                      <div className="privateSwitch">
+                        <EditNameDesc name={analysis.name} description={analysis.description}/>
+                      </div>
+                      <div className="privateSwitch">
                         <Tooltip title="Should this analysis be private (only visible to you) or public?">
                         <Switch
                           checked={!analysis.private}
@@ -910,8 +974,9 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
                           unCheckedChildren="Private"
                           onChange={checked => this.updateState('analysis')({...analysis, 'private': !checked})}
                         />
-                      </Tooltip>}
-                    </div>
+                        </Tooltip>
+                      </div>
+                    </div>}
                   </StatusTab>
                 </TabPane>
               </Tabs>
