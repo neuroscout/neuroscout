@@ -137,7 +137,7 @@ export const getTasks = (datasets: Dataset[], datasetId: string | null): Task[] 
     return [] as Task[];
 };
 
-type editNameDescProps = {name: string, description: string};
+type editNameDescProps = {name: string, description: string, update: (any) => void};
 type editNameDescState = {newName: string, newDescription: string, visible: boolean};
 class EditNameDesc extends React.Component<editNameDescProps, editNameDescState> {
   constructor(props: editNameDescProps) {
@@ -152,12 +152,15 @@ class EditNameDesc extends React.Component<editNameDescProps, editNameDescState>
   render() {
     return (
       <div>
-      <Button type="primary" onClick={() => {this.setState({visible: !this.state.visible}); }}>
+      <Button type="primary" onClick={() => {this.setState({visible: !this.state.visible}); }} size={'small'}>
         Edit Name/Description
       </Button>
       <Modal
         okText="Save Changes"
         onOk={() => {
+          this.props.update(
+            {name: this.state.newName, description: this.state.newDescription}
+          );
           this.setState({visible: false});
         }}
         cancelText="Cancel"
@@ -573,9 +576,12 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
     };
   };
 
+  /* these next few updates are largely similar and are used for updating some part of the nested analysis object
+     when we don't want to trigger a full run of the updateState function. The updateState function handles those
+     elements inside and outside of analysis that have side affects
+   */
   updateConfig = (newConfig: AnalysisConfig): void => {
-    const newAnalysis = { ...this.state.analysis };
-    newAnalysis.config = newConfig;
+    const newAnalysis = { ...this.state.analysis, config: newConfig };
     this.setState({ analysis: newAnalysis, unsavedChanges: true });
   };
 
@@ -598,6 +604,14 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
       analysis: { ...this.state.analysis, status: (status as AnalysisStatus)},
     });
   };
+
+  /* this is used when the analysis is not in a draft state and we want to update name/desc from the Status tab */
+  updateNameDesc = (nameDesc: {name: string, description: string}): void => {
+    this.setState({
+      analysis: { ...this.state.analysis, ...nameDesc }
+    });
+    this.saveAnalysis({compile: false});
+  }
 
   updatePredictorState = (value: any, filteredPredictors: Predictor[], hrf: boolean = false) => {
     let stateUpdate: any = {};
@@ -962,21 +976,25 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
                     updateStatus={this.updateStatus}
                   >
                   {this.props.userOwns &&
-                    <div>
-                      <div className="privateSwitch">
-                        <EditNameDesc name={analysis.name} description={analysis.description}/>
+                    <>
+                    <div className="privateSwitch">
+                      <EditNameDesc
+                        name={analysis.name}
+                        description={analysis.description}
+                        update={this.updateNameDesc}
+                      />
                       </div>
                       <div className="privateSwitch">
-                        <Tooltip title="Should this analysis be private (only visible to you) or public?">
-                        <Switch
-                          checked={!analysis.private}
-                          checkedChildren="Public"
-                          unCheckedChildren="Private"
-                          onChange={checked => this.updateState('analysis')({...analysis, 'private': !checked})}
-                        />
-                        </Tooltip>
+                      <Tooltip title="Should this analysis be private (only visible to you) or public?">
+                      <Switch
+                        checked={!analysis.private}
+                        checkedChildren="Public"
+                        unCheckedChildren="Private"
+                        onChange={checked => this.updateState('analysis')({...analysis, 'private': !checked})}
+                      />
+                      </Tooltip>
                       </div>
-                    </div>}
+                    </>}
                   </StatusTab>
                 </TabPane>
               </Tabs>
