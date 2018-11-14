@@ -1,3 +1,4 @@
 export const config =  {
-  'server_url': 'https://alpha.neuroscout.org'
+  'server_url': 'https://alpha.neuroscout.org',
+  'google_client_id': '188773200209-13crlel7ir10mnm169l8sv2unt2q78p4.apps.googleusercontent.com'
 };
