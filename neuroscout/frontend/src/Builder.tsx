@@ -216,46 +216,46 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
      * predictors field in the database is dropped, predictorIds should be converted
      * to hold predictor names instead of Ids.
      */
-    let variables: string[];
-    variables = this.state.analysis.predictorIds.map(id => {
+    let X: string[];
+    X = this.state.analysis.predictorIds.map(id => {
       let found = this.state.availablePredictors.find(elem => elem.id === id);
       if (found) {
         return found.name;
       }
       return '';
     });
-    variables = variables.filter(x => x !== '');
+    X = X.filter(x => x !== '');
 
     let steps: Step[] = [
       {
-        level: 'run',
-        transformations: this.state.analysis.transformations,
-        contrasts: this.state.analysis.contrasts,
-        auto_contrasts: this.state.analysis.autoContrast,
-        model: {
-          variables: variables,
+        Level: 'Run',
+        Transformations: this.state.analysis.transformations,
+        Contrasts: this.state.analysis.contrasts,
+        AutoContrasts: this.state.analysis.autoContrast,
+        Model: {
+          X: X,
         }
       },
       {
-        level: 'dataset',
-        auto_contrasts: true
+        Level: 'Dataset',
+        AutoContrasts: true
       }
     ];
 
     if (this.state.analysis.hrfPredictorIds) {
-      let hrfVariables: string[];
-      hrfVariables = this.state.analysis.hrfPredictorIds.map(id => {
+      let hrfX: string[];
+      hrfX = this.state.analysis.hrfPredictorIds.map(id => {
         let found = this.state.availablePredictors.find(elem => elem.id === id);
         if (found) {
           return found.name;
         }
         return '';
       });
-      hrfVariables = hrfVariables.filter(x => x !== '');
-      if (hrfVariables.length > 0) {
-        let hrfTransforms = {'name': 'ConvolveHRF' as TransformName, 'input': hrfVariables};
+      hrfX = hrfX.filter(x => x !== '');
+      if (hrfX.length > 0) {
+        let hrfTransforms = {'Name': 'Convolve' as TransformName, 'Input': hrfX};
         // Right now we only want one HRF transform, remove all others to prevent duplicates
-        steps[0].transformations = steps[0].transformations!.filter(x => x.name !== 'ConvolveHRF');
+        steps[0].transformations = steps[0].transformations!.filter(x => x.name !== 'Convolve');
         steps[0].transformations!.push(hrfTransforms);
       }
     }
@@ -414,10 +414,10 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
         }
         if (data.model.steps[i].transformations) {
           data.transformations = data.model.steps[i].transformations!.filter((x) => {
-            return x.name !== 'ConvolveHRF' as TransformName;
+            return x.name !== 'Convolve' as TransformName;
           });
           let hrfTransforms = data.model.steps[i].transformations!.filter((x) => {
-            return x.name === 'ConvolveHRF' as TransformName;
+            return x.name === 'Convolve' as TransformName;
           });
           if (hrfTransforms.length > 0) {
             hrfTransforms.map(x => x.input ? x.input.map(y => hrfPredictorIds.push(y)) : null);
@@ -426,8 +426,8 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
         if (data.model.steps[i].contrasts) {
           data.contrasts = data.model.steps[i].contrasts;
         }
-        if (data.model.steps[i].auto_contrasts) {
-          autoContrast = data.model.steps[i].auto_contrasts;
+        if (data.model.steps[i].AutoContrasts) {
+          autoContrast = data.model.steps[i].AutoContrasts;
         }
       }
     }
@@ -599,14 +599,14 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
     if (!this.state.model || !this.state.model.input) {
       return [];
     }
-    let keys = ['subject', 'session', 'run'];
+    let keys = ['Subject', 'Session', 'Run'];
     keys.map(key => {
       if (!input[key]) {return; }
       runIds = runIds.filter((x) => {
-        if ((key !== 'run' && x[key] === undefined) || (key === 'run' && x.number === undefined)) {
+        if ((key !== 'Run' && x[key] === undefined) || (key === 'Run' && x.number === undefined)) {
           return true;
         }
-        if (key === 'run') {
+        if (key === 'Run') {
           return input[key]!.indexOf(parseInt(x.number, 10)) > -1;
         }
         return input[key].indexOf(x[key]) > -1;
@@ -843,7 +843,7 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
                 >
                   <XformsTab
                     predictors={selectedPredictors}
-                    xforms={analysis.transformations.filter(x => x.name !== 'ConvolveHRF')}
+                    xforms={analysis.transformations.filter(x => x.name !== 'Convolve')}
                     onSave={xforms => this.updateTransformations(xforms)}
                   />
                   <br/>

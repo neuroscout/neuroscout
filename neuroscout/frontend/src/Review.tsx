@@ -107,12 +107,12 @@ class ModelSteps extends React.Component<{steps: Step[]}, {}> {
 }
 
 // In the future this will include the new named outputs from transformations.
-class Variables extends React.Component<{model: BidsModel, available: Predictor[]}, {}> {
+class X extends React.Component<{model: BidsModel, available: Predictor[]}, {}> {
   render() {
     let { model, available } = this.props;
     let modelVars: string[] = [];
-    if (model.steps && model.steps[0] && model.steps[0].model && model.steps[0].model!.variables) {
-      modelVars = model.steps[0].model!.variables;
+    if (model.steps && model.steps[0] && model.steps[0].model && model.steps[0].model!.X) {
+      modelVars = model.steps[0].model!.X;
     }
     let displayVars = available.filter(x => modelVars.indexOf('' + x.name) > -1);
     let display: any[] = [];
@@ -141,8 +141,8 @@ export class Review extends React.Component<ReviewProps, {}> {
     }
 
     let autoContrasts: boolean = false;
-    if (steps && steps[0] && steps[0].auto_contrasts) {
-      autoContrasts = steps[0].auto_contrasts!;
+    if (steps && steps[0] && steps[0].AutoContrasts) {
+      autoContrasts = steps[0].AutoContrasts!;
     }
 
     return (
@@ -152,8 +152,8 @@ export class Review extends React.Component<ReviewProps, {}> {
         <p>{description ? description : 'No description.'}</p>
         <Collapse>
         <Panel header="Inputs" key="inputs"><ModelInput model={model}/></Panel>
-        <Panel header="Variables" key="variables">
-          <Variables model={this.props.model} available={this.props.availablePredictors}/>
+        <Panel header="X" key="X">
+          <X model={this.props.model} available={this.props.availablePredictors}/>
         </Panel>
         <Panel header="Transformations" key="xforms"><ReviewObjects input={xforms}/></Panel>
         <Panel header="Contrasts" key="contrasts">

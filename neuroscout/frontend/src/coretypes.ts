@@ -104,7 +104,7 @@ interface PredictorsParam {
 export type Parameter = BooleanParam | PredictorsParam;
 
 export type TransformName = 'Scale' | 'Orthogonalize' | 'Sum' | 'Product' | 'Threshold'
-  | 'Or' | 'And' | 'Not' | 'ConvolveHRF' | 'Replace';
+  | 'Or' | 'And' | 'Not' | 'Convolve' | 'Replace';
 
 export type StepLevel = 'run' | 'session' | 'subject' | 'dataset';
 
@@ -199,37 +199,37 @@ export interface ApiAnalysis {
 }
 
 export interface BidsModel {
-  input?: ImageInput;
-  steps?: Step[] | never[];
-  name?: string;
-  description?: string;
+  Input?: ImageInput;
+  Steps?: Step[] | never[];
+  Name?: string;
+  Description?: string;
 }
 
 export interface ImageInput {
-  task?: string;
-  run?: number[];
-  session?: string[];
-  subject?: string[];
+  Task?: string;
+  Run?: number[];
+  Session?: string[];
+  Subject?: string[];
 }
 
 export interface Step {
-  model?: StepModel;
-  transformations?: Transformation[];
-  contrasts?: Contrast[];
-  level: string;
-  auto_contrasts?: boolean;
+  Model?: StepModel;
+  Transformations?: Transformation[];
+  Contrasts?: Contrast[];
+  Level: string;
+  AutoContrasts?: boolean;
 }
 
 export interface StepModel {
-  variables: string[];
-  HRF_variables?: string[];
+  X: string[];
+  HRF_X?: string[];
 }
 
 export interface ModelContrast {
-  name: string;
-  predictors: string[];
-  weights: number[];
-  contrastType: 't' | 'F';
+  Name: string;
+  Predictors: string[];
+  Weights: number[];
+  ContrastType: 't' | 'F';
 }
 
 // Shape of User object as consumed/produced by the backend API
