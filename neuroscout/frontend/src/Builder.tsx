@@ -28,8 +28,8 @@ import {
   AnalysisStatus,
   Transformation,
   Contrast,
-  Block,
-  BlockModel,
+  Step,
+  StepModel,
   BidsModel,
   ImageInput,
   TransformName,
@@ -88,10 +88,10 @@ let initializeStore = (): Store => ({
     contrasts: [],
     autoContrast: true,
     model: {
-      blocks: [{
-        level: 'run',
-        transformations: [],
-        contrasts: []
+      Steps: [{
+        Level: 'Run',
+        Transformations: [],
+        Contrasts: []
       }]
     }
   },
@@ -102,13 +102,13 @@ let initializeStore = (): Store => ({
   selectedPredictors: [],
   selectedHRFPredictors: [],
   unsavedChanges: false,
-  currentLevel: 'run',
+  currentLevel: 'Run',
   postReports: false,
   model: {
-    blocks: [{
-      level: 'run',
-      transformations: [],
-      contrasts: []
+    Steps: [{
+      Level: 'Run',
+      Transformations: [],
+      Contrasts: []
     }]
   },
   poll: true
@@ -216,72 +216,72 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
      * predictors field in the database is dropped, predictorIds should be converted
      * to hold predictor names instead of Ids.
      */
-    let variables: string[];
-    variables = this.state.analysis.predictorIds.map(id => {
+    let X: string[];
+    X = this.state.analysis.predictorIds.map(id => {
       let found = this.state.availablePredictors.find(elem => elem.id === id);
       if (found) {
         return found.name;
       }
       return '';
     });
-    variables = variables.filter(x => x !== '');
+    X = X.filter(x => x !== '');
 
-    let blocks: Block[] = [
+    let steps: Step[] = [
       {
-        level: 'run',
-        transformations: this.state.analysis.transformations,
-        contrasts: this.state.analysis.contrasts,
-        auto_contrasts: this.state.analysis.autoContrast,
-        model: {
-          variables: variables,
+        Level: 'Run',
+        Transformations: this.state.analysis.transformations,
+        Contrasts: this.state.analysis.contrasts,
+        AutoContrasts: this.state.analysis.autoContrast,
+        Model: {
+          X: X,
         }
       },
       {
-        level: 'dataset',
-        auto_contrasts: true
+        Level: 'Dataset',
+        AutoContrasts: true
       }
     ];
 
     if (this.state.analysis.hrfPredictorIds) {
-      let hrfVariables: string[];
-      hrfVariables = this.state.analysis.hrfPredictorIds.map(id => {
+      let hrfX: string[];
+      hrfX = this.state.analysis.hrfPredictorIds.map(id => {
         let found = this.state.availablePredictors.find(elem => elem.id === id);
         if (found) {
           return found.name;
         }
         return '';
       });
-      hrfVariables = hrfVariables.filter(x => x !== '');
-      if (hrfVariables.length > 0) {
-        let hrfTransforms = {'name': 'ConvolveHRF' as TransformName, 'input': hrfVariables};
+      hrfX = hrfX.filter(x => x !== '');
+      if (hrfX.length > 0) {
+        let hrfTransforms = {'Name': 'Convolve' as TransformName, 'Input': hrfX};
         // Right now we only want one HRF transform, remove all others to prevent duplicates
-        blocks[0].transformations = blocks[0].transformations!.filter(x => x.name !== 'ConvolveHRF');
-        blocks[0].transformations!.push(hrfTransforms);
+        steps[0].Transformations = steps[0].Transformations!.filter(x => x.Name !== 'Convolve');
+        steps[0].Transformations!.push(hrfTransforms);
       }
     }
 
     let imgInput: ImageInput = {};
     if (runs.length > 0) {
-      imgInput.run = runs;
+      imgInput.Run = runs;
     }
 
     if (sessions.length > 0) {
-      imgInput.session = sessions;
+      imgInput.Session = sessions;
     }
 
     if (subjects.length >  0) {
-      imgInput.subject = subjects;
+      imgInput.Subject = subjects;
     }
 
     if (task[0]) {
-      imgInput.task = task[0];
+      imgInput.Task = task[0];
     }
 
     return {
-      name: this.state.analysis.name,
-      description: this.state.analysis.description,
-      input: imgInput,
-      blocks: blocks,
+      Name: this.state.analysis.name,
+      Description: this.state.analysis.description,
+      Input: imgInput,
+      Steps: steps,
     };
   };
 
@@ -403,31 +403,31 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
 
     data.transformations = [];
 
-    // Extract transformations and contrasts from within block object of response.
+    // Extract transformations and contrasts from within step object of response.
     let contrasts;
     let autoContrast;
     let hrfPredictorIds: string[] = [];
-    if (data && data.model && data.model.blocks) {
-      for (var i = 0; i < data.model.blocks.length; i++) {
-        if (data.model.blocks[i].level !== this.state.currentLevel) {
+    if (data && data.model && data.model.Steps) {
+      for (var i = 0; i < data.model.Steps.length; i++) {
+        if (data.model.Steps[i].Level !== this.state.currentLevel) {
           continue;
         }
-        if (data.model.blocks[i].transformations) {
-          data.transformations = data.model.blocks[i].transformations!.filter((x) => {
-            return x.name !== 'ConvolveHRF' as TransformName;
+        if (data.model.Steps[i].Transformations) {
+          data.transformations = data.model.Steps[i].Transformations!.filter((x) => {
+            return x.Name !== 'Convolve' as TransformName;
           });
-          let hrfTransforms = data.model.blocks[i].transformations!.filter((x) => {
-            return x.name === 'ConvolveHRF' as TransformName;
+          let hrfTransforms = data.model.Steps[i].Transformations!.filter((x) => {
+            return x.Name === 'Convolve' as TransformName;
           });
           if (hrfTransforms.length > 0) {
-            hrfTransforms.map(x => x.input ? x.input.map(y => hrfPredictorIds.push(y)) : null);
+            hrfTransforms.map(x => x.Input ? x.Input.map(y => hrfPredictorIds.push(y)) : null);
           }
         }
-        if (data.model.blocks[i].contrasts) {
-          data.contrasts = data.model.blocks[i].contrasts;
+        if (data.model.Steps[i].Contrasts) {
+          data.contrasts = data.model.Steps[i].Contrasts;
         }
-        if (data.model.blocks[i].auto_contrasts) {
-          autoContrast = data.model.blocks[i].auto_contrasts;
+        if (data.model.Steps[i].AutoContrasts) {
+          autoContrast = data.model.Steps[i].AutoContrasts;
         }
       }
     }
@@ -596,17 +596,17 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
 
   runIdsFromModel = (availableRuns: Run[], input: ImageInput) => {
     let runIds: Run[] = availableRuns;
-    if (!this.state.model || !this.state.model.input) {
+    if (!this.state.model || !this.state.model.Input) {
       return [];
     }
-    let keys = ['subject', 'session', 'run'];
+    let keys = ['Subject', 'Session', 'Run'];
     keys.map(key => {
       if (!input[key]) {return; }
       runIds = runIds.filter((x) => {
-        if ((key !== 'run' && x[key] === undefined) || (key === 'run' && x.number === undefined)) {
+        if ((key !== 'Run' && x[key] === undefined) || (key === 'Run' && x.number === undefined)) {
           return true;
         }
-        if (key === 'run') {
+        if (key === 'Run') {
           return input[key]!.indexOf(parseInt(x.number, 10)) > -1;
         }
         return input[key].indexOf(x[key]) > -1;
@@ -638,8 +638,8 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
           .then((data: Run[]) => {
             let availTasks = getTasks(datasets, updatedAnalysis.datasetId);
 
-            if (updatedAnalysis.model && updatedAnalysis.model.input) {
-              updatedAnalysis.runIds = this.runIdsFromModel(data, updatedAnalysis.model.input);
+            if (updatedAnalysis.model && updatedAnalysis.model.Input) {
+              updatedAnalysis.runIds = this.runIdsFromModel(data, updatedAnalysis.model.Input);
             } else {
               updatedAnalysis.runIds = data.map(x => x.id);
             }
@@ -843,7 +843,7 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
                 >
                   <XformsTab
                     predictors={selectedPredictors}
-                    xforms={analysis.transformations.filter(x => x.name !== 'ConvolveHRF')}
+                    xforms={analysis.transformations.filter(x => x.Name !== 'Convolve')}
                     onSave={xforms => this.updateTransformations(xforms)}
                   />
                   <br/>

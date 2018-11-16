@@ -14,8 +14,8 @@ import {
   AnalysisConfig,
   Transformation,
   Contrast,
-  Block,
-  BlockModel,
+  Step,
+  StepModel,
   BidsModel,
   ImageInput,
   TransformName
@@ -96,7 +96,7 @@ interface ReportProps {
 
 interface ReportState {
   matrices: string[];
-  plots: string[]; 
+  plots: string[];
   reportTimestamp: string;
   reportTraceback: string;
   compileTraceback: string;
@@ -113,7 +113,7 @@ export class Report extends React.Component<ReportProps, ReportState> {
     let state: ReportState = {
       matrices: [],
       plots: [],
-      reportTimestamp: '', 
+      reportTimestamp: '',
       reportsLoaded: false,
       reportsPosted: false,
       compileLoaded: false,
@@ -161,7 +161,7 @@ export class Report extends React.Component<ReportProps, ReportState> {
         state.reportTimestamp = res.generated_at;
         if (res.traceback) {
           state.reportTraceback = res.traceback;
-        } 
+        }
       } else if (res.status === 'FAILED') {
         state.reportTraceback = res.traceback;
       } else if (res.statusCode === 404 && !this.state.reportsPosted) {

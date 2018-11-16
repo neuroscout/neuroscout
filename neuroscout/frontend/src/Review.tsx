@@ -14,8 +14,8 @@ import {
   AnalysisConfig,
   Transformation,
   Contrast,
-  Block,
-  BlockModel,
+  Step,
+  StepModel,
   BidsModel,
   ImageInput,
   TransformName
@@ -33,17 +33,17 @@ interface ReviewProps {
 
 class ModelInput extends React.Component<{model: BidsModel}, {}> {
   render() {
-    if (this.props.model.input === undefined) {
+    if (this.props.model.Input === undefined) {
       return;
     }
-    let input = this.props.model.input;
-    let runs = input.run ? input.run.sort().map(x => <li key={x}>{x}</li>) : [];
-    let subjects = input.subject ? alphaSort(input.subject).join(', ') : [];
-    let sessions = input.session ? alphaSort(input.session).join(', ') : [];
+    let input = this.props.model.Input;
+    let runs = input.Run ? input.Run.sort().map(x => <li key={x}>{x}</li>) : [];
+    let subjects = input.Subject ? alphaSort(input.Subject).join(', ') : [];
+    let sessions = input.Session ? alphaSort(input.Session).join(', ') : [];
 
     return (
       <div>
-        <Card title="Task" key="task">{input.task ? input.task : ''}</Card>
+        <Card title="Task" key="task">{input.Task ? input.Task : ''}</Card>
         {(runs.length > 0) && <Card title="Runs" key="runs"><ul>{runs}</ul></Card>}
         {(subjects.length > 0) && <Card title="Subjects" key="subjects"><p>{subjects}</p></Card>}
         {(sessions.length > 0) && <Card title="Sessions" key="sessions"><p>{sessions}</p></Card>}
@@ -60,7 +60,7 @@ class ReviewObjects extends React.Component<{input: (Transformation | Contrast)[
     if (this.props.autoContrasts !== undefined) {
       display.push(<div key="ac"><h3>Auto Contrasts:</h3>{'' + this.props.autoContrasts}</div>);
     }
-    input.map((x, i) => display.push(<div key={i}><h3>{x.name}:</h3><pre>{JSON.stringify(x, null, 2)}</pre></div>));
+    input.map((x, i) => display.push(<div key={i}><h3>{x.Name}:</h3><pre>{JSON.stringify(x, null, 2)}</pre></div>));
 
     return (
       <div>{display}</div>
@@ -68,13 +68,13 @@ class ReviewObjects extends React.Component<{input: (Transformation | Contrast)[
   }
 }
 
-class ModelBlock extends React.Component<{block: Block}, {}> {
+class ModelStep extends React.Component<{step: Step}, {}> {
   render() {
-    let block = this.props.block;    
+    let step = this.props.step;
     let xforms: any = '';
-    if (block.transformations !== undefined) {
+    if (step.Transformations !== undefined) {
         xforms = (
-          <ReviewObjects input={block.transformations}/>
+          <ReviewObjects input={step.Transformations}/>
         );
     }
     return (
@@ -86,17 +86,17 @@ class ModelBlock extends React.Component<{block: Block}, {}> {
   }
 }
 
-// <Panel header="Blocks" key="blocks"><ModelBlocks blocks={blocks as Block[]}/></Panel>
-// Only displaying run level block right now so this is unused.
-class ModelBlocks extends React.Component<{blocks: Block[]}, {}> {
+// <Panel header="Steps" key="Steps"><ModelSteps Steps={Steps as Step[]}/></Panel>
+// Only displaying run level step right now so this is unused.
+class ModelSteps extends React.Component<{Steps: Step[]}, {}> {
   render() {
-      if (this.props.blocks === undefined) {
+      if (this.props.Steps === undefined) {
         return;
       }
-      let blocks = this.props.blocks;
+      let Steps = this.props.Steps;
       let display: any[] = [];
-      blocks.map((x, i) => display.push(
-        <Panel header={`${x.level} Level`} key={i.toString()}><ModelBlock block={x}/></Panel>)
+      Steps.map((x, i) => display.push(
+        <Panel header={`${x.Level} Level`} key={i.toString()}><ModelStep step={x}/></Panel>)
       );
       return (
         <Collapse>
@@ -107,12 +107,12 @@ class ModelBlocks extends React.Component<{blocks: Block[]}, {}> {
 }
 
 // In the future this will include the new named outputs from transformations.
-class Variables extends React.Component<{model: BidsModel, available: Predictor[]}, {}> {
+class X extends React.Component<{model: BidsModel, available: Predictor[]}, {}> {
   render() {
     let { model, available } = this.props;
     let modelVars: string[] = [];
-    if (model.blocks && model.blocks[0] && model.blocks[0].model && model.blocks[0].model!.variables) {
-      modelVars = model.blocks[0].model!.variables;
+    if (model.Steps && model.Steps[0] && model.Steps[0].Model && model.Steps[0].Model!.X) {
+      modelVars = model.Steps[0].Model!.X;
     }
     let displayVars = available.filter(x => modelVars.indexOf('' + x.name) > -1);
     let display: any[] = [];
@@ -124,36 +124,36 @@ class Variables extends React.Component<{model: BidsModel, available: Predictor[
 export class Review extends React.Component<ReviewProps, {}> {
   render() {
     let model = this.props.model;
-    let { name, description, blocks, input } = model;
-    if (model && model.name) { name = model.name; }
-    if (model && model.blocks) { blocks = model.blocks; }
+    let { Name, Description, Steps, Input } = model;
+    if (model && model.Name) { Name = model.Name; }
+    if (model && model.Steps) { Steps = model.Steps; }
 
     // Only looking at run level transfomraitons right now.
     let xforms: Transformation[] = [];
-    if (blocks && blocks[0] && blocks[0].transformations) {
-      xforms = blocks[0].transformations!;
+    if (Steps && Steps[0] && Steps[0].Transformations) {
+      xforms = Steps[0].Transformations!;
     }
 
     // Only looking at run level transfomraitons right now.
     let contrasts: Contrast[] = [];
-    if (blocks && blocks[0] && blocks[0].contrasts) {
-      contrasts = blocks[0].contrasts!;
+    if (Steps && Steps[0] && Steps[0].Contrasts) {
+      contrasts = Steps[0].Contrasts!;
     }
 
     let autoContrasts: boolean = false;
-    if (blocks && blocks[0] && blocks[0].auto_contrasts) {
-      autoContrasts = blocks[0].auto_contrasts!;
+    if (Steps && Steps[0] && Steps[0].AutoContrasts) {
+      autoContrasts = Steps[0].AutoContrasts!;
     }
 
     return (
       <Card
-        title={'Overview of ' + (name ? name : 'No Name')}
+        title={'Overview of ' + (Name ? Name : 'No Name')}
       >
-        <p>{description ? description : 'No description.'}</p>
+        <p>{Description ? Description : 'No description.'}</p>
         <Collapse>
         <Panel header="Inputs" key="inputs"><ModelInput model={model}/></Panel>
-        <Panel header="Variables" key="variables">
-          <Variables model={this.props.model} available={this.props.availablePredictors}/>
+        <Panel header="X" key="X">
+          <X model={this.props.model} available={this.props.availablePredictors}/>
         </Panel>
         <Panel header="Transformations" key="xforms"><ReviewObjects input={xforms}/></Panel>
         <Panel header="Contrasts" key="contrasts">
