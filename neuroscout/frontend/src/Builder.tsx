@@ -970,6 +970,7 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
                     confirmSubmission={this.confirmSubmission}
                     private={analysis.private || false}
                     updateAnalysis={this.updateAnalysis}
+                    userOwns={this.props.userOwns}
                   >
                   {this.props.userOwns &&
                       <EditDetails

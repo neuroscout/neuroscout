@@ -74,7 +74,8 @@ type submitProps = {
   analysisId?: string,
   confirmSubmission: () => void,
   private: boolean,
-  updateAnalysis?: (value: Partial<Analysis>) => void
+  updateAnalysis?: (value: Partial<Analysis>) => void,
+  userOwns?: boolean
 };
 
 export class Submit extends React.Component<submitProps, {tosAgree: boolean}> {
@@ -158,19 +159,24 @@ export class StatusTab extends React.Component<submitProps, {compileTraceback: s
   }
 
   render() {
+    // tslint:disable-next-line:no-console
+    console.log(this.props);
     return(
       <div>
       <div className="statusHeader">
-        <PubAccess private={this.props.private} updateAnalysis={this.props.updateAnalysis!} />
-        <span>{' '}</span>
+        {this.props.userOwns && 
+          <>
+          <PubAccess private={this.props.private} updateAnalysis={this.props.updateAnalysis!} />
+          <span>{' '}</span>
+          </>}
         <Status status={this.props.status} analysisId={this.props.analysisId} />
       </div>
       {(this.props.status === 'PASSED') &&
         <div>
           <h3>Analysis Passed</h3>
           <p>
-            Congratulations! Your analysis is finished compiling and is ready to be executed.
-            Once you have installed neuroscout-cli you may run your analysis with the following command,
+            Congratulations! The analysis is finished compiling and is ready to be executed.
+            Once you have installed neuroscout-cli you may run the analysis with the following command,
             replacing '/local/outputdirectory' with the directory on your local computer where results
             should be stored:
           </p>
