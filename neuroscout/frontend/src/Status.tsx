@@ -159,8 +159,6 @@ export class StatusTab extends React.Component<submitProps, {compileTraceback: s
   }
 
   render() {
-    // tslint:disable-next-line:no-console
-    console.log(this.props);
     return(
       <div>
       <div className="statusHeader">
