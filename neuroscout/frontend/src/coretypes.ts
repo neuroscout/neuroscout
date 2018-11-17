@@ -171,6 +171,7 @@ export interface Store {
   postReports: boolean;
   model: BidsModel;
   poll: boolean;
+  saveFromUpdate: boolean;
 }
 
 export interface ApiRun {

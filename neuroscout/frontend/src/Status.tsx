@@ -1,8 +1,8 @@
 import * as React from 'react';
-import { Button, Card, Checkbox, Tag, Icon } from 'antd';
+import { Button, Card, Checkbox, Tag, Icon, Tooltip, Switch } from 'antd';
 import { config } from './config';
 import { displayError, jwtFetch, alphaSort, timeout } from './utils';
-import { ApiAnalysis } from './coretypes';
+import { ApiAnalysis, Analysis } from './coretypes';
 
 const domainRoot = config.server_url;
 
@@ -50,12 +50,31 @@ export class DLLink extends React.Component<{status?: string, analysisId?: strin
     }
 }
 
+type PubAccessProps = {
+  private: boolean | undefined,
+  updateAnalysis: (value: Partial<Analysis>, unsavedChanges: boolean, save: boolean) => void
+};
+class PubAccess extends React.Component<PubAccessProps, {}> {
+  render() {
+    return (
+      <Tooltip title="Should this analysis be private (only visible to you) or public?">
+        <Switch
+          checked={!this.props.private}
+          checkedChildren="Public"
+          unCheckedChildren="Private"
+          onChange={checked => this.props.updateAnalysis({'private': !checked}, false, true)}
+        />
+      </Tooltip>
+    );
+  }
+}
+
 type submitProps = {
   status?: string,
   analysisId?: string,
   confirmSubmission: () => void,
   private: boolean,
-  updateStatus?: (any) => void
+  updateAnalysis?: (value: Partial<Analysis>) => void
 };
 
 export class Submit extends React.Component<submitProps, {tosAgree: boolean}> {
@@ -142,7 +161,8 @@ export class StatusTab extends React.Component<submitProps, {compileTraceback: s
     return(
       <div>
       <div className="statusHeader">
-        {this.props.children}
+        <PubAccess private={this.props.private} updateAnalysis={this.props.updateAnalysis!} />
+        <span>{' '}</span>
         <Status status={this.props.status} analysisId={this.props.analysisId} />
       </div>
       {(this.props.status === 'PASSED') &&
@@ -193,6 +213,7 @@ export class StatusTab extends React.Component<submitProps, {compileTraceback: s
           <p>Analysis generation may take some time. This page will update when complete.</p>
         </div>
       }
+      {this.props.children}
       </div>
     );
   }
