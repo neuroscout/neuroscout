@@ -68,15 +68,10 @@
   resolved "https://registry.yarnpkg.com/@types/json5/-/json5-0.0.29.tgz#ee28707ae94e11d2b827bcbe5270bcea7f3e71ee"
   integrity sha1-7ihweulOEdK4J7y+UnC86n8+ce4=
 
-"@types/node@*":
-  version "6.14.2"
-  resolved "https://registry.yarnpkg.com/@types/node/-/node-6.14.2.tgz#40b3dbb1221c7d66802cbcc32fe3b85e54569c77"
-  integrity sha512-JWB3xaVfsfnFY8Ofc9rTB/op0fqqTSqy4vBcVk1LuRJvta7KTX+D//fCkiTMeLGhdr2EbFZzQjC97gvmPilk9Q==
-
-"@types/node@^10.0.6":
-  version "10.12.7"
-  resolved "https://registry.yarnpkg.com/@types/node/-/node-10.12.7.tgz#195808b2d4b2e7c33e75e7d9b24aeee88f94660d"
-  integrity sha512-Zh5Z4kACfbeE8aAOYh9mqotRxaZMro8MbBQtR8vEXOMiZo2rGEh2LayJijKdlu48YnS6y2EFU/oo2NCe5P6jGw==
+"@types/node@*", "@types/node@^10.0.6":
+  version "10.12.9"
+  resolved "https://registry.yarnpkg.com/@types/node/-/node-10.12.9.tgz#a07bfa74331471e1dc22a47eb72026843f7b95c8"
+  integrity sha512-eajkMXG812/w3w4a1OcBlaTwsFPO5F7fJ/amy+tieQxEMWBlbV1JGSjkFM+zkHNf81Cad+dfIRA+IBkvmvdAeA==
 
 "@types/prop-types@*":
   version "15.5.6"
@@ -266,7 +261,7 @@ ant-design-palettes@^1.1.3:
   dependencies:
     tinycolor2 "^1.4.1"
 
-antd@*, antd@^3.5.1:
+antd@*, antd@^3.10.7:
   version "3.10.7"
   resolved "https://registry.yarnpkg.com/antd/-/antd-3.10.7.tgz#7c7901dc18532e5467f84d241921e4a072d5f2a8"
   integrity sha512-lV3X8m8OJZ/YP1E+Bv89jx0uZvrHE44RDs4fdY9Qoez9MZ+yxka9AarfH9vB+QMbcEAtfzCNynAoZ2GvQ0xFHA==
@@ -7206,9 +7201,9 @@ rc-hammerjs@~0.6.0:
     prop-types "^15.5.9"
 
 rc-input-number@~4.3.0:
-  version "4.3.1"
-  resolved "https://registry.yarnpkg.com/rc-input-number/-/rc-input-number-4.3.1.tgz#f4b7f414f00816fd803ce5f11aac25bd38dd0f22"
-  integrity sha512-804O+hgb/+F6cr8m47UeFAENfBtaLiAMfzxjuVPjZtrwh0PD94AihjceZklpu8vN9sgogj2OTXHzj8CLWAXWuQ==
+  version "4.3.4"
+  resolved "https://registry.yarnpkg.com/rc-input-number/-/rc-input-number-4.3.4.tgz#85bf8a0c24b0b717344870a48453c92bb2d69899"
+  integrity sha512-yLbcomRqk9M6mipLyydKp94OtlIFSagE/aAoo3gnnUJn/cAndhoFPwOkamfDG50/5kGc9K3sMJayEUICeZlOJQ==
   dependencies:
     babel-runtime "6.x"
     classnames "^2.2.0"
@@ -9047,10 +9042,10 @@ typedarray@^0.0.6:
   resolved "https://registry.yarnpkg.com/typedarray/-/typedarray-0.0.6.tgz#867ac74e3864187b1d3d47d996a78ec5c8830777"
   integrity sha1-hnrHTjhkGHsdPUfZlqeOxciDB3c=
 
-typescript@^2.8.3:
-  version "2.9.2"
-  resolved "https://registry.yarnpkg.com/typescript/-/typescript-2.9.2.tgz#1cbf61d05d6b96269244eb6a3bce4bd914e0f00c"
-  integrity sha512-Gr4p6nFNaoufRIY4NMdpQRNmgxVIGMs4Fcu/ujdYk3nAZqk7supzBE9idmvfZIlH/Cuj//dvi+019qEue9lV0w==
+typescript@^3:
+  version "3.1.6"
+  resolved "https://registry.yarnpkg.com/typescript/-/typescript-3.1.6.tgz#b6543a83cfc8c2befb3f4c8fba6896f5b0c9be68"
+  integrity sha512-tDMYfVtvpb96msS1lDX9MEdHrW4yOuZ4Kdc4Him9oU796XldPYF/t2+uKoX0BBa0hXXwDlqYQbXY5Rzjzc5hBA==
 
 ua-parser-js@^0.7.18:
   version "0.7.19"
