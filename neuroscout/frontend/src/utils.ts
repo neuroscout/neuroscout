@@ -38,10 +38,6 @@ export const moveItem: MoveItem<any> = (array, index, direction) => {
 // - Decoding JSON response and adding the response status code to decoded JSON object
 export const jwtFetch = (path: string, options?: object) => {
   const jwt = window.localStorage.getItem('jwt');
-  if (jwt === null) {
-    const error = 'JWT not found in local storage. You must be logged in.';
-    message.error(error);
-  }
 
   const newOptions = {
     ...options,

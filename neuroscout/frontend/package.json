@@ -11,10 +11,11 @@
     "@types/react": "^16.3.14",
     "@types/react-dom": "^16.0.5",
     "@types/reflux": "^6.4.1",
-    "antd": "^3.5.1",
+    "antd": "^3.10.7",
     "jwt-decode": "^2.2.0",
     "react": "^16.3.2",
     "react-dom": "^16.3.2",
+    "react-google-login": "^3.2.1",
     "react-router": "^4.1.1",
     "react-router-dom": "^4.1.1",
     "reflux": "^6.4.1"
@@ -25,7 +26,7 @@
     "enzyme-adapter-react-16": "^1.1.1",
     "react-scripts-ts": "^2.3.2",
     "tsutils": "^2.26.2",
-    "typescript": "^2.8.3"
+    "typescript": "^3"
   },
   "scripts": {
     "start": "react-scripts-ts start",
