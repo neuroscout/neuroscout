@@ -104,26 +104,26 @@ interface PredictorsParam {
 export type Parameter = BooleanParam | PredictorsParam;
 
 export type TransformName = 'Scale' | 'Orthogonalize' | 'Sum' | 'Product' | 'Threshold'
-  | 'Or' | 'And' | 'Not' | 'ConvolveHRF' | 'Replace';
+  | 'Or' | 'And' | 'Not' | 'Convolve' | 'Replace';
 
-export type BlockLevel = 'run' | 'session' | 'subject' | 'dataset';
+export type StepLevel = 'Run' | 'Session' | 'Subject' | 'Dataset';
 
 export type ReplaceNA = 'before' | 'after' | undefined;
 
 export interface Transformation {
-  name: TransformName;
-  replace_na?: ReplaceNA;
-  input?: string[]; // predictor IDs
-  output?: string[];
-  demean?: boolean;
-  rescale?: boolean;
-  other?: string[];
-  weights?: number[];
-  threshold?: number;
-  binarize?: boolean;
-  above?: boolean;
-  signed?: boolean;
-  replace?: any;
+  Name: TransformName;
+  ReplaceNa?: ReplaceNA;
+  Input?: string[]; // predictor IDs
+  Output?: string[];
+  Demean?: boolean;
+  Rescale?: boolean;
+  Other?: string[];
+  Weights?: number[];
+  Threshold?: number;
+  Binarize?: boolean;
+  Above?: boolean;
+  Signed?: boolean;
+  Replace?: any;
 }
 
 // Lookup hash of available transformations (as specified in transforms.ts) by their name
@@ -141,10 +141,10 @@ export type TabName =
     | 'submit';
 
 export interface Contrast {
-  name: string;
-  condition_list: string[];
-  weights: number[];
-  contrastType: 't' | 'F';
+  Name: string;
+  ConditionList: string[];
+  Weights: number[];
+  ContrastType: 't' | 'F';
 }
 
 export interface Store {
@@ -167,7 +167,7 @@ export interface Store {
   selectedPredictors: Predictor[];
   selectedHRFPredictors: Predictor[];
   unsavedChanges: boolean;
-  currentLevel: BlockLevel;
+  currentLevel: StepLevel;
   postReports: boolean;
   model: BidsModel;
   poll: boolean;
@@ -200,37 +200,37 @@ export interface ApiAnalysis {
 }
 
 export interface BidsModel {
-  input?: ImageInput;
-  blocks?: Block[] | never[];
-  name?: string;
-  description?: string;
+  Input?: ImageInput;
+  Steps?: Step[] | never[];
+  Name?: string;
+  Description?: string;
 }
 
 export interface ImageInput {
-  task?: string;
-  run?: number[];
-  session?: string[];
-  subject?: string[];
+  Task?: string;
+  Run?: number[];
+  Session?: string[];
+  Subject?: string[];
 }
 
-export interface Block {
-  model?: BlockModel;
-  transformations?: Transformation[];
-  contrasts?: Contrast[];
-  level: string;
-  auto_contrasts?: boolean;
+export interface Step {
+  Model?: StepModel;
+  Transformations?: Transformation[];
+  Contrasts?: Contrast[];
+  Level: string;
+  AutoContrasts?: boolean;
 }
 
-export interface BlockModel {
-  variables: string[];
-  HRF_variables?: string[];
+export interface StepModel {
+  X: string[];
+  HRF_X?: string[];
 }
 
 export interface ModelContrast {
-  name: string;
-  predictors: string[];
-  weights: number[];
-  contrastType: 't' | 'F';
+  Name: string;
+  Predictors: string[];
+  Weights: number[];
+  ContrastType: 't' | 'F';
 }
 
 // Shape of User object as consumed/produced by the backend API

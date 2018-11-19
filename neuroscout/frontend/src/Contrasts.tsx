@@ -36,19 +36,19 @@ interface ContrastDisplayProps {
 
 const ContrastDisplay = (props: ContrastDisplayProps) => {
   const { contrast, index, onDelete, onMove, enableUp, enableDown } = props;
-  const inputs = contrast.condition_list || [];
+  const inputs = contrast.ConditionList || [];
   return (
     <div>
-      <h3>{`${index + 1}: ${contrast.name}`}</h3>
+      <h3>{`${index + 1}: ${contrast.Name}`}</h3>
       <p>Weights:</p>
       <ul>
-        {contrast.condition_list && contrast.condition_list.map((predictor, i) =>
+        {contrast.ConditionList && contrast.ConditionList.map((predictor, i) =>
           <li key={i}>
-            {predictor + ': ' + contrast.weights[i]}
+            {predictor + ': ' + contrast.Weights[i]}
           </li>
         )}
       </ul>
-      <p>{`Contrast type: ${contrast.contrastType}`}</p>
+      <p>{`Contrast type: ${contrast.ContrastType}`}</p>
       {enableUp &&
         <Button onClick={() => onMove(index, 'up')}>
           <Icon type="arrow-up" />
