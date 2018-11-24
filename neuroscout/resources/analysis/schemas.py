@@ -18,8 +18,9 @@ class AnalysisSchema(Schema):
 
 	created_at = fields.Time(dump_only=True)
 	modified_at = fields.Time(dump_only=True)
-	compiled_at = fields.Time(
-		description='Timestamp of when analysis was compiled', dump_only=True)
+	submitted_at = fields.Time(
+		description='Timestamp of when analysis was submitted for compilation',
+		dump_only=True)
 	status = fields.Str(
 		description='PASSED, FAILED, PENDING, or DRAFT.', dump_only=True)
 	locked = fields.Bool(

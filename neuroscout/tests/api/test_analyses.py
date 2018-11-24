@@ -314,7 +314,6 @@ def test_compile(auth_client, add_analysis, add_analysis_fail):
 	locked_analysis = decode_json(resp)
 
 	assert locked_analysis['status'] == 'PENDING'
-	assert 'compiled_at' not in locked_analysis
 
 	# Get full
 	resp = auth_client.get('/api/analyses/{}'.format(analysis.hash_id))

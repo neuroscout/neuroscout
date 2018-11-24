@@ -32,7 +32,7 @@ class Analysis(db.Model):
 
     created_at = db.Column(db.DateTime, default=datetime.datetime.utcnow)
     modified_at = db.Column(db.DateTime, default=datetime.datetime.utcnow)
-    compiled_at = db.Column(db.DateTime)
+    submitted_at = db.Column(db.DateTime)
     saved_count = db.Column(db.Integer, default=0)
 
     status = db.Column(db.Text, default='DRAFT')
