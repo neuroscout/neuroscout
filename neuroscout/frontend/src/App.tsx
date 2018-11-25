@@ -7,7 +7,8 @@ Top-level App component containing AppState. The App component is currently resp
 import * as React from 'react';
 import { BrowserRouter as Router, Route, Link, Redirect } from 'react-router-dom';
 import Reflux from 'reflux';
-import { Avatar, Tabs, Row, Col, Layout, Button, Modal, Menu, Icon, Input, Form, message } from 'antd';
+import { Avatar, Divider, Tabs, Row, Col, Layout, Button, Menu, Modal, Icon, Input, Form, message } from 'antd';
+import { GoogleLogin } from 'react-google-login';
 
 import './App.css';
 import AnalysisBuilder from './Builder';
@@ -23,9 +24,69 @@ import FAQ from './FAQ';
 
 const FormItem = Form.Item;
 const DOMAINROOT = config.server_url;
+const GOOGLECLIENTID = config.google_client_id;
 const { localStorage } = window;
 
 const { Header, Content, Footer, Sider } = Layout;
+
+type JWTChangeProps = {
+  loadAnalyses:  () => any;
+  checkAnalysesStatus: (key: number) => any;
+};
+
+// This global var lets the dumb polling loops know when to exit.
+let checkCount = 0;
+
+class JWTChange extends React.Component<JWTChangeProps, {}> {
+  constructor(props) {
+    super(props);
+    props.loadAnalyses();
+    checkCount += 1;
+    props.checkAnalysesStatus(checkCount);
+  }
+
+  render() { return null; }
+
+}
+
+class GoogleLoginBtn extends React.Component<{}, {}> {
+
+  render() {
+    return (
+      <GoogleLogin
+        clientId={GOOGLECLIENTID}
+        render={renderProps => (
+          <Button
+            onClick={renderProps && renderProps.onClick}
+            style={{ width: '100%' }}
+            htmlType="submit"
+            type="primary"
+            ghost={true}
+          >
+            <Icon type="google" />
+          </Button>
+        )}
+        buttonText="Log in"
+        onSuccess={(e) => {
+          if (e.hasOwnProperty('accessToken')) {
+            authActions.update({
+              email: 'GOOGLE',
+              password: (e as any).tokenId,
+              gAuth: e,
+              openSignup: false,
+              openLogin: false
+            });
+            authActions.login();
+          }
+          return '';
+        }}
+        onFailure={(e) => {
+          return '';
+        }}
+      />
+    );
+  }
+}
 
 interface AppState {
   loadAnalyses: boolean;
@@ -44,7 +105,6 @@ const ApiToAppAnalysis = (data: ApiAnalysis): AppAnalysis => ({
 });
 
 // Top-level App component
-// <authStore, {}, AppState>
 class App extends Reflux.Component<any, {}, AppState> {
   constructor(props) {
     super(props);
@@ -63,6 +123,11 @@ class App extends Reflux.Component<any, {}, AppState> {
     if (this.state.auth.loggedIn) {
       return jwtFetch(`${DOMAINROOT}/api/user`)
         .then((data: ApiUser) => {
+          authActions.update({
+            name: (data.name || []),
+            email: (data.email || []),
+            avatar: (data.picture || [])
+          });
           this.setState({
             analyses: (data.analyses || [])
               .filter(x => !!x.status) // Ignore analyses with missing status
@@ -70,8 +135,10 @@ class App extends Reflux.Component<any, {}, AppState> {
           });
         })
         .catch(displayError);
+    } else {
+      this.setState({analyses: []});
     }
-    return Promise.reject('You are not logged in');
+    return;
   };
 
   // Load public analyses from the server
@@ -90,8 +157,9 @@ class App extends Reflux.Component<any, {}, AppState> {
   /* short polling function checking api for inprocess analyses to see if
    * there have been any changes
    */
-  checkAnalysesStatus = async () => {
+  checkAnalysesStatus = async (key: number) => {
     while (true) {
+      if (key < checkCount) { return; }
       if (!(this.state.auth.loggedIn)) { return; }
       let changeFlag = false;
       let updatedAnalyses = this.state.analyses.map(async (analysis) => {
@@ -177,10 +245,12 @@ class App extends Reflux.Component<any, {}, AppState> {
       loginError,
       signupError,
       password,
-      loggingOut
+      loggingOut,
+      avatar,
+      gAuth
     } = this.state.auth;
 
-    const {
+    let {
       analyses,
       publicAnalyses,
     } = this.state;
@@ -329,10 +399,12 @@ class App extends Reflux.Component<any, {}, AppState> {
             </Button>
           </FormItem>
         </Form>
+        <Divider> Or log in with Google </Divider>
+        <GoogleLoginBtn />
       </Modal>
     );
 
-    const signupModal = () => (
+    const signupModal = (
       <Modal
         title="Sign up for a Neuroscout account"
         visible={openSignup}
@@ -381,15 +453,22 @@ class App extends Reflux.Component<any, {}, AppState> {
             </Button>
           </FormItem>
         </Form>
+        <Divider> Or sign up using a Google account </Divider>
+        <GoogleLoginBtn />
       </Modal>
     );
 
     return (
       <Router>
         <div>
+          <JWTChange
+            loadAnalyses={this.loadAnalyses}
+            checkAnalysesStatus={this.checkAnalysesStatus}
+            key={this.state.auth.jwt}
+          />
           {openLogin && loginModal()}
           {openReset && resetPasswordModal()}
-          {openSignup && signupModal()}
+          {openSignup && signupModal}
           {openEnterResetToken && authActions.enterResetTokenModal()}
           <Layout>
 
@@ -407,9 +486,17 @@ class App extends Reflux.Component<any, {}, AppState> {
                   {this.state.auth.loggedIn ?
                     <Menu.SubMenu
                       style={{float: 'right'}}
-                      title={<Avatar shape="circle" icon="user" />}
+                      title={
+                        <Avatar
+                          shape="circle"
+                          icon="user"
+                          src={avatar ? avatar : gAuth ? gAuth.profileObj.imageUrl : ''}
+                          className="headerAvatar"
+                        />
+                      }
                     >
-                       <Menu.ItemGroup title={`${email}`}>
+
+                       <Menu.ItemGroup title={`${gAuth ? gAuth.profileObj.email : email}`}>
                          <Menu.Item
                           key="profile"
                          >
@@ -513,6 +600,7 @@ class App extends Reflux.Component<any, {}, AppState> {
                   <AnalysisBuilder
                     id={props.match.params.id}
                     updatedAnalysis={() => this.loadAnalyses()}
+                    userOwns={this.state.analyses.filter((x) => x.id === props.match.params.id).length > 0}
                   />}
               />
               <Route
@@ -522,6 +610,7 @@ class App extends Reflux.Component<any, {}, AppState> {
                   <AnalysisBuilder
                     id={props.match.params.id}
                     updatedAnalysis={() => this.loadAnalyses()}
+                    userOwns={this.state.analyses.filter((x) => x.id === props.match.params.id).length > 0}
                   />
                 }
               />
@@ -547,12 +636,6 @@ class App extends Reflux.Component<any, {}, AppState> {
   componentDidUpdate(prevProps, prevState) {
     // Need to do this so logout redirect only happens once, otherwise it'd be an infinite loop
     if (this.state.auth.loggingOut) authActions.update({ loggingOut: false });
-    if ((prevState.auth.jwt !== this.state.auth.jwt)
-      || (this.state.auth.loggedIn && this.state.loadAnalyses)) {
-      this.loadAnalyses();
-      this.checkAnalysesStatus();
-      this.setState({loadAnalyses: false});
-    }
   }
 }
 

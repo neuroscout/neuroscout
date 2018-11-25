@@ -5,7 +5,9 @@
 import { RouteComponentProps } from 'react-router';
 import { createBrowserHistory } from 'history';
 import * as React from 'react';
-import { Tag, Tabs, Row, Col, Layout, Button, Modal, Icon, message, Tooltip, Switch } from 'antd';
+import {
+  Tag, Tabs, Row, Col, Layout, Button, Modal, Icon, message, Tooltip, Switch, Form, Input, Collapse, Divider
+} from 'antd';
 import { Prompt } from 'react-router-dom';
 import { OverviewTab } from './Overview';
 import { PredictorSelector } from './Predictors';
@@ -42,6 +44,8 @@ import { authActions } from './auth.actions';
 
 const { TabPane } = Tabs;
 const { Footer, Content } = Layout;
+const Panel = Collapse.Panel;
+const FormItem = Form.Item;
 const tabOrder = ['overview', 'predictors', 'transformations', 'hrf', 'contrasts', 'review', 'submit'];
 
 const history = createBrowserHistory();
@@ -111,7 +115,8 @@ let initializeStore = (): Store => ({
       Contrasts: []
     }]
   },
-  poll: true
+  poll: true,
+  saveFromUpdate: false
 });
 
 // Normalize dataset object returned by /api/datasets
@@ -136,6 +141,64 @@ export const getTasks = (datasets: Dataset[], datasetId: string | null): Task[] 
     return [] as Task[];
 };
 
+type editDetailsProps = {
+  name: string,
+  description: string,
+  updateAnalysis: (value: Partial<Analysis>, unsavedChanges: boolean, save: boolean) => void
+};
+type editDetailsState = {newName: string, newDescription: string, visible: string[] | string};
+class EditDetails extends React.Component<editDetailsProps, editDetailsState> {
+  constructor(props: editDetailsProps) {
+    super(props);
+    this.state = this.init(props);
+  }
+
+  init(props: editDetailsProps) {
+    return {newName: props.name, newDescription: props.description, visible: []};
+  }
+
+  update() {
+    this.props.updateAnalysis({name: this.state.newName, description: this.state.newDescription}, false, true);
+  }
+
+  onChange = (e: any) => {
+    this.setState({visible: e});
+  };
+
+  render() {
+    return (
+      <div>
+      <Collapse bordered={false} activeKey={this.state.visible} onChange={this.onChange}>
+        <Panel header="Edit Analysis Details" key="1">
+          <Form layout="vertical">
+            <FormItem label="Name" required={true}>
+              <Input
+                placeholder="Name your analysis"
+                value={this.state.newName}
+                onChange={(e) => this.setState({newName: e.currentTarget.value})}
+                required={true}
+                min={1}
+              />
+            </FormItem>
+            <FormItem label="Description">
+              <Input.TextArea
+                placeholder="Description of your analysis"
+                value={this.state.newDescription}
+                autosize={{ minRows: 2, maxRows: 10 }}
+                onChange={(e) => this.setState({newDescription: e.currentTarget.value})}
+              />
+            </FormItem>
+          </Form>
+          <Button type="primary" onClick={() => {this.update(); this.setState({visible: ''}); }} size={'small'}>
+            Save Changes
+          </Button>
+        </Panel>
+      </Collapse>
+      </div>
+    );
+  }
+}
+
 // Given an updated list of predictor IDs, create an updated version of analysis config.
 // preserving the existing predictor configs, and adding/removing new/old ones as necessary
 const getUpdatedConfig = (old_config: AnalysisConfig, predictorIds: string[]): AnalysisConfig => {
@@ -158,6 +221,7 @@ const getUpdatedConfig = (old_config: AnalysisConfig, predictorIds: string[]): A
 type BuilderProps = {
   id?: string;
   updatedAnalysis: () => void;
+  userOwns?: boolean;
 };
 
 export default class AnalysisBuilder extends React.Component<BuilderProps & RouteComponentProps<{}>, Store> {
@@ -295,7 +359,7 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
       jwtFetch(`${domainRoot}/api/analyses/${id}`, { method: 'get' })
         .then((data: ApiAnalysis) => {
           if (this.state.analysis.status !== data.status) {
-            this.updateStatus(data.status);
+            this.updateAnalysis({'status': data.status});
             if (['DRAFT', 'SUBMITTING', 'PENDING'].indexOf(data.status) === -1) {
               this.setState({poll: false});
             }
@@ -312,9 +376,11 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
 
   // Save analysis to server, either with lock=false (just save), or lock=true (save & submit)
   saveAnalysis = ({ compile = false }) => (): void => {
+    /*
     if ((!compile && !this.saveEnabled()) || (compile && !this.submitEnabled())) {
       return;
     }
+    */
 
     const analysis = this.state.analysis;
     if (analysis.datasetId === null) {
@@ -450,7 +516,8 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
       transformations: data.transformations,
       contrasts: data.contrasts || [],
       model: data.model,
-      autoContrast: autoContrast
+      autoContrast: autoContrast,
+      private: data.private
     };
 
     if (analysis.runIds.length > 0) {
@@ -517,11 +584,13 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
     };
   };
 
-  updateConfig = (newConfig: AnalysisConfig): void => {
-    const newAnalysis = { ...this.state.analysis };
-    newAnalysis.config = newConfig;
-    this.setState({ analysis: newAnalysis, unsavedChanges: true });
-  };
+  /* The updateAnalysis inside Overview is doing the same as the following updateAnalysis and should be replaced with
+      this one. Alos the update xforms and contrasts after it could be replaced with this updateAnalysis.
+   */
+  updateAnalysis = (value: Partial<Analysis>, unsavedChanges = false, save = false) => {
+    let updatedAnalysis = { ...this.state.analysis, ...value };
+    this.updateState('analysis', false, save)(updatedAnalysis);
+  }
 
   updateTransformations = (xforms: Transformation[]): void => {
     this.setState({
@@ -534,12 +603,6 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
     this.setState({
       analysis: { ...this.state.analysis, contrasts },
       unsavedChanges: true
-    });
-  };
-
-  updateStatus = (status: string): void => {
-    this.setState({
-      analysis: { ...this.state.analysis, status: (status as AnalysisStatus)},
     });
   };
 
@@ -622,12 +685,14 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
    like loading a new analysis (loadAnalysis function) where updateState is called but
    since state changes aren't really user edits we don't want to set unsavedChanges.
   */
-  updateState = (attrName: keyof Store, keepClean = false) => (value: any) => {
+  updateState = (attrName: keyof Store, keepClean = false, saveToAPI = false) => (value: any) => {
     const { analysis, availableRuns, availablePredictors, datasets } = this.state;
+    /*
     if (!editableStatus.includes(analysis.status) && !keepClean) {
       message.warning('This analysis is locked and cannot be edited');
       return;
     }
+    */
     let stateUpdate: any = {};
     if (attrName === 'analysis') {
       const updatedAnalysis: Analysis = value;
@@ -681,6 +746,7 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
 
     stateUpdate[attrName] = value;
     if (!keepClean) stateUpdate.unsavedChanges = true;
+    if (saveToAPI) stateUpdate.saveFromUpdate = true;
 
     this.setState(stateUpdate);
   };
@@ -765,6 +831,11 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
     if (this.state.analysis.status === 'DRAFT') {
       authActions.checkJWT();
     }
+
+    if (this.state.saveFromUpdate) {
+      this.saveAnalysis({compile: false})();
+      this.setState({saveFromUpdate: false});
+    }
   }
 
   render() {
@@ -792,7 +863,7 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
       PENDING: 'This analysis has been submitted for generation and is being processed.',
       COMPILED: 'This analysis has been successfully generated'
     }[analysis.status];
-    // Jump to submit/results tab if no longer a draft.
+    // Jump to submit/status tab if no longer a draft.
     if (analysis.status !== 'DRAFT' && activeTab === 'overview') {
       activeTab = 'submit';
     }
@@ -887,29 +958,27 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
                         availablePredictors={this.state.availablePredictors}
                       />
                       <br/>
-                      {this.navButtons()}
+                      {this.navButtons(false, isDraft)}
                       <br/>
                     </div>
                   }
                 </TabPane>
-                <TabPane tab={isDraft ? 'Run' : 'Results'} key="submit" disabled={!submitActive && isDraft}>
+                <TabPane tab={isDraft ? 'Run' : 'Status'} key="submit" disabled={!submitActive && isDraft}>
                   <StatusTab
                     status={analysis.status}
                     analysisId={analysis.analysisId}
                     confirmSubmission={this.confirmSubmission}
                     private={analysis.private || false}
-                    updateStatus={this.updateStatus}
+                    updateAnalysis={this.updateAnalysis}
+                    userOwns={this.props.userOwns}
                   >
-                    <div className="privateSwitch">
-                      <Tooltip title="Should this analysis be private (only visible to you) or public?">
-                        <Switch
-                          checked={!analysis.private}
-                          checkedChildren="Public"
-                          unCheckedChildren="Private"
-                          onChange={checked => this.updateState('analysis')({...analysis, 'private': !checked})}
-                        />
-                      </Tooltip>
-                    </div>
+                  {this.props.userOwns &&
+                      <EditDetails
+                        name={analysis.name}
+                        description={analysis.description}
+                        updateAnalysis={this.updateAnalysis}
+                      />
+                  }
                   </StatusTab>
                 </TabPane>
               </Tabs>

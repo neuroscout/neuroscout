@@ -6,7 +6,7 @@ var jwtDecode = require('jwt-decode');
 import { authActions } from './auth.actions';
 import { config } from './config';
 import { AuthStoreState } from './coretypes';
-import { displayError } from './utils';
+import { displayError, jwtFetch } from './utils';
 
 const DOMAINROOT = config.server_url;
 
@@ -29,8 +29,10 @@ export class AuthStore extends Reflux.Store {
     } catch {
       jwt = '';
     }
+
     let _email = localStorage.getItem('email');
     let email = _email == null ? undefined : _email;
+
     return { auth: {
       jwt: jwt ? jwt : '',
       loggedIn: jwt ? true : false,
@@ -38,6 +40,7 @@ export class AuthStore extends Reflux.Store {
       loginError: '',
       signupError: '',
       resetError: '',
+      avatar: '',
       email: email,
       name: undefined,
       password: '',
@@ -47,6 +50,7 @@ export class AuthStore extends Reflux.Store {
       openEnterResetToken: false,
       loggingOut: false,
       token: null,
+      gAuth: null
     }};
   }
 
@@ -93,8 +97,8 @@ export class AuthStore extends Reflux.Store {
   // Authenticate the user with the server. This function is called from login()
   authenticate(): Promise<string> {
     return new Promise((resolve, reject) => {
-      const { email, password } = this.state.auth;
-      const { accountconfirmError } = this;
+      let { email, password } = this.state.auth;
+      let { accountconfirmError } = this;
       fetch(DOMAINROOT + '/api/auth', {
         method: 'post',
         body: JSON.stringify({ email: email, password: password }),
@@ -108,7 +112,7 @@ export class AuthStore extends Reflux.Store {
             this.update({ loginError: data.description || '' });
             reject('Authentication failed');
           } else if (data.access_token) {
-            const token = data.access_token;
+            let token = data.access_token;
             fetch(DOMAINROOT + '/api/user', {
               method: 'get',
               headers: {
@@ -139,7 +143,7 @@ export class AuthStore extends Reflux.Store {
 
   // Log user in
   login = () => {
-    const { email, password, loggedIn, openLogin, nextURL } = this.state;
+    let { email, password, loggedIn, openLogin, nextURL } = this.state;
     return this.authenticate()
       .then((jwt: string) => {
         this.update({
@@ -194,9 +198,12 @@ export class AuthStore extends Reflux.Store {
     this.update({
       loggedIn: false,
       name: undefined,
-      email: undefined, jwt: null,
+      email: undefined,
+      avatar: undefined,
+      jwt: null,
       analyses: [],
-      loggingOut: true
+      loggingOut: true,
+      gAuth: null
     });
   };
 

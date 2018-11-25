@@ -32,6 +32,8 @@ class Config(object):
 
     CACHE_DEFAULT_TIMEOUT = 0
 
+    GOOGLE_CLIENT_ID = 'clientid'
+
 class DevelopmentConfig(Config):
     ENV = 'development'
     SQLALCHEMY_DATABASE_URI = 'postgres://postgres@postgres:5432/neuroscout'
