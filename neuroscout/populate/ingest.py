@@ -204,7 +204,7 @@ def add_task(task_name, dataset_name=None, local_path=None,
 
         # Get duration (helps w/ transformations)
         try:
-            img_ni = nib.load(img.filename)
+            img_ni = nib.load(img.path)
             run_model.duration = img_ni.shape[3] * img_ni.header.get_zooms()[-1]
         except (nib.filebasedimages.ImageFileError, IndexError) as e:
             current_app.logger.debug(
@@ -232,7 +232,7 @@ def add_task(task_name, dataset_name=None, local_path=None,
 
         """ Extract Predictors"""
         # Assert event files exist (for DataLad)
-        for e in layout._get_nearest_helper(img.filename, '.tsv', suffix='events'):
+        for e in layout._get_nearest_helper(img.path, '.tsv', suffix='events'):
             assert isfile(e)
 
         collection = load_variables(
