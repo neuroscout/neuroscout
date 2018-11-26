@@ -192,7 +192,7 @@ def add_task(task_name, dataset_name=None, local_path=None,
         # Get entities
         entities = {entity : getattr(img, entity)
                     for entity in ['subject', 'session', 'acquisition']
-                    if entity in img._fields}
+                    if entity in img.entities}
         run_number = img.run if hasattr(img, 'run') else None
 
         run_model, new = get_or_create(
