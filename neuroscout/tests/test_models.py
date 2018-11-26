@@ -47,7 +47,7 @@ def test_dataset_ingestion(session, add_task):
 
 	# Test run summary statistics
 	assert len(predictor.run_statistics) == 4
-	assert predictor.run_statistics[0].mean == 167.25
+	assert 167.25 in [p.mean for p in predictor.run_statistics]
 
 	# Test predictor event
 	predictor_event = predictor.predictor_events.first()
