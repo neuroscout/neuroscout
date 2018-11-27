@@ -8,9 +8,10 @@ import webargs as wa
 from marshmallow import fields
 from ..utils import owner_required, abort, fetch_analysis
 from .schemas import (AnalysisFullSchema, AnalysisResourcesSchema, ReportSchema,
-					  AnalysisCompiledSchema)
+                      AnalysisCompiledSchema)
 import celery.states as states
 from utils import put_record
+import datetime
 
 def dump_pe(pes):
 	""" Serialize PredictorEvents, with *SPEED*, using core SQL.
@@ -50,26 +51,33 @@ def jsonify_analysis(analysis, run_id=None):
 @doc(tags=['analysis'])
 @marshal_with(AnalysisCompiledSchema)
 class CompileAnalysisResource(MethodResource):
-    @doc(summary='Compile and lock analysis.')
-    @owner_required
-    def post(self, analysis):
-        put_record({'status': 'SUBMITTING'}, analysis)
+	@doc(summary='Compile and lock analysis.')
+	@owner_required
+	def post(self, analysis):
+		put_record(
+			{'status': 'SUBMITTING', 'submitted_at': datetime.datetime.utcnow()},
+			analysis)
 
-        task = celery_app.send_task(
-                'workflow.compile',
-                args=[*jsonify_analysis(analysis),
-                      AnalysisResourcesSchema().dump(analysis)[0],
-                      analysis.dataset.local_path, None]
-                )
+		try:
+			task = celery_app.send_task(
+					'workflow.compile',
+					args=[*jsonify_analysis(analysis),
+					AnalysisResourcesSchema().dump(analysis)[0],
+					analysis.dataset.local_path, None]
+					)
+		except:
+			put_record(
+				{'status': 'FAILED', 'compile_traceback': "Submitting failed. Perhaps analysis is too large?"},
+				analysis)
 
-        put_record({'status': 'PENDING', 'compile_task_id': task.id}, analysis)
+		put_record({'status': 'PENDING', 'compile_task_id': task.id}, analysis)
 
-        return analysis
+		return analysis
 
-    @doc(summary='Check if analysis compilation status.')
-    @fetch_analysis
-    def get(self, analysis):
-    	return analysis
+	@doc(summary='Check if analysis compilation status.')
+	@fetch_analysis
+	def get(self, analysis):
+		return analysis
 
 @marshal_with(ReportSchema)
 @use_kwargs({

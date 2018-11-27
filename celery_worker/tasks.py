@@ -36,7 +36,7 @@ def _writeout_events(analysis, pes, outdir):
     outdir = outdir / "func"
     outdir.mkdir(exist_ok=True)
 
-    desc = {'Name': 'Events', 'BIDSVersion': '1.0', "PipelineDescription.Name": "Neuroscout"}
+    desc = {'Name': 'Events', 'BIDSVersion': '1.0', "PipelineDescription" : {"Name": "Neuroscout"}}
     json.dump(desc, (outdir / 'dataset_description.json').open('w'))
     # Load events and rename columns to human-readable
     pes = pd.DataFrame(pes)

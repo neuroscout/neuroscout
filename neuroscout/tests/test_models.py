@@ -47,7 +47,7 @@ def test_dataset_ingestion(session, add_task):
 
 	# Test run summary statistics
 	assert len(predictor.run_statistics) == 4
-	assert predictor.run_statistics[0].mean == 167.25
+	assert 167.25 in [p.mean for p in predictor.run_statistics]
 
 	# Test predictor event
 	predictor_event = predictor.predictor_events.first()
@@ -189,7 +189,7 @@ def test_external_text(get_data_path, add_task):
 	dataset_model = Dataset.query.filter_by(id=add_task).one()
 	task_name = Task.query.filter_by(dataset_id=add_task).one().name
 
-	stim = Stimulus.query.filter_by(dataset_id=dataset_model.id).first()
+	stim = [s for s in Stimulus.query.filter_by(dataset_id=dataset_model.id).all() if 'obama' in s.path][0]
 
 	ingest_text_stimuli(filename, dataset_model.name, task_name, stim.id,
 						transformer='FakeTextExtraction')
