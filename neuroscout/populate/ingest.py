@@ -211,7 +211,7 @@ def add_task(task_name, dataset_name=None, local_path=None,
                 "Error loading BOLD file, default duration used.")
             run_model.duration = scan_length
 
-        path_patterns = ['sub-{subject}[ses-{session}/]/func/sub-{subject}_'
+        path_patterns = ['sub-{subject}/[ses-{session}/]func/sub-{subject}_'
                          '[ses-{session}_]task-{task}_[acquisition-{acquisition}_]'
                          '[run-{run}_][space-{space}_][desc-{desc}_]{suffix}.nii.gz']
 
