@@ -213,16 +213,16 @@ def add_task(task_name, dataset_name=None, local_path=None,
 
         path_patterns = ['sub-{subject}[ses-{session}/]/func/sub-{subject}_'
                          '[ses-{session}_]task-{task}_[acquisition-{acquisition}_]'
-                         '[run-{run}_]bold_[space-{space}_]{suffix}.nii.gz']
+                         '[run-{run}_][space-{space}_][desc-{desc}_]{suffix}.nii.gz']
 
         if 'run' in 'entities':
             entities['run'] = entities['run'].zfill(2)
 
         run_model.func_path = layout.build_path(
-            {'suffix': 'preproc', 'space': 'MNI152NLin2009cAsym', **entities},
+            {'suffix': 'bold', 'desc': 'preproc', 'space': 'MNI152NLin2009cAsym', **entities},
             path_patterns=path_patterns)
         run_model.mask_path = layout.build_path(
-            {'suffix': 'brainmask', 'space': 'MNI152NLin2009cAsym', **entities},
+            {'suffix': 'mask', 'desc': 'brain', 'space': 'MNI152NLin2009cAsym', **entities},
             path_patterns=path_patterns)
 
         # Confirm remote address exists:
