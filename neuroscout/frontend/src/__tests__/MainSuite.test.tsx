@@ -5,11 +5,11 @@ import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import { BrowserRouter }  from 'react-router-dom';
 import { shallow, mount } from 'enzyme';
-import { moveItem } from './utils';
-import { Analysis, Dataset } from './coretypes';
-import { OverviewTab } from './Overview';
-import AnalysisBuilder from './Builder';
-import App from './App';
+import { moveItem } from '../utils';
+import { Analysis, Dataset } from '../coretypes';
+import { OverviewTab } from '../Overview';
+import AnalysisBuilder from '../Builder';
+import App from '../App';
 
 describe('Test moveItem', () => {
   it('Move up', () => {

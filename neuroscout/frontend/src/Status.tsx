@@ -180,7 +180,8 @@ export class StatusTab extends React.Component<submitProps, {compileTraceback: s
           </p>
           <pre>
             <code>
-              docker run --rm -it -v /local/outputdirectory:/out neuroscout/neuroscout-cli run /out {this.props.analysisId}
+              docker run --rm -it -v /local/outputdirectory:/out neuroscout/neuroscout-cli run /out 
+              {this.props.analysisId}
             </code>
           </pre>
           <p>

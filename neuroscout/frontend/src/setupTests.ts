@@ -5,6 +5,8 @@ Create mock matchMedia and localStorage for the tests to work.
 import { configure } from 'enzyme';
 import Adapter from 'enzyme-adapter-react-16';
 
+// global.fetch = require('jest-fetch-mock');
+
 configure({ adapter: new Adapter() });
 
 window.matchMedia =

@@ -24,6 +24,7 @@
     "@types/enzyme": "^3.1.10",
     "enzyme": "^3.3.0",
     "enzyme-adapter-react-16": "^1.1.1",
+    "jest-fetch-mock": "^2.0.1",
     "react-scripts-ts": "^2.3.2",
     "tsutils": "^2.26.2",
     "typescript": "^3"

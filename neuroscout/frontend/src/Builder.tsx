@@ -374,6 +374,15 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
     }
   };
 
+  hasReplaceNA = () => {
+    return this.state.analysis.transformations.filter(x => (
+      x.Name === 'Replace'
+      && this.state.analysis.predictorIds && x.Input
+      && x.Input.length === this.state.analysis.predictorIds.length
+      && JSON.stringify(x.Replace) === '{"n/a":0}'
+    )).length > 0;
+  }
+
   // Save analysis to server, either with lock=false (just save), or lock=true (save & submit)
   saveAnalysis = ({ compile = false }) => (): void => {
     /*
@@ -391,6 +400,17 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
     if (!analysis.name) {
       displayError(Error('Analysis cannot be saved without a name'));
       return;
+    }
+
+    // Add a final transform to replace all N/As with 0 only when we submit for compilation.
+    if (compile && analysis.predictorIds.length > 0 && !this.hasReplaceNA) {
+      let replaceNA: Transformation = {
+        Name: 'Replace',
+        Input: analysis.predictorIds,
+        Replace: {'n/a': 0}
+      };
+
+      analysis.transformations.push(replaceNA);
     }
 
     const apiAnalysis: ApiAnalysis = {
