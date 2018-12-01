@@ -402,17 +402,6 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
       return;
     }
 
-    // Add a final transform to replace all N/As with 0 only when we submit for compilation.
-    if (compile && analysis.predictorIds.length > 0 && !this.hasReplaceNA) {
-      let replaceNA: Transformation = {
-        Name: 'Replace',
-        Input: analysis.predictorIds,
-        Replace: {'n/a': 0}
-      };
-
-      analysis.transformations.push(replaceNA);
-    }
-
     const apiAnalysis: ApiAnalysis = {
       name: analysis.name,
       description: analysis.description,
@@ -428,6 +417,9 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
     };
 
     apiAnalysis.model = this.buildModel();
+
+    // tslint:disable-next-line:no-console
+    console.log(analysis.transformations);
 
     // const method = analysis.analysisId ? 'put' : 'post';
     let method: string;
@@ -555,7 +547,8 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
 
   confirmSubmission = (): void => {
     if (!this.submitEnabled()) return;
-    const { saveAnalysis } = this;
+    let { saveAnalysis, hasReplaceNA, state } = this;
+    let analysis = state.analysis;
     Modal.confirm({
       title: 'Are you sure you want to submit the analysis?',
       content: `Once you submit an analysis you will no longer be able to modify it.
@@ -563,7 +556,21 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
       okText: 'Yes',
       cancelText: 'No',
       onOk() {
-        // saveAnalysis({ compile: false})();
+        // Add a final transform to replace all N/As with 0 only when we submit for compilation.
+        // this is not saving properly...
+        if (analysis.predictorIds.length > 0 && !hasReplaceNA()) {
+          let input = state.availablePredictors
+            .filter(x => analysis.predictorIds.indexOf(x.id) > -1)
+            .map(y => y.name);
+          let replaceNA: Transformation = {
+            Name: 'Replace',
+            Input: input,
+            Replace: {'n/a': 0}
+          };
+
+          state.analysis.transformations.push(replaceNA);
+          saveAnalysis({ compile: false})();
+        }
         saveAnalysis({ compile: true })();
       }
     });
