@@ -384,7 +384,7 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
   }
 
   // Save analysis to server, either with lock=false (just save), or lock=true (save & submit)
-  saveAnalysis = ({ compile = false }) => (): void => {
+  saveAnalysis = ({ compile = false }) => (): any => {
     /*
     if ((!compile && !this.saveEnabled()) || (compile && !this.submitEnabled())) {
       return;
@@ -418,9 +418,6 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
 
     apiAnalysis.model = this.buildModel();
 
-    // tslint:disable-next-line:no-console
-    console.log(analysis.transformations);
-
     // const method = analysis.analysisId ? 'put' : 'post';
     let method: string;
     let url: string;
@@ -444,7 +441,7 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
       displayError(error);
       throw error;
     }
-    jwtFetch(url, { method, body: JSON.stringify(apiAnalysis) })
+    return jwtFetch(url, { method, body: JSON.stringify(apiAnalysis) })
       // .then(response => response.json())
       .then((data: ApiAnalysis & { statusCode: number }) => {
         if (data.statusCode !== 200) {
@@ -569,9 +566,10 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
           };
 
           state.analysis.transformations.push(replaceNA);
-          saveAnalysis({ compile: false})();
+          saveAnalysis({ compile: false })().then(() => saveAnalysis({ compile: true })());
+        } else {
+          saveAnalysis({ compile: true })();
         }
-        saveAnalysis({ compile: true })();
       }
     });
   };

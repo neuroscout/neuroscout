@@ -142,7 +142,7 @@ export class AuthStore extends Reflux.Store {
     }
 
   // Log user in
-  login = () => {
+  login() {
     let { email, password, loggedIn, openLogin, nextURL } = this.state;
     return this.authenticate()
       .then((jwt: string) => {
@@ -155,7 +155,7 @@ export class AuthStore extends Reflux.Store {
           loginError: ''
         });
       }).catch(displayError);
-  };
+  }
 
   // Sign up for a new account
   signup() {
