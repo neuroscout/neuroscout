@@ -25,6 +25,7 @@ import FAQ from './FAQ';
 const FormItem = Form.Item;
 const DOMAINROOT = config.server_url;
 const GOOGLECLIENTID = config.google_client_id;
+const POLLTIMEOUT = (config as any).poll_timeout ? (config as any).poll_timeout : 10000;
 const { localStorage } = window;
 
 const { Header, Content, Footer, Sider } = Layout;
@@ -184,7 +185,7 @@ class App extends Reflux.Component<any, {}, AppState> {
           this.setState({ analyses: values});
         }
       });
-      await timeout(10000);
+      await timeout(POLLTIMEOUT);
     }
   };
 
