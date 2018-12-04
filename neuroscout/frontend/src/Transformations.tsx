@@ -32,6 +32,7 @@ interface XformDisplayProps {
   index: number;
   xform: Transformation;
   onDelete: (index: number) => void;
+  onEdit: (index: number) => void;
   enableUp: boolean;
   enableDown: boolean;
   onMove: (index: number, direction: 'up' | 'down') => void;
@@ -63,7 +64,7 @@ function renderParamItems(xform: Transformation) {
 }
 
 const XformDisplay = (props: XformDisplayProps) => {
-  const { xform, index, onDelete, onMove, enableUp, enableDown } = props;
+  const { xform, index, onDelete, onMove, enableUp, enableDown, onEdit } = props;
   const input = xform.Input || [];
   let paramItems = renderParamItems(xform);
   return (
@@ -89,25 +90,14 @@ const XformDisplay = (props: XformDisplayProps) => {
       <Button type="danger" onClick={() => onDelete(index)}>
         <Icon type="delete" /> Remove
       </Button>
+      <Button onClick={() => onEdit(index)}>
+        <Icon type="edit" /> edit
+      </Button>
       <br />
       <br />
     </div>
   );
 };
-
-interface XformEditorProps {
-  xformRules:  XformRules;
-  onSave: (xform: Transformation) => void;
-  onCancel: () => void;
-  availableInputs: Predictor[];
-  xform: Transformation;
-}
-
-interface XformEditorState {
-  input:  Predictor[];
-  name: TransformName | '';
-  transformation: Transformation;
-}
 
 interface ParameterFieldProps {
   name:  string;
@@ -220,6 +210,20 @@ class ParameterField extends React.Component<ParameterFieldProps> {
   }
 }
 
+interface XformEditorProps {
+  xformRules:  XformRules;
+  onSave: (xform: Transformation) => void;
+  onCancel: () => void;
+  availableInputs: Predictor[];
+  xform: Transformation;
+}
+
+interface XformEditorState {
+  input:  Predictor[];
+  name: TransformName | '';
+  transformation: Transformation;
+}
+
 class XformEditor extends React.Component<XformEditorProps, XformEditorState> {
   updateParameter = (name: string, value: any) => {
     const { transformation } = this.state;
@@ -233,9 +237,14 @@ class XformEditor extends React.Component<XformEditorProps, XformEditorState> {
   constructor(props: XformEditorProps) {
     super(props);
     const {xform,  availableInputs } = props;
+    let input: Predictor[] = [];
+    if (xform !== undefined && xform.Input && xform.Input.length > 0) {
+      input = availableInputs.filter(x => xform.Input!.indexOf(x.name) >= 0);
+    }
+    
     this.state = {
       transformation: xform,
-      input: [],
+      input: input,
       name: xform ? xform.Name : '',
     };
   }
@@ -339,7 +348,7 @@ class XformEditor extends React.Component<XformEditorProps, XformEditorState> {
             onClick={this.onSave}
             disabled={!this.state.name || (this.state.input.length < 1)}
           >
-            OK{' '}
+            {'Save Transformaiton Changes'}
           </Button>
           <Space />
           <Button onClick={this.props.onCancel}>Cancel </Button>
@@ -357,18 +366,28 @@ interface XformsTabProps {
 
 interface XformsTabState {
   mode:  'add' | 'edit' | 'view';
+  currentEdit: null | number;
 }
 
 export class XformsTab extends React.Component<XformsTabProps,  XformsTabState> {
   constructor(props:  XformsTabProps) {
     super(props);
-    this.state = {mode:  'view' };
+    this.state = {mode:  'view', currentEdit: null };
   }
 
-  onAddXform = (xform: Transformation) => {
-    let newXforms = [...this.props.xforms, ...[xform]];
+  onEditXform = (index: number) => {
+    this.setState({mode: 'add', currentEdit: index});
+  };
+
+  onEditXformSave = (xform: Transformation) => {
+    let newXforms = [...this.props.xforms];
+    if (this.state.currentEdit === null) {
+      newXforms.push(xform);
+    } else {
+      newXforms[this.state.currentEdit] = xform;
+    }
     this.props.onSave(newXforms);
-    this.setState({mode:  'view' });
+    this.setState({mode: 'view', currentEdit: null});
   };
 
   onDeleteXform = (index: number) => {
@@ -384,18 +403,21 @@ export class XformsTab extends React.Component<XformsTabProps,  XformsTabState> 
 
   render() {
     const {xforms,  predictors } = this.props;
-    const {mode} = this.state;
+    const {mode, currentEdit } = this.state;
     const AddMode = () => (
       <div>
         <h2>
-          {'Add a new transformation:'}
+          {(currentEdit !== null) && 'Edit transformation:'}
+          {currentEdit === null && 'Add a new transformation:'}
         </h2>
         <XformEditor
           xformRules={xformRules}
-          onSave={xform => this.onAddXform(xform)}
-          onCancel={() => this.setState({ mode: 'view' })}
+          onSave={xform => this.onEditXformSave(xform)}
+          onCancel={() => this.setState({ mode: 'view', currentEdit: null })}
           availableInputs={predictors}
-          xform={xformRules[0]}
+          xform={
+            (currentEdit === null) ? xformRules[0] : xforms[currentEdit]
+          }
         />
       </div>
     );
@@ -413,6 +435,7 @@ export class XformsTab extends React.Component<XformsTabProps,  XformsTabState> 
                 index={index}
                 xform={xform}
                 onDelete={this.onDeleteXform}
+                onEdit={this.onEditXform}
                 onMove={this.onMoveXform}
                 enableUp={index > 0}
                 enableDown={index < xforms.length - 1}
