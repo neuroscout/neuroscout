@@ -212,7 +212,7 @@ def add_task(task_name, dataset_name=None, local_path=None,
             run_model.duration = scan_length
 
         path_patterns = ['sub-{subject}/[ses-{session}/]func/sub-{subject}_'
-                         '[ses-{session}_]task-{task}_[acquisition-{acquisition}_]'
+                         '[ses-{session}_]task-{task}_[acq-{acquisition}_]'
                          '[run-{run}_][space-{space}_][desc-{desc}_]{suffix}.nii.gz']
 
         if 'run' in 'entities':
