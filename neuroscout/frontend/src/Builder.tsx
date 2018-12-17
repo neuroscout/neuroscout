@@ -306,6 +306,13 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
       }
     ];
 
+    if (runs.length > 1) {
+      steps.push({
+        Level: 'Subject',
+        AutoContrasts: true
+      });
+    }
+
     if (this.state.analysis.hrfPredictorIds) {
       let hrfX: string[];
       hrfX = this.state.analysis.hrfPredictorIds.map(id => {
