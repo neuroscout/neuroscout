@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Button, Card, Checkbox, Tag, Icon, Tooltip, Switch } from 'antd';
+import { Button, Card, Checkbox, Modal, Tag, Icon, Tooltip, Switch } from 'antd';
 import { config } from './config';
 import { displayError, jwtFetch, alphaSort, timeout } from './utils';
 import { ApiAnalysis, Analysis } from './coretypes';
@@ -72,23 +72,41 @@ class PubAccess extends React.Component<PubAccessProps, {}> {
 type submitProps = {
   status?: string,
   analysisId?: string,
-  confirmSubmission: () => void,
+  confirmSubmission: (build: boolean) => void,
   private: boolean,
   updateAnalysis?: (value: Partial<Analysis>) => void,
   userOwns?: boolean
 };
 
-export class Submit extends React.Component<submitProps, {tosAgree: boolean}> {
+export class Submit extends React.Component<submitProps, {tosAgree: boolean, validate: boolean}> {
   constructor(props) {
     super(props);
 
     this.state = {
-      tosAgree: (this.props.status !== 'DRAFT')
+      tosAgree: (this.props.status !== 'DRAFT'),
+      validate: true
     };
   }
 
   onChange(e) {
     this.setState({tosAgree: e.target.checked});
+  }
+
+  validateChange(e) {
+    let setState = this.setState.bind(this);
+    if (!e.target.checked) {
+      Modal.confirm({
+        title: 'Disable validation of model?',
+        content: `Disabling validation of the model will speed up analysis bundle generation but may cause the 
+          analysis to crash during execution if any selected predictors do not exist for all selected 
+          runs/sessions/subjects.`,
+        onOk() {
+          setState({validate: e.target.checked});
+        }
+      });
+    } else {
+      this.setState({validate: e.target.checked});
+    }
   }
 
   render() {
@@ -97,6 +115,7 @@ export class Submit extends React.Component<submitProps, {tosAgree: boolean}> {
       status = 'DRAFT';
     }
     let onChange = this.onChange.bind(this);
+    let validateChange = this.validateChange.bind(this);
     return(
       <div>
         <h3>Terms for analysis generation:</h3>
@@ -116,13 +135,17 @@ export class Submit extends React.Component<submitProps, {tosAgree: boolean}> {
           </li>
             }
         </ul>
+        <Checkbox onChange={validateChange} checked={this.state.validate}>
+          Validate analysis bundle contents
+        </Checkbox>
+        <br/>
         <Checkbox onChange={onChange} checked={this.state.tosAgree}>
-          I have read and agree to Neuroscout's terms of service.
+          I have read and agree to Neuroscout's terms of service
         </Checkbox>
         <br/>
         <Button
           hidden={!this.props.analysisId}
-          onClick={this.props.confirmSubmission}
+          onClick={this.props.confirmSubmission.bind(this, this.state.validate)}
           type={'primary'}
           disabled={!this.state.tosAgree || status !== 'DRAFT'}
         >
