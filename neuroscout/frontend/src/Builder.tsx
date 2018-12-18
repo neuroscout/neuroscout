@@ -453,6 +453,7 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
             status: data.status,
             modifiedAt: data.modified_at
           },
+          postReports: true,
           unsavedChanges: false
         });
         this.props.updatedAnalysis();
@@ -568,9 +569,6 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
       let nextTab = tabOrder[nextIndex];
       let update = {activeTab: nextTab as TabName};
       update[nextTab + 'Active' ] = true;
-      if (nextTab === 'review' && this.state.analysis.status === 'DRAFT') {
-        this.saveAnalysis({compile: false})();
-      }
       if (this.state.activeTab === 'overview') {
         // need name and runids
         if (this.state.analysis.name.length < 1) {
@@ -754,8 +752,10 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
   tabChange = (activeKey) => {
     const analysis = this.state.analysis;
     if (activeKey === 'review') {
-      // this.updateState('analysis')({ ...analysis, model: this.buildModel()});
       this.setState({model: this.buildModel()});
+      if (this.state.analysis.status === 'DRAFT' && this.state.unsavedChanges) {
+        this.saveAnalysis({compile: false})();
+      }
     }
 
     if (activeKey === 'overview' || this.state.predictorsLoad === false) {
