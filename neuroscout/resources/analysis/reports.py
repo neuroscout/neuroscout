@@ -51,10 +51,14 @@ def jsonify_analysis(analysis, run_id=None):
 
 @doc(tags=['analysis'])
 @marshal_with(AnalysisCompiledSchema)
+@use_kwargs({
+    'build': wa.fields.Boolean(
+        description='Run id(s).')
+    }, locations=['query'])
 class CompileAnalysisResource(MethodResource):
     @doc(summary='Compile and lock analysis.')
     @owner_required
-    def post(self, analysis):
+    def post(self, analysis, build=False):
         put_record(
             {'status': 'SUBMITTING',
              'submitted_at': datetime.datetime.utcnow()},
@@ -65,7 +69,7 @@ class CompileAnalysisResource(MethodResource):
                 'workflow.compile',
                 args=[*jsonify_analysis(analysis),
                       AnalysisResourcesSchema().dump(analysis)[0],
-                      analysis.dataset.local_path, None]
+                      analysis.dataset.local_path, None, build]
                 )
         except:
             put_record(
