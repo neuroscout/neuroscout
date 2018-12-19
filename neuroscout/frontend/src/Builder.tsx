@@ -391,7 +391,7 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
   }
 
   // Save analysis to server, either with lock=false (just save), or lock=true (save & submit)
-  saveAnalysis = ({ compile = false, build = true}) => (): void => {
+  saveAnalysis = ({ compile = false, build = true}) => (): any => {
     /*
     if ((!compile && !this.saveEnabled()) || (compile && !this.submitEnabled())) {
       return;
