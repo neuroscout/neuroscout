@@ -382,7 +382,7 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
   };
 
   // Save analysis to server, either with lock=false (just save), or lock=true (save & submit)
-  saveAnalysis = ({ compile = false }) => (): void => {
+  saveAnalysis = ({ compile = false, build = true}) => (): void => {
     /*
     if ((!compile && !this.saveEnabled()) || (compile && !this.submitEnabled())) {
       return;
@@ -421,7 +421,7 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
     let url: string;
     if (compile && analysis.analysisId) {
       // Submit for compilation
-      url = `${domainRoot}/api/analyses/${analysis.analysisId}/compile`;
+      url = `${domainRoot}/api/analyses/${analysis.analysisId}/compile?build=${build}`;
       method = 'post';
       this.setState({analysis: {...analysis, status: 'SUBMITTING'}});
       this.checkAnalysisStatus();
@@ -540,7 +540,7 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
     return Promise.resolve(analysis);
   };
 
-  confirmSubmission = (): void => {
+  confirmSubmission = (build: boolean): void => {
     if (!this.submitEnabled()) return;
     const { saveAnalysis } = this;
     Modal.confirm({
@@ -551,22 +551,9 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
       cancelText: 'No',
       onOk() {
         // saveAnalysis({ compile: false})();
-        saveAnalysis({ compile: true })();
+        saveAnalysis({ compile: true, build: build })();
       }
     });
-  };
-
-  generateButton = () => {
-      return (
-        <Button
-          hidden={!this.state.analysis.analysisId}
-          onClick={this.confirmSubmission}
-          type={'primary'}
-          disabled={!this.submitEnabled()}
-        >
-          {this.state.unsavedChanges ? 'Save & Generate' : 'Generate'}
-        </Button>
-      );
   };
 
   nextTab = (direction = 1) => {
@@ -979,7 +966,7 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
                     updateAnalysis={this.updateAnalysis}
                     userOwns={this.props.userOwns}
                   >
-                  {this.props.userOwns &&
+                  {this.props.userOwns && !isDraft &&
                       <EditDetails
                         name={analysis.name}
                         description={analysis.description}

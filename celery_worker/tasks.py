@@ -88,7 +88,8 @@ def _merge_dictionaries(*arg):
                  for k, v in dd.items()))
 
 
-def _build_analysis(analysis, predictor_events, bids_dir, run_id=None):
+def _build_analysis(analysis, predictor_events, bids_dir, run_id=None,
+                    build=True):
     tmp_dir = Path(mkdtemp())
 
     entities = [{}]
@@ -106,19 +107,25 @@ def _build_analysis(analysis, predictor_events, bids_dir, run_id=None):
 
     # Write out all events
     paths = _writeout_events(analysis, predictor_events, tmp_dir)
-    # Load events and try applying transformations
-    bids_layout = BIDSLayout(bids_dir, derivatives=str(tmp_dir), validate=False)
-    bids_analysis = Analysis(
-        bids_layout, deepcopy(analysis.get('model')))
-    bids_analysis.setup(**entities)
+
+    if build is False:
+        bids_analysis = None
+    else:
+        # Load events and try applying transformations
+        bids_layout = BIDSLayout(bids_dir, derivatives=str(tmp_dir),
+                                 validate=False)
+        bids_analysis = Analysis(
+            bids_layout, deepcopy(analysis.get('model')))
+        bids_analysis.setup(**entities)
 
     return tmp_dir, paths, bids_analysis
 
 
 @celery_app.task(name='workflow.compile')
-def compile(analysis, predictor_events, resources, bids_dir, run_ids):
-    tmp_dir, bundle_paths, bids_analysis = _build_analysis(
-        analysis, predictor_events, bids_dir, run_ids)
+def compile(analysis, predictor_events, resources, bids_dir, run_ids,
+            build=False):
+    tmp_dir, bundle_paths, _ = _build_analysis(
+        analysis, predictor_events, bids_dir, run_ids, build=build)
 
     sidecar = {"RepetitionTime": analysis['TR']}
     # Write out JSON files
