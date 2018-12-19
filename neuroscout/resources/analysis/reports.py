@@ -52,12 +52,12 @@ def jsonify_analysis(analysis, run_id=None):
 @doc(tags=['analysis'])
 @marshal_with(AnalysisCompiledSchema)
 class CompileAnalysisResource(MethodResource):
-    @doc(summary='Compile and lock analysis.')
-    @owner_required
     @use_kwargs({
         'build': wa.fields.Boolean(
             description='Build Analysis object')
         }, locations=['query'])
+    @doc(summary='Compile and lock analysis.')
+    @owner_required
     def post(self, analysis, build=False):
         put_record(
             {'status': 'SUBMITTING',
