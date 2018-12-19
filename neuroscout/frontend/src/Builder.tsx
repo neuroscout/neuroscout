@@ -306,6 +306,13 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
       }
     ];
 
+    if (runs.length > 1) {
+      steps.push({
+        Level: 'Subject',
+        AutoContrasts: true
+      });
+    }
+
     if (this.state.analysis.hrfPredictorIds) {
       let hrfX: string[];
       hrfX = this.state.analysis.hrfPredictorIds.map(id => {
@@ -384,7 +391,7 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
   }
 
   // Save analysis to server, either with lock=false (just save), or lock=true (save & submit)
-  saveAnalysis = ({ compile = false }) => (): any => {
+  saveAnalysis = ({ compile = false, build = true}) => (): void => {
     /*
     if ((!compile && !this.saveEnabled()) || (compile && !this.submitEnabled())) {
       return;
@@ -423,7 +430,7 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
     let url: string;
     if (compile && analysis.analysisId) {
       // Submit for compilation
-      url = `${domainRoot}/api/analyses/${analysis.analysisId}/compile`;
+      url = `${domainRoot}/api/analyses/${analysis.analysisId}/compile?build=${build}`;
       method = 'post';
       this.setState({analysis: {...analysis, status: 'SUBMITTING'}});
       this.checkAnalysisStatus();
@@ -542,7 +549,7 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
     return Promise.resolve(analysis);
   };
 
-  confirmSubmission = (): void => {
+  confirmSubmission = (build: boolean): void => {
     if (!this.submitEnabled()) return;
     let { saveAnalysis, hasReplaceNA, state } = this;
     let analysis = state.analysis;
@@ -566,25 +573,12 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
           };
 
           state.analysis.transformations.push(replaceNA);
-          saveAnalysis({ compile: false })().then(() => saveAnalysis({ compile: true })());
+          saveAnalysis({ compile: false })().then(() => saveAnalysis({ compile: true, build: build })());
         } else {
-          saveAnalysis({ compile: true })();
+          saveAnalysis({ compile: true, build: build })();
         }
       }
     });
-  };
-
-  generateButton = () => {
-      return (
-        <Button
-          hidden={!this.state.analysis.analysisId}
-          onClick={this.confirmSubmission}
-          type={'primary'}
-          disabled={!this.submitEnabled()}
-        >
-          {this.state.unsavedChanges ? 'Save & Generate' : 'Generate'}
-        </Button>
-      );
   };
 
   nextTab = (direction = 1) => {
@@ -997,7 +991,7 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
                     updateAnalysis={this.updateAnalysis}
                     userOwns={this.props.userOwns}
                   >
-                  {this.props.userOwns &&
+                  {this.props.userOwns && !isDraft &&
                       <EditDetails
                         name={analysis.name}
                         description={analysis.description}
