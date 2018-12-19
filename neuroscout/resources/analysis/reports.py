@@ -53,7 +53,7 @@ def jsonify_analysis(analysis, run_id=None):
 @marshal_with(AnalysisCompiledSchema)
 @use_kwargs({
     'build': wa.fields.Boolean(
-        description='Run id(s).')
+        description='Build Analysis object')
     }, locations=['query'])
 class CompileAnalysisResource(MethodResource):
     @doc(summary='Compile and lock analysis.')
