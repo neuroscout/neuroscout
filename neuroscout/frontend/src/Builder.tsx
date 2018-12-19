@@ -299,10 +299,6 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
         Model: {
           X: X,
         }
-      },
-      {
-        Level: 'Dataset',
-        AutoContrasts: true
       }
     ];
 
@@ -312,6 +308,11 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
         AutoContrasts: true
       });
     }
+
+    steps.push({
+      Level: 'Dataset',
+      AutoContrasts: true
+    });
 
     if (this.state.analysis.hrfPredictorIds) {
       let hrfX: string[];
