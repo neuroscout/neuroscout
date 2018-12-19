@@ -97,9 +97,8 @@ export class Submit extends React.Component<submitProps, {tosAgree: boolean, val
     if (!e.target.checked) {
       Modal.confirm({
         title: 'Disable validation of model?',
-        content: `Disabling validation of the model will speed up analysis bundle generation but may cause the 
-          analysis to crash during execution if any selected predictors do not exist for all selected 
-          runs/sessions/subjects.`,
+        content: `Disabling validation of the model will speed up bundle generation
+          but can lead to unexpected errors at runtime. Use at your own risk!`,
         onOk() {
           setState({validate: e.target.checked});
         }
