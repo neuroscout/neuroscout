@@ -437,16 +437,19 @@ export class XformsTab extends React.Component<XformsTabProps,  XformsTabState> 
       source.index,
       destination.index
     );
+    if (this.state.editIndex === source.index) {
+      this.setState({editIndex: destination.index});
+    }
 
     this.props.onSave(newXforms);
   };
 
-  getStyle = (index: number): any => {
+  getStyle = (index: number): string => {
     let style: any = {};
     if (index === this.state.editIndex) {
-      style = {...style, 'backgroundColor': '#1890ff', 'color': 'white'};
+      return 'selectedXform';
     }
-    return style;
+    return 'unselectedXform';
   }
 
   render() {
@@ -487,7 +490,7 @@ export class XformsTab extends React.Component<XformsTabProps,  XformsTabState> 
                   bordered={true}
                   dataSource={this.props.xforms}
                   renderItem={(item, index) => (
-                    <List.Item style={this.getStyle(index)}>
+                    <List.Item className={this.getStyle(index)}>
                       <Draggable key={index} draggableId={'' + index} index={index}>
                         {(providedDraggable: DraggableProvided, snapshotDraggable: DraggableStateSnapshot) => (
                             <div 

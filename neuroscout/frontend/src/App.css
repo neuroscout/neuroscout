@@ -102,3 +102,10 @@ pre {
 .headerAvatar>.anticon {
   margin-right: 0px;
 }
+
+.unselectedXform {
+}
+
+.selectedXform {
+    box-shadow: 0 0 5px rgba(80, 200, 240, 1);
+}
