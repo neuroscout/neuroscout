@@ -65,9 +65,6 @@ interface XformDisplayProps {
   xform: Transformation;
   onDelete: (index: number) => void;
   onEdit: (index: number) => void;
-  enableUp: boolean;
-  enableDown: boolean;
-  onMove: (index: number, direction: 'up' | 'down') => void;
 }
 
 function renderParamItems(xform: Transformation) {
@@ -96,30 +93,22 @@ function renderParamItems(xform: Transformation) {
 }
 
 const XformDisplay = (props: XformDisplayProps) => {
-  const { xform, index, onDelete, onEdit, onMove, enableUp, enableDown } = props;
+  const { xform, index, onDelete, onEdit } = props;
   const input = xform.Input || [];
   let paramItems = renderParamItems(xform);
   return (
     <div>
-      <div style={{'float': 'left'}}>
-        <b>{`${index + 1}: ${xform.Name}`} </b>
-        {`Inputs: ${input!.join(', ')}`}
-        {enableUp && false &&
-          <Button onClick={() => onMove(index, 'up')}>
-            <Icon type="arrow-up" />
-          </Button>}
-        {enableDown && false &&
-          <Button onClick={() => onMove(index, 'down')}>
-            <Icon type="arrow-down" />
-          </Button>}
-      </div>
       <div  style={{'float': 'right'}}>
-      <Button type="primary" onClick={() => onEdit(index)}>
-        <Icon type="edit" />
-      </Button>
-      <Button type="danger" onClick={() => onDelete(index)}>
-        <Icon type="delete" />
-      </Button>
+        <Button type="primary" onClick={() => onEdit(index)}>
+          <Icon type="edit" />
+        </Button>
+        <Button type="danger" onClick={() => onDelete(index)}>
+          <Icon type="delete" />
+        </Button>
+      </div>
+      <div>
+        <b>{`${index + 1}: ${xform.Name}`} </b><br/>
+        {`Inputs: ${input!.join(', ')}`}
       </div>
     </div>
   );
@@ -412,9 +401,12 @@ export class XformsTab extends React.Component<XformsTabProps,  XformsTabState> 
   }
 
   onAddXform = (xform: Transformation) => {
-    let newXforms = [...this.props.xforms, ...[xform]];
-    this.props.onSave(newXforms);
-    this.setState({mode:  'view' });
+    if (this.state.editIndex >= 0) {
+    } else {
+      let newXforms = [...this.props.xforms, ...[xform]];
+      this.props.onSave(newXforms);
+      this.setState({mode:  'view' });
+    }
   };
 
   onDeleteXform = (index: number) => {
@@ -449,6 +441,14 @@ export class XformsTab extends React.Component<XformsTabProps,  XformsTabState> 
     this.props.onSave(newXforms);
   };
 
+  getStyle = (index: number): any => {
+    let style: any = {};
+    if (index === this.state.editIndex) {
+      style = {...style, 'backgroundColor': '#1890ff', 'color': 'white'};
+    }
+    return style;
+  }
+
   render() {
     const {xforms,  predictors } = this.props;
     const {mode, editIndex} = this.state;
@@ -460,7 +460,6 @@ export class XformsTab extends React.Component<XformsTabProps,  XformsTabState> 
       <div>
         <h2>
           {editIndex === -1 && 'Add a new transformation:'}
-          {editIndex >= 0 && `Edit Transformation ${editIndex}`}
         </h2>
         <XformEditor
           xformRules={xformRules}
@@ -488,24 +487,21 @@ export class XformsTab extends React.Component<XformsTabProps,  XformsTabState> 
                   bordered={true}
                   dataSource={this.props.xforms}
                   renderItem={(item, index) => (
-                    <List.Item>
+                    <List.Item style={this.getStyle(index)}>
                       <Draggable key={index} draggableId={'' + index} index={index}>
                         {(providedDraggable: DraggableProvided, snapshotDraggable: DraggableStateSnapshot) => (
-                            <div style={{'width': '100%'}}>
-                              <div
-                                ref={providedDraggable.innerRef}
-                                {...providedDraggable.draggableProps}
-                                {...providedDraggable.dragHandleProps}
-                              >
+                            <div 
+                              style={{'width': '100%'}}
+                              ref={providedDraggable.innerRef}
+                              {...providedDraggable.dragHandleProps}
+                            >
+                              <div {...providedDraggable.draggableProps}>
                                   <XformDisplay
                                     key={index}
                                     index={index}
                                     xform={item}
                                     onDelete={this.onDeleteXform}
                                     onEdit={this.onEditXform}
-                                    onMove={this.onMoveXform}
-                                    enableUp={index > 0}
-                                    enableDown={index < xforms.length - 1}
                                   />
                                   {providedDraggable.placeholder}
                               </div>
@@ -533,11 +529,11 @@ export class XformsTab extends React.Component<XformsTabProps,  XformsTabState> 
         </h2>
         <br />
         <Row>
-          <Col md={12}>
+          <Col md={9}>
           {ViewMode()}
           </Col>
           <Col md={1}/>
-          <Col md={11}>
+          <Col md={14}>
           {mode === 'add' && AddMode()}
           </Col>
         </Row>
