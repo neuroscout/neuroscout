@@ -232,9 +232,16 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
     if (!!props.id) {
       jwtFetch(`${domainRoot}/api/analyses/${props.id}`)
         // .then(response => response.json() as Promise<ApiAnalysis>)
-        .then((data: ApiAnalysis) => this.loadAnalysis(data))
-        .then(() => {
-          this.setState({model: this.buildModel()});
+        .then((data: ApiAnalysis) => {
+          this.loadAnalysis(data);
+          return data;
+        })
+        .then((data: ApiAnalysis) => {
+          if (data.status === 'DRAFT') {
+            this.setState({model: this.buildModel()});
+          } else if (data.model !== undefined) {
+            this.setState({model: data.model!});
+          }
         })
         .catch(displayError);
     }
@@ -461,6 +468,7 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
             status: data.status,
             modifiedAt: data.modified_at
           },
+          postReports: true,
           unsavedChanges: false
         });
         this.props.updatedAnalysis();
@@ -483,13 +491,16 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
     let hrfPredictorIds: string[] = [];
     if (data && data.model && data.model.Steps) {
       for (var i = 0; i < data.model.Steps.length; i++) {
+
         if (data.model.Steps[i].Level !== this.state.currentLevel) {
           continue;
         }
+
         if (data.model.Steps[i].Transformations) {
           data.transformations = data.model.Steps[i].Transformations!.filter((x) => {
             return x.Name !== 'Convolve' as TransformName;
           });
+
           let hrfTransforms = data.model.Steps[i].Transformations!.filter((x) => {
             return x.Name === 'Convolve' as TransformName;
           });
@@ -497,9 +508,11 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
             hrfTransforms.map(x => x.Input ? x.Input.map(y => hrfPredictorIds.push(y)) : null);
           }
         }
+
         if (data.model.Steps[i].Contrasts) {
           data.contrasts = data.model.Steps[i].Contrasts;
         }
+
         if (data.model.Steps[i].AutoContrasts) {
           autoContrast = data.model.Steps[i].AutoContrasts;
         }
@@ -563,9 +576,6 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
       let nextTab = tabOrder[nextIndex];
       let update = {activeTab: nextTab as TabName};
       update[nextTab + 'Active' ] = true;
-      if (nextTab === 'review' && this.state.analysis.status === 'DRAFT') {
-        this.saveAnalysis({compile: false})();
-      }
       if (this.state.activeTab === 'overview') {
         // need name and runids
         if (this.state.analysis.name.length < 1) {
@@ -748,9 +758,11 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
 
   tabChange = (activeKey) => {
     const analysis = this.state.analysis;
-    if (activeKey === 'review') {
-      // this.updateState('analysis')({ ...analysis, model: this.buildModel()});
+    if (activeKey === 'review' && this.state.analysis.status === 'DRAFT') {
       this.setState({model: this.buildModel()});
+      if (this.state.analysis.status === 'DRAFT' && this.state.unsavedChanges) {
+        this.saveAnalysis({compile: false})();
+      }
     }
 
     if (activeKey === 'overview' || this.state.predictorsLoad === false) {

@@ -180,6 +180,7 @@ export class Report extends React.Component<ReportProps, ReportState> {
     if (this.state.reportsLoaded === false) {
       this.checkReportStatus();
     }
+
     if (this.state.compileLoaded === false) {
       let id = this.props.analysisId;
       let state = {...this.state};
