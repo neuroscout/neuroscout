@@ -34,7 +34,6 @@ const transformDefinitions: Transformation[] = [
     Name: 'Scale',
     Demean: true,
     Rescale: true,
-    ReplaceNa: undefined
   },
   {
     Name: 'Orthogonalize',

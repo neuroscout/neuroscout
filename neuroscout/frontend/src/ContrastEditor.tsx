@@ -34,14 +34,24 @@ export default class ContrastEditor extends React.Component<
   constructor(props: ContrastEditorProps) {
     super(props);
     const { contrast, availablePredictors } = props;
-    this.state = {
-      ConditionList: [],
-      Name: contrast ? contrast.Name : '',
-      Weights: contrast ? contrast.Weights : [],
-      ContrastType: 't',
-      errors: [],
-      selectedPredictors: []
-    };
+    let state;
+    if (contrast) {
+      state = {
+        ...contrast,
+        selectedPredictors: availablePredictors.filter(x => contrast.ConditionList.indexOf(x.name) >= 0),
+        errors: []
+      };
+    } else {
+      state = {
+        ConditionList: [],
+        Name: '',
+        Weights:  [],
+        ContrastType: 't',
+        errors: [],
+        selectedPredictors: []
+      };
+    }
+    this.state = state;
   }
 
   // Validate and save contrast
@@ -135,6 +145,7 @@ export default class ContrastEditor extends React.Component<
           availablePredictors={availablePredictors}
           selectedPredictors={selectedPredictors}
           updateSelection={this.updatePredictors}
+          compact={true}
         />
         <br />
         <p>Enter Weights for the selected predictors:</p>

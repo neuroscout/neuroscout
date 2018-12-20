@@ -131,6 +131,8 @@ export class PredictorSelector extends React.Component<
     };
 
     if (this.props.compact) {
+      let compactCol = [columns[0]];
+      compactCol[0].width = '100%';
       return (
         <div>
           <Row type="flex">
@@ -149,7 +151,7 @@ export class PredictorSelector extends React.Component<
               out of ${availablePredictors.length} total predictors):`}</p>
                 <Table
                   locale={{ emptyText: this.state.searchText ? 'No results found' : 'No data'}}
-                  columns={columns}
+                  columns={compactCol}
                   rowKey="id"
                   pagination={false}
                   scroll={{y: 465}}

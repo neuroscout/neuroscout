@@ -28,7 +28,6 @@ import {
   DropResult,
   DroppableStateSnapshot, DraggableProvided, DraggableStateSnapshot
 } from 'react-beautiful-dnd';
-import memoize from 'memoize-one';
 import {
   Analysis,
   Predictor,
@@ -37,28 +36,19 @@ import {
   TransformName,
   XformRules,
 } from './coretypes';
-import { displayError, moveItem } from './utils';
+import { displayError, moveItem, reorder } from './utils';
 import { Space } from './HelperComponents';
 import { PredictorSelector } from './Predictors';
-import transformDefinititions from './transforms';
+import transformDefinitions from './transforms';
 const Option = Select.Option;
 
 let xformRules: XformRules = {};
-for (const item of transformDefinititions) {
+for (const item of transformDefinitions) {
   xformRules[item.Name] = item;
 }
 
 const FormItem = Form.Item;
 const RadioGroup = Radio.Group;
-
-// reorder for drang and drop. Move to utils?
-const reorder = (list: any[], startIndex: number, endIndex: number): any[] => {
-  const result = [...list];
-  const [removed] = result.splice(startIndex, 1);
-  result.splice(endIndex, 0, removed);
-
-  return result;
-};
 
 interface XformDisplayProps {
   index: number;
@@ -184,6 +174,7 @@ class ParameterField extends React.Component<ParameterFieldProps> {
           availablePredictors={options as Predictor[]}
           selectedPredictors={selectedPredictors}
           updateSelection={predictors => onChange(predictors.map(x => x.name))}
+          compact={true}
         />
         <br />
       </div>
@@ -214,8 +205,8 @@ class ParameterField extends React.Component<ParameterFieldProps> {
       <span>
         {kind === 'number' && this.NumberField()}
         {kind === 'boolean' && this.BooleanField()}
-        {name === 'other' && this.WrtField()}
-        {name === 'weights' && options && options.map((x, i) =>
+        {name === 'Other' && this.WrtField()}
+        {name === 'Weights' && options && options.map((x, i) =>
           <Row key={i}>
           <div>
             <Col span={12}>
@@ -300,15 +291,6 @@ class XformEditor extends React.Component<XformEditorProps, XformEditorState> {
     transformation.Output = transformation.Input;
     this.props.onSave(transformation);
   };
-
-  inputFilter = memoize(
-    (xform: Transformation, availableInputs: Predictor[]) => {
-      if (!xform || xform.Input === undefined) {
-        return [] as Predictor[];
-      }
-      return availableInputs.filter(x => xform.Input!.indexOf(x.name) >= 0);
-    }
-  );
 
   render() {
     // tslint:disable-next-line:no-shadowed-variable
@@ -460,10 +442,12 @@ export class XformsTab extends React.Component<XformsTabProps,  XformsTabState> 
       currentEditXform = xforms[editIndex];
     }
     const AddMode = () => (
-      <div>
-        <h2>
-          {editIndex === -1 && 'Add a new transformation:'}
-        </h2>
+      <div style={{'marginTop': '-14px'}}>
+        {editIndex === -1 && (
+          <h2>
+            Add a new transformation:
+          </h2>
+        )}
         <XformEditor
           xformRules={xformRules}
           onSave={xform => this.onAddXform(xform)}
@@ -533,11 +517,11 @@ export class XformsTab extends React.Component<XformsTabProps,  XformsTabState> 
         <br />
         <Row>
           <Col md={9}>
-          {ViewMode()}
+            {ViewMode()}
           </Col>
           <Col md={1}/>
           <Col md={14}>
-          {mode === 'add' && AddMode()}
+            {mode === 'add' && AddMode()}
           </Col>
         </Row>
       </div>
