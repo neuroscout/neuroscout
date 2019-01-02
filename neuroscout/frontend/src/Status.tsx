@@ -196,7 +196,7 @@ export class StatusTab extends React.Component<submitProps, {compileTraceback: s
           <h3>Analysis Passed</h3>
           <p>
             {this.props.userOwns && 'Congratulations!'} The analysis is finished compiling and is ready to be executed.
-            Once you have installed neuroscout-cli you may run the analysis with the following command,
+            Once you have installed Docker you may run the analysis with the following command,
             replacing '/local/outputdirectory' with the directory on your local computer where results
             should be stored:
           </p>
