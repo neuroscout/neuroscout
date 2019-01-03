@@ -2,7 +2,7 @@ from flask import send_file
 from flask_apispec import MethodResource, marshal_with, use_kwargs, doc
 from flask_jwt import current_identity
 from database import db
-from models import Analysis
+from models import Analysis, Report
 from os.path import exists
 import datetime
 
@@ -60,6 +60,10 @@ class AnalysisResource(AnalysisMethodResource):
     def delete(self, analysis):
         if analysis.status not in ['DRAFT', 'FAILED'] or analysis.locked is True:
                 abort(422, "Analysis not editable, cannot delete.")
+
+        # Delete reports
+        Report.query.filter_by(analysis_id=analysis.hash_id).delete()
+
         db.session.delete(analysis)
         db.session.commit()
 
