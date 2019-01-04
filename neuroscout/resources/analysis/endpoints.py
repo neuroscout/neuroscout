@@ -48,8 +48,8 @@ class AnalysisResource(AnalysisMethodResource):
         if analysis.locked is True:
                 abort(422, "Analysis is locked. It cannot be edited.")
                 if analysis.status not in ['DRAFT', 'FAILED']:
-                    exceptions = ['private', 'description']
-                    kwargs = {k: v for k, v in kwargs.items() if k in exceptions}
+                    excep = ['private', 'description']
+                    kwargs = {k: v for k, v in kwargs.items() if k in excep}
         if not kwargs:
             abort(422, "Analysis is not editable. Try cloning it.")
         kwargs['modified_at'] = datetime.datetime.utcnow()
@@ -58,7 +58,7 @@ class AnalysisResource(AnalysisMethodResource):
     @doc(summary='Delete analysis.')
     @owner_required
     def delete(self, analysis):
-        if analysis.status not in ['DRAFT', 'FAILED'] or analysis.locked is True:
+        if analysis.status not in ['DRAFT', 'FAILED'] or analysis.locked:
                 abort(422, "Analysis not editable, cannot delete.")
 
         # Delete reports
@@ -105,7 +105,7 @@ class AnalysisResourcesResource(AnalysisMethodResource):
 class AnalysisBundleResource(MethodResource):
     @doc(tags=['analysis'], summary='Get analysis tarball bundle.',
          responses={"200": {
-             "description": "gzip tarball, including analysis, resources and events.",
+             "description": "tarball, including analysis, resources, events.",
              "type": "application/x-tar"}})
     @fetch_analysis
     def get(self, analysis):
