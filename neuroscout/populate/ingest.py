@@ -17,13 +17,16 @@ from datalad.api import install
 from core import cache
 from .utils import remote_resource_exists, hash_stim
 from utils import get_or_create
-from models import (Dataset, Task, Run, Predictor, PredictorEvent, PredictorRun,
-                    Stimulus, RunStimulus, GroupPredictor, GroupPredictorValue)
+from models import (Dataset, Task, Run, Predictor, PredictorEvent,
+                    PredictorRun, Stimulus, RunStimulus,
+                    GroupPredictor, GroupPredictorValue)
 from database import db
 from progressbar import progressbar
 from .annotate import PredictorSerializer
 
-def add_predictor_collection(collection, dataset_id, run_id, TR=None, include=None):
+
+def add_predictor_collection(collection, dataset_id, run_id,
+                             TR=None, include=None):
     """ Add a RunNode to the database.
     Args:
         collection - BIDSVariableCollection to ingest
@@ -39,7 +42,7 @@ def add_predictor_collection(collection, dataset_id, run_id, TR=None, include=No
         if annotated is not None:
             pred_props, pes_props = annotated
             predictor, _ = get_or_create(
-                Predictor,dataset_id=dataset_id, **pred_props)
+                Predictor, dataset_id=dataset_id, **pred_props)
             for pe in pes_props:
                 pe_objects.append(PredictorEvent(
                                predictor_id=predictor.id, run_id=run_id, **pe))
@@ -49,6 +52,7 @@ def add_predictor_collection(collection, dataset_id, run_id, TR=None, include=No
 
     db.session.bulk_save_objects(pe_objects)
     db.session.commit()
+
 
 def add_group_predictors(dataset_id, participants):
     """ Adds group predictors using participants.tsv
@@ -82,7 +86,7 @@ def add_group_predictors(dataset_id, participants):
             for run in subject_runs:
                 gpv, _ = get_or_create(
                     GroupPredictorValue, commit=False,
-                    gp_id=gp.id, run_id = run.id, level_id=sub_id)
+                    gp_id=gp.id, run_id=run.id, level_id=sub_id)
                 gpv.value = str(val)
         db.session.commit()
         gp_ids.append(gp.id)
@@ -90,8 +94,8 @@ def add_group_predictors(dataset_id, participants):
     return gp_ids
 
 
-def add_stimulus(stim_hash, dataset_id, parent_id=None, path=None, content=None,
-                 converter_name=None, converter_params=None):
+def add_stimulus(stim_hash, dataset_id, parent_id=None, path=None,
+                 content=None, converter_name=None, converter_params=None):
     """ Create stimulus model """
     if path is None and content is None:
         raise ValueError("Stimulus path and data cannot both be None")
@@ -116,9 +120,9 @@ def add_stimulus(stim_hash, dataset_id, parent_id=None, path=None, content=None,
 
 
 def add_task(task_name, dataset_name=None, local_path=None,
-             dataset_address=None, preproc_address=None, include_predictors=None,
-             reingest=False, scan_length=1000, dataset_summary=None,
-             url=None, task_summary=None, **kwargs):
+             dataset_address=None, preproc_address=None,
+             include_predictors=None, reingest=False, scan_length=1000,
+             dataset_summary=None, url=None, task_summary=None, **kwargs):
     """ Adds a BIDS dataset task to the database.
         Args:
             task_name - task to add
@@ -155,7 +159,7 @@ def add_task(task_name, dataset_name=None, local_path=None,
             task_name, local_path))
 
     dataset_name = dataset_name if dataset_name is not None \
-                   else layout.description['Name']
+        else layout.description['Name']
 
     # Get or create dataset model from mandatory arguments
     dataset_model, new_ds = get_or_create(Dataset, name=dataset_name)
@@ -190,14 +194,14 @@ def add_task(task_name, dataset_name=None, local_path=None,
     for img in progressbar(all_runs):
         """ Extract Run information """
         # Get entities
-        entities = {entity : getattr(img, entity)
+        entities = {entity: getattr(img, entity)
                     for entity in ['subject', 'session', 'acquisition']
                     if entity in img.entities}
         run_number = img.run if hasattr(img, 'run') else None
 
         run_model, new = get_or_create(
             Run, dataset_id=dataset_model.id, number=run_number,
-            task_id = task_model.id, **entities)
+            task_id=task_model.id, **entities)
         entities['task'] = task_model.name
         if run_number:
             entities['run'] = run_number
@@ -206,23 +210,26 @@ def add_task(task_name, dataset_name=None, local_path=None,
         try:
             img_ni = nib.load(img.path)
             run_model.duration = img_ni.shape[3] * img_ni.header.get_zooms()[-1]
-        except (nib.filebasedimages.ImageFileError, IndexError) as e:
+        except (nib.filebasedimages.ImageFileError, IndexError):
             current_app.logger.debug(
                 "Error loading BOLD file, default duration used.")
             run_model.duration = scan_length
 
-        path_patterns = ['sub-{subject}/[ses-{session}/]func/sub-{subject}_'
-                         '[ses-{session}_]task-{task}_[acq-{acquisition}_]'
-                         '[run-{run}_][space-{space}_][desc-{desc}_]{suffix}.nii.gz']
+        path_patterns = [
+            'sub-{subject}/[ses-{session}/]func/sub-{subject}_'
+            '[ses-{session}_]task-{task}_[acq-{acquisition}_]'
+            '[run-{run}_][space-{space}_][desc-{desc}_]{suffix}.nii.gz']
 
         if 'run' in 'entities':
             entities['run'] = entities['run'].zfill(2)
 
         run_model.func_path = layout.build_path(
-            {'suffix': 'bold', 'desc': 'preproc', 'space': 'MNI152NLin2009cAsym', **entities},
+            {'suffix': 'bold', 'desc': 'preproc',
+             'space': 'MNI152NLin2009cAsym', **entities},
             path_patterns=path_patterns)
         run_model.mask_path = layout.build_path(
-            {'suffix': 'mask', 'desc': 'brain', 'space': 'MNI152NLin2009cAsym', **entities},
+            {'suffix': 'mask', 'desc': 'brain',
+             'space': 'MNI152NLin2009cAsym', **entities},
             path_patterns=path_patterns)
 
         # Confirm remote address exists:
@@ -237,7 +244,7 @@ def add_task(task_name, dataset_name=None, local_path=None,
 
         collection = load_variables(
             layout, levels='run', scan_length=run_model.duration, **entities).\
-        get_collections('run')[0]
+            get_collections('run')[0]
 
         stims = collection.variables.pop('stim_file')
 
@@ -267,7 +274,6 @@ def add_task(task_name, dataset_name=None, local_path=None,
                 RunStimulus, stimulus_id=stim_model.id, run_id=run_model.id,
                 onset=stims.onset.tolist()[i],
                 duration=stims.duration.tolist()[i])
-
 
     """ Add GroupPredictors """
     current_app.logger.info("Adding group predictors")
