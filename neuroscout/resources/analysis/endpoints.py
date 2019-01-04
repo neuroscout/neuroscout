@@ -75,10 +75,8 @@ class CloneAnalysisResource(AnalysisMethodResource):
     @auth_required
     @fetch_analysis
     def post(self, analysis):
-        if analysis.user_id != current_identity.id:
-            if analysis.status != 'PASSED':
-                abort(422, "You can only clone somebody else's analysis"
-                      " if they have been compiled.")
+        if analysis.status != 'PASSED':
+            abort(422, "Only passed analyses can be cloned.")
 
         cloned = analysis.clone(current_identity)
         db.session.add(cloned)
