@@ -204,6 +204,7 @@ def add_task(task_name, dataset_name=None, local_path=None,
             task_id=task_model.id, **entities)
         entities['task'] = task_model.name
         if run_number:
+            run_number = str(run_number).zfill(2)
             entities['run'] = run_number
 
         # Get duration (helps w/ transformations)
@@ -220,9 +221,6 @@ def add_task(task_name, dataset_name=None, local_path=None,
             '[ses-{session}_]task-{task}_[acq-{acquisition}_]'
             '[run-{run}_][space-{space}_][desc-{desc}_]{suffix}.nii.gz']
 
-        if 'run' in 'entities':
-            entities['run'] = entities['run'].zfill(2)
-
         run_model.func_path = layout.build_path(
             {'suffix': 'bold', 'desc': 'preproc',
              'space': 'MNI152NLin2009cAsym', **entities},
@@ -231,6 +229,10 @@ def add_task(task_name, dataset_name=None, local_path=None,
             {'suffix': 'mask', 'desc': 'brain',
              'space': 'MNI152NLin2009cAsym', **entities},
             path_patterns=path_patterns)
+
+        # Put back as int
+        if 'run' in entities:
+            entities['run'] = int(entities['run'])
 
         # Confirm remote address exists:
         if preproc_address is not None:
