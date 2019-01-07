@@ -1,7 +1,7 @@
 {
   "SherlockMerlin": {
     "preproc_address": "https://github.com/neuroscout-datasets/SherlockMerlin",
-    "path": "/datasets/SherlockMerlin/",
+    "path": "/datasets/raw/SherlockMerlin/",
     "summary": "Participants watched Sherlock movie and episode of Merlin show.",
     "url": "https://openneuro.org/datasets/ds001110",
     "tasks": {

@@ -1,7 +1,7 @@
 {
   "studyforrest_phase2": {
     "dataset_address": "https://github.com/adelavega/studyforrest-data-phase2",
-    "path": "/datasets/studyforrest-data-phase2/",
+    "path": "/datasets/raw/forrest/",
     "summary": "Forrest Gump movie watching task, in German",
     "url": "http://studyforrest.org/",
     "tasks": {

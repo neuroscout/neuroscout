@@ -2,7 +2,7 @@
   "Life": {
     "dataset_address": "///labs/haxby/life",
     "preproc_address": "https://github.com/neuroscout-datasets/life-local",
-    "path": "/datasets/life/",
+    "path": "/datasets/raw/life/",
     "summary": "Four segments of the Life nature documentary narrated by David Attenborough",
     "url": "http://datasets.datalad.org/?dir=/labs/haxby/life",
     "tasks": {
