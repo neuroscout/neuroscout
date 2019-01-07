@@ -11,7 +11,6 @@ import pandas as pd
 import nibabel as nib
 
 from bids.layout import BIDSLayout
-from bids.variables import load_variables
 from datalad.api import install
 
 from core import cache
@@ -244,9 +243,8 @@ def add_task(task_name, dataset_name=None, local_path=None,
         for e in layout._get_nearest_helper(img.path, '.tsv', suffix='events'):
             assert isfile(e)
 
-        collection = load_variables(
-            layout, levels='run', scan_length=run_model.duration, **entities).\
-            get_collections('run')[0]
+        collection = layout.get_collections(
+            'run', scan_length=run_model.duration, **entities)[0]
 
         stims = collection.variables.pop('stim_file')
 
@@ -267,7 +265,6 @@ def add_task(task_name, dataset_name=None, local_path=None,
                 stims_processed[val] = stim_hash
             else:
                 stim_hash = stims_processed[val]
-
             stim_model, _ = add_stimulus(
                 stim_hash, path=stim_path, dataset_id=dataset_model.id)
 
