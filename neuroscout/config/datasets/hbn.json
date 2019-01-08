@@ -1,6 +1,6 @@
 {
   "HealthyBrainNetwork": {
-    "path": "/datasets/HealthyBrainNetwork/",
+    "path": "/datasets/raw/HealthyBrainNetwork/",
     "summary": "Movie watching paradigms from the Healthy Brain Network brain development study",
     "url": "http://fcon_1000.projects.nitrc.org/indi/cmi_healthy_brain_network/",
     "tasks": {

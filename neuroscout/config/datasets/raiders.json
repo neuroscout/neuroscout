@@ -1,7 +1,7 @@
 {
   "Raiders": {
     "dataset_address": "///labs/haxby/raiders",
-    "path": "/datasets/raiders/",
+    "path": "/datasets/raw/raiders/",
     "summary": "Raiders of the Lost Art movie watching paradigm",
     "url": "https://github.com/HaxbyLab/raiders_data",
     "tasks": {
