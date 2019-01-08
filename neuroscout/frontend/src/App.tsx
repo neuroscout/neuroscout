@@ -544,12 +544,10 @@ class App extends Reflux.Component<any, {}, AppState> {
                      </Menu.Item>
                    </Menu.SubMenu>
 
-                   {this.state.auth.loggedIn &&
-                     <Menu.Item key="browse" style={{float: 'right'}}>
-                     <Link to="/browse">
-                       <Icon type="search"/>
-                       Browse</Link></Menu.Item>
-                   }
+                   <Menu.Item key="browse" style={{float: 'right'}}>
+                   <Link to="/browse">
+                     <Icon type="search"/>
+                     Browse</Link></Menu.Item>
 
                    {this.state.auth.loggedIn &&
                      <Menu.Item key="create" style={{float: 'right'}}>
