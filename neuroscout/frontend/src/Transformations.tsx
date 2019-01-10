@@ -395,9 +395,16 @@ export class XformsTab extends React.Component<XformsTabProps,  XformsTabState> 
 
   onAddXform = () => {
     if (this.props.activeXformIndex !== -1) {
+      this.props.updateActiveXform({...xformRules[0]});
       this.props.updateActiveXformIndex(-1);
     }
     this.setState({ mode: 'add'});
+  }
+
+  onCancel = () => {
+    this.props.updateActiveXform(undefined);
+    this.props.updateActiveXformIndex(-1);
+    this.setState({ mode: 'view' });
   }
 
   onSaveXform = (xform: Transformation) => {
@@ -477,7 +484,7 @@ export class XformsTab extends React.Component<XformsTabProps,  XformsTabState> 
         <XformEditor
           xformRules={xformRules}
           onSave={xform => this.onSaveXform(xform)}
-          onCancel={() => this.setState({ mode: 'view' })}
+          onCancel={this.onCancel}
           availableInputs={predictors}
           xform={activeXform ? activeXform : {...xformRules[0]}}
           updateActiveXformIndex={this.props.updateActiveXformIndex}
