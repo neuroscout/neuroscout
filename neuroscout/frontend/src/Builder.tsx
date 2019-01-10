@@ -12,7 +12,7 @@ import { Prompt } from 'react-router-dom';
 import { OverviewTab } from './Overview';
 import { PredictorSelector } from './Predictors';
 import { ContrastsTab } from './Contrasts';
-import { XformsTab } from './Transformations';
+import { XformsTab, validateXform } from './Transformations';
 import { Review } from './Review';
 import { Report } from './Report';
 import { Status, Submit, StatusTab } from './Status';
@@ -116,7 +116,8 @@ let initializeStore = (): Store => ({
     }]
   },
   poll: true,
-  saveFromUpdate: false
+  saveFromUpdate: false,
+  activeXformIndex: -1
 });
 
 // Normalize dataset object returned by /api/datasets
@@ -591,6 +592,26 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
     };
   };
 
+  /* we can change tabs by clicking next/back or on tab itself. Before we change some tabs we need to validate their
+   * current contents
+   */
+  onTabClick = (newTab: TabName) => {
+    if (this.state.activeTab === 'transformations' && this.state.activeXform !== undefined) {
+      if (validateXform(this.state.activeXform) === false) {
+        // validate failure
+        return;
+      }
+      let newXforms = this.state.analysis.transformations;
+      if (this.state.activeXformIndex < 0) {
+        newXforms.push({...this.state.activeXform});
+      } else {
+        newXforms[this.state.activeXformIndex] = {...this.state.activeXform};
+      }
+      this.updateTransformations(newXforms);
+    }
+    this.setState({ activeTab: newTab });
+  }
+
   /* The updateAnalysis inside Overview is doing the same as the following updateAnalysis and should be replaced with
       this one. Alos the update xforms and contrasts after it could be replaced with this updateAnalysis.
    */
@@ -760,6 +781,7 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
 
   tabChange = (activeKey) => {
     const analysis = this.state.analysis;
+
     if (activeKey === 'review') {
       // this.updateState('analysis')({ ...analysis, model: this.buildModel()});
       this.setState({model: this.buildModel()});
@@ -769,6 +791,7 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
       return;
     }
 
+    // does this need to happen every time?
     jwtFetch(`${domainRoot}/api/predictors?run_id=${analysis.runIds}`)
     .then((data: Predictor[]) => {
       const selectedPredictors = data.filter(
@@ -885,7 +908,7 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
             <MainCol>
               <Tabs
                 activeKey={activeTab}
-                onTabClick={newTab => this.setState({ activeTab: newTab })}
+                onTabClick={newTab => this.onTabClick(newTab)}
                 onChange={this.tabChange}
                 className="builderTabs"
                 tabPosition="left"
@@ -923,6 +946,10 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
                     predictors={selectedPredictors}
                     xforms={analysis.transformations.filter(x => x.Name !== 'Convolve')}
                     onSave={xforms => this.updateTransformations(xforms)}
+                    activeXformIndex={this.state.activeXformIndex}
+                    activeXform={this.state.activeXform}
+                    updateActiveXformIndex={this.updateState('activeXformIndex')}
+                    updateActiveXform={this.updateState('activeXform')}
                   />
                   <br/>
                   {this.navButtons()}

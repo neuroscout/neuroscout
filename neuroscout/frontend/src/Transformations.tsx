@@ -50,11 +50,18 @@ for (const item of transformDefinitions) {
 const FormItem = Form.Item;
 const RadioGroup = Radio.Group;
 
-interface XformDisplayProps {
-  index: number;
-  xform: Transformation;
-  onDelete: (index: number) => void;
-  onEdit: (index: number) => void;
+export function validateXform(xform: Transformation) {
+  // tslint:disable-next-line:no-console
+  console.log(xform);
+  if (!xform.Name) {
+    displayError(new Error('Please select a transformation'));
+    return false;
+  }
+  if (xform.Input === undefined || xform.Input.length < 1) {
+    displayError(new Error('Please select at least one input for the transformation'));
+    return false;
+  }
+  return true;
 }
 
 function renderParamItems(xform: Transformation) {
@@ -82,6 +89,13 @@ function renderParamItems(xform: Transformation) {
     return paramItems;
 }
 
+interface XformDisplayProps {
+  index: number;
+  xform: Transformation;
+  onDelete: (index: number) => void;
+  onEdit: (index: number) => void;
+}
+
 const XformDisplay = (props: XformDisplayProps) => {
   const { xform, index, onDelete, onEdit } = props;
   const input = xform.Input || [];
@@ -103,21 +117,6 @@ const XformDisplay = (props: XformDisplayProps) => {
     </div>
   );
 };
-
-interface XformEditorProps {
-  xformRules:  XformRules;
-  onSave: (xform: Transformation) => void;
-  onCancel: () => void;
-  availableInputs: Predictor[];
-  xform: Transformation;
-  index: number;
-}
-
-interface XformEditorState {
-  input:  Predictor[];
-  name: TransformName | '';
-  transformation: Transformation;
-}
 
 interface ParameterFieldProps {
   name:  string;
@@ -220,6 +219,7 @@ class ParameterField extends React.Component<ParameterFieldProps> {
                 let newWeights = this.updateWeight(i, newValue as number);
                 onChange(newWeights);
               }}
+              defaultValue={this.props.value[i] ? this.props.value[i] : undefined}
             />
             </Col>
           </div>
@@ -231,14 +231,27 @@ class ParameterField extends React.Component<ParameterFieldProps> {
   }
 }
 
+interface XformEditorProps {
+  xformRules:  XformRules;
+  onSave: (xform: Transformation) => void;
+  onCancel: () => void;
+  availableInputs: Predictor[];
+  xform: Transformation;
+  index: number;
+  updateActiveXformIndex: (value: any) => void;
+  updateActiveXform: (value: any) => void;
+}
+
+interface XformEditorState {
+  input:  Predictor[];
+  name: TransformName | '';
+}
+
 class XformEditor extends React.Component<XformEditorProps, XformEditorState> {
   updateParameter = (name: string, value: any) => {
-    const { transformation } = this.state;
-    let updatedXform = transformation;
+    let updatedXform = {...this.props.xform};
     updatedXform[name] = value;
-    this.setState({
-      transformation: updatedXform
-    });
+    this.props.updateActiveXform(updatedXform);
   };
 
   constructor(props: XformEditorProps) {
@@ -249,7 +262,6 @@ class XformEditor extends React.Component<XformEditorProps, XformEditorState> {
       input = availableInputs.filter(x => xform.Input!.indexOf(x.name) >= 0);
     }
     this.state = {
-      transformation: xform,
       input: input,
       name: xform ? xform.Name : '',
     };
@@ -258,44 +270,40 @@ class XformEditor extends React.Component<XformEditorProps, XformEditorState> {
   updateInputs = (input: Predictor[]) => {
     // In the special case of the orthogonalize transformation if new inputs are selected
     // we need to make sure we remove them from the 'wrt' parameter if they've already been added there
-    const {transformation} = this.state;
+    let newXform = {...this.props.xform};
     const inputIds = new Set(input.map(x => x.name));
-    let newXform = transformation;
-    if (transformation.Name === 'Orthogonalize') {
-        if (transformation.Other) {
-          newXform.Other = transformation.Other.filter(x => !inputIds.has(x));
+    if (newXform.Name === 'Orthogonalize') {
+        if (newXform.Other) {
+          newXform.Other = newXform.Other.filter(x => !inputIds.has(x));
         }
     }
     newXform.Input = Array.from(inputIds);
-    this.setState({input,  transformation: newXform});
+    this.props.updateActiveXform(newXform);
+    this.setState({input});
   };
 
   updateXformType = (name: TransformName) => {
     // tslint:disable-next-line:no-shadowed-variable
     const {xformRules} = this.props;
-    const transformation = JSON.parse(JSON.stringify(xformRules[name]));
-    this.setState({name,  transformation});
+    const xform = JSON.parse(JSON.stringify(xformRules[name]));
+    this.props.updateActiveXform(xform);
+    this.setState({name});
   };
 
   onSave = () => {
     const {xform} = this.props;
-    const {name,  input, transformation} = this.state;
-    if (!name) {
-      displayError(new Error('Please select a transformation'));
+    const {name,  input} = this.state;
+    if (validateXform(xform) === false) {
       return;
     }
-    if (input.length < 1) {
-      displayError(new Error('Please select at least one input for the transformation'));
-      return;
-    }
-    transformation.Output = transformation.Input;
-    this.props.onSave(transformation);
+    xform.Output = xform.Input;
+    this.props.onSave(xform);
   };
 
   render() {
     // tslint:disable-next-line:no-shadowed-variable
-    const {xform,  xformRules, availableInputs } = this.props;
-    const { name,  transformation, input } = this.state;
+    const { xform, xformRules, availableInputs } = this.props;
+    const { name, input } = this.state;
     const editMode = !!xform;
     const allowedXformNames = Object.keys(xformRules);
     const availableParameters = name ? Object.keys(xformRules[name]) : undefined;
@@ -329,7 +337,7 @@ class XformEditor extends React.Component<XformEditorProps, XformEditorState> {
               {availableParameters &&
                 availableParameters.map(param => {
                   let options: Predictor[] = input;
-                  if (transformation.Name === 'Orthogonalize') {
+                  if (xform.Name === 'Orthogonalize') {
                     // Special case for wrt parameter: in 'options' exclude predictors
                     // that were selected for 'inputs'
                     const inputIds = new Set(input.map(x => x.name));
@@ -340,8 +348,8 @@ class XformEditor extends React.Component<XformEditorProps, XformEditorState> {
                       {(param !== 'other' || input.length > 0) &&
                         <ParameterField
                           name={param}
-                          value={transformation[param]}
-                          kind={typeof(transformation[param])}
+                          value={xform[param]}
+                          kind={typeof(xform[param])}
                           options={options}
                           onChange={value => this.updateParameter(param, value)}
                         />}
@@ -369,21 +377,35 @@ interface XformsTabProps {
   predictors:  Predictor[];
   xforms: Transformation[];
   onSave: (xforms: Transformation[]) => void;
+  activeXformIndex: number;
+  activeXform?: Transformation;
+  updateActiveXformIndex: (value: any) => void;
+  updateActiveXform: (value: any) => void;
 }
 
 interface XformsTabState {
   mode:  'add' | 'edit' | 'view';
-  editIndex: number;
 }
 
 export class XformsTab extends React.Component<XformsTabProps,  XformsTabState> {
   constructor(props:  XformsTabProps) {
     super(props);
-    this.state = {mode:  'view', editIndex: -1};
+    this.state = {mode:  'view'};
   }
 
-  onAddXform = (xform: Transformation) => {
-    if (this.state.editIndex >= 0) {
+  onAddXform = () => {
+    if (this.props.activeXformIndex !== -1) {
+      this.props.updateActiveXformIndex(-1);
+    }
+    this.setState({ mode: 'add'});
+  }
+
+  onSaveXform = (xform: Transformation) => {
+    if (this.props.activeXformIndex >= 0 && this.props.activeXform !== undefined) {
+      let newXforms = this.props.xforms;
+      newXforms[this.props.activeXformIndex] = this.props.activeXform;
+      this.props.onSave(newXforms);
+      this.setState({mode:  'view' });
     } else {
       let newXforms = [...this.props.xforms, ...[xform]];
       this.props.onSave(newXforms);
@@ -398,7 +420,9 @@ export class XformsTab extends React.Component<XformsTabProps,  XformsTabState> 
   };
 
   onEditXform = (index: number) => {
-    this.setState({editIndex: index, mode: 'add'});
+    this.props.updateActiveXformIndex(index);
+    this.props.updateActiveXform({...this.props.xforms[index]});
+    this.setState({mode: 'add'});
   };
 
   onMoveXform = (index: number, direction: 'up' | 'down') => {
@@ -419,8 +443,8 @@ export class XformsTab extends React.Component<XformsTabProps,  XformsTabState> 
       source.index,
       destination.index
     );
-    if (this.state.editIndex === source.index) {
-      this.setState({editIndex: destination.index});
+    if (this.props.activeXformIndex === source.index) {
+      this.props.updateActiveXformIndex(destination.index);
     }
 
     this.props.onSave(newXforms);
@@ -428,34 +452,38 @@ export class XformsTab extends React.Component<XformsTabProps,  XformsTabState> 
 
   getStyle = (index: number): string => {
     let style: any = {};
-    if (index === this.state.editIndex) {
+    if (index === this.props.activeXformIndex) {
       return 'selectedXform';
     }
     return 'unselectedXform';
   }
 
   render() {
-    const {xforms,  predictors } = this.props;
-    const {mode, editIndex} = this.state;
+    const {xforms,  predictors, activeXformIndex, activeXform } = this.props;
+    const {mode} = this.state;
+    /*
     let currentEditXform = xformRules[0];
-    if (editIndex >= 0) {
-      currentEditXform = xforms[editIndex];
+    if (activeXformIndex >= 0) {
+      currentEditXform = {...xforms[activeXformIndex]};
     }
+    */
     const AddMode = () => (
       <div style={{'marginTop': '-14px'}}>
-        {editIndex === -1 && (
+        {activeXformIndex === -1 && (
           <h2>
             Add a new transformation:
           </h2>
         )}
         <XformEditor
           xformRules={xformRules}
-          onSave={xform => this.onAddXform(xform)}
+          onSave={xform => this.onSaveXform(xform)}
           onCancel={() => this.setState({ mode: 'view' })}
           availableInputs={predictors}
-          xform={currentEditXform}
-          index={this.state.editIndex}
-          key={this.state.editIndex}
+          xform={activeXform ? activeXform : {...xformRules[0]}}
+          updateActiveXformIndex={this.props.updateActiveXformIndex}
+          updateActiveXform={this.props.updateActiveXform}
+          index={activeXformIndex}
+          key={activeXformIndex}
         />
       </div>
     );
@@ -503,7 +531,7 @@ export class XformsTab extends React.Component<XformsTabProps,  XformsTabState> 
           </Droppable>
         </DragDropContext>
         <br />
-        <Button type="default" onClick={() => this.setState({ mode: 'add', editIndex: -1 })}>
+        <Button type="default" onClick={this.onAddXform}>
           <Icon type="plus" /> Add Transformation
         </Button>
       </div>

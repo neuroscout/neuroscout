@@ -172,6 +172,8 @@ export interface Store {
   model: BidsModel;
   poll: boolean;
   saveFromUpdate: boolean;
+  activeXform?: Transformation;
+  activeXformIndex: number;
 }
 
 export interface ApiRun {
