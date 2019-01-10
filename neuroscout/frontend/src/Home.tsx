@@ -33,18 +33,19 @@ class Home extends React.Component<HomeProps, {}> {
          </Button>
          </div>
          </div>
-
+         <br/>
+         <Divider />
         </MainCol>
       </Row>
-      <br/>
-      <Divider />
+
       <Row type="flex" justify="center" style={{ background: '#fff', padding: 0 }}>
       <Col xxl={{span: 5}} xl={{span: 6}} lg={{span: 7}} xs={{span: 8}} >
       <Card title="Re-use public data" bordered={false}>
       <img className="splashLogo" src="/static/browse.svg"/>
       <br/>
       Select from openly available naturalistic fMRI datasets,
-      from sources such as <strong>OpenNeuro</strong> and <strong>DataLad</strong>.
+      from sources such as
+      <a href="https://openneuro.org/"> OpenNeuro</a> and <a href="https://datalad.org/">DataLad</a>.
 
       </Card>
       </Col>
@@ -53,8 +54,8 @@ class Home extends React.Component<HomeProps, {}> {
       <Card title="Design your analysis" bordered={false}>
       <img className="splashLogo" src="/static/design.svg"/>
       <br/>
-      Browse hundreds of features pre-extracted from
-      stimuli using <strong>state-of-the-art machine learning</strong> services and algorithms, such as
+      Browse hundreds of annotations automatically extracted from
+      stimuli using <strong>state-of-the-art machine learning</strong> algorithms, such as
       Google Cloud Vision, IBM Watson, and more.
       </Card>
       </Col>
@@ -65,7 +66,8 @@ class Home extends React.Component<HomeProps, {}> {
       <br/>
       Portable BIDS pipelines enable execution with no configuration.
 
-      Results are automatically uploaded to <strong>NeuroVault</strong> for easy sharing.
+      Results are automatically uploaded to
+      <a href="https://neurovault.org/"> NeuroVault</a> for easy sharing.
       </Card>
       </Col>
       </Row>
@@ -78,19 +80,20 @@ class Home extends React.Component<HomeProps, {}> {
       </Button>
       </div>
 
-      </MainCol>
-      </Row>
-
       <br/>
       <Divider />
+      </MainCol>
+      </Row>
       <Row type="flex" justify="center" style={{ background: '#fff', padding: 0 }}>
-      <Col xxl={{span: 9}} xl={{span: 9}} lg={{span: 9}} xs={{span: 10}} >
-      <p className="footertext">
-      Created by the Psychoinformatics Lab at the University of Texas at Austin.<br/>
+      <MainCol>
+      <div className="footerText">
+      <p>
+      Created by the Psychoinformatics Lab at the University of Texas at Austin.
       Supported by NIH award R01MH109682-03.<br/>
       Icons by Smashicons from www.flaticon.com
       </p>
-      </Col>
+      </div>
+      </MainCol>
       </Row>
      </div>
     );

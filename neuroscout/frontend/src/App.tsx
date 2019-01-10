@@ -544,10 +544,26 @@ class App extends Reflux.Component<any, {}, AppState> {
                      </Menu.Item>
                    </Menu.SubMenu>
 
-                   <Menu.Item key="browse" style={{float: 'right'}}>
-                   <Link to="/browse">
-                     <Icon type="search"/>
-                     Browse</Link></Menu.Item>
+                   <Menu.SubMenu
+                    style={{float: 'right'}}
+                    key="browse"
+                    title={<span><Icon type="search"/>Browse</span>}
+                   >
+                     <Menu.Item
+                      key="mine"
+                     >
+                      <Link to="/mine">
+                        My analyses
+                      </Link>
+                     </Menu.Item>
+                     <Menu.Item
+                      key="public"
+                     >
+                     <Link to="/browse">
+                      Public analyses
+                      </Link>
+                     </Menu.Item>
+                   </Menu.SubMenu>
 
                    {this.state.auth.loggedIn &&
                      <Menu.Item key="create" style={{float: 'right'}}>
