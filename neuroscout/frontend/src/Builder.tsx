@@ -586,6 +586,8 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
         }
         if (this.state.analysis.runIds.length < 1) {
         }
+      } else if (!this.xformTabChange()) {
+        return;
       }
       this.setState(update);
       this.tabChange(nextTab);
@@ -596,24 +598,36 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
    * current contents
    */
   onTabClick = (newTab: TabName) => {
-    if (this.state.activeTab === 'transformations' && this.state.activeXform !== undefined) {
-      if (validateXform(this.state.activeXform) === false) {
-        // validate failure
-        return;
-      }
-      let newXforms = this.state.analysis.transformations;
-      if (this.state.activeXformIndex < 0) {
-        newXforms.push({...this.state.activeXform});
-      } else {
-        newXforms[this.state.activeXformIndex] = {...this.state.activeXform};
-      }
-      this.updateTransformations(newXforms);
+    if (!this.xformTabChange()) {
+      return;
     }
     this.setState({ activeTab: newTab });
   }
 
+  // run any time we attempt to leave transformations tab
+  xformTabChange = () => {
+    if (this.state.activeTab !== 'transformations') {
+      return true;
+    }
+    if (this.state.activeXform === undefined) {
+      return true;
+    }
+    if (validateXform(this.state.activeXform) === false) {
+      // validate failure
+      return false;
+    }
+    let newXforms = this.state.analysis.transformations;
+    if (this.state.activeXformIndex < 0) {
+      newXforms.push({...this.state.activeXform});
+    } else {
+      newXforms[this.state.activeXformIndex] = {...this.state.activeXform};
+    }
+    this.updateTransformations(newXforms);
+    return true;
+  }
+
   /* The updateAnalysis inside Overview is doing the same as the following updateAnalysis and should be replaced with
-      this one. Alos the update xforms and contrasts after it could be replaced with this updateAnalysis.
+      this one. Also the update xforms and contrasts after it could be replaced with this updateAnalysis.
    */
   updateAnalysis = (value: Partial<Analysis>, unsavedChanges = false, save = false) => {
     let updatedAnalysis = { ...this.state.analysis, ...value };
