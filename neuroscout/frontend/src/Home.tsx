@@ -28,7 +28,7 @@ class Home extends React.Component<HomeProps, {}> {
          <div className="splashText">A platform for fast and flexible re-analysis of (naturalistic) fMRI studies</div>
          <br/><br/>
          <div className="splashButtonParent">
-         <Button size="large" className="splashButton" type="primary" href="/browse">
+         <Button size="large" className="splashButton" type="primary" href="/public">
             Browse public analyses
          </Button>
          </div>
