@@ -659,6 +659,8 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
   updateTransformations = (xforms: Transformation[]): void => {
     this.setState({
       analysis: { ...this.state.analysis, transformations: xforms },
+      activeXform: undefined,
+      activeXformIndex: -1,
       unsavedChanges: true
     });
   };
@@ -666,6 +668,8 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
   updateContrasts = (contrasts: Contrast[]): void => {
     this.setState({
       analysis: { ...this.state.analysis, contrasts },
+      activeContrast: undefined,
+      activeContrastIndex: -1,
       unsavedChanges: true
     });
   };
