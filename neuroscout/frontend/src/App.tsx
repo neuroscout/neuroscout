@@ -13,7 +13,8 @@ import { GoogleLogin } from 'react-google-login';
 import './App.css';
 import AnalysisBuilder from './Builder';
 import { ApiUser, ApiAnalysis, AppAnalysis, AuthStoreState } from './coretypes';
-import Browse from './Browse';
+import Public from './Public';
+import Private from './Private';
 import { config } from './config';
 import Home from './Home';
 import { MainCol, Space } from './HelperComponents';
@@ -544,12 +545,27 @@ class App extends Reflux.Component<any, {}, AppState> {
                      </Menu.Item>
                    </Menu.SubMenu>
 
-                   {this.state.auth.loggedIn &&
-                     <Menu.Item key="browse" style={{float: 'right'}}>
-                     <Link to="/browse">
-                       <Icon type="search"/>
-                       Browse</Link></Menu.Item>
-                   }
+                   <Menu.SubMenu
+                    style={{float: 'right'}}
+                    key="browse"
+                    title={<span><Icon type="search"/>Browse</span>}
+                   >
+
+                     {this.state.auth.loggedIn &&
+                       <Menu.Item key="mine" >
+                        <Link to="/myanalyses">
+                          My analyses
+                        </Link>
+                       </Menu.Item>
+                    }
+                     <Menu.Item
+                      key="public"
+                     >
+                     <Link to="/public">
+                      Public analyses
+                      </Link>
+                     </Menu.Item>
+                   </Menu.SubMenu>
 
                    {this.state.auth.loggedIn &&
                      <Menu.Item key="create" style={{float: 'right'}}>
@@ -605,7 +621,7 @@ class App extends Reflux.Component<any, {}, AppState> {
               />
               <Route
                 exact={true}
-                path="/browse/:id"
+                path="/public/:id"
                 render={props =>
                   <AnalysisBuilder
                     id={props.match.params.id}
@@ -617,9 +633,15 @@ class App extends Reflux.Component<any, {}, AppState> {
 
               <Route
                 exact={true}
-                path="/browse"
+                path="/public"
                 render={props =>
-                  <Browse analyses={publicAnalyses} cloneAnalysis={this.cloneAnalysis} />}
+                  <Public analyses={publicAnalyses} cloneAnalysis={this.cloneAnalysis} />}
+              />
+              <Route
+                exact={true}
+                path="/myanalyses"
+                render={props =>
+                  <Private analyses={analyses} cloneAnalysis={this.cloneAnalysis} />}
               />
               <Route
                 exact={true}
