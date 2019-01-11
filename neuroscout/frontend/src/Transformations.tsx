@@ -380,6 +380,7 @@ class XformEditor extends React.Component<XformEditorProps, XformEditorState> {
           <Button
             type="primary"
             onClick={this.onSave}
+            disabled={!this.props.xform.Name}
           >
             OK{' '}
           </Button>
