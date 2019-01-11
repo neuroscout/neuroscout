@@ -237,9 +237,16 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
     if (!!props.id) {
       jwtFetch(`${domainRoot}/api/analyses/${props.id}`)
         // .then(response => response.json() as Promise<ApiAnalysis>)
-        .then((data: ApiAnalysis) => this.loadAnalysis(data))
-        .then(() => {
-          this.setState({model: this.buildModel()});
+        .then((data: ApiAnalysis) => {
+          this.loadAnalysis(data);
+          return data;
+        })
+        .then((data: ApiAnalysis) => {
+          if (data.status === 'DRAFT') {
+            this.setState({model: this.buildModel()});
+          } else if (data.model !== undefined) {
+            this.setState({model: data.model!});
+          }
         })
         .catch(displayError);
     }
@@ -304,10 +311,6 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
         Model: {
           X: X,
         }
-      },
-      {
-        Level: 'Dataset',
-        AutoContrasts: true
       }
     ];
 
@@ -317,6 +320,11 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
         AutoContrasts: true
       });
     }
+
+    steps.push({
+      Level: 'Dataset',
+      AutoContrasts: true
+    });
 
     if (this.state.analysis.hrfPredictorIds) {
       let hrfX: string[];
@@ -387,7 +395,7 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
   };
 
   // Save analysis to server, either with lock=false (just save), or lock=true (save & submit)
-  saveAnalysis = ({ compile = false }) => (): void => {
+  saveAnalysis = ({ compile = false, build = true}) => (): void => {
     /*
     if ((!compile && !this.saveEnabled()) || (compile && !this.submitEnabled())) {
       return;
@@ -426,7 +434,7 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
     let url: string;
     if (compile && analysis.analysisId) {
       // Submit for compilation
-      url = `${domainRoot}/api/analyses/${analysis.analysisId}/compile`;
+      url = `${domainRoot}/api/analyses/${analysis.analysisId}/compile?build=${build}`;
       method = 'post';
       this.setState({analysis: {...analysis, status: 'SUBMITTING'}});
       this.checkAnalysisStatus();
@@ -465,6 +473,7 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
             status: data.status,
             modifiedAt: data.modified_at
           },
+          postReports: true,
           unsavedChanges: false
         });
         this.props.updatedAnalysis();
@@ -487,13 +496,16 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
     let hrfPredictorIds: string[] = [];
     if (data && data.model && data.model.Steps) {
       for (var i = 0; i < data.model.Steps.length; i++) {
+
         if (data.model.Steps[i].Level !== this.state.currentLevel) {
           continue;
         }
+
         if (data.model.Steps[i].Transformations) {
           data.transformations = data.model.Steps[i].Transformations!.filter((x) => {
             return x.Name !== 'Convolve' as TransformName;
           });
+
           let hrfTransforms = data.model.Steps[i].Transformations!.filter((x) => {
             return x.Name === 'Convolve' as TransformName;
           });
@@ -501,9 +513,11 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
             hrfTransforms.map(x => x.Input ? x.Input.map(y => hrfPredictorIds.push(y)) : null);
           }
         }
+
         if (data.model.Steps[i].Contrasts) {
           data.contrasts = data.model.Steps[i].Contrasts;
         }
+
         if (data.model.Steps[i].AutoContrasts) {
           autoContrast = data.model.Steps[i].AutoContrasts;
         }
@@ -545,7 +559,7 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
     return Promise.resolve(analysis);
   };
 
-  confirmSubmission = (): void => {
+  confirmSubmission = (build: boolean): void => {
     if (!this.submitEnabled()) return;
     const { saveAnalysis } = this;
     Modal.confirm({
@@ -556,22 +570,9 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
       cancelText: 'No',
       onOk() {
         // saveAnalysis({ compile: false})();
-        saveAnalysis({ compile: true })();
+        saveAnalysis({ compile: true, build: build })();
       }
     });
-  };
-
-  generateButton = () => {
-      return (
-        <Button
-          hidden={!this.state.analysis.analysisId}
-          onClick={this.confirmSubmission}
-          type={'primary'}
-          disabled={!this.submitEnabled()}
-        >
-          {this.state.unsavedChanges ? 'Save & Generate' : 'Generate'}
-        </Button>
-      );
   };
 
   nextTab = (direction = 1) => {
@@ -580,9 +581,6 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
       let nextTab = tabOrder[nextIndex];
       let update = {activeTab: nextTab as TabName};
       update[nextTab + 'Active' ] = true;
-      if (nextTab === 'review' && this.state.analysis.status === 'DRAFT') {
-        this.saveAnalysis({compile: false})();
-      }
       if (this.state.activeTab === 'overview') {
         // need name and runids
         if (this.state.analysis.name.length < 1) {
@@ -821,10 +819,11 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
 
   postTabChange = (activeKey) => {
     const analysis = this.state.analysis;
-
-    if (activeKey === 'review') {
-      // this.updateState('analysis')({ ...analysis, model: this.buildModel()});
+    if (activeKey === 'review' && this.state.analysis.status === 'DRAFT') {
       this.setState({model: this.buildModel()});
+      if (this.state.analysis.status === 'DRAFT' && this.state.unsavedChanges) {
+        this.saveAnalysis({compile: false})();
+      }
     }
 
     if (activeKey === 'overview' || this.state.predictorsLoad === false) {
@@ -1050,7 +1049,7 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
                     updateAnalysis={this.updateAnalysis}
                     userOwns={this.props.userOwns}
                   >
-                  {this.props.userOwns &&
+                  {this.props.userOwns && !isDraft &&
                       <EditDetails
                         name={analysis.name}
                         description={analysis.description}
