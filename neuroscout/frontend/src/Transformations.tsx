@@ -440,6 +440,7 @@ export class XformsTab extends React.Component<XformsTabProps,  XformsTabState> 
   onCancel = () => {
     this.props.updateBuilderState('activeXform')(undefined);
     this.props.updateBuilderState('activeXformIndex')(-1);
+    this.props.updateBuilderState('xformErrors')([] as string[]);
     this.setState({ mode: 'view' });
   }
 

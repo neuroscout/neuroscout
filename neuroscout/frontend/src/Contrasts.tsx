@@ -105,6 +105,8 @@ export class ContrastsTab extends React.Component<ContrastsTabProps, ContrastsTa
 
   onCancel = () => {
     this.props.updateBuilderState('activeContrastIndex')(-1);
+    this.props.updateBuilderState('activeContrast')(undefined);
+    this.props.updateBuilderState('contrastErrors')([] as string[]);
     this.setState({ mode: 'view'});
   };
 
