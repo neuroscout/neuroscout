@@ -292,7 +292,7 @@ class XformEditor extends React.Component<XformEditorProps, XformEditorState> {
     const {xform} = this.props;
     const {name,  input} = this.state;
     let errors = validateXform(xform);
-    if (errors) {
+    if (errors.length > 0) {
       this.props.updateBuilderState('xformErrors')(errors);
       return;
     }
