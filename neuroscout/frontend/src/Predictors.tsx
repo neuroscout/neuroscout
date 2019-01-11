@@ -137,18 +137,18 @@ export class PredictorSelector extends React.Component<
         <div>
           <Row type="flex">
             <Col span={24}>
+              {this.state.filteredPredictors && this.state.filteredPredictors.length > 20 &&
+                <div>
+                  <Input
+                    placeholder="Search predictor name or description..."
+                    value={this.state.searchText}
+                    onChange={this.onInputChange}
+                  />
+                  <br />
+                  <br />
+                </div>
+              }
               <div>
-                <Input
-                  placeholder="Search predictor name or description..."
-                  value={this.state.searchText}
-                  onChange={this.onInputChange}
-                />
-                <br />
-                <br />
-              </div>
-              <div>
-                <p>{`Select predictors ${this.state.selectedText}(displaying ${filteredPredictors.length}
-              out of ${availablePredictors.length} total predictors):`}</p>
                 <Table
                   locale={{ emptyText: this.state.searchText ? 'No results found' : 'No data'}}
                   columns={compactCol}

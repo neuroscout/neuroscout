@@ -183,6 +183,7 @@ export class ContrastEditor extends React.Component<
               labelCol={{ span: 4 }}
               wrapperCol={{ span: 2 }}
               required={true}
+              className="contrast-type-form-item"
             >
               <InputNumber
                 value={Weights[i]}
@@ -191,7 +192,7 @@ export class ContrastEditor extends React.Component<
               />
             </FormItem>
           )}
-          <FormItem label={'Contrast type:'}>
+          <FormItem label={'Contrast type:'} >
             <RadioGroup
               value={ContrastType}
               onChange={(event: any) =>
