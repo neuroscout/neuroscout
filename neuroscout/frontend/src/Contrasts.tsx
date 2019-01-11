@@ -19,21 +19,8 @@ import { Analysis, Predictor, Contrast } from './coretypes';
 import { displayError, moveItem, reorder } from './utils';
 import { Space } from './HelperComponents';
 import { PredictorSelector } from './Predictors';
-import ContrastEditor from './ContrastEditor';
+import { ContrastEditor, emptyContrast } from './ContrastEditor';
 const Option = Select.Option;
-
-interface ContrastsTabProps {
-  predictors: Predictor[];
-  contrasts: Contrast[];
-  onSave: (contrasts: Contrast[]) => void;
-  analysis: Analysis;
-  updateAnalysis: (value: any) => void;
-}
-
-interface ContrastsTabState {
-  mode: 'add' | 'edit' | 'view';
-  editIndex: number;
-}
 
 interface ContrastDisplayProps {
   index: number;
@@ -65,35 +52,60 @@ const ContrastDisplay = (props: ContrastDisplayProps) => {
   );
 };
 
+interface ContrastsTabProps {
+  predictors: Predictor[];
+  contrasts: Contrast[];
+  onSave: (contrasts: Contrast[]) => void;
+  analysis: Analysis;
+  updateAnalysis: (value: any) => void;
+  activeContrastIndex: number;
+  activeContrast?: Contrast;
+  contrastErrors: string[];
+  updateBuilderState: (value: any) => any;
+}
+
+interface ContrastsTabState {
+  mode: 'add' | 'edit' | 'view';
+}
+
 export class ContrastsTab extends React.Component<ContrastsTabProps, ContrastsTabState> {
   constructor(props: ContrastsTabProps) {
     super(props);
-    this.state = { mode: 'view', editIndex: -1 };
+    this.state = { mode: 'view' };
   }
 
   onSave = (contrast: Contrast) => {
-    let { editIndex } = this.state;
+    let { activeContrastIndex } = this.props;
     let newContrasts = this.props.contrasts;
-    if (editIndex >= 0) {
-      newContrasts[editIndex] = contrast;
+    if (activeContrastIndex >= 0) {
+      newContrasts[activeContrastIndex] = contrast;
     } else {
       newContrasts.push(contrast);
     }
     this.props.onSave(newContrasts);
-    this.setState({ mode: 'view', editIndex: -1 });
+    this.props.updateBuilderState('activeContrastIndex')(-1);
+    this.props.updateBuilderState('activeContrast')(undefined);
+    this.setState({ mode: 'view'});
   };
 
   onDelete = (index: number) => {
     // Delete contrast with index
     const newContrasts = this.props.contrasts.filter((elemm, i) => i !== index);
-    if (this.state.editIndex === index) {
-      this.setState({editIndex: -1, mode: 'view'});
+    if (this.props.activeContrastIndex === index) {
+      this.setState({mode: 'view'});
+      this.props.updateBuilderState('activeContrastIndex')(-1);
     }
     this.props.onSave(newContrasts);
   };
 
   onEdit = (index: number) => {
-    this.setState({editIndex: index, mode: 'add'});
+    this.props.updateBuilderState('activeContrastIndex')(index);
+    this.setState({mode: 'add'});
+  };
+
+  onCancel = () => {
+    this.props.updateBuilderState('activeContrastIndex')(-1);
+    this.setState({ mode: 'view'});
   };
 
   onDragEnd = (result: DropResult): void  => {
@@ -110,8 +122,8 @@ export class ContrastsTab extends React.Component<ContrastsTabProps, ContrastsTa
       destination.index
     );
 
-    if (this.state.editIndex === source.index) {
-      this.setState({editIndex: destination.index});
+    if (this.props.activeContrastIndex === source.index) {
+      this.props.updateBuilderState('activeContrastIndex')(destination.index);
     }
 
     this.props.onSave(newContrasts);
@@ -125,32 +137,31 @@ export class ContrastsTab extends React.Component<ContrastsTabProps, ContrastsTa
 
   getStyle = (index: number): string => {
     let style: any = {};
-    if (index === this.state.editIndex) {
+    if (index === this.props.activeContrastIndex) {
       return 'selectedXform';
     }
     return 'unselectedXform';
   }
 
   render() {
-    const { contrasts, predictors } = this.props;
-    const { mode, editIndex } = this.state;
-    let currentEditCont: (Contrast | undefined) = undefined;
-    if (editIndex >= 0) {
-      currentEditCont = this.props.contrasts[editIndex];
-    }
+    const { contrasts, predictors, activeContrastIndex, activeContrast } = this.props;
+    const { mode } = this.state;
+
     const AddMode = () => (
       <div>
-        {this.state.editIndex === -1 &&
+        {activeContrastIndex === -1 &&
           <h2>
             'Add a new contrast:'
           </h2>
         }
         <ContrastEditor
           onSave={this.onSave}
-          onCancel={() => this.setState({ mode: 'view', editIndex: -1 })}
+          onCancel={this.onCancel}
           availablePredictors={predictors}
-          contrast={currentEditCont}
-          key={editIndex}
+          activeContrast={activeContrast ? activeContrast : emptyContrast()}
+          updateBuilderState={this.props.updateBuilderState}
+          contrastErrors={this.props.contrastErrors}
+          key={activeContrastIndex}
         />
       </div>
     );
@@ -167,7 +178,7 @@ export class ContrastsTab extends React.Component<ContrastsTabProps, ContrastsTa
             {'Automatically generate identity contrasts'}
           </Checkbox>
         <br />
-        {contrasts.length &&
+        {contrasts.length > 0 &&
         <DragDropContext onDragEnd={this.onDragEnd}>
           <Droppable droppableId="droppable">
             {(provided: DroppableProvided, snapshot: DroppableStateSnapshot) => (

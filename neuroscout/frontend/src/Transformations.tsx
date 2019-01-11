@@ -6,6 +6,7 @@ This module comtains the following components:
 */
 import * as React from 'react';
 import { 
+  Alert,
   Button,
   Checkbox,
   Col,
@@ -51,17 +52,14 @@ const FormItem = Form.Item;
 const RadioGroup = Radio.Group;
 
 export function validateXform(xform: Transformation) {
-  // tslint:disable-next-line:no-console
-  console.log(xform);
+  let errors: string[] = [];
   if (!xform.Name) {
-    displayError(new Error('Please select a transformation'));
-    return false;
+    errors.push('Please select a transformation');
   }
   if (xform.Input === undefined || xform.Input.length < 1) {
-    displayError(new Error('Please select at least one input for the transformation'));
-    return false;
+    errors.push('Please select at least one input for the transformation');
   }
-  return true;
+  return errors;
 }
 
 function renderParamItems(xform: Transformation) {
@@ -237,9 +235,9 @@ interface XformEditorProps {
   onCancel: () => void;
   availableInputs: Predictor[];
   xform: Transformation;
+  xformErrors: string[];
   index: number;
-  updateActiveXformIndex: (value: any) => void;
-  updateActiveXform: (value: any) => void;
+  updateBuilderState: (value: any) => any;
 }
 
 interface XformEditorState {
@@ -251,7 +249,7 @@ class XformEditor extends React.Component<XformEditorProps, XformEditorState> {
   updateParameter = (name: string, value: any) => {
     let updatedXform = {...this.props.xform};
     updatedXform[name] = value;
-    this.props.updateActiveXform(updatedXform);
+    this.props.updateBuilderState('activeXform')(updatedXform);
   };
 
   constructor(props: XformEditorProps) {
@@ -278,7 +276,7 @@ class XformEditor extends React.Component<XformEditorProps, XformEditorState> {
         }
     }
     newXform.Input = Array.from(inputIds);
-    this.props.updateActiveXform(newXform);
+    this.props.updateBuilderState('activeXform')(newXform);
     this.setState({input});
   };
 
@@ -286,14 +284,16 @@ class XformEditor extends React.Component<XformEditorProps, XformEditorState> {
     // tslint:disable-next-line:no-shadowed-variable
     const {xformRules} = this.props;
     const xform = JSON.parse(JSON.stringify(xformRules[name]));
-    this.props.updateActiveXform(xform);
+    this.props.updateBuilderState('activeXform')(xform);
     this.setState({name});
   };
 
   onSave = () => {
     const {xform} = this.props;
     const {name,  input} = this.state;
-    if (validateXform(xform) === false) {
+    let errors = validateXform(xform);
+    if (errors) {
+      this.props.updateBuilderState('xformErrors')(errors);
       return;
     }
     xform.Output = xform.Input;
@@ -309,6 +309,25 @@ class XformEditor extends React.Component<XformEditorProps, XformEditorState> {
     const availableParameters = name ? Object.keys(xformRules[name]) : undefined;
     return (
       <div>
+        {this.props.xformErrors.length > 0 &&
+          <div>
+            <Alert
+              type="error"
+              showIcon={true}
+              closable={true}
+              message={
+                <ul>
+                  {this.props.xformErrors.map((x, i) =>
+                    <li key={i}>
+                      {x}
+                    </li>
+                  )}
+                </ul>
+              }
+            />
+            <br />
+          </div>}
+
         <Form layout="horizontal">
           <Row type="flex">
             <Col lg={{span: 24}} xs={{span: 24}}>
@@ -361,7 +380,6 @@ class XformEditor extends React.Component<XformEditorProps, XformEditorState> {
           <Button
             type="primary"
             onClick={this.onSave}
-            disabled={!this.state.name || (this.state.input.length < 1)}
           >
             OK{' '}
           </Button>
@@ -379,8 +397,8 @@ interface XformsTabProps {
   onSave: (xforms: Transformation[]) => void;
   activeXformIndex: number;
   activeXform?: Transformation;
-  updateActiveXformIndex: (value: any) => void;
-  updateActiveXform: (value: any) => void;
+  xformErrors: string[];
+  updateBuilderState: (value: any) => any;
 }
 
 interface XformsTabState {
@@ -395,15 +413,15 @@ export class XformsTab extends React.Component<XformsTabProps,  XformsTabState> 
 
   onAddXform = () => {
     if (this.props.activeXformIndex !== -1) {
-      this.props.updateActiveXform({...xformRules[0]});
-      this.props.updateActiveXformIndex(-1);
+      this.props.updateBuilderState('activeXform')({...xformRules[0]});
+      this.props.updateBuilderState('activeXformIndex')(-1);
     }
     this.setState({ mode: 'add'});
   }
 
   onCancel = () => {
-    this.props.updateActiveXform(undefined);
-    this.props.updateActiveXformIndex(-1);
+    this.props.updateBuilderState('activeXform')(undefined);
+    this.props.updateBuilderState('activeXformIndex')(-1);
     this.setState({ mode: 'view' });
   }
 
@@ -427,8 +445,9 @@ export class XformsTab extends React.Component<XformsTabProps,  XformsTabState> 
   };
 
   onEditXform = (index: number) => {
-    this.props.updateActiveXformIndex(index);
-    this.props.updateActiveXform({...this.props.xforms[index]});
+    this.props.updateBuilderState('activeXformIndex')(index);
+    this.props.updateBuilderState('activeXform')({...this.props.xforms[index]});
+    this.props.updateBuilderState('xformErrors')([] as string[]);
     this.setState({mode: 'add'});
   };
 
@@ -451,7 +470,7 @@ export class XformsTab extends React.Component<XformsTabProps,  XformsTabState> 
       destination.index
     );
     if (this.props.activeXformIndex === source.index) {
-      this.props.updateActiveXformIndex(destination.index);
+      this.props.updateBuilderState('ActiveXformIndex')(destination.index);
     }
 
     this.props.onSave(newXforms);
@@ -468,12 +487,6 @@ export class XformsTab extends React.Component<XformsTabProps,  XformsTabState> 
   render() {
     const {xforms,  predictors, activeXformIndex, activeXform } = this.props;
     const {mode} = this.state;
-    /*
-    let currentEditXform = xformRules[0];
-    if (activeXformIndex >= 0) {
-      currentEditXform = {...xforms[activeXformIndex]};
-    }
-    */
     const AddMode = () => (
       <div style={{'marginTop': '-14px'}}>
         {activeXformIndex === -1 && (
@@ -487,8 +500,8 @@ export class XformsTab extends React.Component<XformsTabProps,  XformsTabState> 
           onCancel={this.onCancel}
           availableInputs={predictors}
           xform={activeXform ? activeXform : {...xformRules[0]}}
-          updateActiveXformIndex={this.props.updateActiveXformIndex}
-          updateActiveXform={this.props.updateActiveXform}
+          xformErrors={this.props.xformErrors}
+          updateBuilderState={this.props.updateBuilderState}
           index={activeXformIndex}
           key={activeXformIndex}
         />

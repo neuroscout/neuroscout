@@ -11,6 +11,7 @@ import {
 import { Prompt } from 'react-router-dom';
 import { OverviewTab } from './Overview';
 import { PredictorSelector } from './Predictors';
+import { validateContrast } from './ContrastEditor';
 import { ContrastsTab } from './Contrasts';
 import { XformsTab, validateXform } from './Transformations';
 import { Review } from './Review';
@@ -117,7 +118,10 @@ let initializeStore = (): Store => ({
   },
   poll: true,
   saveFromUpdate: false,
-  activeXformIndex: -1
+  activeXformIndex: -1,
+  activeContrastIndex: -1,
+  xformErrors: [],
+  contrastErrors: []
 });
 
 // Normalize dataset object returned by /api/datasets
@@ -586,11 +590,11 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
         }
         if (this.state.analysis.runIds.length < 1) {
         }
-      } else if (!this.xformTabChange()) {
+      } else if (!this.preTabChange()) {
         return;
       }
       this.setState(update);
-      this.tabChange(nextTab);
+      this.postTabChange(nextTab);
     };
   };
 
@@ -598,31 +602,49 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
    * current contents
    */
   onTabClick = (newTab: TabName) => {
-    if (!this.xformTabChange()) {
+    if (!this.preTabChange()) {
       return;
     }
     this.setState({ activeTab: newTab });
   }
 
-  // run any time we attempt to leave transformations tab
-  xformTabChange = () => {
-    if (this.state.activeTab !== 'transformations') {
-      return true;
+  // run any time we attempt to leave tab
+  // xform and contrast checks are more or less the same save validate funciton call...
+  preTabChange = () => {
+    let errors: string[] = [];
+    if (this.state.activeTab === 'transformations') {
+      if (this.state.activeXform === undefined) {
+        return true;
+      }
+      errors = validateXform(this.state.activeXform);
+      if (errors.length > 0) {
+        this.setState({xformErrors: errors});
+        return false;
+      }
+      let newXforms = this.state.analysis.transformations;
+      if (this.state.activeXformIndex < 0) {
+        newXforms.push({...this.state.activeXform});
+      } else {
+        newXforms[this.state.activeXformIndex] = {...this.state.activeXform};
+      }
+      this.updateTransformations(newXforms);
+    } else if (this.state.activeTab === 'contrasts') {
+      if (this.state.activeContrast === undefined) {
+        return true;
+      }
+      errors = validateContrast(this.state.activeContrast);
+      if (errors.length > 0) {
+        this.setState({contrastErrors: errors});
+        return false;
+      }
+      let newContrasts = this.state.analysis.contrasts;
+      if (this.state.activeContrastIndex < 0) {
+        newContrasts.push({...this.state.activeContrast});
+      } else {
+        newContrasts[this.state.activeContrastIndex] = {...this.state.activeContrast};
+      }
+      this.updateContrasts(newContrasts);
     }
-    if (this.state.activeXform === undefined) {
-      return true;
-    }
-    if (validateXform(this.state.activeXform) === false) {
-      // validate failure
-      return false;
-    }
-    let newXforms = this.state.analysis.transformations;
-    if (this.state.activeXformIndex < 0) {
-      newXforms.push({...this.state.activeXform});
-    } else {
-      newXforms[this.state.activeXformIndex] = {...this.state.activeXform};
-    }
-    this.updateTransformations(newXforms);
     return true;
   }
 
@@ -793,7 +815,7 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
     this.setState(stateUpdate);
   };
 
-  tabChange = (activeKey) => {
+  postTabChange = (activeKey) => {
     const analysis = this.state.analysis;
 
     if (activeKey === 'review') {
@@ -923,7 +945,7 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
               <Tabs
                 activeKey={activeTab}
                 onTabClick={newTab => this.onTabClick(newTab)}
-                onChange={this.tabChange}
+                onChange={this.postTabChange}
                 className="builderTabs"
                 tabPosition="left"
               >
@@ -962,8 +984,8 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
                     onSave={xforms => this.updateTransformations(xforms)}
                     activeXformIndex={this.state.activeXformIndex}
                     activeXform={this.state.activeXform}
-                    updateActiveXformIndex={this.updateState('activeXformIndex')}
-                    updateActiveXform={this.updateState('activeXform')}
+                    xformErrors={this.state.xformErrors}
+                    updateBuilderState={this.updateState}
                   />
                   <br/>
                   {this.navButtons()}
@@ -987,6 +1009,10 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
                     predictors={selectedPredictors}
                     onSave={this.updateContrasts}
                     updateAnalysis={this.updateState('analysis')}
+                    activeContrastIndex={this.state.activeContrastIndex}
+                    activeContrast={this.state.activeContrast}
+                    contrastErrors={this.state.contrastErrors}
+                    updateBuilderState={this.updateState}
                   />
                   <br/>
                   {this.navButtons()}
