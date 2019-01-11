@@ -100,6 +100,8 @@ export class ContrastsTab extends React.Component<ContrastsTabProps, ContrastsTa
 
   onEdit = (index: number) => {
     this.props.updateBuilderState('activeContrastIndex')(index);
+    this.props.updateBuilderState('activeContrast')({...this.props.contrasts[index]});
+    this.props.updateBuilderState('contrastErrors')([] as string[]);
     this.setState({mode: 'add'});
   };
 
