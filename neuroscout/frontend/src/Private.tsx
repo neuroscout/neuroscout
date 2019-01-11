@@ -3,15 +3,15 @@ import { Tabs, Row, Col, Layout, Button, Card } from 'antd';
 import AnalysisList, { AnalysisListProps } from './AnalysisList';
 import { MainCol } from './HelperComponents';
 
-// Interface to browse public analyses
-const Browse = (props: AnalysisListProps) => {
-  const listProps: AnalysisListProps = { ...props, publicList: true };
+// Interface to browse private analyses
+const Private = (props: AnalysisListProps) => {
+  const listProps: AnalysisListProps = { ...props, publicList: false };
   return (
     <div>
       <Row type="flex" justify="center">
         <MainCol>
         <h3>
-          {'Public Analyses'}
+          {'Your saved analyses'}
         </h3>
           <br />
           <AnalysisList {...listProps} />
@@ -20,4 +20,5 @@ const Browse = (props: AnalysisListProps) => {
     </div>
   );
 };
-export default Browse;
+
+export default Private;

@@ -83,20 +83,29 @@ pre {
   display: block;
   margin-left: auto;
   margin-right: auto;
-  width: 30%;
+  width: 36%;
 }
 
 .splashText {
   text-align: center;
-  font-size: 22px;
+  font-size: 25px;
 }
 
+.footerText {
+  text-align: center;
+  font-size: 12px;
+}
+
+.splashButtonParent {
+  text-align: center;
+}
 .splashButton {
-  display: block;
+  display: inline-block;
   margin-left: auto;
   margin-right: auto;
-  width: 30%;
-  font-size: 19px;
+  width: 23%;
+  font-size: 16px;
+  margin: 10px;
 }
 
 .headerAvatar>.anticon {
