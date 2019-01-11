@@ -13,9 +13,9 @@ const CONTRAST_TYPE_OPTIONS: ('T')[] = ['T'];
 
 export function emptyContrast() {
     return {
-        ConditionList: [],
+        ConditionList: [] as string[],
         Name: '',
-        Weights:  [],
+        Weights:  [] as number[],
         ContrastType: 't' as ContrastTypeEnum
     };
 }

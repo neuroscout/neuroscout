@@ -139,6 +139,19 @@ export class ContrastsTab extends React.Component<ContrastsTabProps, ContrastsTa
     this.props.updateAnalysis(newAnalysis);
   };
 
+  addAutoContrasts = () => {
+    let predictors = this.props.predictors;
+    let newContrasts = [...this.props.contrasts];
+    predictors.map((x) => {
+      let newContrast = emptyContrast();
+      newContrast.Name = `${x.name} auto contrast`;
+      newContrast.ConditionList = predictors.map(y => y.name);
+      newContrast.Weights = predictors.map(y => y.name === x.name ? 1 : 0);
+      newContrasts.push(newContrast);
+    });
+    this.props.onSave(newContrasts);
+  };
+
   getStyle = (index: number): string => {
     let style: any = {};
     if (index === this.props.activeContrastIndex) {
@@ -175,12 +188,6 @@ export class ContrastsTab extends React.Component<ContrastsTabProps, ContrastsTa
         <h2>
           {'Contrasts'}
         </h2>
-          <Checkbox
-            checked={this.props.analysis.autoContrast}
-            onChange={() => this.updateAnalysis('autoContrast')(!this.props.analysis.autoContrast)}
-          >
-            {'Automatically generate identity contrasts'}
-          </Checkbox>
         <br />
         <DragDropContext onDragEnd={this.onDragEnd}>
           <Droppable droppableId="droppable">
@@ -226,6 +233,9 @@ export class ContrastsTab extends React.Component<ContrastsTabProps, ContrastsTa
         <br />
         <Button type="default" onClick={() => this.setState({ mode: 'add' })}>
           <Icon type="plus" /> Add Contrast
+        </Button>
+        <Button type="default" onClick={this.addAutoContrasts}>
+          <Icon type="plus" /> Generate Automatic Contrasts
         </Button>
       </div>
     );
