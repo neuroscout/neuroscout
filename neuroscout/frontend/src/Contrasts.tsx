@@ -180,7 +180,6 @@ export class ContrastsTab extends React.Component<ContrastsTabProps, ContrastsTa
             {'Automatically generate identity contrasts'}
           </Checkbox>
         <br />
-        {contrasts.length > 0 &&
         <DragDropContext onDragEnd={this.onDragEnd}>
           <Droppable droppableId="droppable">
             {(provided: DroppableProvided, snapshot: DroppableStateSnapshot) => (
@@ -192,6 +191,7 @@ export class ContrastsTab extends React.Component<ContrastsTabProps, ContrastsTa
                     size="small"
                     bordered={true}
                     dataSource={this.props.contrasts}
+                    locale={{ emptyText: 'You haven\'t added any contrasts' }}
                     renderItem={(contrast, index) => (
                       <List.Item className={this.getStyle(index)}>
                         <Draggable key={index} draggableId={'' + index} index={index}>
@@ -221,8 +221,6 @@ export class ContrastsTab extends React.Component<ContrastsTabProps, ContrastsTa
             )}
           </Droppable>
         </DragDropContext>
-        }
-        {!contrasts.length && <p>{'You haven\'t added any contrasts'}</p>}
         <br />
         <Button type="default" onClick={() => this.setState({ mode: 'add' })}>
           <Icon type="plus" /> Add Contrast

@@ -540,6 +540,7 @@ export class XformsTab extends React.Component<XformsTabProps,  XformsTabState> 
                   size="small"
                   bordered={true}
                   dataSource={this.props.xforms}
+                  locale={{ emptyText: 'You haven\'t added any transformations' }}
                   renderItem={(item, index) => (
                     <List.Item className={this.getStyle(index)}>
                       <Draggable key={index} draggableId={'' + index} index={index}>
