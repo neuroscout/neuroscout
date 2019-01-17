@@ -144,11 +144,17 @@ export class ContrastsTab extends React.Component<ContrastsTabProps, ContrastsTa
     let newContrasts = [...this.props.contrasts];
     predictors.map((x) => {
       let newContrast = emptyContrast();
-      newContrast.Name = `${x.name} auto contrast`;
+      newContrast.Name = `${x.name}`;
       newContrast.ConditionList = predictors.map(y => y.name);
       newContrast.Weights = predictors.map(y => y.name === x.name ? 1 : 0);
       newContrasts.push(newContrast);
     });
+    this.props.onSave(newContrasts);
+  };
+
+  removeAutoContrasts = () => {
+    let predictors = this.props.predictors;
+    let newContrasts = this.props.contrasts.filter((x) => predictors.map(y => y.name).indexOf(x.Name) === -1);
     this.props.onSave(newContrasts);
   };
 
@@ -234,6 +240,7 @@ export class ContrastsTab extends React.Component<ContrastsTabProps, ContrastsTa
         <Button type="default" onClick={() => this.setState({ mode: 'add' })}>
           <Icon type="plus" /> Add Contrast
         </Button>
+        <p />
         <Button type="default" onClick={this.addAutoContrasts}>
           <Icon type="plus" /> Generate Automatic Contrasts
         </Button>

@@ -167,7 +167,10 @@ class ParameterField extends React.Component<ParameterFieldProps> {
         {name}:
         <InputNumber
           defaultValue={value}
-          onChange={(newValue) => newValue ? onChange(newValue) : onChange(0)}
+          onChange={(newValue) => {
+            if (newValue && !Number.isInteger(newValue as number)) { return; }
+            newValue ? onChange(newValue) : onChange(0);
+          }}
         />
         <br />
       </div>
