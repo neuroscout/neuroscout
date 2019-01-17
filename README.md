@@ -121,3 +121,20 @@ You can then insert this token into the header to authorize API requests:
 Tokens expire, so you'll probably need to get a new one soon. To facilitate this, I've wrapped a Flask Client that auto authenticates and inserts the token into the header in neuroscout/tests/request_utils.py. You can use this more easily by entering into Shell mode: `python manage.py shell`. A client object will be preloaded (given the username in the file), that can be used to make requests to Flask. Make sure Flask server is also running on localhost.
 
 Note that in order to use any protected routes, you must confirm the email on your account. Confusingly, you can get a valid token without confirming your account, but protected routes will not function until confirmation.
+
+## Setting up front end
+The frontend dependencies are managed using `yarn`
+
+Enter the neuroscout image, and install all the necessary libraries like so:
+
+    docker-compose exec neuroscout bash
+    cd frontend
+    yarn
+
+You can then start a development server:
+
+    yarn start
+
+Or build a production build:
+
+    yarn build
