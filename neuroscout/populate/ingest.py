@@ -172,6 +172,7 @@ def add_task(task_name, dataset_name=None, local_path=None,
         dataset_model.local_path = local_path.as_posix()
         db.session.commit()
     elif not reingest:
+        print("Dataset found, skipping ingestion...")
         return dataset_model.id
 
     # Get or create task
