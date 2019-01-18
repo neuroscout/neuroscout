@@ -3,7 +3,9 @@
 [![Build Status](https://travis-ci.com/PsychoinformaticsLab/neuroscout.svg?token=mytABRBRnBitJJpBpMxh&branch=master)](https://travis-ci.com/PsychoinformaticsLab/neuroscout)
 [![codecov](https://codecov.io/gh/PsychoinformaticsLab/neuroscout/branch/master/graph/badge.svg)](https://codecov.io/gh/PsychoinformaticsLab/neuroscout)
 
-To set up docker, ensure docker and docker-compose are installed.
+This is the repository for the neuroscout server.
+
+Requirements: Docker and docker-compose.
 
 ## Seting up environment / config variables
 First, set up the main environment variables in `.env` (by copying .env.example).
