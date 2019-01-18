@@ -8,11 +8,11 @@ This is the repository for the neuroscout server.
 Requirements: Docker and docker-compose.
 
 ## Seting up environment / config variables
-First, set up the main environment variables in `.env` (by copying .env.example).
+First, set up the main environment variables in `.env` (see: `.env.example`).
 Set `DATASET_DIR`, `KEY_DIR`, and `FILE_DATA` to folders on the host machine.
 
-To set up environment variables for pliers (optional), modify `.pliersenv.example`,
-configure your private keys, and save as `.pliersenv`. [More info](http://tyarkoni.github.io/pliers/installation.html#api-keys)
+Optionally, set up pliers API keys for feature extraction in `.pliersenv` (see: `.pliersenv.example`).
+[More information on pliers API keys](http://tyarkoni.github.io/pliers/installation.html#api-keys)
 
 Next, set up the Flask server's environment variables by modifying `neuroscout/config/example_app.py`
 and saving as `neuroscout/config/app.py`.
@@ -29,14 +29,15 @@ Build the containers and start services using the development configuration:
 The server should now be running at http://localhost/
 
 Next, initialize, migrate and upgrade the database migrations.
-If you have a database file, load it using `psql`. Otherwise, delete the migrations folder,
+If you have a database file, load it using `pg_restore`. Otherwise, delete the migrations folder,
 initalize the database and add a test user.
 
-    docker-compose exec neuroscout bash rm -rf /migrations/migrations
-    docker-compose exec neuroscout python manage.py db init
-    docker-compose exec neuroscout python manage.py db migrate
-    docker-compose exec neuroscout python manage.py db upgrade
-    docker-compose exec neuroscout python manage.py add_user useremail password
+    docker-compose exec neuroscout bash
+    rm -rf /migrations/migrations
+    python manage.py db init
+    python manage.py db migrate
+    python manage.py db upgrade
+    python manage.py add_user useremail password
 
 ## Setting up front end
 The frontend dependencies are managed using `yarn`
@@ -56,8 +57,8 @@ Or make a production build:
     yarn build
 
 ## Ingesting datasets and extracting features
-You can use `manage.py` commands to ingest data into the database. At the least you want to add a user to be able to access the API.
-[Note, for docker, precede commands with `docker-compose exec neuroscout`]
+You can use `manage.py` commands to ingest data into the database.
+Run the following commands inside docker: `docker-compose exec neuroscout bash`
 
 To add BIDS datasets
 
