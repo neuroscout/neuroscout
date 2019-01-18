@@ -7,7 +7,7 @@ This is the repository for the neuroscout server.
 
 Requirements: Docker and docker-compose.
 
-## Seting up environment / config variables
+## Configuration
 First, set up the main environment variables in `.env` (see: `.env.example`).
 Set `DATASET_DIR`, `KEY_DIR`, and `FILE_DATA` to folders on the host machine.
 
@@ -19,6 +19,9 @@ and saving as `neuroscout/config/app.py`.
 
 Finally, set up the frontend's env variables by modifying `neuroscout/frontend/src/config.ts.example`
 and saving as `neuroscout/frontend/src/config.ts`.
+
+For single sign on using Google, a [sign-in project](https://developers.google.com/identity/sign-in/web/sign-in) is needed.
+
 
 ## Initalizing backend
 Build the containers and start services using the development configuration:
