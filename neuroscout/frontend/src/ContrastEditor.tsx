@@ -9,7 +9,7 @@ import { Space } from './HelperComponents';
 
 const FormItem = Form.Item;
 const RadioGroup = Radio.Group;
-const CONTRAST_TYPE_OPTIONS: ('T')[] = ['T'];
+const CONTRAST_TYPE_OPTIONS: ('t')[] = ['t'];
 
 export function emptyContrast() {
     return {

@@ -91,7 +91,7 @@ let initializeStore = (): Store => ({
     config: defaultConfig,
     transformations: [],
     contrasts: [],
-    autoContrast: true,
+    autoContrast: false,
     model: {
       Steps: [{
         Level: 'Run',
