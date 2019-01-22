@@ -140,11 +140,13 @@ export type TabName =
     | 'review'
     | 'submit';
 
+export type ContrastTypeEnum = 't' | 'F';
+
 export interface Contrast {
   Name: string;
   ConditionList: string[];
   Weights: number[];
-  ContrastType: 't' | 'F';
+  ContrastType: ContrastTypeEnum;
 }
 
 export interface Store {
@@ -172,6 +174,12 @@ export interface Store {
   model: BidsModel;
   poll: boolean;
   saveFromUpdate: boolean;
+  activeXform?: Transformation;
+  activeXformIndex: number;
+  activeContrast?: Contrast;
+  activeContrastIndex: number;
+  xformErrors: string[];
+  contrastErrors: string[];
 }
 
 export interface ApiRun {

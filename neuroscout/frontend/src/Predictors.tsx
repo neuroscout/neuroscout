@@ -23,6 +23,7 @@ interface PredictorSelectorProps {
   updateSelection: (newPredictors: Predictor[], filteredPredictors: Predictor[]) => void;
   predictorsLoad?: boolean;
   selectedText?: string;
+  compact?: boolean;
 }
 
 interface PredictorsSelectorState {
@@ -129,6 +130,43 @@ export class PredictorSelector extends React.Component<
       selectedRowKeys: selectedPredictors.map(p => p.id)
     };
 
+    if (this.props.compact) {
+      let compactCol = [columns[0]];
+      compactCol[0].width = '100%';
+      return (
+        <div>
+          <Row type="flex">
+            <Col span={24}>
+              {this.state.filteredPredictors && this.state.filteredPredictors.length > 20 &&
+                <div>
+                  <Input
+                    placeholder="Search predictor name or description..."
+                    value={this.state.searchText}
+                    onChange={this.onInputChange}
+                  />
+                  <br />
+                  <br />
+                </div>
+              }
+              <div>
+                <Table
+                  locale={{ emptyText: this.state.searchText ? 'No results found' : 'No data'}}
+                  columns={compactCol}
+                  rowKey="id"
+                  pagination={false}
+                  scroll={{y: 465}}
+                  size="small"
+                  dataSource={this.state.filteredPredictors}
+                  rowSelection={rowSelection}
+                  bordered={true}
+                  loading={this.state.predictorsLoad}
+                />
+              </div>
+            </Col>
+          </Row>
+        </div>
+      );
+    }
     return (
       <div>
         <Row type="flex">

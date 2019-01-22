@@ -84,3 +84,11 @@ export const timeout = (ms: number) => {
 export const alphaSort = (x: string[]) => {
   return x.sort((a, b) => a.localeCompare(b));
 };
+
+export const reorder = (list: any[], startIndex: number, endIndex: number): any[] => {
+  const result = [...list];
+  const [removed] = result.splice(startIndex, 1);
+  result.splice(endIndex, 0, removed);
+
+  return result;
+};

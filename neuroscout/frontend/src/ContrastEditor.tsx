@@ -3,50 +3,25 @@
 */
 import * as React from 'react';
 import { Form, Input, InputNumber, Button, Radio, message, Modal, Alert } from 'antd';
-import { Analysis, Predictor, Contrast } from './coretypes';
+import { Analysis, Predictor, Contrast, ContrastTypeEnum } from './coretypes';
 import { PredictorSelector } from './Predictors';
 import { Space } from './HelperComponents';
 
 const FormItem = Form.Item;
 const RadioGroup = Radio.Group;
-const CONTRAST_TYPE_OPTIONS: ('T')[] = ['T'];
+const CONTRAST_TYPE_OPTIONS: ('t')[] = ['t'];
 
-/*
-Contrast editor component to add new contrasts. May extend this in the future
-to also add edit functionality.
-*/
-interface ContrastEditorProps {
-  contrast?: Contrast; // Specify a contrast only when editing an existing one
-  onSave: (contrast: Contrast) => void;
-  onCancel: () => void;
-  availablePredictors: Predictor[];
-}
-
-interface ContrastEditorState extends Contrast {
-  errors: string[];
-  selectedPredictors: Predictor[];
-}
-
-export default class ContrastEditor extends React.Component<
-  ContrastEditorProps,
-  ContrastEditorState
-> {
-  constructor(props: ContrastEditorProps) {
-    super(props);
-    const { contrast, availablePredictors } = props;
-    this.state = {
-      ConditionList: [],
-      Name: contrast ? contrast.Name : '',
-      Weights: contrast ? contrast.Weights : [],
-      ContrastType: 't',
-      errors: [],
-      selectedPredictors: []
+export function emptyContrast() {
+    return {
+        ConditionList: [] as string[],
+        Name: '',
+        Weights:  [] as number[],
+        ContrastType: 't' as ContrastTypeEnum
     };
-  }
+}
 
-  // Validate and save contrast
-  onSave = (): void => {
-    const { Name, ConditionList, Weights, ContrastType } = this.state;
+export function validateContrast(contrast: Contrast): string[] {
+    const { Name, ConditionList, Weights, ContrastType } = contrast;
     let errors: string[] = [];
     if (!Name) {
       errors.push('Please specify a name for the contrast');
@@ -56,37 +31,93 @@ export default class ContrastEditor extends React.Component<
     }
     Weights.forEach((value, index) => {
       if (typeof value !== 'number')
-        errors.push(`Weight at position ${index} must be a numeric value`);
+        errors.push(`Weight for '${ConditionList[index]}' must be a numeric value`);
     });
+    return errors;
+}
+
+/*
+Contrast editor component to add new contrasts. May extend this in the future
+to also add edit functionality.
+*/
+interface ContrastEditorProps {
+  activeContrast: Contrast; // Specify a contrast only when editing an existing one
+  onSave: (contrast: Contrast) => void;
+  onCancel: () => void;
+  availablePredictors: Predictor[];
+  contrastErrors: string[];
+  updateBuilderState: (value: any) => any;
+}
+
+interface ContrastEditorState extends Contrast {
+  selectedPredictors: Predictor[];
+}
+
+export class ContrastEditor extends React.Component<
+  ContrastEditorProps,
+  ContrastEditorState
+> {
+  constructor(props: ContrastEditorProps) {
+    super(props);
+    const { activeContrast, availablePredictors } = props;
+    let state;
+    if (activeContrast) {
+      state = {
+        selectedPredictors: availablePredictors.filter(x => activeContrast.ConditionList.indexOf(x.name) >= 0),
+      };
+    } else {
+      state = {
+        selectedPredictors: []
+      };
+      this.props.updateBuilderState('activeContrast')(emptyContrast());
+    }
+    this.state = state;
+  }
+
+  // Validate and save contrast
+  onSave = (): void => {
+    let errors = validateContrast(this.props.activeContrast);
     if (errors.length > 0) {
-      this.setState({ errors });
+      this.props.updateBuilderState('contrastErrors')(errors);
       return;
     }
-    const newContrast: Contrast = { Name, ConditionList, Weights, ContrastType };
-    this.props.onSave(newContrast);
+    this.props.onSave({...this.props.activeContrast});
   };
 
   updatePredictors = (selectedPredictors: Predictor[]): void => {
     const that = this;
     // Warn user if they have already entered Weights but are now changing the predictors
     let updatedPredictors = selectedPredictors.map(x => x.name);
-    if (this.state.Weights.length > 0) {
+    if (this.props.activeContrast.Weights.length > 0) {
       Modal.confirm({
         title: 'Are you sure?',
         content: 'You have already entered some Weights. Changing the selection will discard that.',
         okText: 'Yes',
         cancelText: 'No',
-        onOk: () => that.setState({ selectedPredictors, Weights: [], ConditionList: updatedPredictors})
+        onOk: () => {
+          that.props.updateBuilderState('activeContrast')({
+            ...this.props.activeContrast,
+            selectedPredictors,
+            Weights: new Array(updatedPredictors.length).fill(1),
+            ConditionList: updatedPredictors
+          });
+          this.setState({ selectedPredictors });
+        }
       });
       return;
     }
+    this.props.updateBuilderState('activeContrast')({...this.props.activeContrast, ConditionList: updatedPredictors});
     this.setState({ selectedPredictors, ConditionList: updatedPredictors});
   };
 
   updateWeight = (index: number, value: number) => {
-    let Weights = [...this.state.Weights];
+    if (this.props.activeContrast === undefined) {
+      // how did we get here with with an index and a value... but the type script gods demand it
+      return;
+    }
+    let Weights = [...this.props.activeContrast.Weights];
     Weights[index] = value;
-    this.setState({ Weights });
+    this.props.updateBuilderState('activeContrast')({...this.props.activeContrast, Weights });
   };
 
   parseInput = (val: string) => {
@@ -95,11 +126,12 @@ export default class ContrastEditor extends React.Component<
   }
 
   render() {
-    const { Name, ConditionList, selectedPredictors, Weights, ContrastType, errors } = this.state;
+    const { selectedPredictors } = this.state;
+    let { Name, ConditionList, Weights, ContrastType } = this.props.activeContrast;
     const { availablePredictors } = this.props;
     return (
       <div>
-        {errors.length > 0 &&
+        {this.props.contrastErrors.length > 0 &&
           <div>
             <Alert
               type="error"
@@ -107,7 +139,7 @@ export default class ContrastEditor extends React.Component<
               closable={true}
               message={
                 <ul>
-                  {errors.map((x, i) =>
+                  {this.props.contrastErrors.map((x, i) =>
                     <li key={i}>
                       {x}
                     </li>
@@ -123,7 +155,10 @@ export default class ContrastEditor extends React.Component<
               placeholder="Name of contrast"
               value={Name}
               onChange={(event: React.FormEvent<HTMLInputElement>) =>
-                this.setState({ Name: event.currentTarget.value })}
+                this.props.updateBuilderState('activeContrast')({
+                  ...this.props.activeContrast,
+                  Name: event.currentTarget.value
+                })}
               type="text"
               required={true}
               min={1}
@@ -135,6 +170,7 @@ export default class ContrastEditor extends React.Component<
           availablePredictors={availablePredictors}
           selectedPredictors={selectedPredictors}
           updateSelection={this.updatePredictors}
+          compact={true}
         />
         <br />
         <p>Enter Weights for the selected predictors:</p>
@@ -147,6 +183,7 @@ export default class ContrastEditor extends React.Component<
               labelCol={{ span: 4 }}
               wrapperCol={{ span: 2 }}
               required={true}
+              className="contrast-type-form-item"
             >
               <InputNumber
                 value={Weights[i]}
@@ -155,11 +192,14 @@ export default class ContrastEditor extends React.Component<
               />
             </FormItem>
           )}
-          <FormItem label={'Contrast type:'}>
+          <FormItem label={'Contrast type:'} >
             <RadioGroup
               value={ContrastType}
               onChange={(event: any) =>
-                this.setState({ ContrastType: event.target.value as 't' | 'F' })}
+                this.props.updateBuilderState('activeContrast')({
+                  ...this.props.activeContrast,
+                  ContrastType: event.target.value as 't' | 'F' }
+                )}
             >
               {CONTRAST_TYPE_OPTIONS.map(x =>
                 <Radio key={x} value={x}>
@@ -173,8 +213,8 @@ export default class ContrastEditor extends React.Component<
           type="primary"
           onClick={this.onSave}
           disabled={
-            !(this.state.Name && this.state.ConditionList.length > 0
-            && this.state.ConditionList.length === this.state.Weights.length)
+            !(this.props.activeContrast.Name && this.props.activeContrast.ConditionList.length > 0
+            && this.props.activeContrast.ConditionList.length === this.props.activeContrast.Weights.length)
           }
         >
           OK{' '}

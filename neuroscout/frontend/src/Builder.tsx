@@ -11,8 +11,9 @@ import {
 import { Prompt } from 'react-router-dom';
 import { OverviewTab } from './Overview';
 import { PredictorSelector } from './Predictors';
+import { validateContrast } from './ContrastEditor';
 import { ContrastsTab } from './Contrasts';
-import { XformsTab } from './Transformations';
+import { XformsTab, validateXform } from './Transformations';
 import { Review } from './Review';
 import { Report } from './Report';
 import { Status, Submit, StatusTab } from './Status';
@@ -90,7 +91,7 @@ let initializeStore = (): Store => ({
     config: defaultConfig,
     transformations: [],
     contrasts: [],
-    autoContrast: true,
+    autoContrast: false,
     model: {
       Steps: [{
         Level: 'Run',
@@ -116,7 +117,11 @@ let initializeStore = (): Store => ({
     }]
   },
   poll: true,
-  saveFromUpdate: false
+  saveFromUpdate: false,
+  activeXformIndex: -1,
+  activeContrastIndex: -1,
+  xformErrors: [],
+  contrastErrors: []
 });
 
 // Normalize dataset object returned by /api/datasets
@@ -583,14 +588,66 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
         }
         if (this.state.analysis.runIds.length < 1) {
         }
+      } else if (!this.preTabChange()) {
+        return;
       }
       this.setState(update);
-      this.tabChange(nextTab);
+      this.postTabChange(nextTab);
     };
   };
 
+  /* we can change tabs by clicking next/back or on tab itself. Before we change some tabs we need to validate their
+   * current contents
+   */
+  onTabClick = (newTab: TabName) => {
+    if (!this.preTabChange()) {
+      return;
+    }
+    this.setState({ activeTab: newTab });
+  }
+
+  // run any time we attempt to leave tab
+  // xform and contrast checks are more or less the same save validate funciton call...
+  preTabChange = () => {
+    let errors: string[] = [];
+    if (this.state.activeTab === 'transformations') {
+      if (this.state.activeXform === undefined) {
+        return true;
+      }
+      errors = validateXform(this.state.activeXform);
+      if (errors.length > 0) {
+        this.setState({xformErrors: errors});
+        return false;
+      }
+      let newXforms = this.state.analysis.transformations;
+      if (this.state.activeXformIndex < 0) {
+        newXforms.push({...this.state.activeXform});
+      } else {
+        newXforms[this.state.activeXformIndex] = {...this.state.activeXform};
+      }
+      this.updateTransformations(newXforms);
+    } else if (this.state.activeTab === 'contrasts') {
+      if (this.state.activeContrast === undefined) {
+        return true;
+      }
+      errors = validateContrast(this.state.activeContrast);
+      if (errors.length > 0) {
+        this.setState({contrastErrors: errors});
+        return false;
+      }
+      let newContrasts = this.state.analysis.contrasts;
+      if (this.state.activeContrastIndex < 0) {
+        newContrasts.push({...this.state.activeContrast});
+      } else {
+        newContrasts[this.state.activeContrastIndex] = {...this.state.activeContrast};
+      }
+      this.updateContrasts(newContrasts);
+    }
+    return true;
+  }
+
   /* The updateAnalysis inside Overview is doing the same as the following updateAnalysis and should be replaced with
-      this one. Alos the update xforms and contrasts after it could be replaced with this updateAnalysis.
+      this one. Also the update xforms and contrasts after it could be replaced with this updateAnalysis.
    */
   updateAnalysis = (value: Partial<Analysis>, unsavedChanges = false, save = false) => {
     let updatedAnalysis = { ...this.state.analysis, ...value };
@@ -600,6 +657,8 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
   updateTransformations = (xforms: Transformation[]): void => {
     this.setState({
       analysis: { ...this.state.analysis, transformations: xforms },
+      activeXform: undefined,
+      activeXformIndex: -1,
       unsavedChanges: true
     });
   };
@@ -607,6 +666,8 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
   updateContrasts = (contrasts: Contrast[]): void => {
     this.setState({
       analysis: { ...this.state.analysis, contrasts },
+      activeContrast: undefined,
+      activeContrastIndex: -1,
       unsavedChanges: true
     });
   };
@@ -756,7 +817,7 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
     this.setState(stateUpdate);
   };
 
-  tabChange = (activeKey) => {
+  postTabChange = (activeKey) => {
     const analysis = this.state.analysis;
     if (activeKey === 'review' && this.state.analysis.status === 'DRAFT') {
       this.setState({model: this.buildModel()});
@@ -769,6 +830,7 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
       return;
     }
 
+    // does this need to happen every time?
     jwtFetch(`${domainRoot}/api/predictors?run_id=${analysis.runIds}`)
     .then((data: Predictor[]) => {
       const selectedPredictors = data.filter(
@@ -885,8 +947,8 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
             <MainCol>
               <Tabs
                 activeKey={activeTab}
-                onTabClick={newTab => this.setState({ activeTab: newTab })}
-                onChange={this.tabChange}
+                onTabClick={newTab => this.onTabClick(newTab)}
+                onChange={this.postTabChange}
                 className="builderTabs"
                 tabPosition="left"
               >
@@ -923,6 +985,10 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
                     predictors={selectedPredictors}
                     xforms={analysis.transformations.filter(x => x.Name !== 'Convolve')}
                     onSave={xforms => this.updateTransformations(xforms)}
+                    activeXformIndex={this.state.activeXformIndex}
+                    activeXform={this.state.activeXform}
+                    xformErrors={this.state.xformErrors}
+                    updateBuilderState={this.updateState}
                   />
                   <br/>
                   {this.navButtons()}
@@ -946,6 +1012,10 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
                     predictors={selectedPredictors}
                     onSave={this.updateContrasts}
                     updateAnalysis={this.updateState('analysis')}
+                    activeContrastIndex={this.state.activeContrastIndex}
+                    activeContrast={this.state.activeContrast}
+                    contrastErrors={this.state.contrastErrors}
+                    updateBuilderState={this.updateState}
                   />
                   <br/>
                   {this.navButtons()}
