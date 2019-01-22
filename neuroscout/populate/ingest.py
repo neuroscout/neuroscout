@@ -254,26 +254,29 @@ def add_task(task_name, dataset_name=None, local_path=None,
             include=include_predictors, TR=task_model.TR)
 
         """ Ingest Stimuli """
-        for i, val in enumerate(stims.values):
-            stim_path = local_path / 'stimuli' / val
-            if val not in stims_processed:
-                try:
-                    stim_hash = hash_stim(stim_path)
-                except OSError:
-                    current_app.logger.debug('{} not found.'.format(stim_path))
-                    continue
+        if stims is not None:
+            for i, val in enumerate(stims.values):
+                stim_path = local_path / 'stimuli' / val
+                if val not in stims_processed:
+                    try:
+                        stim_hash = hash_stim(stim_path)
+                    except OSError:
+                        current_app.logger.debug(
+                            '{} not found.'.format(stim_path))
+                        continue
 
-                stims_processed[val] = stim_hash
-            else:
-                stim_hash = stims_processed[val]
-            stim_model, _ = add_stimulus(
-                stim_hash, path=stim_path, dataset_id=dataset_model.id)
+                    stims_processed[val] = stim_hash
+                else:
+                    stim_hash = stims_processed[val]
+                stim_model, _ = add_stimulus(
+                    stim_hash, path=stim_path, dataset_id=dataset_model.id)
 
-            # Get or create Run Stimulus association
-            runstim, _ = get_or_create(
-                RunStimulus, stimulus_id=stim_model.id, run_id=run_model.id,
-                onset=stims.onset.tolist()[i],
-                duration=stims.duration.tolist()[i])
+                # Get or create Run Stimulus association
+                runstim, _ = get_or_create(
+                    RunStimulus, stimulus_id=stim_model.id,
+                    run_id=run_model.id,
+                    onset=stims.onset.tolist()[i],
+                    duration=stims.duration.tolist()[i])
 
     """ Add GroupPredictors """
     current_app.logger.info("Adding group predictors")
