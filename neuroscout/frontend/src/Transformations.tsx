@@ -56,8 +56,6 @@ function weightsRequired(name) {
 }
 
 export function validateXform(xform: Transformation) {
-  // tslint:disable-next-line:no-console
-  console.log(xform);
   let errors: string[] = [];
   if (!xform.Name) {
     errors.push('Please select a transformation');
@@ -73,6 +71,17 @@ export function validateXform(xform: Transformation) {
   if ((xform.Name === 'Orthogonalize') && xform.Input !== undefined) {
     if (xform.Other === undefined || xform.Other.length < 1) {
       errors.push('Must orthoganalize with respect to at least one predictor');
+    }
+  }
+  if (xform.Name === 'Replace') {
+    let keys = Object.keys(xform.Replace);
+    let predecessor;
+    let replacement;
+    if (keys.length > 0) {
+      predecessor = keys[0];
+    }
+    if (predecessor === undefined || predecessor.length < 1) {
+      errors.push('Enter value to be replaced.');
     }
   }
   
@@ -177,6 +186,41 @@ class ParameterField extends React.Component<ParameterFieldProps> {
     );
   };
 
+  ReplaceField = () => {
+    const { name, value, onChange } = this.props;
+    let keys = Object.keys(value);
+    let predecessor;
+    let replacement;
+    if (keys.length > 0) {
+      predecessor = keys[0];
+    }
+    if (predecessor !== []) {
+      replacement = value[predecessor];
+    }
+    return (
+      <div>
+        Old Value:
+        <Input
+          defaultValue={predecessor}
+          onChange={(event) => {
+            let x = {};
+            x[event.target.value] = replacement;
+            onChange(x);
+          }}
+        />
+        New Value:
+        <Input
+          defaultValue={replacement}
+          onChange={(event) => {
+            let x = {};
+            x[predecessor] = event.target.value;
+            onChange(x);
+          }}
+        />
+      </div>
+    );
+  };
+
   WrtField = () => {
     const {name,  onChange, value, options } = this.props;
     // const selectedPredictors = (options as Predictor[] || []).filter(p => value.indexOf(p.id) > -1);
@@ -223,6 +267,7 @@ class ParameterField extends React.Component<ParameterFieldProps> {
         {kind === 'number' && this.NumberField()}
         {kind === 'boolean' && this.BooleanField()}
         {name === 'Other' && this.WrtField()}
+        {name === 'Replace' && this.ReplaceField()}
         {name === 'Weights' && options && options.map((x, i) =>
           <Row key={i}>
           <div>
