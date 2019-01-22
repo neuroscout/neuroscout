@@ -247,7 +247,10 @@ def add_task(task_name, dataset_name=None, local_path=None,
         collection = layout.get_collections(
             'run', scan_length=run_model.duration, **entities)[0]
 
-        stims = collection.variables.pop('stim_file')
+        if 'stim_file' in collection.variables:
+            stims = collection.variables.pop('stim_file')
+        else:
+            stims = None
 
         add_predictor_collection(
             collection, dataset_model.id, run_model.id,
