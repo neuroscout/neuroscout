@@ -137,11 +137,11 @@ class ReportResource(MethodResource):
 
         if report.status == 'PENDING':
             res = celery_app.AsyncResult(report.task_id)
-        if res.state == states.FAILURE:
-            put_record(
-                {'status': 'FAILED', 'traceback': res.traceback}, report)
-        elif res.state == states.SUCCESS:
-            put_record(
-                {'status': 'OK', 'result': res.result}, report)
+            if res.state == states.FAILURE:
+                put_record(
+                    {'status': 'FAILED', 'traceback': res.traceback}, report)
+            elif res.state == states.SUCCESS:
+                put_record(
+                    {'status': 'OK', 'result': res.result}, report)
 
         return report
