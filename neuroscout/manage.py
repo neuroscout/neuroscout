@@ -49,16 +49,17 @@ def add_user(email, password, confirm=True):
     db.session.commit()
 
 @manager.command
-def add_task(local_path, task, skip_predictors=False, filters='{}'):
+def add_task(local_path, task, include_predictors=None, filters='{}',
+             reingest=False):
     """ Add BIDS dataset to database.
     local_path - Path to local_path directory
     task - Task name
-    skip_predictors - Skip original Predictors
+    include_predictors - Set of predictors to ingest. "None" ingests all.
     filters - string JSON object with optional run filters
     """
     populate.add_task(
-        task, local_path=local_path, skip_predictors=skip_predictors,
-        **json.loads(filters))
+        task, local_path=local_path, **json.loads(filters),
+        include_predictors=include_predictors, reingest=reingest)
 
 @manager.command
 def extract_features(local_path, task, graph_spec, filters='{}'):

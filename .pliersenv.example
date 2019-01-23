@@ -1,0 +1,3 @@
+GOOGLE_APPLICATION_CREDENTIALS=/keys/path.json
+CLARIFAI_API_KEY=key_hash
+INDICO_APP_KEY=key_hash
