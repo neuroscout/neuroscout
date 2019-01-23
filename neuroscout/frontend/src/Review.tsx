@@ -1,6 +1,6 @@
 
 import * as React from 'react';
-import { message, Button, Collapse, Card } from 'antd';
+import { message, Button, Collapse, Card, Table } from 'antd';
 
 import {
   Store,
@@ -117,7 +117,17 @@ class X extends React.Component<{model: BidsModel, available: Predictor[]}, {}> 
     let displayVars = available.filter(x => modelVars.indexOf('' + x.name) > -1);
     let display: any[] = [];
     displayVars.map((x, i) => display.push(<div key={i}><h3>{x.name}:</h3><pre>{x.description}</pre></div>));
-    return (<div>{display}</div>);
+    displayVars.map((x, i) => { return {name: x.name, description: x.description}; });
+    let columns = [{
+      title: 'Name',
+      dataIndex: 'name',
+      key: 'name',
+    }, {
+      title: 'Description',
+      dataIndex: 'description',
+      key: 'description',
+    }];
+    return (<Table dataSource={displayVars} columns={columns} />);
   }
 }
 
@@ -152,14 +162,14 @@ export class Review extends React.Component<ReviewProps, {}> {
         <p>{Description ? Description : 'No description.'}</p>
         <Collapse>
         <Panel header="Inputs" key="inputs"><ModelInput model={model}/></Panel>
-        <Panel header="X" key="X">
+        <Panel header="X (Variables)" key="X">
           <X model={this.props.model} available={this.props.availablePredictors}/>
         </Panel>
         <Panel header="Transformations" key="xforms"><ReviewObjects input={xforms}/></Panel>
         <Panel header="Contrasts" key="contrasts">
           <ReviewObjects input={contrasts} autoContrasts={autoContrasts}/>
         </Panel>
-        <Panel header="JSON Model" key="model"><pre>{JSON.stringify(this.props.model, null, 2)}</pre></Panel>
+        <Panel header="BIDS StatsModel" key="model"><pre>{JSON.stringify(this.props.model, null, 2)}</pre></Panel>
         </Collapse>
       </Card>
     );
