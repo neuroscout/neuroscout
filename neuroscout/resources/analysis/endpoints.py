@@ -5,6 +5,7 @@ from database import db
 from models import Analysis, Report
 from os.path import exists
 import datetime
+import webargs as wa
 
 from utils.db import put_record
 from ..utils import owner_required, auth_required, fetch_analysis, abort
@@ -72,9 +73,13 @@ class AnalysisResource(AnalysisMethodResource):
 
 
 class AnalysisFillResource(AnalysisMethodResource):
+    @use_kwargs({
+        'partial': wa.fields.Boolean(
+            description='Attempt partial fill if complete fill is not possible.')
+        }, locations=['query'])
     @doc(summary='Auto fill fields from model.')
     @owner_required
-    def post(self, analysis):
+    def post(self, analysis, partial=False):
         if analysis.status not in ['DRAFT', 'FAILED'] or analysis.locked:
                 abort(422, "Analysis not editable.")
 
@@ -96,6 +101,11 @@ class AnalysisFillResource(AnalysisMethodResource):
                     name=names, run_id=[r.id for r in analysis.runs])
 
                 if len(predictors) == len(names):
+                    fields['predictors'] = predictors
+                elif len(predictors) < len(names) and partial is True:
+                    new_names = [p.name for p in predictors]
+                    fields['model'] = analysis.model
+                    fields['model']['Steps'][0]['Model']['X'] = new_names
                     fields['predictors'] = predictors
 
         if fields:
