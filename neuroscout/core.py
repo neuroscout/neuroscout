@@ -2,19 +2,7 @@
 """ Core Neuroscout App """
 import os
 from flask import Flask, send_file, render_template, url_for
-from flask_mail import Mail
-from flask_caching import Cache
-from flask_jwt import JWT
-from flask_cors import CORS
-from flask_security import Security
-from flask_security.confirmable import confirm_email_token_status, confirm_user
-from auth import authenticate, load_user, add_auth_to_swagger
-from models import *
 from database import db
-
-from apispec import APISpec
-from flask_apispec.extension import FlaskApiSpec
-from utils import route_factory
 
 app = Flask(__name__, static_folder='/static')
 app.config.from_object(os.environ['APP_SETTINGS'])
@@ -31,23 +19,32 @@ app.config.update(
 
 db.init_app(app)
 
+from flask_mail import Mail
 mail = Mail(app)
 
-cache = Cache(
-    config={'CACHE_TYPE': 'filesystem', 'CACHE_DIR': app.config['CACHE_DIR']})
+from flask_caching import Cache
+cache = Cache(config={'CACHE_TYPE': 'filesystem', 'CACHE_DIR': app.config['CACHE_DIR']})
 cache.init_app(app)
 
+from flask_jwt import JWT
+from flask_security import Security
+from flask_security.confirmable import confirm_email_token_status, confirm_user
+from auth import authenticate, load_user, add_auth_to_swagger
+from models import *
 
 # Setup Flask-Security and JWT
 security = Security(app, user_datastore)
 jwt = JWT(app, authenticate, load_user)
 
 # Enable CORS
+from flask_cors import CORS
 cors = CORS(app, resources={r"/api/*": {"origins": "*"},
                             r"/swagger/": {"origins": "*"}})
 
 # Setup API
-
+from apispec import APISpec
+from flask_apispec.extension import FlaskApiSpec
+from utils import route_factory
 
 spec = APISpec(
     title='neuroscout',
@@ -59,8 +56,7 @@ app.config.update({
 add_auth_to_swagger(spec)
 
 docs = FlaskApiSpec(app)
-route_factory(
-    app, docs,
+route_factory(app, docs,
     [
         ('DatasetResource', 'datasets/<int:dataset_id>'),
         ('DatasetListResource', 'datasets'),
@@ -72,7 +68,7 @@ route_factory(
         ('ReportResource', 'analyses/<analysis_id>/report'),
         ('AnalysisResourcesResource', 'analyses/<analysis_id>/resources'),
         ('AnalysisBundleResource', 'analyses/<analysis_id>/bundle'),
-        ('AnalysisFillResource', 'analyses/<analysis_id>/fill')
+        ('AnalysisFillResource', 'analyses/<analysis_id>/fill'),
         ('RunListResource', 'runs'),
         ('RunResource', 'runs/<int:run_id>'),
         ('PredictorListResource', 'predictors'),
@@ -85,7 +81,6 @@ route_factory(
         ('TaskResource', 'tasks/<int:task_id>'),
         ('TaskListResource', 'tasks')
     ])
-
 
 @app.route('/confirm/<token>')
 def confirm(token):
@@ -104,7 +99,6 @@ def confirm(token):
                            confirmed=confirmed, expired=expired,
                            invalid=invalid, name=name,
                            action_url=url_for('index', _external=True))
-
 
 @app.route('/', defaults={'path': ''})
 @app.route('/<path:path>')
