@@ -8,6 +8,7 @@ import datetime
 
 from utils.db import put_record
 from ..utils import owner_required, auth_required, fetch_analysis, abort
+from ..predictor import get_predictors
 from .schemas import (AnalysisSchema, AnalysisFullSchema,
                       AnalysisResourcesSchema)
 
@@ -46,10 +47,10 @@ class AnalysisResource(AnalysisMethodResource):
     @owner_required
     def put(self, analysis, **kwargs):
         if analysis.locked is True:
-                abort(422, "Analysis is locked. It cannot be edited.")
-                if analysis.status not in ['DRAFT', 'FAILED']:
-                    excep = ['private', 'description']
-                    kwargs = {k: v for k, v in kwargs.items() if k in excep}
+            abort(422, "Analysis is locked. It cannot be edited.")
+        if analysis.status not in ['DRAFT', 'FAILED']:
+            excep = ['private', 'description']
+            kwargs = {k: v for k, v in kwargs.items() if k in excep}
         if not kwargs:
             abort(422, "Analysis is not editable. Try cloning it.")
         kwargs['modified_at'] = datetime.datetime.utcnow()
@@ -68,6 +69,40 @@ class AnalysisResource(AnalysisMethodResource):
         db.session.commit()
 
         return {'message': 'deleted!'}
+
+
+class AnalysisFillResource(AnalysisMethodResource):
+    @doc(summary='Auto fill fields from model.')
+    @owner_required
+    def post(self, analysis):
+        if analysis.status not in ['DRAFT', 'FAILED'] or analysis.locked:
+                abort(422, "Analysis not editable.")
+
+        fields = {}
+
+        if not analysis.runs:
+            #  Set to all runs in dataset
+            fields['runs'] = analysis.dataset.runs.all()
+
+        if not analysis.predictors:
+            # Look in model to see if there are predictor names
+            try:
+                names = analysis.model['Steps'][0]['Model']['X']
+            except (KeyError, TypeError):
+                names = None
+
+            if names is not None:
+                predictors = get_predictors(
+                    name=names, run_id=[r.id for r in analysis.runs])
+
+                if len(predictors) == len(names):
+                    fields['predictors'] = predictors
+
+        if fields:
+            fields['modified_at'] = datetime.datetime.utcnow()
+            return put_record(fields, analysis)
+        else:
+            return analysis
 
 
 class CloneAnalysisResource(AnalysisMethodResource):

@@ -68,6 +68,7 @@ route_factory(app, docs,
         ('ReportResource', 'analyses/<analysis_id>/report'),
         ('AnalysisResourcesResource', 'analyses/<analysis_id>/resources'),
         ('AnalysisBundleResource', 'analyses/<analysis_id>/bundle'),
+        ('AnalysisFillResource', 'analyses/<analysis_id>/fill')
         ('RunListResource', 'runs'),
         ('RunResource', 'runs/<int:run_id>'),
         ('PredictorListResource', 'predictors'),
