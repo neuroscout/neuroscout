@@ -88,7 +88,8 @@ class AnalysisFillResource(AnalysisMethodResource):
         if not analysis.runs:
             #  Set to all runs in dataset
             fields['runs'] = analysis.dataset.runs.all()
-
+            fields['model'] = analysis.model
+            fields['model'].pop("Input")
         if not analysis.predictors:
             # Look in model to see if there are predictor names
             try:
@@ -104,7 +105,8 @@ class AnalysisFillResource(AnalysisMethodResource):
                     fields['predictors'] = predictors
                 elif len(predictors) < len(names) and partial is True:
                     new_names = [p.name for p in predictors]
-                    fields['model'] = analysis.model
+                    if 'model' not in fields:
+                        fields['model'] = analysis.model
                     fields['model']['Steps'][0]['Model']['X'] = new_names
                     fields['predictors'] = predictors
 
