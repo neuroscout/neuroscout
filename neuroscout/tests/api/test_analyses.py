@@ -260,6 +260,90 @@ def test_put(auth_client, add_analysis, add_task, session):
         hash_id=analysis_json['hash_id']).count() == 0
 
 
+def test_autofill(auth_client, add_analysis, add_task, session):
+    # Get analysis to edit
+    analysis = Analysis.query.filter_by(id=add_analysis).first()
+    analysis_json = decode_json(
+        auth_client.get('/api/analyses/{}'.format(analysis.hash_id)))
+
+    analysis_json['predictors'] = []
+    analysis_json['runs'] = []
+
+    resp = auth_client.put('/api/analyses/{}'.format(analysis.hash_id),
+                           data=analysis_json)
+    assert resp.status_code == 200
+    assert len(decode_json(resp)['predictors']) == 0
+    assert len(decode_json(resp)['runs']) == 0
+
+    resp = auth_client.post('/api/analyses/{}/fill'.format(analysis.hash_id),
+                            data=analysis_json)
+    assert resp.status_code == 200
+    analysis_json = decode_json(resp)
+
+    assert len(analysis_json['predictors']) == 2
+    assert len(analysis_json['runs']) == 4
+
+    # Try with names that don't exist
+    analysis_json['model']['Steps'][0]["Model"]["X"] = \
+        ["Brightness", "nonexistent"]
+    analysis_json['predictors'] = []
+    analysis_json['runs'] = []
+    resp = auth_client.put('/api/analyses/{}'.format(analysis.hash_id),
+                           data=analysis_json)
+    assert resp.status_code == 200
+
+    # Partial fill should remove a predictor
+    resp = auth_client.post('/api/analyses/{}/fill'.format(analysis.hash_id),
+                            data=analysis_json,
+                            params=dict(partial=True, dryrun=True))
+    assert resp.status_code == 200
+    analysis_json = decode_json(resp)
+
+    assert len(analysis_json['predictors']) == 1
+    assert len(analysis_json['model']['Steps'][0]["Model"]["X"]) == 1
+
+    assert len(analysis_json['runs']) == 4
+
+    # No partial fill - extra predictor remains in model
+    resp = auth_client.post('/api/analyses/{}/fill'.format(analysis.hash_id),
+                            data=analysis_json,
+                            params=dict(partial=False, dryrun=True))
+    assert resp.status_code == 200
+    analysis_json = decode_json(resp)
+
+    assert len(analysis_json['predictors']) == 1
+    assert len(analysis_json['model']['Steps'][0]["Model"]["X"]) == 2
+    assert len(analysis_json['runs']) == 4
+
+    #
+
+    # Try with names that don't exist
+    analysis_json['model']['Steps'][0]["Model"]["X"] = \
+        ["Brightness", "nonexistent"]
+    analysis_json['model']['Steps'][0]["Transformations"].append(
+              {
+                "Name": "Scale",
+                "Input": [
+                  "nonexistent"
+                ]
+              }
+        )
+
+    analysis_json['predictors'] = []
+    analysis_json['runs'] = []
+    resp = auth_client.put('/api/analyses/{}'.format(analysis.hash_id),
+                           data=analysis_json)
+    assert resp.status_code == 200
+    assert len(decode_json(resp)['model']['Steps'][0]["Transformations"]) == 2
+
+    # Partial fill should remove all transformations
+    resp = auth_client.post('/api/analyses/{}/fill'.format(analysis.hash_id),
+                            data=analysis_json,
+                            params=dict(partial=True, dryrun=True))
+    assert len(decode_json(resp)['model']['Steps'][0]["Transformations"]) == 0
+    assert len(decode_json(resp)['model']['Steps'][0]["Contrasts"]) == 0
+
+
 @pytest.mark.skipif('CELERY_BROKER_URL' not in os.environ,
                     reason="requires redis")
 def test_reports(auth_client, add_analysis):

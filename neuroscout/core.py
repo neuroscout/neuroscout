@@ -7,13 +7,13 @@ from database import db
 app = Flask(__name__, static_folder='/static')
 app.config.from_object(os.environ['APP_SETTINGS'])
 app.config.update(
-    FEATURE_DATASTORE = str(app.config['FILE_DIR'] / 'feature-tracking.csv'),
-    CACHE_DIR = str(app.config['FILE_DIR'] / 'cache'),
-    STIMULUS_DIR = str(app.config['FILE_DIR'] / 'stimuli'),
-    EXTRACTION_DIR = str(app.config['FILE_DIR'] / 'extracted'),
-    FEATURE_SCHEMA = str(app.config['CONFIG_PATH'] / 'feature_schema.json'),
-    PREDICTOR_SCHEMA = str(app.config['CONFIG_PATH'] / 'predictor_schema.json'),
-    ALL_TRANSFORMERS = str(app.config['CONFIG_PATH'] / 'transformers.json')
+    FEATURE_DATASTORE=str(app.config['FILE_DIR'] / 'feature-tracking.csv'),
+    CACHE_DIR=str(app.config['FILE_DIR'] / 'cache'),
+    STIMULUS_DIR=str(app.config['FILE_DIR'] / 'stimuli'),
+    EXTRACTION_DIR=str(app.config['FILE_DIR'] / 'extracted'),
+    FEATURE_SCHEMA=str(app.config['CONFIG_PATH'] / 'feature_schema.json'),
+    PREDICTOR_SCHEMA=str(app.config['CONFIG_PATH'] / 'predictor_schema.json'),
+    ALL_TRANSFORMERS=str(app.config['CONFIG_PATH'] / 'transformers.json')
 )
 
 
@@ -68,6 +68,7 @@ route_factory(app, docs,
         ('ReportResource', 'analyses/<analysis_id>/report'),
         ('AnalysisResourcesResource', 'analyses/<analysis_id>/resources'),
         ('AnalysisBundleResource', 'analyses/<analysis_id>/bundle'),
+        ('AnalysisFillResource', 'analyses/<analysis_id>/fill'),
         ('RunListResource', 'runs'),
         ('RunResource', 'runs/<int:run_id>'),
         ('PredictorListResource', 'predictors'),
