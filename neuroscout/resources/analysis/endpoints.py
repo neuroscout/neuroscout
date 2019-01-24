@@ -75,11 +75,14 @@ class AnalysisResource(AnalysisMethodResource):
 class AnalysisFillResource(AnalysisMethodResource):
     @use_kwargs({
         'partial': wa.fields.Boolean(
-            description='Attempt partial fill if complete is not possible.')
+            description='Attempt partial fill if complete is not possible.',
+            missing=True),
+        'dryrun': wa.fields.Boolean(
+            description="Don't commit autofill results to database")
         }, locations=['query'])
     @doc(summary='Auto fill fields from model.')
     @owner_required
-    def post(self, analysis, partial=False):
+    def post(self, analysis, partial=True, dryrun=False):
         if analysis.status not in ['DRAFT', 'FAILED'] or analysis.locked:
                 abort(422, "Analysis not editable.")
 
@@ -117,13 +120,14 @@ class AnalysisFillResource(AnalysisMethodResource):
                             fields['model'] = analysis.model
                         fields['model']['Steps'][0]['Model']['X'] = new_names
 
-                        # If any transformations use missing predictors
+                        # If any transformations use missing predictors, drop
                         if any([t for t in
                                 fields['model']['Steps'][0]['Transformations']
                                 if missing.intersection(t['Input'])]):
                             fields['model']['Steps'][0]['Transformations'] = []
                             fields['model']['Steps'][0]['Contrasts'] = []
 
+                        # If any contrasts use missing predictors, drop all
                         if any([t for t in
                                 fields['model']['Steps'][0]['Contrasts']
                                 if missing.intersection(t['ConditionList'])]):
@@ -131,7 +135,7 @@ class AnalysisFillResource(AnalysisMethodResource):
 
         if fields:
             fields['modified_at'] = datetime.datetime.utcnow()
-            return put_record(fields, analysis)
+            return put_record(fields, analysis, commit=(not dryrun))
         else:
             return analysis
 
