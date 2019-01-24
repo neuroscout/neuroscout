@@ -98,8 +98,12 @@ class AnalysisFillResource(AnalysisMethodResource):
                 names = None
 
             if names is not None:
+                runs = fields['runs'] if 'runs' in fields else analysis.runs
+                if 'runs' in fields:
+                    runs = fields['runs']
+                    
                 predictors = get_predictors(
-                    name=names, run_id=[r.id for r in analysis.runs])
+                    name=names, run_id=[r.id for r in runs])
 
                 if len(predictors) == len(names):
                     fields['predictors'] = predictors
