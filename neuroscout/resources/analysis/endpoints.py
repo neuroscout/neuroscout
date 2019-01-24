@@ -75,7 +75,7 @@ class AnalysisResource(AnalysisMethodResource):
 class AnalysisFillResource(AnalysisMethodResource):
     @use_kwargs({
         'partial': wa.fields.Boolean(
-            description='Attempt partial fill if complete fill is not possible.')
+            description='Attempt partial fill if complete is not possible.')
         }, locations=['query'])
     @doc(summary='Auto fill fields from model.')
     @owner_required
@@ -89,7 +89,8 @@ class AnalysisFillResource(AnalysisMethodResource):
             #  Set to all runs in dataset
             fields['runs'] = analysis.dataset.runs.all()
             fields['model'] = analysis.model
-            fields['model'].pop("Input")
+            fields['model']["Input"] = {}
+
         if not analysis.predictors:
             # Look in model to see if there are predictor names
             try:
@@ -97,22 +98,36 @@ class AnalysisFillResource(AnalysisMethodResource):
             except (KeyError, TypeError):
                 names = None
 
-            if names is not None:
+            if names:
                 runs = fields['runs'] if 'runs' in fields else analysis.runs
-                if 'runs' in fields:
-                    runs = fields['runs']
-                    
+
                 predictors = get_predictors(
                     name=names, run_id=[r.id for r in runs])
 
                 if len(predictors) == len(names):
                     fields['predictors'] = predictors
-                elif len(predictors) < len(names) and partial is True:
-                    new_names = [p.name for p in predictors]
-                    if 'model' not in fields:
-                        fields['model'] = analysis.model
-                    fields['model']['Steps'][0]['Model']['X'] = new_names
-                    fields['predictors'] = predictors
+                elif len(predictors) < len(names):
+                    if partial:
+                        fields['predictors'] = predictors
+
+                        new_names = [p.name for p in predictors]
+                        missing = set(names) - set(new_names)
+
+                        if 'model' not in fields:
+                            fields['model'] = analysis.model
+                        fields['model']['Steps'][0]['Model']['X'] = new_names
+
+                        # If any transformations use missing predictors
+                        if any([t for t in
+                                fields['model']['Steps'][0]['Transformations']
+                                if missing.intersection(t['Input'])]):
+                            fields['model']['Steps'][0]['Transformations'] = []
+                            fields['model']['Steps'][0]['Contrasts'] = []
+
+                        if any([t for t in
+                                fields['model']['Steps'][0]['Contrasts']
+                                if missing.intersection(t['ConditionList'])]):
+                            fields['model']['Steps'][0]['Contrasts'] = []
 
         if fields:
             fields['modified_at'] = datetime.datetime.utcnow()
