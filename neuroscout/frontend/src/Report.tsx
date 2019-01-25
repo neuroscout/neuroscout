@@ -40,7 +40,11 @@ let getSub = (x: string, pre: string) => {
 class Plots extends React.Component<{plots: string[]}, {}> {
     render() {
       let display: any[] = [];
+      let firstUrl = '';
       let plots = this.props.plots.map((x, i) => {
+        if (i === 0) {
+          firstUrl = x;
+        }
         let url = x;
         let sub = getSub(x, 'sub');
         let run = getSub(x, 'run');
@@ -56,7 +60,7 @@ class Plots extends React.Component<{plots: string[]}, {}> {
         );
       });
       return(
-        <Collapse defaultActiveKey={['0']}>
+        <Collapse defaultActiveKey={[firstUrl]}>
           {display}
         </Collapse>
       );
