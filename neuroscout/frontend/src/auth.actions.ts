@@ -5,6 +5,7 @@ var authActions = Reflux.createActions({
   'jwtFetch': {sync: false, asyncResult: true},
   'authenticate': {sync: false, asyncResult: true},
   'login': {},
+  'logout': {},
   'signup': {},
   'confirmLogout': {},
   'resetPassword': {},

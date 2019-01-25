@@ -641,6 +641,10 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
       } else {
         newContrasts[this.state.activeContrastIndex] = {...this.state.activeContrast};
       }
+      if (newContrasts.length < 1) {
+        this.setState({contrastErrors: ['Minimum of one contrast required.']});
+        return false;
+      }
       this.updateContrasts(newContrasts);
     }
     return true;
@@ -934,7 +938,7 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
     }[analysis.status];
     // Jump to submit/status tab if no longer a draft.
     if (analysis.status !== 'DRAFT' && activeTab === 'overview') {
-      activeTab = 'submit';
+      activeTab = 'review';
     }
     let isDraft = analysis.status === 'DRAFT';
     return (
