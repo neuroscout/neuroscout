@@ -166,6 +166,7 @@ class PathBuilder():
     def __init__(self, outdir, domain, hash, entities):
         self.outdir = outdir
         prepend = "https://" if domain == "alpha.neuroscout.com" else "http://"
+        logger.error(prepend)
         self.domain = prepend + domain
         self.hash = hash
         self.entities = entities
