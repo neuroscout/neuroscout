@@ -1,24 +1,26 @@
 {
   "studyforrest_phase2": {
-    "dataset_address": "https://github.com/adelavega/studyforrest-data-phase2",
+    "preproc_address": "https://github.com/neuroscout-datasets/studyforrest/",
     "path": "/datasets/raw/forrest/",
     "summary": "Forrest Gump movie watching task, in German",
     "url": "http://studyforrest.org/",
     "tasks": {
       "movie": {
         "summary": "Audio Visual Presentation (German)",
+        "converters": [
+          ["FrameSamplingFilter", { "hertz": 1 }],
+          ["VideoToAudioConverter", {}]
+        ],
         "extractors": [
           ["BrightnessExtractor", {}],
           ["VibranceExtractor", {}]
         ],
+        "transformations": [
+        ],
         "filters": {
-          "run": 1,
-          "subject": "01",
+          "subject": ["01","03", "04", "05", "06", "09", "10", "14", "15", "16", "18", "19", "20"],
           "session": "movie"
-        },
-        "ingest_args": {
-          "include_predictors": ["stim_file"]
-          }
+        }
       }
     }
   }
