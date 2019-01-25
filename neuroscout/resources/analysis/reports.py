@@ -96,7 +96,6 @@ class CompileAnalysisResource(MethodResource):
 @doc(tags=['analysis'])
 class ReportResource(MethodResource):
     @doc(summary='Generate analysis reports.')
-    @owner_required
     def post(self, analysis, run_id=None):
         # Submit report generation
         analysis_json, pes_json = jsonify_analysis(analysis, run_id=run_id)
