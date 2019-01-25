@@ -628,8 +628,12 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
       this.updateTransformations(newXforms);
     } else if (this.state.activeTab === 'contrasts') {
       if (this.state.activeContrast === undefined) {
-        return true;
-      }
+        if (this.state.analysis.contrasts.length > 0) {
+          return true;
+        }
+        this.setState({contrastErrors: ['Minimum of one contrast required.']});
+        return false;
+      } 
       errors = validateContrast(this.state.activeContrast);
       if (errors.length > 0) {
         this.setState({contrastErrors: errors});
@@ -640,10 +644,6 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
         newContrasts.push({...this.state.activeContrast});
       } else {
         newContrasts[this.state.activeContrastIndex] = {...this.state.activeContrast};
-      }
-      if (newContrasts.length < 1) {
-        this.setState({contrastErrors: ['Minimum of one contrast required.']});
-        return false;
       }
       this.updateContrasts(newContrasts);
     }
