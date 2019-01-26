@@ -40,11 +40,7 @@ let getSub = (x: string, pre: string) => {
 class Plots extends React.Component<{plots: string[]}, {}> {
     render() {
       let display: any[] = [];
-      let firstUrl = '';
       let plots = this.props.plots.map((x, i) => {
-        if (i === 0) {
-          firstUrl = x;
-        }
         let url = x;
         let sub = getSub(x, 'sub');
         let run = getSub(x, 'run');
@@ -54,13 +50,13 @@ class Plots extends React.Component<{plots: string[]}, {}> {
           url = domainRoot + url;
         }
         display.push(
-          <Panel header={<a href={url}>{`Subject ${sub} Run ${run}`}</a>} key={'' + url}>
+          <Panel header={<a href={url}>{`Subject ${sub} Run ${run}`}</a>} key={'' + i}>
             <img src={url} className="designMatrix"/>
           </Panel>
         );
       });
       return(
-        <Collapse defaultActiveKey={[firstUrl]}>
+        <Collapse defaultActiveKey={['0']}>
           {display}
         </Collapse>
       );
