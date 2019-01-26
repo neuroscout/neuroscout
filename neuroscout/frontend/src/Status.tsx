@@ -135,7 +135,8 @@ export class Submit extends React.Component<submitProps, {tosAgree: boolean, val
             }
         </ul>
         <Checkbox onChange={validateChange} checked={this.state.validate}>
-          Validate analysis bundle contents
+          Validate design matrix construction for all runs (reduces the chance of run-time errors, but can
+          substantially increase bundle compilation time.)
         </Checkbox>
         <br/>
         <Checkbox onChange={onChange} checked={this.state.tosAgree}>

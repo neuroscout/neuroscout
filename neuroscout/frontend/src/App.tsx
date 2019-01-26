@@ -359,6 +359,7 @@ class App extends Reflux.Component<any, {}, AppState> {
         footer={null}
         maskClosable={true}
         onCancel={e => {
+          authActions.logout();
           authActions.update({ openLogin: false });
         }}
       >

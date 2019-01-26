@@ -165,7 +165,9 @@ def _plot_save(dm, plotter, outfile, **kwargs):
 class PathBuilder():
     def __init__(self, outdir, domain, hash, entities):
         self.outdir = outdir
-        self.domain = domain
+        prepend = "https://" if "neuroscout.org" in domain else "http://"
+        logger.error(prepend)
+        self.domain = prepend + domain
         self.hash = hash
         self.entities = entities
 

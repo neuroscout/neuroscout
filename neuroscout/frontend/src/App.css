@@ -1,29 +1,21 @@
 @import '~antd/dist/antd.css';
 
-/*.App {
-  text-align: center;
-}
-
-.App-logo {
-  animation: App-logo-spin infinite 20s linear;
-  height: 80px;
-}
-
-.App-header {
-  background-color: #222;
-  height: 150px;
-  padding: 20px;
-  color: white;
-}
-
-.App-intro {
-  font-size: large;
-}*/
-
 @keyframes App-logo-spin {
   from { transform: rotate(0deg); }
   to { transform: rotate(360deg); }
 }
+
+body {
+    background-color: white;
+}
+
+pre {
+    padding: 10px;
+    border-radius: 10px;
+    color: white;
+    background-color: black;
+}
+
 
 .Login-col {
   float: right;
@@ -37,8 +29,10 @@
   float: right;
 }
 
-body {
-    background-color: white;
+.privateSwitch {
+    text-align: center;
+    padding-right: 10px;
+    display: inline-block;
 }
 
 .builderTabs {
@@ -51,19 +45,6 @@ body {
 
 .mainCol {
     padding: 0 0px 0 0px;
-}
-
-pre {
-    padding: 10px;
-    border-radius: 10px;
-    color: white;
-    background-color: black;
-}
-
-.privateSwitch {
-    text-align: center;
-    padding-right: 10px;
-    display: inline-block;
 }
 
 .headerRow {
@@ -121,4 +102,9 @@ pre {
 
 .contrast-type-form-item {
     margin-bottom: 0px;
+}
+
+.designMatrix {
+    max-width: 100%;
+    max-height: 80vh;
 }

@@ -588,7 +588,7 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
         }
         if (this.state.analysis.runIds.length < 1) {
         }
-      } else if (!this.preTabChange()) {
+      } else if (!this.preTabChange(nextTab as TabName)) {
         return;
       }
       this.setState(update);
@@ -600,7 +600,7 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
    * current contents
    */
   onTabClick = (newTab: TabName) => {
-    if (!this.preTabChange()) {
+    if (!this.preTabChange(newTab)) {
       return;
     }
     this.setState({ activeTab: newTab });
@@ -608,7 +608,7 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
 
   // run any time we attempt to leave tab
   // xform and contrast checks are more or less the same save validate funciton call...
-  preTabChange = () => {
+  preTabChange = (nextTab: TabName) => {
     let errors: string[] = [];
     if (this.state.activeTab === 'transformations') {
       if (this.state.activeXform === undefined) {
@@ -628,8 +628,15 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
       this.updateTransformations(newXforms);
     } else if (this.state.activeTab === 'contrasts') {
       if (this.state.activeContrast === undefined) {
-        return true;
-      }
+        if (this.state.analysis.contrasts.length > 0) {
+          return true;
+        }
+        if (tabOrder.indexOf(nextTab) <= tabOrder.indexOf('contrasts')) {
+          return true;
+        }
+        this.setState({contrastErrors: ['Minimum of one contrast required.']});
+        return false;
+      } 
       errors = validateContrast(this.state.activeContrast);
       if (errors.length > 0) {
         this.setState({contrastErrors: errors});
@@ -934,7 +941,7 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
     }[analysis.status];
     // Jump to submit/status tab if no longer a draft.
     if (analysis.status !== 'DRAFT' && activeTab === 'overview') {
-      activeTab = 'submit';
+      activeTab = 'review';
     }
     let isDraft = analysis.status === 'DRAFT';
     return (
