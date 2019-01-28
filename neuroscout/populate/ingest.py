@@ -31,7 +31,6 @@ def add_predictor_collection(collection, dataset_id, run_id,
         collection - BIDSVariableCollection to ingest
         dataset_id - Dataset model id
         run_id - Run model id
-        source - source of collection. e.g "events", "recordings"
         TR - time repetiton of task
         include - list of predictors to include. all if None.
     """
