@@ -25,7 +25,7 @@ from .annotate import PredictorSerializer
 
 
 def add_predictor_collection(collection, dataset_id, run_id,
-                             TR=None, include=None):
+                             TR=None, include=None, exclude=None):
     """ Add a RunNode to the database.
     Args:
         collection - BIDSVariableCollection to ingest
@@ -36,7 +36,8 @@ def add_predictor_collection(collection, dataset_id, run_id,
     """
     pe_objects = []
     for var in collection.variables.values():
-        annotated = PredictorSerializer(TR=TR, include=include).load(var)
+        annotated = PredictorSerializer(
+            TR=TR, include=include, exclude=exclude).load(var)
         if annotated is not None:
             pred_props, pes_props = annotated
             predictor, _ = get_or_create(
@@ -119,7 +120,8 @@ def add_stimulus(stim_hash, dataset_id, parent_id=None, path=None,
 
 def add_task(task_name, dataset_name=None, local_path=None,
              dataset_address=None, preproc_address=None,
-             include_predictors=None, reingest=False, scan_length=1000,
+             include_predictors=None, exclude_predictors=None,
+             reingest=False, scan_length=1000,
              dataset_summary=None, url=None, task_summary=None, **kwargs):
     """ Adds a BIDS dataset task to the database.
         Args:
@@ -129,6 +131,7 @@ def add_task(task_name, dataset_name=None, local_path=None,
             dataset_address - remote address of BIDS dataset.
             preproc_address - remote address of preprocessed files.
             include_predictors - set of predictors to ingest
+            exclude_predictors - set of predictors to exclude from ingestions
             reingest - force reingesting even if dataset already exists
             scan_length - default scan length in case it cant be found in image
             dataset_summary - Dataset summary description,
@@ -253,7 +256,8 @@ def add_task(task_name, dataset_name=None, local_path=None,
 
         add_predictor_collection(
             collection, dataset_model.id, run_model.id,
-            include=include_predictors, TR=task_model.TR)
+            include=include_predictors,
+            exclude=exclude_predictors, TR=task_model.TR)
 
         """ Ingest Stimuli """
         if stims is not None:

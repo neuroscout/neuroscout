@@ -9,10 +9,11 @@ from pathlib import Path
 from pliers.utils.updater import check_updates
 import itertools
 
+
 def load_update_config(config_file, update=False):
     """ Returns element of config file that must be re-extracted
         as well as prepopulating default transformers in config file. """
-    config_dict =  json.load(open(config_file, 'r'))
+    config_dict = json.load(open(config_file, 'r'))
 
     default_tfs = json.load(
         open(current_app.config['ALL_TRANSFORMERS'], 'r'))
@@ -20,12 +21,14 @@ def load_update_config(config_file, update=False):
     tfs = []
     for _, dataset in config_dict.items():
         for _, task in dataset['tasks'].items():
-         task['extractors'] = task.get('extractors', default_tfs['extractors'])
-         task['converters'] = task.get('converters', default_tfs['converters'])
+            task['extractors'] = task.get(
+                'extractors', default_tfs['extractors'])
+            task['converters'] = task.get(
+                'converters', default_tfs['converters'])
 
-         tfs += task['extractors'] + task['converters']
+            tfs += task['extractors'] + task['converters']
 
-    tfs = list(k for k,_ in itertools.groupby(tfs)) # Unique-ify
+    tfs = list(k for k, _ in itertools.groupby(tfs))  # Unique-ify
 
     # Check for updates
     datastore = Path(current_app.config['FEATURE_DATASTORE'])
@@ -38,10 +41,10 @@ def load_update_config(config_file, update=False):
         for dname, dataset in config_dict.items():
             new_tasks = {}
             for tname, task in dataset.pop('tasks').items():
-                filt_ext = [e for e in task['extractors'] \
+                filt_ext = [e for e in task['extractors']
                             if tuple(e) in updated['transformers']]
-                filt_conv = [c for c in task['converters'] \
-                            if tuple(c) in updated['transformers']]
+                filt_conv = [c for c in task['converters']
+                             if tuple(c) in updated['transformers']]
 
                 if filt_ext or filt_conv:
                     task['extractors'] = filt_ext
@@ -55,6 +58,7 @@ def load_update_config(config_file, update=False):
         config_dict = filt_config
 
     return config_dict
+
 
 def ingest_from_json(config_file, update_features=False, reingest=False):
     """ Adds a datasets from a JSON configuration file
@@ -86,16 +90,17 @@ def ingest_from_json(config_file, update_features=False, reingest=False):
             """ Add task to database"""
             dp = params.get('ingest_args', {})
             dp.update(params.get('filters', {}))
-            dataset_id = add_task(task_name,
-                                  dataset_name=dataset_name,
-                                  local_path=local_path,
-                                  dataset_address=dataset_address,
-                                  preproc_address=preproc_address,
-                                  reingest=reingest,
-                                  url=items.get('url'),
-                                  dataset_summary=items.get('summary'),
-                                  task_summary=params.get('summary'),
-            					  **dp)
+            dataset_id = add_task(
+                task_name,
+                dataset_name=dataset_name,
+                local_path=local_path,
+                dataset_address=dataset_address,
+                preproc_address=preproc_address,
+                reingest=reingest,
+                url=items.get('url'),
+                dataset_summary=items.get('summary'),
+                task_summary=params.get('summary'),
+                **dp)
             dataset_ids.append(dataset_id)
             dataset_name = Dataset.query.filter_by(id=dataset_id).one().name
 
@@ -108,7 +113,7 @@ def ingest_from_json(config_file, update_features=False, reingest=False):
             extractors = params.get('extractors', None)
             if extractors:
                 extract_features(dataset_name, task_name,
-                                 extractors, **params.get('extract_args',{}))
+                                 extractors, **params.get('extract_args', {}))
             transformations = params.get("transformations", [])
             post = Postprocessing(dataset_name, task_name)
             for args in transformations:

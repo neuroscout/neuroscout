@@ -49,8 +49,8 @@ def add_user(email, password, confirm=True):
     db.session.commit()
 
 @manager.command
-def add_task(local_path, task, include_predictors=None, filters='{}',
-             reingest=False):
+def add_task(local_path, task, include_predictors=None, exclude_predictors=None,
+             filters='{}', reingest=False):
     """ Add BIDS dataset to database.
     local_path - Path to local_path directory
     task - Task name
@@ -59,7 +59,9 @@ def add_task(local_path, task, include_predictors=None, filters='{}',
     """
     populate.add_task(
         task, local_path=local_path, **json.loads(filters),
-        include_predictors=include_predictors, reingest=reingest)
+        include_predictors=include_predictors,
+        exclude_predictors=exclude_predictors,
+        reingest=reingest)
 
 @manager.command
 def extract_features(local_path, task, graph_spec, filters='{}'):
