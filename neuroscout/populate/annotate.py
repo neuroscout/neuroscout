@@ -44,19 +44,17 @@ class PredictorSerializer(Serializer):
 
         annotated = {}
         annotated['original_name'] = variable.name
-        source = variable.source
-        if source == 'confounds':
-            source = 'fmriprep'
-        annotated['source'] = source
+        annotated['source'] = variable.source
 
         for pattern, attr in self.schema.items():
             if re.compile(pattern).match(variable.name):
                 annotated['name'] = re.sub(
-                    pattern, attr['name'], variable.name) \
+                    pattern, attr.pop('name'), variable.name) \
                     if 'name' in attr else variable.name
                 annotated['description'] = re.sub(
-                    pattern, attr['description'], variable.name) \
+                    pattern, attr.pop('description'), variable.name) \
                     if 'description' in attr else None
+                annotated.update(**attr)  # Add any additional attributes
                 break
         else:
             annotated['name'] = variable.name

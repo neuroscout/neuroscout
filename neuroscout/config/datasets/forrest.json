@@ -17,6 +17,9 @@
         ],
         "transformations": [
         ],
+        "ingest_args": {
+          "exclude_predictors": ["lasttrigger", "audiotime", "videotime", "frameidx", "trigger"]
+        },
         "filters": {
           "subject": ["01","03", "04", "05", "06", "09", "10", "14", "15", "16", "18", "19", "20"],
           "session": "movie"
