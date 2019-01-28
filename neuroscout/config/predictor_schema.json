@@ -58,9 +58,6 @@
   "^pupil_dil$": {
     "description": "Pupil dilation",
     "source": "eye-tracking"
-  },
-  "^movieframe_idx$": {
-    "description": "Movie-frame index from eye-tracking",
-    "source": "eye-tracking"
+  }
   }
 }
