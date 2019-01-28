@@ -37,7 +37,9 @@ class PredictorSerializer(Serializer):
             res - BIDSVariableCollection object
         Returns a dictionary of annotated features
         """
-        if (self.include is not None and variable.name not in self.include) or variable.name in self.exclude:
+        if self.include is not None and variable.name not in self.include:
+            return None
+        if self.exclude is not None and variable.name in self.exclude:
             return None
 
         annotated = {}
