@@ -19,6 +19,7 @@ app.config.from_object(os.environ['APP_SETTINGS'])
 migrate = Migrate(app, db, directory=app.config['MIGRATIONS_DIR'])
 manager = Manager(app)
 
+
 def _make_context():
     import models
     from tests.request_utils import Client
@@ -26,15 +27,17 @@ def _make_context():
 
     try:
         client = Client(requests, 'http://127.0.0.1:80',
-            username='test2@test.com', password='password')
+                        username='test2@test.com', password='password')
     except:
         client = None
 
     return dict(app=app, db=db, ms=models, client=client,
-        resources=resources)
+                resources=resources)
+
 
 manager.add_command('db', MigrateCommand)
 manager.add_command("shell", Shell(make_context=_make_context))
+
 
 @manager.command
 def add_user(email, password, confirm=True):
@@ -48,9 +51,10 @@ def add_user(email, password, confirm=True):
         user.confirmed_at = datetime.datetime.now()
     db.session.commit()
 
+
 @manager.command
-def add_task(local_path, task, include_predictors=None, exclude_predictors=None,
-             filters='{}', reingest=False):
+def add_task(local_path, task, include_predictors=None,
+             exclude_predictors=None, filters='{}', reingest=False):
     """ Add BIDS dataset to database.
     local_path - Path to local_path directory
     task - Task name
@@ -63,6 +67,7 @@ def add_task(local_path, task, include_predictors=None, exclude_predictors=None,
         exclude_predictors=exclude_predictors,
         reingest=reingest)
 
+
 @manager.command
 def extract_features(local_path, task, graph_spec, filters='{}'):
     """ Extract features from a BIDS dataset.
@@ -74,6 +79,7 @@ def extract_features(local_path, task, graph_spec, filters='{}'):
     populate.extract_features(
         local_path, task, graph_spec, **json.loads(filters))
 
+
 @manager.command
 def ingest_from_json(config_file, update_features=False, reingest=False):
     """ Ingest/update datasets and extracted features from a json config file.
@@ -83,6 +89,7 @@ def ingest_from_json(config_file, update_features=False, reingest=False):
     populate.ingest_from_json(
         config_file, update_features=update_features,
         reingest=reingest)
+
 
 if __name__ == '__main__':
     manager.run()
