@@ -23,6 +23,7 @@ class PredictorSerializer(Serializer):
         Args:
             add_all - Add all variables including those not in the schema
             include - List of variables to include
+            exclude - List of variables to exclude
             TR - TR in seconds
         """
         self.include = include
