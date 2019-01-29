@@ -461,7 +461,9 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
           }
           throw new Error('Oops...something went wrong. Analysis was not saved.');
         }
-        message.success(compile ? 'Analysis submitted for generation' : 'Analysis saved');
+        if (compile) {
+          message.success('Analysis submitted for generation');
+        }
         let analysisId = this.state.analysis.analysisId;
         if (data.hash_id !== undefined) {
           analysisId = data.hash_id;
@@ -826,7 +828,7 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
 
   postTabChange = (activeKey) => {
     const analysis = this.state.analysis;
-    if (activeKey === 'review' && this.state.analysis.status === 'DRAFT') {
+    if (this.state.analysis.status === 'DRAFT') {
       this.setState({model: this.buildModel()});
       if (this.state.analysis.status === 'DRAFT' && this.state.unsavedChanges) {
         this.saveAnalysis({compile: false})();
