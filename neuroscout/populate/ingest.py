@@ -210,12 +210,10 @@ def add_task(task_name, dataset_name=None, local_path=None,
             entities['run'] = run_number
 
         # Get duration (helps w/ transformations)
-        try:
-            img_ni = nib.load(img.path)
-            run_model.duration = img_ni.shape[3] * img_ni.header.get_zooms()[-1]
-        except (nib.filebasedimages.ImageFileError, IndexError):
-            current_app.logger.debug(
-                "Error loading BOLD file, default duration used.")
+        if hasattr(img, 'image'):
+            run_model.duration = img.image.shape[3] * \
+             img.image.header.get_zooms()[-1]
+        else:
             run_model.duration = scan_length
 
         path_patterns = [
