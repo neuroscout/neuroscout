@@ -210,7 +210,7 @@ def add_task(task_name, dataset_name=None, local_path=None,
             entities['run'] = run_number
 
         # Get duration (helps w/ transformations)
-        if hasattr(img, 'image'):
+        if img.image is not None:
             run_model.duration = img.image.shape[3] * \
              img.image.header.get_zooms()[-1]
         else:
