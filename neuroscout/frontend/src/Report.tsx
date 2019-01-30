@@ -27,12 +27,12 @@ const domainRoot = config.server_url;
 
 const Panel = Collapse.Panel;
 
-let getSub = (x: string) => {
-  let subRe = /sub-([a-zA-Z0-9]+)/;
+let getSub = (x: string, pre: string) => {
+  let subRe = new RegExp(`${pre}-([a-zA-Z0-9]+)`);
   let sub = '';
   let _sub = subRe.exec(x);
   if (_sub !== null) {
-    sub = _sub[0];
+    sub = _sub[1];
   }
   return sub;
 };
@@ -40,19 +40,27 @@ let getSub = (x: string) => {
 class Plots extends React.Component<{plots: string[]}, {}> {
     render() {
       let display: any[] = [];
+      let firstUrl = '';
       let plots = this.props.plots.map((x, i) => {
-        let url = 'https://' + x;
+        if (i === 0) {
+          firstUrl = x;
+        }
+        let url = x;
+        let sub = getSub(x, 'sub');
+        let run = getSub(x, 'run');
         // urls generated for localhost have None instead of localhost in url
         if (x.indexOf('None') === 0) {
           url = x.slice(4);
           url = domainRoot + url;
         }
         display.push(
-          <Panel header={<a href={url}>{url}</a>} key={'' + i}><img src={url} style={{width: '100%'}}/></Panel>
+          <Panel header={<a href={url}>{`Subject ${sub} Run ${run}`}</a>} key={'' + url}>
+            <img src={url} className="designMatrix"/>
+          </Panel>
         );
       });
       return(
-        <Collapse defaultActiveKey={['0']}>
+        <Collapse defaultActiveKey={[firstUrl]}>
           {display}
         </Collapse>
       );
@@ -64,7 +72,7 @@ class Matrices extends React.Component<{matrices: string[]}, {}> {
       let display: any[] = [];
       let matrices = this.props.matrices.map((x) => {
         let url = x;
-        let sub = getSub(x);
+        let sub = getSub(x, 'sub');
         if (x.indexOf('None') === 0) {
           url = x.slice(4);
         }
@@ -161,6 +169,8 @@ export class Report extends React.Component<ReportProps, ReportState> {
         state.reportTimestamp = res.generated_at;
         if (res.traceback) {
           state.reportTraceback = res.traceback;
+        } else {
+          state.reportTraceback = '';
         }
       } else if (res.status === 'FAILED') {
         state.reportTraceback = res.traceback;

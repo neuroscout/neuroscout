@@ -5,7 +5,7 @@
  - ContrastDisplay: component to display a single contrast
 */
 import * as React from 'react';
-import { Table, Input, Button, Row, Col, Form, Select, Checkbox, Icon, List } from 'antd';
+import { Alert, Table, Input, Button, Row, Col, Form, Select, Checkbox, Icon, List } from 'antd';
 import {
   DragDropContext,
   Draggable,
@@ -195,6 +195,25 @@ export class ContrastsTab extends React.Component<ContrastsTabProps, ContrastsTa
           {'Contrasts'}
         </h2>
         <br />
+        {this.props.contrastErrors.length > 0 && mode !== 'add' &&
+          <div>
+            <Alert
+              type="error"
+              showIcon={true}
+              closable={true}
+              message={
+                <ul>
+                  {this.props.contrastErrors.map((x, i) =>
+                    <li key={i}>
+                      {x}
+                    </li>
+                  )}
+                </ul>
+              }
+            />
+            <br />
+          </div>}
+
         <DragDropContext onDragEnd={this.onDragEnd}>
           <Droppable droppableId="droppable">
             {(provided: DroppableProvided, snapshot: DroppableStateSnapshot) => (
