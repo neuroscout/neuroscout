@@ -186,7 +186,7 @@ def ingest_text_stimuli(filename, dataset_name, task_name, parent_ids,
         if onset < 0:
             duration = duration - onset
         sub = sub[sub.onset < duration]
-        
+
         # Get associations with parent stimulus
         rs_orig = RunStimulus.query.filter_by(stimulus_id=parent_id).join(
             Run).join(Task).filter_by(name=task_name)

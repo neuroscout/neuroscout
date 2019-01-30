@@ -8,7 +8,6 @@ from flask import current_app
 from pathlib import Path
 
 import pandas as pd
-import nibabel as nib
 
 from bids.layout import BIDSLayout
 from datalad.api import install
@@ -174,7 +173,7 @@ def add_task(task_name, dataset_name=None, local_path=None,
         dataset_model.local_path = local_path.as_posix()
         db.session.commit()
     elif not reingest:
-        current_app.logger.info("Dataset found, skipping ingestion...")
+        print("Dataset found, skipping ingestion...")
         return dataset_model.id
 
     # Get or create task
@@ -190,7 +189,7 @@ def add_task(task_name, dataset_name=None, local_path=None,
 
     stims_processed = {}
     """ Parse every Run """
-    current_app.logger.info("Parsing runs")
+    print("Parsing runs")
     all_runs = layout.get(task=task_name, suffix='bold', extensions='.nii.gz',
                           desc=None, **kwargs)
     for img in progressbar(all_runs):
@@ -283,7 +282,7 @@ def add_task(task_name, dataset_name=None, local_path=None,
                     duration=stims.duration.tolist()[i])
 
     """ Add GroupPredictors """
-    current_app.logger.info("Adding group predictors")
+    print("Adding group predictors")
     add_group_predictors(dataset_model.id, local_path / 'participants.tsv')
 
     return dataset_model.id
