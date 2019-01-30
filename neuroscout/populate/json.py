@@ -33,6 +33,7 @@ def load_update_config(config_file, update=False):
     # Check for updates
     datastore = Path(current_app.config['FEATURE_DATASTORE'])
     datastore.parents[0].mkdir(exist_ok=True)
+    print("Checking for updates...")
     updated = check_updates(tfs, datastore=datastore.as_posix())
 
     if update:
@@ -107,16 +108,19 @@ def ingest_from_json(config_file, update_features=False, reingest=False):
             """ Convert stimuli """
             converters = params.get('converters', None)
             if converters:
+                print("Converting...")
                 convert_stimuli(dataset_name, task_name, converters)
 
             """ Extract features from applicable stimuli """
             extractors = params.get('extractors', None)
             if extractors:
+                print("Extracting...")
                 extract_features(dataset_name, task_name,
                                  extractors, **params.get('extract_args', {}))
             transformations = params.get("transformations", [])
             post = Postprocessing(dataset_name, task_name)
             for args in transformations:
+                print("Applying transformation...")
                 post = Postprocessing(dataset_name, task_name)
                 post.apply_transformation(**args)
 

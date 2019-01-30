@@ -10,8 +10,9 @@
         "converters": [
         ],
         "extractors": [
-          ["GoogleVisionAPIFaceExtractor", {}],
-          ["GoogleVisionAPILabelExtractor", {}]
+          ["ClarifaiAPIImageExtractor", { "model": "general-v1.3",
+            "select_concepts": ["alphabet", "portrait", "dark", "daylight", "creativity", "animal", "face", "wild", "abstract", "sky", "room", "vertical", "text", "business", "vehicle", "wear", "horizontal", "man", "furniture", "old", "home", "two", "nature", "image", "family", "building", "empty", "road", "design", "woman", "girl", "landscape", "hand", "fashion", "equipment", "child", "art", "sunset", "music", "summer", "light", "wildlife", "competition", "simplicity", "architecture", "desktop", "retro", "technology", "street", "indoors", "adult", "outdoors", "recreation", "military", "color", "blur", "wood", "writing", "illustration", "travel", "one", "car", "action", "pattern", "water", "city", "people"]
+            }]
         ],
         "transformations": [
         ],
@@ -26,3 +27,4 @@
     }
   }
 }
+
