@@ -10,7 +10,8 @@
         "converters": [
         ],
         "extractors": [
-          ["SharpnessExtractor", {}]
+          ["GoogleVisionAPIFaceExtractor", {}],
+          ["GoogleVisionAPILabelExtractor", {}]
         ],
         "transformations": [
         ],
