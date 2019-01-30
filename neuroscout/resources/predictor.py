@@ -79,7 +79,8 @@ def get_predictors(newest=True, **kwargs):
     for param in kwargs:
         query = query.filter(getattr(Predictor, param).in_(kwargs[param]))
 
-    return query.all()
+    # Only display active predictors
+    return query.filter_by(active=True).all()
 
 
 class PredictorListResource(MethodResource):
