@@ -96,7 +96,7 @@ def convert_stimuli(dataset_name, task_name, converters):
         Output:
             list of db ids of converted stimuli
     """
-    current_app.logger.info("Converting stimuli")
+    print("Converting stimuli")
 
     dataset_id = Dataset.query.filter_by(name=dataset_name).one().id
 
