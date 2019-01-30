@@ -11,11 +11,12 @@ from flask_migrate import Migrate, MigrateCommand
 from flask_security.utils import encrypt_password
 
 import populate
+import logging
 from core import app, db
 from models import user_datastore
 
 app.config.from_object(os.environ['APP_SETTINGS'])
-app.logger.setLevel('INFO')
+app.logger.setLevel(logging.INFO)
 migrate = Migrate(app, db, directory=app.config['MIGRATIONS_DIR'])
 manager = Manager(app)
 
