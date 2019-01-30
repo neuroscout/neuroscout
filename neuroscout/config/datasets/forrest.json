@@ -1,5 +1,5 @@
 {
-  "studyforrest_phase2": {
+  "studyforrest": {
     "preproc_address": "https://github.com/neuroscout-datasets/studyforrest/",
     "path": "/datasets/raw/forrest/",
     "summary": "Forrest Gump movie watching task, in German",
@@ -8,12 +8,10 @@
       "movie": {
         "summary": "Audio Visual Presentation (German)",
         "converters": [
-          ["FrameSamplingFilter", { "hertz": 1 }],
-          ["VideoToAudioConverter", {}]
         ],
         "extractors": [
-          ["BrightnessExtractor", {}],
-          ["VibranceExtractor", {}]
+          ["SharpnessExtractor", {}],
+          ["SaliencyExtractor", {}]
         ],
         "transformations": [
         ],
