@@ -10,8 +10,7 @@
         "converters": [
         ],
         "extractors": [
-          ["SharpnessExtractor", {}],
-          ["SaliencyExtractor", {}]
+          ["SharpnessExtractor", {}]
         ],
         "transformations": [
         ],
