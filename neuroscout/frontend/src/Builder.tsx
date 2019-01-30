@@ -53,8 +53,6 @@ const history = createBrowserHistory();
 
 // const logo = require('./logo.svg');
 const domainRoot = config.server_url;
-const EMAIL = 'user@example.com';
-const PASSWORD = 'string';
 const DEFAULT_SMOOTHING = 5;
 const editableStatus = ['DRAFT', 'FAILED'];
 
@@ -839,7 +837,8 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
       return;
     }
 
-    // does this need to happen every time?
+    // does this need to happen every time? We are relying on this function to do initial load of predictors when
+    // loading an analysis not in draft.
     jwtFetch(`${domainRoot}/api/predictors?run_id=${analysis.runIds}`)
     .then((data: Predictor[]) => {
       const selectedPredictors = data.filter(
@@ -944,6 +943,7 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
     // Jump to submit/status tab if no longer a draft.
     if (analysis.status !== 'DRAFT' && activeTab === 'overview') {
       activeTab = 'review';
+      this.postTabChange(activeTab);
     }
     let isDraft = analysis.status === 'DRAFT';
     return (
