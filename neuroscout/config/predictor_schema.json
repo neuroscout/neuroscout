@@ -46,5 +46,17 @@
   "^trans_[x-z]?$": {
     "description": "Rigid-body transform parameter (translation)",
     "source": "fmriprep"
+  },
+  "^x$": {
+    "description": "X-coordinate",
+    "source": "eye-tracking"
+  },
+  "^y$": {
+    "description": "X-coordinate",
+    "source": "eye-tracking"
+  },
+  "^pupil_dil$": {
+    "description": "Pupil dilation",
+    "source": "eye-tracking"
   }
 }

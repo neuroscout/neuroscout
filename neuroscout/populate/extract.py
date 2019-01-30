@@ -17,10 +17,12 @@ from pliers.transformers import get_transformer
 from pliers.extractors import merge_results
 
 from models import (Dataset, Task, Predictor, PredictorEvent, PredictorRun,
-    Run, Stimulus, RunStimulus, ExtractedFeature, ExtractedEvent)
+                    Run, Stimulus, RunStimulus,
+                    ExtractedFeature, ExtractedEvent)
 from .annotate import FeatureSerializer
 
 socket.setdefaulttimeout(10000)
+
 
 def _load_stim_models(dataset_name, task_name):
     """ Given a dataset and task, load all available stimuli as Pliers
@@ -32,11 +34,14 @@ def _load_stim_models(dataset_name, task_name):
     stims = []
     for stim_model in stim_models:
         if stim_model.path is None:
-             # Load both ways for Text stimuli
-            stims.append((stim_model, ComplexTextStim(text=stim_model.content)))
-            stims.append((stim_model, TextStim(text=stims[-1][1].data)))
+            # Load both ways for Text stimuli
+            stims.append(
+                (stim_model, ComplexTextStim(text=stim_model.content)))
+            stims.append(
+                (stim_model, TextStim(text=stims[-1][1].data)))
         else:
-            stims.append((stim_model, load_stims(stim_model.path)))
+            stims.append(
+                (stim_model, load_stims(stim_model.path)))
 
     return stims
 
@@ -49,15 +54,17 @@ def _extract(extractors, stims):
         ext = get_transformer(name, **parameters)
         for stim_model, stim in stims:
             if ext._stim_matches_input_types(stim):
-                ### Hacky workaround. Look for compatible AVI
+                # Hacky workaround. Look for compatible AVI
                 if 'GoogleVideoAPIShotDetectionExtractor' in str(ext.__class__):
-                    stim.filename = Path(stim.filename).with_suffix('.avi').as_posix()
+                    stim.filename = Path(
+                        stim.filename).with_suffix('.avi').as_posix()
                 results.append((stim_model, ext.transform(stim)))
     return results
 
+
 def _to_csv(results, dataset_name, task_name):
     """ Save extracted Pliers results to file. """
-    if results != [] and 'EXTRACTION_DIR' in current_app.config.get('EXTRACTION_DIR'):
+    if results != [] and 'EXTRACTION_DIR' in current_app.config:
         results_df = merge_results(list(zip(*results))[1])
         outfile = Path(
             current_app.config['EXTRACTION_DIR']) / '{}_{}_{}.csv'.format(
@@ -66,6 +73,7 @@ def _to_csv(results, dataset_name, task_name):
             )
         outfile.parents[0].mkdir(exist_ok=True)
         results_df.to_csv(outfile)
+
 
 def extract_features(dataset_name, task_name, extractors):
     """ Extract features using pliers for a dataset/task
@@ -109,6 +117,7 @@ def extract_features(dataset_name, task_name, extractors):
 
     return create_predictors([ef for ef in ext_feats.values() if ef.active],
                              dataset_name)
+
 
 def create_predictors(features, dataset_name, run_ids=None):
     """ Create Predictors from Extracted Features.

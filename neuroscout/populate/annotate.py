@@ -5,6 +5,7 @@ import re
 import pandas as pd
 from .utils import hash_data
 
+
 class Serializer(object):
     def __init__(self, schema, add_all):
         """ Serialize and annotate results using a schema.
@@ -15,15 +16,18 @@ class Serializer(object):
         self.schema = json.load(open(schema, 'r'))
         self.add_all = add_all
 
+
 class PredictorSerializer(Serializer):
-    def __init__(self, add_all=True, include=None, TR=None):
+    def __init__(self, add_all=True, include=None, exclude=None, TR=None):
         """ Initalize serializer for ingested features.
         Args:
             add_all - Add all variables including those not in the schema
             include - List of variables to include
+            exclude - List of variables to exclude
             TR - TR in seconds
         """
         self.include = include
+        self.exclude = exclude
         self.TR = TR
         super().__init__(current_app.config['PREDICTOR_SCHEMA'], add_all)
 
@@ -35,24 +39,26 @@ class PredictorSerializer(Serializer):
         """
         if self.include is not None and variable.name not in self.include:
             return None
+        if self.exclude is not None and variable.name in self.exclude:
+            return None
 
         annotated = {}
         annotated['original_name'] = variable.name
-        source = variable.source
-        if source == 'confounds':
-            source = 'fmriprep'
-        annotated['source'] = source
+        annotated['source'] = variable.source
 
         for pattern, attr in self.schema.items():
             if re.compile(pattern).match(variable.name):
-                annotated['name'] = re.sub(pattern, attr['name'], variable.name) \
+                annotated['name'] = re.sub(
+                    pattern, attr.pop('name'), variable.name) \
                     if 'name' in attr else variable.name
-                annotated['description'] = re.sub(pattern, attr['description'], variable.name) \
+                annotated['description'] = re.sub(
+                    pattern, attr.pop('description'), variable.name) \
                     if 'description' in attr else None
+                annotated.update(**attr)  # Add any additional attributes
                 break
         else:
             annotated['name'] = variable.name
-            if self.add_all == False:
+            if self.add_all is False:
                 return None
 
         # If SparseVariable
@@ -66,7 +72,8 @@ class PredictorSerializer(Serializer):
             TR = variable.sampling_rate / 2 if self.TR is None else self.TR
             variable = variable.resample(1 / TR)
 
-            onsets = np.arange(0, len(variable.values) * self.TR, self.TR).tolist()
+            onsets = np.arange(
+                0, len(variable.values) * self.TR, self.TR).tolist()
             durations = [(self.TR)] * len(variable.values)
             values = variable.values[variable.name].values.tolist()
 
@@ -82,12 +89,14 @@ class PredictorSerializer(Serializer):
 
         return annotated, events
 
+
 stim_map = {
     'ImageStim': 'image',
     'VideoStim': 'video',
     'TextStim': 'text',
     'AudioStim': 'audio'
 }
+
 
 class FeatureSerializer(Serializer):
     def __init__(self, add_all=True):
@@ -115,8 +124,10 @@ class FeatureSerializer(Serializer):
                 (
                     {
                         'value': v['value'],
-                        'onset': v['onset'] if not pd.isnull(v['onset']) else None,
-                        'duration': v['duration'] if not pd.isnull(v['duration']) else None,
+                        'onset': v['onset']
+                        if not pd.isnull(v['onset']) else None,
+                        'duration': v['duration']
+                        if not pd.isnull(v['duration']) else None,
                         'object_id': v['object_id']
                         },
                     {
@@ -158,7 +169,8 @@ class FeatureSerializer(Serializer):
             features = set(features) - set(matching)
             for feat in matching:
                 annotated += self._annotate_feature(
-                    pattern, schema, feat, ext_hash, res_df[res_df.feature == feat])
+                    pattern, schema, feat, ext_hash,
+                    res_df[res_df.feature == feat])
 
         # Add all remaining features
         if self.add_all is True:
@@ -168,7 +180,7 @@ class FeatureSerializer(Serializer):
                     res_df[res_df.feature == feat], default_active=False)
 
         # Add extractor constants
-        tr_attrs = [getattr(res.extractor, a) \
+        tr_attrs = [getattr(res.extractor, a)
                     for a in res.extractor._log_attributes]
         constants = {
             "extractor_name": res.extractor.name,
@@ -177,7 +189,6 @@ class FeatureSerializer(Serializer):
             "extractor_version": res.extractor.VERSION,
             "modality": stim_map[res.extractor._input_type.__name__]
         }
-
 
         for ee, ef in annotated:
             ef.update(constants)

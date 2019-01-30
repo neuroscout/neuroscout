@@ -21,6 +21,7 @@ class Predictor(db.Model):
                                        lazy='dynamic')
 
     run_statistics = db.relationship('PredictorRun')
+    active = db.Column(db.Boolean, default=True)  # Actively display or not
 
     @property
     def non_null(self):
