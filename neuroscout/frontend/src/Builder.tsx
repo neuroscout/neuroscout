@@ -53,8 +53,6 @@ const history = createBrowserHistory();
 
 // const logo = require('./logo.svg');
 const domainRoot = config.server_url;
-const EMAIL = 'user@example.com';
-const PASSWORD = 'string';
 const DEFAULT_SMOOTHING = 5;
 const editableStatus = ['DRAFT', 'FAILED'];
 
@@ -461,7 +459,9 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
           }
           throw new Error('Oops...something went wrong. Analysis was not saved.');
         }
-        message.success(compile ? 'Analysis submitted for generation' : 'Analysis saved');
+        if (compile) {
+          message.success('Analysis submitted for generation');
+        }
         let analysisId = this.state.analysis.analysisId;
         if (data.hash_id !== undefined) {
           analysisId = data.hash_id;
@@ -826,7 +826,7 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
 
   postTabChange = (activeKey) => {
     const analysis = this.state.analysis;
-    if (activeKey === 'review' && this.state.analysis.status === 'DRAFT') {
+    if (this.state.analysis.status === 'DRAFT') {
       this.setState({model: this.buildModel()});
       if (this.state.analysis.status === 'DRAFT' && this.state.unsavedChanges) {
         this.saveAnalysis({compile: false})();
@@ -837,7 +837,8 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
       return;
     }
 
-    // does this need to happen every time?
+    // does this need to happen every time? We are relying on this function to do initial load of predictors when
+    // loading an analysis not in draft.
     jwtFetch(`${domainRoot}/api/predictors?run_id=${analysis.runIds}`)
     .then((data: Predictor[]) => {
       const selectedPredictors = data.filter(
@@ -942,6 +943,7 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
     // Jump to submit/status tab if no longer a draft.
     if (analysis.status !== 'DRAFT' && activeTab === 'overview') {
       activeTab = 'review';
+      this.postTabChange(activeTab);
     }
     let isDraft = analysis.status === 'DRAFT';
     return (

@@ -23,6 +23,7 @@ interface OverviewTabProps {
 }
 
 interface OverviewTabState {
+  clearFilteredVal: boolean;
   filteredVal: any[];
   runColumns: ColumnProps<any>[];
   taskMsg: string;
@@ -33,6 +34,7 @@ export class OverviewTab extends React.Component<OverviewTabProps, OverviewTabSt
   constructor(props) {
     super(props);
     this.state = {
+      clearFilteredVal: false,
       filteredVal: [],
       runColumns: [],
       taskMsg: 'Please Select'
@@ -50,34 +52,40 @@ export class OverviewTab extends React.Component<OverviewTabProps, OverviewTabSt
       this.updateAnalysis(attrName)(event.currentTarget.value);
     };
 
-  tableChange = (pagination, filters, sorter) => {
-    let newRunIds = this.props.availableRuns;
-    newRunIds = newRunIds.filter((x) => this.props.analysis.runIds.indexOf(x.id) > -1);
-    let newRunColumns = this.state.runColumns;
-    Object.keys(filters).map(key => {
-      if (filters[key] === null || filters[key].length === 0) { return; }
-      newRunIds = newRunIds.filter((x) => {return filters[key].includes(String(x[key])); });
-      newRunColumns = newRunColumns.map((x) => {
-        if (x.key === key) {
-          let newCol = x;
-          newCol.filteredValue = filters[key];
-          return newCol;
-        }
-        return x;
+  applyFilter = (pagination, filters, sorter) => {
+      let newRunIds = this.props.availableRuns;
+      let newRunColumns = this.state.runColumns;
+      Object.keys(filters).map(key => {
+        if (filters[key] === null || filters[key].length === 0) { return; }
+        newRunIds = newRunIds.filter((x) => {return filters[key].includes(String(x[key])); });
+        newRunColumns = newRunColumns.map((x) => {
+          if (x.key === key) {
+            let newCol = x;
+            newCol.filteredValue = filters[key];
+            return newCol;
+          }
+          return x;
+        });
       });
-    });
-    this.updateAnalysis('runIds')(newRunIds.map(x => x.id));
-    this.setState({filteredVal: filters});
+      this.updateAnalysis('runIds')(newRunIds.map(x => x.id));
+      this.setState({filteredVal: filters});
   };
 
   componentDidUpdate(prevProps) {
+    if (this.props.analysis.datasetId !== prevProps.analysis.datasetId) {
+      this.setState({clearFilteredVal: true});
+    }
+
     if (this.props.availableRuns.length !== prevProps.availableRuns.length) {
       let subCol = this.makeCol('Subject', 'subject', this.sortSub);
       let runCol = this.makeCol('Run Number', 'number', this.sortNum);
       let sesCol = this.makeCol('Session', 'session', this.sortSes);
       let _runColumns = [subCol, runCol, sesCol].filter(x => x !== undefined) as ColumnProps<any>[];
       if (_runColumns[0]) { _runColumns[0].defaultSortOrder = 'ascend' as 'ascend'; }
-      this.setState({runColumns: _runColumns});
+      if (this.state.clearFilteredVal) {
+        _runColumns.map(x => x.filteredValue = []);
+      }
+      this.setState({runColumns: _runColumns, clearFilteredVal: false});
     }
   }
 
@@ -117,6 +125,7 @@ export class OverviewTab extends React.Component<OverviewTabProps, OverviewTabSt
       key: _key,
       sorter: sortFn
     };
+
     if (unique.length > 0) {
       col.filters = unique.map((x) => {return {'text': x, 'value': x}; });
       col.onFilter = (value, record) => {
@@ -124,7 +133,6 @@ export class OverviewTab extends React.Component<OverviewTabProps, OverviewTabSt
       };
 
       if (this.props.analysis.runIds.length === this.props.availableRuns.length) {
-        col.filteredValue = unique;
         col.filteredValue = this.state.filteredVal[_key];
         let newFilteredVal = this.state.filteredVal;
         newFilteredVal[_key] = unique;
@@ -143,7 +151,8 @@ export class OverviewTab extends React.Component<OverviewTabProps, OverviewTabSt
       return x;
     });
     this.setState({runColumns: newRunCols});
-    this.updateAnalysis('runIds')([]);
+    this.updateAnalysis('runIds')
+      (this.props.availableRuns.map(x => x.id));
   };
 
   render() {
@@ -196,6 +205,7 @@ export class OverviewTab extends React.Component<OverviewTabProps, OverviewTabSt
     const taskRowSelection: TableRowSelection<Task> = {
       type: 'radio',
       onSelect: (record, selected, selectedRows) => {
+        this.clearFilters();
         this.props.updateSelectedTaskId(record.id);
       },
       selectedRowKeys: selectedTaskId ? [selectedTaskId] : []
@@ -208,8 +218,7 @@ export class OverviewTab extends React.Component<OverviewTabProps, OverviewTabSt
       },
       onSelectAll: (selected, selectedRows: any, changeRows) => {
         if (selected) {
-          this.updateAnalysis('runIds')
-            (this.props.availableRuns.filter(r => r.task === selectedTaskId).map(x => x.id));
+          this.applyFilter(undefined, this.state.filteredVal, undefined);
         } else {
           this.updateAnalysis('runIds')([]);
         }
@@ -297,7 +306,7 @@ export class OverviewTab extends React.Component<OverviewTabProps, OverviewTabSt
                   dataSource={availableRuns.filter(r => r.task === selectedTaskId).sort(this.sortSub)}
                   pagination={(availableRuns.length > 10) ? {'position': 'bottom'} : false}
                   rowSelection={runRowSelection}
-                  onChange={this.tableChange}
+                  onChange={this.applyFilter}
                 />
                 <div>
                   <Button onClick={this.clearFilters}>Clear Filters</Button>
