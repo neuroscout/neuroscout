@@ -19,6 +19,7 @@ before_script:
   - psql -c 'create database travis_ci_test;' -U postgres
   - CI=""; cd neuroscout/frontend && yarn install --concurrency=1 && yarn build --concurrency=1
   - CI="true"; cd ../
+  - imageio_download_bin ffmpeg
   - python -c "import imageio; imageio.plugins.ffmpeg.download()"
   - python -m pliers.support.download
 before_install:
