@@ -108,19 +108,19 @@ def ingest_from_json(config_file, update_features=False, reingest=False):
             """ Convert stimuli """
             converters = params.get('converters', None)
             if converters:
-                print("Converting...")
+                print("Converting... {}".format(converters))
                 convert_stimuli(dataset_name, task_name, converters)
 
             """ Extract features from applicable stimuli """
             extractors = params.get('extractors', None)
             if extractors:
-                print("Extracting...")
+                print("Extracting... {}".format(extractors))
                 extract_features(dataset_name, task_name,
                                  extractors, **params.get('extract_args', {}))
             transformations = params.get("transformations", [])
             post = Postprocessing(dataset_name, task_name)
             for args in transformations:
-                print("Applying transformation...")
+                print("Applying transformation... {}".format(args))
                 post = Postprocessing(dataset_name, task_name)
                 post.apply_transformation(**args)
 
