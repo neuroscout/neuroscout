@@ -40,6 +40,9 @@ export class OverviewTab extends React.Component<OverviewTabProps, OverviewTabSt
   }
 
   updateAnalysis = (attrName: string) => (value: any) => {
+    if (attrName === 'datasetId') {
+      this.setState({filteredVal: [] as any[]});
+    }
     let newAnalysis = { ...this.props.analysis };
     newAnalysis[attrName] = value;
     this.props.updateAnalysis(newAnalysis);
@@ -119,6 +122,7 @@ export class OverviewTab extends React.Component<OverviewTabProps, OverviewTabSt
       key: _key,
       sorter: sortFn
     };
+
     if (unique.length > 0) {
       col.filters = unique.map((x) => {return {'text': x, 'value': x}; });
       col.onFilter = (value, record) => {
@@ -199,6 +203,7 @@ export class OverviewTab extends React.Component<OverviewTabProps, OverviewTabSt
     const taskRowSelection: TableRowSelection<Task> = {
       type: 'radio',
       onSelect: (record, selected, selectedRows) => {
+        this.setState({filteredVal: [] as any[]});
         this.props.updateSelectedTaskId(record.id);
       },
       selectedRowKeys: selectedTaskId ? [selectedTaskId] : []
