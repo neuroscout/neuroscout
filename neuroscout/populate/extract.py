@@ -50,7 +50,7 @@ def _extract(extractors, stims):
     results = []
     for name, parameters in extractors:
         # For every extractor, extract from matching stims
-        current_app.logger.info("Extractor: {}".format(name))
+        print("Extractor: {}".format(name))
         ext = get_transformer(name, **parameters)
         for stim_model, stim in stims:
             if ext._stim_matches_input_types(stim):
@@ -127,7 +127,7 @@ def create_predictors(features, dataset_name, run_ids=None):
             run_ids (list of ints) - Optional list of run_ids for which to
                                      create PredictorEvents for.
     """
-    current_app.logger.info("Creating predictors")
+    print("Creating predictors")
 
     # Create/Get Predictors
     all_preds = []

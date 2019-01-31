@@ -96,7 +96,7 @@ def convert_stimuli(dataset_name, task_name, converters):
         Output:
             list of db ids of converted stimuli
     """
-    current_app.logger.info("Converting stimuli")
+    print("Converting stimuli")
 
     dataset_id = Dataset.query.filter_by(name=dataset_name).one().id
 
@@ -186,7 +186,7 @@ def ingest_text_stimuli(filename, dataset_name, task_name, parent_ids,
         if onset < 0:
             duration = duration - onset
         sub = sub[sub.onset < duration]
-        
+
         # Get associations with parent stimulus
         rs_orig = RunStimulus.query.filter_by(stimulus_id=parent_id).join(
             Run).join(Task).filter_by(name=task_name)
