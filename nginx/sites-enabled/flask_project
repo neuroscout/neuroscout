@@ -48,13 +48,14 @@ server {
         proxy_read_timeout 300s;
     }
 
-
-    location /swagger-ui/ {
-        proxy_pass http://swagger-ui:8080/;
-        proxy_set_header Host $host;
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    location = /api/ {
+        return 301 /api/swagger/;
     }
 
-
+    location /api/swagger/ {
+        proxy_pass http://swagger-ui:8080/;
+        proxy_set_header host $host;
+        proxy_set_header x-real-ip $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    }
 }
