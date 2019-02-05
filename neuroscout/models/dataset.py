@@ -11,15 +11,11 @@ class Dataset(db.Model):
 	url = db.Column(db.Text) # External resource / link
 	active = db.Column(db.Boolean, default=True)
 	name = db.Column(db.Text, unique=True, nullable=False)
-	runs = db.relationship('Run', backref='dataset',
-	                        lazy='dynamic')
-	predictors = db.relationship('Predictor', backref='dataset',
-	                             lazy='dynamic')
+	runs = db.relationship('Run', backref='dataset')
+	predictors = db.relationship('Predictor', backref='dataset')
 
-	tasks = db.relationship('Task', backref='dataset',
-								lazy='dynamic')
-	analyses = db.relationship('Analysis', backref='dataset',
-	                            lazy='dynamic')
+	tasks = db.relationship('Task', backref='dataset')
+	analyses = db.relationship('Analysis', backref='dataset')
 	dataset_address = db.Column(db.Text)
 	preproc_address = db.Column(db.Text)
 	local_path = db.Column(db.Text)

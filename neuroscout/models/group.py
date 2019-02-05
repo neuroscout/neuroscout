@@ -9,8 +9,7 @@ class GroupPredictor(db.Model):
 
     dataset_id = db.Column(db.Integer, db.ForeignKey('dataset.id'), nullable=False)
 
-    values = db.relationship('GroupPredictorValue', backref='group_predictor',
-    							lazy='dynamic')
+    values = db.relationship('GroupPredictorValue', backref='group_predictor')
     def __repr__(self):
         return '<models.GroupPredictor[name=%s]>' % self.name
 

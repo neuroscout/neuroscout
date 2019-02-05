@@ -19,8 +19,7 @@ class ExtractedFeature(db.Model):
 	created_at = db.Column(db.DateTime, default=datetime.datetime.utcnow)
 	extractor_version = db.Column(db.Float, default=0.1)
 
-	extracted_events = db.relationship('ExtractedEvent', backref='extracted_feature',
-	                            		lazy='dynamic')
+	extracted_events = db.relationship('ExtractedEvent', backref='extracted_feature')
 	generated_predictors = db.relationship('Predictor',
 											backref='extracted_feature')
 

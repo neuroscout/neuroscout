@@ -30,9 +30,8 @@ class Run(db.Model):
     gpv = db.relationship('GroupPredictorValue',
                           cascade='delete')
     predictor_events = db.relationship('PredictorEvent', backref='run',
-                                        lazy='dynamic', cascade='delete')
+                                        cascade='delete')
     analyses = db.relationship('Analysis',
-                            secondary='analysis_run',
-                            lazy='dynamic')
+                            secondary='analysis_run')
     def __repr__(self):
         return '<models.Run[task={} sub={} sess={} number={}]>'.format(self.task, self.subject, self.session, self.number)
