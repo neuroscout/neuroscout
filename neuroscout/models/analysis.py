@@ -51,7 +51,7 @@ class Analysis(db.Model):
     # If cloned, this is the parent analysis:
     parent_id = db.Column(db.Text, db.ForeignKey('analysis.hash_id'))
 
-    results = db.relationship('Result', backref='analysis')
+    results = db.relationship('Result', backref='analysis', lazy='dynamic')
     predictors = db.relationship('Predictor', secondary=analysis_predictor,
                                  backref='analysis')
     runs = db.relationship('Run', secondary='analysis_run')

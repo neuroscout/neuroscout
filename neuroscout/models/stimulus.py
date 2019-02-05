@@ -29,9 +29,9 @@ class Stimulus(db.Model):
 	converter_name = db.Column(db.String)
 	converter_parameters = db.Column(db.Text)
 
-	extracted_events = db.relationship('ExtractedEvent')
+	extracted_events = db.relationship('ExtractedEvent', lazy='dynamic')
 	runs = db.relationship('Run',secondary='run_stimulus')
-	run_stimuli = db.relationship('RunStimulus',
+	run_stimuli = db.relationship('RunStimulus', lazy='dynamic',
 							   	  backref='stimulus')
 
 	def __repr__(self):

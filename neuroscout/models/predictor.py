@@ -1,5 +1,6 @@
 from database import db
 import statistics
+from sqlalchemy import func, Numeric, cast
 
 
 class Predictor(db.Model):
@@ -16,10 +17,46 @@ class Predictor(db.Model):
                            nullable=False)
     ef_id = db.Column(db.Integer, db.ForeignKey('extracted_feature.id'))
 
-    predictor_events = db.relationship('PredictorEvent', backref='predictor')
+    predictor_events = db.relationship('PredictorEvent', backref='predictor',
+                                       lazy='dynamic')
 
     run_statistics = db.relationship('PredictorRun')
     active = db.Column(db.Boolean, default=True)  # Actively display or not
+
+    @property
+    def non_null(self):
+        return self.predictor_events.filter(
+            ~PredictorEvent.value.in_(['nan', 'n/a', 'NaN']))
+
+    @property
+    def num_na(self):
+        return self.predictor_events.filter(
+            PredictorEvent.value.in_(['nan', 'n/a', 'NaN'])).count()
+
+    def apply_func(self, method):
+        """ Apply function to non-null Numeric castable values """
+        return self.non_null.with_entities(
+            getattr(func, method)(
+                cast(func.nullif(
+                    func.regexp_replace(
+                        PredictorEvent.value, ".*[^0-9.]+.*", ""), ""),
+                     Numeric))).scalar()
+
+    @property
+    def max(self):
+        return self.apply_func('max')
+
+    @property
+    def min(self):
+        return self.apply_func('min')
+
+    @property
+    def mean(self):
+        return self.apply_func('avg')
+
+    @property
+    def stddev(self):
+        return self.apply_func('stddev')
 
     def __repr__(self):
         return '<models.Predictor[name=%s]>' % self.name
