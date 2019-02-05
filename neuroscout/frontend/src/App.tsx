@@ -22,6 +22,7 @@ import { displayError, jwtFetch, timeout } from './utils';
 import { AuthStore } from './auth.store';
 import { authActions } from './auth.actions';
 import FAQ from './FAQ';
+import NotFound from './404';
 
 const FormItem = Form.Item;
 const DOMAINROOT = config.server_url;
@@ -649,6 +650,7 @@ class App extends Reflux.Component<any, {}, AppState> {
                 path="/faq"
                 render={() => <FAQ/>}
               />
+              <Route render={() => <NotFound/>} />
             </Content>
           </Layout>
         </div>
