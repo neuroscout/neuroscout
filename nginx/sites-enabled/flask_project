@@ -43,6 +43,10 @@ server {
         return 301 https://$host/api/swagger/;
     }
 
+    location = /api {
+        return 301 https://$host/api/swagger/;
+    }
+
     location /api/swagger/ {
         proxy_pass http://swagger-ui:8080/;
         proxy_set_header Host $host;
