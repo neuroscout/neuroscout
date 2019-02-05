@@ -6,7 +6,8 @@ import hashlib
 import warnings
 from pathlib import Path
 
-def hash_stim(stim, blocksize = 65536):
+
+def hash_stim(stim, blocksize=65536):
     """ Hash a pliers stimulus """
     if isinstance(stim, Path):
         stim = stim.as_posix()
@@ -32,6 +33,7 @@ def hash_stim(stim, blocksize = 65536):
 
     return hasher.hexdigest()
 
+
 def hash_data(data):
     """" Hashes data or string """
     if isinstance(data, str):
@@ -42,6 +44,7 @@ def hash_data(data):
     hasher.update(data)
 
     return hasher.hexdigest()
+
 
 def remote_resource_exists(base_address, resource, raise_exception=False,
                  content_type='binary/octet-stream'):
@@ -57,18 +60,3 @@ def remote_resource_exists(base_address, resource, raise_exception=False,
             return False
 
     return True
-
-# For updating paths in the db
-# def get_entities(run, **kwargs):
-#      entities = {entity : getattr(run, entity)
-#          for entity in ['subject', 'session', 'acquisition']
-#          if entity in run.__dict__ and getattr(run, entity) is not None}
-#      entities['task'] = run.task.name
-#      if 'number' in run.__dict__ and run.number is not None:
-#              entities['run'] = str(run.number)
-#      if 'run' in entities:
-#          entities['run']= entities['run'].zfill(2)
-#      return {**kwargs, **entities}
-# for r in ms.Run.query.all():
-#     ...:     r.func_path = layout.build_path(get_entities(r, suffix='bold', desc='preproc', space='MNI152NLin2009cAsym'), path_patterns=
-#     ...: path_patterns)

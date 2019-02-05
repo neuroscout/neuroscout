@@ -32,8 +32,6 @@ def test_dataset_ingestion(session, add_task):
     assert 'TaskName' in run_model.task.description
     assert run_model.task.description['RepetitionTime'] == 2.0
 
-    assert run_model.func_path == 'sub-01/func/sub-01_task-bidstest_run-01_space-MNI152NLin2009cAsym_desc-preproc_bold.nii.gz'
-
     # Test properties of first run's predictor events
     assert len(run_model.predictor_events) == 12
     assert Predictor.query.count() == len(dataset_model.predictors) == 3

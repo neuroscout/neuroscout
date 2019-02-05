@@ -21,8 +21,6 @@ class Run(db.Model):
     number = db.Column(db.Integer)
 
     duration = db.Column(db.Float)
-    func_path = db.Column(db.Text)  # Relative to fmriprep root
-    mask_path = db.Column(db.Text)  # Relative to fmriprep root
 
     task_id = db.Column(db.Integer, db.ForeignKey('task.id'),
                         nullable=False)
