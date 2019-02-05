@@ -20,11 +20,11 @@ class User(db.Model, UserMixin):
     active = db.Column(db.Boolean())  # If set to disabled, cannot access.
     confirmed_at = db.Column(db.DateTime())
     roles = db.relationship('Role', secondary=roles_users,
-                            backref=db.backref('users', lazy='dynamic'))
+                            backref=db.backref('users'))
     last_activity_at = db.Column(db.DateTime())
     last_activity_ip = db.Column(db.String(255))
 
-    analyses = db.relationship('Analysis', backref='user', lazy='dynamic')
+    analyses = db.relationship('Analysis', backref='user')
 
     def __repr__(self):
         return '<models.User[email=%s]>' % self.email
