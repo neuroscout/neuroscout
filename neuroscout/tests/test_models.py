@@ -35,7 +35,7 @@ def test_dataset_ingestion(session, add_task):
     assert run_model.func_path == 'sub-01/func/sub-01_task-bidstest_run-01_space-MNI152NLin2009cAsym_desc-preproc_bold.nii.gz'
 
     # Test properties of first run's predictor events
-    assert run_model.predictor_events.count() == 12
+    assert len(run_model.predictor_events) == 12
     assert Predictor.query.count() == len(dataset_model.predictors) == 3
 
     pred_names = [p.name for p in Predictor.query.all()]
@@ -43,7 +43,7 @@ def test_dataset_ingestion(session, add_task):
     assert 'rating' in pred_names  # Derivative event
 
     predictor = Predictor.query.filter_by(name='rt').first()
-    assert predictor.predictor_events.count() == 16
+    assert len(predictor.predictor_events) == 16
     assert predictor.source == 'events'
     assert predictor.original_name == 'reaction_time'
 
@@ -83,7 +83,7 @@ def test_json_local_dataset(session, add_local_task_json):
     assert Run.query.filter_by(dataset_id=add_local_task_json).count() \
         == len(dataset_model.runs) == 1
     predictor = Predictor.query.filter_by(name='rt').first()
-    assert predictor.predictor_events.count() == 4
+    assert len(predictor.predictor_events) == 4
 
     # Test that Stimiuli were extracted
     assert Stimulus.query.count() == 5
@@ -102,7 +102,7 @@ def test_json_local_dataset(session, add_local_task_json):
 
     num_bright = ExtractedFeature.query.filter_by(feature_name='num_bright')
     assert num_bright.count() == 1
-    assert num_bright.first().extracted_events.count() == 3
+    assert len(num_bright.first().extracted_events) == 3
 
     for ee in num_bright.first().extracted_events:
         assert ee.value == '1'
@@ -128,7 +128,7 @@ def test_extracted_features(session, add_task, extract_features):
     assert ef_b.description == "Brightness of an image."
 
     # Check that the number of features extracted is the same as Stimuli
-    assert ef_b.extracted_events.count() == Stimulus.query.count()
+    assert len(ef_b.extracted_events) == Stimulus.query.count()
 
     # Check for sensical value
     assert isclose(float(session.query(func.max(PredictorEvent.value)).join(

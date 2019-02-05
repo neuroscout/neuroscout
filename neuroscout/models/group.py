@@ -1,18 +1,21 @@
 from database import db
 
+
 class GroupPredictor(db.Model):
     """ Group-level predictors, e.g. across subjects, sessions, etc... """
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.Text, nullable=False)
-    description = db.Column(db.Text) # Where to get this from?
-    level = db.Column(db.String, nullable=False) # Session? Subject?
+    description = db.Column(db.Text)  # Where to get this from?
+    level = db.Column(db.String, nullable=False)  # Session? Subject?
 
-    dataset_id = db.Column(db.Integer, db.ForeignKey('dataset.id'), nullable=False)
+    dataset_id = db.Column(
+        db.Integer, db.ForeignKey('dataset.id'), nullable=False)
 
-    values = db.relationship('GroupPredictorValue', backref='group_predictor',
-    							lazy='dynamic')
+    values = db.relationship('GroupPredictorValue', backref='group_predictor')
+
     def __repr__(self):
         return '<models.GroupPredictor[name=%s]>' % self.name
+
 
 class GroupPredictorValue(db.Model):
     """ Contains values of GroupPredictor for every Run.
