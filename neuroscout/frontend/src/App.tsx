@@ -5,7 +5,7 @@ Top-level App component containing AppState. The App component is currently resp
 - Managing user's saved analyses (list display, clone and delete)
 */
 import * as React from 'react';
-import { BrowserRouter as Router, Route, Link, Redirect } from 'react-router-dom';
+import { BrowserRouter as Router, Route, Link, Redirect, Switch } from 'react-router-dom';
 import Reflux from 'reflux';
 import { Avatar, Divider, Tabs, Row, Col, Layout, Button, Menu, Modal, Icon, Input, Form, message } from 'antd';
 import { GoogleLogin } from 'react-google-login';
@@ -583,74 +583,76 @@ class App extends Reflux.Component<any, {}, AppState> {
               </MainCol>
             </Row>
               <br />
-              <Route
-                exact={true}
-                path="/"
-                render={props =>
-                  <Home
-                    analyses={this.state.auth.loggedIn ?
-                      analyses
-                    :
-                      publicAnalyses}
-                    loggedIn={this.state.auth.loggedIn}
-                    cloneAnalysis={this.cloneAnalysis}
-                    onDelete={this.onDelete}
-                  />}
-              />
-              <Route
-                exact={true}
-                path="/builder"
-                render={props => {
-                  // This is a temporary solution to prevent non logged-in users from entering the builder.
-                  // Longer term to automatically redirect the user to the target URL after login we
-                  // need to implement something like the auth workflow example here:
-                  // https://reacttraining.com/react-router/web/example/auth-workflow
-                  if (loggedIn || this.state.auth.openLogin) {
-                    return <AnalysisBuilder updatedAnalysis={() => this.loadAnalyses()} key={props.location.key}/>;
+              <Switch>
+                <Route
+                  exact={true}
+                  path="/"
+                  render={props =>
+                    <Home
+                      analyses={this.state.auth.loggedIn ?
+                        analyses
+                      :
+                        publicAnalyses}
+                      loggedIn={this.state.auth.loggedIn}
+                      cloneAnalysis={this.cloneAnalysis}
+                      onDelete={this.onDelete}
+                    />}
+                />
+                <Route
+                  exact={true}
+                  path="/builder"
+                  render={props => {
+                    // This is a temporary solution to prevent non logged-in users from entering the builder.
+                    // Longer term to automatically redirect the user to the target URL after login we
+                    // need to implement something like the auth workflow example here:
+                    // https://reacttraining.com/react-router/web/example/auth-workflow
+                    if (loggedIn || this.state.auth.openLogin) {
+                      return <AnalysisBuilder updatedAnalysis={() => this.loadAnalyses()} key={props.location.key}/>;
+                    }
+                    message.warning('Please log in first and try again');
+                    return <Redirect to="/" />;
+                  }}
+                />
+                <Route
+                  path="/builder/:id"
+                  render={props =>
+                    <AnalysisBuilder
+                      id={props.match.params.id}
+                      updatedAnalysis={() => this.loadAnalyses()}
+                      userOwns={this.state.analyses.filter((x) => x.id === props.match.params.id).length > 0}
+                    />}
+                />
+                <Route
+                  exact={true}
+                  path="/public/:id"
+                  render={props =>
+                    <AnalysisBuilder
+                      id={props.match.params.id}
+                      updatedAnalysis={() => this.loadAnalyses()}
+                      userOwns={this.state.analyses.filter((x) => x.id === props.match.params.id).length > 0}
+                    />
                   }
-                  message.warning('Please log in first and try again');
-                  return <Redirect to="/" />;
-                }}
-              />
-              <Route
-                path="/builder/:id"
-                render={props =>
-                  <AnalysisBuilder
-                    id={props.match.params.id}
-                    updatedAnalysis={() => this.loadAnalyses()}
-                    userOwns={this.state.analyses.filter((x) => x.id === props.match.params.id).length > 0}
-                  />}
-              />
-              <Route
-                exact={true}
-                path="/public/:id"
-                render={props =>
-                  <AnalysisBuilder
-                    id={props.match.params.id}
-                    updatedAnalysis={() => this.loadAnalyses()}
-                    userOwns={this.state.analyses.filter((x) => x.id === props.match.params.id).length > 0}
-                  />
-                }
-              />
+                />
 
-              <Route
-                exact={true}
-                path="/public"
-                render={props =>
-                  <Public analyses={publicAnalyses} cloneAnalysis={this.cloneAnalysis} />}
-              />
-              <Route
-                exact={true}
-                path="/myanalyses"
-                render={props =>
-                  <Private analyses={analyses} cloneAnalysis={this.cloneAnalysis} />}
-              />
-              <Route
-                exact={true}
-                path="/faq"
-                render={() => <FAQ/>}
-              />
-              <Route render={() => <NotFound/>} />
+                <Route
+                  exact={true}
+                  path="/public"
+                  render={props =>
+                    <Public analyses={publicAnalyses} cloneAnalysis={this.cloneAnalysis} />}
+                />
+                <Route
+                  exact={true}
+                  path="/myanalyses"
+                  render={props =>
+                    <Private analyses={analyses} cloneAnalysis={this.cloneAnalysis} />}
+                />
+                <Route
+                  exact={true}
+                  path="/faq"
+                  render={() => <FAQ/>}
+                />
+                <Route render={() => <NotFound/>} />
+              </Switch>
             </Content>
           </Layout>
         </div>
