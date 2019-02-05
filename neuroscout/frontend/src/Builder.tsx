@@ -962,6 +962,7 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
                 tabPosition="left"
               >
                 {isDraft && <TabPane tab="Overview" key="overview" disabled={!isDraft}>
+                  <h2>Overview</h2>
                   <OverviewTab
                     analysis={analysis}
                     datasets={datasets}
@@ -975,6 +976,7 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
                   <br/>
                 </TabPane>}
                 {isDraft && <TabPane tab="Predictors" key="predictors" disabled={!predictorsActive || !isDraft}>
+                  <h2>Select Predictors</h2>
                   <PredictorSelector
                     availablePredictors={availablePredictors}
                     selectedPredictors={selectedPredictors}
@@ -990,6 +992,7 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
                   key="transformations"
                   disabled={!transformationsActive || !isDraft}
                 >
+                  <h2>Add Transformations</h2>
                   <XformsTab
                     predictors={selectedPredictors}
                     xforms={analysis.transformations.filter(x => x.Name !== 'Convolve')}
@@ -1004,17 +1007,18 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
                   <br/>
                 </TabPane>}
                 {isDraft && <TabPane tab="HRF" key="hrf" disabled={!hrfActive || !isDraft}>
+                  <h2>HRF Convolution</h2>
                   <PredictorSelector
                     availablePredictors={selectedPredictors}
                     selectedPredictors={selectedHRFPredictors}
                     updateSelection={this.updateHRFPredictorState}
-                    selectedText="to be convolved with HRF "
                   />
                   <br/>
                   {this.navButtons()}
                   <br/>
                 </TabPane>}
                 {isDraft && <TabPane tab="Contrasts" key="contrasts" disabled={!contrastsActive || !isDraft}>
+                  <h2>Add Contrasts</h2>
                   <ContrastsTab
                     analysis={analysis}
                     contrasts={analysis.contrasts}
@@ -1033,6 +1037,7 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
                 <TabPane tab="Review" key="review" disabled={((!reviewActive || !analysis.analysisId) && isDraft)}>
                   {this.state.model &&
                     <div>
+                      <h2>Review</h2>
                       <Report
                         analysisId={analysis.analysisId}
                         runIds={analysis.runIds}
@@ -1050,6 +1055,7 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
                   }
                 </TabPane>
                 <TabPane tab={isDraft ? 'Run' : 'Status'} key="submit" disabled={!submitActive && isDraft}>
+                  <h2>Finalize and Run</h2>
                   <StatusTab
                     status={analysis.status}
                     analysisId={analysis.analysisId}
