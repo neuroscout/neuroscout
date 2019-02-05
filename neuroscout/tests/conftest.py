@@ -8,10 +8,15 @@ import datetime
 import sqlalchemy as sa
 import pandas as pd
 from flask import current_app
+from models import (Analysis, Result, Predictor,
+                    PredictorEvent, User, Role, Dataset)
+import populate
 
 """
 Session / db managment tools
 """
+
+
 @pytest.fixture(scope='session')
 def app():
     """Session-wide test `Flask` application."""
@@ -26,6 +31,7 @@ def app():
 
     ctx.pop()
 
+
 @pytest.fixture(scope='session')
 def db(app):
     """Session-wide test database."""
@@ -37,9 +43,11 @@ def db(app):
     _db.session.remove()
     _db.drop_all()
 
+
 @pytest.fixture(scope='function')
 def session(db):
-    """Creates a new db session for a test. Changes in session are rolled back"""
+    """Creates a new db session for a test.
+    Changes in session are rolled back """
     connection = db.engine.connect()
     transaction = connection.begin()
 
@@ -71,16 +79,15 @@ def auth_client(add_users):
     """ Return authorized client wrapper """
     from tests.request_utils import Client
 
-    _ , ((email, password), _) = add_users
+    _, ((email, password), _) = add_users
     client = Client(email=email, password=password)
     return client
+
 
 """
 Data population fixtures
 """
-from models import (Analysis, Result, Predictor,
-                    PredictorEvent, User, Role, Dataset)
-import populate
+
 
 DATA_PATH = Path(__file__).resolve().parents[0] / 'data'
 
@@ -92,9 +99,11 @@ EXTRACTORS = [
     ("VibranceExtractor", {})
     ]
 
+
 @pytest.fixture()
 def get_data_path():
     return DATA_PATH
+
 
 @pytest.fixture(scope="function")
 def add_users(app, db, session):
@@ -110,12 +119,12 @@ def add_users(app, db, session):
     pass2 = 'test2'
 
     user_datastore.create_user(email=user1, password=encrypt_password(pass1),
-                               confirmed_at = datetime.datetime.now())
+                               confirmed_at=datetime.datetime.now())
     session.commit()
     id_1 = user_datastore.find_user(email=user1).id
 
     user_datastore.create_user(email=user2, password=encrypt_password(pass2),
-                               confirmed_at = datetime.datetime.now())
+                               confirmed_at=datetime.datetime.now())
     session.commit()
     id_2 = user_datastore.find_user(email=user2).id
 
@@ -127,20 +136,23 @@ def add_task(session):
     """ Add a dataset with two subjects """
     return populate.add_task('bidstest', local_path=DATASET_PATH)
 
+
 @pytest.fixture(scope="function")
 def add_task_remote(session):
     """ Add a dataset with two subjects. """
     return populate.ingest_from_json(REMOTE_JSON_PATH)[0]
+
 
 @pytest.fixture(scope="function")
 def add_local_task_json(session):
     """ Add a dataset with two subjects. """
     return populate.ingest_from_json(LOCAL_JSON_PATH)[0]
 
+
 @pytest.fixture(scope="function")
 def update_local_json(session, add_local_task_json):
     """ Add a dataset with two subjects. """
-    ## Edit datastore file
+    # Edit datastore file
     datastore_file = current_app.config['FEATURE_DATASTORE']
 
     # Change value in datastore
@@ -149,31 +161,37 @@ def update_local_json(session, add_local_task_json):
     ds.loc[ds.time_extracted.max() == ds.time_extracted, select_cols] = 1
     ds.to_csv(datastore_file, index=False)
 
-    ## Update
+    # Update
     return populate.ingest_from_json(LOCAL_JSON_PATH, update_features=True)[0]
+
 
 @pytest.fixture(scope="function")
 def extract_features(session, add_task):
     return populate.extract_features('Test Dataset', 'bidstest', EXTRACTORS)
+
+
 @pytest.fixture(scope="function")
 def reextract(session, extract_features):
     return populate.extract_features('Test Dataset', 'bidstest', EXTRACTORS)
+
 
 @pytest.fixture(scope="function")
 def add_analysis(session, add_users, add_task, extract_features):
     dataset = Dataset.query.filter_by(id=add_task).first()
 
-    analysis = Analysis(dataset_id = add_task, user_id = add_users[0][0],
-        name = "My first fMRI analysis!", description = "Ground breaking",
-        runs=dataset.runs.all())
+    analysis = Analysis(
+        dataset_id=add_task, user_id=add_users[0][0],
+        name="My first fMRI analysis!", description="Ground breaking",
+        runs=dataset.runs)
 
-    run_id = [r.id for r in dataset.runs.all()]
+    run_id = [r.id for r in dataset.runs]
     pred_id = PredictorEvent.query.filter(
         PredictorEvent.run_id.in_(run_id)).distinct(
             'predictor_id').with_entities('predictor_id').all()
 
-    analysis.predictors = Predictor.query.filter(Predictor.id.in_(pred_id),
-                                                 Predictor.name.in_(['Brightness', 'rt'])).all()
+    analysis.predictors = Predictor.query.filter(
+        Predictor.id.in_(pred_id),
+        Predictor.name.in_(['Brightness', 'rt'])).all()
 
     analysis.model = {
         "Name": "test_model1",
@@ -225,32 +243,34 @@ def add_analysis(session, add_users, add_task, extract_features):
         ]
       }
 
-
     session.add(analysis)
     session.commit()
 
     return analysis.id
+
 
 @pytest.fixture(scope="function")
 def add_analysis_fail(session, add_users, add_task):
     """ This analysis is from user 1 should fail compilation """
     dataset = Dataset.query.filter_by(id=add_task).first()
-    analysis = Analysis(dataset_id = add_task, user_id = add_users[0][0],
-        name = "A bad analysis!", description = "Bad!",
-        runs=dataset.runs.all())
+    analysis = Analysis(dataset_id=add_task, user_id=add_users[0][0],
+                        name="A bad analysis!", description="Bad!",
+                        runs=dataset.runs)
 
     session.add(analysis)
     session.commit()
 
     return analysis.id
 
+
 @pytest.fixture(scope="function")
 def add_analysis_user2(session, add_users, add_task):
     """ This analysis is from user 2 and also should fail compilation """
     dataset = Dataset.query.filter_by(id=add_task).first()
-    analysis = Analysis(dataset_id = add_task, user_id = add_users[0][1],
-        name = "My first fMRI analysis!", description = "Ground breaking",
-        runs=dataset.runs.all())
+    analysis = Analysis(
+        dataset_id=add_task, user_id=add_users[0][1],
+        name="My first fMRI analysis!", description="Ground breaking",
+        runs=dataset.runs)
 
     session.add(analysis)
     session.commit()
@@ -260,17 +280,17 @@ def add_analysis_user2(session, add_users, add_task):
 
 @pytest.fixture(scope="function")
 def add_predictor(session, add_task):
-    pred = Predictor(dataset_id = add_task,
-        name = "RT")
+    pred = Predictor(dataset_id=add_task, name="RT")
 
     session.add(pred)
     session.commit()
 
     return pred.id
 
+
 @pytest.fixture(scope="function")
 def add_result(session, add_analysis):
-    result = Result(analysis_id = add_analysis)
+    result = Result(analysis_id=add_analysis)
 
     session.add(result)
     session.commit()

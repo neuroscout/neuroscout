@@ -24,7 +24,7 @@ def test_dataset_ingestion(session, add_task):
     session.rollback()
 
     # Test properties of Run
-    assert Run.query.count() == dataset_model.runs.count() == 4
+    assert Run.query.count() == len(dataset_model.runs) == 4
     run_model = dataset_model.runs.filter_by(number='1', subject='01').first()
     assert run_model.dataset_id == dataset_model.id
     assert 'TaskName' in run_model.task.description
@@ -79,7 +79,7 @@ def test_json_local_dataset(session, add_local_task_json):
 
     # Test properties of Run
     assert Run.query.filter_by(dataset_id=add_local_task_json).count() \
-        == dataset_model.runs.count() == 1
+        == len(dataset_model.runs) == 1
     predictor = Predictor.query.filter_by(name='rt').first()
     assert predictor.predictor_events.count() == 4
 
