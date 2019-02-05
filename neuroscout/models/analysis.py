@@ -11,9 +11,10 @@ from hashids import Hashids
 import datetime
 
 # Association table between analysis and predictor.
-analysis_predictor = db.Table('analysis_predictor',
-                       db.Column('analysis_id', db.Integer(), db.ForeignKey('analysis.id')),
-                       db.Column('predictor_id', db.Integer(), db.ForeignKey('predictor.id')))
+analysis_predictor = db.Table(
+    'analysis_predictor',
+    db.Column('analysis_id', db.Integer(), db.ForeignKey('analysis.id')),
+    db.Column('predictor_id', db.Integer(), db.ForeignKey('predictor.id')))
 
 
 class Analysis(db.Model):
@@ -26,9 +27,9 @@ class Analysis(db.Model):
     predictions = db.Column(db.Text, default='')
     private = db.Column(db.Boolean, default=True)
 
-    model = db.Column(JSONB, default={}) # BIDS Model
-    data = db.Column(JSONB, default={}) # Additional data (e.g. )
-    filters = db.Column(JSONB) # List of filters used to select runs
+    model = db.Column(JSONB, default={})  # BIDS Model
+    data = db.Column(JSONB, default={})  # Additional data (e.g. )
+    filters = db.Column(JSONB)  # List of filters used to select runs
 
     created_at = db.Column(db.DateTime, default=datetime.datetime.utcnow)
     modified_at = db.Column(db.DateTime, default=datetime.datetime.utcnow)
@@ -37,12 +38,14 @@ class Analysis(db.Model):
 
     status = db.Column(db.Text, default='DRAFT')
     __table_args__ = (
-    	db.CheckConstraint(status.in_(['PASSED', 'FAILED', 'SUBMITTING', 'PENDING', 'DRAFT'])), )
+        db.CheckConstraint(
+            status.in_(
+                ['PASSED', 'FAILED', 'SUBMITTING', 'PENDING', 'DRAFT'])), )
 
     locked = db.Column(db.Boolean, default=False)
 
     compile_traceback = db.Column(db.Text, default='')
-    compile_task_id = db.Column(db.Text) # Celery task id
+    compile_task_id = db.Column(db.Text)  # Celery task id
     bundle_path = db.Column(db.Text)
 
     dataset_id = db.Column(db.Integer, db.ForeignKey('dataset.id'),
@@ -62,21 +65,23 @@ class Analysis(db.Model):
 
     @hybrid_property
     def subject(self):
-        items = list(set([run.subject for run in self.runs]) -  set([None]))
+        items = list(set([run.subject for run in self.runs]) - set([None]))
         if len(items) == 0:
             items = None
         return items
 
     @hybrid_property
     def run(self):
-        items = list(set([int(run.number) for run in self.runs if run.number is not None]) -  set([None]))
+        items = list(set([int(run.number)
+                          for run in self.runs
+                          if run.number is not None]) - set([None]))
         if len(items) == 0:
             items = None
         return items
 
     @hybrid_property
     def session(self):
-        items = list(set([run.session for run in self.runs]) -  set([None]))
+        items = list(set([run.session for run in self.runs]) - set([None]))
         if len(items) == 0:
             items = None
         return items
@@ -92,20 +97,22 @@ class Analysis(db.Model):
         clone_row.parent_id = self.hash_id
         clone_row.user_id = user.id
         clone_row.status = "DRAFT"
-        ## Copy relationships
+        # Copy relationships
         return clone_row
 
     def __repr__(self):
-        return '<models.Analysis[hash_id=%s]>' % self.hash_id
+        return '<models.Analysis[hash_id =%s]>' % self.hash_id
+
 
 @listens_for(Analysis, "after_insert")
 def update_hash(mapper, connection, target):
     analysis_table = mapper.local_table
     connection.execute(
-          analysis_table.update().
-              values(hash_id=Hashids(current_app.config['HASH_SALT'],
-                                     min_length=5).encode(target.id)).
-              where(analysis_table.c.id==target.id)
+         analysis_table.update().
+         values(
+             hash_id=Hashids(
+                 current_app.config['HASH_SALT'], min_length=5).
+             encode(target.id)).where(analysis_table.c.id == target.id)
     )
 
 
@@ -115,10 +122,10 @@ class Report(db.Model):
     analysis_id = db.Column(db.Text, db.ForeignKey('analysis.hash_id'))
     runs = db.Column(JSONB, default=None)
     generated_at = db.Column(db.DateTime, default=datetime.datetime.utcnow)
-    task_id = db.Column(db.Text) # Celery task id
-    result = db.Column(JSONB) # JSON result from Celery (once finished)
+    task_id = db.Column(db.Text)   # Celery task id
+    result = db.Column(JSONB)  # JSON result from Celery (once finished)
     traceback = db.Column(db.Text)
 
     status = db.Column(db.Text, default='PENDING')
     __table_args__ = (
-    	db.CheckConstraint(status.in_(['OK', 'FAILED', 'PENDING'])), )
+        db.CheckConstraint(status.in_(['OK', 'FAILED', 'PENDING'])), )
