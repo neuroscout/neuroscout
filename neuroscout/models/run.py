@@ -35,9 +35,9 @@ class Run(db.Model):
                           cascade='delete')
     predictor_events = db.relationship(
         'PredictorEvent', backref='run',
-        lazy='dynamic', cascade='delete')
+        cascade='delete')
     analyses = db.relationship(
-        'Analysis', secondary='analysis_run', lazy='dynamic')
+        'Analysis', secondary='analysis_run')
 
     def __repr__(self):
         return '<models.Run[task={} sub={} sess={} number={}]>'.format(

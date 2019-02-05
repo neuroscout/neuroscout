@@ -1,6 +1,5 @@
 from database import db
 import statistics
-from sqlalchemy import func, Numeric, cast
 
 
 class Predictor(db.Model):

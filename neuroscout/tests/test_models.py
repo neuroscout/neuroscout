@@ -52,7 +52,7 @@ def test_dataset_ingestion(session, add_task):
     assert 167.25 in [p.mean for p in predictor.run_statistics]
 
     # Test predictor event
-    predictor_event = predictor.predictor_events.first()
+    predictor_event = predictor.predictor_events[0]
     assert predictor_event.value is not None
     assert predictor_event.onset is not None
 
@@ -68,7 +68,7 @@ def test_dataset_ingestion(session, add_task):
     assert GroupPredictor.query.filter_by(name='sex').count() == 1
 
     gpv = GroupPredictor.query.filter_by(name='sex').one().values
-    assert gpv.count() == 4
+    assert len(gpv) == 4
     assert 'F' in [v.value for v in gpv]
 
 
@@ -211,7 +211,7 @@ def test_external_text(get_data_path, add_task):
     first_stim = [s for s in data if s.content == 'no'][0]
 
     assert len(data) == 2
-    assert first_stim.run_stimuli.count() == 4
+    assert len(first_stim.run_stimuli) == 4
     assert 2.2 in [s.onset for s in first_stim.run_stimuli]
 
 
