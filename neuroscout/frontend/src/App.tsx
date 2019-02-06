@@ -198,7 +198,9 @@ class App extends Reflux.Component<any, {}, AppState> {
 
   // Actually delete existing analysis given its hash ID, called from onDelete()
   deleteAnalysis = (id): void => {
-    jwtFetch(`${DOMAINROOT}/api/analyses/${id}`, { method: 'delete' })
+      // tslint:disable-next-line:no-console
+      console.log(id);
+      jwtFetch(`${DOMAINROOT}/api/analyses/${id}`, { method: 'delete' })
       .then((data: ApiAnalysis) => {
         this.setState({ analyses: this.state.analyses.filter(a => a.id !== id) });
       })
@@ -637,13 +639,13 @@ class App extends Reflux.Component<any, {}, AppState> {
                 exact={true}
                 path="/public"
                 render={props =>
-                  <Public analyses={publicAnalyses} cloneAnalysis={this.cloneAnalysis} />}
+                  <Public analyses={publicAnalyses} cloneAnalysis={this.cloneAnalysis}/>}
               />
               <Route
                 exact={true}
                 path="/myanalyses"
                 render={props =>
-                  <Private analyses={analyses} cloneAnalysis={this.cloneAnalysis} />}
+                  <Private analyses={analyses} cloneAnalysis={this.cloneAnalysis} onDelete={this.onDelete}/>}
               />
               <Route
                 exact={true}
