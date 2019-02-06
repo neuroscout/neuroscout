@@ -2,7 +2,7 @@ from marshmallow import Schema, fields, post_dump
 import webargs as wa
 from flask_apispec import MethodResource, marshal_with, use_kwargs, doc
 from models import Predictor, PredictorEvent, PredictorRun
-from .utils import first_or_404, make_cache_key
+from .utils import first_or_404
 from sqlalchemy import func
 from database import db
 from sqlalchemy.dialects import postgresql
