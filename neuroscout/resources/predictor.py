@@ -5,6 +5,7 @@ from models import Predictor, PredictorEvent
 from .utils import first_or_404, make_cache_key
 from sqlalchemy import func
 from database import db
+from sqlalchemy.dialects import postgresql
 from core import cache
 
 
@@ -47,6 +48,22 @@ class PredictorEventSchema(Schema):
     value = fields.Str(description="Value, or amplitude.")
     run_id = fields.Int()
     predictor_id = fields.Int()
+
+
+def dump_pe(pes):
+    """ Serialize PredictorEvents, with *SPEED*, using core SQL.
+    Warning: relies on attributes being in correct order. """
+    statement = str(pes.statement.compile(dialect=postgresql.dialect()))
+    params = pes.statement.compile(dialect=postgresql.dialect()).params
+    res = db.session.connection().execute(statement, params)
+    return [{
+      'id': r[0],
+      'onset': r[1],
+      'duration': r[2],
+      'value':  r[3],
+      'run_id': r[5],
+      'predictor_id': r[6]
+      } for r in res]
 
 
 class PredictorRunSchema(Schema):
@@ -104,7 +121,6 @@ class PredictorListResource(MethodResource):
 
 class PredictorEventListResource(MethodResource):
     @doc(tags=['predictors'], summary='Get events for predictor(s)',)
-    @marshal_with(PredictorEventSchema(many=True))
     @cache.cached(60 * 60 * 24 * 300, key_prefix=make_cache_key)
     @use_kwargs({
         'run_id': wa.fields.DelimitedList(
@@ -119,4 +135,4 @@ class PredictorEventListResource(MethodResource):
         for param in kwargs:
             query = query.filter(
                 getattr(PredictorEvent, param).in_(kwargs[param]))
-        return query.all()
+        return dump_pe(query.all())

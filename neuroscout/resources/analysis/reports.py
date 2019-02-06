@@ -1,32 +1,17 @@
 from flask_apispec import doc, use_kwargs, MethodResource, marshal_with
 from database import db
 from flask import current_app
-from sqlalchemy.dialects import postgresql
 from models import PredictorEvent, Report
 from worker import celery_app
 import webargs as wa
 from marshmallow import fields
 from ..utils import owner_required, abort, fetch_analysis
+from ..predictor import dump_pe
 from .schemas import (AnalysisFullSchema, AnalysisResourcesSchema,
                       ReportSchema, AnalysisCompiledSchema)
 import celery.states as states
 from utils import put_record
 import datetime
-
-
-def dump_pe(pes):
-    """ Serialize PredictorEvents, with *SPEED*, using core SQL.
-    Warning: relies on attributes being in correct order. """
-    statement = str(pes.statement.compile(dialect=postgresql.dialect()))
-    params = pes.statement.compile(dialect=postgresql.dialect()).params
-    res = db.session.connection().execute(statement, params)
-    return [{
-      'onset': r[1],
-      'duration': r[2],
-      'value':  r[3],
-      'run_id': r[5],
-      'predictor_id': r[6]
-      } for r in res]
 
 
 def jsonify_analysis(analysis, run_id=None):
