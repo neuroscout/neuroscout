@@ -31,7 +31,7 @@ class DatasetSchema(Schema):
 
 class DatasetResource(MethodResource):
     @doc(tags=['dataset'], summary='Get dataset by id.')
-    @cache.cached(60 * 60 * 24 * 300 query_string=True)
+    @cache.cached(60 * 60 * 24 * 300, query_string=True)
     @marshal_with(DatasetSchema)
     def get(self, dataset_id):
         return first_or_404(Dataset.query.filter_by(id=dataset_id))
