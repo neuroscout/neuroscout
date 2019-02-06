@@ -131,4 +131,4 @@ class PredictorEventListResource(MethodResource):
         for param in kwargs:
             query = query.filter(
                 getattr(PredictorEvent, param).in_(kwargs[param]))
-        return dump_pe(query.all())
+        return dump_pe(query)
