@@ -1,7 +1,4 @@
 from database import db
-import statistics
-from sqlalchemy import func, Numeric, cast
-
 
 class Predictor(db.Model):
     """ Instantiation of a predictor in a dataset.
@@ -17,46 +14,10 @@ class Predictor(db.Model):
                            nullable=False)
     ef_id = db.Column(db.Integer, db.ForeignKey('extracted_feature.id'))
 
-    predictor_events = db.relationship('PredictorEvent', backref='predictor',
-                                       lazy='dynamic')
+    predictor_events = db.relationship('PredictorEvent', backref='predictor')
 
-    run_statistics = db.relationship('PredictorRun')
+    predictor_run = db.relationship('PredictorRun')
     active = db.Column(db.Boolean, default=True)  # Actively display or not
-
-    @property
-    def non_null(self):
-        return self.predictor_events.filter(
-            ~PredictorEvent.value.in_(['nan', 'n/a', 'NaN']))
-
-    @property
-    def num_na(self):
-        return self.predictor_events.filter(
-            PredictorEvent.value.in_(['nan', 'n/a', 'NaN'])).count()
-
-    def apply_func(self, method):
-        """ Apply function to non-null Numeric castable values """
-        return self.non_null.with_entities(
-            getattr(func, method)(
-                cast(func.nullif(
-                    func.regexp_replace(
-                        PredictorEvent.value, ".*[^0-9.]+.*", ""), ""),
-                     Numeric))).scalar()
-
-    @property
-    def max(self):
-        return self.apply_func('max')
-
-    @property
-    def min(self):
-        return self.apply_func('min')
-
-    @property
-    def mean(self):
-        return self.apply_func('avg')
-
-    @property
-    def stddev(self):
-        return self.apply_func('stddev')
 
     def __repr__(self):
         return '<models.Predictor[name=%s]>' % self.name
@@ -91,23 +52,3 @@ class PredictorRun(db.Model):
     run_id = db.Column(db.Integer, db.ForeignKey('run.id'), primary_key=True)
     predictor_id = db.Column(db.Integer, db.ForeignKey('predictor.id'),
                              primary_key=True)
-
-    def stat_property(function):
-        @property
-        def wrapper(self):
-            val_query = PredictorEvent.query.filter_by(
-                    run_id=self.run_id,
-                    predictor_id=self.predictor_id).with_entities('value')
-            try:
-                return function(self, [float(a[0]) for a in val_query])
-            except ValueError:
-                return None
-        return wrapper
-
-    @stat_property
-    def mean(self, values):
-        return statistics.mean(values)
-
-    @stat_property
-    def stdev(self, values):
-        return statistics.stdev(values)

@@ -215,28 +215,9 @@ def add_task(task_name, dataset_name=None, local_path=None,
         else:
             run_model.duration = scan_length
 
-        path_patterns = [
-            'sub-{subject}/[ses-{session}/]func/sub-{subject}_'
-            '[ses-{session}_]task-{task}_[acq-{acquisition}_]'
-            '[run-{run}_][space-{space}_][desc-{desc}_]{suffix}.nii.gz']
-
-        run_model.func_path = layout.build_path(
-            {'suffix': 'bold', 'desc': 'preproc',
-             'space': 'MNI152NLin2009cAsym', **entities},
-            path_patterns=path_patterns)
-        run_model.mask_path = layout.build_path(
-            {'suffix': 'mask', 'desc': 'brain',
-             'space': 'MNI152NLin2009cAsym', **entities},
-            path_patterns=path_patterns)
-
         # Put back as int
         if 'run' in entities:
             entities['run'] = int(entities['run'])
-
-        # Confirm remote address exists:
-        if preproc_address is not None:
-            remote_resource_exists(preproc_address, run_model.func_path)
-            remote_resource_exists(preproc_address, run_model.mask_path)
 
         """ Extract Predictors"""
         # Assert event files exist (for DataLad)

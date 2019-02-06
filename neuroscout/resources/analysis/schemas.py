@@ -105,10 +105,6 @@ class AnalysisResourcesSchema(Schema):
         'DatasetSchema', only='dataset_address', attribute='dataset')
     dataset_name = fields.Nested(
         'DatasetSchema', only='name', attribute='dataset')
-    func_paths = fields.Nested(
-        'RunSchema', many=True, only='func_path', attribute='runs')
-    mask_paths = fields.Nested(
-        'RunSchema', many=True, only='mask_path', attribute='runs')
 
 
 class AnalysisCompiledSchema(Schema):
