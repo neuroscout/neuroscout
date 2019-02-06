@@ -16,7 +16,7 @@ class Predictor(db.Model):
 
     predictor_events = db.relationship('PredictorEvent', backref='predictor')
 
-    run_statistics = db.relationship('PredictorRun')
+    predictor_run = db.relationship('PredictorRun')
     active = db.Column(db.Boolean, default=True)  # Actively display or not
 
     def __repr__(self):

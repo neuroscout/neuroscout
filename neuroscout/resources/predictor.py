@@ -1,7 +1,7 @@
 from marshmallow import Schema, fields, post_dump
 import webargs as wa
 from flask_apispec import MethodResource, marshal_with, use_kwargs, doc
-from models import Predictor, PredictorEvent
+from models import Predictor, PredictorEvent, PredictorRun
 from .utils import first_or_404, make_cache_key
 from sqlalchemy import func
 from database import db
@@ -37,10 +37,6 @@ class PredictorSchema(Schema):
         return data
 
 
-class PredictorSingleSchema(PredictorSchema):
-    run_statistics = fields.Nested('PredictorRunSchema', many=True)
-
-
 class PredictorEventSchema(Schema):
     id = fields.Str()
     onset = fields.Number(description="Onset in seconds.")
@@ -74,7 +70,7 @@ class PredictorRunSchema(Schema):
 
 class PredictorResource(MethodResource):
     @doc(tags=['predictors'], summary='Get predictor by id.')
-    @marshal_with(PredictorSingleSchema)
+    @marshal_with(PredictorSchema)
     def get(self, predictor_id, **kwargs):
         return first_or_404(Predictor.query.filter_by(id=predictor_id))
 
@@ -89,8 +85,8 @@ def get_predictors(newest=True, **kwargs):
 
     if 'run_id' in kwargs:
         # This following JOIN can be slow
-        predictor_ids = predictor_ids.join(PredictorEvent).filter(
-            PredictorEvent.run_id.in_(kwargs.pop('run_id')))
+        predictor_ids = predictor_ids.join(PredictorRun).filter(
+            PredictorRun.run_id.in_(kwargs.pop('run_id')))
 
     query = Predictor.query.filter(Predictor.id.in_(predictor_ids))
     for param in kwargs:

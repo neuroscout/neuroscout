@@ -45,10 +45,6 @@ def test_dataset_ingestion(session, add_task):
     assert predictor.source == 'events'
     assert predictor.original_name == 'reaction_time'
 
-    # Test run summary statistics
-    assert len(predictor.run_statistics) == 4
-    assert 167.25 in [p.mean for p in predictor.run_statistics]
-
     # Test predictor event
     predictor_event = predictor.predictor_events[0]
     assert predictor_event.value is not None
