@@ -2,7 +2,7 @@ from flask_apispec import MethodResource, marshal_with, doc, use_kwargs
 import webargs as wa
 from marshmallow import Schema, fields
 from models import Dataset
-from .utils import first_or_404, make_cache_key
+from .utils import first_or_404
 from core import cache
 
 
@@ -31,7 +31,7 @@ class DatasetSchema(Schema):
 
 class DatasetResource(MethodResource):
     @doc(tags=['dataset'], summary='Get dataset by id.')
-    @cache.cached(60 * 60 * 24 * 300, key_prefix=make_cache_key)
+    @cache.cached(60 * 60 * 24 * 300, query_string=True)
     @marshal_with(DatasetSchema)
     def get(self, dataset_id):
         return first_or_404(Dataset.query.filter_by(id=dataset_id))
@@ -44,7 +44,7 @@ class DatasetListResource(MethodResource):
             missing=True, description="Return only active Datasets")
         },
         locations=['query'])
-    @cache.cached(60 * 60 * 24 * 300, key_prefix=make_cache_key)
+    @cache.cached(60 * 60 * 24 * 300, query_string=True)
     @marshal_with(DatasetSchema(
         many=True, exclude=['dataset_address', 'preproc_address']))
     def get(self, **kwargs):
