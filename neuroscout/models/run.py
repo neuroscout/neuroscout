@@ -33,7 +33,8 @@ class Run(db.Model):
                           cascade='delete')
     predictor_events = db.relationship(
         'PredictorEvent', backref='run',
-        cascade='delete')
+        cascade='delete',
+        lazy='dynamic')
     analyses = db.relationship(
         'Analysis', secondary='analysis_run')
 
