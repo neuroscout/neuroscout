@@ -4,7 +4,6 @@ from flask_apispec import doc
 import datetime
 from webargs.flaskparser import parser
 from models import Analysis
-from flask import current_app
 
 import celery.states as states
 from worker import celery_app
