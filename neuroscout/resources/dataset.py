@@ -2,7 +2,7 @@ from flask_apispec import MethodResource, marshal_with, doc, use_kwargs
 import webargs as wa
 from marshmallow import Schema, fields
 from models import Dataset
-from .utils import first_or_404, make_cache_key
+from .utils import first_or_404
 from core import cache
 
 
