@@ -33,7 +33,7 @@ def test_dataset_ingestion(session, add_task):
     assert run_model.task.description['RepetitionTime'] == 2.0
 
     # Test properties of first run's predictor events
-    assert len(run_model.predictor_events) == 12
+    assert run_model.predictor_events.count() == 12
     assert Predictor.query.count() == len(dataset_model.predictors) == 3
 
     pred_names = [p.name for p in Predictor.query.all()]
