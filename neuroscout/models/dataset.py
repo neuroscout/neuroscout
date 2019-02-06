@@ -13,8 +13,8 @@ class Dataset(db.Model):
     active = db.Column(db.Boolean, default=True)
     name = db.Column(db.Text, unique=True, nullable=False)
     runs = db.relationship('Run', backref='dataset')
-    predictors = db.relationship('Predictor', backref='dataset')
-
+    predictors = db.relationship('Predictor', backref='dataset',
+                                 lazy='dynamic')
     tasks = db.relationship('Task', backref='dataset')
     analyses = db.relationship('Analysis', backref='dataset')
     dataset_address = db.Column(db.Text)
