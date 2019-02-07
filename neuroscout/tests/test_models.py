@@ -34,7 +34,7 @@ def test_dataset_ingestion(session, add_task):
 
     # Test properties of first run's predictor events
     assert run_model.predictor_events.count() == 12
-    assert Predictor.query.count() == len(dataset_model.predictors) == 3
+    assert Predictor.query.count() == dataset_model.predictors.count() == 3
 
     pred_names = [p.name for p in Predictor.query.all()]
     assert 'rt' in pred_names
