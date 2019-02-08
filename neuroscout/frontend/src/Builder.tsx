@@ -240,7 +240,7 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
           return data;
         })
         .then((data: ApiAnalysis) => {
-          if (data.status === 'DRAFT') {
+          if (editableStatus.includes(data.status)) {
             this.setState({model: this.buildModel()});
           } else if (data.model !== undefined) {
             this.setState({model: data.model!});
@@ -826,9 +826,9 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
 
   postTabChange = (activeKey) => {
     const analysis = this.state.analysis;
-    if (this.state.analysis.status === 'DRAFT') {
+    if (editableStatus.includes(this.state.analysis.status)) {
       this.setState({model: this.buildModel()});
-      if (this.state.analysis.status === 'DRAFT' && this.state.unsavedChanges) {
+      if (editableStatus.includes(this.state.analysis.status) && this.state.unsavedChanges) {
         this.saveAnalysis({compile: false})();
       }
     }
@@ -905,7 +905,7 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
 
   componentDidUpdate(prevProps, prevState) {
     // we really only need a valid JWT when creating the analysis
-    if (this.state.analysis.status === 'DRAFT') {
+    if (editableStatus.includes(this.state.analysis.status)) {
       authActions.checkJWT();
     }
 
@@ -941,11 +941,11 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
       COMPILED: 'This analysis has been successfully generated'
     }[analysis.status];
     // Jump to submit/status tab if no longer a draft.
-    if (analysis.status !== 'DRAFT' && activeTab === 'overview') {
+    if (!editableStatus.includes(analysis.status) && activeTab === 'overview') {
       activeTab = 'review';
       this.postTabChange(activeTab);
     }
-    let isDraft = analysis.status === 'DRAFT';
+    let isDraft = editableStatus.includes(analysis.status);
     return (
       <div className="App">
           <Prompt
