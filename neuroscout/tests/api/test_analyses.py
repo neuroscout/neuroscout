@@ -46,7 +46,6 @@ def test_get(session, auth_client, add_analysis):
         first_analysis_id))
     assert resp.status_code == 200
     assert 'dataset_address' in decode_json(resp)
-    assert 'mask_paths' in decode_json(resp)
     assert 'preproc_address' in decode_json(resp)
 
 

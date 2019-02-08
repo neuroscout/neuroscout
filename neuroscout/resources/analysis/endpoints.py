@@ -90,7 +90,7 @@ class AnalysisFillResource(AnalysisMethodResource):
 
         if not analysis.runs:
             #  Set to all runs in dataset
-            fields['runs'] = analysis.dataset.runs.all()
+            fields['runs'] = analysis.dataset.runs
             fields['model'] = analysis.model
             fields['model']["Input"] = {}
 

@@ -1,10 +1,11 @@
 from marshmallow import Schema, fields, post_dump
 import webargs as wa
 from flask_apispec import MethodResource, marshal_with, use_kwargs, doc
-from models import Predictor, PredictorEvent
-from .utils import first_or_404, make_cache_key
+from models import Predictor, PredictorEvent, PredictorRun
+from .utils import first_or_404
 from sqlalchemy import func
 from database import db
+from sqlalchemy.dialects import postgresql
 from core import cache
 
 
@@ -36,10 +37,6 @@ class PredictorSchema(Schema):
         return data
 
 
-class PredictorSingleSchema(PredictorSchema):
-    run_statistics = fields.Nested('PredictorRunSchema', many=True)
-
-
 class PredictorEventSchema(Schema):
     id = fields.Str()
     onset = fields.Number(description="Onset in seconds.")
@@ -47,6 +44,22 @@ class PredictorEventSchema(Schema):
     value = fields.Str(description="Value, or amplitude.")
     run_id = fields.Int()
     predictor_id = fields.Int()
+
+
+def dump_pe(pes):
+    """ Serialize PredictorEvents, with *SPEED*, using core SQL.
+    Warning: relies on attributes being in correct order. """
+    statement = str(pes.statement.compile(dialect=postgresql.dialect()))
+    params = pes.statement.compile(dialect=postgresql.dialect()).params
+    res = db.session.connection().execute(statement, params)
+    return [{
+      'id': r[0],
+      'onset': r[1],
+      'duration': r[2],
+      'value':  r[3],
+      'run_id': r[5],
+      'predictor_id': r[6]
+      } for r in res]
 
 
 class PredictorRunSchema(Schema):
@@ -57,7 +70,7 @@ class PredictorRunSchema(Schema):
 
 class PredictorResource(MethodResource):
     @doc(tags=['predictors'], summary='Get predictor by id.')
-    @marshal_with(PredictorSingleSchema)
+    @marshal_with(PredictorSchema)
     def get(self, predictor_id, **kwargs):
         return first_or_404(Predictor.query.filter_by(id=predictor_id))
 
@@ -72,8 +85,8 @@ def get_predictors(newest=True, **kwargs):
 
     if 'run_id' in kwargs:
         # This following JOIN can be slow
-        predictor_ids = predictor_ids.join(PredictorEvent).filter(
-            PredictorEvent.run_id.in_(kwargs.pop('run_id')))
+        predictor_ids = predictor_ids.join(PredictorRun).filter(
+            PredictorRun.run_id.in_(kwargs.pop('run_id')))
 
     query = Predictor.query.filter(Predictor.id.in_(predictor_ids))
     for param in kwargs:
@@ -95,7 +108,7 @@ class PredictorListResource(MethodResource):
             description="Return only newest Predictor by name")
         },
         locations=['query'])
-    @cache.cached(key_prefix=make_cache_key)
+    @cache.cached(60 * 60 * 24 * 300, query_string=True)
     @marshal_with(PredictorSchema(many=True))
     def get(self, **kwargs):
         newest = kwargs.pop('newest')
@@ -104,8 +117,6 @@ class PredictorListResource(MethodResource):
 
 class PredictorEventListResource(MethodResource):
     @doc(tags=['predictors'], summary='Get events for predictor(s)',)
-    @marshal_with(PredictorEventSchema(many=True))
-    @cache.cached(60 * 60 * 24 * 300, key_prefix=make_cache_key)
     @use_kwargs({
         'run_id': wa.fields.DelimitedList(
             fields.Int(),
@@ -114,9 +125,10 @@ class PredictorEventListResource(MethodResource):
             fields.Int(),
             description="Predictor id(s)"),
     }, locations=['query'])
+    @cache.cached(60 * 60 * 24 * 300, query_string=True)
     def get(self, **kwargs):
         query = PredictorEvent.query
         for param in kwargs:
             query = query.filter(
                 getattr(PredictorEvent, param).in_(kwargs[param]))
-        return query.all()
+        return dump_pe(query)
