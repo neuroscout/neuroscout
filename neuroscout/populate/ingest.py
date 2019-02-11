@@ -153,11 +153,7 @@ def add_task(task_name, dataset_name=None, local_path=None,
 
     assert isfile(str(local_path / 'dataset_description.json'))
 
-    # Preproc path is assumed
-    preproc_path = local_path.parent.parent / \
-        'neuroscout-datasets' / local_path.parts[-1]
-
-    layout = BIDSLayout(str(local_path), derivatives=str(preproc_path))
+    layout = BIDSLayout(str(local_path), derivatives=True)
     if task_name not in layout.get_tasks():
         raise ValueError("Task {} not found in dataset {}".format(
             task_name, local_path))
