@@ -20,11 +20,11 @@
           "exclude_predictors": ["lasttrigger", "audiotime", "videotime", "frameidx", "trigger", "respiratory", "cardiac", "pupil_dil", "x", "y", "movieframe_idx"]
         },
         "filters": {
-          "subject": ["01","03", "04", "05", "06", "09", "10", "14", "15", "16", "18", "19", "20"],
-          "session": "movie"
+          "subject": ["16"],
+          "session": "movie",
+          "run": [1, 3, 4]
         }
       }
     }
   }
 }
-

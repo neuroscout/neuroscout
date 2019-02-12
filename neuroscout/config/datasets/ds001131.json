@@ -1,0 +1,71 @@
+{
+  "Milky-Vodka": {
+    "preproc_address": "https://github.com/neuroscout-datasets/ds001131/",
+    "path": "/datasets/raw/ds001131/",
+    "summary": "Passively listening of two audio stories ('Milky Way' and 'Vodka')",
+    "url": "https://openneuro.org/datasets/ds001131",
+    "tasks": {
+      "milky": {
+        "summary": "Milky Way story",
+        "converters": [
+        ],
+        "extractors": [
+        ],
+        "transformations": [
+        ],
+        "ingest_args": {
+        },
+        "filters": {
+        }
+      },
+      "vodka": {
+        "summary": "Vodka story",
+        "converters": [
+        ],
+        "extractors": [
+          ["SpectralCentroidExtractor", {}],
+          ["RMSEExtractor", {"frame_length": 72000, "hop_length": 72000, "center": false}],
+          ["STFTAudioExtractor", {}]
+        ],
+        "transformations": [
+        ],
+        "ingest_args": {
+        },
+        "filters": {
+        }
+      },
+      "synonyms": {
+        "summary": "Milky Way story with alternate synonyms",
+        "converters": [
+        ],
+        "extractors": [
+          ["SpectralCentroidExtractor", {}],
+          ["RMSEExtractor", {"frame_length": 72000, "hop_length": 72000, "center": false}],
+          ["STFTAudioExtractor", {}]
+        ],
+        "transformations": [
+        ],
+        "ingest_args": {
+        },
+        "filters": {
+        }
+      },
+      "scrambled": {
+        "summary": "Scrambled Vodka story",
+        "converters": [
+        ],
+        "extractors": [
+          ["SpectralCentroidExtractor", {}],
+          ["RMSEExtractor", {"frame_length": 72000, "hop_length": 72000, "center": false}],
+          ["STFTAudioExtractor", {}]
+        ],
+        "transformations": [
+        ],
+        "ingest_args": {
+        },
+        "filters": {
+        }
+      }
+    }
+  }
+}
