@@ -10,6 +10,9 @@
         "converters": [
         ],
         "extractors": [
+          ["RMSEExtractor", {"frame_length": 72000, "hop_length": 72000, "center": false}],
+          ["SpectralCentroidExtractor", {}],
+          ["STFTAudioExtractor", {}]
         ],
         "transformations": [
         ],
