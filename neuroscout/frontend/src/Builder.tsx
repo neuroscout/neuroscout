@@ -245,6 +245,9 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
           } else if (data.model !== undefined) {
             this.setState({model: data.model!});
           }
+          if (data.status === 'FAILED') {
+            this.setState({activeTab: 'submit'});
+          }
         })
         .catch(displayError);
     }
@@ -431,6 +434,9 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
     let method: string;
     let url: string;
     if (compile && analysis.analysisId) {
+      if (analysis.analysisId === undefined) {
+        return;
+      }
       // Submit for compilation
       url = `${domainRoot}/api/analyses/${analysis.analysisId}/compile?build=${build}`;
       method = 'post';
@@ -569,7 +575,6 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
       okText: 'Yes',
       cancelText: 'No',
       onOk() {
-        // saveAnalysis({ compile: false})();
         saveAnalysis({ compile: true, build: build })();
       }
     });
@@ -940,12 +945,15 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
       PENDING: 'This analysis has been submitted for generation and is being processed.',
       COMPILED: 'This analysis has been successfully generated'
     }[analysis.status];
-    // Jump to submit/status tab if no longer a draft.
-    if (!editableStatus.includes(analysis.status) && activeTab === 'overview') {
+
+    let isDraft = (analysis.status === 'DRAFT');
+    let isFailed = (analysis.status === 'FAILED');
+    let isEditable = editableStatus.includes(analysis.status);
+    // Jump to submit/status tab if no longer editable.
+    if (!isEditable && activeTab === 'overview') {
       activeTab = 'review';
       this.postTabChange(activeTab);
     }
-    let isDraft = editableStatus.includes(analysis.status);
     return (
       <div className="App">
           <Prompt
@@ -961,7 +969,7 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
                 className="builderTabs"
                 tabPosition="left"
               >
-                {isDraft && <TabPane tab="Overview" key="overview" disabled={!isDraft}>
+                {isEditable && <TabPane tab="Overview" key="overview" disabled={!isEditable}>
                   <h2>Overview</h2>
                   <OverviewTab
                     analysis={analysis}
@@ -975,7 +983,11 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
                   {this.navButtons(!(!!this.state.analysis.name && this.state.analysis.runIds.length > 0), false)}
                   <br/>
                 </TabPane>}
-                {isDraft && <TabPane tab="Predictors" key="predictors" disabled={!predictorsActive || !isDraft}>
+                {isEditable && <TabPane
+                  tab="Predictors"
+                  key="predictors"
+                  disabled={(!predictorsActive || !isEditable) && !isFailed}
+                >
                   <h2>Select Predictors</h2>
                   <PredictorSelector
                     availablePredictors={availablePredictors}
@@ -987,10 +999,10 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
                   {this.navButtons(!(selectedPredictors.length > 0))}
                   <br/>
                 </TabPane>}
-                {isDraft && <TabPane
+                {isEditable && <TabPane
                   tab="Transformations"
                   key="transformations"
-                  disabled={!transformationsActive || !isDraft}
+                  disabled={(!transformationsActive || !isEditable) && !isFailed}
                 >
                   <h2>Add Transformations</h2>
                   <XformsTab
@@ -1006,7 +1018,7 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
                   {this.navButtons()}
                   <br/>
                 </TabPane>}
-                {isDraft && <TabPane tab="HRF" key="hrf" disabled={!hrfActive || !isDraft}>
+                {isEditable && <TabPane tab="HRF" key="hrf" disabled={(!hrfActive || !isEditable) && !isFailed}>
                   <h2>HRF Convolution</h2>
                   <PredictorSelector
                     availablePredictors={selectedPredictors}
@@ -1017,7 +1029,11 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
                   {this.navButtons()}
                   <br/>
                 </TabPane>}
-                {isDraft && <TabPane tab="Contrasts" key="contrasts" disabled={!contrastsActive || !isDraft}>
+                {isEditable && <TabPane
+                  tab="Contrasts"
+                  key="contrasts"
+                  disabled={(!contrastsActive || !isEditable) && !isFailed}
+                >
                   <h2>Add Contrasts</h2>
                   <ContrastsTab
                     analysis={analysis}
@@ -1034,7 +1050,7 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
                   {this.navButtons()}
                   <br/>
                 </TabPane>}
-                <TabPane tab="Review" key="review" disabled={((!reviewActive || !analysis.analysisId) && isDraft)}>
+                <TabPane tab="Review" key="review" disabled={((!reviewActive || !analysis.analysisId) && !isFailed)}>
                   {this.state.model &&
                     <div>
                       <h2>Review</h2>
@@ -1049,12 +1065,16 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
                         availablePredictors={this.state.availablePredictors}
                       />
                       <br/>
-                      {this.navButtons(false, isDraft)}
+                      {this.navButtons(false, isEditable)}
                       <br/>
                     </div>
                   }
                 </TabPane>
-                <TabPane tab={isDraft ? 'Run' : 'Status'} key="submit" disabled={!submitActive && isDraft}>
+                <TabPane
+                  tab={isEditable ? 'Run' : 'Status'}
+                  key="submit"
+                  disabled={!submitActive && !isFailed}
+                >
                   <h2>Finalize and Run</h2>
                   <StatusTab
                     status={analysis.status}

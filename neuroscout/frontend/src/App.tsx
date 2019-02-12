@@ -48,11 +48,9 @@ class JWTChange extends React.Component<JWTChangeProps, {}> {
   }
 
   render() { return null; }
-
 }
 
 class GoogleLoginBtn extends React.Component<{}, {}> {
-
   render() {
     return (
       <GoogleLogin
@@ -198,8 +196,6 @@ class App extends Reflux.Component<any, {}, AppState> {
 
   // Actually delete existing analysis given its hash ID, called from onDelete()
   deleteAnalysis = (id): void => {
-      // tslint:disable-next-line:no-console
-      console.log(id);
       jwtFetch(`${DOMAINROOT}/api/analyses/${id}`, { method: 'delete' })
       .then((data: ApiAnalysis) => {
         this.setState({ analyses: this.state.analyses.filter(a => a.id !== id) });
