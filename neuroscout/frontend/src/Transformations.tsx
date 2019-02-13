@@ -345,7 +345,7 @@ class XformEditor extends React.Component<XformEditorProps, XformEditorState> {
     this.setState({input});
   };
 
-  updateXformType = (name: TransformName) => {
+  updateXformType = (name: (TransformName | '')) => {
     // tslint:disable-next-line:no-shadowed-variable
     const {xformRules} = this.props;
     const xform = JSON.parse(JSON.stringify(xformRules[name]));
