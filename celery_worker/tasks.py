@@ -13,6 +13,7 @@ from app import celery_app
 from matplotlib import pyplot as plt
 from nistats.reporting import plot_design_matrix
 from fitlins.viz import plot_corr_matrix, plot_contrast_matrix
+import numpy as np
 
 plt.set_cmap('viridis')
 logger = get_task_logger(__name__)
@@ -179,6 +180,18 @@ class PathBuilder():
         return outfile, '{}/reports/{}/{}'.format(self.domain, self.hash, file)
 
 
+def _impute_confounds(dense):
+    for imputable in ('framewise_displacement', 'std_dvars', 'dvars'):
+        if imputable in dense.columns:
+            vals = dense[imputable].values
+            if not np.isnan(vals[0]):
+                continue
+
+            # Impute the mean non-zero, non-NaN value
+            dense[imputable][0] = np.nanmean(vals[vals != 0])
+    return dense
+
+
 @celery_app.task(name='workflow.generate_report')
 def generate_report(analysis, predictor_events, bids_dir, run_ids, domain):
     _, _, bids_analysis = _build_analysis(
@@ -193,24 +206,27 @@ def generate_report(analysis, predictor_events, bids_dir, run_ids, domain):
                'contrast_plot': []}
 
     for dm in first.get_design_matrix(
-      mode='dense', force=True, entities=False, sampling_rate=5):
+      mode='dense', force=True, entities=False):
+        dense = _impute_confounds(dm.dense)
+
         builder = PathBuilder(outdir, domain, analysis['hash_id'], dm.entities)
         # Writeout design matrix
         out, url = builder.build('design_matrix', 'tsv')
         results['design_matrix'].append(url)
-        dm.dense.to_csv(out, index=False)
+        dense.to_csv(out, index=False)
 
         out, url = builder.build('design_matrix_plot', 'png')
         results['design_matrix_plot'].append(url)
-        _plot_save(dm.dense, plot_design_matrix, out)
+        _plot_save(dense, plot_design_matrix, out)
 
         out, url = builder.build('design_matrix_corrplot', 'png')
         results['design_matrix_corrplot'].append(url)
         _plot_save(
-            dm.dense.corr(), plot_corr_matrix, out, n_evs=None, partial=None)
+            dense.corr(), plot_corr_matrix, out, n_evs=None, partial=None)
 
     for cm in first.get_contrasts():
-        builder = PathBuilder(outdir, domain, analysis['hash_id'], cm[0].entities)
+        builder = PathBuilder(outdir, domain, analysis['hash_id'],
+                              cm[0].entities)
         out, url = builder.build('contrast_matrix', 'png')
         _plot_save(cm[0].weights, plot_contrast_matrix, out)
         results['contrast_plot'].append(url)
