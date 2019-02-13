@@ -181,6 +181,7 @@ class PathBuilder():
 
 
 def _impute_confounds(dense):
+    """ Impute first TR for confounds that may have n/as """
     for imputable in ('framewise_displacement', 'std_dvars', 'dvars'):
         if imputable in dense.columns:
             vals = dense[imputable].values
