@@ -191,9 +191,6 @@ export class ContrastsTab extends React.Component<ContrastsTabProps, ContrastsTa
 
     const ViewMode = () => (
       <div>
-        <h2>
-          {'Contrasts'}
-        </h2>
         <br />
         {this.props.contrastErrors.length > 0 && mode !== 'add' &&
           <div>

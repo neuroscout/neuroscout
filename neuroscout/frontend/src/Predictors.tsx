@@ -181,8 +181,6 @@ export class PredictorSelector extends React.Component<
               <br />
             </div>
             <div>
-              <p>{`Select predictors ${this.state.selectedText}(displaying ${filteredPredictors.length}
-            out of ${availablePredictors.length} total predictors):`}</p>
               <Table
                 locale={{ emptyText: this.state.searchText ? 'No results found' : 'No data'}}
                 columns={columns}
@@ -196,6 +194,9 @@ export class PredictorSelector extends React.Component<
                 loading={this.state.predictorsLoad}
               />
             </div>
+            <p style={{'float': 'right'}}>
+              {`Showing  ${filteredPredictors.length} out of ${availablePredictors.length} predictors.`}
+            </p>
           </Col>
           <Col xl={{span: 1}}/>
           <Col xl={{span: 5}}>
