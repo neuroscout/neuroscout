@@ -94,6 +94,7 @@ stim_map = {
     'ImageStim': 'image',
     'VideoStim': 'video',
     'TextStim': 'text',
+    'ComplexTextStim': 'text',
     'AudioStim': 'audio'
 }
 
