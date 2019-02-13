@@ -61,7 +61,9 @@ class AnalysisResource(AnalysisMethodResource):
     @owner_required
     def delete(self, analysis):
         if analysis.status not in ['DRAFT', 'FAILED'] or analysis.locked:
-                abort(422, "Analysis not editable, cannot delete.")
+            abort(422, "Analysis not editable, cannot delete.")
+
+        analysis.runs = []
 
         # Delete reports
         Report.query.filter_by(analysis_id=analysis.hash_id).delete()
@@ -84,7 +86,7 @@ class AnalysisFillResource(AnalysisMethodResource):
     @owner_required
     def post(self, analysis, partial=True, dryrun=False):
         if analysis.status not in ['DRAFT', 'FAILED'] or analysis.locked:
-                abort(422, "Analysis not editable.")
+            abort(422, "Analysis not editable.")
 
         fields = {}
 
