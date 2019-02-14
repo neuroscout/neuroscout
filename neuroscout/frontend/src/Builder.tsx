@@ -245,6 +245,9 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
           } else if (data.model !== undefined) {
             this.setState({model: data.model!});
           }
+          if (data.status === 'DRAFT' || data.status === 'FAILED') {
+            this.postTabChange('notatab');
+          }
         })
         .catch(displayError);
     }
@@ -835,10 +838,13 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
 
     if (activeKey === 'overview' || this.state.predictorsLoad === false) {
       return;
+    } else {
+      this.loadPredictors();
     }
+  }
 
-    // does this need to happen every time? We are relying on this function to do initial load of predictors when
-    // loading an analysis not in draft.
+  loadPredictors = () => {
+    const analysis = this.state.analysis;
     jwtFetch(`${domainRoot}/api/predictors?run_id=${analysis.runIds}`)
     .then((data: Predictor[]) => {
       const selectedPredictors = data.filter(
