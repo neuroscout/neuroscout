@@ -1073,7 +1073,7 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
                 <TabPane
                   tab={isEditable ? 'Run' : 'Status'}
                   key="submit"
-                  disabled={!submitActive && !isFailed}
+                  disabled={!submitActive && isDraft}
                 >
                   <h2>Finalize and Run</h2>
                   <StatusTab
