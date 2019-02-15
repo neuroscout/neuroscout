@@ -627,9 +627,6 @@ export class XformsTab extends React.Component<XformsTabProps,  XformsTabState> 
 
     return (
       <div>
-        <h2>
-          {'Transformations'}
-        </h2>
         <br />
         <Row>
           <Col md={9}>

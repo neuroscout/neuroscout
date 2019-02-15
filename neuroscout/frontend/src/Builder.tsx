@@ -240,13 +240,17 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
           return data;
         })
         .then((data: ApiAnalysis) => {
-          if (data.status === 'DRAFT') {
+          // tslint:disable-next-line:no-console
+          console.log('maybe here?');
+          // tslint:disable-next-line:no-console
+          console.log(data);
+          if (editableStatus.includes(data.status)) {
             this.setState({model: this.buildModel()});
           } else if (data.model !== undefined) {
             this.setState({model: data.model!});
           }
-          if (data.status === 'DRAFT' || data.status === 'FAILED') {
-            this.postTabChange('notatab');
+          if (data.status === 'FAILED') {
+            this.setState({activeTab: 'submit'});
           }
         })
         .catch(displayError);
@@ -362,6 +366,10 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
       imgInput.Task = task[0];
     }
 
+    // tslint:disable-next-line:no-console
+    console.log('in build model');
+    // tslint:disable-next-line:no-console
+    console.log(runs);
     return {
       Name: this.state.analysis.name,
       Description: this.state.analysis.description,
@@ -434,6 +442,9 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
     let method: string;
     let url: string;
     if (compile && analysis.analysisId) {
+      if (analysis.analysisId === undefined) {
+        return;
+      }
       // Submit for compilation
       url = `${domainRoot}/api/analyses/${analysis.analysisId}/compile?build=${build}`;
       method = 'post';
@@ -572,7 +583,6 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
       okText: 'Yes',
       cancelText: 'No',
       onOk() {
-        // saveAnalysis({ compile: false})();
         saveAnalysis({ compile: true, build: build })();
       }
     });
@@ -829,9 +839,9 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
 
   postTabChange = (activeKey) => {
     const analysis = this.state.analysis;
-    if (this.state.analysis.status === 'DRAFT') {
+    if (editableStatus.includes(this.state.analysis.status)) {
       this.setState({model: this.buildModel()});
-      if (this.state.analysis.status === 'DRAFT' && this.state.unsavedChanges) {
+      if (editableStatus.includes(this.state.analysis.status) && this.state.unsavedChanges) {
         this.saveAnalysis({compile: false})();
       }
     }
@@ -844,9 +854,14 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
   }
 
   loadPredictors = () => {
-    const analysis = this.state.analysis;
-    jwtFetch(`${domainRoot}/api/predictors?run_id=${analysis.runIds}`)
+    let analysis = this.state.analysis;
+    let runIds = this.state.analysis.runIds;
+    jwtFetch(`${domainRoot}/api/predictors?run_id=${runIds}`)
     .then((data: Predictor[]) => {
+      // If there is a statusCode we do not have a list of predictors
+      if ((data as any).statusCode) {
+        return;
+      }
       const selectedPredictors = data.filter(
         p => analysis.predictorIds.indexOf(p.id) > -1
       );
@@ -911,7 +926,7 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
 
   componentDidUpdate(prevProps, prevState) {
     // we really only need a valid JWT when creating the analysis
-    if (this.state.analysis.status === 'DRAFT') {
+    if (editableStatus.includes(this.state.analysis.status)) {
       authActions.checkJWT();
     }
 
@@ -919,6 +934,9 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
       this.saveAnalysis({compile: false})();
       this.setState({saveFromUpdate: false});
     }
+    /*
+    }
+      */
   }
 
   render() {
@@ -946,12 +964,17 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
       PENDING: 'This analysis has been submitted for generation and is being processed.',
       COMPILED: 'This analysis has been successfully generated'
     }[analysis.status];
-    // Jump to submit/status tab if no longer a draft.
-    if (analysis.status !== 'DRAFT' && activeTab === 'overview') {
+
+    let isDraft = (analysis.status === 'DRAFT');
+    let isFailed = (analysis.status === 'FAILED');
+    let isEditable = editableStatus.includes(analysis.status);
+    // Jump to submit/status tab if no longer editable.
+    if (!isEditable && activeTab === 'overview') {
       activeTab = 'review';
       this.postTabChange(activeTab);
     }
-    let isDraft = analysis.status === 'DRAFT';
+    // tslint:disable-next-line:no-console
+    console.log(this.state);
     return (
       <div className="App">
           <Prompt
@@ -967,7 +990,8 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
                 className="builderTabs"
                 tabPosition="left"
               >
-                {isDraft && <TabPane tab="Overview" key="overview" disabled={!isDraft}>
+                {isEditable && <TabPane tab="Overview" key="overview" disabled={!isEditable}>
+                  <h2>Overview</h2>
                   <OverviewTab
                     analysis={analysis}
                     datasets={datasets}
@@ -980,7 +1004,12 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
                   {this.navButtons(!(!!this.state.analysis.name && this.state.analysis.runIds.length > 0), false)}
                   <br/>
                 </TabPane>}
-                {isDraft && <TabPane tab="Predictors" key="predictors" disabled={!predictorsActive || !isDraft}>
+                {isEditable && <TabPane
+                  tab="Predictors"
+                  key="predictors"
+                  disabled={(!predictorsActive || !isEditable) && !isFailed}
+                >
+                  <h2>Select Predictors</h2>
                   <PredictorSelector
                     availablePredictors={availablePredictors}
                     selectedPredictors={selectedPredictors}
@@ -991,11 +1020,12 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
                   {this.navButtons(!(selectedPredictors.length > 0))}
                   <br/>
                 </TabPane>}
-                {isDraft && <TabPane
+                {isEditable && <TabPane
                   tab="Transformations"
                   key="transformations"
-                  disabled={!transformationsActive || !isDraft}
+                  disabled={(!transformationsActive || !isEditable) && !isFailed}
                 >
+                  <h2>Add Transformations</h2>
                   <XformsTab
                     predictors={selectedPredictors}
                     xforms={analysis.transformations.filter(x => x.Name !== 'Convolve')}
@@ -1009,18 +1039,23 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
                   {this.navButtons()}
                   <br/>
                 </TabPane>}
-                {isDraft && <TabPane tab="HRF" key="hrf" disabled={!hrfActive || !isDraft}>
+                {isEditable && <TabPane tab="HRF" key="hrf" disabled={(!hrfActive || !isEditable) && !isFailed}>
+                  <h2>HRF Convolution</h2>
                   <PredictorSelector
                     availablePredictors={selectedPredictors}
                     selectedPredictors={selectedHRFPredictors}
                     updateSelection={this.updateHRFPredictorState}
-                    selectedText="to be convolved with HRF "
                   />
                   <br/>
                   {this.navButtons()}
                   <br/>
                 </TabPane>}
-                {isDraft && <TabPane tab="Contrasts" key="contrasts" disabled={!contrastsActive || !isDraft}>
+                {isEditable && <TabPane
+                  tab="Contrasts"
+                  key="contrasts"
+                  disabled={(!contrastsActive || !isEditable) && !isFailed}
+                >
+                  <h2>Add Contrasts</h2>
                   <ContrastsTab
                     analysis={analysis}
                     contrasts={analysis.contrasts}
@@ -1036,9 +1071,10 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
                   {this.navButtons()}
                   <br/>
                 </TabPane>}
-                <TabPane tab="Review" key="review" disabled={((!reviewActive || !analysis.analysisId) && isDraft)}>
+                <TabPane tab="Review" key="review" disabled={((!reviewActive || !analysis.analysisId) && !isFailed)}>
                   {this.state.model &&
                     <div>
+                      <h2>Review</h2>
                       <Report
                         analysisId={analysis.analysisId}
                         runIds={analysis.runIds}
@@ -1050,12 +1086,17 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
                         availablePredictors={this.state.availablePredictors}
                       />
                       <br/>
-                      {this.navButtons(false, isDraft)}
+                      {this.navButtons(false, isEditable)}
                       <br/>
                     </div>
                   }
                 </TabPane>
-                <TabPane tab={isDraft ? 'Run' : 'Status'} key="submit" disabled={!submitActive && isDraft}>
+                <TabPane
+                  tab={isEditable ? 'Run' : 'Status'}
+                  key="submit"
+                  disabled={!submitActive && !isFailed}
+                >
+                  <h2>Finalize and Run</h2>
                   <StatusTab
                     status={analysis.status}
                     analysisId={analysis.analysisId}

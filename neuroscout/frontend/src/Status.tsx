@@ -147,7 +147,7 @@ export class Submit extends React.Component<submitProps, {tosAgree: boolean, val
           hidden={!this.props.analysisId}
           onClick={this.props.confirmSubmission.bind(this, this.state.validate)}
           type={'primary'}
-          disabled={!this.state.tosAgree || status !== 'DRAFT'}
+          disabled={!this.state.tosAgree || !['DRAFT', 'FAILED'].includes(status)}
         >
           Generate
         </Button>
@@ -162,11 +162,13 @@ export class StatusTab extends React.Component<submitProps, {compileTraceback: s
     this.state = {
       compileTraceback: '',
     };
-    this.getTraceback();
+    this.getTraceback(this.props.analysisId);
   }
 
-  getTraceback() {
-      let id = this.props.analysisId;
+  getTraceback(id) {
+      if (id === undefined) {
+        return;
+      }
       jwtFetch(`${domainRoot}/api/analyses/${id}/compile`)
       .then((res) => {
         if (res.compile_traceback) {
@@ -177,7 +179,10 @@ export class StatusTab extends React.Component<submitProps, {compileTraceback: s
 
   componentWillReceiveProps(nextProps: submitProps) {
     if ((nextProps.status !== this.props.status) && (nextProps.status === 'FAILED')) {
-      this.getTraceback();
+      this.getTraceback(nextProps.analysisId);
+    }
+    if ((nextProps.analysisId !== this.props.analysisId)) {
+      this.getTraceback(nextProps.analysisId);
     }
   }
 
@@ -213,20 +218,12 @@ export class StatusTab extends React.Component<submitProps, {compileTraceback: s
           </p>
         </div>
       }
-      {(this.props.status === 'DRAFT') &&
-        <Submit
-          status={this.props.status}
-          analysisId={this.props.analysisId}
-          confirmSubmission={this.props.confirmSubmission}
-          private={this.props.private}
-        />
-      }
       {(this.props.status === 'FAILED') &&
         <div>
           <h3>Analysis Failed to Compile</h3>
           <p>
             Oh no! It looks like your analysis failed to compile.
-            Please clone and edit your analysis to try again.
+            Once you make changes to fix the analysis you can re-run it below.
             If the issue remains, please file a
             <a href="https://github.com/neuroscout/neuroscout/issues"> bugreport</a>.
           </p>
@@ -234,6 +231,14 @@ export class StatusTab extends React.Component<submitProps, {compileTraceback: s
             <pre>{this.state.compileTraceback}</pre>
           </Card>
         </div>
+      }
+      {(this.props.status === 'DRAFT' || this.props.status === 'FAILED') &&
+        <Submit
+          status={this.props.status}
+          analysisId={this.props.analysisId}
+          confirmSubmission={this.props.confirmSubmission}
+          private={this.props.private}
+        />
       }
       {(this.props.status === 'PENDING' || this.props.status === 'SUBMITTING') &&
         <div>
