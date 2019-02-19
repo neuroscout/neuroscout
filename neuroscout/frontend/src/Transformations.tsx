@@ -6,7 +6,6 @@ This module comtains the following components:
 */
 import * as React from 'react';
 import { 
-  Alert,
   Button,
   Checkbox,
   Col,
@@ -38,7 +37,7 @@ import {
   XformRules,
 } from './coretypes';
 import { displayError, moveItem, reorder } from './utils';
-import { Space } from './HelperComponents';
+import { DisplayErrorsInline, Space } from './HelperComponents';
 import { PredictorSelector } from './Predictors';
 import transformDefinitions from './transforms';
 const Option = Select.Option;
@@ -374,24 +373,7 @@ class XformEditor extends React.Component<XformEditorProps, XformEditorState> {
     const availableParameters = name ? Object.keys(xformRules[name]) : undefined;
     return (
       <div>
-        {this.props.xformErrors.length > 0 &&
-          <div>
-            <Alert
-              type="error"
-              showIcon={true}
-              closable={true}
-              message={
-                <ul>
-                  {this.props.xformErrors.map((x, i) =>
-                    <li key={i}>
-                      {x}
-                    </li>
-                  )}
-                </ul>
-              }
-            />
-            <br />
-          </div>}
+        <DisplayErrorsInline errors={this.props.xformErrors} />
 
         <Form layout="horizontal">
           <Row type="flex">
