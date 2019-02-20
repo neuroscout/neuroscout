@@ -240,10 +240,6 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
           return data;
         })
         .then((data: ApiAnalysis) => {
-          // tslint:disable-next-line:no-console
-          console.log('maybe here?');
-          // tslint:disable-next-line:no-console
-          console.log(data);
           if (editableStatus.includes(data.status)) {
             this.setState({model: this.buildModel()});
           } else if (data.model !== undefined) {
@@ -366,10 +362,6 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
       imgInput.Task = task[0];
     }
 
-    // tslint:disable-next-line:no-console
-    console.log('in build model');
-    // tslint:disable-next-line:no-console
-    console.log(runs);
     return {
       Name: this.state.analysis.name,
       Description: this.state.analysis.description,
@@ -859,7 +851,10 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
     jwtFetch(`${domainRoot}/api/predictors?run_id=${runIds}`)
     .then((data: Predictor[]) => {
       // If there is a statusCode we do not have a list of predictors
-      if ((data as any).statusCode) {
+      if ((data as any).statusCode === undefined) {
+        this.setState({
+          predictorsLoad: false
+        });
         return;
       }
       const selectedPredictors = data.filter(
@@ -934,9 +929,10 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
       this.saveAnalysis({compile: false})();
       this.setState({saveFromUpdate: false});
     }
-    /*
+    if ((prevState.analysis.runIds.length !== this.state.analysis.runIds.length)
+        && this.state.activeTab !== 'overview') {
+      this.loadPredictors();
     }
-      */
   }
 
   render() {
@@ -973,8 +969,6 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
       activeTab = 'review';
       this.postTabChange(activeTab);
     }
-    // tslint:disable-next-line:no-console
-    console.log(this.state);
     return (
       <div className="App">
           <Prompt
