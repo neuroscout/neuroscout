@@ -5,19 +5,15 @@
     "summary": "Passiving watching of three clips from the movie 'The Grand Budapest Hotel', six times each",
     "url": "https://openneuro.org/datasets/ds001545",
     "tasks": {
-      "story": {
-        "summary": "Audio narrative",
+      "movie": {
+        "summary": "Movie watching, six clips each run",
         "converters": [
         ],
         "extractors": [
-          ["PredefinedDictionaryExtractor", {"variables": ["subtlexusfrequency/Lg10WF"], "missing": "n/a"} ]
         ],
         "transformations": [
         ],
         "ingest_args": {
-        },
-        "filters": {
-          "subject": ["tb3784", "tb3646", "tb3279", "tb3626", "tb3744", "tb3810", "tb3964", "tb4450", "tb2994", "tb3132", "tb3592", "tb3602", "tb3757", "tb4547", "tb3512", "tb3858", "tb3929", "tb3920", "tb3240"]
         }
       }
     }
