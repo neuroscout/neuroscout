@@ -69,6 +69,7 @@ let initializeStore = (): Store => ({
   activeTab: 'overview',
   predictorsActive: false,
   predictorsLoad: false,
+  loadInitialPredictors: true,
   transformationsActive: false,
   contrastsActive: false,
   hrfActive: false,
@@ -846,6 +847,8 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
   }
 
   loadPredictors = () => {
+    // tslint:disable-next-line:no-console
+    console.log('loading predictors');
     let analysis = this.state.analysis;
     let runIds = this.state.analysis.runIds;
     jwtFetch(`${domainRoot}/api/predictors?run_id=${runIds}`)
@@ -929,9 +932,14 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
       this.saveAnalysis({compile: false})();
       this.setState({saveFromUpdate: false});
     }
-    if ((prevState.analysis.runIds.length !== this.state.analysis.runIds.length)
-        && this.state.activeTab !== 'overview') {
+    if (prevState.analysis.runIds.length !== this.state.analysis.runIds.length) {
+      // tslint:disable-next-line:no-console
+      console.log(this.state);
+    }
+    if ((this.state.loadInitialPredictors === true) 
+      && (prevState.analysis.runIds.length !== this.state.analysis.runIds.length)) {
       this.loadPredictors();
+      this.setState({loadInitialPredictors: false});
     }
   }
 
