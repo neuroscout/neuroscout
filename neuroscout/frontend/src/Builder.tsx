@@ -847,8 +847,6 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
   }
 
   loadPredictors = () => {
-    // tslint:disable-next-line:no-console
-    console.log('loading predictors');
     let analysis = this.state.analysis;
     let runIds = this.state.analysis.runIds;
     jwtFetch(`${domainRoot}/api/predictors?run_id=${runIds}`)
@@ -931,10 +929,6 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
     if (this.state.saveFromUpdate) {
       this.saveAnalysis({compile: false})();
       this.setState({saveFromUpdate: false});
-    }
-    if (prevState.analysis.runIds.length !== this.state.analysis.runIds.length) {
-      // tslint:disable-next-line:no-console
-      console.log(this.state);
     }
     if ((this.state.loadInitialPredictors === true) 
       && (prevState.analysis.runIds.length !== this.state.analysis.runIds.length)) {
