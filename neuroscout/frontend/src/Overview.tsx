@@ -174,7 +174,16 @@ export class OverviewTab extends React.Component<OverviewTabProps, OverviewTabSt
         sorter: (a, b) => a.name.localeCompare(b.name),
       },
       { title: 'Description', dataIndex: 'description'},
-      { title: 'Author(s)', dataIndex: 'authors', width: 280 },
+      { title: 'Author(s)', dataIndex: 'authors', width: 280,
+        render: (text) => {
+          let disp = text.split(',');
+          if (disp.length > 1) {
+            return (<Tooltip title={text}>{disp[0]},...,{disp[1]}</Tooltip>); 
+          } else {
+            return `${disp[0]}`;
+          }
+        }
+      },
       { dataIndex: 'url', width: 50,
         render: text => <a href={text} target="_blank" rel="noopener"><Icon type="link" /></a>,
       }
