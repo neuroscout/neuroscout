@@ -1071,7 +1071,7 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
                   {this.navButtons()}
                   <br/>
                 </TabPane>}
-                <TabPane tab="Review" key="review" disabled={((!reviewActive || !analysis.analysisId) && !isFailed)}>
+                <TabPane tab="Review" key="review" disabled={((!reviewActive || !analysis.analysisId) && isDraft)}>
                   {this.state.model &&
                     <div>
                       <h2>Review</h2>
@@ -1094,7 +1094,7 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
                 <TabPane
                   tab={isEditable ? 'Run' : 'Status'}
                   key="submit"
-                  disabled={!submitActive && !isFailed}
+                  disabled={!submitActive && isDraft}
                 >
                   <h2>Finalize and Run</h2>
                   <StatusTab
