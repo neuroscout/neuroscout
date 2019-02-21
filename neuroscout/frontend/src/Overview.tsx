@@ -176,11 +176,10 @@ export class OverviewTab extends React.Component<OverviewTabProps, OverviewTabSt
       { title: 'Description', dataIndex: 'description'},
       { title: 'Author(s)', dataIndex: 'authors', width: 280,
         render: (text) => {
-          let disp = text.split(',');
-          if (disp.length > 1) {
-            return (<Tooltip title={text}>{disp[0]},...,{disp[1]}</Tooltip>); 
+          if (text.length > 1) {
+            return (<Tooltip title={text.join(', ')}>{text[0]},...,{text[1]}</Tooltip>); 
           } else {
-            return `${disp[0]}`;
+            return (<>{text[0]}</>);
           }
         }
       },
