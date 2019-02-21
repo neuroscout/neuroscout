@@ -397,7 +397,7 @@ class XformEditor extends React.Component<XformEditorProps, XformEditorState> {
           <Row type="flex">
             <Col lg={{span: 24}} xs={{span: 24}}>
               <FormItem label="Transformation:">
-                <Select value={name as TransformName} onChange={this.updateXformType}>
+                <Select value={name} onChange={this.updateXformType}>
                   {allowedXformNames.map(x =>
                     <Option value={x} key={x}>
                       {x}
