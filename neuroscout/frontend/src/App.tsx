@@ -48,11 +48,9 @@ class JWTChange extends React.Component<JWTChangeProps, {}> {
   }
 
   render() { return null; }
-
 }
 
 class GoogleLoginBtn extends React.Component<{}, {}> {
-
   render() {
     return (
       <GoogleLogin
@@ -198,7 +196,7 @@ class App extends Reflux.Component<any, {}, AppState> {
 
   // Actually delete existing analysis given its hash ID, called from onDelete()
   deleteAnalysis = (id): void => {
-    jwtFetch(`${DOMAINROOT}/api/analyses/${id}`, { method: 'delete' })
+      jwtFetch(`${DOMAINROOT}/api/analyses/${id}`, { method: 'delete' })
       .then((data: ApiAnalysis) => {
         this.setState({ analyses: this.state.analyses.filter(a => a.id !== id) });
       })
@@ -633,25 +631,24 @@ class App extends Reflux.Component<any, {}, AppState> {
                     />
                   }
                 />
-
-                <Route
-                  exact={true}
-                  path="/public"
-                  render={props =>
-                    <Public analyses={publicAnalyses} cloneAnalysis={this.cloneAnalysis} />}
-                />
-                <Route
-                  exact={true}
-                  path="/myanalyses"
-                  render={props =>
-                    <Private analyses={analyses} cloneAnalysis={this.cloneAnalysis} />}
-                />
-                <Route
-                  exact={true}
-                  path="/faq"
-                  render={() => <FAQ/>}
-                />
-                <Route render={() => <NotFound/>} />
+              <Route
+                exact={true}
+                path="/public"
+                render={props =>
+                  <Public analyses={publicAnalyses} cloneAnalysis={this.cloneAnalysis}/>}
+              />
+              <Route
+                exact={true}
+                path="/myanalyses"
+                render={props =>
+                  <Private analyses={analyses} cloneAnalysis={this.cloneAnalysis} onDelete={this.onDelete}/>}
+              />
+              <Route
+                exact={true}
+                path="/faq"
+                render={() => <FAQ/>}
+              />
+              <Route render={() => <NotFound/>} />
               </Switch>
             </Content>
           </Layout>
