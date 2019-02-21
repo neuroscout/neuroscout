@@ -2,10 +2,10 @@
  ContrastEditor module for adding/editing a contrast (used in the Contrasts tab)
 */
 import * as React from 'react';
-import { Form, Input, InputNumber, Button, Radio, message, Modal, Alert } from 'antd';
+import { Form, Input, InputNumber, Button, Radio, message, Modal } from 'antd';
 import { Analysis, Predictor, Contrast, ContrastTypeEnum } from './coretypes';
 import { PredictorSelector } from './Predictors';
-import { Space } from './HelperComponents';
+import { DisplayErrorsInline, Space } from './HelperComponents';
 
 const FormItem = Form.Item;
 const RadioGroup = Radio.Group;
@@ -131,24 +131,7 @@ export class ContrastEditor extends React.Component<
     const { availablePredictors } = this.props;
     return (
       <div>
-        {this.props.contrastErrors.length > 0 &&
-          <div>
-            <Alert
-              type="error"
-              showIcon={true}
-              closable={true}
-              message={
-                <ul>
-                  {this.props.contrastErrors.map((x, i) =>
-                    <li key={i}>
-                      {x}
-                    </li>
-                  )}
-                </ul>
-              }
-            />
-            <br />
-          </div>}
+        <DisplayErrorsInline errors={this.props.contrastErrors} />
         <Form>
           <FormItem required={true} label={'Name of Contrast:'}>
             <Input
@@ -212,10 +195,6 @@ export class ContrastEditor extends React.Component<
         <Button
           type="primary"
           onClick={this.onSave}
-          disabled={
-            !(this.props.activeContrast.Name && this.props.activeContrast.ConditionList.length > 0
-            && this.props.activeContrast.ConditionList.length === this.props.activeContrast.Weights.length)
-          }
         >
           OK{' '}
         </Button>

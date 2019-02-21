@@ -153,6 +153,7 @@ export interface Store {
   activeTab: TabName;
   predictorsActive: boolean;
   predictorsLoad: boolean;
+  loadInitialPredictors: boolean;
   transformationsActive: boolean;
   contrastsActive: boolean;
   hrfActive: boolean;
