@@ -174,7 +174,7 @@ export class ContrastsTab extends React.Component<ContrastsTabProps, ContrastsTa
       <div>
         {activeContrastIndex === -1 &&
           <h2>
-            'Add a new contrast:'
+            Add a new contrast:
           </h2>
         }
         <ContrastEditor
