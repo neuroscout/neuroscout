@@ -29,7 +29,7 @@ export interface Analysis {
 export interface Dataset {
   name: string;
   id: string;
-  authors: string;
+  authors: string[];
   url: string;
   description: string;
   tasks: Task[];

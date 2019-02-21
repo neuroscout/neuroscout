@@ -125,7 +125,7 @@ let initializeStore = (): Store => ({
 
 // Normalize dataset object returned by /api/datasets
 const normalizeDataset = (d: ApiDataset): Dataset => {
-  const authors = d.description.Authors ? d.description.Authors.join(', ') : 'No authors listed';
+  const authors = d.description.Authors ? d.description.Authors : ['No authors listed'];
   const description = d.summary;
   const url = d.url;
   const id = d.id.toString();
