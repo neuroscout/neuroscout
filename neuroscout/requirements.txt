@@ -46,7 +46,7 @@ Pillow==4.1.1
 psycopg2==2.7.1
 progressbar2
 py==1.4.33
-pybids==0.7.0
+pybids==0.8.0
 PyJWT==1.4.2
 pyparsing==2.2.0
 pytest==3.0.7
