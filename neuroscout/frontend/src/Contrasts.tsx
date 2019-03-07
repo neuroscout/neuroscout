@@ -5,7 +5,7 @@
  - ContrastDisplay: component to display a single contrast
 */
 import * as React from 'react';
-import { Alert, Table, Input, Button, Row, Col, Form, Select, Checkbox, Icon, List } from 'antd';
+import { Table, Input, Button, Row, Col, Form, Select, Checkbox, Icon, List } from 'antd';
 import {
   DragDropContext,
   Draggable,
@@ -17,7 +17,7 @@ import {
 } from 'react-beautiful-dnd';
 import { Analysis, Predictor, Contrast } from './coretypes';
 import { displayError, moveItem, reorder } from './utils';
-import { Space } from './HelperComponents';
+import { DisplayErrorsInline, Space } from './HelperComponents';
 import { PredictorSelector } from './Predictors';
 import { ContrastEditor, emptyContrast } from './ContrastEditor';
 const Option = Select.Option;
@@ -174,7 +174,7 @@ export class ContrastsTab extends React.Component<ContrastsTabProps, ContrastsTa
       <div>
         {activeContrastIndex === -1 &&
           <h2>
-            'Add a new contrast:'
+            Add a new contrast:
           </h2>
         }
         <ContrastEditor
@@ -192,25 +192,7 @@ export class ContrastsTab extends React.Component<ContrastsTabProps, ContrastsTa
     const ViewMode = () => (
       <div>
         <br />
-        {this.props.contrastErrors.length > 0 && mode !== 'add' &&
-          <div>
-            <Alert
-              type="error"
-              showIcon={true}
-              closable={true}
-              message={
-                <ul>
-                  {this.props.contrastErrors.map((x, i) =>
-                    <li key={i}>
-                      {x}
-                    </li>
-                  )}
-                </ul>
-              }
-            />
-            <br />
-          </div>}
-
+        {mode !== 'add' && <DisplayErrorsInline errors={this.props.contrastErrors} />}
         <DragDropContext onDragEnd={this.onDragEnd}>
           <Droppable droppableId="droppable">
             {(provided: DroppableProvided, snapshot: DroppableStateSnapshot) => (

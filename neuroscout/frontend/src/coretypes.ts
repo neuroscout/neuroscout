@@ -29,7 +29,7 @@ export interface Analysis {
 export interface Dataset {
   name: string;
   id: string;
-  authors: string;
+  authors: string[];
   url: string;
   description: string;
   tasks: Task[];
@@ -153,6 +153,7 @@ export interface Store {
   activeTab: TabName;
   predictorsActive: boolean;
   predictorsLoad: boolean;
+  loadInitialPredictors: boolean;
   transformationsActive: boolean;
   contrastsActive: boolean;
   hrfActive: boolean;

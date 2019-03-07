@@ -221,7 +221,8 @@ def add_task(task_name, dataset_name=None, local_path=None,
 
         """ Extract Predictors"""
         # Assert event files exist (for DataLad)
-        for e in layout._get_nearest_helper(img.path, '.tsv', suffix='events'):
+        for e in layout.get_nearest(
+          img.path, suffix='events', all_=True, strict=False):
             assert isfile(e)
 
         collection = layout.get_collections(

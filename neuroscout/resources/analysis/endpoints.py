@@ -50,7 +50,7 @@ class AnalysisResource(AnalysisMethodResource):
         if analysis.locked is True:
             abort(422, "Analysis is locked. It cannot be edited.")
         if analysis.status not in ['DRAFT', 'FAILED']:
-            excep = ['private', 'description']
+            excep = ['private', 'description', 'name']
             kwargs = {k: v for k, v in kwargs.items() if k in excep}
         if not kwargs:
             abort(422, "Analysis is not editable. Try cloning it.")

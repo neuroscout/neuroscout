@@ -69,6 +69,7 @@ let initializeStore = (): Store => ({
   activeTab: 'overview',
   predictorsActive: false,
   predictorsLoad: false,
+  loadInitialPredictors: true,
   transformationsActive: false,
   contrastsActive: false,
   hrfActive: false,
@@ -124,7 +125,7 @@ let initializeStore = (): Store => ({
 
 // Normalize dataset object returned by /api/datasets
 const normalizeDataset = (d: ApiDataset): Dataset => {
-  const authors = d.description.Authors ? d.description.Authors.join(', ') : 'No authors listed';
+  const authors = d.description.Authors ? d.description.Authors : ['No authors listed'];
   const description = d.summary;
   const url = d.url;
   const id = d.id.toString();
@@ -840,12 +841,23 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
 
     if (activeKey === 'overview' || this.state.predictorsLoad === false) {
       return;
+    } else {
+      this.loadPredictors();
     }
+  }
 
-    // does this need to happen every time? We are relying on this function to do initial load of predictors when
-    // loading an analysis not in draft.
-    jwtFetch(`${domainRoot}/api/predictors?run_id=${analysis.runIds}`)
+  loadPredictors = () => {
+    let analysis = this.state.analysis;
+    let runIds = this.state.analysis.runIds;
+    jwtFetch(`${domainRoot}/api/predictors?run_id=${runIds}`)
     .then((data: Predictor[]) => {
+      // If there is a statusCode we do not have a list of predictors
+      if ((data as any).statusCode === undefined) {
+        this.setState({
+          predictorsLoad: false
+        });
+        return;
+      }
       const selectedPredictors = data.filter(
         p => analysis.predictorIds.indexOf(p.id) > -1
       );
@@ -917,6 +929,11 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
     if (this.state.saveFromUpdate) {
       this.saveAnalysis({compile: false})();
       this.setState({saveFromUpdate: false});
+    }
+    if ((this.state.loadInitialPredictors === true) 
+      && (prevState.analysis.runIds.length !== this.state.analysis.runIds.length)) {
+      this.loadPredictors();
+      this.setState({loadInitialPredictors: false});
     }
   }
 
