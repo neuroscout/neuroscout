@@ -8,17 +8,17 @@
       "movie": {
         "summary": "Movie watching, six clips each run",
         "converters": [
-	    ["FrameSamplingFilter", { "hertz": 1 }],
-	    ["VideoToAudioConverter", {}]
         ],
         "extractors": [
-	    ["BrightnessExtractor", {}],
-	    ["VibranceExtractor", {}],
-	    ["SpectralCentroidExtractor", {}],
-	    ["RMSEExtractor", {"frame_length": 72000, "hop_length": 72000, "center": false}],
-	    ["STFTAudioExtractor", {}]
+["GoogleVideoAPIShotDetectionExtractor", {"timeout": 100000}]
         ],
         "transformations": [
+    {
+      "function": "dummy_value",
+      "new_name": "shot_change",
+      "extractor_name": "GoogleVideoAPIShotDetectionExtractor",
+      "feature_name": "shot_id"
+    }
         ],
         "ingest_args": {
         }

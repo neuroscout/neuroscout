@@ -59,7 +59,6 @@ def _extract(extractors, stims):
                 # Hacky workaround. Look for compatible AVI
                 if 'GoogleVideoAPIShotDetectionExtractor' in str(ext.__class__):
                     s.filename = str(Path(s.filename).with_suffix('.avi'))
-                    print(s.filename)
                 valid_stims.append((sm, s))
         results += [(sm, ext.transform(s))
                     for sm, s in progressbar(valid_stims)]
