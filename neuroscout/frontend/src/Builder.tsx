@@ -74,7 +74,6 @@ let initializeStore = (): Store => ({
   contrastsActive: false,
   hrfActive: false,
   submitActive: false,
-  modelingActive: true,
   reviewActive: false,
   analysis: {
     analysisId: undefined,
@@ -120,7 +119,8 @@ let initializeStore = (): Store => ({
   activeXformIndex: -1,
   activeContrastIndex: -1,
   xformErrors: [],
-  contrastErrors: []
+  contrastErrors: [],
+  fillAnalysis: false
 });
 
 // Normalize dataset object returned by /api/datasets
@@ -397,7 +397,7 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
   };
 
   // Save analysis to server, either with lock=false (just save), or lock=true (save & submit)
-  saveAnalysis = ({ compile = false, build = true}) => (): void => {
+  saveAnalysis = ({ compile = false, build = true }) => (): Promise<boolean> => {
     /*
     if ((!compile && !this.saveEnabled()) || (compile && !this.submitEnabled())) {
       return;
@@ -407,12 +407,12 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
     const analysis = this.state.analysis;
     if (analysis.datasetId === null) {
       displayError(Error('Analysis cannot be saved without selecting a dataset'));
-      return;
+      return new Promise(() => {return false; });
     }
 
     if (!analysis.name) {
       displayError(Error('Analysis cannot be saved without a name'));
-      return;
+      return new Promise(() => {return false; });
     }
 
     const apiAnalysis: ApiAnalysis = {
@@ -429,14 +429,17 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
       config: analysis.config,
     };
 
-    apiAnalysis.model = this.buildModel();
+    if (this.state.fillAnalysis === false) {
+      apiAnalysis.model = this.buildModel();
+      // could we clear predictor ids here?
+    }
 
     // const method = analysis.analysisId ? 'put' : 'post';
     let method: string;
     let url: string;
     if (compile && analysis.analysisId) {
       if (analysis.analysisId === undefined) {
-        return;
+        return new Promise(() => {return false; });
       }
       // Submit for compilation
       url = `${domainRoot}/api/analyses/${analysis.analysisId}/compile?build=${build}`;
@@ -457,7 +460,7 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
       displayError(error);
       throw error;
     }
-    jwtFetch(url, { method, body: JSON.stringify(apiAnalysis) })
+    return jwtFetch(url, { method, body: JSON.stringify(apiAnalysis) })
       // .then(response => response.json())
       .then((data: ApiAnalysis & { statusCode: number }) => {
         if (data.statusCode !== 200) {
@@ -483,12 +486,19 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
           postReports: true,
           unsavedChanges: false
         });
+        // will this mess with /fill workflow?
+        // can't remember reason behind having to call this so often
         this.props.updatedAnalysis();
+
         if (data.hash_id !== undefined) {
           history.push('/builder/' + data.hash_id);
         }
       })
-      .catch(displayError);
+      .then(() => {return true; })
+      .catch((err) => {
+        displayError(err);
+        return false;
+      });
   };
 
   // Decode data returned by '/api/analyses/<id>' (ApiAnalysis) to convert it to the right shape (Analysis)
@@ -610,6 +620,41 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
       return;
     }
     this.setState({ activeTab: newTab });
+  }
+
+  analysisToApiAnalysis = (analysis): ApiAnalysis => {
+    let apiAnalysis: ApiAnalysis = {
+      name: analysis.name,
+      description: analysis.description,
+      predictions: analysis.predictions,
+      private: analysis.private,
+      dataset_id: analysis.datasetId.toString(),
+      status: analysis.status,
+      runs: analysis.runIds,
+      predictors: analysis.predictorIds,
+      transformations: analysis.transformations,
+      contrasts: analysis.contrasts,
+      config: analysis.config,
+    };
+    return apiAnalysis;
+  }
+
+  fillAnalysis = () => {
+    // tslint:disable-next-line:no-console
+    console.log('in fill analysis');
+    let url = `${domainRoot}/api/analysis/${this.state.analysis.datasetId}/fill`;
+    let apiAnalysis = this.analysisToApiAnalysis(this.state.analysis);
+    apiAnalysis.predictors = [];
+    jwtFetch(url, { method: 'POST', analysis: apiAnalysis})
+    .then((res) => {
+      // tslint:disable-next-line:no-console
+      console.log(res);
+    })
+    .catch((err) => {
+      // tslint:disable-next-line:no-console
+      console.log(err);
+    });
+
   }
 
   // run any time we attempt to leave tab
@@ -778,28 +823,33 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
       if (updatedAnalysis.datasetId !== analysis.datasetId) {
         // If a new dataset is selected we need to fetch the associated runs
         jwtFetch(`${domainRoot}/api/runs?dataset_id=${updatedAnalysis.datasetId}`)
-          // .then(response => response.json())
           .then((data: Run[]) => {
             let availTasks = getTasks(datasets, updatedAnalysis.datasetId);
-
+            let datasetIdUpdate: any = {};
             if (updatedAnalysis.model && updatedAnalysis.model.Input) {
               updatedAnalysis.runIds = this.runIdsFromModel(data, updatedAnalysis.model.Input);
+              if (analysis.datasetId !== null) {
+                stateUpdate.fillAnalysis = true;
+              }
             } else {
               updatedAnalysis.runIds = data.map(x => x.id);
             }
 
             if (availTasks.length === 1) {
-              this.setState({
+              stateUpdate = {
+                ...stateUpdate, 
                 selectedTaskId: availTasks[0].id,
                 predictorsLoad: true,
-              });
+              };
             }
 
-            this.setState({
+            stateUpdate = {
+              ...stateUpdate,
               availableRuns: data,
               availablePredictors: [],
               selectedPredictors: []
-            });
+            };
+            this.setState(stateUpdate);
           })
           .catch(displayError);
       }
@@ -807,7 +857,7 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
         // If there was any change in selection of runs, fetch the associated predictors
         const runIds = updatedAnalysis.runIds.join(',');
         if (runIds) {
-          this.setState({predictorsLoad: true});
+          stateUpdate.predictorsLoad = true;
         } else {
           stateUpdate.availablePredictors = [];
         }
@@ -832,7 +882,9 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
 
   postTabChange = (activeKey) => {
     const analysis = this.state.analysis;
-    if (editableStatus.includes(this.state.analysis.status)) {
+    if (this.state.fillAnalysis) {
+      this.fillAnalysis();
+    } else if (editableStatus.includes(this.state.analysis.status)) {
       this.setState({model: this.buildModel()});
       if (editableStatus.includes(this.state.analysis.status) && this.state.unsavedChanges) {
         this.saveAnalysis({compile: false})();
@@ -945,7 +997,6 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
       hrfActive,
       reviewActive,
       submitActive,
-      modelingActive,
       activeTab,
       analysis,
       datasets,

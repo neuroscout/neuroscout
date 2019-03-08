@@ -159,7 +159,6 @@ export interface Store {
   hrfActive: boolean;
   reviewActive: boolean;
   submitActive: boolean;
-  modelingActive: boolean;
   analysis: Analysis;
   datasets: Dataset[];
   availableRuns: Run[];
@@ -181,6 +180,7 @@ export interface Store {
   activeContrastIndex: number;
   xformErrors: string[];
   contrastErrors: string[];
+  fillAnalysis: boolean;
 }
 
 export interface ApiRun {
