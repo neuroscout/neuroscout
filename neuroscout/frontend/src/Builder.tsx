@@ -645,7 +645,7 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
     let url = `${domainRoot}/api/analysis/${this.state.analysis.datasetId}/fill`;
     let apiAnalysis = this.analysisToApiAnalysis(this.state.analysis);
     apiAnalysis.predictors = [];
-    jwtFetch(url, { method: 'POST', analysis: apiAnalysis})
+    jwtFetch(url, { method: 'POST', body: {analysis: apiAnalysis}})
     .then((res) => {
       // tslint:disable-next-line:no-console
       console.log(res);
