@@ -10,6 +10,8 @@
         "converters": [
         ],
         "extractors": [
+	    ["SpectralCentroidExtractor", {}],
+	    ["STFTAudioExtractor", {}]
         ],
         "transformations":[
         ]

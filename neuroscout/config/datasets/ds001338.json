@@ -1,6 +1,6 @@
 {
   "ParanoiaStory": {
-    "preproc_address": "https://github.com/neuroscout-datasets/ds001338/",
+    "preproc_address": "https://github.com/neuroscout-datasets/ParanoiaStory/",
     "path": "/datasets/raw/ds001338/",
     "summary": "Passive listening of audio narrative designed to elicit individual variation in paranoia",
     "url": "https://openneuro.org/datasets/ds001338",
@@ -10,14 +10,10 @@
         "converters": [
         ],
         "extractors": [
-          ["PredefinedDictionaryExtractor", {"variables": ["subtlexusfrequency/Lg10WF"], "missing": "n/a"} ]
         ],
         "transformations": [
         ],
         "ingest_args": {
-        },
-        "filters": {
-          "subject": ["tb3784", "tb3646", "tb3279", "tb3626", "tb3744", "tb3810", "tb3964", "tb4450", "tb2994", "tb3132", "tb3592", "tb3602", "tb3757", "tb4547", "tb3512", "tb3858", "tb3929", "tb3920", "tb3240"]
         }
       }
     }
