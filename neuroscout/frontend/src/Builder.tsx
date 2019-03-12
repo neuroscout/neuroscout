@@ -431,7 +431,8 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
 
     if (this.state.fillAnalysis === false) {
       apiAnalysis.model = this.buildModel();
-      // could we clear predictor ids here?
+    } else {
+      apiAnalysis.predictors = [];
     }
 
     // const method = analysis.analysisId ? 'put' : 'post';
@@ -505,6 +506,8 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
   // and fetch the associated runs
   loadAnalysis = (data: ApiAnalysis): Promise<Analysis> => {
 
+    // tslint:disable-next-line:no-console
+    console.log(`predictors: ${data.predictors}`);
     data.transformations = [];
 
     // Extract transformations and contrasts from within step object of response.
@@ -642,19 +645,32 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
   fillAnalysis = () => {
     // tslint:disable-next-line:no-console
     console.log('in fill analysis');
-    let url = `${domainRoot}/api/analysis/${this.state.analysis.datasetId}/fill`;
-    let apiAnalysis = this.analysisToApiAnalysis(this.state.analysis);
-    apiAnalysis.predictors = [];
-    jwtFetch(url, { method: 'POST', body: {analysis: apiAnalysis}})
+    let url = `${domainRoot}/api/analyses/${this.state.analysis.analysisId}/fill`;
+    this.saveAnalysis({compile: false, build: false})()
+    .then((res) => {
+      if (res) {
+        return jwtFetch(url, { method: 'post', body: {partial: true, dryrun: false}});
+      }
+      // what to do if save fails?
+      return;
+    })
     .then((res) => {
       // tslint:disable-next-line:no-console
+      console.log('post result:');
+      // tslint:disable-next-line:no-console
       console.log(res);
+      return this.loadAnalysis(res);
+    })
+    .then((newAnalysis) => {
+      this.updateAnalysis(newAnalysis);
     })
     .catch((err) => {
       // tslint:disable-next-line:no-console
+      console.log('error:');
+      // tslint:disable-next-line:no-console
       console.log(err);
     });
-
+    this.setState({fillAnalysis: false});
   }
 
   // run any time we attempt to leave tab
