@@ -94,7 +94,15 @@ class AnalysisFillResource(AnalysisMethodResource):
             #  Set to all runs in dataset
             fields['runs'] = analysis.dataset.runs
             fields['model'] = analysis.model
-            fields['model']["Input"] = {}
+
+            input = {k: list(set(getattr(r, k)
+                                 for r in fields['runs']
+                                 if getattr(r, k) is not None))
+                     for k in ['subject', 'number', 'task', 'session']}
+            input['run'] = input.pop('number')
+            input['task'] = [t.name for t in input['task']]
+            fields['model']['Input'] = {
+                k.capitalize(): v for k, v in input.items() if v}
 
         if not analysis.predictors:
             # Look in model to see if there are predictor names
