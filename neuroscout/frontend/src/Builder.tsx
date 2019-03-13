@@ -506,8 +506,6 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
   // and fetch the associated runs
   loadAnalysis = (data: ApiAnalysis): Promise<Analysis> => {
 
-    // tslint:disable-next-line:no-console
-    console.log(`predictors: ${data.predictors}`);
     data.transformations = [];
 
     // Extract transformations and contrasts from within step object of response.
@@ -643,8 +641,6 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
   }
 
   fillAnalysis = () => {
-    // tslint:disable-next-line:no-console
-    console.log('in fill analysis');
     let url = `${domainRoot}/api/analyses/${this.state.analysis.analysisId}/fill`;
     this.saveAnalysis({compile: false, build: false})()
     .then((res) => {
@@ -655,10 +651,6 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
       return;
     })
     .then((res) => {
-      // tslint:disable-next-line:no-console
-      console.log('post result:');
-      // tslint:disable-next-line:no-console
-      console.log(res);
       return this.loadAnalysis(res);
     })
     .then((newAnalysis) => {
@@ -666,9 +658,7 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
     })
     .catch((err) => {
       // tslint:disable-next-line:no-console
-      console.log('error:');
-      // tslint:disable-next-line:no-console
-      console.log(err);
+      console.log(`error: ${err}`);
     });
     this.setState({fillAnalysis: false});
   }
@@ -877,6 +867,12 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
         } else {
           stateUpdate.availablePredictors = [];
         }
+      }
+      if (updatedAnalysis.predictorIds.length !== this.state.selectedPredictors.length
+          && this.state.availablePredictors.length > 0) {
+        stateUpdate.selectedPredictors = this.state.availablePredictors.filter((x) => {
+          return updatedAnalysis.predictorIds.includes(x.id);
+        });
       }
       // Enable predictors tab only if at least one run has been selected
       stateUpdate.predictorsActive = value.runIds.length > 0;
