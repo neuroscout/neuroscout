@@ -640,6 +640,11 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
     return apiAnalysis;
   }
 
+  /* when state.fillAnalysis is true and a tab change occurs this function isn called.
+   * First we save the analysis, with state.fillAnalysis true this clears out predictors in
+   * the analysis but leaves predictorIds alone in the model, a prerequisite for /fill endpoint
+   * to work. We then post to /fill, and attempt to reload the analysis from what /fill returns.
+   */
   fillAnalysis = () => {
     let url = `${domainRoot}/api/analyses/${this.state.analysis.analysisId}/fill`;
     this.saveAnalysis({compile: false, build: false})()
@@ -647,7 +652,6 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
       if (res) {
         return jwtFetch(url, { method: 'post', body: {partial: true, dryrun: false}});
       }
-      // what to do if save fails?
       return;
     })
     .then((res) => {
