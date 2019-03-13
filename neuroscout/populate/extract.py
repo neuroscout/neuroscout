@@ -32,7 +32,8 @@ def _load_stim_models(dataset_name, task_name):
             Dataset).filter_by(name=dataset_name)
 
     stims = []
-    for stim_model in stim_models:
+    print("Loading stim models...")
+    for stim_model in progressbar(stim_models):
         if stim_model.path is None:
             # Load both ways for Text stimuli
             stims.append(
@@ -48,17 +49,19 @@ def _load_stim_models(dataset_name, task_name):
 
 def _extract(extractors, stims):
     results = []
+    # For every extractor, extract from matching stims
     for name, parameters in extractors:
-        # For every extractor, extract from matching stims
         print("Extractor: {}".format(name))
         ext = get_transformer(name, **parameters)
-        for stim_model, stim in stims:
-            if ext._stim_matches_input_types(stim):
+        valid_stims = []
+        for sm, s in stims:
+            if ext._stim_matches_input_types(s):
                 # Hacky workaround. Look for compatible AVI
                 if 'GoogleVideoAPIShotDetectionExtractor' in str(ext.__class__):
-                    stim.filename = Path(
-                        stim.filename).with_suffix('.avi').as_posix()
-                results.append((stim_model, ext.transform(stim)))
+                    s.filename = str(Path(s.filename).with_suffix('.avi'))
+                valid_stims.append((sm, s))
+        results += [(sm, ext.transform(s))
+                    for sm, s in progressbar(valid_stims)]
     return results
 
 
@@ -92,10 +95,11 @@ def extract_features(dataset_name, task_name, extractors):
     _to_csv(results, dataset_name, task_name)
 
     ext_feats = {}
+    print("Creating ExtractedFeatures...")
     for stim_object, result in progressbar(results):
         bulk_ees = []
         for ee_props, ef_props in FeatureSerializer().load(result):
-            # Hash extractor name + feature name
+            # Hash extractor name + feaFture name
             feat_hash = ef_props['sha1_hash']
 
             # If we haven't already added this feature

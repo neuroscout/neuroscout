@@ -1,0 +1,28 @@
+{
+  "LearningTemporalStructure": {
+    "preproc_address": "https://github.com/neuroscout-datasets/LearningTemporalStructure.git",
+    "path": "/datasets/raw/ds001545/",
+    "summary": "Passiving watching of three clips from the movie 'The Grand Budapest Hotel', six times each",
+    "url": "https://openneuro.org/datasets/ds001545",
+    "tasks": {
+      "movie": {
+        "summary": "Movie watching, six clips each run",
+        "converters": [
+        ],
+        "extractors": [
+["GoogleVideoAPIShotDetectionExtractor", {"timeout": 100000}]
+        ],
+        "transformations": [
+    {
+      "function": "dummy_value",
+      "new_name": "shot_change",
+      "extractor_name": "GoogleVideoAPIShotDetectionExtractor",
+      "feature_name": "shot_id"
+    }
+        ],
+        "ingest_args": {
+        }
+      }
+    }
+  }
+}

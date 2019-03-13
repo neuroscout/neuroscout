@@ -2,6 +2,9 @@
 
 [![Build Status](https://travis-ci.com/PsychoinformaticsLab/neuroscout.svg?token=mytABRBRnBitJJpBpMxh&branch=master)](https://travis-ci.com/PsychoinformaticsLab/neuroscout)
 [![codecov](https://codecov.io/gh/neuroscout/neuroscout/branch/master/graph/badge.svg)](https://codecov.io/gh/neuroscout/neuroscout)
+[![DOI](https://zenodo.org/badge/68325864.svg)](https://zenodo.org/badge/latestdoi/68325864)
+
+
 
 This is the repository for the neuroscout server.
 

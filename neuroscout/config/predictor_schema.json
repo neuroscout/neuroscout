@@ -39,7 +39,7 @@
     "description": "Average signal in White Matter mask",
     "source": "fmriprep"
   },
-  "^rot_([X-Z]?)$": {
+  "^rot_([x-z]?)$": {
     "description": "Rigid-body transform parameter (rotation)",
     "source": "fmriprep"
   },

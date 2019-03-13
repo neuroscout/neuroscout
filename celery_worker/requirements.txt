@@ -1,9 +1,9 @@
 celery
-flower
+flower==0.9.2
 redis
 docopt
 grabbit
-pybids==0.8.0
+-e git+https://github.com/bids-standard/pybids.git@4315865#egg=pybids
 duecredit
 pandas
 patsy
@@ -19,3 +19,4 @@ nistats
 nilearn
 fitlins
 sklearn
+tornado==5.1.1

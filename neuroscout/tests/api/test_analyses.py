@@ -281,6 +281,8 @@ def test_autofill(auth_client, add_analysis, add_task, session):
 
     assert len(analysis_json['predictors']) == 2
     assert len(analysis_json['runs']) == 4
+    assert analysis_json['model']['Input'] == {
+        'Run': [1, 2], 'Subject': ['02', '01'], 'Task': ['bidstest']}
 
     # Try with names that don't exist
     analysis_json['model']['Steps'][0]["Model"]["X"] = \
