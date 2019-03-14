@@ -837,10 +837,10 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
             let availTasks = getTasks(datasets, updatedAnalysis.datasetId);
             let datasetIdUpdate: any = {};
             if (updatedAnalysis.model && updatedAnalysis.model.Input) {
-              updatedAnalysis.runIds = this.runIdsFromModel(data, updatedAnalysis.model.Input);
               if (analysis.datasetId !== null) {
                 stateUpdate.fillAnalysis = true;
               }
+              updatedAnalysis.runIds = this.runIdsFromModel(data, updatedAnalysis.model.Input);
             } else {
               updatedAnalysis.runIds = data.map(x => x.id);
             }
@@ -1077,7 +1077,7 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
                     availablePredictors={availablePredictors}
                     selectedPredictors={selectedPredictors}
                     updateSelection={this.updatePredictorState}
-                    predictorsLoad={this.state.predictorsLoad}
+                    predictorsLoad={this.state.predictorsLoad || this.state.fillAnalysis}
                   />
                   <br/>
                   {this.navButtons(!(selectedPredictors.length > 0))}
