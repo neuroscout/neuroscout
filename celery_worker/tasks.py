@@ -6,6 +6,7 @@ from nistats.reporting import plot_design_matrix
 from fitlins.viz import plot_corr_matrix, plot_contrast_matrix
 from .compile import build_analysis, plot_save, PathBuilder, impute_confounds
 from celery.utils.log import get_task_logger
+from pynv import Client
 
 logger = get_task_logger(__name__)
 
@@ -78,3 +79,15 @@ def generate_report(analysis, predictor_events, bids_dir, run_ids, domain):
         results['contrast_plot'].append(url)
 
     return results
+
+
+@celery_app.task(name='neurovault.upload')
+def upload(image_paths, hash_id, access_token):
+    api = Client(access_token=access_token)
+    collection = api.create_collection(hash_id)
+
+    for img_path in image_paths:
+        contrast_name = None
+        api.add_image(
+            collection['id'], img_path, name=contrast_name,
+            modality="fMRI-BOLD", map_type='T')

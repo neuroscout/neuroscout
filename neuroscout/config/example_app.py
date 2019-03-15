@@ -38,6 +38,7 @@ class Config(object):
     APISPEC_SWAGGER_UI_URL = None
     WTF_CSRF_ENABLED = False
     ENV = 'production'
+    NEUROVAULT_ACCESS_TOKEN = 'something'
 
 
 class DevelopmentConfig(Config):
