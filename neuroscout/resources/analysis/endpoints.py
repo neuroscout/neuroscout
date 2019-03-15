@@ -192,3 +192,10 @@ class AnalysisBundleResource(MethodResource):
             msg = "Analysis bundle not available. Try compiling."
             abort(404, msg)
         return send_file(analysis.bundle_path, as_attachment=True)
+
+
+class AnalysisUploadResource(MethodResource):
+    @doc(tags=['analysis'], summary='Upload fitlins analysis tarball.')
+    @fetch_analysis
+    def post(self, analysis, validation_hash):
+        pass
