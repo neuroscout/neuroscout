@@ -800,7 +800,7 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
     keys.map(key => {
       if (!input[key]) {return; }
       runIds = runIds.filter((x) => {
-        if ((key !== 'Run' && x[key] === undefined) || (key === 'Run' && x.number === undefined)) {
+        if ((key !== 'Run' && !x[key]) || (key === 'Run' && !x.number)) {
           return true;
         }
         if (key === 'Run') {

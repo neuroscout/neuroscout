@@ -185,7 +185,7 @@ export class PredictorSelector extends React.Component<
                 locale={{ emptyText: this.state.searchText ? 'No results found' : 'No data'}}
                 columns={columns}
                 rowKey="id"
-                // pagination={false}
+                pagination={false}
                 scroll={{y: 465}}
                 size="small"
                 dataSource={this.state.filteredPredictors}
