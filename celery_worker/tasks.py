@@ -1,5 +1,6 @@
 import tarfile
 import json
+import re
 from pathlib import Path
 from app import celery_app
 from nistats.reporting import plot_design_matrix
@@ -87,7 +88,7 @@ def upload(image_paths, hash_id, access_token):
     collection = api.create_collection(hash_id)
 
     for img_path in image_paths:
-        contrast_name = None
+        contrast_name = re.findall('contrast-(.*)_', img_path)[0]
         api.add_image(
             collection['id'], img_path, name=contrast_name,
             modality="fMRI-BOLD", map_type='T')
