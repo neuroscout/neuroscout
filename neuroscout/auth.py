@@ -106,7 +106,7 @@ def load_user(payload):
 
 def add_auth_to_swagger(spec):
     """ Document auth paths using swagger """
-    spec.add_path(
+    spec.path(
         path='/api/auth',
         operations=dict(
             post=dict(
