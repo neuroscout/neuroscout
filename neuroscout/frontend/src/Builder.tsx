@@ -836,13 +836,13 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
           .then((data: Run[]) => {
             let availTasks = getTasks(datasets, updatedAnalysis.datasetId);
             let datasetIdUpdate: any = {};
+            updatedAnalysis.runIds = data.map(x => x.id);
             if (updatedAnalysis.model && updatedAnalysis.model.Input) {
               if (analysis.datasetId !== null) {
                 stateUpdate.fillAnalysis = true;
+              } else {
+                updatedAnalysis.runIds = this.runIdsFromModel(data, updatedAnalysis.model.Input);
               }
-              updatedAnalysis.runIds = this.runIdsFromModel(data, updatedAnalysis.model.Input);
-            } else {
-              updatedAnalysis.runIds = data.map(x => x.id);
             }
 
             if (availTasks.length === 1) {
