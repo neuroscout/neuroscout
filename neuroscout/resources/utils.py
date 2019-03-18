@@ -4,6 +4,7 @@ from flask_apispec import doc
 import datetime
 from webargs.flaskparser import parser
 from models import Analysis
+from marshmallow import ValidationError
 
 import celery.states as states
 from worker import celery_app
@@ -94,7 +95,11 @@ def owner_required(function):
 
 
 @parser.error_handler
-def handle_request_parsing_error(err):
-    code = getattr(err, 'status_code', 400)
-    msg = getattr(err, 'messages', 'Invalid Request')
+def handle_request_parsing_error(error, req, schema, error_status_code,
+                                 error_headers):
+    if isinstance(error, ValidationError):
+        code = 422
+    else:
+        code = error_status_code or 400
+    msg = error.messages or 'Invalid request'
     abort(code, msg)

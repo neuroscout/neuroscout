@@ -43,13 +43,15 @@ cors = CORS(app, resources={r"/api/*": {"origins": "*"},
 
 # Setup API
 from apispec import APISpec
+from apispec.ext.marshmallow import MarshmallowPlugin
 from flask_apispec.extension import FlaskApiSpec
 from utils import route_factory
 
 spec = APISpec(
     title='neuroscout',
     version='v1',
-    plugins=['apispec.ext.marshmallow'],
+    plugins=[MarshmallowPlugin()],
+    openapi_version='3.0.2'
 )
 app.config.update({
     'APISPEC_SPEC': spec})
