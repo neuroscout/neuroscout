@@ -198,4 +198,8 @@ class AnalysisUploadResource(MethodResource):
     @doc(tags=['analysis'], summary='Upload fitlins analysis tarball.')
     @fetch_analysis
     def post(self, analysis, validation_hash):
+
+        # Check hash_id
+        # Save files
+        # Send to celery
         pass
