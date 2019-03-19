@@ -35,7 +35,7 @@ def jsonify_analysis(analysis, run_id=None):
 
 
 @doc(tags=['analysis'])
-@marshal_with(AnalysisCompiledSchema)
+@marshal_with(AnalysisCompiledSchema, code=200)
 class CompileAnalysisResource(MethodResource):
     @use_kwargs({
         'build': wa.fields.Boolean(
@@ -65,15 +65,15 @@ class CompileAnalysisResource(MethodResource):
 
         put_record({'status': 'PENDING', 'compile_task_id': task.id}, analysis)
 
-        return analysis
+        return analysis, 200
 
     @doc(summary='Check if analysis compilation status.')
     @fetch_analysis
     def get(self, analysis):
-        return analysis
+        return analysis, 200
 
 
-@marshal_with(ReportSchema)
+@marshal_with(ReportSchema, code=200)
 @use_kwargs({
     'run_id': wa.fields.DelimitedList(fields.Int(),
                                       description='Run id(s).')
@@ -101,7 +101,7 @@ class ReportResource(MethodResource):
         db.session.add(report)
         db.session.commit()
 
-        return report
+        return report, 200
 
     @doc(summary='Get analysis reports.')
     @fetch_analysis
@@ -129,4 +129,4 @@ class ReportResource(MethodResource):
                 put_record(
                     {'status': 'OK', 'result': res.result}, report)
 
-        return report
+        return report, 200

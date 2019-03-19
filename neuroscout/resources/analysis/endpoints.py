@@ -7,6 +7,7 @@ from os.path import exists
 import datetime
 import webargs as wa
 
+from core import file_plugin
 from utils.db import put_record
 from ..utils import owner_required, auth_required, fetch_analysis, abort
 from ..predictor import get_predictors
@@ -15,14 +16,14 @@ from .schemas import (AnalysisSchema, AnalysisFullSchema,
 
 
 @doc(tags=['analysis'])
-@marshal_with(AnalysisSchema)
+@marshal_with(AnalysisSchema, code=200)
 class AnalysisMethodResource(MethodResource):
     pass
 
 
 class AnalysisRootResource(AnalysisMethodResource):
     """" Resource for root address """
-    @marshal_with(AnalysisSchema(many=True))
+    @marshal_with(AnalysisSchema(many=True), code=200)
     @doc(summary='Returns list of public analyses.')
     def get(self):
         return Analysis.query.filter_by(private=False, status='PASSED').all()
@@ -34,7 +35,7 @@ class AnalysisRootResource(AnalysisMethodResource):
         new = Analysis(user_id=current_identity.id, **kwargs)
         db.session.add(new)
         db.session.commit()
-        return new
+        return new, 200
 
 
 class AnalysisResource(AnalysisMethodResource):
@@ -55,7 +56,7 @@ class AnalysisResource(AnalysisMethodResource):
         if not kwargs:
             abort(422, "Analysis is not editable. Try cloning it.")
         kwargs['modified_at'] = datetime.datetime.utcnow()
-        return put_record(kwargs, analysis)
+        return put_record(kwargs, analysis), 200
 
     @doc(summary='Delete analysis.')
     @owner_required
@@ -71,7 +72,7 @@ class AnalysisResource(AnalysisMethodResource):
         db.session.delete(analysis)
         db.session.commit()
 
-        return {'message': 'deleted!'}
+        return {'message': 'deleted!'}, 200
 
 
 class AnalysisFillResource(AnalysisMethodResource):
@@ -147,7 +148,7 @@ class AnalysisFillResource(AnalysisMethodResource):
             fields['modified_at'] = datetime.datetime.utcnow()
             return put_record(fields, analysis, commit=(not dryrun))
         else:
-            return analysis
+            return analysis, 200
 
 
 class CloneAnalysisResource(AnalysisMethodResource):
@@ -161,23 +162,23 @@ class CloneAnalysisResource(AnalysisMethodResource):
         cloned = analysis.clone(current_identity)
         db.session.add(cloned)
         db.session.commit()
-        return cloned
+        return cloned, 200
 
 
 class AnalysisFullResource(AnalysisMethodResource):
-    @marshal_with(AnalysisFullSchema)
+    @marshal_with(AnalysisFullSchema, code=200)
     @doc(summary='Get analysis (including nested fields).')
     @fetch_analysis
     def get(self, analysis):
-        return analysis
+        return analysis, 200
 
 
 class AnalysisResourcesResource(AnalysisMethodResource):
-    @marshal_with(AnalysisResourcesSchema)
+    @marshal_with(AnalysisResourcesSchema, code=200)
     @doc(summary='Get analysis resources.')
     @fetch_analysis
     def get(self, analysis):
-        return analysis
+        return analysis, 200
 
 
 class AnalysisBundleResource(MethodResource):
@@ -194,12 +195,25 @@ class AnalysisBundleResource(MethodResource):
         return send_file(analysis.bundle_path, as_attachment=True)
 
 
-class AnalysisUploadResource(MethodResource):
-    @doc(tags=['analysis'], summary='Upload fitlins analysis tarball.')
-    @fetch_analysis
-    def post(self, analysis, validation_hash):
+#
+# @file_plugin.map_to_openapi_type('file', None)
+# class FileField(wa.fields.Raw):
+#     pass
+#
+#
+# class AnalysisUploadResource(MethodResource):
+#     @doc(tags=['analysis'], summary='Upload fitlins analysis tarball.',
+#          consumes=['multipart/form-dat', 'application/x-www-form-urlencoded'])
+#     @use_kwargs({"tarball": FileField(required=True)}, locations=["files"])
+#     @fetch_analysis
+#     def post(self, tarball):
+#
+#         # Check hash_id
+#         # Save files
+#         # Send to celery
+#         return({'message': 'Got it!'})
 
-        # Check hash_id
-        # Save files
-        # Send to celery
-        pass
+
+class AnalysisUploadResource(MethodResource):
+    def get(self):
+        return {}

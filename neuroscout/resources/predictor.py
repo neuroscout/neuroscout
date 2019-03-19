@@ -70,7 +70,7 @@ class PredictorRunSchema(Schema):
 
 class PredictorResource(MethodResource):
     @doc(tags=['predictors'], summary='Get predictor by id.')
-    @marshal_with(PredictorSchema)
+    @marshal_with(PredictorSchema, code=200)
     def get(self, predictor_id, **kwargs):
         return first_or_404(Predictor.query.filter_by(id=predictor_id))
 
@@ -109,7 +109,7 @@ class PredictorListResource(MethodResource):
         },
         locations=['query'])
     @cache.cached(60 * 60 * 24 * 300, query_string=True)
-    @marshal_with(PredictorSchema(many=True))
+    @marshal_with(PredictorSchema(many=True), code=200)
     def get(self, **kwargs):
         newest = kwargs.pop('newest')
         return get_predictors(newest=newest, **kwargs)

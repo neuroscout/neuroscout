@@ -47,7 +47,7 @@ class UserResetSchema(UserCreationSchema):
     token = fields.Str(required=True, description="Password reset token.")
 
 # @doc(tags=['auth'])
-@marshal_with(UserSchema)
+@marshal_with(UserSchema, code=200)
 class UserRootResource(MethodResource):
     @doc(summary='Get current user information.')
     @auth_required

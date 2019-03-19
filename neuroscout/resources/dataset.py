@@ -32,7 +32,7 @@ class DatasetSchema(Schema):
 class DatasetResource(MethodResource):
     @doc(tags=['dataset'], summary='Get dataset by id.')
     @cache.cached(60 * 60 * 24 * 300, query_string=True)
-    @marshal_with(DatasetSchema)
+    @marshal_with(DatasetSchema, code=200)
     def get(self, dataset_id):
         return first_or_404(Dataset.query.filter_by(id=dataset_id))
 
@@ -46,7 +46,7 @@ class DatasetListResource(MethodResource):
         locations=['query'])
     @cache.cached(60 * 60 * 24 * 300, query_string=True)
     @marshal_with(DatasetSchema(
-        many=True, exclude=['dataset_address', 'preproc_address']))
+        many=True, exclude=['dataset_address', 'preproc_address']), code=200)
     def get(self, **kwargs):
         query = {}
         if kwargs.pop('active_only'):
