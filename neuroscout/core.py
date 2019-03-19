@@ -59,7 +59,8 @@ app.config.update({
 add_auth_to_swagger(spec)
 
 docs = FlaskApiSpec(app)
-route_factory(app, docs,
+route_factory(
+    app, docs,
     [
         ('DatasetResource', 'datasets/<int:dataset_id>'),
         ('DatasetListResource', 'datasets'),
@@ -85,6 +86,7 @@ route_factory(app, docs,
         ('TaskResource', 'tasks/<int:task_id>'),
         ('TaskListResource', 'tasks')
     ])
+
 
 @app.route('/confirm/<token>')
 def confirm(token):

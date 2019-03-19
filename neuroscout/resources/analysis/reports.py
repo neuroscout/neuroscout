@@ -183,12 +183,8 @@ class AnalysisUploadResource(MethodResource):
     @doc(summary='Get uploads for analyses.')
     @fetch_analysis
     def get(self, analysis):
-        candidate = Report.query.filter_by(analysis_id=analysis.hash_id)
-        if candidate.count() == 0:
-            abort(404, "No uploads found")
-
-        uploads = candidate.filter_by(
-            generated_at=max(candidate.with_entities('uploaded_at'))).all()
+        uploads = NeurovaultCollection.query.filter_by(
+            analysis_id=analysis.hash_id)
 
         # Update upload statuses
         for up in uploads:
