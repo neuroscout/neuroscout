@@ -4,6 +4,7 @@ redis
 docopt
 grabbit
 -e git+https://github.com/bids-standard/pybids.git@4315865#egg=pybids
+-e git+https://github.com/neurolearn/pynv#egg=pynv
 duecredit
 pandas
 patsy

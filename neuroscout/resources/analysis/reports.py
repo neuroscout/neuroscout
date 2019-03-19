@@ -160,19 +160,24 @@ class AnalysisUploadResource(MethodResource):
             abort(422, "Invalid validation hash.")
 
         with tempfile.NamedTemporaryFile(
-          suffix='_{}.tar.gz'.format(analysis.hash_id), delete=False) as f:
+          suffix='_{}.tar.gz'.format(analysis.hash_id),
+          dir='/file-data/uploads', delete=False) as f:
             tarball.save(f)
+
+        timestamp = datetime.datetime.utcnow()
 
         task = celery_app.send_task(
             'neurovault.upload',
             args=[f.name,
                   analysis.hash_id,
+                  str(timestamp),
                   current_app.config['NEUROVAULT_ACCESS_TOKEN']])
 
         # Create new upload
         upload = NeurovaultCollection(
             analysis_id=analysis.hash_id,
-            task_id=task.id
+            task_id=task.id,
+            uploaded_at=timestamp
             )
         db.session.add(upload)
         db.session.commit()
@@ -195,6 +200,7 @@ class AnalysisUploadResource(MethodResource):
                         {'status': 'FAILED', 'traceback': res.traceback}, up)
                 elif res.state == states.SUCCESS:
                     put_record(
-                        {'status': 'OK', 'result': res.result}, up)
+                        {'status': 'OK',
+                         'collection_id': res.result['collection_id']}, up)
 
         return uploads
