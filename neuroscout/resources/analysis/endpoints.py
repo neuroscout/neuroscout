@@ -1,4 +1,4 @@
-from flask import send_file
+from flask import send_file, current_app
 from flask_apispec import MethodResource, marshal_with, use_kwargs, doc
 from flask_jwt import current_identity
 from database import db
@@ -6,6 +6,8 @@ from models import Analysis, Report
 from os.path import exists
 import datetime
 import webargs as wa
+import tempfile
+from hashids import Hashids
 
 from core import file_plugin
 from utils.db import put_record
@@ -195,25 +197,29 @@ class AnalysisBundleResource(MethodResource):
         return send_file(analysis.bundle_path, as_attachment=True)
 
 
-#
-# @file_plugin.map_to_openapi_type('file', None)
-# class FileField(wa.fields.Raw):
-#     pass
-#
-#
-# class AnalysisUploadResource(MethodResource):
-#     @doc(tags=['analysis'], summary='Upload fitlins analysis tarball.',
-#         consumes=['multipart/form-dat', 'application/x-www-form-urlencoded'])
-#     @use_kwargs({"tarball": FileField(required=True)}, locations=["files"])
-#     @fetch_analysis
-#     def post(self, tarball):
-#
-#         # Check hash_id
-#         # Save files
-#         # Send to celery
-#         return({'message': 'Got it!'})
+@file_plugin.map_to_openapi_type('file', None)
+class FileField(wa.fields.Raw):
+    pass
 
 
 class AnalysisUploadResource(MethodResource):
-    def get(self):
-        return {}
+    @doc(tags=['analysis'], summary='Upload fitlins analysis tarball.',
+         consumes=['multipart/form-dat', 'application/x-www-form-urlencoded'])
+    @use_kwargs({
+        "tarball": FileField(required=True),
+        "validation_hash": wa.fields.Str(required=True)},
+                locations=["files", "form"])
+    @fetch_analysis
+    def post(self, analysis, validation_hash, tarball):
+        # Check hash_id
+        correct = Hashids(current_app.config['SECONDARY_HASH_SALT'],
+                          min_length=10).encode(analysis.id)
+
+        if correct != validation_hash:
+            abort(422, "Invalid validation hash.")
+
+        with tempfile.NamedTemporaryFile(
+          suffix='_{}.tar.gz'.format(analysis.hash_id), delete=False) as f:
+            tarball.save(f)
+
+        return({'message': f.name})
