@@ -53,6 +53,12 @@ export class OverviewTab extends React.Component<OverviewTabProps, OverviewTabSt
     };
 
   applyFilter = (pagination, filters, sorter) => {
+      /* If we have no set filters, but some selected subjects and we change pages then all subjects will 
+       * be selected. To prevent this we return immediatly if no filters are set.
+       */
+      if (Object.keys(filters).map((y) => filters[y]).filter((z) => z.length > 0).length === 0) {
+        return;
+      }
       let newRunIds = this.props.availableRuns;
       let newRunColumns = this.state.runColumns;
       Object.keys(filters).map(key => {
