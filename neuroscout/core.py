@@ -52,7 +52,7 @@ spec = APISpec(
     title='neuroscout',
     version='v1',
     plugins=[file_plugin],
-    openapi_version='3.0.2'
+    openapi_version='2.0'
 )
 app.config.update({
     'APISPEC_SPEC': spec})
