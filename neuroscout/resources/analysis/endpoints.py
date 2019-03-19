@@ -16,14 +16,14 @@ from .schemas import (AnalysisSchema, AnalysisFullSchema,
 
 
 @doc(tags=['analysis'])
-@marshal_with(AnalysisSchema, code=200)
+@marshal_with(AnalysisSchema)
 class AnalysisMethodResource(MethodResource):
     pass
 
 
 class AnalysisRootResource(AnalysisMethodResource):
     """" Resource for root address """
-    @marshal_with(AnalysisSchema(many=True), code=200)
+    @marshal_with(AnalysisSchema(many=True))
     @doc(summary='Returns list of public analyses.')
     def get(self):
         return Analysis.query.filter_by(private=False, status='PASSED').all()
@@ -166,7 +166,7 @@ class CloneAnalysisResource(AnalysisMethodResource):
 
 
 class AnalysisFullResource(AnalysisMethodResource):
-    @marshal_with(AnalysisFullSchema, code=200)
+    @marshal_with(AnalysisFullSchema)
     @doc(summary='Get analysis (including nested fields).')
     @fetch_analysis
     def get(self, analysis):
@@ -174,7 +174,7 @@ class AnalysisFullResource(AnalysisMethodResource):
 
 
 class AnalysisResourcesResource(AnalysisMethodResource):
-    @marshal_with(AnalysisResourcesSchema, code=200)
+    @marshal_with(AnalysisResourcesSchema)
     @doc(summary='Get analysis resources.')
     @fetch_analysis
     def get(self, analysis):
@@ -203,7 +203,7 @@ class AnalysisBundleResource(MethodResource):
 #
 # class AnalysisUploadResource(MethodResource):
 #     @doc(tags=['analysis'], summary='Upload fitlins analysis tarball.',
-#          consumes=['multipart/form-dat', 'application/x-www-form-urlencoded'])
+#         consumes=['multipart/form-dat', 'application/x-www-form-urlencoded'])
 #     @use_kwargs({"tarball": FileField(required=True)}, locations=["files"])
 #     @fetch_analysis
 #     def post(self, tarball):

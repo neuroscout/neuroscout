@@ -16,7 +16,7 @@ class TaskSchema(Schema):
 
 class TaskResource(MethodResource):
     @doc(tags=['run'], summary='Get task by id.')
-    @marshal_with(TaskSchema, code=200)
+    @marshal_with(TaskSchema)
     def get(self, task_id):
         return first_or_404(Task.query.filter_by(id=task_id))
 
@@ -26,7 +26,7 @@ class TaskListResource(MethodResource):
     @use_kwargs({
         'dataset_id': wa.fields.Int(description='Dataset id(s).'),
     }, locations=['query'])
-    @marshal_with(TaskSchema(many=True), code=200)
+    @marshal_with(TaskSchema(many=True))
     def get(self, **kwargs):
         query = Task.query
         for param in kwargs:

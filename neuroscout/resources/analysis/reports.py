@@ -35,7 +35,7 @@ def jsonify_analysis(analysis, run_id=None):
 
 
 @doc(tags=['analysis'])
-@marshal_with(AnalysisCompiledSchema, code=200)
+@marshal_with(AnalysisCompiledSchema)
 class CompileAnalysisResource(MethodResource):
     @use_kwargs({
         'build': wa.fields.Boolean(
@@ -73,7 +73,7 @@ class CompileAnalysisResource(MethodResource):
         return analysis, 200
 
 
-@marshal_with(ReportSchema, code=200)
+@marshal_with(ReportSchema)
 @use_kwargs({
     'run_id': wa.fields.DelimitedList(fields.Int(),
                                       description='Run id(s).')

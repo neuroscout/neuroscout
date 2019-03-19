@@ -19,7 +19,7 @@ class RunSchema(Schema):
 
 class RunResource(MethodResource):
     @doc(tags=['run'], summary='Get run by id.')
-    @marshal_with(RunSchema(), code=200)
+    @marshal_with(RunSchema())
     def get(self, run_id):
         return first_or_404(Run.query.filter_by(id=run_id))
 
@@ -37,7 +37,7 @@ class RunListResource(MethodResource):
             fields.Str(), description='Subject id(s).'),
         'dataset_id': wa.fields.Int(description='Dataset id.'),
     }, locations=['query'])
-    @marshal_with(RunSchema(many=True), code=200)
+    @marshal_with(RunSchema(many=True))
     def get(self, **kwargs):
         try:
             dataset = kwargs.pop('dataset_id')
