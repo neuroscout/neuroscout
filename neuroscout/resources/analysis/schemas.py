@@ -24,12 +24,14 @@ class AnalysisSchema(Schema):
     submitted_at = fields.Time(
         description='Timestamp of when analysis was submitted for compilation',
         dump_only=True)
-    status = fields.Str(
-        description='PASSED, FAILED, PENDING, or DRAFT.', dump_only=True)
     locked = fields.Bool(
         description='Is analysis locked by admins?', dump_only=True)
     compile_traceback = fields.Str(
         description='Traceback of compilation error.', dump_only=True)
+    status = fields.Str(
+        description='PASSED, FAILED, PENDING, or DRAFT.', dump_only=True)
+    upload_status = fields.Str(
+        description='PASSED, FAILED, PENDING, or DRAFT.', dump_only=True)
 
     private = fields.Bool(description='Analysis private or discoverable?')
 
@@ -122,3 +124,13 @@ class ReportSchema(Schema):
     status = fields.Str(description='Report status')
     traceback = fields.Str(
         description='Traceback of generation error.')
+
+
+class NeurovaultCollectionSchema(Schema):
+    """ Schema for report results """
+    uploaded_at = fields.Time(description='Time images upload began')
+    collection_id = fields.Dict(description='NeuroVault collection id')
+    status = fields.Str(description='Upload status')
+    task_id = fields.Str(description='Upload job id')
+    traceback = fields.Str(
+        description='Traceback of upload error.')

@@ -1,6 +1,7 @@
 ''' Model hierarchy. '''
 
-from .analysis import Analysis, Report, analysis_predictor
+from .analysis import (Analysis, Report, NeurovaultCollection,
+                       analysis_predictor)
 from .auth import User, Role, roles_users, user_datastore
 from .group import GroupPredictor, GroupPredictorValue
 from .dataset import Dataset
@@ -28,6 +29,7 @@ __all__ = [
     'PredictorRun',
     'Result',
     'Report',
+    'NeurovaultCollection',
     'Run',
     'analysis_run',
     'Stimulus',

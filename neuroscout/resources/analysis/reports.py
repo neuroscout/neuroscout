@@ -1,17 +1,21 @@
 from flask_apispec import doc, use_kwargs, MethodResource, marshal_with
 from database import db
 from flask import current_app
-from models import PredictorEvent, Report
+from models import PredictorEvent, Report, NeurovaultCollection
 from worker import celery_app
 import webargs as wa
 from marshmallow import fields
 from ..utils import owner_required, abort, fetch_analysis
 from ..predictor import dump_pe
 from .schemas import (AnalysisFullSchema, AnalysisResourcesSchema,
-                      ReportSchema, AnalysisCompiledSchema)
+                      ReportSchema, AnalysisCompiledSchema,
+                      NeurovaultCollectionSchema)
 import celery.states as states
 from utils import put_record
 import datetime
+import tempfile
+from hashids import Hashids
+from core import file_plugin
 
 
 def jsonify_analysis(analysis, run_id=None):
@@ -65,12 +69,12 @@ class CompileAnalysisResource(MethodResource):
 
         put_record({'status': 'PENDING', 'compile_task_id': task.id}, analysis)
 
-        return analysis, 200
+        return analysis
 
     @doc(summary='Check if analysis compilation status.')
     @fetch_analysis
     def get(self, analysis):
-        return analysis, 200
+        return analysis
 
 
 @marshal_with(ReportSchema)
@@ -129,4 +133,72 @@ class ReportResource(MethodResource):
                 put_record(
                     {'status': 'OK', 'result': res.result}, report)
 
-        return report, 200
+        return report
+
+
+@file_plugin.map_to_openapi_type('file', None)
+class FileField(wa.fields.Raw):
+    pass
+
+
+@doc(tags=['analysis'])
+class AnalysisUploadResource(MethodResource):
+    @doc(summary='Upload fitlins analysis tarball.',
+         consumes=['multipart/form-dat', 'application/x-www-form-urlencoded'])
+    @marshal_with(NeurovaultCollectionSchema)
+    @use_kwargs({
+        "tarball": FileField(required=True),
+        "validation_hash": wa.fields.Str(required=True)},
+                locations=["files", "form"])
+    @fetch_analysis
+    def post(self, analysis, validation_hash, tarball):
+        # Check hash_id
+        correct = Hashids(current_app.config['SECONDARY_HASH_SALT'],
+                          min_length=10).encode(analysis.id)
+
+        if correct != validation_hash:
+            abort(422, "Invalid validation hash.")
+
+        with tempfile.NamedTemporaryFile(
+          suffix='_{}.tar.gz'.format(analysis.hash_id), delete=False) as f:
+            tarball.save(f)
+
+        task = celery_app.send_task(
+            'neurovault.upload',
+            args=[f.name,
+                  analysis.hash_id,
+                  current_app.config['NEUROVAULT_ACCESS_TOKEN']])
+
+        # Create new upload
+        upload = NeurovaultCollection(
+            analysis_id=analysis.hash_id,
+            task_id=task.id
+            )
+        db.session.add(upload)
+        db.session.commit()
+
+        return upload
+
+    @marshal_with(NeurovaultCollectionSchema(many=True))
+    @doc(summary='Get uploads for analyses.')
+    @fetch_analysis
+    def get(self, analysis):
+        candidate = Report.query.filter_by(analysis_id=analysis.hash_id)
+        if candidate.count() == 0:
+            abort(404, "No uploads found")
+
+        uploads = candidate.filter_by(
+            generated_at=max(candidate.with_entities('uploaded_at'))).all()
+
+        # Update upload statuses
+        for up in uploads:
+            if up.status == 'PENDING':
+                res = celery_app.AsyncResult(up.task_id)
+                if res.state == states.FAILURE:
+                    put_record(
+                        {'status': 'FAILED', 'traceback': res.traceback}, up)
+                elif res.state == states.SUCCESS:
+                    put_record(
+                        {'status': 'OK', 'result': res.result}, up)
+
+        return uploads
