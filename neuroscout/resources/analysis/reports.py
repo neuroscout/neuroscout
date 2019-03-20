@@ -148,10 +148,11 @@ class AnalysisUploadResource(MethodResource):
     @marshal_with(NeurovaultCollectionSchema)
     @use_kwargs({
         "tarball": FileField(required=True),
-        "validation_hash": wa.fields.Str(required=True)},
+        "validation_hash": wa.fields.Str(required=True),
+        "force": wa.fields.Bool()},
                 locations=["files", "form"])
     @fetch_analysis
-    def post(self, analysis, validation_hash, tarball):
+    def post(self, analysis, tarball, validation_hash, force=False):
         # Check hash_id
         correct = Hashids(current_app.config['SECONDARY_HASH_SALT'],
                           min_length=10).encode(analysis.id)
@@ -170,8 +171,9 @@ class AnalysisUploadResource(MethodResource):
             'neurovault.upload',
             args=[f.name,
                   analysis.hash_id,
-                  str(timestamp),
-                  current_app.config['NEUROVAULT_ACCESS_TOKEN']])
+                  current_app.config['NEUROVAULT_ACCESS_TOKEN'],
+                  timestamp if force else None
+                  ])
 
         # Create new upload
         upload = NeurovaultCollection(

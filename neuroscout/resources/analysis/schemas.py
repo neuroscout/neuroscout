@@ -131,6 +131,5 @@ class NeurovaultCollectionSchema(Schema):
     uploaded_at = fields.Time(description='Time images upload began')
     collection_id = fields.Dict(description='NeuroVault collection id')
     status = fields.Str(description='Upload status')
-    task_id = fields.Str(description='Upload job id')
     traceback = fields.Str(
         description='Traceback of upload error.')

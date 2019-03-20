@@ -84,19 +84,27 @@ def generate_report(analysis, predictor_events, bids_dir, run_ids, domain):
 
 
 @celery_app.task(name='neurovault.upload')
-def upload(img_tarball, hash_id, timestamp, access_token):
+def upload(img_tarball, hash_id, access_token, timestamp=None):
     tmp_dir = Path(mkdtemp())
     # Untar:
     with tarfile.open(img_tarball) as tf:
         tf.extractall(tmp_dir)
 
+    timestamp = "_" + timestamp if timestamp is not None else ''
     api = Client(access_token=access_token)
-    collection = api.create_collection(
-        '{}_{}'.format(hash_id, timestamp))
 
-    for img_path in tmp_dir.glob('*.nii.gz'):
-        contrast_name = re.findall('contrast-(.*)_', str(img_path))[0]
-        api.add_image(
-            collection['id'], img_path, name=contrast_name,
-            modality="fMRI-BOLD", map_type='T')
+    try:
+        collection = api.create_collection(
+            '{}{}'.format(hash_id, timestamp))
+
+        for img_path in tmp_dir.glob('*.nii.gz'):
+            contrast_name = re.findall('contrast-(.*)_', str(img_path))[0]
+            api.add_image(
+                collection['id'], img_path, name=contrast_name,
+                modality="fMRI-BOLD", map_type='T')
+    except:
+        raise Exception(
+            "Error uploading."
+            " Perhaps a collection with the same name already exists?")
+
     return {'collection_id': collection['id']}
