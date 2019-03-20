@@ -19,9 +19,8 @@ def compile(analysis, predictor_events, resources, bids_dir, run_ids,
     tmp_dir, bundle_paths, _ = build_analysis(
         analysis, predictor_events, bids_dir, run_ids, build=build)
 
-    sidecar = {"RepetitionTime": analysis['TR'],
-               "HashId": analysis['hash_id'],
-               "ValidationHash": validation_hash}
+    sidecar = {"RepetitionTime": analysis['TR']}
+    resources["validation_hash"] = validation_hash
 
     # Write out JSON files
     for obj, name in [
