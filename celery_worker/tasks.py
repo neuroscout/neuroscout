@@ -15,11 +15,14 @@ logger = get_task_logger(__name__)
 
 @celery_app.task(name='workflow.compile')
 def compile(analysis, predictor_events, resources, bids_dir, run_ids,
-            build=False):
+            validation_hash, build=False):
     tmp_dir, bundle_paths, _ = build_analysis(
         analysis, predictor_events, bids_dir, run_ids, build=build)
 
-    sidecar = {"RepetitionTime": analysis['TR']}
+    sidecar = {"RepetitionTime": analysis['TR'],
+               "HashId": analysis['hash_id'],
+               "ValidationHash": validation_hash}
+
     # Write out JSON files
     for obj, name in [
       (analysis, 'analysis'),

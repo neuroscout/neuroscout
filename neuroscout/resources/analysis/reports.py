@@ -53,12 +53,17 @@ class CompileAnalysisResource(MethodResource):
              'submitted_at': datetime.datetime.utcnow()},
             analysis)
 
+        validation_hash = Hashids(
+            current_app.config['SECONDARY_HASH_SALT'],
+            min_length=10).encode(analysis.id)
+
         try:
             task = celery_app.send_task(
                 'workflow.compile',
                 args=[*jsonify_analysis(analysis),
                       AnalysisResourcesSchema().dump(analysis)[0],
-                      analysis.dataset.local_path, None, build]
+                      analysis.dataset.local_path, None, validation_hash,
+                      build]
                 )
         except:
             put_record(
