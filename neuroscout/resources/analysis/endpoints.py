@@ -34,7 +34,7 @@ class AnalysisRootResource(AnalysisMethodResource):
         new = Analysis(user_id=current_identity.id, **kwargs)
         db.session.add(new)
         db.session.commit()
-        return new
+        return new, 200
 
 
 class AnalysisResource(AnalysisMethodResource):
@@ -55,7 +55,7 @@ class AnalysisResource(AnalysisMethodResource):
         if not kwargs:
             abort(422, "Analysis is not editable. Try cloning it.")
         kwargs['modified_at'] = datetime.datetime.utcnow()
-        return put_record(kwargs, analysis)
+        return put_record(kwargs, analysis), 200
 
     @doc(summary='Delete analysis.')
     @owner_required
@@ -71,7 +71,7 @@ class AnalysisResource(AnalysisMethodResource):
         db.session.delete(analysis)
         db.session.commit()
 
-        return {'message': 'deleted!'}
+        return {'message': 'deleted!'}, 200
 
 
 class AnalysisFillResource(AnalysisMethodResource):
@@ -147,7 +147,7 @@ class AnalysisFillResource(AnalysisMethodResource):
             fields['modified_at'] = datetime.datetime.utcnow()
             return put_record(fields, analysis, commit=(not dryrun))
         else:
-            return analysis
+            return analysis, 200
 
 
 class CloneAnalysisResource(AnalysisMethodResource):
@@ -161,7 +161,7 @@ class CloneAnalysisResource(AnalysisMethodResource):
         cloned = analysis.clone(current_identity)
         db.session.add(cloned)
         db.session.commit()
-        return cloned
+        return cloned, 200
 
 
 class AnalysisFullResource(AnalysisMethodResource):
@@ -169,7 +169,7 @@ class AnalysisFullResource(AnalysisMethodResource):
     @doc(summary='Get analysis (including nested fields).')
     @fetch_analysis
     def get(self, analysis):
-        return analysis
+        return analysis, 200
 
 
 class AnalysisResourcesResource(AnalysisMethodResource):
@@ -177,7 +177,7 @@ class AnalysisResourcesResource(AnalysisMethodResource):
     @doc(summary='Get analysis resources.')
     @fetch_analysis
     def get(self, analysis):
-        return analysis
+        return analysis, 200
 
 
 class AnalysisBundleResource(MethodResource):

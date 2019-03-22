@@ -1,17 +1,21 @@
 from flask_apispec import doc, use_kwargs, MethodResource, marshal_with
 from database import db
 from flask import current_app
-from models import PredictorEvent, Report
+from models import PredictorEvent, Report, NeurovaultCollection
 from worker import celery_app
 import webargs as wa
 from marshmallow import fields
 from ..utils import owner_required, abort, fetch_analysis
 from ..predictor import dump_pe
 from .schemas import (AnalysisFullSchema, AnalysisResourcesSchema,
-                      ReportSchema, AnalysisCompiledSchema)
+                      ReportSchema, AnalysisCompiledSchema,
+                      NeurovaultCollectionSchema)
 import celery.states as states
 from utils import put_record
 import datetime
+import tempfile
+from hashids import Hashids
+from core import file_plugin
 
 
 def jsonify_analysis(analysis, run_id=None):
@@ -49,12 +53,17 @@ class CompileAnalysisResource(MethodResource):
              'submitted_at': datetime.datetime.utcnow()},
             analysis)
 
+        validation_hash = Hashids(
+            current_app.config['SECONDARY_HASH_SALT'],
+            min_length=10).encode(analysis.id)
+
         try:
             task = celery_app.send_task(
                 'workflow.compile',
                 args=[*jsonify_analysis(analysis),
                       AnalysisResourcesSchema().dump(analysis)[0],
-                      analysis.dataset.local_path, None, build]
+                      analysis.dataset.local_path, None, validation_hash,
+                      build]
                 )
         except:
             put_record(
@@ -101,7 +110,7 @@ class ReportResource(MethodResource):
         db.session.add(report)
         db.session.commit()
 
-        return report
+        return report, 200
 
     @doc(summary='Get analysis reports.')
     @fetch_analysis
@@ -130,3 +139,75 @@ class ReportResource(MethodResource):
                     {'status': 'OK', 'result': res.result}, report)
 
         return report
+
+
+@file_plugin.map_to_openapi_type('file', None)
+class FileField(wa.fields.Raw):
+    pass
+
+
+@doc(tags=['analysis'])
+class AnalysisUploadResource(MethodResource):
+    @doc(summary='Upload fitlins analysis tarball.',
+         consumes=['multipart/form-dat', 'application/x-www-form-urlencoded'])
+    @marshal_with(NeurovaultCollectionSchema)
+    @use_kwargs({
+        "tarball": FileField(required=True),
+        "validation_hash": wa.fields.Str(required=True),
+        "force": wa.fields.Bool()},
+                locations=["files", "form"])
+    @fetch_analysis
+    def post(self, analysis, tarball, validation_hash, force=False):
+        # Check hash_id
+        correct = Hashids(current_app.config['SECONDARY_HASH_SALT'],
+                          min_length=10).encode(analysis.id)
+
+        if correct != validation_hash:
+            abort(422, "Invalid validation hash.")
+
+        with tempfile.NamedTemporaryFile(
+          suffix='_{}.tar.gz'.format(analysis.hash_id),
+          dir='/file-data/uploads', delete=False) as f:
+            tarball.save(f)
+
+        timestamp = datetime.datetime.utcnow()
+
+        task = celery_app.send_task(
+            'neurovault.upload',
+            args=[f.name,
+                  analysis.hash_id,
+                  current_app.config['NEUROVAULT_ACCESS_TOKEN'],
+                  timestamp if force else None
+                  ])
+
+        # Create new upload
+        upload = NeurovaultCollection(
+            analysis_id=analysis.hash_id,
+            task_id=task.id,
+            uploaded_at=timestamp
+            )
+        db.session.add(upload)
+        db.session.commit()
+
+        return upload
+
+    @marshal_with(NeurovaultCollectionSchema(many=True))
+    @doc(summary='Get uploads for analyses.')
+    @fetch_analysis
+    def get(self, analysis):
+        uploads = NeurovaultCollection.query.filter_by(
+            analysis_id=analysis.hash_id)
+
+        # Update upload statuses
+        for up in uploads:
+            if up.status == 'PENDING':
+                res = celery_app.AsyncResult(up.task_id)
+                if res.state == states.FAILURE:
+                    put_record(
+                        {'status': 'FAILED', 'traceback': res.traceback}, up)
+                elif res.state == states.SUCCESS:
+                    put_record(
+                        {'status': 'OK',
+                         'collection_id': res.result['collection_id']}, up)
+
+        return uploads

@@ -47,24 +47,27 @@ from apispec.ext.marshmallow import MarshmallowPlugin
 from flask_apispec.extension import FlaskApiSpec
 from utils import route_factory
 
+file_plugin = MarshmallowPlugin()
 spec = APISpec(
     title='neuroscout',
     version='v1',
-    plugins=[MarshmallowPlugin()],
-    openapi_version='3.0.2'
+    plugins=[file_plugin],
+    openapi_version='2.0'
 )
 app.config.update({
     'APISPEC_SPEC': spec})
 add_auth_to_swagger(spec)
 
 docs = FlaskApiSpec(app)
-route_factory(app, docs,
+route_factory(
+    app, docs,
     [
         ('DatasetResource', 'datasets/<int:dataset_id>'),
         ('DatasetListResource', 'datasets'),
         ('AnalysisRootResource', 'analyses'),
         ('AnalysisResource', 'analyses/<analysis_id>'),
         ('AnalysisFullResource', 'analyses/<analysis_id>/full'),
+        ('AnalysisUploadResource', 'analyses/<analysis_id>/upload'),
         ('CloneAnalysisResource', 'analyses/<analysis_id>/clone'),
         ('CompileAnalysisResource', 'analyses/<analysis_id>/compile'),
         ('ReportResource', 'analyses/<analysis_id>/report'),
@@ -83,6 +86,7 @@ route_factory(app, docs,
         ('TaskResource', 'tasks/<int:task_id>'),
         ('TaskListResource', 'tasks')
     ])
+
 
 @app.route('/confirm/<token>')
 def confirm(token):

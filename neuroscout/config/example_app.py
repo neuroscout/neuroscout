@@ -12,6 +12,7 @@ class Config(object):
     GOOGLE_CLIENT_ID = 'clientid'  # Must set this for frontend to build
     SECRET_KEY = 'A_SECRET!'
     HASH_SALT = 'dfdfdf'
+    SECONDARY_HASH_SALT = 'something_else'
     SECURITY_PASSWORD_HASH = 'pbkdf2_sha512'
     SECURITY_PASSWORD_SALT = 'A_SECRET'
 
@@ -38,6 +39,7 @@ class Config(object):
     APISPEC_SWAGGER_UI_URL = None
     WTF_CSRF_ENABLED = False
     ENV = 'production'
+    NEUROVAULT_ACCESS_TOKEN = 'something'
 
 
 class DevelopmentConfig(Config):

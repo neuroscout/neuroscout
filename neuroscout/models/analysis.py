@@ -129,3 +129,18 @@ class Report(db.Model):
     status = db.Column(db.Text, default='PENDING')
     __table_args__ = (
         db.CheckConstraint(status.in_(['OK', 'FAILED', 'PENDING'])), )
+
+
+class NeurovaultCollection(db.Model):
+    """ Neurovault collection and upload status """
+    id = db.Column(db.Integer, primary_key=True)
+    analysis_id = db.Column(db.Text, db.ForeignKey('analysis.hash_id'))
+    uploaded_at = db.Column(db.DateTime, default=datetime.datetime.utcnow)
+
+    task_id = db.Column(db.Text)
+    collection_id = db.Column(db.Text)
+    traceback = db.Column(db.Text)
+
+    status = db.Column(db.Text, default='PENDING')
+    __table_args__ = (
+        db.CheckConstraint(status.in_(['OK', 'FAILED', 'PENDING'])), )

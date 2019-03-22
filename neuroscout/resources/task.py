@@ -13,11 +13,13 @@ class TaskSchema(Schema):
     TR = fields.Number()
     summary = fields.Str(description='Task summary description')
 
+
 class TaskResource(MethodResource):
     @doc(tags=['run'], summary='Get task by id.')
     @marshal_with(TaskSchema)
     def get(self, task_id):
         return first_or_404(Task.query.filter_by(id=task_id))
+
 
 class TaskListResource(MethodResource):
     @doc(tags=['run'], summary='Returns list of tasks.')
@@ -28,5 +30,5 @@ class TaskListResource(MethodResource):
     def get(self, **kwargs):
         query = Task.query
         for param in kwargs:
-        	query = query.filter(getattr(Task, param)==kwargs[param])
+            query = query.filter(getattr(Task, param) == kwargs[param])
         return query.all()
