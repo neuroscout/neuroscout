@@ -24,7 +24,7 @@ Flask-WTF==0.14.2
 google-api-python-client
 gunicorn==19.7.1
 hashids==1.2.0
-imageio==2.1.2
+imageio
 ipython==6.2.1
 itsdangerous==0.24
 Jinja2==2.9.6
@@ -54,7 +54,7 @@ python-magic==0.4.13
 pytz==2017.2
 redis
 requests==2.20.0
-scipy==0.19.0
+scipy
 SQLAlchemy==1.1.9
 tqdm==4.11.2
 webargs>=5.1.3
