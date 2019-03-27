@@ -257,6 +257,7 @@ export interface AppAnalysis {
   name: string;
   description: string;
   status: AnalysisStatus;
+  datasetName?: string;
   modifiedAt?: string;
 }
 

@@ -101,6 +101,7 @@ const ApiToAppAnalysis = (data: ApiAnalysis): AppAnalysis => ({
   name: data.name,
   description: data.description,
   status: data.status,
+  datasetName: data.dataset_id,
   modifiedAt: data.modified_at
 });
 
@@ -184,7 +185,7 @@ class App extends Reflux.Component<any, {}, AppState> {
           this.setState({ analyses: values});
         }
       });
-      await timeout(10000);
+      await timeout(10000000);
     }
   };
 

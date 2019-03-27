@@ -55,6 +55,11 @@ const AnalysisList = (props: AnalysisListProps) => {
       sorter: (a, b) => a.modifiedAt.localeCompare(b.modifiedAt)
     },
     {
+      title: 'Dataset',
+      dataIndex: 'datasetName',
+      sorter: (a, b) => a.datasetName.localeCompare(b.datasetName)
+    },
+    {
       title: 'Actions',
       render: (text, record: AppAnalysis) => (
         <span>
