@@ -4,11 +4,11 @@ import re
 from tempfile import mkdtemp
 from pathlib import Path
 from app import celery_app
-from nistats.reporting import plot_design_matrix
 from fitlins.viz import plot_corr_matrix, plot_contrast_matrix
 from compile import build_analysis, plot_save, PathBuilder, impute_confounds
 from celery.utils.log import get_task_logger
 from pynv import Client
+from viz import plot_interactive_design_matrix
 
 logger = get_task_logger(__name__)
 
@@ -66,9 +66,8 @@ def generate_report(analysis, predictor_events, bids_dir, run_ids, domain):
         results['design_matrix'].append(url)
         dense.to_csv(out, index=False)
 
-        out, url = builder.build('design_matrix_plot', 'png')
-        results['design_matrix_plot'].append(url)
-        plot_save(dense, plot_design_matrix, out)
+        dm_plot = plot_interactive_design_matrix(dm)
+        results['design_matrix_plot'].append(dm_plot)
 
         out, url = builder.build('design_matrix_corrplot', 'png')
         results['design_matrix_corrplot'].append(url)
