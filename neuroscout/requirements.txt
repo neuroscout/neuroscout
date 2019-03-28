@@ -24,7 +24,7 @@ Flask-WTF==0.14.2
 google-api-python-client
 gunicorn==19.7.1
 hashids==1.2.0
-imageio
+imageio==2.5.0
 ipython==6.2.1
 itsdangerous==0.24
 Jinja2==2.9.6
@@ -41,7 +41,7 @@ pandas==0.22
 patsy
 passlib==1.7.1
 pytesseract
-Pillow
+Pillow==5.4.1
 psycopg2==2.7.1
 progressbar2
 py==1.4.33
