@@ -42,6 +42,7 @@ import { displayError, jwtFetch, timeout } from './utils';
 import { MainCol, Space } from './HelperComponents';
 import { config } from './config';
 import { authActions } from './auth.actions';
+import { api } from './api';
 
 const { TabPane } = Tabs;
 const { Footer, Content } = Layout;
@@ -122,16 +123,6 @@ let initializeStore = (): Store => ({
   contrastErrors: [],
   fillAnalysis: false
 });
-
-// Normalize dataset object returned by /api/datasets
-const normalizeDataset = (d: ApiDataset): Dataset => {
-  const authors = d.description.Authors ? d.description.Authors : ['No authors listed'];
-  const description = d.summary;
-  const url = d.url;
-  const id = d.id.toString();
-  const { name, tasks } = d;
-  return { id, name, authors, url, description, tasks };
-};
 
 // Get list of tasks from a given dataset
 export const getTasks = (datasets: Dataset[], datasetId: string | null): Task[] => {
@@ -253,13 +244,11 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
         .catch(displayError);
     }
 
-    jwtFetch(domainRoot + '/api/datasets?active_only=true')
-      // .then(response => response.json())
-      .then(data => {
-        const datasets: Dataset[] = data.map(d => normalizeDataset(d));
+    api.getDatasets().then((datasets) => {
+      if (datasets.length !== 0) {
         this.setState({ datasets });
-      })
-      .catch(displayError);
+      }
+    });
   }
 
   saveEnabled = (): boolean => this.state.unsavedChanges && editableStatus.includes(this.state.analysis.status);

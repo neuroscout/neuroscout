@@ -10,19 +10,20 @@ import Reflux from 'reflux';
 import { Avatar, Divider, Tabs, Row, Col, Layout, Button, Menu, Modal, Icon, Input, Form, message } from 'antd';
 import { GoogleLogin } from 'react-google-login';
 
+import NotFound from './404';
 import './App.css';
-import AnalysisBuilder from './Builder';
-import { ApiUser, ApiAnalysis, AppAnalysis, AuthStoreState } from './coretypes';
-import Public from './Public';
-import Private from './Private';
-import { config } from './config';
-import Home from './Home';
-import { MainCol, Space } from './HelperComponents';
-import { displayError, jwtFetch, timeout } from './utils';
+import { api } from './api';
 import { AuthStore } from './auth.store';
 import { authActions } from './auth.actions';
+import AnalysisBuilder from './Builder';
+import { config } from './config';
+import { ApiUser, ApiAnalysis, AppAnalysis, AuthStoreState, Dataset } from './coretypes';
 import FAQ from './FAQ';
-import NotFound from './404';
+import { MainCol, Space } from './HelperComponents';
+import Home from './Home';
+import Private from './Private';
+import Public from './Public';
+import { displayError, jwtFetch, timeout } from './utils';
 
 const FormItem = Form.Item;
 const DOMAINROOT = config.server_url;
@@ -93,6 +94,7 @@ interface AppState {
   analyses: AppAnalysis[]; // List of analyses belonging to the user
   publicAnalyses: AppAnalysis[]; // List of public analyses
   auth: AuthStoreState;
+  datasets: Dataset[];
 }
 
 // Convert analyses returned by API to the shape expected by the frontend
@@ -113,10 +115,16 @@ class App extends Reflux.Component<any, {}, AppState> {
       loadAnalyses: true,
       analyses: [],
       publicAnalyses: [],
-      auth: authActions.getInitialState()
+      auth: authActions.getInitialState(),
+      datasets: []
     };
     this.store = AuthStore;
     this.loadPublicAnalyses();
+    api.getDatasets().then((datasets) => {
+      if (datasets.length !== 0) {
+        this.setState({ datasets });
+      }
+    });
   }
 
   // Load user's saved analyses from the server
@@ -595,6 +603,7 @@ class App extends Reflux.Component<any, {}, AppState> {
                       loggedIn={this.state.auth.loggedIn}
                       cloneAnalysis={this.cloneAnalysis}
                       onDelete={this.onDelete}
+                      datasets={this.state.datasets}
                     />}
                 />
                 <Route
@@ -636,13 +645,22 @@ class App extends Reflux.Component<any, {}, AppState> {
                 exact={true}
                 path="/public"
                 render={props =>
-                  <Public analyses={publicAnalyses} cloneAnalysis={this.cloneAnalysis}/>}
+                  <Public
+                    analyses={publicAnalyses}
+                    cloneAnalysis={this.cloneAnalysis}
+                    datasets={this.state.datasets}
+                  />}
               />
               <Route
                 exact={true}
                 path="/myanalyses"
                 render={props =>
-                  <Private analyses={analyses} cloneAnalysis={this.cloneAnalysis} onDelete={this.onDelete}/>}
+                  <Private
+                    analyses={analyses}
+                    cloneAnalysis={this.cloneAnalysis}
+                    onDelete={this.onDelete}
+                    datasets={this.state.datasets}
+                  />}
               />
               <Route
                 exact={true}
