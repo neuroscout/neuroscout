@@ -66,7 +66,7 @@ def generate_report(analysis, predictor_events, bids_dir, run_ids, domain):
         results['design_matrix'].append(url)
         dense.to_csv(out, index=False)
 
-        dm_plot = plot_interactive_design_matrix(dm)
+        dm_plot = plot_interactive_design_matrix(dense)
         results['design_matrix_plot'].append(dm_plot)
 
         out, url = builder.build('design_matrix_corrplot', 'png')
