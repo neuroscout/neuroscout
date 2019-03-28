@@ -1136,6 +1136,7 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
                         model={this.state.model}
                         unsavedChanges={this.state.unsavedChanges}
                         availablePredictors={this.state.availablePredictors}
+                        dataset={this.state.datasets.find((x => x.id === this.state.analysis.datasetId))}
                       />
                       <br/>
                       {this.navButtons(false, isEditable)}
