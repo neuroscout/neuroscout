@@ -2,6 +2,9 @@ import altair as alt
 
 
 def plot_interactive_design_matrix(dm):
+    dm = dm.reset_index().rename(columns={'index': 'scan_number'})
+    dm = dm.melt('scan_number', var_name='regressor', value_name='value')
+
     pts = alt.selection_multi(encodings=['x'])
 
     base_color = alt.Color(
