@@ -30,7 +30,7 @@ itsdangerous==0.24
 Jinja2==2.9.6
 MarkupSafe==1.0
 marshmallow==2.19.1
-moviepy==0.2.3.2
+moviepy==0.2.3.5
 nibabel==2.1.0
 nltk==3.2.2
 numpy==1.12.0
