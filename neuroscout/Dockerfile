@@ -13,7 +13,6 @@ COPY . /usr/src/app
 RUN apt-get -qq update
 RUN apt-get install -yq ffmpeg tesseract-ocr
 RUN pip install -e git+https://github.com/tyarkoni/pliers.git#egg=pliers
-RUN pip install imageio-ffmpeg
 RUN apt-get install -yq cmake libopenblas-dev liblapack-dev
 RUN pip install -e git+https://github.com/davisking/dlib.git#egg=dlib
 RUN curl https://raw.githubusercontent.com/tyarkoni/pliers/master/optional-dependencies.txt | pip install -r /dev/stdin
