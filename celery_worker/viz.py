@@ -43,4 +43,4 @@ def plot_interactive_design_matrix(dm):
         line
     ).configure_scale(bandPaddingInner=0.0)
 
-    return json.dumps(json.loads(plt.to_json()))
+    return plt.to_dict()
