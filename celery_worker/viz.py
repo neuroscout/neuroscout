@@ -1,9 +1,14 @@
 import altair as alt
+import json
+
+
+def melt_dm(dm):
+    dm = dm.reset_index().rename(columns={'index': 'scan_number'})
+    return dm.melt('scan_number', var_name='regressor', value_name='value')
 
 
 def plot_interactive_design_matrix(dm):
-    dm = dm.reset_index().rename(columns={'index': 'scan_number'})
-    dm = dm.melt('scan_number', var_name='regressor', value_name='value')
+    dm = melt_dm(dm)
 
     pts = alt.selection_multi(encodings=['x'])
 
@@ -38,4 +43,4 @@ def plot_interactive_design_matrix(dm):
         line
     ).configure_scale(bandPaddingInner=0.0)
 
-    return plt.to_json()
+    return json.dumps(json.loads(plt.to_json()))

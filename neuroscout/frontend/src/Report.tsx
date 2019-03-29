@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { message, Button, Collapse, Card, Icon, Spin, Tag } from 'antd';
 import { config } from './config';
-import VegaLite from 'react-vega-lite';
+import * as VegaLite from 'react-vega-lite';
 
 import {
   Store,
@@ -45,9 +45,7 @@ class Plots extends React.Component<{plots: string[]}, {}> {
         let spec = x;
 
         display.push(
-          <Panel header={<p> test </p>} key={'' + i}>
             <VegaLite spec={spec} />
-          </Panel>
         );
       });
       return(
