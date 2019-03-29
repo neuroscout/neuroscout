@@ -21,11 +21,12 @@
     "react-google-login": "^3.2.1",
     "react-router": "^4.1.1",
     "react-router-dom": "^4.1.1",
+    "react-vega": "^4.0.2",
+    "react-vega-lite": "^2.0.2",
     "reflux": "^6.4.1",
-    "vega": "5.3.2",
-    "vega-lite": "^3.0.3",
-    "vega-embed": "^4.0.0"
-
+    "vega": "^5.3.2",
+    "vega-lib": "^4.4.0",
+    "vega-lite": "^3.0.3"
   },
   "devDependencies": {
     "@types/enzyme": "^3.1.10",

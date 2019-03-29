@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { message, Button, Collapse, Card, Icon, Spin, Tag } from 'antd';
 import { config } from './config';
+import VegaLite from 'react-vega-lite';
 
 import {
   Store,
@@ -41,17 +42,11 @@ class Plots extends React.Component<{plots: string[]}, {}> {
     render() {
       let display: any[] = [];
       let plots = this.props.plots.map((x, i) => {
-        let url = x;
-        let sub = getSub(x, 'sub');
-        let run = getSub(x, 'run');
-        // urls generated for localhost have None instead of localhost in url
-        if (x.indexOf('None') === 0) {
-          url = x.slice(4);
-          url = domainRoot + url;
-        }
+        let spec = x;
+
         display.push(
-          <Panel header={<a href={url}>{`Subject ${sub} Run ${run}`}</a>} key={'' + i}>
-            <img src={url} className="designMatrix"/>
+          <Panel header={<p> test </p>} key={'' + i}>
+            <VegaLite spec={spec} />
           </Panel>
         );
       });
