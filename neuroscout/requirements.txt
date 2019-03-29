@@ -24,13 +24,14 @@ Flask-WTF==0.14.2
 google-api-python-client
 gunicorn==19.7.1
 hashids==1.2.0
-imageio
+imageio==2.5.0
 ipython==6.2.1
 itsdangerous==0.24
+imageio-ffmpeg
 Jinja2==2.9.6
 MarkupSafe==1.0
 marshmallow==2.19.1
-moviepy==0.2.3.2
+moviepy==0.2.3.5
 nibabel==2.1.0
 nltk==3.2.2
 numpy==1.12.0
@@ -41,7 +42,7 @@ pandas==0.22
 patsy
 passlib==1.7.1
 pytesseract
-Pillow==4.1.1
+Pillow==5.4.1
 psycopg2==2.7.1
 progressbar2
 py==1.4.33
