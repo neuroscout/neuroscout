@@ -45,7 +45,9 @@ class Plots extends React.Component<{plots: string[]}, {}> {
         let spec = x;
 
         display.push(
+           <Panel header="Design Matrix" key={'' + i}>
             <VegaLite spec={spec} />
+            </Panel>
         );
       });
       return(
