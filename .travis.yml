@@ -21,9 +21,10 @@ before_script:
   - CI="true"; cd ../
   - python -m pliers.support.download
 before_install:
+  - sudo add-apt-repository -y ppa:mc3man/trusty-media && sudo apt-get -qq update && sudo apt-get install -y ffmpeg
   - bash <(wget -q -O- http://neuro.debian.net/_files/neurodebian-travis.sh)
   - sudo apt-get -qq update
-  - sudo apt-get install -yq git-annex-standalone tesseract-ocr ffmpeg
+  - sudo apt-get install -yq git-annex-standalone tesseract-ocr
 
 apt:
   sources:
