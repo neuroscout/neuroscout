@@ -21,7 +21,11 @@
     "react-google-login": "^3.2.1",
     "react-router": "^4.1.1",
     "react-router-dom": "^4.1.1",
-    "reflux": "^6.4.1"
+    "reflux": "^6.4.1",
+    "vega": "5.3.2",
+    "vega-lite": "^3.0.3",
+    "vega-embed": "^4.0.0"
+
   },
   "devDependencies": {
     "@types/enzyme": "^3.1.10",
