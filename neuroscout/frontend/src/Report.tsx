@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { message, Button, Collapse, Card, Icon, Spin, Tag } from 'antd';
 import { config } from './config';
-import * as VegaLite from 'react-vega-lite';
+import vegaEmbed from 'vega-embed';
 
 import {
   Store,
@@ -38,16 +38,28 @@ let getSub = (x: string, pre: string) => {
   return sub;
 };
 
-class Plots extends React.Component<{plots: string[]}, {}> {
+class Plots extends React.Component<{plots: any[]}, {}> {
+    vegaContainer;
+    constructor(props) {
+      super(props);
+      this.vegaContainer = React.createRef();
+    }
+
+    componentDidUpdate() {
+      this.props.plots.map((x, i) => {
+        let spec = x;
+        vegaEmbed(this.vegaContainer.current, spec, { renderer: 'svg' });
+      });
+    }
+
     render() {
       let display: any[] = [];
       let plots = this.props.plots.map((x, i) => {
         let spec = x;
-
         display.push(
            <Panel header="Design Matrix" key={'' + i}>
-            <VegaLite spec={spec} />
-            </Panel>
+            <div ref={this.vegaContainer}/>
+           </Panel>
         );
       });
       return(
