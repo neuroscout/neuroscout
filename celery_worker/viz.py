@@ -1,6 +1,7 @@
 import altair as alt
 import json
 
+alt.data_transformers.enable('default', max_rows=None)
 
 def melt_dm(dm):
     dm = dm.reset_index().rename(columns={'index': 'scan_number'})
