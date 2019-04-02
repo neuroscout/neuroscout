@@ -69,10 +69,8 @@ def generate_report(analysis, predictor_events, bids_dir, run_ids, domain):
         dm_plot = plot_interactive_design_matrix(dense)
         results['design_matrix_plot'].append(dm_plot)
 
-        out, url = builder.build('design_matrix_corrplot', 'png')
-        results['design_matrix_corrplot'].append(url)
-        plot_save(
-            dense.corr(), plot_corr_matrix, out, n_evs=None, partial=None)
+        corr_plot = plot_corr_matrix(dense)
+        results['design_matrix_corrplot'].append(corr_plot)
 
     for cm in first.get_contrasts():
         builder = PathBuilder(outdir, domain, analysis['hash_id'],
