@@ -38,6 +38,7 @@ def plot_design_matrix(dm):
 
     line = alt.Chart(dm).mark_line().encode(
         alt.X('scan_number',
+              scale=alt.Scale(domain=[0, int(dm.scan_number.max())]),
               axis=alt.Axis(
                   title='Time (TRs)', values=time_labels, ticks=False)),
         y=alt.Y('value:Q', axis=alt.Axis(title='Amplitude')),
