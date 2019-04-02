@@ -13,6 +13,7 @@ def plot_design_matrix(dm):
     dm = melt_dm(dm)
 
     pts = alt.selection_multi(encodings=['x'])
+    time_labels = list(range(0, dm.scan_number.max(), 50))
 
     base_color = alt.Color(
         'value:Q', sort='ascending',
@@ -20,24 +21,32 @@ def plot_design_matrix(dm):
 
     heat = alt.Chart(dm).mark_rect().encode(
         alt.Y('scan_number:O',
-              axis=alt.Axis(title=None, ticks=False, labels=False)),
-        alt.X('regressor:N', axis=alt.Axis(title=None, ticks=False)),
+              axis=alt.Axis(
+                  title='Time (TRs)',
+                  ticks=False, values=time_labels, labels=True)),
+        alt.X('regressor:N',
+              axis=alt.Axis(labelAngle=-45, title=None, ticks=False)),
         fill=base_color,
         stroke=alt.condition(pts,
                              base_color,
                              alt.value('black'))
     ).properties(
-        width=500,
-        height=900,
+        width=700,
+        height=700,
         selection=pts
     )
 
     line = alt.Chart(dm).mark_line().encode(
-        alt.X('scan_number', axis=alt.Axis(ticks=False)),
-        y='value:Q',
+        alt.X('scan_number',
+              axis=alt.Axis(
+                  title='Time (TRs)', values=time_labels, ticks=False)),
+        y=alt.Y('value:Q', axis=alt.Axis(title='Amplitude')),
         color=alt.Color('regressor', legend=None)
     ).transform_filter(
         pts
+    ).properties(
+        width=700,
+        height=275,
     )
 
     plt = alt.vconcat(
