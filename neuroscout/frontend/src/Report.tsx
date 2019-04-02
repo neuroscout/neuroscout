@@ -57,7 +57,7 @@ class Plots extends React.Component<{plots: any[]}, {}> {
       let plots = this.props.plots.map((x, i) => {
         let spec = x;
         display.push(
-           <Panel header="Design Matrix" key={'' + i}>
+           <Panel header="Plot" key={'' + i}>
             <div ref={this.vegaContainer}/>
            </Panel>
         );
@@ -108,6 +108,7 @@ interface ReportProps {
 interface ReportState {
   matrices: string[];
   plots: string[];
+  corr_plots: string[];
   reportTimestamp: string;
   reportTraceback: string;
   compileTraceback: string;
@@ -124,6 +125,7 @@ export class Report extends React.Component<ReportProps, ReportState> {
     let state: ReportState = {
       matrices: [],
       plots: [],
+      corr_plots: [],
       reportTimestamp: '',
       reportsLoaded: false,
       reportsPosted: false,
@@ -169,6 +171,7 @@ export class Report extends React.Component<ReportProps, ReportState> {
         }
         state.matrices = res.result.design_matrix;
         state.plots = res.result.design_matrix_plot;
+        state.corr_plots = res.result.design_matrix_corrplot;
         state.reportTimestamp = res.generated_at;
         if (res.traceback) {
           state.reportTraceback = res.traceback;
@@ -227,6 +230,12 @@ export class Report extends React.Component<ReportProps, ReportState> {
         <Card title="Design Matrix" key="plots">
           <Spin spinning={!this.state.reportsLoaded}>
             <Plots plots={this.state.plots} />
+          </Spin>
+        </Card>
+        <br/>
+        <Card title="Correlation Matrix" key="corr_plots">
+          <Spin spinning={!this.state.reportsLoaded}>
+            <Plots plots={this.state.corr_plots} />
           </Spin>
         </Card>
         <br/>
