@@ -9,7 +9,7 @@ def melt_dm(dm):
     return dm.melt('scan_number', var_name='regressor', value_name='value')
 
 
-def plot_interactive_design_matrix(dm):
+def plot_design_matrix(dm):
     dm = melt_dm(dm)
 
     pts = alt.selection_multi(encodings=['x'])

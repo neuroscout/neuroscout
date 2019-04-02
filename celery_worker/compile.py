@@ -122,19 +122,6 @@ def build_analysis(analysis, predictor_events, bids_dir, run_id=None,
     return tmp_dir, paths, bids_analysis
 
 
-def plot_save(dm, plotter, outfile, **kwargs):
-    fig = plt.figure(figsize=(9, 9))
-    axes = plt.gca()
-    plt.xticks(fontsize=10)
-    plt.yticks(fontsize=10)
-
-    ax = plotter(dm, ax=axes, **kwargs)
-    xtl = ax.get_xticklabels()
-    ax.set_xticklabels(xtl, rotation=90, fontsize=10)
-    fig.savefig(outfile, bbox_inches='tight')
-    plt.close(fig)
-
-
 def impute_confounds(dense):
     """ Impute first TR for confounds that may have n/as """
     for imputable in ('framewise_displacement', 'std_dvars', 'dvars'):
