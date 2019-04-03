@@ -52,8 +52,7 @@ def generate_report(analysis, predictor_events, bids_dir, run_ids, domain):
     first = bids_analysis.steps[0]
     results = {'design_matrix': [],
                'design_matrix_plot': [],
-               'design_matrix_corrplot': [],
-               'contrast_plot': []}
+               'design_matrix_corrplot': []}
 
     hrf = [t for t in
            analysis['model']['Steps'][0]['Transformations']
