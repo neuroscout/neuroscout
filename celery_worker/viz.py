@@ -4,10 +4,12 @@ import pandas as pd
 
 alt.data_transformers.enable('default', max_rows=None)
 
+
 def sort_dm(dm_wide, interest=[]):
     return pd.concat(
         [dm_wide[interest], dm_wide[set(dm_wide.columns) - set(interest)], ],
         axis=1)
+
 
 def melt_dm(dm):
     dm = dm.reset_index().rename(columns={'index': 'scan_number'})
@@ -38,7 +40,10 @@ def plot_design_matrix(dm_wide):
         height=700,
         selection=pts
     ).interactive()
-    line = alt.Chart(dm).mark_line(clip=True).encode(
+    line = alt.Chart(
+        dm,
+        title='Regressor timecourses (shift-click above to select)').mark_line(
+            clip=True).encode(
         alt.X('scan_number',
               axis=alt.Axis(
                   title='Time (TRs)', values=time_labels, ticks=False),
