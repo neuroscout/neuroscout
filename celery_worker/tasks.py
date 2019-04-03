@@ -7,7 +7,7 @@ from app import celery_app
 from compile import build_analysis, PathBuilder, impute_confounds
 from celery.utils.log import get_task_logger
 from pynv import Client
-from viz import plot_design_matrix, plot_corr_matrix
+from viz import plot_design_matrix, plot_corr_matrix, sort_dm
 
 logger = get_task_logger(__name__)
 
@@ -55,9 +55,15 @@ def generate_report(analysis, predictor_events, bids_dir, run_ids, domain):
                'design_matrix_corrplot': [],
                'contrast_plot': []}
 
+    hrf = [t for t in
+           analysis['model']['Steps'][0]['Transformations']
+           if t['Name'] == 'Convolve']
+
     for dm in first.get_design_matrix(
       mode='dense', force=True, entities=False):
         dense = impute_confounds(dm.dense)
+        if hrf:
+            dense = sort_dm(dense, interest=hrf[0]['Input'])
 
         builder = PathBuilder(outdir, domain, analysis['hash_id'], dm.entities)
         # Writeout design matrix
