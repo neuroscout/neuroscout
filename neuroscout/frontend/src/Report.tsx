@@ -76,7 +76,7 @@ class Plots extends React.Component<{plots: any[], corr_plots: any[]}, {}> {
              <Panel header="Design Matrix" key="dm">
               <VegaPlot spec={spec}/>
              </Panel>
-             <Panel header="Contrast Matrix" key="cm">
+             <Panel header="Correlation Matrix" key="cm">
               <VegaPlot spec={this.props.corr_plots[i]}/>
              </Panel>
             </Collapse>

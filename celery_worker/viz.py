@@ -37,8 +37,8 @@ def plot_design_matrix(dm_wide):
         stroke=base_color,
         opacity=alt.condition(pts, alt.value(1), alt.value(0.7))
     ).properties(
-        width=800,
-        height=550,
+        width=750,
+        height=450,
         selection=pts
     ).interactive()
     line = alt.Chart(
@@ -56,8 +56,8 @@ def plot_design_matrix(dm_wide):
     ).transform_filter(
         pts
     ).properties(
-        width=700,
-        height=255,
+        width=650,
+        height=225,
     )
 
     plt = alt.vconcat(
@@ -86,8 +86,8 @@ def plot_corr_matrix(dm_wide):
             'r:Q', sort='descending', legend=alt.Legend(title='r'),
             scale=alt.Scale(scheme='redyellowblue', domain=[-1, 1]))
     ).properties(
-        width=400,
-        height=400,
+        width=375,
+        height=350,
     ).configure_scale(
         bandPaddingInner=0.015
     ).configure_view(
