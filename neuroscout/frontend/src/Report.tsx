@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { message, Button, Collapse, Card, Icon, Spin, Tag } from 'antd';
+import { message, Tabs, Button, Collapse, Card, Icon, Spin, Tag } from 'antd';
 import { config } from './config';
 import vegaEmbed from 'vega-embed';
 
@@ -26,6 +26,7 @@ import { displayError, jwtFetch, alphaSort, timeout } from './utils';
 
 const domainRoot = config.server_url;
 
+const TabPane = Tabs.TabPane;
 const Panel = Collapse.Panel;
 
 let getSub = (x: string, pre: string) => {
@@ -38,18 +39,31 @@ let getSub = (x: string, pre: string) => {
   return sub;
 };
 
-class Plots extends React.Component<{plots: any[]}, {}> {
-    vegaContainer;
+class VegaPlot extends React.Component<{spec: string}, {}> {
+  vegaContainer;
+
+  constructor(props) {
+    super(props);
+    this.vegaContainer = React.createRef();
+  }
+
+  componentDidMount() {
+      vegaEmbed(this.vegaContainer.current, this.props.spec, { renderer: 'svg' });
+  }
+
+  render () {
+    return(
+      <div ref={this.vegaContainer}/>
+    );
+  }
+
+}
+
+class Plots extends React.Component<{plots: any[], corr_plots: any[]}, {}> {
+    plotContainer;
     constructor(props) {
       super(props);
-      this.vegaContainer = React.createRef();
-    }
-
-    componentDidUpdate() {
-      this.props.plots.map((x, i) => {
-        let spec = x;
-        vegaEmbed(this.vegaContainer.current, spec, { renderer: 'svg' });
-      });
+      this.plotContainer = React.createRef();
     }
 
     render() {
@@ -57,15 +71,23 @@ class Plots extends React.Component<{plots: any[]}, {}> {
       let plots = this.props.plots.map((x, i) => {
         let spec = x;
         display.push(
-           <Panel header="Plot" key={'' + i}>
-            <div ref={this.vegaContainer}/>
-           </Panel>
+          <TabPane tab="First run" key={'' + i}>
+            <Collapse bordered={false} defaultActiveKey={['dm']}>
+             <Panel header="Design Matrix" key="dm">
+              <VegaPlot spec={spec}/>
+             </Panel>
+             <Panel header="Contrast Matrix" key="cm">
+              <VegaPlot spec={this.props.corr_plots[i]}/>
+             </Panel>
+            </Collapse>
+          </TabPane>
         );
       });
       return(
-        <Collapse defaultActiveKey={['0']}>
+        <Tabs  type="card">
           {display}
-        </Collapse>
+        </Tabs>
+
       );
     }
 }
@@ -227,15 +249,9 @@ export class Report extends React.Component<ReportProps, ReportState> {
   render() {
     return (
       <div>
-        <Card title="Design Matrix" key="plots">
+        <Card title="Design Report" key="plots">
           <Spin spinning={!this.state.reportsLoaded}>
-            <Plots plots={this.state.plots} />
-          </Spin>
-        </Card>
-        <br/>
-        <Card title="Correlation Matrix" key="corr_plots">
-          <Spin spinning={!this.state.reportsLoaded}>
-            <Plots plots={this.state.corr_plots} />
+            <Plots plots={this.state.plots} corr_plots={this.state.corr_plots} />
           </Spin>
         </Card>
         <br/>

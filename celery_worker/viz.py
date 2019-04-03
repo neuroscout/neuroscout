@@ -38,12 +38,13 @@ def plot_design_matrix(dm_wide):
         opacity=alt.condition(pts, alt.value(1), alt.value(0.7))
     ).properties(
         width=800,
-        height=700,
+        height=550,
         selection=pts
     ).interactive()
     line = alt.Chart(
         dm,
-        title='Regressor timecourses (shift-click above to select)').mark_line(clip=True).encode(
+        title='Regressor timecourses (shift-click above to select)').mark_line(
+            clip=True).encode(
         alt.X('scan_number',
               axis=alt.Axis(
                   title='Time (TRs)', values=time_labels, ticks=False),
@@ -56,7 +57,7 @@ def plot_design_matrix(dm_wide):
         pts
     ).properties(
         width=700,
-        height=275,
+        height=255,
     )
 
     plt = alt.vconcat(

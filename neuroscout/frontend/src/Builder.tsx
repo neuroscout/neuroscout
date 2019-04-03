@@ -697,7 +697,7 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
         }
         this.setState({contrastErrors: ['Minimum of one contrast required.']});
         return false;
-      } 
+      }
       errors = validateContrast(this.state.activeContrast);
       if (errors.length > 0) {
         this.setState({contrastErrors: errors});
@@ -847,7 +847,7 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
 
             if (availTasks.length === 1) {
               stateUpdate = {
-                ...stateUpdate, 
+                ...stateUpdate,
                 selectedTaskId: availTasks[0].id,
                 predictorsLoad: true,
               };
@@ -998,7 +998,7 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
       this.saveAnalysis({compile: false})();
       this.setState({saveFromUpdate: false});
     }
-    if ((this.state.loadInitialPredictors === true) 
+    if ((this.state.loadInitialPredictors === true)
       && (prevState.analysis.runIds.length !== this.state.analysis.runIds.length)) {
       this.loadPredictors();
       this.setState({loadInitialPredictors: false});
@@ -1137,7 +1137,6 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
                 <TabPane tab="Review" key="review" disabled={((!reviewActive || !analysis.analysisId) && isDraft)}>
                   {this.state.model &&
                     <div>
-                      <h2>Review</h2>
                       <Report
                         analysisId={analysis.analysisId}
                         runIds={analysis.runIds}
