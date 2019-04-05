@@ -65,14 +65,15 @@ class CompileAnalysisResource(MethodResource):
                       analysis.dataset.local_path, None, validation_hash,
                       build]
                 )
+            put_record(
+                {'status': 'PENDING', 'compile_task_id': task.id}, analysis)
+
         except:
             put_record(
                 {'status': 'FAILED',
                  'compile_traceback': "Submitting failed. "
                  "Perhaps analysis is too large?"},
                 analysis)
-
-        put_record({'status': 'PENDING', 'compile_task_id': task.id}, analysis)
 
         return analysis
 
