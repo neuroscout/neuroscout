@@ -54,7 +54,7 @@ python-dateutil==2.6.0
 python-magic==0.4.13
 pytz==2017.2
 redis
-requests==2.20.0
+requests==2.21.0
 scipy
 SQLAlchemy==1.1.9
 tqdm==4.11.2
