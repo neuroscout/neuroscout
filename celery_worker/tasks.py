@@ -80,7 +80,8 @@ def generate_report(analysis, predictor_events, bids_dir, run_ids, domain):
 
 
 @celery_app.task(name='neurovault.upload')
-def upload(img_tarball, hash_id, access_token, timestamp=None):
+def upload(img_tarball, hash_id, access_token, timestamp=None,
+           n_subjects=None):
     tmp_dir = Path(mkdtemp())
     # Untar:
     with tarfile.open(img_tarball) as tf:
@@ -97,7 +98,9 @@ def upload(img_tarball, hash_id, access_token, timestamp=None):
             contrast_name = re.findall('contrast-(.*)_', str(img_path))[0]
             api.add_image(
                 collection['id'], img_path, name=contrast_name,
-                modality="fMRI-BOLD", map_type='T')
+                modality="fMRI-BOLD", map_type='T',
+                analysis_level='G', cognitive_paradigm_cogatlas='None',
+                number_of_subjects=n_subjects, is_valid=True)
     except:
         raise Exception(
             "Error uploading."
