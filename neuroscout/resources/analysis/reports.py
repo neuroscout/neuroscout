@@ -155,10 +155,12 @@ class AnalysisUploadResource(MethodResource):
     @use_kwargs({
         "tarball": FileField(required=True),
         "validation_hash": wa.fields.Str(required=True),
-        "force": wa.fields.Bool()},
-                locations=["files", "form"])
+        "force": wa.fields.Bool(),
+        "n_subjects": wa.fields.Number(description='Number of subjects'),
+        }, locations=["files", "form"])
     @fetch_analysis
-    def post(self, analysis, tarball, validation_hash, force=False):
+    def post(self, analysis, tarball, validation_hash, n_subjects=None,
+             force=False):
         # Check hash_id
         correct = Hashids(current_app.config['SECONDARY_HASH_SALT'],
                           min_length=10).encode(analysis.id)
@@ -178,7 +180,8 @@ class AnalysisUploadResource(MethodResource):
             args=[f.name,
                   analysis.hash_id,
                   current_app.config['NEUROVAULT_ACCESS_TOKEN'],
-                  timestamp if force else None
+                  timestamp if force else None,
+                  n_subjects
                   ])
 
         # Create new upload
