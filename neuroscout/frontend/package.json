@@ -21,6 +21,7 @@
     "react-google-login": "^3.2.1",
     "react-router": "^4.1.1",
     "react-router-dom": "^4.1.1",
+    "react-scripts": "2.1.0",
     "reflux": "^6.4.1",
     "vega": "5.3.4",
     "vega-embed": "^4.0.0",
@@ -30,7 +31,7 @@
     "@types/enzyme": "^3.1.10",
     "enzyme": "^3.3.0",
     "enzyme-adapter-react-16": "^1.1.1",
-    "react-scripts-ts": "^2.3.2",
+    "react-scripts-ts": "3.1.0",
     "tsutils": "^2.26.2",
     "typescript": "^3"
   },
