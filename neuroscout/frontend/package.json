@@ -14,6 +14,7 @@
     "@types/reflux": "^6.4.1",
     "antd": "^3.13.2",
     "jwt-decode": "^2.2.0",
+    "node": "^11.13.0",
     "rc-calendar": "^9.10.8",
     "react": "^16.3.2",
     "react-beautiful-dnd": "^10.0.3",
