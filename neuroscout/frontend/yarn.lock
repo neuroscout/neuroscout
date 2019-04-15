@@ -1016,10 +1016,10 @@
   resolved "https://registry.yarnpkg.com/@types/node/-/node-11.9.2.tgz#806126bdb6b1d7adcbff39170e5c95b19d3ec0d4"
   integrity sha512-MMwOkF+sy8LlSN2jLTGtwTcfqVN3H1WaCRO8gVaySVMJtOiZR+9V0y/3UprGi0rx6X7OrWGKGUtSviGVT44W3A==
 
-"@types/node@^10.0.6":
-  version "10.12.25"
-  resolved "https://registry.yarnpkg.com/@types/node/-/node-10.12.25.tgz#0d01a7dd6127de60d861ece4a650963042abb538"
-  integrity sha512-IcvnGLGSQFDvC07Bz2I8SX+QKErDZbUdiQq7S2u3XyzTyJfUmT0sWJMbeQkMzpTAkO7/N7sZpW/arUM2jfKsbQ==
+"@types/node@^9.6.47":
+  version "9.6.47"
+  resolved "https://registry.yarnpkg.com/@types/node/-/node-9.6.47.tgz#655b4a1cc52c8ab08f48cc055061990d6846bc97"
+  integrity sha512-56wEJWXZs+3XXoTe/OCpdZ6czrONhy+6hT0GdPOb7HvudLTMJ1T5tuZPs37K5cPR5t+J9+vLPFDQgUQ8NWJE1w==
 
 "@types/prop-types@*":
   version "15.5.8"
@@ -9203,6 +9203,11 @@ no-case@^2.2.0:
   dependencies:
     lower-case "^1.1.1"
 
+node-bin-setup@^1.0.0:
+  version "1.0.6"
+  resolved "https://registry.yarnpkg.com/node-bin-setup/-/node-bin-setup-1.0.6.tgz#4b5c9bb937ece702d7069b36ca78af4684677528"
+  integrity sha512-uPIxXNis1CRbv1DwqAxkgBk5NFV3s7cMN/Gf556jSw6jBvV7ca4F9lRL/8cALcZecRibeqU+5dFYqFFmzv5a0Q==
+
 node-fetch@^1.0.1:
   version "1.7.3"
   resolved "https://registry.yarnpkg.com/node-fetch/-/node-fetch-1.7.3.tgz#980f6f72d85211a5347c6b2bc18c5b84c3eb47ef"
@@ -9288,6 +9293,13 @@ node-releases@^1.0.0-alpha.11, node-releases@^1.1.13:
   integrity sha512-d58EpVZRhQE60kWiWUaaPlK9dyC4zg3ZoMcHcky2d4hDksyQj0rUozwInOl0C66mBsqo01Tuns8AvxnL5S7PKg==
   dependencies:
     semver "^5.3.0"
+
+node@^9.10.0:
+  version "9.11.2"
+  resolved "https://registry.yarnpkg.com/node/-/node-9.11.2.tgz#8d07d22f1fb75dce11572f864f45f901f06d5d92"
+  integrity sha512-K140s07Yd6pnfb4GppcqbPlVdFzCt5mxfie6RJfKGae77HnRnYJLRbF/vEnNZDKe1CHSOSOhQlePVrf2q04/5A==
+  dependencies:
+    node-bin-setup "^1.0.0"
 
 nopt@^4.0.1:
   version "4.0.1"
