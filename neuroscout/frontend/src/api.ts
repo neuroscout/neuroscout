@@ -20,8 +20,8 @@ const normalizeDataset = (d: ApiDataset): Dataset => {
 };
 
 export const api = {
-  getDatasets:  (): Promise<Dataset[]> => {
-    return jwtFetch(domainRoot + '/api/datasets?active_only=true')
+  getDatasets:  (active_only = true): Promise<Dataset[]> => {
+    return jwtFetch(domainRoot + `/api/datasets?active_only=${active_only}`)
     .then(data => {
       const datasets: Dataset[] = data.map(d => normalizeDataset(d));
       return datasets;
