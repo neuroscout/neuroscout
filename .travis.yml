@@ -25,7 +25,6 @@ before_install:
   - bash <(wget -q -O- http://neuro.debian.net/_files/neurodebian-travis.sh)
   - sudo apt-get -qq update
   - sudo apt-get install -yq git-annex-standalone tesseract-ocr
-  - apt-get install -yq nodejs
 
 apt:
   sources:
