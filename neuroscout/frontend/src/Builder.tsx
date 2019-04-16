@@ -222,10 +222,18 @@ type BuilderProps = {
 export default class AnalysisBuilder extends React.Component<BuilderProps & RouteComponentProps<{}>, Store> {
   constructor(props: BuilderProps) {
     super(props);
+    let _datasets = [] as Dataset[];
     this.state = initializeStore();
     // Load analysis from server if an analysis id is specified in the props
-    if (!!props.id) {
-      jwtFetch(`${domainRoot}/api/analyses/${props.id}`)
+    api.getDatasets().then((datasets) => {
+      _datasets = datasets;
+      if (datasets.length !== 0) {
+        this.setState({ datasets });
+      }
+    })
+    .then(() => {
+      if (!!props.id) {
+        jwtFetch(`${domainRoot}/api/analyses/${props.id}`)
         // .then(response => response.json() as Promise<ApiAnalysis>)
         .then((data: ApiAnalysis) => {
           this.loadAnalysis(data);
@@ -240,13 +248,19 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
           if (data.status === 'FAILED') {
             this.setState({activeTab: 'submit'});
           }
+
+          if (_datasets.findIndex((x) => { return (x.id === ('' + data.dataset_id)); }) === -1) {
+            // dataset inactive?
+            api.getDataset(data.dataset_id)
+            .then((dataset) => {
+              if (dataset !== null) {
+                let newDatasets = this.state.datasets.concat([dataset]);
+                this.setState({ datasets: newDatasets });
+              }
+            });
+          }
         })
         .catch(displayError);
-    }
-
-    api.getDatasets().then((datasets) => {
-      if (datasets.length !== 0) {
-        this.setState({ datasets });
       }
     });
   }

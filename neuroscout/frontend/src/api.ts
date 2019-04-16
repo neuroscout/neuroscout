@@ -30,5 +30,15 @@ export const api = {
       displayError(error);
       return [] as Dataset[];
     });
-    }
+  },
+  getDataset: (datasetId: (number | string)): Promise<(Dataset | null)> => {
+    return jwtFetch(domainRoot + `/api/datasets/${datasetId}`)
+    .then(data => {
+      return normalizeDataset(data);
+    })
+    .catch((error) => {
+      displayError(error);
+      return null;
+    });
+  }
 };
