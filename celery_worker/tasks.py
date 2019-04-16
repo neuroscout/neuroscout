@@ -59,6 +59,9 @@ def generate_report(analysis, predictor_events, bids_dir, run_ids,
            analysis['model']['Steps'][0]['Transformations']
            if t['Name'] == 'Convolve']
 
+    if sampling_rate is None:
+        sampling_rate = 'TR'
+
     for dm in first.get_design_matrix(
       mode='dense', force=True, entities=False, sampling_rate=sampling_rate):
         dense = impute_confounds(dm.dense)
