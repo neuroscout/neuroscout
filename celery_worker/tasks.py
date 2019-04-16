@@ -43,7 +43,8 @@ def compile(analysis, predictor_events, resources, bids_dir, run_ids,
 
 
 @celery_app.task(name='workflow.generate_report')
-def generate_report(analysis, predictor_events, bids_dir, run_ids, domain):
+def generate_report(analysis, predictor_events, bids_dir, run_ids,
+                    sampling_rate, domain):
     _, _, bids_analysis = build_analysis(
         analysis, predictor_events, bids_dir, run_ids)
     outdir = Path('/file-data/reports') / analysis['hash_id']
@@ -58,8 +59,11 @@ def generate_report(analysis, predictor_events, bids_dir, run_ids, domain):
            analysis['model']['Steps'][0]['Transformations']
            if t['Name'] == 'Convolve']
 
+    if sampling_rate is None:
+        sampling_rate = 'TR'
+
     for dm in first.get_design_matrix(
-      mode='dense', force=True, entities=False):
+      mode='dense', force=True, entities=False, sampling_rate=sampling_rate):
         dense = impute_confounds(dm.dense)
         if hrf:
             dense = sort_dm(dense, interest=hrf[0]['Input'])
