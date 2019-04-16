@@ -12,7 +12,6 @@ env:
 - APP_SETTINGS=config.app.TravisConfig PYTHONHASHSEED=0
 addons:
   postgresql: "9.4"
-cache: yarn
 before_script:
   - cp neuroscout/config/example_app.py neuroscout/config/app.py
   - cp neuroscout/frontend/src/config.ts.example neuroscout/frontend/src/config.ts
