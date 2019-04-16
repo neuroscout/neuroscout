@@ -30,6 +30,7 @@ apt:
   sources:
     - sourceline: 'deb https://dl.yarnpkg.com/debian/ stable main'
       key_url: 'https://dl.yarnpkg.com/debian/pubkey.gpg'
+    - sourceline: 'deb https://deb.nodesource.com/setup_11.x stable main'
   packages:
     - yarn
 after_success:
