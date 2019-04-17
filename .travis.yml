@@ -7,7 +7,7 @@ install:
   - pip install pytest-cov
 script:
   - python -m pytest tests/ --cov=./
-  - cd frontend && npm test
+  # cd frontend && npm test
 env:
 - APP_SETTINGS=config.app.TravisConfig PYTHONHASHSEED=0
 addons:
