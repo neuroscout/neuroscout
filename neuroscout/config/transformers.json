@@ -28,7 +28,7 @@
     ["MeanAmplitudeExtractor", {}],
     ["SpectralCentroidExtractor", {}],
     ["VADERSentimentExtractor", {}],
-    ["RMSEExtractor", {"frame_length": 72000, "hop_length": 72000, "center": false}],
+    ["RMSExtractor", {"frame_length": 72000, "hop_length": 72000, "center": false}],
     ["ComplexTextExtractor", {}],
     ["PredefinedDictionaryExtractor", {"variables": ["subtlexusfrequency/Lg10WF"], "missing": "n/a"} ]
   ],
