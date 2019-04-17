@@ -21,3 +21,4 @@ nilearn
 fitlins
 sklearn
 tornado==5.1.1
+altair
