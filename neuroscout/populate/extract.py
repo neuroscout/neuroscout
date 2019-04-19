@@ -123,7 +123,8 @@ def extract_features(dataset_name, task_name, extractors):
                              dataset_name)
 
 
-def create_predictors(features, dataset_name, run_ids=None):
+def create_predictors(features, dataset_name, run_ids=None,
+                      percentage_include=.9):
     """ Create Predictors from Extracted Features.
         Args:
             features (object) - ExtractedFeature objects
@@ -133,13 +134,22 @@ def create_predictors(features, dataset_name, run_ids=None):
     """
     print("Creating predictors")
 
+    dataset = Dataset.query.filter_by(name=dataset_name).one()
+
     # Create/Get Predictors
     all_preds = []
     for ef in features:
-        all_preds.append(get_or_create(
-            Predictor, name=ef.feature_name, description=ef.description,
-            dataset_id=Dataset.query.filter_by(name=dataset_name).one().id,
-            source='extracted', ef_id=ef.id)[0])
+        # Calculate num of runs this feature is present in
+        unique_runs = RunStimulus.query.filter(
+            RunStimulus.stimulus_id.in_(
+                set([ee.stimulus_id for ee in ef.extracted_events]))).\
+                distinct('run_id')
+
+        if unique_runs.count() / len(dataset.runs) > percentage_include:
+            all_preds.append(get_or_create(
+                Predictor, name=ef.feature_name, description=ef.description,
+                dataset_id=dataset.id,
+                source='extracted', ef_id=ef.id)[0])
 
     # Create PredictorEvents and PredictorRuns
     for ix, predictor in enumerate(progressbar(all_preds)):
@@ -153,21 +163,21 @@ def create_predictors(features, dataset_name, run_ids=None):
             if run_ids is not None:
                 query = query.filter(RunStimulus.run_id.in_(run_ids))
             for rs in query:
-                    all_rs.append((predictor.id, rs.run_id))
-                    duration = ee.duration
-                    if duration is None:
-                        duration = rs.duration
-                    all_pes.append(
-                        PredictorEvent(
-                            onset=(ee.onset or 0) + rs.onset,
-                            value=ee.value,
-                            object_id=ee.object_id,
-                            duration=duration,
-                            predictor_id=predictor.id,
-                            run_id=rs.run_id,
-                            stimulus_id=ee.stimulus_id
-                        )
+                all_rs.append((predictor.id, rs.run_id))
+                duration = ee.duration
+                if duration is None:
+                    duration = rs.duration
+                all_pes.append(
+                    PredictorEvent(
+                        onset=(ee.onset or 0) + rs.onset,
+                        value=ee.value,
+                        object_id=ee.object_id,
+                        duration=duration,
+                        predictor_id=predictor.id,
+                        run_id=rs.run_id,
+                        stimulus_id=ee.stimulus_id
                     )
+                )
 
         all_rs = [PredictorRun(predictor_id=pred_id, run_id=run_id)
                   for pred_id, run_id in set(all_rs)]
