@@ -1,6 +1,7 @@
 import * as React from 'react';
-import { message, Button, Collapse, Card, Icon, Spin, Tag } from 'antd';
+import { message, Tabs, Button, Collapse, Card, Icon, Spin, Tag } from 'antd';
 import { config } from './config';
+import vegaEmbed from 'vega-embed';
 
 import {
   Store,
@@ -25,6 +26,7 @@ import { displayError, jwtFetch, alphaSort, timeout } from './utils';
 
 const domainRoot = config.server_url;
 
+const TabPane = Tabs.TabPane;
 const Panel = Collapse.Panel;
 
 let getSub = (x: string, pre: string) => {
@@ -37,28 +39,55 @@ let getSub = (x: string, pre: string) => {
   return sub;
 };
 
-class Plots extends React.Component<{plots: string[]}, {}> {
+class VegaPlot extends React.Component<{spec: string}, {}> {
+  vegaContainer;
+
+  constructor(props) {
+    super(props);
+    this.vegaContainer = React.createRef();
+  }
+
+  componentDidMount() {
+      vegaEmbed(this.vegaContainer.current, this.props.spec, { renderer: 'svg' });
+  }
+
+  render () {
+    return(
+      <div ref={this.vegaContainer}/>
+    );
+  }
+
+}
+
+class Plots extends React.Component<{plots: any[], corr_plots: any[]}, {}> {
+    plotContainer;
+    constructor(props) {
+      super(props);
+      this.plotContainer = React.createRef();
+    }
+
     render() {
       let display: any[] = [];
       let plots = this.props.plots.map((x, i) => {
-        let url = x;
-        let sub = getSub(x, 'sub');
-        let run = getSub(x, 'run');
-        // urls generated for localhost have None instead of localhost in url
-        if (x.indexOf('None') === 0) {
-          url = x.slice(4);
-          url = domainRoot + url;
-        }
+        let spec = x;
         display.push(
-          <Panel header={<a href={url}>{`Subject ${sub} Run ${run}`}</a>} key={'' + i}>
-            <img src={url} className="designMatrix"/>
-          </Panel>
+          <TabPane tab="First run" key={'' + i}>
+            <Collapse bordered={false} defaultActiveKey={['dm']}>
+             <Panel header="Design Matrix" key="dm">
+              <VegaPlot spec={spec}/>
+             </Panel>
+             <Panel header="Correlation Matrix" key="cm">
+              <VegaPlot spec={this.props.corr_plots[i]}/>
+             </Panel>
+            </Collapse>
+          </TabPane>
         );
       });
       return(
-        <Collapse defaultActiveKey={['0']}>
+        <Tabs  type="card">
           {display}
-        </Collapse>
+        </Tabs>
+
       );
     }
 }
@@ -101,6 +130,7 @@ interface ReportProps {
 interface ReportState {
   matrices: string[];
   plots: string[];
+  corr_plots: string[];
   reportTimestamp: string;
   reportTraceback: string;
   compileTraceback: string;
@@ -117,6 +147,7 @@ export class Report extends React.Component<ReportProps, ReportState> {
     let state: ReportState = {
       matrices: [],
       plots: [],
+      corr_plots: [],
       reportTimestamp: '',
       reportsLoaded: false,
       reportsPosted: false,
@@ -162,6 +193,7 @@ export class Report extends React.Component<ReportProps, ReportState> {
         }
         state.matrices = res.result.design_matrix;
         state.plots = res.result.design_matrix_plot;
+        state.corr_plots = res.result.design_matrix_corrplot;
         state.reportTimestamp = res.generated_at;
         if (res.traceback) {
           state.reportTraceback = res.traceback;
@@ -217,9 +249,9 @@ export class Report extends React.Component<ReportProps, ReportState> {
   render() {
     return (
       <div>
-        <Card title="Design Matrix" key="plots">
+        <Card title="Design Report" key="plots">
           <Spin spinning={!this.state.reportsLoaded}>
-            <Plots plots={this.state.plots} />
+            <Plots plots={this.state.plots} corr_plots={this.state.corr_plots} />
           </Spin>
         </Card>
         <br/>

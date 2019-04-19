@@ -113,7 +113,7 @@ class ModelSteps extends React.Component<{Steps: Step[]}, {}> {
         <Panel header={`${x.Level} Level`} key={i.toString()}><ModelStep step={x}/></Panel>)
       );
       return (
-        <Collapse>
+        <Collapse bordered={false}>
           {display}
         </Collapse>
       );
@@ -175,7 +175,7 @@ export class Review extends React.Component<ReviewProps, {}> {
         title={'Overview of ' + (Name ? Name : 'No Name')}
       >
         <p>{Description ? Description : 'No description.'}</p>
-        <Collapse>
+        <Collapse bordered={false}>
         {dataset && <Panel header={`Dataset - ${dataset.name}`} key="dataset"><DatasetInfo dataset={dataset}/></Panel>}
         <Panel header="Inputs" key="inputs"><ModelInput model={model}/></Panel>
         <Panel header="X (Variables)" key="X">

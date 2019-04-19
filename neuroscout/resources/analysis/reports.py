@@ -65,14 +65,15 @@ class CompileAnalysisResource(MethodResource):
                       analysis.dataset.local_path, None, validation_hash,
                       build]
                 )
+            put_record(
+                {'status': 'PENDING', 'compile_task_id': task.id}, analysis)
+
         except:
             put_record(
                 {'status': 'FAILED',
                  'compile_traceback': "Submitting failed. "
                  "Perhaps analysis is too large?"},
                 analysis)
-
-        put_record({'status': 'PENDING', 'compile_task_id': task.id}, analysis)
 
         return analysis
 
@@ -85,13 +86,14 @@ class CompileAnalysisResource(MethodResource):
 @marshal_with(ReportSchema)
 @use_kwargs({
     'run_id': wa.fields.DelimitedList(fields.Int(),
-                                      description='Run id(s).')
+                                      description='Run id(s).'),
+    'sampling_rate': wa.fields.Number(description='Sampling rate in Hz')
 }, locations=['query'])
 @doc(tags=['analysis'])
 class ReportResource(MethodResource):
     @doc(summary='Generate analysis reports.')
     @fetch_analysis
-    def post(self, analysis, run_id=None):
+    def post(self, analysis, run_id=None, sampling_rate=None):
         # Submit report generation
         analysis_json, pes_json = jsonify_analysis(analysis, run_id=run_id)
 
@@ -99,6 +101,7 @@ class ReportResource(MethodResource):
             'workflow.generate_report',
             args=[analysis_json, pes_json,
                   analysis.dataset.local_path, run_id,
+                  sampling_rate,
                   current_app.config['SERVER_NAME']])
 
         # Create new Report

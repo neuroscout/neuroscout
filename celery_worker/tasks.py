@@ -4,11 +4,10 @@ import re
 from tempfile import mkdtemp
 from pathlib import Path
 from app import celery_app
-from nistats.reporting import plot_design_matrix
-from fitlins.viz import plot_corr_matrix, plot_contrast_matrix
-from compile import build_analysis, plot_save, PathBuilder, impute_confounds
+from compile import build_analysis, PathBuilder, impute_confounds
 from celery.utils.log import get_task_logger
 from pynv import Client
+from viz import plot_design_matrix, plot_corr_matrix, sort_dm
 
 logger = get_task_logger(__name__)
 
@@ -44,7 +43,8 @@ def compile(analysis, predictor_events, resources, bids_dir, run_ids,
 
 
 @celery_app.task(name='workflow.generate_report')
-def generate_report(analysis, predictor_events, bids_dir, run_ids, domain):
+def generate_report(analysis, predictor_events, bids_dir, run_ids,
+                    sampling_rate, domain):
     _, _, bids_analysis = build_analysis(
         analysis, predictor_events, bids_dir, run_ids)
     outdir = Path('/file-data/reports') / analysis['hash_id']
@@ -53,12 +53,20 @@ def generate_report(analysis, predictor_events, bids_dir, run_ids, domain):
     first = bids_analysis.steps[0]
     results = {'design_matrix': [],
                'design_matrix_plot': [],
-               'design_matrix_corrplot': [],
-               'contrast_plot': []}
+               'design_matrix_corrplot': []}
+
+    hrf = [t for t in
+           analysis['model']['Steps'][0]['Transformations']
+           if t['Name'] == 'Convolve']
+
+    if sampling_rate is None:
+        sampling_rate = 'TR'
 
     for dm in first.get_design_matrix(
-      mode='dense', force=True, entities=False):
+      mode='dense', force=True, entities=False, sampling_rate=sampling_rate):
         dense = impute_confounds(dm.dense)
+        if hrf:
+            dense = sort_dm(dense, interest=hrf[0]['Input'])
 
         builder = PathBuilder(outdir, domain, analysis['hash_id'], dm.entities)
         # Writeout design matrix
@@ -66,21 +74,11 @@ def generate_report(analysis, predictor_events, bids_dir, run_ids, domain):
         results['design_matrix'].append(url)
         dense.to_csv(out, index=False)
 
-        out, url = builder.build('design_matrix_plot', 'png')
-        results['design_matrix_plot'].append(url)
-        plot_save(dense, plot_design_matrix, out)
+        dm_plot = plot_design_matrix(dense)
+        results['design_matrix_plot'].append(dm_plot)
 
-        out, url = builder.build('design_matrix_corrplot', 'png')
-        results['design_matrix_corrplot'].append(url)
-        plot_save(
-            dense.corr(), plot_corr_matrix, out, n_evs=None, partial=None)
-
-    for cm in first.get_contrasts():
-        builder = PathBuilder(outdir, domain, analysis['hash_id'],
-                              cm[0].entities)
-        out, url = builder.build('contrast_matrix', 'png')
-        plot_save(cm[0].weights, plot_contrast_matrix, out)
-        results['contrast_plot'].append(url)
+        corr_plot = plot_corr_matrix(dense)
+        results['design_matrix_corrplot'].append(corr_plot)
 
     return results
 
