@@ -94,7 +94,8 @@ interface AppState {
   analyses: AppAnalysis[]; // List of analyses belonging to the user
   publicAnalyses: AppAnalysis[]; // List of public analyses
   auth: AuthStoreState;
-  datasets: Dataset[];
+  activeDatasets: Dataset[];
+  allDatasets: Dataset[];
 }
 
 // Convert analyses returned by API to the shape expected by the frontend
@@ -116,13 +117,17 @@ class App extends Reflux.Component<any, {}, AppState> {
       analyses: [],
       publicAnalyses: [],
       auth: authActions.getInitialState(),
-      datasets: []
+      activeDatasets: [],
+      allDatasets: []
     };
     this.store = AuthStore;
     this.loadPublicAnalyses();
-    api.getDatasets().then((datasets) => {
+    api.getDatasets(false).then((datasets) => {
       if (datasets.length !== 0) {
-        this.setState({ datasets });
+        this.setState({
+          activeDatasets: datasets.filter((x) => x.active === true),
+          allDatasets: datasets
+        });
       }
     });
   }
@@ -603,7 +608,7 @@ class App extends Reflux.Component<any, {}, AppState> {
                       loggedIn={this.state.auth.loggedIn}
                       cloneAnalysis={this.cloneAnalysis}
                       onDelete={this.onDelete}
-                      datasets={this.state.datasets}
+                      datasets={this.state.activeDatasets}
                     />}
                 />
                 <Route
@@ -648,7 +653,7 @@ class App extends Reflux.Component<any, {}, AppState> {
                   <Public
                     analyses={publicAnalyses}
                     cloneAnalysis={this.cloneAnalysis}
-                    datasets={this.state.datasets}
+                    datasets={this.state.allDatasets}
                   />}
               />
               <Route
@@ -659,7 +664,7 @@ class App extends Reflux.Component<any, {}, AppState> {
                     analyses={analyses}
                     cloneAnalysis={this.cloneAnalysis}
                     onDelete={this.onDelete}
-                    datasets={this.state.datasets}
+                    datasets={this.state.allDatasets}
                   />}
               />
               <Route

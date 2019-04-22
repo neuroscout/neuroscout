@@ -33,6 +33,7 @@ export interface Dataset {
   url: string;
   description: string;
   tasks: Task[];
+  active: boolean;
 }
 
 // Dataset object as returned by /api/datasets
@@ -47,6 +48,7 @@ export interface ApiDataset {
   url: string;
   summary: string;
   tasks: Task[];
+  active: boolean;
 }
 
 export interface Run {

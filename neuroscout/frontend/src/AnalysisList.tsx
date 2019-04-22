@@ -60,11 +60,10 @@ class AnalysisList extends React.Component<AnalysisListProps> {
         title: 'Dataset',
         dataIndex: 'datasetName',
         render: (text, record) => {
-          let name: any = datasets.filter((x) => {return x.id === text.toString(); } );
+          let dataset: any = datasets.filter((x) => {return x.id === text.toString(); } );
+          let name = ' ';
           if (!!name && name.length === 1) {
-            name = name[0].name;
-          } else {
-            name = ' ';
+            name = dataset[0].name;
           }
           return (<>{name}</>);
         },

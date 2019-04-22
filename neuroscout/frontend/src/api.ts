@@ -15,8 +15,8 @@ const normalizeDataset = (d: ApiDataset): Dataset => {
   const description = d.summary;
   const url = d.url;
   const id = d.id.toString();
-  const { name, tasks } = d;
-  return { id, name, authors, url, description, tasks };
+  const { name, tasks, active } = d;
+  return { id, name, authors, url, description, tasks, active };
 };
 
 export const api = {
