@@ -217,52 +217,33 @@ type BuilderProps = {
   id?: string;
   updatedAnalysis: () => void;
   userOwns?: boolean;
+  datasets: Dataset[];
 };
 
 export default class AnalysisBuilder extends React.Component<BuilderProps & RouteComponentProps<{}>, Store> {
   constructor(props: BuilderProps) {
     super(props);
-    let _datasets = [] as Dataset[];
     this.state = initializeStore();
     // Load analysis from server if an analysis id is specified in the props
-    api.getDatasets().then((datasets) => {
-      _datasets = datasets;
-      if (datasets.length !== 0) {
-        this.setState({ datasets });
-      }
-    })
-    .then(() => {
-      if (!!props.id) {
-        jwtFetch(`${domainRoot}/api/analyses/${props.id}`)
-        // .then(response => response.json() as Promise<ApiAnalysis>)
-        .then((data: ApiAnalysis) => {
-          this.loadAnalysis(data);
-          return data;
-        })
-        .then((data: ApiAnalysis) => {
-          if (editableStatus.includes(data.status)) {
-            this.setState({model: this.buildModel()});
-          } else if (data.model !== undefined) {
-            this.setState({model: data.model!});
-          }
-          if (data.status === 'FAILED') {
-            this.setState({activeTab: 'submit'});
-          }
-
-          if (_datasets.findIndex((x) => { return (x.id === ('' + data.dataset_id)); }) === -1) {
-            // dataset inactive?
-            api.getDataset(data.dataset_id)
-            .then((dataset) => {
-              if (dataset !== null) {
-                let newDatasets = this.state.datasets.concat([dataset]);
-                this.setState({ datasets: newDatasets });
-              }
-            });
-          }
-        })
-        .catch(displayError);
-      }
-    });
+    if (!!props.id) {
+      jwtFetch(`${domainRoot}/api/analyses/${props.id}`)
+      // .then(response => response.json() as Promise<ApiAnalysis>)
+      .then((data: ApiAnalysis) => {
+        this.loadAnalysis(data);
+        return data;
+      })
+      .then((data: ApiAnalysis) => {
+        if (editableStatus.includes(data.status)) {
+          this.setState({model: this.buildModel()});
+        } else if (data.model !== undefined) {
+          this.setState({model: data.model!});
+        }
+        if (data.status === 'FAILED') {
+          this.setState({activeTab: 'submit'});
+        }
+      })
+      .catch(displayError);
+    }
   }
 
   saveEnabled = (): boolean => this.state.unsavedChanges && editableStatus.includes(this.state.analysis.status);
@@ -1060,7 +1041,7 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
                   <h2>Overview</h2>
                   <OverviewTab
                     analysis={analysis}
-                    datasets={datasets}
+                    datasets={this.props.datasets}
                     availableRuns={availableRuns}
                     selectedTaskId={selectedTaskId}
                     predictorsActive={predictorsActive}

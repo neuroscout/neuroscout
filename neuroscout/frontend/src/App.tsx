@@ -94,8 +94,7 @@ interface AppState {
   analyses: AppAnalysis[]; // List of analyses belonging to the user
   publicAnalyses: AppAnalysis[]; // List of public analyses
   auth: AuthStoreState;
-  activeDatasets: Dataset[];
-  allDatasets: Dataset[];
+  datasets: Dataset[];
 }
 
 // Convert analyses returned by API to the shape expected by the frontend
@@ -117,17 +116,13 @@ class App extends Reflux.Component<any, {}, AppState> {
       analyses: [],
       publicAnalyses: [],
       auth: authActions.getInitialState(),
-      activeDatasets: [],
-      allDatasets: []
+      datasets: [] 
     };
     this.store = AuthStore;
     this.loadPublicAnalyses();
     api.getDatasets(false).then((datasets) => {
       if (datasets.length !== 0) {
-        this.setState({
-          activeDatasets: datasets.filter((x) => x.active === true),
-          allDatasets: datasets
-        });
+        this.setState({ datasets });
       }
     });
   }
@@ -158,7 +153,9 @@ class App extends Reflux.Component<any, {}, AppState> {
   // Load public analyses from the server
   loadPublicAnalyses = () =>
     fetch(`${DOMAINROOT}/api/analyses`)
-      .then(response => response.json())
+      .then((response) => {
+        return response.json();
+      })
       .then((data: ApiAnalysis[]) => {
         this.setState({
           publicAnalyses: data
@@ -600,16 +597,8 @@ class App extends Reflux.Component<any, {}, AppState> {
                   exact={true}
                   path="/"
                   render={props =>
-                    <Home
-                      analyses={this.state.auth.loggedIn ?
-                        analyses
-                      :
-                        publicAnalyses}
-                      loggedIn={this.state.auth.loggedIn}
-                      cloneAnalysis={this.cloneAnalysis}
-                      onDelete={this.onDelete}
-                      datasets={this.state.activeDatasets}
-                    />}
+                    <Home />
+                   }
                 />
                 <Route
                   exact={true}
@@ -620,7 +609,11 @@ class App extends Reflux.Component<any, {}, AppState> {
                     // need to implement something like the auth workflow example here:
                     // https://reacttraining.com/react-router/web/example/auth-workflow
                     if (loggedIn || this.state.auth.openLogin) {
-                      return <AnalysisBuilder updatedAnalysis={() => this.loadAnalyses()} key={props.location.key}/>;
+                      return <AnalysisBuilder
+                                updatedAnalysis={() => this.loadAnalyses()}
+                                key={props.location.key}
+                                datasets={this.state.datasets}
+                      />;
                     }
                     message.warning('Please log in first and try again');
                     return <Redirect to="/" />;
@@ -633,6 +626,7 @@ class App extends Reflux.Component<any, {}, AppState> {
                       id={props.match.params.id}
                       updatedAnalysis={() => this.loadAnalyses()}
                       userOwns={this.state.analyses.filter((x) => x.id === props.match.params.id).length > 0}
+                      datasets={this.state.datasets}
                     />}
                 />
                 <Route
@@ -643,6 +637,7 @@ class App extends Reflux.Component<any, {}, AppState> {
                       id={props.match.params.id}
                       updatedAnalysis={() => this.loadAnalyses()}
                       userOwns={this.state.analyses.filter((x) => x.id === props.match.params.id).length > 0}
+                      datasets={this.state.datasets}
                     />
                   }
                 />
@@ -653,7 +648,7 @@ class App extends Reflux.Component<any, {}, AppState> {
                   <Public
                     analyses={publicAnalyses}
                     cloneAnalysis={this.cloneAnalysis}
-                    datasets={this.state.allDatasets}
+                    datasets={this.state.datasets}
                   />}
               />
               <Route
@@ -664,7 +659,7 @@ class App extends Reflux.Component<any, {}, AppState> {
                     analyses={analyses}
                     cloneAnalysis={this.cloneAnalysis}
                     onDelete={this.onDelete}
-                    datasets={this.state.allDatasets}
+                    datasets={this.state.datasets}
                   />}
               />
               <Route

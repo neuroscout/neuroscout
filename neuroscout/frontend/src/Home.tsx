@@ -9,14 +9,8 @@ import { AppAnalysis } from './coretypes';
 import { Link } from 'react-router-dom';
 import AnalysisList, { AnalysisListProps } from './AnalysisList';
 
-interface HomeProps extends AnalysisListProps {
-  loggedIn: boolean;
-}
-
-class Home extends React.Component<HomeProps, {}> {
+class Home extends React.Component<{}, {}> {
   render() {
-    const { analyses, cloneAnalysis, onDelete, loggedIn, publicList } = this.props;
-    const listProps: AnalysisListProps = { ...this.props, publicList: loggedIn === false };
     return (
 
       <div>
