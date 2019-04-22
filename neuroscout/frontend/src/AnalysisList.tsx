@@ -62,13 +62,17 @@ class AnalysisList extends React.Component<AnalysisListProps> {
         render: (text, record) => {
           let dataset: any = datasets.filter((x) => {return x.id === text.toString(); } );
           let name = ' ';
-          if (!!name && name.length === 1) {
+          if (!!dataset && dataset.length === 1) {
             name = dataset[0].name;
           }
           return (<>{name}</>);
         },
         sorter: (a, b) => {
-          return a.datasetName.localeCompare(b.datasetName);
+          let dataset: (Dataset | undefined) = datasets.find((x) => {return x.id === a.datasetName.toString(); } );
+          a = (!!dataset && !!dataset.name) ? dataset.name : '';
+          dataset = datasets.find((x) => {return x.id === b.datasetName.toString(); } );
+          b = (!!dataset && !!dataset.name) ? dataset.name : '';
+          return a.localeCompare(b);
         }
       },
       {
