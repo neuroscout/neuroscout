@@ -103,7 +103,7 @@ const ApiToAppAnalysis = (data: ApiAnalysis): AppAnalysis => ({
   name: data.name,
   description: data.description,
   status: data.status,
-  datasetName: data.dataset_id,
+  datasetName: !!data.dataset_id ? '' + data.dataset_id : '',
   modifiedAt: data.modified_at
 });
 
@@ -140,7 +140,7 @@ class App extends Reflux.Component<any, {}, AppState> {
           this.setState({
             analyses: (data.analyses || [])
               .filter(x => !!x.status) // Ignore analyses with missing status
-              .map(x => ApiToAppAnalysis(x))
+              .map((x) => ApiToAppAnalysis(x))
           });
         })
         .catch(displayError);
