@@ -27,6 +27,8 @@ class DatasetSchema(Schema):
         description='BIDS Dataset remote address')
     preproc_address = fields.Str(
         description='Preprocessed data remote address')
+    active = fields.Boolean(
+        description='Dataset is currently available for model creation')
 
 
 class DatasetResource(MethodResource):

@@ -10,19 +10,20 @@ import Reflux from 'reflux';
 import { Avatar, Divider, Tabs, Row, Col, Layout, Button, Menu, Modal, Icon, Input, Form, message } from 'antd';
 import { GoogleLogin } from 'react-google-login';
 
+import NotFound from './404';
 import './App.css';
-import AnalysisBuilder from './Builder';
-import { ApiUser, ApiAnalysis, AppAnalysis, AuthStoreState } from './coretypes';
-import Public from './Public';
-import Private from './Private';
-import { config } from './config';
-import Home from './Home';
-import { MainCol, Space } from './HelperComponents';
-import { displayError, jwtFetch, timeout } from './utils';
+import { api } from './api';
 import { AuthStore } from './auth.store';
 import { authActions } from './auth.actions';
+import AnalysisBuilder from './Builder';
+import { config } from './config';
+import { ApiUser, ApiAnalysis, AppAnalysis, AuthStoreState, Dataset } from './coretypes';
 import FAQ from './FAQ';
-import NotFound from './404';
+import { MainCol, Space } from './HelperComponents';
+import Home from './Home';
+import Private from './Private';
+import Public from './Public';
+import { displayError, jwtFetch, timeout } from './utils';
 
 const FormItem = Form.Item;
 const DOMAINROOT = config.server_url;
@@ -93,6 +94,7 @@ interface AppState {
   analyses: AppAnalysis[]; // List of analyses belonging to the user
   publicAnalyses: AppAnalysis[]; // List of public analyses
   auth: AuthStoreState;
+  datasets: Dataset[];
 }
 
 // Convert analyses returned by API to the shape expected by the frontend
@@ -101,6 +103,7 @@ const ApiToAppAnalysis = (data: ApiAnalysis): AppAnalysis => ({
   name: data.name,
   description: data.description,
   status: data.status,
+  datasetName: !!data.dataset_id ? '' + data.dataset_id : '',
   modifiedAt: data.modified_at
 });
 
@@ -112,10 +115,16 @@ class App extends Reflux.Component<any, {}, AppState> {
       loadAnalyses: true,
       analyses: [],
       publicAnalyses: [],
-      auth: authActions.getInitialState()
+      auth: authActions.getInitialState(),
+      datasets: [] 
     };
     this.store = AuthStore;
     this.loadPublicAnalyses();
+    api.getDatasets(false).then((datasets) => {
+      if (datasets.length !== 0) {
+        this.setState({ datasets });
+      }
+    });
   }
 
   // Load user's saved analyses from the server
@@ -131,7 +140,7 @@ class App extends Reflux.Component<any, {}, AppState> {
           this.setState({
             analyses: (data.analyses || [])
               .filter(x => !!x.status) // Ignore analyses with missing status
-              .map(x => ApiToAppAnalysis(x))
+              .map((x) => ApiToAppAnalysis(x))
           });
         })
         .catch(displayError);
@@ -144,7 +153,9 @@ class App extends Reflux.Component<any, {}, AppState> {
   // Load public analyses from the server
   loadPublicAnalyses = () =>
     fetch(`${DOMAINROOT}/api/analyses`)
-      .then(response => response.json())
+      .then((response) => {
+        return response.json();
+      })
       .then((data: ApiAnalysis[]) => {
         this.setState({
           publicAnalyses: data
@@ -184,7 +195,7 @@ class App extends Reflux.Component<any, {}, AppState> {
           this.setState({ analyses: values});
         }
       });
-      await timeout(10000);
+      await timeout(10000000);
     }
   };
 
@@ -586,15 +597,8 @@ class App extends Reflux.Component<any, {}, AppState> {
                   exact={true}
                   path="/"
                   render={props =>
-                    <Home
-                      analyses={this.state.auth.loggedIn ?
-                        analyses
-                      :
-                        publicAnalyses}
-                      loggedIn={this.state.auth.loggedIn}
-                      cloneAnalysis={this.cloneAnalysis}
-                      onDelete={this.onDelete}
-                    />}
+                    <Home />
+                   }
                 />
                 <Route
                   exact={true}
@@ -605,7 +609,11 @@ class App extends Reflux.Component<any, {}, AppState> {
                     // need to implement something like the auth workflow example here:
                     // https://reacttraining.com/react-router/web/example/auth-workflow
                     if (loggedIn || this.state.auth.openLogin) {
-                      return <AnalysisBuilder updatedAnalysis={() => this.loadAnalyses()} key={props.location.key}/>;
+                      return <AnalysisBuilder
+                                updatedAnalysis={() => this.loadAnalyses()}
+                                key={props.location.key}
+                                datasets={this.state.datasets}
+                      />;
                     }
                     message.warning('Please log in first and try again');
                     return <Redirect to="/" />;
@@ -618,6 +626,7 @@ class App extends Reflux.Component<any, {}, AppState> {
                       id={props.match.params.id}
                       updatedAnalysis={() => this.loadAnalyses()}
                       userOwns={this.state.analyses.filter((x) => x.id === props.match.params.id).length > 0}
+                      datasets={this.state.datasets}
                     />}
                 />
                 <Route
@@ -628,6 +637,7 @@ class App extends Reflux.Component<any, {}, AppState> {
                       id={props.match.params.id}
                       updatedAnalysis={() => this.loadAnalyses()}
                       userOwns={this.state.analyses.filter((x) => x.id === props.match.params.id).length > 0}
+                      datasets={this.state.datasets}
                     />
                   }
                 />
@@ -635,13 +645,22 @@ class App extends Reflux.Component<any, {}, AppState> {
                 exact={true}
                 path="/public"
                 render={props =>
-                  <Public analyses={publicAnalyses} cloneAnalysis={this.cloneAnalysis}/>}
+                  <Public
+                    analyses={publicAnalyses}
+                    cloneAnalysis={this.cloneAnalysis}
+                    datasets={this.state.datasets}
+                  />}
               />
               <Route
                 exact={true}
                 path="/myanalyses"
                 render={props =>
-                  <Private analyses={analyses} cloneAnalysis={this.cloneAnalysis} onDelete={this.onDelete}/>}
+                  <Private
+                    analyses={analyses}
+                    cloneAnalysis={this.cloneAnalysis}
+                    onDelete={this.onDelete}
+                    datasets={this.state.datasets}
+                  />}
               />
               <Route
                 exact={true}

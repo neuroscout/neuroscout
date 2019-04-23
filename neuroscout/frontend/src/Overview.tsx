@@ -294,7 +294,9 @@ export class OverviewTab extends React.Component<OverviewTabProps, OverviewTabSt
             columns={datasetColumns}
             rowKey="id"
             size="small"
-            dataSource={datasets}
+            dataSource={datasets.filter((x) => {
+              return x.active === true || x.id === this.props.analysis.datasetId; 
+            })}
             rowSelection={datasetRowSelection}
             pagination={(datasets.length > 10) ? {'position': 'bottom'} : false}
           />

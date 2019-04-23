@@ -1,6 +1,6 @@
 
 import * as React from 'react';
-import { message, Button, Collapse, Card, Table } from 'antd';
+import { message, Button, Collapse, Card, Icon, Table } from 'antd';
 
 import {
   Store,
@@ -29,6 +29,20 @@ interface ReviewProps {
   model: BidsModel;
   unsavedChanges: boolean;
   availablePredictors: Predictor[];
+  dataset?: Dataset;
+}
+
+class DatasetInfo extends React.Component<{dataset: Dataset}, {}> {
+  render() {
+    let dataset = this.props.dataset;
+    return (
+      <>
+        <p>{dataset.description}</p>
+        <p>Authors:<br/> {dataset.authors}</p>
+        <a href={dataset.url} target="_blank" rel="noopener">{dataset.url}</a>
+      </>
+    );
+  }
 }
 
 class ModelInput extends React.Component<{model: BidsModel}, {}> {
@@ -134,6 +148,7 @@ class X extends React.Component<{model: BidsModel, available: Predictor[]}, {}> 
 export class Review extends React.Component<ReviewProps, {}> {
   render() {
     let model = this.props.model;
+    let dataset = this.props.dataset;
     let { Name, Description, Steps, Input } = model;
     if (model && model.Name) { Name = model.Name; }
     if (model && model.Steps) { Steps = model.Steps; }
@@ -161,6 +176,7 @@ export class Review extends React.Component<ReviewProps, {}> {
       >
         <p>{Description ? Description : 'No description.'}</p>
         <Collapse bordered={false}>
+        {dataset && <Panel header={`Dataset - ${dataset.name}`} key="dataset"><DatasetInfo dataset={dataset}/></Panel>}
         <Panel header="Inputs" key="inputs"><ModelInput model={model}/></Panel>
         <Panel header="X (Variables)" key="X">
           <X model={this.props.model} available={this.props.availablePredictors}/>

@@ -19,7 +19,7 @@ class UserSchema(Schema):
     picture = fields.Str(allow_none=True)
     analyses = fields.Nested('AnalysisSchema',
                              only=['hash_id', 'name', 'status',
-                                   'description', 'modified_at'],
+                                   'description', 'modified_at', 'dataset_id'],
                              many=True, dump_only=True)
 
     @validates('password')
