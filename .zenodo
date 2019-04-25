@@ -1,0 +1,27 @@
+{
+  "creators": [
+    {
+      "affiliation": "University of Texas at Austin",
+      "name": "De La Vega, Alejandro",
+      "orcid": "0000-0001-9062-3778"
+    },
+    {
+      "affiliation": "Stanford University",
+      "name": "Blair, Ross",
+      "orcid": "0000-0003-3007-1056"
+     },
+     {
+      "affiliation": "University of Texas at Austin",
+      "name": "Yarkoni, Tal",
+      "orcid": "0000-0002-6558-5113"
+     }
+  ],
+  "keywords": [
+    "neuroimaging",
+    "naturalstic",
+    "BIDS",
+    "fMRI"
+  ],
+  "license": "BSD-3-Clause",
+  "upload_type": "software"
+}
