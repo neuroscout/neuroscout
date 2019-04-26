@@ -13,7 +13,8 @@ app.config.update(
     EXTRACTION_DIR=str(app.config['FILE_DIR'] / 'extracted'),
     FEATURE_SCHEMA=str(app.config['CONFIG_PATH'] / 'feature_schema.json'),
     PREDICTOR_SCHEMA=str(app.config['CONFIG_PATH'] / 'predictor_schema.json'),
-    ALL_TRANSFORMERS=str(app.config['CONFIG_PATH'] / 'transformers.json')
+    ALL_TRANSFORMERS=str(app.config['CONFIG_PATH'] / 'transformers.json'),
+    BIBLIOGRAPHY=str(app.config['CONFIG_PATH'] / 'bibliography.json')
 )
 
 
@@ -68,6 +69,7 @@ route_factory(
         ('AnalysisResource', 'analyses/<analysis_id>'),
         ('AnalysisFullResource', 'analyses/<analysis_id>/full'),
         ('AnalysisUploadResource', 'analyses/<analysis_id>/upload'),
+        ('BibliographyResource', 'analyses/<analysis_id>/bibliography'),
         ('CloneAnalysisResource', 'analyses/<analysis_id>/clone'),
         ('CompileAnalysisResource', 'analyses/<analysis_id>/compile'),
         ('ReportResource', 'analyses/<analysis_id>/report'),

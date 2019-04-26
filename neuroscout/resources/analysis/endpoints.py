@@ -1,4 +1,4 @@
-from flask import send_file
+from flask import send_file, current_app
 from flask_apispec import MethodResource, marshal_with, use_kwargs, doc
 from flask_jwt import current_identity
 from database import db
@@ -6,13 +6,13 @@ from models import Analysis, Report
 from os.path import exists
 import datetime
 import webargs as wa
+import json
 
 from utils.db import put_record
 from ..utils import owner_required, auth_required, fetch_analysis, abort
 from ..predictor import get_predictors
 from .schemas import (AnalysisSchema, AnalysisFullSchema,
-                      AnalysisResourcesSchema)
-
+                      AnalysisResourcesSchema, BibliographySchema)
 
 @doc(tags=['analysis'])
 @marshal_with(AnalysisSchema)
@@ -192,3 +192,19 @@ class AnalysisBundleResource(MethodResource):
             msg = "Analysis bundle not available. Try compiling."
             abort(404, msg)
         return send_file(analysis.bundle_path, as_attachment=True)
+
+
+class BibliographyResource(MethodResource):
+    @doc(tags=['analysis'], summary='Get analysis bibliography')
+    @marshal_with(BibliographySchema)
+    @fetch_analysis
+    def get(self, analysis):
+        bibliography = json.load(open(current_app.config['BIBLIOGRAPHY']))
+        CORE = ['nipype', 'neuroscout', 'fitlins', 'nipype']
+        papers = CORE + []
+
+        resp = {
+            'csl_json': [b for k, b in bibliography.items() if k in papers]
+        }
+
+        return resp

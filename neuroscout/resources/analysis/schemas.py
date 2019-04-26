@@ -133,3 +133,10 @@ class NeurovaultCollectionSchema(Schema):
     status = fields.Str(description='Upload status')
     traceback = fields.Str(
         description='Traceback of upload error.')
+
+
+class BibliographySchema(Schema):
+    """ Schema for analysis bibliographies """
+    csl_json = fields.Dict(
+        description='CSL-JSON representation of the tools, datasets, and'
+                    'extractors used in this analysis.')
