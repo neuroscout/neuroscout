@@ -1,0 +1,908 @@
+{
+  "neuroscout": [
+    {
+      "publisher": "Zenodo",
+      "DOI": "10.5281/zenodo.2592675",
+      "title": "neuroscout/neuroscout: 0.3.0",
+      "issued": {
+        "date-parts": [
+          [
+            2019,
+            3,
+            13
+          ]
+        ]
+      },
+      "author": [
+        {
+          "family": "de la Vega, Alejandro"
+        },
+        {
+          "family": "Blair, Ross"
+        },
+        {
+          "family": "Razavi, Pouya"
+        },
+        {
+          "family": "Yarkoni, Tal"
+        }
+      ],
+      "version": "v0.3.0",
+      "type": "article",
+      "id": "2592675"
+    }
+  ],
+  "nipype": [
+    {
+      "publisher": "Zenodo",
+      "DOI": "10.5281/zenodo.2577511",
+      "title": "nipy/nipype: 1.1.9",
+      "issued": {
+        "date-parts": [
+          [
+            2019,
+            2,
+            25
+          ]
+        ]
+      },
+      "author": [
+        {
+          "family": "Gorgolewski, Krzysztof J."
+        },
+        {
+          "family": "Esteban, Oscar"
+        },
+        {
+          "family": "Markiewicz, Christopher J."
+        },
+        {
+          "family": "Ziegler, Erik"
+        },
+        {
+          "family": "Ellis, David Gage"
+        },
+        {
+          "family": "Jarecka, Dorota"
+        },
+        {
+          "family": "Notter, Michael Philipp"
+        },
+        {
+          "family": "Johnson, Hans"
+        },
+        {
+          "family": "Burns, Christopher"
+        },
+        {
+          "family": "Manh\u00e3es-Savio, Alexandre"
+        },
+        {
+          "family": "Hamalainen, Carlo"
+        },
+        {
+          "family": "Yvernault, Benjamin"
+        },
+        {
+          "family": "Salo, Taylor"
+        },
+        {
+          "family": "Goncalves, Mathias"
+        },
+        {
+          "family": "Jordan, Kesshi"
+        },
+        {
+          "family": "Waskom, Michael"
+        },
+        {
+          "family": "Wong, Jason"
+        },
+        {
+          "family": "Modat, Marc"
+        },
+        {
+          "family": "Loney, Fred"
+        },
+        {
+          "family": "Clark, Daniel"
+        },
+        {
+          "family": "Nielson, Dylan M."
+        },
+        {
+          "family": "Dewey, Blake E"
+        },
+        {
+          "family": "Madison, Cindee"
+        },
+        {
+          "family": "Bougacha, Salma"
+        },
+        {
+          "family": "Clark, Michael G."
+        },
+        {
+          "family": "Dayan, Michael"
+        },
+        {
+          "family": "Visconti di Oleggio Castello, Matteo"
+        },
+        {
+          "family": "Clark, Dav"
+        },
+        {
+          "family": "Keshavan, Anisha"
+        },
+        {
+          "family": "Pinsard, Basile"
+        },
+        {
+          "family": "Gramfort, Alexandre"
+        },
+        {
+          "family": "Berleant, Shoshana"
+        },
+        {
+          "family": "Halchenko, Yaroslav O."
+        },
+        {
+          "family": "Christian, Horea"
+        },
+        {
+          "family": "Cipollini, Ben"
+        },
+        {
+          "family": "Guillon, J\u00e9r\u00e9my"
+        },
+        {
+          "family": "Markello, Ross"
+        },
+        {
+          "family": "Rokem, Ariel"
+        },
+        {
+          "family": "DuPre, Elizabeth"
+        },
+        {
+          "family": "Kaczmarzyk, Jakub"
+        },
+        {
+          "family": "Moloney, Brendan"
+        },
+        {
+          "family": "Varoquaux, Gael"
+        },
+        {
+          "family": "Wassermann, Demian"
+        },
+        {
+          "family": "Hanke, Michael"
+        },
+        {
+          "family": "de Hollander, Gilles"
+        },
+        {
+          "family": "Mordom, David"
+        },
+        {
+          "family": "Gillman, Ashley"
+        },
+        {
+          "family": "Buchanan, Colin"
+        },
+        {
+          "family": "Tabas, Alejandro"
+        },
+        {
+          "family": "Tungaraza, Rosalia"
+        },
+        {
+          "family": "Pauli, Wolfgang M."
+        },
+        {
+          "family": "Sikka, Sharad"
+        },
+        {
+          "family": "Mancini, Matteo"
+        },
+        {
+          "family": "Forbes, Jessica"
+        },
+        {
+          "family": "Iqbal, Shariq"
+        },
+        {
+          "family": "Richie-Halford, Adam"
+        },
+        {
+          "family": "Schwartz, Yannick"
+        },
+        {
+          "family": "Malone, Ian B."
+        },
+        {
+          "family": "Dubois, Mathieu"
+        },
+        {
+          "family": "Heinsfeld, Anibal S\u00f3lon"
+        },
+        {
+          "family": "Frohlich, Caroline"
+        },
+        {
+          "family": "Welch, David"
+        },
+        {
+          "family": "Bottenhorn, Katherine"
+        },
+        {
+          "family": "Kent, James"
+        },
+        {
+          "family": "De La Vega, Alejandro"
+        },
+        {
+          "family": "Watanabe, Aimi"
+        },
+        {
+          "family": "Huntenburg, Julia M."
+        },
+        {
+          "family": "Cumba, Chad"
+        },
+        {
+          "family": "Nichols, B. Nolan"
+        },
+        {
+          "family": "Eshaghi, Arman"
+        },
+        {
+          "family": "Ginsburg, Daniel"
+        },
+        {
+          "family": "Schaefer, Alexander"
+        },
+        {
+          "family": "Kastman, Erik"
+        },
+        {
+          "family": "Acland, Benjamin"
+        },
+        {
+          "family": "Liem, Franz"
+        },
+        {
+          "family": "Kleesiek, Jens"
+        },
+        {
+          "family": "Erickson, Drew"
+        },
+        {
+          "family": "Giavasis, Steven"
+        },
+        {
+          "family": "Correa, Carlos"
+        },
+        {
+          "family": "Ghayoor, Ali"
+        },
+        {
+          "family": "Contier, Oliver"
+        },
+        {
+          "family": "K\u00fcttner, Ren\u00e9"
+        },
+        {
+          "family": "Millman, Jarrod"
+        },
+        {
+          "family": "Lai, Jeff"
+        },
+        {
+          "family": "Zhou, Dale"
+        },
+        {
+          "family": "Blair, Ross"
+        },
+        {
+          "family": "Haselgrove, Christian"
+        },
+        {
+          "family": "Glatard, Tristan"
+        },
+        {
+          "family": "Renfro, Mandy"
+        },
+        {
+          "family": "Liu, Siqi"
+        },
+        {
+          "family": "Stadler, J\u00f6rg"
+        },
+        {
+          "family": "Kahn, Ari E."
+        },
+        {
+          "family": "P\u00e9rez-Garc\u00eda, Fernando"
+        },
+        {
+          "family": "Triplett, William"
+        },
+        {
+          "family": "Lampe, Leonie"
+        },
+        {
+          "family": "Kong, Xiang-Zhen"
+        },
+        {
+          "family": "Hallquist, Michael"
+        },
+        {
+          "family": "Ma, Feilong"
+        },
+        {
+          "family": "Leinweber, Katrin"
+        },
+        {
+          "family": "Chetverikov, Andrey"
+        },
+        {
+          "family": "Grignard, Martin"
+        },
+        {
+          "family": "Chawla, Kshitij"
+        },
+        {
+          "family": "Salvatore, John"
+        },
+        {
+          "family": "Park, Anne"
+        },
+        {
+          "family": "Poldrack, Russell"
+        },
+        {
+          "family": "Craddock, R. Cameron"
+        },
+        {
+          "family": "Hinds, Oliver"
+        },
+        {
+          "family": "Cooper, Gavin"
+        },
+        {
+          "family": "Weninger, Leon"
+        },
+        {
+          "family": "Inati, Souheil"
+        },
+        {
+          "family": "Perkins, L. Nathan"
+        },
+        {
+          "family": "Lukas Snoek"
+        },
+        {
+          "family": "Marina, Ana"
+        },
+        {
+          "family": "Mattfeld, Aaron"
+        },
+        {
+          "family": "Matsubara, K"
+        },
+        {
+          "family": "Noel, Maxime"
+        },
+        {
+          "family": "Cheung, Brian"
+        },
+        {
+          "family": "Urchs, Sebastian"
+        },
+        {
+          "family": "Durnez, Joke"
+        },
+        {
+          "family": "Condamine, Eric"
+        },
+        {
+          "family": "Geisler, Daniel"
+        },
+        {
+          "family": "Floren, Andrew"
+        },
+        {
+          "family": "Gerhard, Stephan"
+        },
+        {
+          "family": "Sharp, Paul"
+        },
+        {
+          "family": "Molina-Romero, Miguel"
+        },
+        {
+          "family": "Haehn, Daniel"
+        },
+        {
+          "family": "Weinstein, Alejandro"
+        },
+        {
+          "family": "Tambini, Arielle"
+        },
+        {
+          "family": "Broderick, William"
+        },
+        {
+          "family": "Saase, Victor"
+        },
+        {
+          "family": "Rothmei, Simon"
+        },
+        {
+          "family": "Andberg, Sami Kristian"
+        },
+        {
+          "family": "Harms, Robbert"
+        },
+        {
+          "family": "Khanuja, Ranjeet"
+        },
+        {
+          "family": "Schlamp, Kai"
+        },
+        {
+          "family": "Arias, Jaime"
+        },
+        {
+          "family": "Papadopoulos Orfanos, Dimitri"
+        },
+        {
+          "family": "Tarbert, Claire"
+        },
+        {
+          "family": "Nickson, Thomas"
+        },
+        {
+          "family": "Brett, Matthew"
+        },
+        {
+          "family": "Falkiewicz, Marcel"
+        },
+        {
+          "family": "Podranski, Kornelius"
+        },
+        {
+          "family": "Linkersd\u00f6rfer, Janosch"
+        },
+        {
+          "family": "Flandin, Guillaume"
+        },
+        {
+          "family": "Ort, Eduard"
+        },
+        {
+          "family": "Shachnev, Dmitry"
+        },
+        {
+          "family": "McNamee, Daniel"
+        },
+        {
+          "family": "Davison, Andrew"
+        },
+        {
+          "family": "Varada, Jan"
+        },
+        {
+          "family": "Schwabacher, Isaac"
+        },
+        {
+          "family": "Pellman, John"
+        },
+        {
+          "family": "Perez-Guevara, Martin"
+        },
+        {
+          "family": "Khanuja, Ranjeet"
+        },
+        {
+          "family": "Pannetier, Nicolas"
+        },
+        {
+          "family": "McDermottroe, Conor"
+        },
+        {
+          "family": "Mihai, Paul Glad"
+        },
+        {
+          "family": "Ghosh, Satrajit"
+        }
+      ],
+      "version": "1.1.9",
+      "type": "article",
+      "id": "2577511"
+    },
+    {
+      "id": "http://zotero.org/users/local/JXz6ijqB/items/6ZQLU4A3",
+      "type": "article-journal",
+      "title": "Nipype: A Flexible, Lightweight and Extensible Neuroimaging Data Processing Framework in Python",
+      "container-title": "Frontiers in Neuroinformatics",
+      "volume": "5",
+      "source": "Crossref",
+      "URL": "http://journal.frontiersin.org/article/10.3389/fninf.2011.00013/abstract",
+      "DOI": "10.3389/fninf.2011.00013",
+      "ISSN": "1662-5196",
+      "title-short": "Nipype",
+      "author": [
+        {
+          "family": "Gorgolewski",
+          "given": "Krzysztof"
+        },
+        {
+          "family": "Burns",
+          "given": "Christopher D."
+        },
+        {
+          "family": "Madison",
+          "given": "Cindee"
+        },
+        {
+          "family": "Clark",
+          "given": "Dav"
+        },
+        {
+          "family": "Halchenko",
+          "given": "Yaroslav O."
+        },
+        {
+          "family": "Waskom",
+          "given": "Michael L."
+        },
+        {
+          "family": "Ghosh",
+          "given": "Satrajit S."
+        }
+      ],
+      "issued": {
+        "date-parts": [
+          [
+            "2011"
+          ]
+        ]
+      },
+      "accessed": {
+        "date-parts": [
+          [
+            "2019",
+            4,
+            26
+          ]
+        ]
+      }
+    }
+  ],
+  "fmriprep": [
+    {
+      "publisher": "Zenodo",
+      "DOI": "10.5281/zenodo.2597526",
+      "title": "fMRIPrep: a robust preprocessing pipeline for functional MRI",
+      "issued": {
+        "date-parts": [
+          [
+            2019,
+            3,
+            18
+          ]
+        ]
+      },
+      "author": [
+        {
+          "family": "Esteban, Oscar"
+        },
+        {
+          "family": "Blair, Ross"
+        },
+        {
+          "family": "Markiewicz, Christopher J."
+        },
+        {
+          "family": "Berleant, Shoshana L."
+        },
+        {
+          "family": "Moodie, Craig"
+        },
+        {
+          "family": "Ma, Feilong"
+        },
+        {
+          "family": "Isik, Ayse Ilkay"
+        },
+        {
+          "family": "Erramuzpe, Asier"
+        },
+        {
+          "family": "Kent, James D."
+        },
+        {
+          "family": "Goncalves, Mathias"
+        },
+        {
+          "family": "DuPre, Elizabeth"
+        },
+        {
+          "family": "Sitek, Kevin R."
+        },
+        {
+          "family": "Gomez, Daniel E. P."
+        },
+        {
+          "family": "Lurie, Daniel J."
+        },
+        {
+          "family": "Ye, Zhifang"
+        },
+        {
+          "family": "Salo, Taylor"
+        },
+        {
+          "family": "Valabregue, Romain"
+        },
+        {
+          "family": "Amlien, Inge K."
+        },
+        {
+          "family": "Liem, Franz"
+        },
+        {
+          "family": "Jacoby, Nir"
+        },
+        {
+          "family": "Stojic, Hrvoje"
+        },
+        {
+          "family": "Poldrack, Russell A."
+        },
+        {
+          "family": "Gorgolewski, Krzysztof J."
+        }
+      ],
+      "version": "1.3.2",
+      "type": "article",
+      "id": "2597526"
+    },
+    {
+      "id": "http://zotero.org/users/local/JXz6ijqB/items/MB27YTQQ",
+      "type": "article-journal",
+      "title": "fMRIPrep: a robust preprocessing pipeline for functional MRI",
+      "container-title": "Nature Methods",
+      "page": "111",
+      "volume": "16",
+      "issue": "1",
+      "source": "www.nature.com",
+      "URL": "https://www.nature.com/articles/s41592-018-0235-4",
+      "DOI": "10.1038/s41592-018-0235-4",
+      "ISSN": "1548-7105",
+      "title-short": "fMRIPrep",
+      "language": "En",
+      "author": [
+        {
+          "family": "Esteban",
+          "given": "Oscar"
+        },
+        {
+          "family": "Markiewicz",
+          "given": "Christopher J."
+        },
+        {
+          "family": "Blair",
+          "given": "Ross W."
+        },
+        {
+          "family": "Moodie",
+          "given": "Craig A."
+        },
+        {
+          "family": "Isik",
+          "given": "A. Ilkay"
+        },
+        {
+          "family": "Erramuzpe",
+          "given": "Asier"
+        },
+        {
+          "family": "Kent",
+          "given": "James D."
+        },
+        {
+          "family": "Goncalves",
+          "given": "Mathias"
+        },
+        {
+          "family": "DuPre",
+          "given": "Elizabeth"
+        },
+        {
+          "family": "Snyder",
+          "given": "Madeleine"
+        },
+        {
+          "family": "Oya",
+          "given": "Hiroyuki"
+        },
+        {
+          "family": "Ghosh",
+          "given": "Satrajit S."
+        },
+        {
+          "family": "Wright",
+          "given": "Jessey"
+        },
+        {
+          "family": "Durnez",
+          "given": "Joke"
+        },
+        {
+          "family": "Poldrack",
+          "given": "Russell A."
+        },
+        {
+          "family": "Gorgolewski",
+          "given": "Krzysztof J."
+        }
+      ],
+      "issued": {
+        "date-parts": [
+          [
+            "2019",
+            1
+          ]
+        ]
+      },
+      "accessed": {
+        "date-parts": [
+          [
+            "2019",
+            4,
+            26
+          ]
+        ]
+      }
+    }
+  ],
+  "datalad": [
+    {
+      "publisher": "Zenodo",
+      "DOI": "10.5281/zenodo.2630963",
+      "title": "datalad/datalad 0.11.4",
+      "issued": {
+        "date-parts": [
+          [
+            2019,
+            4,
+            6
+          ]
+        ]
+      },
+      "author": [
+        {
+          "family": "Halchenko, Yaroslav O."
+        },
+        {
+          "family": "Hanke, Michael"
+        },
+        {
+          "family": "Poldrack, Benjamin"
+        },
+        {
+          "family": "Meyer, Kyle"
+        },
+        {
+          "family": "Solanky, Debanjum Singh"
+        },
+        {
+          "family": "Alteva, Gergana"
+        },
+        {
+          "family": "Gors, Jason"
+        },
+        {
+          "family": "MacFarlane, Dave"
+        },
+        {
+          "family": "Olaf H\u00e4usler, Christian"
+        },
+        {
+          "family": "Olson, Taylor"
+        },
+        {
+          "family": "Waite, Alex"
+        },
+        {
+          "family": "De La Vega, Alejandro"
+        },
+        {
+          "family": "Sochat, Vanessa"
+        },
+        {
+          "family": "Keshavan, Anisha"
+        },
+        {
+          "family": "Ma, Feilong"
+        },
+        {
+          "family": "Christian, Horea"
+        },
+        {
+          "family": "Poelen, Jorrit"
+        },
+        {
+          "family": "Skyt\u00e9n, Kusti"
+        },
+        {
+          "family": "Visconti di Oleggio Castello, Matteo"
+        },
+        {
+          "family": "Hardcastle, Nell"
+        },
+        {
+          "family": "Stoeter, Torsten"
+        },
+        {
+          "family": "C Lau, Vicky"
+        }
+      ],
+      "version": "0.11.4",
+      "type": "article",
+      "id": "2630963"
+      }
+  ],
+  "pliers": [
+    {
+      "id": "http://zotero.org/users/local/JXz6ijqB/items/8IWC3VF5",
+      "type": "paper-conference",
+      "title": "Developing a Comprehensive Framework for Multimodal Feature Extraction",
+      "container-title": "Proceedings of the 23rd ACM SIGKDD International Conference on Knowledge Discovery and Data Mining",
+      "collection-title": "KDD '17",
+      "publisher": "ACM",
+      "publisher-place": "New York, NY, USA",
+      "page": "1567–1574",
+      "source": "ACM Digital Library",
+      "event-place": "New York, NY, USA",
+      "URL": "http://doi.acm.org/10.1145/3097983.3098075",
+      "DOI": "10.1145/3097983.3098075",
+      "ISBN": "978-1-4503-4887-4",
+      "note": "event-place: Halifax, NS, Canada",
+      "author": [
+        {
+          "family": "McNamara",
+          "given": "Quinten"
+        },
+        {
+          "family": "De La Vega",
+          "given": "Alejandro"
+        },
+        {
+          "family": "Yarkoni",
+          "given": "Tal"
+        }
+      ],
+      "issued": {
+        "date-parts": [
+          [
+            "2017"
+          ]
+        ]
+      },
+      "accessed": {
+        "date-parts": [
+          [
+            "2019",
+            4,
+            26
+          ]
+        ]
+      }
+    }
+  ]
+}

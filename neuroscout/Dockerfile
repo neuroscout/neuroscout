@@ -4,11 +4,6 @@ ARG DEBIAN_FRONTEND=noninteractive
 RUN mkdir -p /usr/src/app
 WORKDIR /usr/src/app
 
-COPY requirements.txt /usr/src/app/
-RUN pip install --no-cache-dir -r requirements.txt
-
-COPY . /usr/src/app
-
 RUN apt-get -qq update
 RUN apt-get install -yq ffmpeg tesseract-ocr
 RUN pip install -e git+https://github.com/tyarkoni/pliers.git#egg=pliers
@@ -28,6 +23,11 @@ RUN echo "deb-src https://deb.nodesource.com/node_11.x jessie main" | tee -a /et
 RUN apt-get update
 RUN apt-get install -y nodejs
 RUN npm install -g yarn
+
+COPY requirements.txt /usr/src/app/
+RUN pip install --no-cache-dir -r requirements.txt
+
+COPY . /usr/src/app
 
 RUN git config --global user.name "Neuroscout"
 RUN git config --global  user.email "delavega@utexas.edu"
