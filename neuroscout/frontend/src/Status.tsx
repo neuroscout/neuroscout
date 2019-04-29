@@ -203,8 +203,7 @@ export class StatusTab extends React.Component<submitProps, {compileTraceback: s
           <p>
             {this.props.userOwns && 'Congratulations!'} The analysis is finished compiling and is ready to be executed.
             Once you have installed Docker you may run the analysis with the following command,
-            replacing '/local/outputdirectory' with the directory on your local computer where results
-            should be stored:
+            replacing '/local/directory' with a directory on your computer:
           </p>
           <pre>
             <code>

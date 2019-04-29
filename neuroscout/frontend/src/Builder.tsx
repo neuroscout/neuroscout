@@ -17,6 +17,7 @@ import { XformsTab, validateXform } from './Transformations';
 import { Review } from './Review';
 import { Report } from './Report';
 import { Status, Submit, StatusTab } from './Status';
+import { BibliographyTab } from './Bibliography';
 import OptionsTab from './Options';
 import {
   Store,
@@ -1160,6 +1161,16 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
                       />
                   }
                   </StatusTab>
+                </TabPane>
+                <TabPane
+                  tab="Bibliography"
+                  key="bib"
+                  disabled={!submitActive && isDraft}
+                >
+                  <h2>Bibliography</h2>
+                  <BibliographyTab
+                    analysisId={analysis.analysisId}
+                  />
                 </TabPane>
               </Tabs>
             </MainCol>

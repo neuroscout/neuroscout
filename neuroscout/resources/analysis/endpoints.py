@@ -194,17 +194,22 @@ class AnalysisBundleResource(MethodResource):
         return send_file(analysis.bundle_path, as_attachment=True)
 
 
+def _flatten(li):
+    return [item for sublist in li for item in sublist]
+
+
 class BibliographyResource(MethodResource):
     @doc(tags=['analysis'], summary='Get analysis bibliography')
     @marshal_with(BibliographySchema)
     @fetch_analysis
     def get(self, analysis):
-        bibliography = json.load(open(current_app.config['BIBLIOGRAPHY']))
+        bib = json.load(open(current_app.config['BIBLIOGRAPHY']))
         CORE = ['nipype', 'neuroscout', 'fitlins', 'nipype']
-        papers = CORE + []
 
         resp = {
-            'csl_json': [b for k, b in bibliography.items() if k in papers]
+            'tools': _flatten([b for k, b in bib.items() if k in CORE]),
+            'data': [],
+            'extractors': []
         }
 
         return resp
