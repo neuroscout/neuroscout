@@ -1,4 +1,4 @@
-from flask import send_file
+from flask import send_file, current_app
 from flask_apispec import MethodResource, marshal_with, use_kwargs, doc
 from flask_jwt import current_identity
 from database import db
@@ -6,12 +6,14 @@ from models import Analysis, Report
 from os.path import exists
 import datetime
 import webargs as wa
+import json
 
 from utils.db import put_record
+from .bib import format_bibliography, find_predictor_citation, _flatten
 from ..utils import owner_required, auth_required, fetch_analysis, abort
 from ..predictor import get_predictors
 from .schemas import (AnalysisSchema, AnalysisFullSchema,
-                      AnalysisResourcesSchema)
+                      AnalysisResourcesSchema, BibliographySchema)
 
 
 @doc(tags=['analysis'])
@@ -192,3 +194,38 @@ class AnalysisBundleResource(MethodResource):
             msg = "Analysis bundle not available. Try compiling."
             abort(404, msg)
         return send_file(analysis.bundle_path, as_attachment=True)
+
+
+class BibliographyResource(MethodResource):
+    @doc(tags=['analysis'], summary='Get analysis bibliography')
+    @marshal_with(BibliographySchema)
+    @fetch_analysis
+    def get(self, analysis):
+        """ Searches for references for the core tools, dataset and extractors
+        used in this analysis. For extractors, individual features can be
+        coded as the second-level key in the Bibliography. Otherwise,
+        for all other matches, .* is used to denote that all entries match. """
+        bib = json.load(open(current_app.config['BIBLIOGRAPHY']))
+
+        tools = [b['.*'] for k, b in bib.items()
+                 if k in ['nipype', 'neuroscout', 'fitlins', 'nipype']]
+        all_csl_json = tools
+
+        dataset_entry = bib.get(analysis.dataset.name, [])
+        if dataset_entry:
+            data = [dataset_entry['.*']]
+            all_csl_json += data
+
+        # Search for Predictor citations
+        extractors = [find_predictor_citation(p, bib)
+                      for p in analysis.predictors]
+        all_csl_json += extractors
+
+        resp = {
+            'tools': format_bibliography(tools),
+            'data': format_bibliography(data),
+            'extractors': format_bibliography(extractors),
+            'csl_json': _flatten(all_csl_json)
+        }
+
+        return resp

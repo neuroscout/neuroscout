@@ -4,7 +4,8 @@ from .analysis import (AnalysisResource, AnalysisRootResource,
                        CloneAnalysisResource, CompileAnalysisResource,
                        AnalysisBundleResource, AnalysisFullResource,
                        AnalysisResourcesResource, ReportResource,
-                       AnalysisFillResource, AnalysisUploadResource)
+                       AnalysisFillResource, AnalysisUploadResource,
+                       BibliographyResource)
 from .dataset import DatasetSchema, DatasetResource, DatasetListResource
 from .predictor import (PredictorEventSchema, PredictorSchema,
                         PredictorListResource, PredictorResource,
@@ -24,6 +25,7 @@ __all__ = [
     'AnalysisFillResource',
     'AnalysisResourcesResource',
     'AnalysisUploadResource',
+    'BibliographyResource',
     'ReportResource',
     'DatasetSchema',
     'DatasetResource',

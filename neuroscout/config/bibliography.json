@@ -1,0 +1,1672 @@
+{
+    "ClarifaiAPIImageExtractor": {
+        ".*": [
+            {
+                "URL": "https://clarifai.com/",
+                "accessed": {
+                    "date-parts": [
+                        [
+                            "2019",
+                            4,
+                            30
+                        ]
+                    ]
+                },
+                "id": "http://zotero.org/users/local/JXz6ijqB/items/PL5VBJKF",
+                "title": "Clarifai",
+                "type": "webpage"
+            }
+        ]
+    },
+    "GoogleVisionAPIFaceExtractor|GoogleVisionAPILabelExtractor|GoogleVisionAPIPropertyExtractor|GoogleVideoAPIShotDetectionExtractor|GoogleVisionAPISafeSearchExtractor": {
+        ".*": [
+            {
+                "URL": "https://cloud.google.com/",
+                "accessed": {
+                    "date-parts": [
+                        [
+                            "2019",
+                            4,
+                            30
+                        ]
+                    ]
+                },
+                "container-title": "Google Cloud",
+                "id": "http://zotero.org/users/local/JXz6ijqB/items/QBBN5S87",
+                "language": "en",
+                "title": "Google Cloud Computing Services",
+                "type": "webpage"
+            }
+        ]
+    },
+    "HealthyBrainNetwork": {
+        ".*": [
+            {
+                "DOI": "10.1038/sdata.2017.181",
+                "ISSN": "2052-4463",
+                "URL": "https://www.nature.com/articles/sdata2017181",
+                "abstract": "Technological and methodological innovations are equipping researchers with unprecedented capabilities for detecting and characterizing pathologic processes in the developing human brain. As a result, ambitions to achieve clinically useful tools to assist in the diagnosis and management of mental health and learning disorders are gaining momentum. To this end, it is critical to accrue large-scale multimodal datasets that capture a broad range of commonly encountered clinical psychopathology. The Child Mind Institute has launched the Healthy Brain Network (HBN), an ongoing initiative focused on creating and sharing a biobank of data from 10,000 New York area participants (ages 5\u201321). The HBN Biobank houses data about psychiatric, behavioral, cognitive, and lifestyle phenotypes, as well as multimodal brain imaging (resting and naturalistic viewing fMRI, diffusion MRI, morphometric MRI), electroencephalography, eye-tracking, voice and video recordings, genetics and actigraphy. Here, we present the rationale, design and implementation of HBN protocols. We describe the first data release (n=664) and the potential of the biobank to advance related areas (e.g., biophysical modeling, voice analysis).",
+                "accessed": {
+                    "date-parts": [
+                        [
+                            "2019",
+                            4,
+                            29
+                        ]
+                    ]
+                },
+                "author": [
+                    {
+                        "family": "Alexander",
+                        "given": "Lindsay M."
+                    },
+                    {
+                        "family": "Escalera",
+                        "given": "Jasmine"
+                    },
+                    {
+                        "family": "Ai",
+                        "given": "Lei"
+                    },
+                    {
+                        "family": "Andreotti",
+                        "given": "Charissa"
+                    },
+                    {
+                        "family": "Febre",
+                        "given": "Karina"
+                    },
+                    {
+                        "family": "Mangone",
+                        "given": "Alexander"
+                    },
+                    {
+                        "family": "Vega-Potler",
+                        "given": "Natan"
+                    },
+                    {
+                        "family": "Langer",
+                        "given": "Nicolas"
+                    },
+                    {
+                        "family": "Alexander",
+                        "given": "Alexis"
+                    },
+                    {
+                        "family": "Kovacs",
+                        "given": "Meagan"
+                    },
+                    {
+                        "family": "Litke",
+                        "given": "Shannon"
+                    },
+                    {
+                        "family": "O'Hagan",
+                        "given": "Bridget"
+                    },
+                    {
+                        "family": "Andersen",
+                        "given": "Jennifer"
+                    },
+                    {
+                        "family": "Bronstein",
+                        "given": "Batya"
+                    },
+                    {
+                        "family": "Bui",
+                        "given": "Anastasia"
+                    },
+                    {
+                        "family": "Bushey",
+                        "given": "Marijayne"
+                    },
+                    {
+                        "family": "Butler",
+                        "given": "Henry"
+                    },
+                    {
+                        "family": "Castagna",
+                        "given": "Victoria"
+                    },
+                    {
+                        "family": "Camacho",
+                        "given": "Nicolas"
+                    },
+                    {
+                        "family": "Chan",
+                        "given": "Elisha"
+                    },
+                    {
+                        "family": "Citera",
+                        "given": "Danielle"
+                    },
+                    {
+                        "family": "Clucas",
+                        "given": "Jon"
+                    },
+                    {
+                        "family": "Cohen",
+                        "given": "Samantha"
+                    },
+                    {
+                        "family": "Dufek",
+                        "given": "Sarah"
+                    },
+                    {
+                        "family": "Eaves",
+                        "given": "Megan"
+                    },
+                    {
+                        "family": "Fradera",
+                        "given": "Brian"
+                    },
+                    {
+                        "family": "Gardner",
+                        "given": "Judith"
+                    },
+                    {
+                        "family": "Grant-Villegas",
+                        "given": "Natalie"
+                    },
+                    {
+                        "family": "Green",
+                        "given": "Gabriella"
+                    },
+                    {
+                        "family": "Gregory",
+                        "given": "Camille"
+                    },
+                    {
+                        "family": "Hart",
+                        "given": "Emily"
+                    },
+                    {
+                        "family": "Harris",
+                        "given": "Shana"
+                    },
+                    {
+                        "family": "Horton",
+                        "given": "Megan"
+                    },
+                    {
+                        "family": "Kahn",
+                        "given": "Danielle"
+                    },
+                    {
+                        "family": "Kabotyanski",
+                        "given": "Katherine"
+                    },
+                    {
+                        "family": "Karmel",
+                        "given": "Bernard"
+                    },
+                    {
+                        "family": "Kelly",
+                        "given": "Simon P."
+                    },
+                    {
+                        "family": "Kleinman",
+                        "given": "Kayla"
+                    },
+                    {
+                        "family": "Koo",
+                        "given": "Bonhwang"
+                    },
+                    {
+                        "family": "Kramer",
+                        "given": "Eliza"
+                    },
+                    {
+                        "family": "Lennon",
+                        "given": "Elizabeth"
+                    },
+                    {
+                        "family": "Lord",
+                        "given": "Catherine"
+                    },
+                    {
+                        "family": "Mantello",
+                        "given": "Ginny"
+                    },
+                    {
+                        "family": "Margolis",
+                        "given": "Amy"
+                    },
+                    {
+                        "family": "Merikangas",
+                        "given": "Kathleen R."
+                    },
+                    {
+                        "family": "Milham",
+                        "given": "Judith"
+                    },
+                    {
+                        "family": "Minniti",
+                        "given": "Giuseppe"
+                    },
+                    {
+                        "family": "Neuhaus",
+                        "given": "Rebecca"
+                    },
+                    {
+                        "family": "Levine",
+                        "given": "Alexandra"
+                    },
+                    {
+                        "family": "Osman",
+                        "given": "Yael"
+                    },
+                    {
+                        "family": "Parra",
+                        "given": "Lucas C."
+                    },
+                    {
+                        "family": "Pugh",
+                        "given": "Ken R."
+                    },
+                    {
+                        "family": "Racanello",
+                        "given": "Amy"
+                    },
+                    {
+                        "family": "Restrepo",
+                        "given": "Anita"
+                    },
+                    {
+                        "family": "Saltzman",
+                        "given": "Tian"
+                    },
+                    {
+                        "family": "Septimus",
+                        "given": "Batya"
+                    },
+                    {
+                        "family": "Tobe",
+                        "given": "Russell"
+                    },
+                    {
+                        "family": "Waltz",
+                        "given": "Rachel"
+                    },
+                    {
+                        "family": "Williams",
+                        "given": "Anna"
+                    },
+                    {
+                        "family": "Yeo",
+                        "given": "Anna"
+                    },
+                    {
+                        "family": "Castellanos",
+                        "given": "Francisco X."
+                    },
+                    {
+                        "family": "Klein",
+                        "given": "Arno"
+                    },
+                    {
+                        "family": "Paus",
+                        "given": "Tomas"
+                    },
+                    {
+                        "family": "Leventhal",
+                        "given": "Bennett L."
+                    },
+                    {
+                        "family": "Craddock",
+                        "given": "R. Cameron"
+                    },
+                    {
+                        "family": "Koplewicz",
+                        "given": "Harold S."
+                    },
+                    {
+                        "family": "Milham",
+                        "given": "Michael P."
+                    }
+                ],
+                "container-title": "Scientific Data",
+                "id": "http://zotero.org/users/local/JXz6ijqB/items/22BEZ3Y2",
+                "issued": {
+                    "date-parts": [
+                        [
+                            "2017",
+                            12,
+                            19
+                        ]
+                    ]
+                },
+                "language": "en",
+                "page": "170181",
+                "source": "www.nature.com",
+                "title": "An open resource for transdiagnostic research in pediatric mental health and learning disorders",
+                "type": "article-journal",
+                "volume": "4"
+            }
+        ]
+    },
+    "LearningTemporalStructure": {
+        ".*": [
+            {
+                "DOI": "10.1162/jocn_a_01308",
+                "ISSN": "0898-929X",
+                "URL": "https://doi.org/10.1162/jocn_a_01308",
+                "abstract": "The posterior medial network is at the apex of a temporal integration hierarchy in the brain, integrating information over many seconds of viewing intact, but not scrambled, movies. This has been interpreted as an effect of temporal structure. Such structure in movies depends on preexisting event schemas, but temporal structure can also arise de novo from learning. Here, we examined the relative role of schema-consistent temporal structure and arbitrary but consistent temporal structure on the human posterior medial network. We tested whether, with repeated viewing, the network becomes engaged by scrambled movies with temporal structure. Replicating prior studies, activity in posterior medial regions was immediately locked to stimulus structure upon exposure to intact, but not scrambled, movies. However, for temporally structured scrambled movies, functional coupling within the network increased across stimulus repetitions, rising to the level of intact movies. Thus, temporal structure is a key determinant of network dynamics and function in the posterior medial network.",
+                "accessed": {
+                    "date-parts": [
+                        [
+                            "2019",
+                            4,
+                            29
+                        ]
+                    ]
+                },
+                "author": [
+                    {
+                        "family": "Aly",
+                        "given": "Mariam"
+                    },
+                    {
+                        "family": "Chen",
+                        "given": "Janice"
+                    },
+                    {
+                        "family": "Turk-Browne",
+                        "given": "Nicholas B."
+                    },
+                    {
+                        "family": "Hasson",
+                        "given": "Uri"
+                    }
+                ],
+                "container-title": "Journal of Cognitive Neuroscience",
+                "id": "http://zotero.org/users/local/JXz6ijqB/items/7DA5V3VE",
+                "issue": "9",
+                "issued": {
+                    "date-parts": [
+                        [
+                            "2018",
+                            7,
+                            13
+                        ]
+                    ]
+                },
+                "journalAbbreviation": "Journal of Cognitive Neuroscience",
+                "page": "1345-1365",
+                "source": "MIT Press Journals",
+                "title": "Learning Naturalistic Temporal Structure in the Posterior Medial Network",
+                "type": "article-journal",
+                "volume": "30"
+            }
+        ]
+    },
+    "Life": {
+        ".*": [
+            {
+                "DOI": "10.3389/fnins.2018.00316",
+                "ISSN": "1662-453X",
+                "URL": "https://www.frontiersin.org/articles/10.3389/fnins.2018.00316/full",
+                "abstract": "Neural Responses to Naturalistic Clips of Behaving Animals in Two Different Task Contexts",
+                "accessed": {
+                    "date-parts": [
+                        [
+                            "2019",
+                            4,
+                            29
+                        ]
+                    ]
+                },
+                "author": [
+                    {
+                        "family": "Nastase",
+                        "given": "Samuel A."
+                    },
+                    {
+                        "family": "Halchenko",
+                        "given": "Yaroslav O."
+                    },
+                    {
+                        "family": "Connolly",
+                        "given": "Andrew C."
+                    },
+                    {
+                        "family": "Gobbini",
+                        "given": "M. Ida"
+                    },
+                    {
+                        "family": "Haxby",
+                        "given": "James V."
+                    }
+                ],
+                "container-title": "Frontiers in Neuroscience",
+                "id": "http://zotero.org/users/local/JXz6ijqB/items/4YR9JJEG",
+                "issued": {
+                    "date-parts": [
+                        [
+                            "2018"
+                        ]
+                    ]
+                },
+                "journalAbbreviation": "Front. Neurosci.",
+                "language": "English",
+                "source": "Frontiers",
+                "title": "Neural Responses to Naturalistic Clips of Behaving Animals in Two Different Task Contexts",
+                "type": "article-journal",
+                "volume": "12"
+            }
+        ]
+    },
+    "MeanAmplitudeExtractor|RMSExtractor|RMSEExtractor|SpectralCentroidExtractor": {
+        ".*": [
+            {
+                "DOI": "10.25080/majora-7b98e3ed-003",
+                "abstract": "This document describes version 0.4.0 of librosa: a Python package for audio and music signal processing. At a high level, librosa provides implementations of a variety of common functions used throughout the field of music information retrieval. In this document, a brief overview of the library\u2019s functionality is provided, along with explanations of the design goals, software development practices, and notational conventions.",
+                "author": [
+                    {
+                        "family": "McFee",
+                        "given": "Brian"
+                    },
+                    {
+                        "family": "Raffel",
+                        "given": "Colin A."
+                    },
+                    {
+                        "family": "Liang",
+                        "given": "Dawen"
+                    },
+                    {
+                        "family": "Ellis",
+                        "given": "Daniel Patrick Whittlesey"
+                    },
+                    {
+                        "family": "McVicar",
+                        "given": "Matt"
+                    },
+                    {
+                        "family": "Battenberg",
+                        "given": "Eric"
+                    },
+                    {
+                        "family": "Nieto",
+                        "given": "Oriol"
+                    }
+                ],
+                "container-title": "Proceedings of 14th Python in Science Conference",
+                "event": "SciPy",
+                "id": "http://zotero.org/users/local/JXz6ijqB/items/ECUAQPES",
+                "issued": {
+                    "date-parts": [
+                        [
+                            "2015"
+                        ]
+                    ]
+                },
+                "shortTitle": "librosa",
+                "source": "Semantic Scholar",
+                "title": "librosa: Audio and Music Signal Analysis in Python",
+                "type": "paper-conference"
+            }
+        ]
+    },
+    "ParanoiaStory": {
+        ".*": [
+            {
+                "DOI": "10.1038/s41467-018-04387-2",
+                "ISSN": "2041-1723",
+                "URL": "https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5966466/",
+                "abstract": "Individuals often interpret the same event in different ways. How do personality traits modulate brain activity evoked by a complex stimulus? Here we report results from a naturalistic paradigm designed to draw out both neural and behavioral variation along a specific dimension of interest, namely paranoia. Participants listen to a narrative during functional MRI describing an ambiguous social scenario, written such that some individuals would find it highly suspicious, while others less so. Using inter-subject correlation analysis, we identify several brain areas that are differentially synchronized during listening between participants with high and low\u00a0trait-level paranoia, including theory-of-mind regions. Follow-up analyses indicate that these regions are more active to mentalizing events in high-paranoia individuals. Analyzing participants\u2019 speech as they freely recall the narrative reveals semantic and syntactic features that also scale with paranoia. Results indicate that a personality trait can act as an intrinsic \u201cprime,\u201d yielding different neural and behavioral responses to the same stimulus across individuals., Reactions to the same event can vary vastly based on multiple factors. Here the authors show that people with high trait-level paranoia process ambiguous information in a narrative differently and this can be attributed to greater activity in mentalizing brain regions during the moments of ambiguity.",
+                "accessed": {
+                    "date-parts": [
+                        [
+                            "2019",
+                            4,
+                            29
+                        ]
+                    ]
+                },
+                "author": [
+                    {
+                        "family": "Finn",
+                        "given": "Emily S."
+                    },
+                    {
+                        "family": "Corlett",
+                        "given": "Philip R."
+                    },
+                    {
+                        "family": "Chen",
+                        "given": "Gang"
+                    },
+                    {
+                        "family": "Bandettini",
+                        "given": "Peter A."
+                    },
+                    {
+                        "family": "Constable",
+                        "given": "R. Todd"
+                    }
+                ],
+                "container-title": "Nature Communications",
+                "id": "http://zotero.org/users/local/JXz6ijqB/items/D3SYM22D",
+                "issued": {
+                    "date-parts": [
+                        [
+                            "2018",
+                            5,
+                            23
+                        ]
+                    ]
+                },
+                "journalAbbreviation": "Nat Commun",
+                "note": "PMID: 29795116\nPMCID: PMC5966466",
+                "source": "PubMed Central",
+                "title": "Trait paranoia shapes inter-subject synchrony in brain activity during an ambiguous social narrative",
+                "type": "article-journal",
+                "volume": "9"
+            }
+        ]
+    },
+    "Raiders": {
+        ".*": [
+            {
+                "DOI": "10.1016/j.neuron.2011.08.026",
+                "ISSN": "0896-6273",
+                "URL": "https://www.cell.com/neuron/abstract/S0896-6273(11)00781-1",
+                "accessed": {
+                    "date-parts": [
+                        [
+                            "2019",
+                            4,
+                            29
+                        ]
+                    ]
+                },
+                "author": [
+                    {
+                        "family": "Haxby",
+                        "given": "James V."
+                    },
+                    {
+                        "family": "Guntupalli",
+                        "given": "J. Swaroop"
+                    },
+                    {
+                        "family": "Connolly",
+                        "given": "Andrew C."
+                    },
+                    {
+                        "family": "Halchenko",
+                        "given": "Yaroslav O."
+                    },
+                    {
+                        "family": "Conroy",
+                        "given": "Bryan R."
+                    },
+                    {
+                        "family": "Gobbini",
+                        "given": "M. Ida"
+                    },
+                    {
+                        "family": "Hanke",
+                        "given": "Michael"
+                    },
+                    {
+                        "family": "Ramadge",
+                        "given": "Peter J."
+                    }
+                ],
+                "container-title": "Neuron",
+                "id": "http://zotero.org/users/local/JXz6ijqB/items/YH36WXVC",
+                "issue": "2",
+                "issued": {
+                    "date-parts": [
+                        [
+                            "2011",
+                            10,
+                            20
+                        ]
+                    ]
+                },
+                "journalAbbreviation": "Neuron",
+                "language": "English",
+                "note": "PMID: 22017997",
+                "page": "404-416",
+                "source": "www.cell.com",
+                "title": "A Common, High-Dimensional Model of the Representational Space in Human Ventral Temporal Cortex",
+                "type": "article-journal",
+                "volume": "72"
+            }
+        ]
+    },
+    "datalad": {
+        ".*": [
+            {
+                "DOI": "10.5281/zenodo.2630963",
+                "author": [
+                    {
+                        "family": "Halchenko, Yaroslav O."
+                    },
+                    {
+                        "family": "Hanke, Michael"
+                    },
+                    {
+                        "family": "Poldrack, Benjamin"
+                    },
+                    {
+                        "family": "Meyer, Kyle"
+                    },
+                    {
+                        "family": "Solanky, Debanjum Singh"
+                    },
+                    {
+                        "family": "Alteva, Gergana"
+                    },
+                    {
+                        "family": "Gors, Jason"
+                    },
+                    {
+                        "family": "MacFarlane, Dave"
+                    },
+                    {
+                        "family": "Olaf H\u00e4usler, Christian"
+                    },
+                    {
+                        "family": "Olson, Taylor"
+                    },
+                    {
+                        "family": "Waite, Alex"
+                    },
+                    {
+                        "family": "De La Vega, Alejandro"
+                    },
+                    {
+                        "family": "Sochat, Vanessa"
+                    },
+                    {
+                        "family": "Keshavan, Anisha"
+                    },
+                    {
+                        "family": "Ma, Feilong"
+                    },
+                    {
+                        "family": "Christian, Horea"
+                    },
+                    {
+                        "family": "Poelen, Jorrit"
+                    },
+                    {
+                        "family": "Skyt\u00e9n, Kusti"
+                    },
+                    {
+                        "family": "Visconti di Oleggio Castello, Matteo"
+                    },
+                    {
+                        "family": "Hardcastle, Nell"
+                    },
+                    {
+                        "family": "Stoeter, Torsten"
+                    },
+                    {
+                        "family": "C Lau, Vicky"
+                    }
+                ],
+                "id": "2630963",
+                "issued": {
+                    "date-parts": [
+                        [
+                            2019,
+                            4,
+                            6
+                        ]
+                    ]
+                },
+                "publisher": "Zenodo",
+                "title": "datalad/datalad 0.11.4",
+                "type": "article",
+                "version": "0.11.4"
+            }
+        ]
+    },
+    "fmriprep": {
+        ".*": [
+            {
+                "DOI": "10.5281/zenodo.2597526",
+                "author": [
+                    {
+                        "family": "Esteban, Oscar"
+                    },
+                    {
+                        "family": "Blair, Ross"
+                    },
+                    {
+                        "family": "Markiewicz, Christopher J."
+                    },
+                    {
+                        "family": "Berleant, Shoshana L."
+                    },
+                    {
+                        "family": "Moodie, Craig"
+                    },
+                    {
+                        "family": "Ma, Feilong"
+                    },
+                    {
+                        "family": "Isik, Ayse Ilkay"
+                    },
+                    {
+                        "family": "Erramuzpe, Asier"
+                    },
+                    {
+                        "family": "Kent, James D."
+                    },
+                    {
+                        "family": "Goncalves, Mathias"
+                    },
+                    {
+                        "family": "DuPre, Elizabeth"
+                    },
+                    {
+                        "family": "Sitek, Kevin R."
+                    },
+                    {
+                        "family": "Gomez, Daniel E. P."
+                    },
+                    {
+                        "family": "Lurie, Daniel J."
+                    },
+                    {
+                        "family": "Ye, Zhifang"
+                    },
+                    {
+                        "family": "Salo, Taylor"
+                    },
+                    {
+                        "family": "Valabregue, Romain"
+                    },
+                    {
+                        "family": "Amlien, Inge K."
+                    },
+                    {
+                        "family": "Liem, Franz"
+                    },
+                    {
+                        "family": "Jacoby, Nir"
+                    },
+                    {
+                        "family": "Stojic, Hrvoje"
+                    },
+                    {
+                        "family": "Poldrack, Russell A."
+                    },
+                    {
+                        "family": "Gorgolewski, Krzysztof J."
+                    }
+                ],
+                "id": "2597526",
+                "issued": {
+                    "date-parts": [
+                        [
+                            2019,
+                            3,
+                            18
+                        ]
+                    ]
+                },
+                "publisher": "Zenodo",
+                "title": "fMRIPrep: a robust preprocessing pipeline for functional MRI",
+                "type": "article",
+                "version": "1.3.2"
+            },
+            {
+                "DOI": "10.1038/s41592-018-0235-4",
+                "ISSN": "1548-7105",
+                "URL": "https://www.nature.com/articles/s41592-018-0235-4",
+                "accessed": {
+                    "date-parts": [
+                        [
+                            "2019",
+                            4,
+                            26
+                        ]
+                    ]
+                },
+                "author": [
+                    {
+                        "family": "Esteban",
+                        "given": "Oscar"
+                    },
+                    {
+                        "family": "Markiewicz",
+                        "given": "Christopher J."
+                    },
+                    {
+                        "family": "Blair",
+                        "given": "Ross W."
+                    },
+                    {
+                        "family": "Moodie",
+                        "given": "Craig A."
+                    },
+                    {
+                        "family": "Isik",
+                        "given": "A. Ilkay"
+                    },
+                    {
+                        "family": "Erramuzpe",
+                        "given": "Asier"
+                    },
+                    {
+                        "family": "Kent",
+                        "given": "James D."
+                    },
+                    {
+                        "family": "Goncalves",
+                        "given": "Mathias"
+                    },
+                    {
+                        "family": "DuPre",
+                        "given": "Elizabeth"
+                    },
+                    {
+                        "family": "Snyder",
+                        "given": "Madeleine"
+                    },
+                    {
+                        "family": "Oya",
+                        "given": "Hiroyuki"
+                    },
+                    {
+                        "family": "Ghosh",
+                        "given": "Satrajit S."
+                    },
+                    {
+                        "family": "Wright",
+                        "given": "Jessey"
+                    },
+                    {
+                        "family": "Durnez",
+                        "given": "Joke"
+                    },
+                    {
+                        "family": "Poldrack",
+                        "given": "Russell A."
+                    },
+                    {
+                        "family": "Gorgolewski",
+                        "given": "Krzysztof J."
+                    }
+                ],
+                "container-title": "Nature Methods",
+                "id": "http://zotero.org/users/local/JXz6ijqB/items/MB27YTQQ",
+                "issue": "1",
+                "issued": {
+                    "date-parts": [
+                        [
+                            "2019",
+                            1
+                        ]
+                    ]
+                },
+                "language": "En",
+                "page": "111",
+                "source": "www.nature.com",
+                "title": "fMRIPrep: a robust preprocessing pipeline for functional MRI",
+                "title-short": "fMRIPrep",
+                "type": "article-journal",
+                "volume": "16"
+            }
+        ]
+    },
+    "neuroscout": {
+        ".*": [
+            {
+                "DOI": "10.5281/zenodo.2592675",
+                "author": [
+                    {
+                        "family": "de la Vega, Alejandro"
+                    },
+                    {
+                        "family": "Blair, Ross"
+                    },
+                    {
+                        "family": "Razavi, Pouya"
+                    },
+                    {
+                        "family": "Yarkoni, Tal"
+                    }
+                ],
+                "id": "2592675",
+                "issued": {
+                    "date-parts": [
+                        [
+                            2019,
+                            3,
+                            13
+                        ]
+                    ]
+                },
+                "publisher": "Zenodo",
+                "title": "neuroscout/neuroscout: 0.3.0",
+                "type": "article",
+                "version": "v0.3.0"
+            }
+        ]
+    },
+    "nipype": {
+        ".*": [
+            {
+                "DOI": "10.5281/zenodo.2577511",
+                "author": [
+                    {
+                        "family": "Gorgolewski, Krzysztof J."
+                    },
+                    {
+                        "family": "Esteban, Oscar"
+                    },
+                    {
+                        "family": "Markiewicz, Christopher J."
+                    },
+                    {
+                        "family": "Ziegler, Erik"
+                    },
+                    {
+                        "family": "Ellis, David Gage"
+                    },
+                    {
+                        "family": "Jarecka, Dorota"
+                    },
+                    {
+                        "family": "Notter, Michael Philipp"
+                    },
+                    {
+                        "family": "Johnson, Hans"
+                    },
+                    {
+                        "family": "Burns, Christopher"
+                    },
+                    {
+                        "family": "Manh\u00e3es-Savio, Alexandre"
+                    },
+                    {
+                        "family": "Hamalainen, Carlo"
+                    },
+                    {
+                        "family": "Yvernault, Benjamin"
+                    },
+                    {
+                        "family": "Salo, Taylor"
+                    },
+                    {
+                        "family": "Goncalves, Mathias"
+                    },
+                    {
+                        "family": "Jordan, Kesshi"
+                    },
+                    {
+                        "family": "Waskom, Michael"
+                    },
+                    {
+                        "family": "Wong, Jason"
+                    },
+                    {
+                        "family": "Modat, Marc"
+                    },
+                    {
+                        "family": "Loney, Fred"
+                    },
+                    {
+                        "family": "Clark, Daniel"
+                    },
+                    {
+                        "family": "Nielson, Dylan M."
+                    },
+                    {
+                        "family": "Dewey, Blake E"
+                    },
+                    {
+                        "family": "Madison, Cindee"
+                    },
+                    {
+                        "family": "Bougacha, Salma"
+                    },
+                    {
+                        "family": "Clark, Michael G."
+                    },
+                    {
+                        "family": "Dayan, Michael"
+                    },
+                    {
+                        "family": "Visconti di Oleggio Castello, Matteo"
+                    },
+                    {
+                        "family": "Clark, Dav"
+                    },
+                    {
+                        "family": "Keshavan, Anisha"
+                    },
+                    {
+                        "family": "Pinsard, Basile"
+                    },
+                    {
+                        "family": "Gramfort, Alexandre"
+                    },
+                    {
+                        "family": "Berleant, Shoshana"
+                    },
+                    {
+                        "family": "Halchenko, Yaroslav O."
+                    },
+                    {
+                        "family": "Christian, Horea"
+                    },
+                    {
+                        "family": "Cipollini, Ben"
+                    },
+                    {
+                        "family": "Guillon, J\u00e9r\u00e9my"
+                    },
+                    {
+                        "family": "Markello, Ross"
+                    },
+                    {
+                        "family": "Rokem, Ariel"
+                    },
+                    {
+                        "family": "DuPre, Elizabeth"
+                    },
+                    {
+                        "family": "Kaczmarzyk, Jakub"
+                    },
+                    {
+                        "family": "Moloney, Brendan"
+                    },
+                    {
+                        "family": "Varoquaux, Gael"
+                    },
+                    {
+                        "family": "Wassermann, Demian"
+                    },
+                    {
+                        "family": "Hanke, Michael"
+                    },
+                    {
+                        "family": "de Hollander, Gilles"
+                    },
+                    {
+                        "family": "Mordom, David"
+                    },
+                    {
+                        "family": "Gillman, Ashley"
+                    },
+                    {
+                        "family": "Buchanan, Colin"
+                    },
+                    {
+                        "family": "Tabas, Alejandro"
+                    },
+                    {
+                        "family": "Tungaraza, Rosalia"
+                    },
+                    {
+                        "family": "Pauli, Wolfgang M."
+                    },
+                    {
+                        "family": "Sikka, Sharad"
+                    },
+                    {
+                        "family": "Mancini, Matteo"
+                    },
+                    {
+                        "family": "Forbes, Jessica"
+                    },
+                    {
+                        "family": "Iqbal, Shariq"
+                    },
+                    {
+                        "family": "Richie-Halford, Adam"
+                    },
+                    {
+                        "family": "Schwartz, Yannick"
+                    },
+                    {
+                        "family": "Malone, Ian B."
+                    },
+                    {
+                        "family": "Dubois, Mathieu"
+                    },
+                    {
+                        "family": "Heinsfeld, Anibal S\u00f3lon"
+                    },
+                    {
+                        "family": "Frohlich, Caroline"
+                    },
+                    {
+                        "family": "Welch, David"
+                    },
+                    {
+                        "family": "Bottenhorn, Katherine"
+                    },
+                    {
+                        "family": "Kent, James"
+                    },
+                    {
+                        "family": "De La Vega, Alejandro"
+                    },
+                    {
+                        "family": "Watanabe, Aimi"
+                    },
+                    {
+                        "family": "Huntenburg, Julia M."
+                    },
+                    {
+                        "family": "Cumba, Chad"
+                    },
+                    {
+                        "family": "Nichols, B. Nolan"
+                    },
+                    {
+                        "family": "Eshaghi, Arman"
+                    },
+                    {
+                        "family": "Ginsburg, Daniel"
+                    },
+                    {
+                        "family": "Schaefer, Alexander"
+                    },
+                    {
+                        "family": "Kastman, Erik"
+                    },
+                    {
+                        "family": "Acland, Benjamin"
+                    },
+                    {
+                        "family": "Liem, Franz"
+                    },
+                    {
+                        "family": "Kleesiek, Jens"
+                    },
+                    {
+                        "family": "Erickson, Drew"
+                    },
+                    {
+                        "family": "Giavasis, Steven"
+                    },
+                    {
+                        "family": "Correa, Carlos"
+                    },
+                    {
+                        "family": "Ghayoor, Ali"
+                    },
+                    {
+                        "family": "Contier, Oliver"
+                    },
+                    {
+                        "family": "K\u00fcttner, Ren\u00e9"
+                    },
+                    {
+                        "family": "Millman, Jarrod"
+                    },
+                    {
+                        "family": "Lai, Jeff"
+                    },
+                    {
+                        "family": "Zhou, Dale"
+                    },
+                    {
+                        "family": "Blair, Ross"
+                    },
+                    {
+                        "family": "Haselgrove, Christian"
+                    },
+                    {
+                        "family": "Glatard, Tristan"
+                    },
+                    {
+                        "family": "Renfro, Mandy"
+                    },
+                    {
+                        "family": "Liu, Siqi"
+                    },
+                    {
+                        "family": "Stadler, J\u00f6rg"
+                    },
+                    {
+                        "family": "Kahn, Ari E."
+                    },
+                    {
+                        "family": "P\u00e9rez-Garc\u00eda, Fernando"
+                    },
+                    {
+                        "family": "Triplett, William"
+                    },
+                    {
+                        "family": "Lampe, Leonie"
+                    },
+                    {
+                        "family": "Kong, Xiang-Zhen"
+                    },
+                    {
+                        "family": "Hallquist, Michael"
+                    },
+                    {
+                        "family": "Ma, Feilong"
+                    },
+                    {
+                        "family": "Leinweber, Katrin"
+                    },
+                    {
+                        "family": "Chetverikov, Andrey"
+                    },
+                    {
+                        "family": "Grignard, Martin"
+                    },
+                    {
+                        "family": "Chawla, Kshitij"
+                    },
+                    {
+                        "family": "Salvatore, John"
+                    },
+                    {
+                        "family": "Park, Anne"
+                    },
+                    {
+                        "family": "Poldrack, Russell"
+                    },
+                    {
+                        "family": "Craddock, R. Cameron"
+                    },
+                    {
+                        "family": "Hinds, Oliver"
+                    },
+                    {
+                        "family": "Cooper, Gavin"
+                    },
+                    {
+                        "family": "Weninger, Leon"
+                    },
+                    {
+                        "family": "Inati, Souheil"
+                    },
+                    {
+                        "family": "Perkins, L. Nathan"
+                    },
+                    {
+                        "family": "Lukas Snoek"
+                    },
+                    {
+                        "family": "Marina, Ana"
+                    },
+                    {
+                        "family": "Mattfeld, Aaron"
+                    },
+                    {
+                        "family": "Matsubara, K"
+                    },
+                    {
+                        "family": "Noel, Maxime"
+                    },
+                    {
+                        "family": "Cheung, Brian"
+                    },
+                    {
+                        "family": "Urchs, Sebastian"
+                    },
+                    {
+                        "family": "Durnez, Joke"
+                    },
+                    {
+                        "family": "Condamine, Eric"
+                    },
+                    {
+                        "family": "Geisler, Daniel"
+                    },
+                    {
+                        "family": "Floren, Andrew"
+                    },
+                    {
+                        "family": "Gerhard, Stephan"
+                    },
+                    {
+                        "family": "Sharp, Paul"
+                    },
+                    {
+                        "family": "Molina-Romero, Miguel"
+                    },
+                    {
+                        "family": "Haehn, Daniel"
+                    },
+                    {
+                        "family": "Weinstein, Alejandro"
+                    },
+                    {
+                        "family": "Tambini, Arielle"
+                    },
+                    {
+                        "family": "Broderick, William"
+                    },
+                    {
+                        "family": "Saase, Victor"
+                    },
+                    {
+                        "family": "Rothmei, Simon"
+                    },
+                    {
+                        "family": "Andberg, Sami Kristian"
+                    },
+                    {
+                        "family": "Harms, Robbert"
+                    },
+                    {
+                        "family": "Khanuja, Ranjeet"
+                    },
+                    {
+                        "family": "Schlamp, Kai"
+                    },
+                    {
+                        "family": "Arias, Jaime"
+                    },
+                    {
+                        "family": "Papadopoulos Orfanos, Dimitri"
+                    },
+                    {
+                        "family": "Tarbert, Claire"
+                    },
+                    {
+                        "family": "Nickson, Thomas"
+                    },
+                    {
+                        "family": "Brett, Matthew"
+                    },
+                    {
+                        "family": "Falkiewicz, Marcel"
+                    },
+                    {
+                        "family": "Podranski, Kornelius"
+                    },
+                    {
+                        "family": "Linkersd\u00f6rfer, Janosch"
+                    },
+                    {
+                        "family": "Flandin, Guillaume"
+                    },
+                    {
+                        "family": "Ort, Eduard"
+                    },
+                    {
+                        "family": "Shachnev, Dmitry"
+                    },
+                    {
+                        "family": "McNamee, Daniel"
+                    },
+                    {
+                        "family": "Davison, Andrew"
+                    },
+                    {
+                        "family": "Varada, Jan"
+                    },
+                    {
+                        "family": "Schwabacher, Isaac"
+                    },
+                    {
+                        "family": "Pellman, John"
+                    },
+                    {
+                        "family": "Perez-Guevara, Martin"
+                    },
+                    {
+                        "family": "Khanuja, Ranjeet"
+                    },
+                    {
+                        "family": "Pannetier, Nicolas"
+                    },
+                    {
+                        "family": "McDermottroe, Conor"
+                    },
+                    {
+                        "family": "Mihai, Paul Glad"
+                    },
+                    {
+                        "family": "Ghosh, Satrajit"
+                    }
+                ],
+                "id": "2577511",
+                "issued": {
+                    "date-parts": [
+                        [
+                            2019,
+                            2,
+                            25
+                        ]
+                    ]
+                },
+                "publisher": "Zenodo",
+                "title": "nipy/nipype: 1.1.9",
+                "type": "article",
+                "version": "1.1.9"
+            },
+            {
+                "DOI": "10.3389/fninf.2011.00013",
+                "ISSN": "1662-5196",
+                "URL": "http://journal.frontiersin.org/article/10.3389/fninf.2011.00013/abstract",
+                "accessed": {
+                    "date-parts": [
+                        [
+                            "2019",
+                            4,
+                            26
+                        ]
+                    ]
+                },
+                "author": [
+                    {
+                        "family": "Gorgolewski",
+                        "given": "Krzysztof"
+                    },
+                    {
+                        "family": "Burns",
+                        "given": "Christopher D."
+                    },
+                    {
+                        "family": "Madison",
+                        "given": "Cindee"
+                    },
+                    {
+                        "family": "Clark",
+                        "given": "Dav"
+                    },
+                    {
+                        "family": "Halchenko",
+                        "given": "Yaroslav O."
+                    },
+                    {
+                        "family": "Waskom",
+                        "given": "Michael L."
+                    },
+                    {
+                        "family": "Ghosh",
+                        "given": "Satrajit S."
+                    }
+                ],
+                "container-title": "Frontiers in Neuroinformatics",
+                "id": "http://zotero.org/users/local/JXz6ijqB/items/6ZQLU4A3",
+                "issued": {
+                    "date-parts": [
+                        [
+                            "2011"
+                        ]
+                    ]
+                },
+                "source": "Crossref",
+                "title": "Nipype: A Flexible, Lightweight and Extensible Neuroimaging Data Processing Framework in Python",
+                "title-short": "Nipype",
+                "type": "article-journal",
+                "volume": "5"
+            }
+        ]
+    },
+    "pliers": {
+        ".*": [
+            {
+                "DOI": "10.1145/3097983.3098075",
+                "ISBN": "978-1-4503-4887-4",
+                "URL": "http://doi.acm.org/10.1145/3097983.3098075",
+                "accessed": {
+                    "date-parts": [
+                        [
+                            "2019",
+                            4,
+                            26
+                        ]
+                    ]
+                },
+                "author": [
+                    {
+                        "family": "McNamara",
+                        "given": "Quinten"
+                    },
+                    {
+                        "family": "De La Vega",
+                        "given": "Alejandro"
+                    },
+                    {
+                        "family": "Yarkoni",
+                        "given": "Tal"
+                    }
+                ],
+                "collection-title": "KDD '17",
+                "container-title": "Proceedings of the 23rd ACM SIGKDD International Conference on Knowledge Discovery and Data Mining",
+                "event-place": "New York, NY, USA",
+                "id": "http://zotero.org/users/local/JXz6ijqB/items/8IWC3VF5",
+                "issued": {
+                    "date-parts": [
+                        [
+                            "2017"
+                        ]
+                    ]
+                },
+                "note": "event-place: Halifax, NS, Canada",
+                "page": "1567\u20131574",
+                "publisher": "ACM",
+                "publisher-place": "New York, NY, USA",
+                "source": "ACM Digital Library",
+                "title": "Developing a Comprehensive Framework for Multimodal Feature Extraction",
+                "type": "paper-conference"
+            }
+        ]
+    },
+    "studyforrest": {
+        ".*": [
+            {
+                "DOI": "10.1038/sdata.2016.93",
+                "ISSN": "2052-4463",
+                "URL": "https://www.nature.com/articles/sdata201693",
+                "abstract": "The studyforrest (http://studyforrest.org) dataset is likely the largest neuroimaging dataset on natural language and story processing publicly available today. In this article, along with a companion publication, we present an update of this dataset that extends its scope to vision and multi-sensory research. 15 participants of the original cohort volunteered for a series of additional studies: a clinical examination of visual function, a standard retinotopic mapping procedure, and a localization of higher visual areas\u2014such as the fusiform face area. The combination of this update, the previous data releases for the dataset, and the companion publication, which includes neuroimaging and eye tracking data from natural stimulation with a motion picture, form an extremely versatile and comprehensive resource for brain imaging research\u2014with almost six hours of functional neuroimaging data across five different stimulation paradigms for each participant. Furthermore, we describe employed paradigms and present results that document the quality of the data for the purpose of characterising major properties of participants\u2019 visual processing stream.",
+                "accessed": {
+                    "date-parts": [
+                        [
+                            "2019",
+                            4,
+                            29
+                        ]
+                    ]
+                },
+                "author": [
+                    {
+                        "family": "Sengupta",
+                        "given": "Ayan"
+                    },
+                    {
+                        "family": "Kaule",
+                        "given": "Falko R."
+                    },
+                    {
+                        "family": "Guntupalli",
+                        "given": "J. Swaroop"
+                    },
+                    {
+                        "family": "Hoffmann",
+                        "given": "Michael B."
+                    },
+                    {
+                        "family": "H\u00e4usler",
+                        "given": "Christian"
+                    },
+                    {
+                        "family": "Stadler",
+                        "given": "J\u00f6rg"
+                    },
+                    {
+                        "family": "Hanke",
+                        "given": "Michael"
+                    }
+                ],
+                "container-title": "Scientific Data",
+                "id": "http://zotero.org/users/local/JXz6ijqB/items/AVVLTFW4",
+                "issued": {
+                    "date-parts": [
+                        [
+                            "2016",
+                            10,
+                            25
+                        ]
+                    ]
+                },
+                "language": "en",
+                "page": "160093",
+                "source": "www.nature.com",
+                "title": "A studyforrest extension, retinotopic mapping and localization of higher visual areas",
+                "type": "article-journal",
+                "volume": "3"
+            }
+        ]
+    },
+    "PredefinedDictionaryExtractor": {
+      "subtlexusfrequency.*":[
+      	{
+      		"id": "http://zotero.org/users/local/JXz6ijqB/items/HK7TT8RJ",
+      		"type": "article-journal",
+      		"title": "Moving beyond Kučera and Francis: A critical evaluation of current word frequency norms and the introduction of a new and improved word frequency measure for American English",
+      		"container-title": "Behavior Research Methods",
+      		"page": "977-990",
+      		"volume": "41",
+      		"issue": "4",
+      		"source": "Springer Link",
+      		"abstract": "Word frequency is the most important variable in research on word processing and memory. Yet, the main criterion for selecting word frequency norms has been the availability of the measure, rather than its quality. As a result, much research is still based on the old Kučera and Francis frequency norms. By using the lexical decision times of recently published megastudies, we show how bad this measure is and what must be done to improve it. In particular, we investigated the size of the corpus, the language register on which the corpus is based, and the definition of the frequency measure. We observed that corpus size is of practical importance for small sizes (depending on the frequency of the word), but not for sizes above 16–30 million words. As for the language register, we found that frequencies based on television and film subtitles are better than frequencies based on written sources, certainly for the monosyllabic and bisyllabic words used in psycholinguistic research. Finally, we found that lemma frequencies are not superior to word form frequencies in English and that a measure of contextual diversity is better than a measure based on raw frequency of occurrence. Part of the superiority of the latter is due to the words that are frequently used as names. Assembling a new frequency norm on the basis of these considerations turned out to predict word processing times much better than did the existing norms (including Kučera & Francis and Celex). The new SUBTL frequency norms from the SUBTLEXUS corpus are freely available for research purposes from http://brm.psychonomic-journals.org/content/supplemental, as well as from the University of Ghent and Lexique Web sites.",
+      		"URL": "https://doi.org/10.3758/BRM.41.4.977",
+      		"DOI": "10.3758/BRM.41.4.977",
+      		"ISSN": "1554-3528",
+      		"shortTitle": "Moving beyond Kučera and Francis",
+      		"journalAbbreviation": "Behavior Research Methods",
+      		"language": "en",
+      		"author": [
+      			{
+      				"family": "Brysbaert",
+      				"given": "Marc"
+      			},
+      			{
+      				"family": "New",
+      				"given": "Boris"
+      			}
+      		],
+      		"issued": {
+      			"date-parts": [
+      				[
+      					"2009",
+      					11,
+      					1
+      				]
+      			]
+      		},
+      		"accessed": {
+      			"date-parts": [
+      				[
+      					"2019",
+      					4,
+      					30
+      				]
+      			]
+      		}
+      	}
+      ]
+    }
+}

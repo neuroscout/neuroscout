@@ -1,0 +1,196 @@
+{
+    "ClarifaiAPIImageExtractor": {
+        ".*": [
+            {
+                "URL": "https://clarifai.com/",
+                "accessed": {
+                    "date-parts": [
+                        [
+                            "2019",
+                            4,
+                            30
+                        ]
+                    ]
+                },
+                "id": "http://zotero.org/users/local/JXz6ijqB/items/PL5VBJKF",
+                "title": "Clarifai",
+                "type": "webpage"
+            }
+        ]
+    },
+    "BrightnessExtractor|GoogleVisionAPILabelExtractor|GoogleVisionAPIPropertyExtractor|GoogleVideoAPIShotDetectionExtractor|GoogleVisionAPISafeSearchExtractor": {
+        ".*": [
+            {
+                "URL": "https://cloud.google.com/",
+                "accessed": {
+                    "date-parts": [
+                        [
+                            "2019",
+                            4,
+                            30
+                        ]
+                    ]
+                },
+                "container-title": "Google Cloud",
+                "id": "http://zotero.org/users/local/JXz6ijqB/items/QBBN5S87",
+                "language": "en",
+                "title": "Google Cloud Computing Services",
+                "type": "webpage"
+            }
+        ]
+    },
+    "Test Dataset": {
+        ".*": [
+            {
+                "URL": "https://test.test.com/",
+                "accessed": {
+                    "date-parts": [
+                        [
+                            "2019",
+                            4,
+                            30
+                        ]
+                    ]
+                },
+                "container-title": "Test",
+                "id": "http://zotero.org/users/local/JXz6ijqB/items/test",
+                "language": "en",
+                "type": "webpage"
+            }
+        ]
+    },
+    "neuroscout": {
+        ".*": [
+            {
+                "DOI": "10.5281/zenodo.2592675",
+                "author": [
+                    {
+                        "family": "de la Vega, Alejandro"
+                    },
+                    {
+                        "family": "Blair, Ross"
+                    },
+                    {
+                        "family": "Razavi, Pouya"
+                    },
+                    {
+                        "family": "Yarkoni, Tal"
+                    }
+                ],
+                "id": "2592675",
+                "issued": {
+                    "date-parts": [
+                        [
+                            2019,
+                            3,
+                            13
+                        ]
+                    ]
+                },
+                "publisher": "Zenodo",
+                "title": "neuroscout/neuroscout: 0.3.0",
+                "type": "article",
+                "version": "v0.3.0"
+            }
+        ]
+    },
+    "pliers": {
+        ".*": [
+            {
+                "DOI": "10.1145/3097983.3098075",
+                "ISBN": "978-1-4503-4887-4",
+                "URL": "http://doi.acm.org/10.1145/3097983.3098075",
+                "accessed": {
+                    "date-parts": [
+                        [
+                            "2019",
+                            4,
+                            26
+                        ]
+                    ]
+                },
+                "author": [
+                    {
+                        "family": "McNamara",
+                        "given": "Quinten"
+                    },
+                    {
+                        "family": "De La Vega",
+                        "given": "Alejandro"
+                    },
+                    {
+                        "family": "Yarkoni",
+                        "given": "Tal"
+                    }
+                ],
+                "collection-title": "KDD '17",
+                "container-title": "Proceedings of the 23rd ACM SIGKDD International Conference on Knowledge Discovery and Data Mining",
+                "event-place": "New York, NY, USA",
+                "id": "http://zotero.org/users/local/JXz6ijqB/items/8IWC3VF5",
+                "issued": {
+                    "date-parts": [
+                        [
+                            "2017"
+                        ]
+                    ]
+                },
+                "note": "event-place: Halifax, NS, Canada",
+                "page": "1567\u20131574",
+                "publisher": "ACM",
+                "publisher-place": "New York, NY, USA",
+                "source": "ACM Digital Library",
+                "title": "Developing a Comprehensive Framework for Multimodal Feature Extraction",
+                "type": "paper-conference"
+            }
+        ]
+    },
+    "PredefinedDictionaryExtractor": {
+      "subtlexusfrequency.*":[
+      	{
+      		"id": "http://zotero.org/users/local/JXz6ijqB/items/HK7TT8RJ",
+      		"type": "article-journal",
+      		"title": "Moving beyond Kučera and Francis: A critical evaluation of current word frequency norms and the introduction of a new and improved word frequency measure for American English",
+      		"container-title": "Behavior Research Methods",
+      		"page": "977-990",
+      		"volume": "41",
+      		"issue": "4",
+      		"source": "Springer Link",
+      		"abstract": "Word frequency is the most important variable in research on word processing and memory. Yet, the main criterion for selecting word frequency norms has been the availability of the measure, rather than its quality. As a result, much research is still based on the old Kučera and Francis frequency norms. By using the lexical decision times of recently published megastudies, we show how bad this measure is and what must be done to improve it. In particular, we investigated the size of the corpus, the language register on which the corpus is based, and the definition of the frequency measure. We observed that corpus size is of practical importance for small sizes (depending on the frequency of the word), but not for sizes above 16–30 million words. As for the language register, we found that frequencies based on television and film subtitles are better than frequencies based on written sources, certainly for the monosyllabic and bisyllabic words used in psycholinguistic research. Finally, we found that lemma frequencies are not superior to word form frequencies in English and that a measure of contextual diversity is better than a measure based on raw frequency of occurrence. Part of the superiority of the latter is due to the words that are frequently used as names. Assembling a new frequency norm on the basis of these considerations turned out to predict word processing times much better than did the existing norms (including Kučera & Francis and Celex). The new SUBTL frequency norms from the SUBTLEXUS corpus are freely available for research purposes from http://brm.psychonomic-journals.org/content/supplemental, as well as from the University of Ghent and Lexique Web sites.",
+      		"URL": "https://doi.org/10.3758/BRM.41.4.977",
+      		"DOI": "10.3758/BRM.41.4.977",
+      		"ISSN": "1554-3528",
+      		"shortTitle": "Moving beyond Kučera and Francis",
+      		"journalAbbreviation": "Behavior Research Methods",
+      		"language": "en",
+      		"author": [
+      			{
+      				"family": "Brysbaert",
+      				"given": "Marc"
+      			},
+      			{
+      				"family": "New",
+      				"given": "Boris"
+      			}
+      		],
+      		"issued": {
+      			"date-parts": [
+      				[
+      					"2009",
+      					11,
+      					1
+      				]
+      			]
+      		},
+      		"accessed": {
+      			"date-parts": [
+      				[
+      					"2019",
+      					4,
+      					30
+      				]
+      			]
+      		}
+      	}
+      ]
+    }
+}

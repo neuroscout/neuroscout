@@ -464,3 +464,17 @@ def test_auth_id(auth_client, add_analysis_user2):
     resp = auth_client.delete('/api/analyses/{}'.format(analysis.hash_id))
 
     assert resp.status_code == 401
+
+
+def test_bibliography(auth_client, add_analysis, add_task, session):
+    # Get analysis to edit
+    analysis = Analysis.query.filter_by(id=add_analysis).first()
+    bib_json = decode_json(
+        auth_client.get('/api/analyses/{}/bibliography'.format(
+            analysis.hash_id)))
+
+    assert 'tools' in bib_json
+    assert "https://test.test.com/" in bib_json['data'][0]
+    assert "Google Cloud Computing Services" in bib_json['extractors'][0]
+
+    assert len([j['id'] for j in bib_json['csl_json']]) == 3
