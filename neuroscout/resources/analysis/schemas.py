@@ -138,8 +138,10 @@ class NeurovaultCollectionSchema(Schema):
 class BibliographySchema(Schema):
     """ Schema for analysis bibliographies """
     tools = fields.List(
-        fields.Dict, description='Tools used in the analysis.')
+        fields.Str, description='Tools used in the analysis.')
     data = fields.List(
-        fields.Dict, description='Datasets used in the analysis.')
+        fields.Str, description='Datasets used in the analysis.')
     extractors = fields.List(
-        fields.Dict, description='Extractors used in the analysis.')
+        fields.Str, description='Extractors used in the analysis.')
+    csl_json = fields.List(
+        fields.Dict, description='CSL-JSON of all references.')

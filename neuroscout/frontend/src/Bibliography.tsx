@@ -15,7 +15,7 @@ interface BibState {
   tools: any[];
   data: any[];
   extractors: any[];
-
+  csl_json: any[];
   bibLoaded: boolean;
 }
 
@@ -33,6 +33,19 @@ class RefList extends React.Component<{refs: any[]}, {}> {
   }
 }
 
+class DownloadButton extends React.Component<{data: any[], title: string, filename: string}, {}> {
+  render() {
+    let data = this.props.data;
+    let formatted = 'data: text/json;charset=utf-8,' + encodeURIComponent(JSON.stringify(data));
+
+    return(
+      <a href={formatted} download={this.props.filename}>
+        <Button type="primary" icon="download">{this.props.title}</Button>
+      </a>
+    );
+  }
+}
+
 export class BibliographyTab extends React.Component<bibProps, BibState> {
   constructor(props) {
     super(props);
@@ -40,6 +53,7 @@ export class BibliographyTab extends React.Component<bibProps, BibState> {
       tools: [],
       data: [],
       extractors: [],
+      csl_json: [],
       bibLoaded: false,
     };
     this.state = state;
@@ -54,7 +68,7 @@ export class BibliographyTab extends React.Component<bibProps, BibState> {
       state.tools = res.tools;
       state.data = res.data;
       state.extractors = res.extractors;
-
+      state.csl_json = res.csl_json;
       state.bibLoaded = true;
       this.setState({...state});
     });
@@ -67,7 +81,7 @@ export class BibliographyTab extends React.Component<bibProps, BibState> {
   }
 
   render() {
-
+    let merged = this.state.data.concat(this.state.tools, this.state.extractors);
     return(
       <div>
           <p>
@@ -96,8 +110,16 @@ export class BibliographyTab extends React.Component<bibProps, BibState> {
 
           <Card title="Export All" bordered={false} style={{ width: 400 }}>
           <ButtonGroup>
-            <Button icon="download">CSL-JSON</Button>
-            <Button icon="download">Text - APA</Button>
+            <DownloadButton
+              data={merged}
+              title="HTML - APA"
+              filename={this.props.analysisId + '_refs.html'}
+            />
+            <DownloadButton
+              data={this.state.csl_json}
+              title="CSL - JSON"
+              filename={this.props.analysisId + '_refs.json'}
+            />
           </ButtonGroup>
           </Card>
       </div>

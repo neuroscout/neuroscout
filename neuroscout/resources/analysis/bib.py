@@ -8,10 +8,14 @@ from citeproc_styles import get_style_filepath
 import re
 
 
+def _flatten(li):
+    li = [i for i in li if i is not None]
+    return [item for sublist in li for item in sublist]
+
+
 def _flatten_uniqueify(li):
     """ Flatten and _flatten_uniqueify basd on id """
-    li = [i for i in li if i is not None]
-    li = [item for sublist in li for item in sublist]
+    li = _flatten(li)
     return list({v['id']: v for v in li}.values())
 
 

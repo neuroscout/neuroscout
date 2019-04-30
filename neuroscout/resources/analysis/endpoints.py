@@ -9,11 +9,12 @@ import webargs as wa
 import json
 
 from utils.db import put_record
-from .bib import format_bibliography, find_predictor_citation
+from .bib import format_bibliography, find_predictor_citation, _flatten
 from ..utils import owner_required, auth_required, fetch_analysis, abort
 from ..predictor import get_predictors
 from .schemas import (AnalysisSchema, AnalysisFullSchema,
                       AnalysisResourcesSchema, BibliographySchema)
+
 
 @doc(tags=['analysis'])
 @marshal_with(AnalysisSchema)
@@ -201,25 +202,26 @@ class BibliographyResource(MethodResource):
     @fetch_analysis
     def get(self, analysis):
         bib = json.load(open(current_app.config['BIBLIOGRAPHY']))
-        CORE = ['nipype', 'neuroscout', 'fitlins', 'nipype']
 
-        tools = format_bibliography(
-            [b['.*'] for k, b in bib.items() if k in CORE])
+        tools = [b['.*'] for k, b in bib.items()
+                 if k in ['nipype', 'neuroscout', 'fitlins', 'nipype']]
+        all_csl_json = tools
 
-        dataset_entry = bib.get(analysis.dataset.name, None)
+        dataset_entry = bib.get(analysis.dataset.name, [])
         if dataset_entry:
-            data = format_bibliography([dataset_entry['.*']])
-        else:
-            data = None
+            data = [dataset_entry['.*']]
+            all_csl_json += data
 
         # Search for Predictor citations
-        extractors = format_bibliography(
-            [find_predictor_citation(p, bib) for p in analysis.predictors])
+        extractors = [find_predictor_citation(p, bib)
+                      for p in analysis.predictors]
+        all_csl_json += extractors
 
         resp = {
-            'tools': tools,
-            'data': data,
-            'extractors': extractors
+            'tools': format_bibliography(tools),
+            'data': format_bibliography(data),
+            'extractors': format_bibliography(extractors),
+            'csl_json': _flatten(all_csl_json)
         }
 
         return resp
