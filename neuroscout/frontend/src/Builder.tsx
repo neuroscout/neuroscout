@@ -1162,16 +1162,15 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
                   }
                   </StatusTab>
                 </TabPane>
-                <TabPane
+                {!isEditable &&  <TabPane
                   tab="Bibliography"
                   key="bib"
-                  disabled={!submitActive && isDraft}
                 >
                   <h2>Bibliography</h2>
                   <BibliographyTab
                     analysisId={analysis.analysisId}
                   />
-                </TabPane>
+                </TabPane>}
               </Tabs>
             </MainCol>
           </Row>

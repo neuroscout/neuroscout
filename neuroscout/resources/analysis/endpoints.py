@@ -7,6 +7,7 @@ from os.path import exists
 import datetime
 import webargs as wa
 import json
+import re
 
 from utils.db import put_record
 from .bib import format_bibliography
@@ -209,12 +210,16 @@ class BibliographyResource(MethodResource):
         data = format_bibliography(
             [bib.get(analysis.dataset.name)])
 
-        extractors = [p.extracted_feature.extractor_name
-                      for p in analysis.predictors
-                      if p.extracted_feature is not None]
+        # Search for extractor CSL using regex
+        extractors = {}
+        for p in analysis.predictors:
+            if p.extracted_feature is not None:
+                ext_name = p.extracted_feature.extractor_name
+                for patt, csl in bib.items():
+                    if re.match(patt, ext_name):
+                        extractors[patt] = csl
 
-        extractors = format_bibliography(
-            [b for k, b in bib.items() if k in extractors])
+        extractors = format_bibliography(extractors.values())
 
         resp = {
             'tools': tools,
