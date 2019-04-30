@@ -201,6 +201,10 @@ class BibliographyResource(MethodResource):
     @marshal_with(BibliographySchema)
     @fetch_analysis
     def get(self, analysis):
+        """ Searches for references for the core tools, dataset and extractors
+        used in this analysis. For extractors, individual features can be
+        coded as the second-level key in the Bibliography. Otherwise,
+        for all other matches, .* is used to denote that all entries match. """
         bib = json.load(open(current_app.config['BIBLIOGRAPHY']))
 
         tools = [b['.*'] for k, b in bib.items()

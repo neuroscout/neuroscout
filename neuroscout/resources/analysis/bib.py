@@ -9,18 +9,19 @@ import re
 
 
 def _flatten(li):
+    """ Flatten nested list and remove None values """
     li = [i for i in li if i is not None]
     return [item for sublist in li for item in sublist]
 
 
-def _flatten_uniqueify(li):
-    """ Flatten and _flatten_uniqueify basd on id """
-    li = _flatten(li)
+def _uniqueify(li):
+    """ Uniqueify based on id """
     return list({v['id']: v for v in li}.values())
 
 
 def format_bibliography(json_data):
-    json_data = _flatten_uniqueify(json_data)
+    """ Format CSL-JSON to HTML APA format """
+    json_data = _uniqueify(_flatten(json_data))
     bib_source = CiteProcJSON(json_data)
     style_path = get_style_filepath('apa')
     bib_style = CitationStylesStyle(style_path, validate=False)
@@ -50,6 +51,8 @@ def format_bibliography(json_data):
 
 
 def find_predictor_citation(pred, bib):
+    """ Search bibliography JSON for entry that matches extractor +
+    predictor_name. If ".*", all names will match """
     if pred.extracted_feature is not None:
         ext_name = pred.extracted_feature.extractor_name
         feat_name = pred.name
