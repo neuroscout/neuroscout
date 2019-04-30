@@ -7,10 +7,9 @@ from os.path import exists
 import datetime
 import webargs as wa
 import json
-import re
 
 from utils.db import put_record
-from .bib import format_bibliography
+from .bib import format_bibliography, find_predictor_citation
 from ..utils import owner_required, auth_required, fetch_analysis, abort
 from ..predictor import get_predictors
 from .schemas import (AnalysisSchema, AnalysisFullSchema,
@@ -205,21 +204,17 @@ class BibliographyResource(MethodResource):
         CORE = ['nipype', 'neuroscout', 'fitlins', 'nipype']
 
         tools = format_bibliography(
-            [b for k, b in bib.items() if k in CORE])
+            [b['.*'] for k, b in bib.items() if k in CORE])
 
-        data = format_bibliography(
-            [bib.get(analysis.dataset.name)])
+        dataset_entry = bib.get(analysis.dataset.name, None)
+        if dataset_entry:
+            data = format_bibliography([dataset_entry['.*']])
+        else:
+            data = None
 
-        # Search for extractor CSL using regex
-        extractors = {}
-        for p in analysis.predictors:
-            if p.extracted_feature is not None:
-                ext_name = p.extracted_feature.extractor_name
-                for patt, csl in bib.items():
-                    if re.match(patt, ext_name):
-                        extractors[patt] = csl
-
-        extractors = format_bibliography(extractors.values())
+        # Search for Predictor citations
+        extractors = format_bibliography(
+            [find_predictor_citation(p, bib) for p in analysis.predictors])
 
         resp = {
             'tools': tools,

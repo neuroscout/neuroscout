@@ -76,19 +76,19 @@ export class BibliographyTab extends React.Component<bibProps, BibState> {
           </p>
           <Card title="Dataset">
           <Skeleton loading={this.state.bibLoaded === false}>
-            <RefList refs={this.state.data}/>
+            {this.state.data && <RefList refs={this.state.data}/>}
           </Skeleton>
           </Card>
           <br/>
           <Card title="Scientific Software">
           <Skeleton loading={this.state.bibLoaded === false}>
-            <RefList refs={this.state.tools}/>
+            {this.state.tools && <RefList refs={this.state.tools}/>}
           </Skeleton>
           </Card>
           <br/>
           <Card title="Feature Extractors">
           <Skeleton loading={this.state.bibLoaded === false}>
-            <RefList refs={this.state.extractors}/>
+            {this.state.extractors && <RefList refs={this.state.extractors}/>}
           </Skeleton>
 
           </Card>

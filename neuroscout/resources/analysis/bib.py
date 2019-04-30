@@ -5,14 +5,18 @@ from citeproc import Citation, CitationItem
 from citeproc import formatter
 from citeproc.source.json import CiteProcJSON
 from citeproc_styles import get_style_filepath
+import re
 
 
-def _flatten(li):
-    return [item for sublist in li for item in sublist]
+def _flatten_uniqueify(li):
+    """ Flatten and _flatten_uniqueify basd on id """
+    li = [i for i in li if i is not None]
+    li = [item for sublist in li for item in sublist]
+    return list({v['id']: v for v in li}.values())
 
 
 def format_bibliography(json_data):
-    json_data = _flatten(json_data)
+    json_data = _flatten_uniqueify(json_data)
     bib_source = CiteProcJSON(json_data)
     style_path = get_style_filepath('apa')
     bib_style = CitationStylesStyle(style_path, validate=False)
@@ -39,3 +43,15 @@ def format_bibliography(json_data):
         items.append(str(item))
 
     return items
+
+
+def find_predictor_citation(pred, bib):
+    if pred.extracted_feature is not None:
+        ext_name = pred.extracted_feature.extractor_name
+        feat_name = pred.name
+        for patt, feats in bib.items():
+            if re.match(patt, ext_name):
+                for fpatt, csl in feats.items():
+                    if re.match(fpatt, feat_name):
+                        return csl
+    return None
