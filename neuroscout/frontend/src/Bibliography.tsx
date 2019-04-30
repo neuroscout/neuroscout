@@ -2,6 +2,7 @@ import * as React from 'react';
 import { Button, Card, Icon, Dropdown, Skeleton } from 'antd';
 import { config } from './config';
 import { displayError, jwtFetch, alphaSort, timeout } from './utils';
+import './Bibliography.css';
 
 const domainRoot = config.server_url;
 const ButtonGroup = Button.Group;
@@ -21,15 +22,13 @@ interface BibState {
 class RefList extends React.Component<{refs: any[]}, {}> {
   render() {
     let items = this.props.refs.map((item, key) =>
-      <li key={key}>{item.title}</li>
+      <div className={'bibStyle'} key={key}  dangerouslySetInnerHTML={{__html: item}} />
     );
 
     return(
-    <div>
-      <ul>
-      {items}
-      </ul>
-    </div>
+      <div>
+        {items}
+      </div>
     );
   }
 }
@@ -75,15 +74,15 @@ export class BibliographyTab extends React.Component<bibProps, BibState> {
             Below are the references for the tools, data, and extractors used in this analysis.
             Be sure to cite these references if you publish any results stemming from this analysis.
           </p>
-          <Card title="Scientific Software">
+          <Card title="Dataset">
           <Skeleton loading={this.state.bibLoaded === false}>
-            <RefList refs={this.state.tools}/>
+            <RefList refs={this.state.data}/>
           </Skeleton>
           </Card>
           <br/>
-          <Card title="Datasets">
+          <Card title="Scientific Software">
           <Skeleton loading={this.state.bibLoaded === false}>
-            <RefList refs={this.state.data}/>
+            <RefList refs={this.state.tools}/>
           </Skeleton>
           </Card>
           <br/>
@@ -97,7 +96,6 @@ export class BibliographyTab extends React.Component<bibProps, BibState> {
 
           <Card title="Export All" bordered={false} style={{ width: 400 }}>
           <ButtonGroup>
-            <Button icon="download">BibTex</Button>
             <Button icon="download">CSL-JSON</Button>
             <Button icon="download">Text - APA</Button>
           </ButtonGroup>

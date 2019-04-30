@@ -13,7 +13,6 @@
     "@types/react-dom": "^16.0.5",
     "@types/reflux": "^6.4.1",
     "antd": "^3.13.2",
-    "citation-js": "^0.4.0",
     "jwt-decode": "^2.2.0",
     "node": "^9.10.0",
     "rc-calendar": "^9.10.8",

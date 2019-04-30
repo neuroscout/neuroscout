@@ -9,6 +9,7 @@ import webargs as wa
 import json
 
 from utils.db import put_record
+from .bib import format_bibliography
 from ..utils import owner_required, auth_required, fetch_analysis, abort
 from ..predictor import get_predictors
 from .schemas import (AnalysisSchema, AnalysisFullSchema,
@@ -194,10 +195,6 @@ class AnalysisBundleResource(MethodResource):
         return send_file(analysis.bundle_path, as_attachment=True)
 
 
-def _flatten(li):
-    return [item for sublist in li for item in sublist]
-
-
 class BibliographyResource(MethodResource):
     @doc(tags=['analysis'], summary='Get analysis bibliography')
     @marshal_with(BibliographySchema)
@@ -206,10 +203,23 @@ class BibliographyResource(MethodResource):
         bib = json.load(open(current_app.config['BIBLIOGRAPHY']))
         CORE = ['nipype', 'neuroscout', 'fitlins', 'nipype']
 
+        tools = format_bibliography(
+            [b for k, b in bib.items() if k in CORE])
+
+        data = format_bibliography(
+            [bib.get(analysis.dataset.name)])
+
+        extractors = [p.extracted_feature.extractor_name
+                      for p in analysis.predictors
+                      if p.extracted_feature is not None]
+
+        extractors = format_bibliography(
+            [b for k, b in bib.items() if k in extractors])
+
         resp = {
-            'tools': _flatten([b for k, b in bib.items() if k in CORE]),
-            'data': [],
-            'extractors': []
+            'tools': tools,
+            'data': data,
+            'extractors': extractors
         }
 
         return resp

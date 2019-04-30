@@ -1,6 +1,8 @@
 apispec==1.1.0
 appdirs==1.4.3
 blinker==1.4
+citeproc-py==0.4.0
+citeproc-py-styles==0.1.1
 click==6.7
 celery
 decorator==4.0.11
