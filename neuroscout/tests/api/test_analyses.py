@@ -479,7 +479,7 @@ def test_auth_id(auth_client, add_analysis_user2):
     analysis = Analysis.query.filter_by(id=add_analysis_user2).first()
     resp = auth_client.delete('/api/analyses/{}'.format(analysis.hash_id))
 
-    assert resp.status_code == 401
+    assert resp.status_code == 404
 
 
 def test_bibliography(auth_client, add_analysis, add_task, session):
