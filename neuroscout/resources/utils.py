@@ -89,7 +89,7 @@ def owner_required(function):
     def wrapper(*args, **kwargs):
         if current_identity.id != kwargs['analysis'].user_id:
             return abort(
-                401, {"message": "You are not the owner of this analysis."})
+                404, {"message": "Resource not found."})
         return function(*args, **kwargs)
     return wrapper
 

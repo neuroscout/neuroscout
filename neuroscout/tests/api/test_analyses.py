@@ -15,7 +15,10 @@ def test_get(session, auth_client, add_analysis):
 
     # Make analysis public
     analysis = Analysis.query.filter_by(id=add_analysis).first()
+    dataset_id = analysis.dataset_id
+    name = analysis.name
     analysis.private = False
+    analysis.status = "PASSED"
     session.commit()
 
     # List of analyses
@@ -23,7 +26,21 @@ def test_get(session, auth_client, add_analysis):
     assert resp.status_code == 200
     analysis_list = decode_json(resp)
     assert type(analysis_list) == list
-    assert len(analysis_list) == 0  # Analysis should not be displayed, yet...
+    assert len(analysis_list) == 1
+
+    # Filter by dataset_id and name
+    resp = auth_client.get('/api/analyses',
+                           params=dict(dataset_id=dataset_id, name=name))
+    assert resp.status_code == 200
+    analysis_list = decode_json(resp)
+    assert len(analysis_list) == 1
+
+    # Filter with wrong name
+    resp = auth_client.get('/api/analyses',
+                           params=dict(dataset_id=100, name='sds'))
+    assert resp.status_code == 200
+    analysis_list = decode_json(resp)
+    assert len(analysis_list) == 0
 
     # Get first analysis
     first_analysis_id = analysis.hash_id
@@ -372,8 +389,7 @@ def test_reports(auth_client, add_analysis):
 
     result = decode_json(resp)['result']
 
-    for f in ['contrast_plot', 'design_matrix',
-              'design_matrix_corrplot', 'design_matrix_plot']:
+    for f in ['design_matrix', 'design_matrix_corrplot', 'design_matrix_plot']:
         assert f in result
 
     assert len(result['design_matrix']) == 4
@@ -463,7 +479,7 @@ def test_auth_id(auth_client, add_analysis_user2):
     analysis = Analysis.query.filter_by(id=add_analysis_user2).first()
     resp = auth_client.delete('/api/analyses/{}'.format(analysis.hash_id))
 
-    assert resp.status_code == 401
+    assert resp.status_code == 404
 
 
 def test_bibliography(auth_client, add_analysis, add_task, session):
