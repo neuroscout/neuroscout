@@ -48,7 +48,7 @@ Pillow==5.4.1
 psycopg2==2.7.1
 progressbar2
 py==1.4.33
-pybids==0.8.0
+-e git+https://github.com/bids-standard/pybids.git@sqlalchemy#egg=pybids
 PyJWT==1.4.2
 pyparsing==2.2.0
 pytest==3.0.7
