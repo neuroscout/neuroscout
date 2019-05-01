@@ -26,8 +26,19 @@ class AnalysisRootResource(AnalysisMethodResource):
     """" Resource for root address """
     @marshal_with(AnalysisSchema(many=True))
     @doc(summary='Returns list of public analyses.')
-    def get(self):
-        return Analysis.query.filter_by(private=False, status='PASSED').all()
+    @use_kwargs({
+        'name': wa.fields.DelimitedList(
+            wa.fields.Str(), description="Analysis name(s)"),
+        'dataset_id': wa.fields.DelimitedList(
+            wa.fields.Number(), description="Dataset id(s)")
+        }, locations=['query'])
+    def get(self, **kwargs):
+        query = Analysis.query.filter_by(private=False, status='PASSED')
+        for param in kwargs:
+            query = query.filter(
+                getattr(Analysis, param).in_(kwargs[param]))
+
+        return query
 
     @use_kwargs(AnalysisSchema)
     @doc(summary='Add new analysis!')
