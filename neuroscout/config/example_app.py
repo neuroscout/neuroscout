@@ -44,7 +44,7 @@ class Config(object):
 
 class DevelopmentConfig(Config):
     ENV = 'development'
-    SQLALCHEMY_DATABASE_URI = 'postgres://postgres@postgres:5432/neuroscout'
+    SQLALCHEMY_DATABASE_URI = 'postgres://postgres:password@postgres:5432/neuroscout'
     PROPAGATE_EXCEPTIONS = True
 
 
