@@ -6,7 +6,6 @@ import magic
 from os.path import isfile
 from flask import current_app
 from pathlib import Path
-import nibabel as nib
 
 import pandas as pd
 
@@ -209,11 +208,11 @@ def add_task(task_name, dataset_name=None, local_path=None,
             run_number = str(run_number).zfill(2)
             entities['run'] = run_number
 
+        niimg = img.get_image()
         # Get duration (helps w/ transformations)
-        try:
-            niimg = nib.load(img.path)
+        if niimg:
             run_model.duration = niimg.shape[3] * niimg.header.get_zooms()[-1]
-        except nib.filebasedimages.ImageFileError:
+        else:
             run_model.duration = scan_length
 
         # Put back as int
