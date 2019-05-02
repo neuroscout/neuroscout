@@ -208,11 +208,11 @@ def add_task(task_name, dataset_name=None, local_path=None,
             run_number = str(run_number).zfill(2)
             entities['run'] = run_number
 
-        niimg = img.get_image()
         # Get duration (helps w/ transformations)
-        if niimg:
+        try:
+            niimg = img.get_image()
             run_model.duration = niimg.shape[3] * niimg.header.get_zooms()[-1]
-        else:
+        except ValueError:
             run_model.duration = scan_length
 
         # Put back as int
