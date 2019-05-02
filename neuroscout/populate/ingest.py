@@ -6,6 +6,7 @@ import magic
 from os.path import isfile
 from flask import current_app
 from pathlib import Path
+import nibabel as nib
 
 import pandas as pd
 
@@ -13,7 +14,7 @@ from bids.layout import BIDSLayout
 from datalad.api import install
 
 from core import cache
-from .utils import remote_resource_exists, hash_stim
+from .utils import hash_stim
 from utils import get_or_create
 from models import (Dataset, Task, Run, Predictor, PredictorEvent,
                     PredictorRun, Stimulus, RunStimulus,
@@ -190,8 +191,8 @@ def add_task(task_name, dataset_name=None, local_path=None,
     stims_processed = {}
     """ Parse every Run """
     print("Parsing runs")
-    all_runs = layout.get(task=task_name, suffix='bold', extensions='.nii.gz',
-                          desc=None, **kwargs)
+    all_runs = layout.get(task=task_name, suffix='bold', extension='nii.gz',
+                          scope='raw', **kwargs)
     for img in progressbar(all_runs):
         """ Extract Run information """
         # Get entities
@@ -209,10 +210,10 @@ def add_task(task_name, dataset_name=None, local_path=None,
             entities['run'] = run_number
 
         # Get duration (helps w/ transformations)
-        if img.image is not None:
-            run_model.duration = img.image.shape[3] * \
-             img.image.header.get_zooms()[-1]
-        else:
+        try:
+            niimg = nib.load(img.path)
+            run_model.duration = niimg.shape[3] * niimg.header.get_zooms()[-1]
+        except nib.filebasedimages.ImageFileError:
             run_model.duration = scan_length
 
         # Put back as int
