@@ -268,8 +268,47 @@
   "PredefinedDictionaryExtractor":[
     {
       "features": {
+        "subtlexusfrequency_FREQcount": {
+          "description": "Number of times the word appears in the corpus"
+        },
+        "subtlexusfrequency_CDcount": {
+          "description": "Number of times the word appears in the corpus"
+        },
+        "subtlexusfrequency_FREQlow": {
+          "description": "Number of times the word appears in the corpus"
+        },
+        "subtlexusfrequency_Cdlow": {
+          "description": "Number of times the word appears in the corpus"
+        },
+        "subtlexusfrequency_SUBTLWF": {
+          "description": "Number of times the word appears in the corpus"
+        },
         "subtlexusfrequency_Lg10WF": {
-          "description": "Lexical frequency of words in corpus of 51 million words (log)"
+          "description": "Number of times the word appears in the corpus"
+        },
+        "subtlexusfrequency_SUBTLCD": {
+          "description": "Number of times the word appears in the corpus"
+        },
+        "subtlexusfrequency_Lg10CD": {
+          "description": "Number of times the word appears in the corpus"
+        },
+        "subtlexusfrequency_Dom_PoS_SUBTLEX": {
+          "description": "Number of times the word appears in the corpus"
+        },
+        "subtlexusfrequency_Freq_dom_PoS_SUBTLEX": {
+          "description": "Number of times the word appears in the corpus"
+        },
+        "subtlexusfrequency_Percentage_dom_PoS": {
+          "description": "Number of times the word appears in the corpus"
+        },
+        "subtlexusfrequency_All_PoS_SUBTLEX": {
+          "description": "Number of times the word appears in the corpus"
+        },
+        "subtlexusfrequency_All_freqs_SUBTLEX": {
+          "description": "Number of times the word appears in the corpus"
+        },
+        "subtlexusfrequency_Zipf-value": {
+          "description": "Number of times the word appears in the corpus"
         }
       }
     }
