@@ -164,6 +164,9 @@ def ingest_text_stimuli(filename, dataset_name, task_name, parent_ids,
                          variable play speeds.
     """
     df = pd.read_csv(filename, delimiter='\t')
+    # Remove N/As
+    df = df[df.text.isnull() == False]
+
     parent_ids = listify(parent_ids)
     onsets = listify(onsets)
     if params is None:
