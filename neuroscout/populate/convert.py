@@ -192,8 +192,10 @@ def ingest_text_stimuli(filename, dataset_name, task_name, parent_ids=None,
     for onset, parent_id in zip(onsets, parent_ids):
         # Trim and align trancript
         sub = df[df.onset > onset]
+        sub = sub[sub.duration > 0]
         sub['onset'] = (sub['onset'] - onset) * resample_ratio
 
+        # Calculate run duration
         duration = max(db.session.query(RunStimulus.duration).filter_by(
             stimulus_id=parent_id).distinct())[0]
         if onset < 0:
