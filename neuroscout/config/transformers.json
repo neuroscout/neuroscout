@@ -38,7 +38,7 @@
       "aoa": ["AoA_Kup"],
       "concreteness": ["Conc.M"]},
       "missing": "n/a"} ],
-    ["LengthExtractor", {}],
+    ["LengthExtractor", {}]
   ],
   "transformations":[
     {
