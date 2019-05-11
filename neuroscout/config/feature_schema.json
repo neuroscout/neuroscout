@@ -309,6 +309,21 @@
         },
         "subtlexusfrequency_Zipf-value": {
           "description": "Zipf frequency"
+        },
+        "affect_V.Mean.Sum": {
+          "description": "Mean valence of spoken words."
+        },
+        "affect_A.Mean.Sum": {
+          "description": "Mean arousal of spoken words."
+        },
+        "affect_D.Mean.Sum": {
+          "description": "Mean dominance of spoken words."
+        },
+        "concreteness_Conc.M": {
+          "description": "Mean concreteness rating of spoken words."
+        },
+        "aoa.AoA_Kup": {
+          "description": "Age of aquisition of spoken words."
         }
       }
     }
