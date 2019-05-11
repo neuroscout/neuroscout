@@ -265,6 +265,15 @@
       }
     }
   ],
+  "LengthExtractor": [
+    {
+      "features": {
+        "text_length": {
+          "description": "Number of letters in each spoken word."
+        }
+      }
+    }
+  ],
   "PredefinedDictionaryExtractor":[
     {
       "features": {
