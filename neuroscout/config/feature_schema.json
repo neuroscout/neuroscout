@@ -265,6 +265,15 @@
       }
     }
   ],
+  "LengthExtractor": [
+    {
+      "features": {
+        "text_length": {
+          "description": "Number of letters in each spoken word."
+        }
+      }
+    }
+  ],
   "PredefinedDictionaryExtractor":[
     {
       "features": {
@@ -272,43 +281,58 @@
           "description": "Number of times the word appears in the corpus"
         },
         "subtlexusfrequency_CDcount": {
-          "description": "Number of times the word appears in the corpus"
+          "description": "The number of films in which the word appears"
         },
         "subtlexusfrequency_FREQlow": {
-          "description": "Number of times the word appears in the corpus"
+          "description": "The number of times the word appears in the corpus starting with a lowercase letter"
         },
         "subtlexusfrequency_Cdlow": {
-          "description": "Number of times the word appears in the corpus"
+          "description": "The number of films in which the word appears starting with a lowercase letter"
         },
         "subtlexusfrequency_SUBTLWF": {
-          "description": "Number of times the word appears in the corpus"
+          "description": "The word frequency per million words"
         },
         "subtlexusfrequency_Lg10WF": {
-          "description": "Number of times the word appears in the corpus"
+          "description": "This value is based on log10(FREQcount+1)"
         },
         "subtlexusfrequency_SUBTLCD": {
-          "description": "Number of times the word appears in the corpus"
+          "description": "Indicates in what percent of the films the word appears"
         },
         "subtlexusfrequency_Lg10CD": {
-          "description": "Number of times the word appears in the corpus"
+          "description": "This value is based on log10(CDcount+1)"
         },
         "subtlexusfrequency_Dom_PoS_SUBTLEX": {
-          "description": "Number of times the word appears in the corpus"
+          "description": "The dominant (most frequent) part of speech of each entry"
         },
         "subtlexusfrequency_Freq_dom_PoS_SUBTLEX": {
-          "description": "Number of times the word appears in the corpus"
+          "description": "The frequency of the dominant part of speech"
         },
         "subtlexusfrequency_Percentage_dom_PoS": {
-          "description": "Number of times the word appears in the corpus"
+          "description": "The relative frequency of the dominant part of speech"
         },
         "subtlexusfrequency_All_PoS_SUBTLEX": {
-          "description": "Number of times the word appears in the corpus"
+          "description": "All parts of speech observed for the entry"
         },
         "subtlexusfrequency_All_freqs_SUBTLEX": {
-          "description": "Number of times the word appears in the corpus"
+          "description": "The frequencies of each part of speech"
         },
         "subtlexusfrequency_Zipf-value": {
-          "description": "Number of times the word appears in the corpus"
+          "description": "Zipf frequency"
+        },
+        "affect_V.Mean.Sum": {
+          "description": "Mean valence of spoken words."
+        },
+        "affect_A.Mean.Sum": {
+          "description": "Mean arousal of spoken words."
+        },
+        "affect_D.Mean.Sum": {
+          "description": "Mean dominance of spoken words."
+        },
+        "concreteness_Conc.M": {
+          "description": "Mean concreteness rating of spoken words."
+        },
+        "aoa.AoA_Kup": {
+          "description": "Age of aquisition of spoken words."
         }
       }
     }
