@@ -3,6 +3,7 @@
  an analysis.
 */
 import { RouteComponentProps } from 'react-router';
+import { Redirect } from 'react-router-dom';
 import { createBrowserHistory } from 'history';
 import * as React from 'react';
 import {
@@ -122,7 +123,8 @@ let initializeStore = (): Store => ({
   activeContrastIndex: -1,
   xformErrors: [],
   contrastErrors: [],
-  fillAnalysis: false
+  fillAnalysis: false,
+  analysis404: false
 });
 
 // Get list of tasks from a given dataset
@@ -230,10 +232,16 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
       jwtFetch(`${domainRoot}/api/analyses/${props.id}`)
       // .then(response => response.json() as Promise<ApiAnalysis>)
       .then((data: ApiAnalysis) => {
-        this.loadAnalysis(data);
-        return data;
+        if ((data as any).statusCode === 404) {
+          this.setState({analysis404: true});
+          return;
+        } else {
+          this.loadAnalysis(data);
+          return data;
+        }
       })
       .then((data: ApiAnalysis) => {
+        if (this.state.analysis404) { return; }
         if (editableStatus.includes(data.status)) {
           this.setState({model: this.buildModel()});
         } else if (data.model !== undefined) {
@@ -469,7 +477,7 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
             status: data.status,
             modifiedAt: data.modified_at
           },
-          postReports: true,
+          postReports: analysis.contrasts.length > 0,
           unsavedChanges: false
         });
         // will this mess with /fill workflow?
@@ -490,7 +498,7 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
   // Decode data returned by '/api/analyses/<id>' (ApiAnalysis) to convert it to the right shape (Analysis)
   // and fetch the associated runs
   loadAnalysis = (data: ApiAnalysis): Promise<Analysis> => {
-
+    if (this.state.analysis404) { return Promise.reject('404'); }
     data.transformations = [];
 
     // Extract transformations and contrasts from within step object of response.
@@ -805,7 +813,8 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
    since state changes aren't really user edits we don't want to set unsavedChanges.
   */
   updateState = (attrName: keyof Store, keepClean = false, saveToAPI = false) => (value: any) => {
-    const { analysis, availableRuns, availablePredictors, datasets } = this.state;
+    const { analysis, availableRuns, availablePredictors } = this.state;
+    const { datasets } = this.props;
     /*
     if (!editableStatus.includes(analysis.status) && !keepClean) {
       message.warning('This analysis is locked and cannot be edited');
@@ -829,7 +838,6 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
                 updatedAnalysis.runIds = this.runIdsFromModel(data, updatedAnalysis.model.Input);
               }
             }
-
             if (availTasks.length === 1) {
               stateUpdate = {
                 ...stateUpdate,
@@ -991,6 +999,9 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
   }
 
   render() {
+    if (this.state.analysis404) {
+      return <Redirect to="/builder/" />;
+    }
     let {
       predictorsActive,
       transformationsActive,
@@ -1024,6 +1035,7 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
       this.postTabChange(activeTab);
     }
     return (
+      
       <div className="App">
           <Prompt
             when={unsavedChanges}
@@ -1116,7 +1128,7 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
                     updateBuilderState={this.updateState}
                   />
                   <br/>
-                  {this.navButtons()}
+                  {this.navButtons(!(this.state.analysis.contrasts.length > 0))}
                   <br/>
                 </TabPane>}
                 <TabPane tab="Review" key="review" disabled={((!reviewActive || !analysis.analysisId) && isDraft)}>
