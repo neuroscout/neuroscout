@@ -42,6 +42,7 @@ services:
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
     env_file:
       - .env
+      - .pliersenv
 
   swagger-ui:
     image: swaggerapi/swagger-ui
