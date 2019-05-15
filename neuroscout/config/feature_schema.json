@@ -333,6 +333,66 @@
         },
         "aoa.AoA_Kup": {
           "description": "Age of aquisition of spoken words."
+        },
+        "massiveauditorylexicaldecision_IsWord": {
+          "description": "Whether the item is a word or pseudo-word."
+        },
+        "massiveauditorylexicaldecision_StressPattern": {
+          "description": "The stress pattern of the word."
+        },
+        "massiveauditorylexicaldecision_NumSylls": {
+          "description": "The number of syllables in the item."
+        },
+        "massiveauditorylexicaldecision_NumPhones": {
+          "description": "The number of phones in the item."
+        },
+        "massiveauditorylexicaldecision_Duration": {
+          "description": "The duration of the item in milliseconds."
+        },
+        "massiveauditorylexicaldecision_OrthUP": {
+          "description": "The letter index of the orthographic uniqueness point of the item."
+        },
+        "massiveauditorylexicaldecision_PhonND": {
+          "description": "The number of phonological neighbors (one phone edit away)."
+        },
+        "massiveauditorylexicaldecision_OrthND": {
+          "description": "The number of orthographic neighbors (one glyph edit away)."
+        },
+        "massiveauditorylexicaldecision_POS": {
+          "description": "The frequency-dominant part-of-speech of the orthographic form."
+        },
+        "massiveauditorylexicaldecision_AllPOS": {
+          "description": "All parts-of-speech of the orthographic wordform."
+        },
+        "massiveauditorylexicaldecision_FreqSUBTLEX": {
+          "description": "The frequency of the orthographic word form (SUBTLEX-US corpus)."
+        },
+        "massiveauditorylexicaldecision_FreqCOCA": {
+          "description": "Word frequency in the COCA corpus."
+        },
+        "massiveauditorylexicaldecision_FreqCOCAspok": {
+          "description": "Word frequency in the spoken language subset of the COCA corpus."
+        },
+        "massiveauditorylexicaldecision_FreqGoogle": {
+          "description": "Word frequency in the Google Unigram corpus."
+        },
+        "massiveauditorylexicaldecision_PhonUP": {
+          "description": "The phone index of the phonological uniqueness point of the item."
+        },
+        "massiveauditorylexicaldecision_StressCat": {
+          "description": "The stress category of word items."
+        },
+        "massiveauditorylexicaldecision_PhonLev": {
+          "description": "Mean phone-level Levenshtein distance from all entries in CMU-A."
+        },
+        "massiveauditorylexicaldecision_NumMorphs": {
+          "description": "The number of morphemes."
+        },
+        "massiveauditorylexicaldecision_OrthLev": {
+          "description": "Mean orthographic Levenshtein distance from all entries in CMU-A."
+        },
+        "calgarysemanticdecision_Concrete_rating": {
+          "description": "Concreteness (calgarysemanticdecision)."
         }
       }
     }
