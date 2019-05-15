@@ -12,12 +12,15 @@
         ],
         "extractors": [
           ["PredefinedDictionaryExtractor", {"variables":
-            {"affect":["V.Mean.Sum", "A.Mean.Sum", "D.Mean.Sum"],
-            "aoa": ["AoA_Kup"],
-            "concreteness": ["Conc.M"]},
-            "missing": "n/a"} ],
-          ["LengthExtractor", {}]
-        ],
+            {"massiveauditorylexicaldecision":
+                ["StressPattern", "NumSylls", "NumPhones", "Duration",
+                  "OrthUP", "PhonND", "OrthND", "POS", "AllPOS", "FreqSUBTLEX",
+                  "FreqCOCA", "FreqCOCAspok", "FreqGoogle", "PhonUP", "StressCat",
+                  "PhonLev", "NumMorphs", "OrthLev"],
+               "calgarysemanticdecision": ["Concrete_rating"]
+              },
+            "missing": "n/a"} ]
+          ],
         "transformations":[
         ]
       }
