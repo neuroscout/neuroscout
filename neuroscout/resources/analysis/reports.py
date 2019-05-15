@@ -88,8 +88,7 @@ class CompileAnalysisResource(MethodResource):
     'run_id': wa.fields.DelimitedList(fields.Int(),
                                       description='Run id(s).'),
     'sampling_rate': wa.fields.Number(description='Sampling rate in Hz'),
-    'scale': wa.fields.Boolean(description='Scale columns for plotting',
-                               missing=True),
+    'scale': wa.fields.Boolean(description='Scale columns for plotting'),
 }, locations=['query'])
 @doc(tags=['analysis'])
 class ReportResource(MethodResource):
