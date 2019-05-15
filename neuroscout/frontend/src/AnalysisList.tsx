@@ -39,7 +39,7 @@ class AnalysisList extends React.Component<AnalysisListProps> {
         title: 'Name',
         render: (text, record: AppAnalysis) => (
           <Link to={`/builder/${record.id}`}>
-            {record.name}
+            <div className="recordName">{record.name}</div>
           </Link>
         ),
         sorter: (a, b) => a.name.localeCompare(b.name)

@@ -58,22 +58,23 @@ export const jwtFetch = (path: string, options?: object) => {
       });
       throw new Error('Please Login Again');
     }
-    if (response.status !== 200) {
-      // displayError(new Error(`HTTP ${response.status} on ${path}`));
+    if (response.status >= 400) {
+      return { statusCode: response.status };
+    } else {
+      return response.json().then(json => {
+        // Always add statusCode to the data object or array returned by response.json()
+        let copy: any;
+        if ('length' in json) {
+          // array
+          copy = [...json];
+          (copy as any).statusCode = response.status;
+        } else {
+          // object
+          copy = { ...json, statusCode: response.status };
+        }
+        return copy;
+      });
     }
-    return response.json().then(json => {
-      // Always add statusCode to the data object or array returned by response.json()
-      let copy: any;
-      if ('length' in json) {
-        // array
-        copy = [...json];
-        (copy as any).statusCode = response.status;
-      } else {
-        // object
-        copy = { ...json, statusCode: response.status };
-      }
-      return copy;
-    });
   });
 };
 

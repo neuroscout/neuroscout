@@ -183,6 +183,7 @@ export interface Store {
   xformErrors: string[];
   contrastErrors: string[];
   fillAnalysis: boolean;
+  analysis404: boolean;
 }
 
 export interface ApiRun {
