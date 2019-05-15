@@ -1621,6 +1621,166 @@
         ]
     },
     "PredefinedDictionaryExtractor": {
+      "concreteness.*": [
+        {
+        "id": "http://zotero.org/users/local/JXz6ijqB/items/Z8ZF6ICY",
+        "type": "article-journal",
+        "title": "Concreteness ratings for 40 thousand generally known English word lemmas",
+        "container-title": "Behavior Research Methods",
+        "page": "904-911",
+        "volume": "46",
+        "issue": "3",
+        "source": "DOI.org (Crossref)",
+        "URL": "http://link.springer.com/10.3758/s13428-013-0403-5",
+        "DOI": "10.3758/s13428-013-0403-5",
+        "ISSN": "1554-3528",
+        "journalAbbreviation": "Behav Res",
+        "language": "en",
+        "author": [
+        	{
+        		"family": "Brysbaert",
+        		"given": "Marc"
+        	},
+        	{
+        		"family": "Warriner",
+        		"given": "Amy Beth"
+        	},
+        	{
+        		"family": "Kuperman",
+        		"given": "Victor"
+        	}
+        ],
+        "issued": {
+        	"date-parts": [
+        		[
+        			"2014",
+        			9
+        		]
+        	]
+        },
+        "accessed": {
+        	"date-parts": [
+        		[
+        			"2019",
+        			5,
+        			15
+        		]
+        	]
+        }
+        }
+      ],
+      "calgarysemanticdecision.*" : [
+      	{
+      		"id": "http://zotero.org/users/local/JXz6ijqB/items/D5EM4SZP",
+      		"type": "article-journal",
+      		"title": "The Calgary semantic decision project: concrete/abstract decision data for 10,000 English words",
+      		"container-title": "Behavior Research Methods",
+      		"page": "407-417",
+      		"volume": "49",
+      		"issue": "2",
+      		"source": "Springer Link",
+      		"URL": "https://doi.org/10.3758/s13428-016-0720-6",
+      		"DOI": "10.3758/s13428-016-0720-6",
+      		"ISSN": "1554-3528",
+      		"shortTitle": "The Calgary semantic decision project",
+      		"journalAbbreviation": "Behav Res",
+      		"language": "en",
+      		"author": [
+      			{
+      				"family": "Pexman",
+      				"given": "Penny M."
+      			},
+      			{
+      				"family": "Heard",
+      				"given": "Alison"
+      			},
+      			{
+      				"family": "Lloyd",
+      				"given": "Ellen"
+      			},
+      			{
+      				"family": "Yap",
+      				"given": "Melvin J."
+      			}
+      		],
+      		"issued": {
+      			"date-parts": [
+      				[
+      					"2017",
+      					4,
+      					1
+      				]
+      			]
+      		},
+      		"accessed": {
+      			"date-parts": [
+      				[
+      					"2019",
+      					5,
+      					15
+      				]
+      			]
+      		}
+      	}
+      ],
+      "massiveauditorylexicaldecision.*": [
+      	{
+      		"id": "http://zotero.org/users/local/JXz6ijqB/items/KHYK769U",
+      		"type": "article-journal",
+      		"title": "The Massive Auditory Lexical Decision (MALD) database",
+      		"container-title": "Behavior Research Methods",
+      		"source": "Springer Link",
+      		"URL": "https://doi.org/10.3758/s13428-018-1056-1",
+      		"DOI": "10.3758/s13428-018-1056-1",
+      		"ISSN": "1554-3528",
+      		"journalAbbreviation": "Behav Res",
+      		"language": "en",
+      		"author": [
+      			{
+      				"family": "Tucker",
+      				"given": "Benjamin V."
+      			},
+      			{
+      				"family": "Brenner",
+      				"given": "Daniel"
+      			},
+      			{
+      				"family": "Danielson",
+      				"given": "D. Kyle"
+      			},
+      			{
+      				"family": "Kelley",
+      				"given": "Matthew C."
+      			},
+      			{
+      				"family": "Nenadić",
+      				"given": "Filip"
+      			},
+      			{
+      				"family": "Sims",
+      				"given": "Michelle"
+      			}
+      		],
+      		"issued": {
+      			"date-parts": [
+      				[
+      					"2018",
+      					6,
+      					18
+      				]
+      			]
+      		},
+      		"accessed": {
+      			"date-parts": [
+      				[
+      					"2019",
+      					5,
+      					15
+      				]
+      			]
+      		}
+      	}
+      ]
       "subtlexusfrequency.*":[
       	{
       		"id": "http://zotero.org/users/local/JXz6ijqB/items/HK7TT8RJ",
