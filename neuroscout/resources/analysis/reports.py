@@ -87,13 +87,14 @@ class CompileAnalysisResource(MethodResource):
 @use_kwargs({
     'run_id': wa.fields.DelimitedList(fields.Int(),
                                       description='Run id(s).'),
-    'sampling_rate': wa.fields.Number(description='Sampling rate in Hz')
+    'sampling_rate': wa.fields.Number(description='Sampling rate in Hz'),
+    'scale': wa.fields.Boolean(description='Scale columns for plotting'),
 }, locations=['query'])
 @doc(tags=['analysis'])
 class ReportResource(MethodResource):
     @doc(summary='Generate analysis reports.')
     @fetch_analysis
-    def post(self, analysis, run_id=None, sampling_rate=None):
+    def post(self, analysis, run_id=None, sampling_rate=None, scale=True):
         # Submit report generation
         analysis_json, pes_json = jsonify_analysis(analysis, run_id=run_id)
 
@@ -102,7 +103,8 @@ class ReportResource(MethodResource):
             args=[analysis_json, pes_json,
                   analysis.dataset.local_path, run_id,
                   sampling_rate,
-                  current_app.config['SERVER_NAME']])
+                  current_app.config['SERVER_NAME'],
+                  scale])
 
         # Create new Report
         report = Report(

@@ -220,7 +220,7 @@ class BibliographyResource(MethodResource):
 
         tools = [b['.*'] for k, b in bib.items()
                  if k in ['nipype', 'neuroscout', 'fitlins', 'nipype']]
-        all_csl_json = tools
+        all_csl_json = tools.copy()
 
         dataset_entry = bib.get(analysis.dataset.name, [])
         if dataset_entry:

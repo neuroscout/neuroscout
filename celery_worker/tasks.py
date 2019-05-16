@@ -44,7 +44,7 @@ def compile(analysis, predictor_events, resources, bids_dir, run_ids,
 
 @celery_app.task(name='workflow.generate_report')
 def generate_report(analysis, predictor_events, bids_dir, run_ids,
-                    sampling_rate, domain):
+                    sampling_rate, domain, scale):
     _, _, bids_analysis = build_analysis(
         analysis, predictor_events, bids_dir, run_ids)
     outdir = Path('/file-data/reports') / analysis['hash_id']
@@ -74,7 +74,7 @@ def generate_report(analysis, predictor_events, bids_dir, run_ids,
         results['design_matrix'].append(url)
         dense.to_csv(out, index=False)
 
-        dm_plot = plot_design_matrix(dense)
+        dm_plot = plot_design_matrix(dense, scale=scale)
         results['design_matrix_plot'].append(dm_plot)
 
         corr_plot = plot_corr_matrix(dense)
