@@ -11,6 +11,7 @@ from .utils import copy_row
 # Association table between analysis and predictor.
 analysis_predictor = Table(
     'analysis_predictor',
+    Base.metadata,
     Column('analysis_id', Integer(), ForeignKey('analysis.id')),
     Column('predictor_id', Integer(), ForeignKey('predictor.id')))
 

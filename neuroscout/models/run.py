@@ -8,6 +8,7 @@ from .base import Base
 # Association table between analysis and run.
 analysis_run = Table(
     'analysis_run',
+    Base.metadata,
     Column('analysis_id', Integer(), ForeignKey('analysis.id')),
     Column('run_id', Integer(), ForeignKey('run.id')))
 
