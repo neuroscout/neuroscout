@@ -1,25 +1,28 @@
-from database import db
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.ext.hybrid import hybrid_property
+from sqlalchemy import (Column, Integer, Text, Boolean)
+from sqlalchemy.orm import relationship
+
+from base import Base
 from .stimulus import Stimulus
 
 
-class Dataset(db.Model):
+class Dataset(Base):
     """ A BIDS dataset """
-    id = db.Column(db.Integer, primary_key=True)
-    description = db.Column(JSONB)  # BIDS description
-    summary = db.Column(db.Text)  # Hand crafted summary
-    url = db.Column(db.Text)  # External resource / link
-    active = db.Column(db.Boolean, default=True)
-    name = db.Column(db.Text, unique=True, nullable=False)
-    runs = db.relationship('Run', backref='dataset')
-    predictors = db.relationship('Predictor', backref='dataset',
-                                 lazy='dynamic')
-    tasks = db.relationship('Task', backref='dataset')
-    analyses = db.relationship('Analysis', backref='dataset')
-    dataset_address = db.Column(db.Text)
-    preproc_address = db.Column(db.Text)
-    local_path = db.Column(db.Text)
+    id = Column(Integer, primary_key=True)
+    description = Column(JSONB)  # BIDS description
+    summary = Column(Text)  # Hand crafted summary
+    url = Column(Text)  # External resource / link
+    active = Column(Boolean, default=True)
+    name = Column(Text, unique=True, nullable=False)
+    runs = relationship('Run', backref='dataset')
+    predictors = relationship('Predictor', backref='dataset',
+                              lazy='dynamic')
+    tasks = relationship('Task', backref='dataset')
+    analyses = relationship('Analysis', backref='dataset')
+    dataset_address = Column(Text)
+    preproc_address = Column(Text)
+    local_path = Column(Text)
 
     @hybrid_property
     def mimetypes(self):

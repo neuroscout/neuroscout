@@ -1,63 +1,61 @@
-from flask import current_app
-
+import datetime
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.ext.hybrid import hybrid_property
-from sqlalchemy.event import listens_for
+from sqlalchemy import (Column, Integer, Table, ForeignKey, Text,
+                        Boolean, DateTime, CheckConstraint)
+from sqlalchemy.orm import relationship
 
-from database import db
-from utils.db import copy_row
-
-from hashids import Hashids
-import datetime
+from base import Base
+from utils import copy_row
 
 # Association table between analysis and predictor.
-analysis_predictor = db.Table(
+analysis_predictor = Table(
     'analysis_predictor',
-    db.Column('analysis_id', db.Integer(), db.ForeignKey('analysis.id')),
-    db.Column('predictor_id', db.Integer(), db.ForeignKey('predictor.id')))
+    Column('analysis_id', Integer(), ForeignKey('analysis.id')),
+    Column('predictor_id', Integer(), ForeignKey('predictor.id')))
 
 
-class Analysis(db.Model):
+class Analysis(Base):
     """" A single fMRI analysis. """
-    id = db.Column(db.Integer, primary_key=True)
-    hash_id = db.Column(db.Text, unique=True)
+    id = Column(Integer, primary_key=True)
+    hash_id = Column(Text, unique=True)
 
-    name = db.Column(db.Text, nullable=False)
-    description = db.Column(db.Text)
-    predictions = db.Column(db.Text, default='')
-    private = db.Column(db.Boolean, default=True)
+    name = Column(Text, nullable=False)
+    description = Column(Text)
+    predictions = Column(Text, default='')
+    private = Column(Boolean, default=True)
 
-    model = db.Column(JSONB, default={})  # BIDS Model
-    data = db.Column(JSONB, default={})  # Additional data (e.g. )
-    filters = db.Column(JSONB)  # List of filters used to select runs
+    model = Column(JSONB, default={})  # BIDS Model
+    data = Column(JSONB, default={})  # Additional data (e.g. )
+    filters = Column(JSONB)  # List of filters used to select runs
 
-    created_at = db.Column(db.DateTime, default=datetime.datetime.utcnow)
-    modified_at = db.Column(db.DateTime, default=datetime.datetime.utcnow)
-    submitted_at = db.Column(db.DateTime)
-    saved_count = db.Column(db.Integer, default=0)
+    created_at = Column(DateTime, default=datetime.datetime.utcnow)
+    modified_at = Column(DateTime, default=datetime.datetime.utcnow)
+    submitted_at = Column(DateTime)
+    saved_count = Column(Integer, default=0)
 
-    status = db.Column(db.Text, default='DRAFT')
+    status = Column(Text, default='DRAFT')
     __table_args__ = (
-        db.CheckConstraint(
+        CheckConstraint(
             status.in_(
                 ['PASSED', 'FAILED', 'SUBMITTING', 'PENDING', 'DRAFT'])), )
 
-    locked = db.Column(db.Boolean, default=False)
+    locked = Column(Boolean, default=False)
 
-    compile_traceback = db.Column(db.Text, default='')
-    compile_task_id = db.Column(db.Text)  # Celery task id
-    bundle_path = db.Column(db.Text)
+    compile_traceback = Column(Text, default='')
+    compile_task_id = Column(Text)  # Celery task id
+    bundle_path = Column(Text)
 
-    dataset_id = db.Column(db.Integer, db.ForeignKey('dataset.id'),
-                           nullable=False)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    dataset_id = Column(Integer, ForeignKey('dataset.id'),
+                        nullable=False)
+    user_id = Column(Integer, ForeignKey('user.id'), nullable=False)
     # If cloned, this is the parent analysis:
-    parent_id = db.Column(db.Text, db.ForeignKey('analysis.hash_id'))
+    parent_id = Column(Text, ForeignKey('analysis.hash_id'))
 
-    results = db.relationship('Result', backref='analysis')
-    predictors = db.relationship('Predictor', secondary=analysis_predictor,
-                                 backref='analysis')
-    runs = db.relationship('Run', secondary='analysis_run')
+    results = relationship('Result', backref='analysis')
+    predictors = relationship('Predictor', secondary=analysis_predictor,
+                              backref='analysis')
+    runs = relationship('Run', secondary='analysis_run')
 
     @hybrid_property
     def task_name(self):
@@ -104,43 +102,31 @@ class Analysis(db.Model):
         return '<models.Analysis[hash_id =%s]>' % self.hash_id
 
 
-@listens_for(Analysis, "after_insert")
-def update_hash(mapper, connection, target):
-    analysis_table = mapper.local_table
-    connection.execute(
-         analysis_table.update().
-         values(
-             hash_id=Hashids(
-                 current_app.config['HASH_SALT'], min_length=5).
-             encode(target.id)).where(analysis_table.c.id == target.id)
-    )
-
-
-class Report(db.Model):
+class Report(Base):
     """" Report generation table"""
-    id = db.Column(db.Integer, primary_key=True)
-    analysis_id = db.Column(db.Text, db.ForeignKey('analysis.hash_id'))
-    runs = db.Column(JSONB, default=None)
-    generated_at = db.Column(db.DateTime, default=datetime.datetime.utcnow)
-    task_id = db.Column(db.Text)   # Celery task id
-    result = db.Column(JSONB)  # JSON result from Celery (once finished)
-    traceback = db.Column(db.Text)
+    id = Column(Integer, primary_key=True)
+    analysis_id = Column(Text, ForeignKey('analysis.hash_id'))
+    runs = Column(JSONB, default=None)
+    generated_at = Column(DateTime, default=datetime.datetime.utcnow)
+    task_id = Column(Text)   # Celery task id
+    result = Column(JSONB)  # JSON result from Celery (once finished)
+    traceback = Column(Text)
 
-    status = db.Column(db.Text, default='PENDING')
+    status = Column(Text, default='PENDING')
     __table_args__ = (
-        db.CheckConstraint(status.in_(['OK', 'FAILED', 'PENDING'])), )
+        CheckConstraint(status.in_(['OK', 'FAILED', 'PENDING'])), )
 
 
-class NeurovaultCollection(db.Model):
+class NeurovaultCollection(Base):
     """ Neurovault collection and upload status """
-    id = db.Column(db.Integer, primary_key=True)
-    analysis_id = db.Column(db.Text, db.ForeignKey('analysis.hash_id'))
-    uploaded_at = db.Column(db.DateTime, default=datetime.datetime.utcnow)
+    id = Column(Integer, primary_key=True)
+    analysis_id = Column(Text, ForeignKey('analysis.hash_id'))
+    uploaded_at = Column(DateTime, default=datetime.datetime.utcnow)
 
-    task_id = db.Column(db.Text)
-    collection_id = db.Column(db.Text)
-    traceback = db.Column(db.Text)
+    task_id = Column(Text)
+    collection_id = Column(Text)
+    traceback = Column(Text)
 
-    status = db.Column(db.Text, default='PENDING')
+    status = Column(Text, default='PENDING')
     __table_args__ = (
-        db.CheckConstraint(status.in_(['OK', 'FAILED', 'PENDING'])), )
+        CheckConstraint(status.in_(['OK', 'FAILED', 'PENDING'])), )

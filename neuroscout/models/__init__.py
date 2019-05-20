@@ -2,12 +2,11 @@
 
 from .analysis import (Analysis, Report, NeurovaultCollection,
                        analysis_predictor)
-from .auth import User, Role, roles_users, user_datastore
+from .auth import User, Role, roles_users
 from .group import GroupPredictor, GroupPredictorValue
 from .dataset import Dataset
 from .features import ExtractedFeature, ExtractedEvent
 from .predictor import Predictor, PredictorEvent, PredictorRun
-from .result import Result
 from .run import Run, analysis_run
 from .stimulus import Stimulus, RunStimulus
 from .task import Task
@@ -18,7 +17,6 @@ __all__ = [
     'User',
     'Role',
     'roles_users',
-    'user_datastore',
     'Dataset',
     'ExtractedFeature',
     'ExtractedEvent',
@@ -27,7 +25,6 @@ __all__ = [
     'Predictor',
     'PredictorEvent',
     'PredictorRun',
-    'Result',
     'Report',
     'NeurovaultCollection',
     'Run',

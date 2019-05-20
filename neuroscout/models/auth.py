@@ -1,40 +1,42 @@
-from database import db
-from flask_security import UserMixin, RoleMixin, SQLAlchemyUserDatastore
+from flask_security import UserMixin, RoleMixin
+
+from sqlalchemy import (Column, Integer, Table, ForeignKey, Text,
+                        Boolean, DateTime, String)
+from sqlalchemy.orm import relationship, backref
+
+from base import Base
 
 # Association table between users and runs.
-roles_users = db.Table(
+roles_users = Table(
     'roles_users',
-    db.Column('user_id', db.Integer(), db.ForeignKey('user.id')),
-    db.Column('role_id', db.Integer(), db.ForeignKey('role.id')))
+    Column('user_id', Integer(), ForeignKey('user.id')),
+    Column('role_id', Integer(), ForeignKey('role.id')))
 
 
-class User(db.Model, UserMixin):
-    """" User model class """
-    id = db.Column(db.Integer, primary_key=True)
-    google_id = db.Column(db.Text)
-    email = db.Column(db.String(100), unique=True)
-    password = db.Column(db.String(255))
-    picture = db.Column(db.Text)
+class User(Base, UserMixin):
+    """" User Base class """
+    id = Column(Integer, primary_key=True)
+    google_id = Column(Text)
+    email = Column(String(100), unique=True)
+    password = Column(String(255))
+    picture = Column(Text)
 
-    name = db.Column(db.String(40))
-    active = db.Column(db.Boolean())  # If set to disabled, cannot access.
-    confirmed_at = db.Column(db.DateTime())
-    roles = db.relationship('Role', secondary=roles_users,
-                            backref=db.backref('users'))
-    last_activity_at = db.Column(db.DateTime())
-    last_activity_ip = db.Column(db.String(255))
+    name = Column(String(40))
+    active = Column(Boolean())  # If set to disabled, cannot access.
+    confirmed_at = Column(DateTime())
+    roles = relationship('Role', secondary=roles_users,
+                         backref=backref('users'))
+    last_activity_at = Column(DateTime())
+    last_activity_ip = Column(String(255))
 
-    analyses = db.relationship('Analysis', backref='user')
+    analyses = relationship('Analysis', backref='user')
 
     def __repr__(self):
-        return '<models.User[email=%s]>' % self.email
+        return '<Bases.User[email=%s]>' % self.email
 
 
-class Role(db.Model, RoleMixin):
+class Role(Base, RoleMixin):
     """ User roles """
-    id = db.Column(db.Integer(), primary_key=True)
-    name = db.Column(db.String(80), unique=True)
-    description = db.Column(db.String(255))
-
-
-user_datastore = SQLAlchemyUserDatastore(db, User, Role)
+    id = Column(Integer(), primary_key=True)
+    name = Column(String(80), unique=True)
+    description = Column(String(255))

@@ -30,7 +30,7 @@ cache.init_app(app)
 from flask_jwt import JWT
 from flask_security import Security
 from flask_security.confirmable import confirm_email_token_status, confirm_user
-from auth import authenticate, load_user, add_auth_to_swagger
+from auth import authenticate, load_user, add_auth_to_swagger, user_datastore
 from models import *
 
 # Setup Flask-Security and JWT

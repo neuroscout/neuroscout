@@ -1,13 +1,17 @@
 """ Auth related functions """
 from datetime import datetime
-from models.auth import user_datastore, User
+from database import db
+from models import User, Role
 from flask_security.utils import verify_password
+from flask_security import SQLAlchemyUserDatastore
 from flask_security.confirmable import generate_confirmation_token
 from flask_security.recoverable import generate_reset_password_token
 from flask import current_app, url_for
 from mail import send_confirm_mail, send_reset_mail
 from google.oauth2 import id_token
 from google.auth.transport import requests
+
+user_datastore = SQLAlchemyUserDatastore(db, User, Role)
 
 
 def generate_confirmation_link(user):

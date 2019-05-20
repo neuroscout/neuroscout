@@ -1,44 +1,48 @@
-from database import db
 import datetime
 from sqlalchemy.dialects.postgresql import JSONB
+from sqlalchemy import (Column, Integer, ForeignKey, Text,
+                        Boolean, DateTime, String, Float)
+from sqlalchemy.orm import relationship
+
+from base import Base
 
 
-class ExtractedFeature(db.Model):
+class ExtractedFeature(Base):
     """ Events extracted from a Stimulus using an Extractor"""
-    id = db.Column(db.Integer, primary_key=True)
+    id = Column(Integer, primary_key=True)
     # Hash of next three variables
-    sha1_hash = db.Column(db.Text, nullable=False)
-    extractor_name = db.Column(db.String)
-    extractor_parameters = db.Column(JSONB)
-    feature_name = db.Column(db.String)
-    original_name = db.Column(db.String)  # Original feature_name
-    description = db.Column(db.String)
-    active = db.Column(db.Boolean)
-    modality = db.Column(db.String)
-    transformed = db.Column(db.Boolean, default=False)
+    sha1_hash = Column(Text, nullable=False)
+    extractor_name = Column(String)
+    extractor_parameters = Column(JSONB)
+    feature_name = Column(String)
+    original_name = Column(String)  # Original feature_name
+    description = Column(String)
+    active = Column(Boolean)
+    modality = Column(String)
+    transformed = Column(Boolean, default=False)
 
-    created_at = db.Column(db.DateTime, default=datetime.datetime.utcnow)
-    extractor_version = db.Column(db.Float, default=0.1)
+    created_at = Column(DateTime, default=datetime.datetime.utcnow)
+    extractor_version = Column(Float, default=0.1)
 
-    extracted_events = db.relationship(
+    extracted_events = relationship(
         'ExtractedEvent', backref='extracted_feature')
-    generated_predictors = db.relationship(
+    generated_predictors = relationship(
         'Predictor', backref='extracted_feature')
 
     def __repr__(self):
         return '<models.ExtractedFeature[feature_name=%s]>' % self.feature_name
 
 
-class ExtractedEvent(db.Model):
+class ExtractedEvent(Base):
     """ Events extracted from a Stimuli"""
-    id = db.Column(db.Integer, primary_key=True)
-    onset = db.Column(db.Float)
-    duration = db.Column(db.Float)
-    value = db.Column(db.String, nullable=False)
-    history = db.Column(db.String)
-    object_id = db.Column(db.Integer)
+    id = Column(Integer, primary_key=True)
+    onset = Column(Float)
+    duration = Column(Float)
+    value = Column(String, nullable=False)
+    history = Column(String)
+    object_id = Column(Integer)
 
-    stimulus_id = db.Column(
-        db.Integer, db.ForeignKey('stimulus.id'), nullable=False)
-    ef_id = db.Column(
-        db.Integer, db.ForeignKey(ExtractedFeature.id), nullable=False)
+    stimulus_id = Column(
+        Integer, ForeignKey('stimulus.id'), nullable=False)
+    ef_id = Column(
+        Integer, ForeignKey(ExtractedFeature.id), nullable=False)
