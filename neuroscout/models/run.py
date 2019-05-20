@@ -2,7 +2,7 @@ from sqlalchemy import (Column, Integer, Table, ForeignKey, Text, Float,
                         UniqueConstraint)
 from sqlalchemy.orm import relationship
 
-from base import Base
+from .base import Base
 
 
 # Association table between analysis and run.

@@ -4,7 +4,7 @@ from sqlalchemy import (Column, Integer, ForeignKey, Text,
                         Boolean, DateTime, String, Float)
 from sqlalchemy.orm import relationship
 
-from base import Base
+from .base import Base
 
 
 class ExtractedFeature(Base):

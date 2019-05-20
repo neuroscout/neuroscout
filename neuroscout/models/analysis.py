@@ -5,8 +5,8 @@ from sqlalchemy import (Column, Integer, Table, ForeignKey, Text,
                         Boolean, DateTime, CheckConstraint)
 from sqlalchemy.orm import relationship
 
-from base import Base
-from utils import copy_row
+from .base import Base
+from .utils import copy_row
 
 # Association table between analysis and predictor.
 analysis_predictor = Table(

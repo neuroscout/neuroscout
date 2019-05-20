@@ -4,7 +4,7 @@ from sqlalchemy import (Column, Integer, Table, ForeignKey, Text,
                         Boolean, DateTime, String)
 from sqlalchemy.orm import relationship, backref
 
-from base import Base
+from .base import Base
 
 # Association table between users and runs.
 roles_users = Table(

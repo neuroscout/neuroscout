@@ -2,7 +2,7 @@ from sqlalchemy import (Column, Integer, ForeignKey, Text, String,
                         Boolean, Float, UniqueConstraint, Index)
 from sqlalchemy.orm import relationship
 
-from base import Base
+from .base import Base
 
 
 class Predictor(Base):

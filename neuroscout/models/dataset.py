@@ -3,7 +3,7 @@ from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy import (Column, Integer, Text, Boolean)
 from sqlalchemy.orm import relationship
 
-from base import Base
+from .base import Base
 from .stimulus import Stimulus
 
 
