@@ -8,7 +8,7 @@ import datetime
 import sqlalchemy as sa
 import pandas as pd
 from flask import current_app
-from models import (Analysis, Result, Predictor,
+from models import (Analysis, Predictor,
                     PredictorEvent, User, Role, Dataset)
 import populate
 
@@ -286,13 +286,3 @@ def add_predictor(session, add_task):
     session.commit()
 
     return pred.id
-
-
-@pytest.fixture(scope="function")
-def add_result(session, add_analysis):
-    result = Result(analysis_id=add_analysis)
-
-    session.add(result)
-    session.commit()
-
-    return result.id
