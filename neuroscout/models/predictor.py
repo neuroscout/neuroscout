@@ -1,5 +1,6 @@
 from database import db
 
+
 class Predictor(db.Model):
     """ Instantiation of a predictor in a dataset.
     A collection of PredictorEvents. """
