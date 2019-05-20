@@ -4,19 +4,22 @@
 from flask import abort, current_app
 from sqlalchemy.exc import SQLAlchemyError
 from database import db
+from sqlalchemy.event import listens_for
+from models import Analysis
+from hashids import Hashids
 
-def copy_row(model, row, ignored_columns=[], ignored_relationships=[]):
-    copy = model()
 
-    for col in row.__table__.columns:
-        if col.name not in ignored_columns:
-            copy.__setattr__(col.name, getattr(row, col.name))
+@listens_for(Analysis, "after_insert")
+def update_hash(mapper, connection, target):
+    analysis_table = mapper.local_table
+    connection.execute(
+         analysis_table.update().
+         values(
+             hash_id=Hashids(
+                 current_app.config['HASH_SALT'], min_length=5).
+             encode(target.id)).where(analysis_table.c.id == target.id)
+    )
 
-    # Copy relationships:
-    for r in row.__mapper__.relationships:
-        if r.key not in ignored_relationships:
-            copy.__setattr__(r.key, getattr(row, r.key))
-    return copy
 
 def put_record(updated_values, instance, commit=True):
     try:
@@ -30,6 +33,7 @@ def put_record(updated_values, instance, commit=True):
         current_app.logger.error(e)
         db.session.rollback()
         abort(400, "Error updating field")
+
 
 def get_or_create(model, commit=True, **kwargs):
     """ Checks to see if instance of model is in db.

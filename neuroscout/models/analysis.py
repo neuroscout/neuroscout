@@ -1,13 +1,9 @@
-from flask import current_app
-
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.ext.hybrid import hybrid_property
-from sqlalchemy.event import listens_for
 
 from database import db
-from utils.db import copy_row
+from .utils import copy_row
 
-from hashids import Hashids
 import datetime
 
 # Association table between analysis and predictor.
@@ -102,18 +98,6 @@ class Analysis(db.Model):
 
     def __repr__(self):
         return '<models.Analysis[hash_id =%s]>' % self.hash_id
-
-
-@listens_for(Analysis, "after_insert")
-def update_hash(mapper, connection, target):
-    analysis_table = mapper.local_table
-    connection.execute(
-         analysis_table.update().
-         values(
-             hash_id=Hashids(
-                 current_app.config['HASH_SALT'], min_length=5).
-             encode(target.id)).where(analysis_table.c.id == target.id)
-    )
 
 
 class Report(db.Model):
