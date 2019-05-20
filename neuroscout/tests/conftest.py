@@ -8,7 +8,7 @@ import datetime
 import sqlalchemy as sa
 import pandas as pd
 from flask import current_app
-from models import (Analysis, Result, Predictor,
+from models import (Analysis, Predictor,
                     PredictorEvent, User, Role, Dataset)
 import populate
 

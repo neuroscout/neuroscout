@@ -53,7 +53,6 @@ class Analysis(Base):
     # If cloned, this is the parent analysis:
     parent_id = Column(Text, ForeignKey('analysis.hash_id'))
 
-    results = relationship('Result', backref='analysis')
     predictors = relationship('Predictor', secondary=analysis_predictor,
                               backref='analysis')
     runs = relationship('Run', secondary='analysis_run')
