@@ -1,4 +1,4 @@
-from .database import db
+from ..database import db
 from flask_security import UserMixin, RoleMixin, SQLAlchemyUserDatastore
 
 # Association table between users and runs.

@@ -1,6 +1,7 @@
 from flask_apispec import doc, use_kwargs, MethodResource, marshal_with
 from flask import current_app
-from ...models import PredictorEvent, Report, NeurovaultCollection, db
+from ...models import PredictorEvent, Report, NeurovaultCollection
+from ...database import db
 from ...worker import celery_app
 import webargs as wa
 from marshmallow import fields

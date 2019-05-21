@@ -10,7 +10,7 @@ from .predictor import Predictor, PredictorEvent, PredictorRun
 from .run import Run, analysis_run
 from .stimulus import Stimulus, RunStimulus
 from .task import Task
-from .database import db
+from ..database import db
 
 __all__ = [
     'Analysis',

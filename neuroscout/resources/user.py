@@ -5,7 +5,7 @@ from flask_security.recoverable import reset_password_token_status
 from flask_apispec import MethodResource, marshal_with, use_kwargs, doc
 from marshmallow import Schema, fields, validates, ValidationError, post_load
 from ..models.auth import User
-from ..models import db
+from ..database import db
 from ..auth import register_user, reset_password, send_confirmation
 from .utils import abort, auth_required
 from ..utils.db import put_record

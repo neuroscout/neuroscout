@@ -1,7 +1,8 @@
 from marshmallow import Schema, fields, post_dump
 import webargs as wa
 from flask_apispec import MethodResource, marshal_with, use_kwargs, doc
-from ..models import Predictor, PredictorEvent, PredictorRun, db
+from ..models import Predictor, PredictorEvent, PredictorRun
+from ..database import db
 from .utils import first_or_404
 from sqlalchemy import func
 from sqlalchemy.dialects import postgresql

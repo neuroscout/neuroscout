@@ -4,7 +4,7 @@ the associated predictors
 """
 from flask import current_app
 from ..core import cache
-from ..models import db
+from ..database import db
 import socket
 
 from pathlib import Path
@@ -16,9 +16,9 @@ from pliers.stimuli import load_stims, ComplexTextStim, TextStim
 from pliers.transformers import get_transformer
 from pliers.extractors import merge_results
 
-from ..models import (Dataset, Task, Predictor, PredictorEvent, PredictorRun,
-                    Run, Stimulus, RunStimulus,
-                    ExtractedFeature, ExtractedEvent)
+from ..models import (
+    Dataset, Task, Predictor, PredictorEvent, PredictorRun, Run, Stimulus,
+    RunStimulus, ExtractedFeature, ExtractedEvent)
 from .annotate import FeatureSerializer
 
 socket.setdefaulttimeout(10000)

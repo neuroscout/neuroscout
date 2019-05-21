@@ -1,6 +1,7 @@
 """" Custom transformations of extracted features """
 from ..models import (Dataset, ExtractedFeature, ExtractedEvent,
-                    Stimulus, RunStimulus, Run, Task, db)
+                    Stimulus, RunStimulus, Run, Task)
+from ..database import db
 from flask import current_app
 from sqlalchemy import func
 from .utils import hash_data
