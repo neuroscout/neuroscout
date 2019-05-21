@@ -1,16 +1,13 @@
 from flask_apispec import doc, use_kwargs, MethodResource, marshal_with
 from flask import current_app
-from ...models import PredictorEvent, Report, NeurovaultCollection
+from ...models import Report, NeurovaultCollection
 from ...database import db
 from ...worker import celery_app
 import webargs as wa
 from marshmallow import fields
 from ..utils import owner_required, abort, fetch_analysis
-from ..predictor import dump_pe
-from .schemas import (AnalysisFullSchema, AnalysisResourcesSchema,
-                      ReportSchema, AnalysisCompiledSchema,
+from .schemas import (ReportSchema, AnalysisCompiledSchema,
                       NeurovaultCollectionSchema)
-import celery.states as states
 from ...utils.db import put_record
 
 import datetime
@@ -18,24 +15,11 @@ import tempfile
 from hashids import Hashids
 
 
-def jsonify_analysis(analysis, run_id=None):
-    """" Serialize to JSON analysis's predictor events
-    Queries PredictorEvents to get all events for all runs and predictors. """
-
-    analysis_json = AnalysisFullSchema().dump(analysis)[0]
-    pred_ids = [p['id'] for p in analysis_json['predictors']]
-    all_runs = [r['id'] for r in analysis_json['runs']]
-
-    if run_id is None:
-        run_id = all_runs
-    if not set(run_id) <= set(all_runs):
-        raise ValueError("Incorrect run id specified")
-
-    pes = PredictorEvent.query.filter(
-        (PredictorEvent.predictor_id.in_(pred_ids)) &
-        (PredictorEvent.run_id.in_(run_id)))
-
-    return analysis_json, dump_pe(pes)
+def _validation_hash(analysis_id):
+    """ Create a validation hash for the analysis """
+    return Hashids(
+        current_app.config['SECONDARY_HASH_SALT'],
+        min_length=10).encode(analysis_id)
 
 
 @doc(tags=['analysis'])
@@ -48,22 +32,10 @@ class CompileAnalysisResource(MethodResource):
     @doc(summary='Compile and lock analysis.')
     @owner_required
     def post(self, analysis, build=False):
-        put_record(
-            {'status': 'SUBMITTING',
-             'submitted_at': datetime.datetime.utcnow()},
-            analysis)
-
-        validation_hash = Hashids(
-            current_app.config['SECONDARY_HASH_SALT'],
-            min_length=10).encode(analysis.id)
-
         try:
             task = celery_app.send_task(
                 'workflow.compile',
-                args=[*jsonify_analysis(analysis),
-                      AnalysisResourcesSchema().dump(analysis)[0],
-                      analysis.dataset.local_path, None, validation_hash,
-                      build]
+                args=[analysis.id, None, _validation_hash(analysis.id), build]
                 )
             put_record(
                 {'status': 'PENDING', 'compile_task_id': task.id}, analysis)
@@ -71,8 +43,7 @@ class CompileAnalysisResource(MethodResource):
         except:
             put_record(
                 {'status': 'FAILED',
-                 'compile_traceback': "Submitting failed. "
-                 "Perhaps analysis is too large?"},
+                 'compile_traceback': "Submitting failed. "},
                 analysis)
 
         return analysis
@@ -96,12 +67,11 @@ class ReportResource(MethodResource):
     @fetch_analysis
     def post(self, analysis, run_id=None, sampling_rate=None, scale=True):
         # Submit report generation
-        analysis_json, pes_json = jsonify_analysis(analysis, run_id=run_id)
 
         task = celery_app.send_task(
             'workflow.generate_report',
-            args=[analysis_json, pes_json,
-                  analysis.dataset.local_path, run_id,
+            args=[analysis.id,
+                  run_id,
                   sampling_rate,
                   current_app.config['SERVER_NAME'],
                   scale])
@@ -134,16 +104,8 @@ class ReportResource(MethodResource):
         if report.generated_at < analysis.modified_at:
             abort(404, "No fresh reports available")
 
-        if report.status == 'PENDING':
-            res = celery_app.AsyncResult(report.task_id)
-            if res.state == states.FAILURE:
-                put_record(
-                    {'status': 'FAILED', 'traceback': res.traceback}, report)
-            elif res.state == states.SUCCESS:
-                put_record(
-                    {'status': 'OK', 'result': res.result}, report)
-
         return report
+
 
 # Use current_app
 # file_plugin = MarshmallowPlugin()
@@ -169,10 +131,7 @@ class AnalysisUploadResource(MethodResource):
     def post(self, analysis, tarball, validation_hash, n_subjects=None,
              force=False):
         # Check hash_id
-        correct = Hashids(current_app.config['SECONDARY_HASH_SALT'],
-                          min_length=10).encode(analysis.id)
-
-        if correct != validation_hash:
+        if validation_hash != _validation_hash(analysis.id):
             abort(422, "Invalid validation hash.")
 
         with tempfile.NamedTemporaryFile(
@@ -206,19 +165,5 @@ class AnalysisUploadResource(MethodResource):
     @doc(summary='Get uploads for analyses.')
     @fetch_analysis
     def get(self, analysis):
-        uploads = NeurovaultCollection.query.filter_by(
+        return NeurovaultCollection.query.filter_by(
             analysis_id=analysis.hash_id)
-
-        # Update upload statuses
-        for up in uploads:
-            if up.status == 'PENDING':
-                res = celery_app.AsyncResult(up.task_id)
-                if res.state == states.FAILURE:
-                    put_record(
-                        {'status': 'FAILED', 'traceback': res.traceback}, up)
-                elif res.state == states.SUCCESS:
-                    put_record(
-                        {'status': 'OK',
-                         'collection_id': res.result['collection_id']}, up)
-
-        return uploads

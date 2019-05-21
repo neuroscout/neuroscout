@@ -9,6 +9,22 @@ from sqlalchemy.dialects import postgresql
 from ..core import cache
 
 
+def dump_pe(pes):
+    """ Serialize PredictorEvents, with *SPEED*, using core SQL.
+    Warning: relies on attributes being in correct order. """
+    statement = str(pes.statement.compile(dialect=postgresql.dialect()))
+    params = pes.statement.compile(dialect=postgresql.dialect()).params
+    res = db.session.connection().execute(statement, params)
+    return [{
+      'id': r[0],
+      'onset': r[1],
+      'duration': r[2],
+      'value':  r[3],
+      'run_id': r[5],
+      'predictor_id': r[6]
+      } for r in res]
+
+
 class ExtractedFeatureSchema(Schema):
     id = fields.Int(description="Extractor id")
     description = fields.Str(description="Feature description.")
@@ -44,22 +60,6 @@ class PredictorEventSchema(Schema):
     value = fields.Str(description="Value, or amplitude.")
     run_id = fields.Int()
     predictor_id = fields.Int()
-
-
-def dump_pe(pes):
-    """ Serialize PredictorEvents, with *SPEED*, using core SQL.
-    Warning: relies on attributes being in correct order. """
-    statement = str(pes.statement.compile(dialect=postgresql.dialect()))
-    params = pes.statement.compile(dialect=postgresql.dialect()).params
-    res = db.session.connection().execute(statement, params)
-    return [{
-      'id': r[0],
-      'onset': r[1],
-      'duration': r[2],
-      'value':  r[3],
-      'run_id': r[5],
-      'predictor_id': r[6]
-      } for r in res]
 
 
 class PredictorRunSchema(Schema):
