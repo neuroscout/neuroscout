@@ -1,24 +1,10 @@
 # -*- coding: utf-8 -*-
 """ Core Neuroscout App """
-import os
-from flask import Flask, send_file, render_template, url_for
-from database import db
+from flask import send_file, render_template, url_for
+from .basic import create_app
+from .models import db
 
-app = Flask(__name__, static_folder='/static')
-app.config.from_object(os.environ['APP_SETTINGS'])
-app.config.update(
-    FEATURE_DATASTORE=str(app.config['FILE_DIR'] / 'feature-tracking.csv'),
-    CACHE_DIR=str(app.config['FILE_DIR'] / 'cache'),
-    STIMULUS_DIR=str(app.config['FILE_DIR'] / 'stimuli'),
-    EXTRACTION_DIR=str(app.config['FILE_DIR'] / 'extracted'),
-    FEATURE_SCHEMA=str(app.config['CONFIG_PATH'] / 'feature_schema.json'),
-    PREDICTOR_SCHEMA=str(app.config['CONFIG_PATH'] / 'predictor_schema.json'),
-    ALL_TRANSFORMERS=str(app.config['CONFIG_PATH'] / 'transformers.json'),
-    BIBLIOGRAPHY=str(app.config['CONFIG_PATH'] / 'bibliography.json')
-)
-
-
-db.init_app(app)
+app = create_app()
 
 from flask_mail import Mail
 mail = Mail(app)
@@ -30,8 +16,8 @@ cache.init_app(app)
 from flask_jwt import JWT
 from flask_security import Security
 from flask_security.confirmable import confirm_email_token_status, confirm_user
-from auth import authenticate, load_user, add_auth_to_swagger
-from models import *
+from .auth import authenticate, load_user, add_auth_to_swagger
+from .models import *
 
 # Setup Flask-Security and JWT
 security = Security(app, user_datastore)
@@ -46,7 +32,7 @@ cors = CORS(app, resources={r"/api/*": {"origins": "*"},
 from apispec import APISpec
 from apispec.ext.marshmallow import MarshmallowPlugin
 from flask_apispec.extension import FlaskApiSpec
-from utils import route_factory
+from .utils import route_factory
 
 file_plugin = MarshmallowPlugin()
 spec = APISpec(
@@ -107,6 +93,7 @@ def confirm(token):
                            confirmed=confirmed, expired=expired,
                            invalid=invalid, name=name,
                            action_url=url_for('index', _external=True))
+
 
 @app.route('/', defaults={'path': ''})
 @app.route('/<path:path>')

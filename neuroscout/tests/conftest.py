@@ -2,15 +2,15 @@ from os import environ
 from pathlib import Path
 import pytest
 from flask_security.utils import encrypt_password
-from core import app as _app
-from database import db as _db
+from ..core import app as _app
+from ..models import db as _db
 import datetime
 import sqlalchemy as sa
 import pandas as pd
 from flask import current_app
-from models import (Analysis, Predictor,
-                    PredictorEvent, User, Role, Dataset)
-import populate
+from ..models import (Analysis, Predictor,
+                      PredictorEvent, User, Role, Dataset)
+from .. import populate
 
 """
 Session / db managment tools
@@ -77,7 +77,7 @@ def session(db):
 @pytest.fixture(scope="function")
 def auth_client(add_users):
     """ Return authorized client wrapper """
-    from tests.request_utils import Client
+    from .request_utils import Client
 
     _, ((email, password), _) = add_users
     client = Client(email=email, password=password)

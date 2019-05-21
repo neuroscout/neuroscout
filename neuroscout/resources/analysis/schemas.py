@@ -1,6 +1,6 @@
 from marshmallow import (Schema, fields, validates, ValidationError,
                          post_load, pre_load)
-from models import Dataset, Run, Predictor
+from ...models import Dataset, Run, Predictor
 
 
 class AnalysisSchema(Schema):

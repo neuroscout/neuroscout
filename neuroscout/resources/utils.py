@@ -3,13 +3,12 @@ from flask_jwt import jwt_required, current_identity
 from flask_apispec import doc
 import datetime
 from webargs.flaskparser import parser
-from models import Analysis
+from ..models import Analysis, db
 from marshmallow import ValidationError
 
 import celery.states as states
-from worker import celery_app
-from database import db
-from utils import put_record
+from ..worker import celery_app
+from ..utils.db import put_record
 
 
 def abort(code, message=''):

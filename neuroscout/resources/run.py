@@ -1,7 +1,7 @@
 from marshmallow import Schema, fields
 from flask_apispec import MethodResource, marshal_with, use_kwargs, doc
 import webargs as wa
-from models import Run
+from ..models import Run
 from .utils import first_or_404
 
 

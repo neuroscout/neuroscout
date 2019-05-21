@@ -10,6 +10,7 @@ from .predictor import Predictor, PredictorEvent, PredictorRun
 from .run import Run, analysis_run
 from .stimulus import Stimulus, RunStimulus
 from .task import Task
+from .database import db
 
 __all__ = [
     'Analysis',
@@ -32,5 +33,6 @@ __all__ = [
     'analysis_run',
     'Stimulus',
     'RunStimulus',
-    'Task'
+    'Task',
+    'db'
 ]

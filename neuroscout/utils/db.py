@@ -3,9 +3,8 @@
 """
 from flask import abort, current_app
 from sqlalchemy.exc import SQLAlchemyError
-from database import db
+from ..models import db, Analysis
 from sqlalchemy.event import listens_for
-from models import Analysis
 from hashids import Hashids
 
 

@@ -1,14 +1,13 @@
 from flask import send_file, current_app
 from flask_apispec import MethodResource, marshal_with, use_kwargs, doc
 from flask_jwt import current_identity
-from database import db
-from models import Analysis, Report
+from ...models import Analysis, Report, db
 from os.path import exists
 import datetime
 import webargs as wa
 import json
 
-from utils.db import put_record
+from ...utils.db import put_record
 from .bib import format_bibliography, find_predictor_citation, _flatten
 from ..utils import owner_required, auth_required, fetch_analysis, abort
 from ..predictor import get_predictors

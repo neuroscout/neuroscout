@@ -1,4 +1,4 @@
-from tests.request_utils import decode_json
+from ..request_utils import decode_json
 
 
 def test_get_predictor(auth_client, extract_features):

@@ -1,8 +1,7 @@
 from flask_apispec import doc, use_kwargs, MethodResource, marshal_with
-from database import db
 from flask import current_app
-from models import PredictorEvent, Report, NeurovaultCollection
-from worker import celery_app
+from ...models import PredictorEvent, Report, NeurovaultCollection, db
+from ...worker import celery_app
 import webargs as wa
 from marshmallow import fields
 from ..utils import owner_required, abort, fetch_analysis
@@ -11,11 +10,11 @@ from .schemas import (AnalysisFullSchema, AnalysisResourcesSchema,
                       ReportSchema, AnalysisCompiledSchema,
                       NeurovaultCollectionSchema)
 import celery.states as states
-from utils import put_record
+from ...utils.db import put_record
+
 import datetime
 import tempfile
 from hashids import Hashids
-from core import file_plugin
 
 
 def jsonify_analysis(analysis, run_id=None):
@@ -145,8 +144,11 @@ class ReportResource(MethodResource):
 
         return report
 
-
-@file_plugin.map_to_openapi_type('file', None)
+# Use current_app
+# file_plugin = MarshmallowPlugin()
+#
+#
+# @file_plugin.map_to_openapi_type('file', None)
 class FileField(wa.fields.Raw):
     pass
 

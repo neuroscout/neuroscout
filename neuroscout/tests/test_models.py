@@ -1,12 +1,12 @@
 import pytest
 from sqlalchemy import func
-from models import (
+from ..models import (
     Analysis, User, Dataset, Predictor, Stimulus, Run, RunStimulus,
     ExtractedFeature, PredictorEvent, GroupPredictor, Task)
 
 from numpy import isclose
-from populate.convert import ingest_text_stimuli
-from populate.modify import update_annotations
+from ..populate.convert import ingest_text_stimuli
+from ..populate.modify import update_annotations
 
 
 def test_dataset_ingestion(session, add_task):

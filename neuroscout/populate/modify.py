@@ -5,9 +5,8 @@ Tools to modify/delete datasets already in database.
 import json
 import re
 from flask import current_app
-from models import (Dataset, Task, Run, RunStimulus, Stimulus,
-                    ExtractedFeature, ExtractedEvent, Predictor)
-from database import db
+from ..models import (Dataset, Task, Run, RunStimulus, Stimulus,
+                      ExtractedFeature, ExtractedEvent, Predictor, db)
 from .extract import create_predictors
 
 
