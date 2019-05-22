@@ -175,7 +175,7 @@ def generate_report(hash_id, report_id, run_ids, sampling_rate, scale):
 
     return update_record(
         report_object,
-        results=results,
+        result=results,
         status='OK'
     )
 
