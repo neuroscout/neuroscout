@@ -28,12 +28,15 @@ def compile(hash_id, run_ids=None, build=False):
     writout analysis bundle
     Args:
         hash_id (str): analysis hash_id
-        validation_hash (str): Unique validation hash for this analysis
         run_ids (list): Optional list of runs to include
         build (bool): Validate in pybids?
     """
-    analysis_object = Analysis.query.filter_by(hash_id=hash_id).one()
-
+    try:
+        analysis_object = Analysis.query.filter_by(hash_id=hash_id).one()
+    except Exception as e:
+        return {
+            'traceback': f'Error loading {hash_id} from db /n {str(e)}'
+            }
     try:
         a_id, analysis, resources, predictor_events, bids_dir = dump_analysis(
             hash_id)
@@ -96,7 +99,13 @@ def generate_report(hash_id, report_id, run_ids, sampling_rate, scale):
         sampling_rate (float): Rate to re-sample design matrix in Hz
         scale (bool): Scale columns in dm plot
     """
-    report_object = Report.query.filter_by(id=report_id).one()
+    try:
+        report_object = Report.query.filter_by(id=report_id).one()
+    except Exception as e:
+        return {
+            'traceback': f'Error loading {report_id} from db /n {str(e)}'
+            }
+
     domain = flask_app.config['SERVER_NAME']
 
     try:

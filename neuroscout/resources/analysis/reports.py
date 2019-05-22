@@ -82,7 +82,6 @@ class ReportResource(MethodResource):
                   report.id,
                   run_id,
                   sampling_rate,
-                  current_app.config['SERVER_NAME'],
                   scale])
         report.task_id = task.id
         db.session.commit()
