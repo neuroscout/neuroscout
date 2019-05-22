@@ -30,7 +30,7 @@ def write_jsons(objects, base_dir):
     for obj, file_name in objects:
         path = (base_dir / file_name).with_suffix('.json')
         json.dump(obj, path.open('w'))
-        results.append(str(path), path.name)
+        results.append((str(path), path.name))
     return results
 
 

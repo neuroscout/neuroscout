@@ -145,7 +145,6 @@ class AnalysisUploadResource(MethodResource):
         # Create new upload
         upload = NeurovaultCollection(
             analysis_id=analysis.hash_id,
-            timestamp=timestamp,
             uploaded_at=timestamp
             )
         db.session.add(upload)
