@@ -1,6 +1,9 @@
 from marshmallow import (Schema, fields, validates, ValidationError,
                          post_load, pre_load)
 from ..models import Dataset, Run, Predictor
+from .dataset import DatasetSchema
+from .run import RunSchema
+from .predictor import PredictorSchema
 
 
 class AnalysisSchema(Schema):
@@ -36,11 +39,11 @@ class AnalysisSchema(Schema):
     private = fields.Bool(description='Analysis private or discoverable?')
 
     predictors = fields.Nested(
-        'PredictorSchema', many=True, only='id',
+        PredictorSchema, many=True, only='id',
         description='Predictor id(s) associated with analysis')
 
     runs = fields.Nested(
-        'RunSchema', many=True, only='id',
+        RunSchema, many=True, only='id',
         description='Runs associated with analysis')
 
     @validates('dataset_id')
@@ -91,22 +94,22 @@ class AnalysisSchema(Schema):
 class AnalysisFullSchema(AnalysisSchema):
     """ Analysis schema, with additional nested fields """
     runs = fields.Nested(
-        'RunSchema', many=True, description='Runs associated with analysis',
+        RunSchema, many=True, description='Runs associated with analysis',
         exclude=['dataset_id', 'task'], dump_only=True)
 
     predictors = fields.Nested(
-        'PredictorSchema', many=True, only=['id', 'name'],
+        PredictorSchema, many=True, only=['id', 'name'],
         description='Predictor id(s) associated with analysis', dump_only=True)
 
 
 class AnalysisResourcesSchema(Schema):
     """ Schema for Analysis resources. """
     preproc_address = fields.Nested(
-        'DatasetSchema', only='preproc_address', attribute='dataset')
+        DatasetSchema, only='preproc_address', attribute='dataset')
     dataset_address = fields.Nested(
-        'DatasetSchema', only='dataset_address', attribute='dataset')
+        DatasetSchema, only='dataset_address', attribute='dataset')
     dataset_name = fields.Nested(
-        'DatasetSchema', only='name', attribute='dataset')
+        DatasetSchema, only='name', attribute='dataset')
 
 
 class AnalysisCompiledSchema(Schema):
