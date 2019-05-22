@@ -58,7 +58,6 @@ def compile(hash_id, run_ids=None, build=False):
         )
         raise
 
-
     try:
         sidecar = {'RepetitionTime': analysis['TR']}
         resources['validation_hash'] = Hashids(
@@ -70,7 +69,7 @@ def compile(hash_id, run_ids=None, build=False):
                 (analysis, 'analysis'),
                 (resources, 'resources'),
                 (analysis.get('model'), 'model'),
-                (sidecar, 'task-{analysis["task_name"]}_bold'.format())
+                (sidecar, f'task-{analysis_object.task_name}_bold')
                 ], tmp_dir)
 
         # Save bundle as tarball
