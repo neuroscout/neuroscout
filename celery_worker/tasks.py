@@ -12,9 +12,7 @@ from neuroscout.models import Analysis, Report, NeurovaultCollection
 from app import celery_app
 from compile import build_analysis, PathBuilder, impute_confounds
 from viz import plot_design_matrix, plot_corr_matrix, sort_dm
-from serialize import dump_analysis
-from io import write_jsons, write_tarball
-from utils import update_record
+from utils import update_record, write_jsons, write_tarball, dump_analysis
 
 logger = get_task_logger(__name__)
 FILE_DATA = Path('/file-data/')
