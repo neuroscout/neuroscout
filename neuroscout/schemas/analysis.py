@@ -1,6 +1,6 @@
 from marshmallow import (Schema, fields, validates, ValidationError,
                          post_load, pre_load)
-from ...models import Dataset, Run, Predictor
+from ..models import Dataset, Run, Predictor
 
 
 class AnalysisSchema(Schema):
@@ -52,14 +52,14 @@ class AnalysisSchema(Schema):
     def validate_runs(self, value):
         try:
             [Run.query.filter_by(**r).one() for r in value]
-        except:
+        except Exception:
             raise ValidationError('Invalid run id!')
 
     @validates('predictors')
     def validate_preds(self, value):
         try:
             [Predictor.query.filter_by(**r).one() for r in value]
-        except:
+        except Exception:
             raise ValidationError('Invalid predictor id.')
 
     @pre_load

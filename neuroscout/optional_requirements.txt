@@ -1,0 +1,4 @@
+moviepy==0.2.3.5
+opencv-python
+imageio-ffmpeg
+imageio==2.5.0

@@ -6,8 +6,8 @@ from ...worker import celery_app
 import webargs as wa
 from marshmallow import fields
 from ..utils import owner_required, abort, fetch_analysis
-from .schemas import (ReportSchema, AnalysisCompiledSchema,
-                      NeurovaultCollectionSchema)
+from ...schemas.analysis import (
+    ReportSchema, AnalysisCompiledSchema, NeurovaultCollectionSchema)
 from ...utils.db import put_record
 
 import datetime

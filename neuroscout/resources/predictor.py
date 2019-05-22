@@ -1,71 +1,12 @@
-from marshmallow import Schema, fields, post_dump
 import webargs as wa
 from flask_apispec import MethodResource, marshal_with, use_kwargs, doc
 from ..models import Predictor, PredictorEvent, PredictorRun
 from ..database import db
 from .utils import first_or_404
 from sqlalchemy import func
-from sqlalchemy.dialects import postgresql
 from ..core import cache
-
-
-def dump_pe(pes):
-    """ Serialize PredictorEvents, with *SPEED*, using core SQL.
-    Warning: relies on attributes being in correct order. """
-    statement = str(pes.statement.compile(dialect=postgresql.dialect()))
-    params = pes.statement.compile(dialect=postgresql.dialect()).params
-    res = db.session.connection().execute(statement, params)
-    return [{
-      'id': r[0],
-      'onset': r[1],
-      'duration': r[2],
-      'value':  r[3],
-      'run_id': r[5],
-      'predictor_id': r[6]
-      } for r in res]
-
-
-class ExtractedFeatureSchema(Schema):
-    id = fields.Int(description="Extractor id")
-    description = fields.Str(description="Feature description.")
-    created_at = fields.Str(description="Extraction timestamp.")
-    extractor_name = fields.Str(description="Extractor name.")
-    modality = fields.Str()
-
-
-class PredictorSchema(Schema):
-    id = fields.Int()
-    name = fields.Str(description="Predictor name.")
-    description = fields.Str(description="Predictor description")
-    extracted_feature = fields.Nested('ExtractedFeatureSchema', skip_if=None)
-    source = fields.Str()
-
-    max = fields.Float(description="Maximum value")
-    min = fields.Float(description="Minimum value")
-    mean = fields.Float(description="Mean value")
-    stddev = fields.Float(description="Standard deviation of value")
-    num_na = fields.Int(description="Number of missing values")
-
-    @post_dump
-    def remove_null_values(self, data):
-        if data.get('extracted_feature', True) is None:
-            data.pop('extracted_feature')
-        return data
-
-
-class PredictorEventSchema(Schema):
-    id = fields.Str()
-    onset = fields.Number(description="Onset in seconds.")
-    duration = fields.Number(description="Duration in seconds.")
-    value = fields.Str(description="Value, or amplitude.")
-    run_id = fields.Int()
-    predictor_id = fields.Int()
-
-
-class PredictorRunSchema(Schema):
-    run_id = fields.Int()
-    mean = fields.Number()
-    stdev = fields.Number()
+from ..utils.db import dump_pe
+from ..schemas.predictor import PredictorSchema
 
 
 class PredictorResource(MethodResource):
@@ -100,8 +41,8 @@ class PredictorListResource(MethodResource):
     @doc(tags=['predictors'], summary='Get list of predictors.',)
     @use_kwargs({
         'run_id': wa.fields.DelimitedList(
-            fields.Int(), description="Run id(s). Warning, slow query."),
-        'name': wa.fields.DelimitedList(fields.Str(),
+            wa.fields.Int(), description="Run id(s). Warning, slow query."),
+        'name': wa.fields.DelimitedList(wa.fields.Str(),
                                         description="Predictor name(s)"),
         'newest': wa.fields.Boolean(
             missing=True,
@@ -119,10 +60,10 @@ class PredictorEventListResource(MethodResource):
     @doc(tags=['predictors'], summary='Get events for predictor(s)',)
     @use_kwargs({
         'run_id': wa.fields.DelimitedList(
-            fields.Int(),
+            wa.fields.Int(),
             description="Run id(s)"),
         'predictor_id': wa.fields.DelimitedList(
-            fields.Int(),
+            wa.fields.Int(),
             description="Predictor id(s)"),
     }, locations=['query'])
     @cache.cached(60 * 60 * 24 * 300, query_string=True)

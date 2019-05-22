@@ -32,7 +32,7 @@ cors = CORS(app, resources={r"/api/*": {"origins": "*"},
 from apispec import APISpec
 from apispec.ext.marshmallow import MarshmallowPlugin
 from flask_apispec.extension import FlaskApiSpec
-from .utils import route_factory
+from .utils.core import route_factory
 
 file_plugin = MarshmallowPlugin()
 spec = APISpec(

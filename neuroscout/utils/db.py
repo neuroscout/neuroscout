@@ -6,7 +6,24 @@ from sqlalchemy.exc import SQLAlchemyError
 from ..models import Analysis
 from ..database import db
 from sqlalchemy.event import listens_for
+from sqlalchemy.dialects import postgresql
 from hashids import Hashids
+
+
+def dump_pe(pes):
+    """ Serialize PredictorEvents, with *SPEED*, using core SQL.
+    Warning: relies on attributes being in correct order. """
+    statement = str(pes.statement.compile(dialect=postgresql.dialect()))
+    params = pes.statement.compile(dialect=postgresql.dialect()).params
+    res = db.session.connection().execute(statement, params)
+    return [{
+      'id': r[0],
+      'onset': r[1],
+      'duration': r[2],
+      'value':  r[3],
+      'run_id': r[5],
+      'predictor_id': r[6]
+      } for r in res]
 
 
 @listens_for(Analysis, "after_insert")

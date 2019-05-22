@@ -1,5 +1,5 @@
 """ Basic Flask app creation """
-from .models import db
+from .database import db
 from flask import Flask
 import os
 

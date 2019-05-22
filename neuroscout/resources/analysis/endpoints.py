@@ -12,8 +12,9 @@ from ...utils.db import put_record
 from .bib import format_bibliography, find_predictor_citation, _flatten
 from ..utils import owner_required, auth_required, fetch_analysis, abort
 from ..predictor import get_predictors
-from .schemas import (AnalysisSchema, AnalysisFullSchema,
-                      AnalysisResourcesSchema, BibliographySchema)
+from ...schemas.analysis import (
+    AnalysisSchema, AnalysisFullSchema,
+    AnalysisResourcesSchema, BibliographySchema)
 
 
 @doc(tags=['analysis'])
