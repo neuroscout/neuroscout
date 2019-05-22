@@ -67,18 +67,6 @@ services:
       - ./celery_worker:/celery_worker
     env_file: .env
 
-  monitor:
-    build:
-      context: ./celery_worker
-      dockerfile: Dockerfile
-    ports:
-     - "5555:5555"
-    entrypoint: flower
-    command:  -A tasks --port=5555 --broker=redis://redis:6379/0
-    depends_on:
-      - redis
-    env_file: .env
-
 volumes:
   postgres-data:
   certs:
