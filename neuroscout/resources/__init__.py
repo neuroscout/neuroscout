@@ -6,14 +6,13 @@ from .analysis import (AnalysisResource, AnalysisRootResource,
                        AnalysisResourcesResource, ReportResource,
                        AnalysisFillResource, AnalysisUploadResource,
                        BibliographyResource)
-from .dataset import DatasetSchema, DatasetResource, DatasetListResource
-from .predictor import (PredictorEventSchema, PredictorSchema,
-                        PredictorListResource, PredictorResource,
+from .dataset import DatasetResource, DatasetListResource
+from .predictor import (PredictorListResource, PredictorResource,
                         PredictorEventListResource)
-from .run import RunSchema, RunResource, RunListResource
-from .user import (UserSchema, UserRootResource, UserTriggerResetResource,
+from .run import RunResource, RunListResource
+from .user import (UserRootResource, UserTriggerResetResource,
                    UserResetSubmitResource, UserResendConfirm)
-from .task import TaskSchema, TaskResource, TaskListResource
+from .task import TaskResource, TaskListResource
 
 __all__ = [
     'AnalysisResource',
@@ -27,24 +26,17 @@ __all__ = [
     'AnalysisUploadResource',
     'BibliographyResource',
     'ReportResource',
-    'DatasetSchema',
     'DatasetResource',
     'DatasetListResource',
-    'PredictorEventSchema',
-    'PredictorSchema',
     'PredictorResource',
     'PredictorListResource',
     'PredictorEventListResource',
-    'RunSchema',
     'RunResource',
     'RunListResource',
-    'UserSchema',
     'UserRootResource',
-    'UserSchema',
     'UserTriggerResetResource',
     'UserResetSubmitResource',
     'UserResendConfirm',
-    'TaskSchema',
     'TaskResource',
     'TaskListResource'
 ]

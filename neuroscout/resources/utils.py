@@ -3,13 +3,9 @@ from flask_jwt import jwt_required, current_identity
 from flask_apispec import doc
 import datetime
 from webargs.flaskparser import parser
-from models import Analysis
+from ..models import Analysis
+from ..database import db
 from marshmallow import ValidationError
-
-import celery.states as states
-from worker import celery_app
-from database import db
-from utils import put_record
 
 
 def abort(code, message=''):
@@ -27,31 +23,11 @@ def first_or_404(query):
         abort(404, 'Resource not found')
 
 
-def update_analysis_status(analysis, commit=True):
-    """ Checks celery for updates to analysis status and results """
-    if analysis.status not in ["DRAFT", "PASSED", "SUBMITTING"] and \
-       analysis.compile_task_id is not None:
-        res = celery_app.AsyncResult(analysis.compile_task_id)
-        if res.state == states.FAILURE:
-            analysis.status = "FAILED"
-            analysis.compile_traceback = res.traceback
-        elif res.state == states.SUCCESS:
-            analysis = put_record(res.result, analysis, commit=commit)
-            analysis.status = "PASSED"
-        else:
-            analysis.status = "PENDING"
-
-        if commit:
-            db.session.commit()
-    return analysis
-
-
 def fetch_analysis(function):
     """ Given kwarg analysis_id, fetch analysis model and insert as kwargs """
     def wrapper(*args, **kwargs):
         analysis = first_or_404(
             Analysis.query.filter_by(hash_id=kwargs.pop('analysis_id')))
-        analysis = update_analysis_status(analysis)
         kwargs['analysis'] = analysis
         return function(*args, **kwargs)
     return wrapper

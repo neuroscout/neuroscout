@@ -7,10 +7,10 @@ from .group import GroupPredictor, GroupPredictorValue
 from .dataset import Dataset
 from .features import ExtractedFeature, ExtractedEvent
 from .predictor import Predictor, PredictorEvent, PredictorRun
-from .result import Result
 from .run import Run, analysis_run
 from .stimulus import Stimulus, RunStimulus
 from .task import Task
+from ..database import db
 
 __all__ = [
     'Analysis',
@@ -27,12 +27,12 @@ __all__ = [
     'Predictor',
     'PredictorEvent',
     'PredictorRun',
-    'Result',
     'Report',
     'NeurovaultCollection',
     'Run',
     'analysis_run',
     'Stimulus',
     'RunStimulus',
-    'Task'
+    'Task',
+    'db'
 ]

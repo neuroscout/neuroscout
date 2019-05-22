@@ -4,7 +4,7 @@ from .ingest import add_task
 from .extract import extract_features
 from .convert import convert_stimuli
 from .transform import Postprocessing
-from models import Dataset
+from ..models import Dataset
 from pathlib import Path
 from pliers.utils.updater import check_updates
 import itertools

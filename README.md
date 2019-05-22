@@ -138,8 +138,12 @@ To run tests, after starting services, create a test database:
 
 and execute:
 
-    docker-compose run -e "APP_SETTINGS=config.app.DockerTestConfig" --rm -w /neuroscout neuroscout python -m pytest
+    docker-compose run -e "APP_SETTINGS=neuroscout.config.app.DockerTestConfig" --rm -w /neuroscout neuroscout python -m pytest neuroscout/tests
+
+or run them interactively:
+    docker.compose exec neuroscout bash
+    APP_SETTINGS=neuroscout.config.app.DockerTestConfig python -m pytest neuroscout/tests/ --pdb
 
 To run frontend tests run:
 
-    docker-compose run --rm -w /neuroscout/frontend neuroscout npm test
+    docker-compose run --rm -w /neuroscout/neuroscout/frontend neuroscout npm test

@@ -1,4 +1,4 @@
-from database import db
+from ..database import db
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.ext.hybrid import hybrid_property
 from .stimulus import Stimulus

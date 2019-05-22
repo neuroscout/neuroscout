@@ -6,10 +6,10 @@ install:
   - pip install -e git+https://github.com/tyarkoni/pliers.git#egg=pliers
   - pip install pytest-cov
 script:
-  - python -m pytest tests/ --cov=./
+  - python -m pytest neuroscout/tests/ --cov=./
   # cd frontend && npm test
 env:
-- APP_SETTINGS=config.app.TravisConfig PYTHONHASHSEED=0
+- APP_SETTINGS=neuroscout.config.app.TravisConfig PYTHONHASHSEED=0
 addons:
   postgresql: "9.4"
 before_script:
@@ -17,7 +17,7 @@ before_script:
   - cp neuroscout/frontend/src/config.ts.example neuroscout/frontend/src/config.ts
   - psql -c 'create database travis_ci_test;' -U postgres
   # CI=""; cd neuroscout/frontend && yarn install --ignore-engines --concurrency=1 && yarn build --concurrency=1
-  - CI="true"; cd neuroscout 
+  - CI="true"
   - python -m pliers.support.download
 before_install:
   - sudo add-apt-repository -y ppa:mc3man/trusty-media && sudo apt-get -qq update && sudo apt-get install -y ffmpeg

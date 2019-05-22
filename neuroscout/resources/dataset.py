@@ -1,34 +1,9 @@
 from flask_apispec import MethodResource, marshal_with, doc, use_kwargs
 import webargs as wa
-from marshmallow import Schema, fields
-from models import Dataset
+from ..models import Dataset
+from ..core import cache
 from .utils import first_or_404
-from core import cache
-
-
-class DatasetSchema(Schema):
-    """ Dataset validation schema. """
-    id = fields.Int()
-    name = fields.Str(
-        description='Dataset name')
-    description = fields.Dict(
-        description='Dataset description from BIDS dataset')
-    summary = fields.Str(
-        description='Dataset summary description')
-    url = fields.Str(
-        descrption='Link to external resources')
-    mimetypes = fields.List(
-        fields.Str(), description='Dataset mimetypes/modalities')
-    runs = fields.Nested(
-        'RunSchema', many=True, only='id')
-    tasks = fields.Nested(
-        'TaskSchema', many=True, only=['id', 'name', 'summary', 'num_runs'])
-    dataset_address = fields.Str(
-        description='BIDS Dataset remote address')
-    preproc_address = fields.Str(
-        description='Preprocessed data remote address')
-    active = fields.Boolean(
-        description='Dataset is currently available for model creation')
+from ..schemas.dataset import DatasetSchema
 
 
 class DatasetResource(MethodResource):
