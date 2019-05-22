@@ -38,7 +38,9 @@ class CompileAnalysisResource(MethodResource):
                 args=[analysis.hash_id, None, build]
                 )
             put_record(
-                {'status': 'PENDING', 'compile_task_id': task.id}, analysis)
+                {'status': 'PENDING',
+                 'traceback': '',
+                 'compile_task_id': task.id}, analysis)
 
         except Exception as e:
             put_record(
