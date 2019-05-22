@@ -5,7 +5,7 @@ grabbit
 -e git+https://github.com/bids-standard/pybids.git@4315865#egg=pybids
 -e git+https://github.com/neurolearn/pynv#egg=pynv
 duecredit
-hash_ids
+hashids==1.2.0
 pandas
 patsy
 matplotlib
