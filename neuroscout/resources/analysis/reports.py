@@ -35,15 +35,15 @@ class CompileAnalysisResource(MethodResource):
         try:
             task = celery_app.send_task(
                 'workflow.compile',
-                args=[analysis.id, None, _validation_hash(analysis.id), build]
+                args=[analysis.hash_id, None, build]
                 )
             put_record(
                 {'status': 'PENDING', 'compile_task_id': task.id}, analysis)
 
-        except:
+        except Exception as e:
             put_record(
                 {'status': 'FAILED',
-                 'compile_traceback': "Submitting failed. "},
+                 'compile_traceback': str(e)},
                 analysis)
 
         return analysis
@@ -68,21 +68,23 @@ class ReportResource(MethodResource):
     def post(self, analysis, run_id=None, sampling_rate=None, scale=True):
         # Submit report generation
 
-        task = celery_app.send_task(
-            'workflow.generate_report',
-            args=[analysis.id,
-                  run_id,
-                  sampling_rate,
-                  current_app.config['SERVER_NAME'],
-                  scale])
-
         # Create new Report
         report = Report(
             analysis_id=analysis.hash_id,
             runs=run_id,
-            task_id=task.id
             )
         db.session.add(report)
+        db.session.commit()
+
+        task = celery_app.send_task(
+            'workflow.generate_report',
+            args=[analysis.hash_id,
+                  report.id,
+                  run_id,
+                  sampling_rate,
+                  current_app.config['SERVER_NAME'],
+                  scale])
+        report.task_id = task.id
         db.session.commit()
 
         return report, 200
@@ -141,22 +143,25 @@ class AnalysisUploadResource(MethodResource):
 
         timestamp = datetime.datetime.utcnow()
 
+        # Create new upload
+        upload = NeurovaultCollection(
+            analysis_id=analysis.hash_id,
+            timestamp=timestamp,
+            uploaded_at=timestamp
+            )
+        db.session.add(upload)
+        db.session.commit()
+
         task = celery_app.send_task(
             'neurovault.upload',
             args=[f.name,
                   analysis.hash_id,
-                  current_app.config['NEUROVAULT_ACCESS_TOKEN'],
+                  upload.id,
                   timestamp if force else None,
                   n_subjects
                   ])
 
-        # Create new upload
-        upload = NeurovaultCollection(
-            analysis_id=analysis.hash_id,
-            task_id=task.id,
-            uploaded_at=timestamp
-            )
-        db.session.add(upload)
+        upload.task_id = task.id
         db.session.commit()
 
         return upload

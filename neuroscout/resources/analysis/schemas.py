@@ -113,7 +113,7 @@ class AnalysisCompiledSchema(Schema):
     """ Simple route for checking if analysis compilation status. """
     status = fields.Str(description='PASSED, FAILED, PENDING, or DRAFT.',
                         dump_only=True)
-    compile_traceback = fields.Str(
+    traceback = fields.Str(
         description='Traceback of compilation error.')
 
 

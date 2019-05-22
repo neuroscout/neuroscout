@@ -40,7 +40,7 @@ class Analysis(db.Model):
 
     locked = db.Column(db.Boolean, default=False)
 
-    compile_traceback = db.Column(db.Text, default='')
+    traceback = db.Column(db.Text, default='')
     compile_task_id = db.Column(db.Text)  # Celery task id
     bundle_path = db.Column(db.Text)
 

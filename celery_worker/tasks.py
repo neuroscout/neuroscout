@@ -1,98 +1,203 @@
 import tarfile
-import json
 import re
 from tempfile import mkdtemp
 from pathlib import Path
-from app import celery_app
-from compile import build_analysis, PathBuilder, impute_confounds
 from celery.utils.log import get_task_logger
 from pynv import Client
+from hashids import Hashids
+
+from neuroscout.basic import create_app
+from neuroscout.models import Analysis, Report, NeurovaultCollection
+
+from app import celery_app
+from compile import build_analysis, PathBuilder, impute_confounds
 from viz import plot_design_matrix, plot_corr_matrix, sort_dm
+from serialize import dump_analysis
+from io import write_jsons, write_tarball
+from utils import update_record
 
 logger = get_task_logger(__name__)
+FILE_DATA = Path('/file-data/')
+
+# Push db context
+flask_app = create_app()
+flask_app.app_context().push()
 
 
 @celery_app.task(name='workflow.compile')
-def compile(analysis, predictor_events, resources, bids_dir, run_ids,
-            validation_hash, build=False):
-    tmp_dir, bundle_paths, _ = build_analysis(
-        analysis, predictor_events, bids_dir, run_ids, build=build)
+def compile(hash_id, run_ids=None, build=False):
+    """ Compile analysis_id. Validate analysis using pybids and
+    writout analysis bundle
+    Args:
+        hash_id (str): analysis hash_id
+        validation_hash (str): Unique validation hash for this analysis
+        run_ids (list): Optional list of runs to include
+        build (bool): Validate in pybids?
+    """
+    analysis_object = Analysis.query.filter_by(hash_id=hash_id).one()
 
-    sidecar = {"RepetitionTime": analysis['TR']}
-    resources["validation_hash"] = validation_hash
+    try:
+        a_id, analysis, resources, predictor_events, bids_dir = dump_analysis(
+            hash_id)
+    except Exception as e:
+        return update_record(
+            analysis_object,
+            exception=e,
+            traceback='Error deserializing analysis'
+        )
 
-    # Write out JSON files
-    for obj, name in [
-      (analysis, 'analysis'),
-      (resources, 'resources'),
-      (analysis.get('model'), 'model'),
-      (sidecar, 'task-{}_bold'.format(analysis['task_name']))]:
+    try:
+        tmp_dir, bundle_paths, _ = build_analysis(
+            analysis, predictor_events, bids_dir, run_ids, build=build)
+    except Exception as e:
+        return update_record(
+            analysis_object,
+            exception=e,
+            traceback='Error validating analysis'
+        )
 
-        path = (tmp_dir / name).with_suffix('.json')
-        json.dump(obj, path.open('w'))
-        bundle_paths.append((path.as_posix(), path.name))
+    try:
+        sidecar = {'RepetitionTime': analysis['TR']}
+        resources['validation_hash'] = Hashids(
+            flask_app.config['SECONDARY_HASH_SALT'],
+            min_length=10).encode(a_id)
 
-    # Save bundle as tarball
-    bundle_path = '/file-data/analyses/{}_bundle.tar.gz'.format(
-        analysis['hash_id'])
-    with tarfile.open(bundle_path, "w:gz") as tar:
-        for path, arcname in bundle_paths:
-            tar.add(path, arcname=arcname)
+        # Write out JSON files to tmp_dir
+        bundle_paths += write_jsons([
+                (analysis, 'analysis'),
+                (resources, 'resources'),
+                (analysis.get('model'), 'model'),
+                (sidecar, 'task-{analysis["task_name"]}_bold'.format())
+                ], tmp_dir)
 
-    return {'bundle_path': bundle_path}
+        # Save bundle as tarball
+        bundle_path = str(
+            FILE_DATA / f'analyses/{analysis["hash_id"]}_bundle.tar.gz')
+        write_tarball(bundle_paths, bundle_path)
+    except Exception as e:
+        return update_record(
+            analysis_object,
+            exception=e,
+            traceback='Error writing tarball bundle'
+        )
+
+    return update_record(
+        analysis_object,
+        status='PASSED',
+        bundle_path=bundle_path
+    )
 
 
 @celery_app.task(name='workflow.generate_report')
-def generate_report(analysis, predictor_events, bids_dir, run_ids,
-                    sampling_rate, domain, scale):
-    _, _, bids_analysis = build_analysis(
-        analysis, predictor_events, bids_dir, run_ids)
-    outdir = Path('/file-data/reports') / analysis['hash_id']
-    outdir.mkdir(exist_ok=True)
+def generate_report(hash_id, report_id, run_ids, sampling_rate, scale):
+    """ Generate report for analysis
+    Args:
+        hash_id (str): analysis hash_id
+        report_id (int): Report object id
+        run_ids (list): List of run ids
+        sampling_rate (float): Rate to re-sample design matrix in Hz
+        scale (bool): Scale columns in dm plot
+    """
+    report_object = Report.query.filter_by(id=report_id).one()
+    domain = flask_app.config['SERVER_NAME']
 
-    first = bids_analysis.steps[0]
-    results = {'design_matrix': [],
-               'design_matrix_plot': [],
-               'design_matrix_corrplot': []}
+    try:
+        a_id, analysis, resources, predictor_events, bids_dir = dump_analysis(
+            hash_id)
+    except Exception as e:
+        return update_record(
+            report_object,
+            exception=e,
+            traceback='Error deserializing analysis'
+        )
 
-    hrf = [t for t in
-           analysis['model']['Steps'][0]['Transformations']
-           if t['Name'] == 'Convolve']
+    try:
+        _, _, bids_analysis = build_analysis(
+            analysis, predictor_events, bids_dir, run_ids)
+    except Exception as e:
+        # Todo: In future, could add more messages here
+        return update_record(
+            report_object,
+            exception=e,
+            traceback='Error validating analysis'
+        )
 
-    if sampling_rate is None:
-        sampling_rate = 'TR'
+    try:
+        outdir = FILE_DATA / 'reports' / analysis['hash_id']
+        outdir.mkdir(exist_ok=True)
 
-    for dm in first.get_design_matrix(
-      mode='dense', force=True, entities=False, sampling_rate=sampling_rate):
-        dense = impute_confounds(dm.dense)
-        if hrf:
-            dense = sort_dm(dense, interest=hrf[0]['Input'])
+        first = bids_analysis.steps[0]
+        results = {
+            'design_matrix': [],
+            'design_matrix_plot': [],
+            'design_matrix_corrplot': []
+            }
 
-        builder = PathBuilder(outdir, domain, analysis['hash_id'], dm.entities)
-        # Writeout design matrix
-        out, url = builder.build('design_matrix', 'tsv')
-        results['design_matrix'].append(url)
-        dense.to_csv(out, index=False)
+        hrf = [t for t in
+               analysis['model']['Steps'][0]['Transformations']
+               if t['Name'] == 'Convolve']
 
-        dm_plot = plot_design_matrix(dense, scale=scale)
-        results['design_matrix_plot'].append(dm_plot)
+        if sampling_rate is None:
+            sampling_rate = 'TR'
 
-        corr_plot = plot_corr_matrix(dense)
-        results['design_matrix_corrplot'].append(corr_plot)
+        for dm in first.get_design_matrix(
+          mode='dense', force=True, entities=False,
+          sampling_rate=sampling_rate):
+            dense = impute_confounds(dm.dense)
+            if hrf:
+                dense = sort_dm(dense, interest=hrf[0]['Input'])
 
-    return results
+            builder = PathBuilder(
+                outdir, domain, analysis['hash_id'], dm.entities)
+            # Writeout design matrix
+            out, url = builder.build('design_matrix', 'tsv')
+            results['design_matrix'].append(url)
+            dense.to_csv(out, index=False)
+
+            dm_plot = plot_design_matrix(dense, scale=scale)
+            results['design_matrix_plot'].append(dm_plot)
+
+            corr_plot = plot_corr_matrix(dense)
+            results['design_matrix_corrplot'].append(corr_plot)
+    except Exception as e:
+        return update_record(
+            report_object,
+            exception=e,
+            traceback='Error generating report outputs'
+        )
+
+    return update_record(
+        report_object,
+        results=results,
+        status='OK'
+    )
 
 
 @celery_app.task(name='neurovault.upload')
-def upload(img_tarball, hash_id, access_token, timestamp=None,
-           n_subjects=None):
-    tmp_dir = Path(mkdtemp())
-    # Untar:
-    with tarfile.open(img_tarball) as tf:
-        tf.extractall(tmp_dir)
-
+def upload(img_tarball, hash_id, upload_id, timestamp=None, n_subjects=None):
+    """ Upload results to NeuroVault
+    Args:
+        img_tarball (str): tarball path containg images
+        hash_id (str): Analysis hash_id
+        upload_id (int): NeurovaultCollection object id
+        timestamp (str): Current server timestamp
+        n_subjects (int): Number of subjects in analysis
+    """
+    upload_object = NeurovaultCollection.query.filter_by(id=upload_id).one()
     timestamp = "_" + timestamp if timestamp is not None else ''
-    api = Client(access_token=access_token)
+    api = Client(access_token=flask_app.config['NEUROVAULT_ACCESS_TOKEN'])
+
+    try:
+        # Untar:
+        tmp_dir = Path(mkdtemp())
+        with tarfile.open(img_tarball) as tf:
+            tf.extractall(tmp_dir)
+    except Exception as e:
+        return update_record(
+            upload_object,
+            exception=e,
+            traceback='Error decompressing image bundle'
+        )
 
     try:
         collection = api.create_collection(
@@ -105,9 +210,16 @@ def upload(img_tarball, hash_id, access_token, timestamp=None,
                 modality="fMRI-BOLD", map_type='T',
                 analysis_level='G', cognitive_paradigm_cogatlas='None',
                 number_of_subjects=n_subjects, is_valid=True)
-    except:
-        raise Exception(
-            "Error uploading."
-            " Perhaps a collection with the same name already exists?")
+    except Exception as e:
+        return update_record(
+            upload_object,
+            exception=e,
+            traceback='Error uploading, perhaps a \
+                collection with the same name exists?'
+        )
 
-    return {'collection_id': collection['id']}
+    return update_record(
+        upload_object,
+        collection_id=collection['id'],
+        status='OK'
+    )

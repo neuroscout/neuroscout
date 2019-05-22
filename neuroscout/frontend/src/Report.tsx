@@ -226,8 +226,8 @@ export class Report extends React.Component<ReportProps, ReportState> {
       .then((res) => {
         state.status = res.status;
         state.compileLoaded = true;
-        if (res.compile_traceback) {
-          state.compileTraceback = res.compile_traceback;
+        if (res.traceback) {
+          state.compileTraceback = res.traceback;
         }
         this.setState({...state});
       });
