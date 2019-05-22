@@ -41,21 +41,23 @@ def compile(hash_id, run_ids=None, build=False):
         a_id, analysis, resources, predictor_events, bids_dir = dump_analysis(
             hash_id)
     except Exception as e:
-        return update_record(
+        update_record(
             analysis_object,
             exception=e,
             traceback='Error deserializing analysis'
         )
-
+        raise
     try:
         tmp_dir, bundle_paths, _ = build_analysis(
             analysis, predictor_events, bids_dir, run_ids, build=build)
     except Exception as e:
-        return update_record(
+        update_record(
             analysis_object,
             exception=e,
             traceback='Error validating analysis'
         )
+        raise
+
 
     try:
         sidecar = {'RepetitionTime': analysis['TR']}
@@ -76,11 +78,12 @@ def compile(hash_id, run_ids=None, build=False):
             FILE_DATA / f'analyses/{analysis["hash_id"]}_bundle.tar.gz')
         write_tarball(bundle_paths, bundle_path)
     except Exception as e:
-        return update_record(
+        update_record(
             analysis_object,
             exception=e,
             traceback='Error writing tarball bundle'
         )
+        raise
 
     return update_record(
         analysis_object,
@@ -112,22 +115,24 @@ def generate_report(hash_id, report_id, run_ids, sampling_rate, scale):
         a_id, analysis, resources, predictor_events, bids_dir = dump_analysis(
             hash_id)
     except Exception as e:
-        return update_record(
+        update_record(
             report_object,
             exception=e,
             traceback='Error deserializing analysis'
         )
+        raise
 
     try:
         _, _, bids_analysis = build_analysis(
             analysis, predictor_events, bids_dir, run_ids)
     except Exception as e:
         # Todo: In future, could add more messages here
-        return update_record(
+        update_record(
             report_object,
             exception=e,
             traceback='Error validating analysis'
         )
+        raise
 
     try:
         outdir = FILE_DATA / 'reports' / analysis['hash_id']
@@ -172,6 +177,7 @@ def generate_report(hash_id, report_id, run_ids, sampling_rate, scale):
             exception=e,
             traceback='Error generating report outputs'
         )
+        raise
 
     return update_record(
         report_object,
@@ -200,11 +206,12 @@ def upload(img_tarball, hash_id, upload_id, timestamp=None, n_subjects=None):
         with tarfile.open(img_tarball) as tf:
             tf.extractall(tmp_dir)
     except Exception as e:
-        return update_record(
+        update_record(
             upload_object,
             exception=e,
             traceback='Error decompressing image bundle'
         )
+        raise
 
     try:
         collection = api.create_collection(
@@ -218,12 +225,13 @@ def upload(img_tarball, hash_id, upload_id, timestamp=None, n_subjects=None):
                 analysis_level='G', cognitive_paradigm_cogatlas='None',
                 number_of_subjects=n_subjects, is_valid=True)
     except Exception as e:
-        return update_record(
+        update_record(
             upload_object,
             exception=e,
             traceback='Error uploading, perhaps a \
                 collection with the same name exists?'
         )
+        raise
 
     return update_record(
         upload_object,
