@@ -10,7 +10,8 @@ from neuroscout.schemas.analysis import (AnalysisFullSchema,
 def update_record(model, exception=None, **fields):
     if exception is not None:
         if 'traceback' in fields:
-            fields['traceback'] = f"{fields['traceback']} \n {str(exception)}"
+            fields['traceback'] = f"{fields['traceback']}. \
+             Error:{str(exception)}"
         if 'status' not in fields:
             fields['status'] = 'FAILED'
     put_record(fields, model)
@@ -26,7 +27,7 @@ def write_jsons(objects, base_dir):
         string path, base_name
     """
     results = []
-    for obj, file_name in results:
+    for obj, file_name in objects:
         path = (base_dir / file_name).with_suffix('.json')
         json.dump(obj, path.open('w'))
         results.append(str(path), path.name)
