@@ -122,7 +122,7 @@ class FileField(wa.fields.Raw):
 @doc(tags=['analysis'])
 class AnalysisUploadResource(MethodResource):
     @doc(summary='Upload fitlins analysis tarball.',
-         consumes=['multipart/form-dat', 'application/x-www-form-urlencoded'])
+         consumes=['multipart/form-data', 'application/x-www-form-urlencoded'])
     @marshal_with(NeurovaultCollectionSchema)
     @use_kwargs({
         "tarball": FileField(required=True),

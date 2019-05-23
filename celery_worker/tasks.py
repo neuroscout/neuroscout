@@ -202,7 +202,7 @@ def upload(img_tarball, hash_id, upload_id, timestamp=None, n_subjects=None):
     try:
         # Untar:
         tmp_dir = Path(mkdtemp())
-        with tarfile.open(img_tarball) as tf:
+        with tarfile.open(img_tarball, mode="r:gz") as tf:
             tf.extractall(tmp_dir)
     except Exception as e:
         update_record(
