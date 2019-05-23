@@ -116,7 +116,7 @@ class App extends Reflux.Component<any, {}, AppState> {
       analyses: [],
       publicAnalyses: [],
       auth: authActions.getInitialState(),
-      datasets: [] 
+      datasets: []
     };
     this.store = AuthStore;
     this.loadPublicAnalyses();
@@ -509,11 +509,6 @@ class App extends Reflux.Component<any, {}, AppState> {
                     >
 
                        <Menu.ItemGroup title={`${gAuth ? gAuth.profileObj.email : email}`}>
-                         <Menu.Item
-                          key="profile"
-                         >
-                          My Profile
-                         </Menu.Item>
                          <Menu.Divider/>
                          <Menu.Item
                           key="signout"
@@ -548,11 +543,6 @@ class App extends Reflux.Component<any, {}, AppState> {
                       <Link to="/faq">
                         FAQ
                       </Link>
-                     </Menu.Item>
-                     <Menu.Item
-                      key="guide"
-                     >
-                      User's Guide
                      </Menu.Item>
                    </Menu.SubMenu>
 
