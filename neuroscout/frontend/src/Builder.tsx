@@ -261,7 +261,7 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
   buildModel = (): BidsModel => {
 
     let availableRuns = this.state.availableRuns;
-    let availableTasks = getTasks(this.state.datasets, this.state.analysis.datasetId);
+    let availableTasks = getTasks(this.props.datasets, this.state.analysis.datasetId);
 
     let task: string[] = availableTasks.filter(
       x => x.id === this.state.selectedTaskId
@@ -1143,7 +1143,7 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
                         model={this.state.model}
                         unsavedChanges={this.state.unsavedChanges}
                         availablePredictors={this.state.availablePredictors}
-                        dataset={this.state.datasets.find((x => x.id === this.state.analysis.datasetId))}
+                        dataset={this.props.datasets.find((x => x.id === this.state.analysis.datasetId))}
                       />
                       <br/>
                       {this.navButtons(false, isEditable)}
