@@ -216,7 +216,7 @@ def upload(img_tarball, hash_id, upload_id, timestamp=None, n_subjects=None):
         collection = api.create_collection(
             '{}{}'.format(hash_id, timestamp))
 
-        for img_path in tmp_dir.glob('*.nii.gz'):
+        for img_path in tmp_dir.glob('*stat-t_statmap.nii.gz'):
             contrast_name = re.findall('contrast-(.*)_', str(img_path))[0]
             api.add_image(
                 collection['id'], img_path, name=contrast_name,
