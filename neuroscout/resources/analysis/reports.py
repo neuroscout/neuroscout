@@ -142,7 +142,7 @@ class AnalysisUploadResource(MethodResource):
           dir='/file-data/uploads', delete=False) as f:
             tarball.save(f)
 
-        timestamp = datetime.datetime.utcnow()
+        timestamp = datetime.datetime.utcnow().strftime('%Y-%m-%d_%H:%M')
 
         # Create new upload
         upload = NeurovaultCollection(
