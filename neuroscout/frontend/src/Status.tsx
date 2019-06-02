@@ -206,8 +206,9 @@ export class StatusTab extends React.Component<submitProps, statusTabState> {
   }
 
   nvLink(collection_id: any) {
+    let url = `https://neurovault.org/collections/${collection_id}`;
     return (
-      <a href="https://neurovault.org/collections/{collection_id}/">
+      <a href={url}>
         https://neurovault.org/collections/{collection_id}/
       </a>
     );
