@@ -1,8 +1,9 @@
 import * as React from 'react';
-import { Button, Card, Checkbox, Modal, Tag, Icon, Tooltip, Switch } from 'antd';
+import { Alert, Button, Card, Checkbox, Modal, Tag, Icon, Tooltip, Switch } from 'antd';
 import { config } from './config';
 import { displayError, jwtFetch, alphaSort, timeout } from './utils';
 import { ApiAnalysis, Analysis } from './coretypes';
+import { api } from './api';
 
 const domainRoot = config.server_url;
 
@@ -158,13 +159,24 @@ export class Submit extends React.Component<submitProps, {tosAgree: boolean, val
   }
 }
 
-export class StatusTab extends React.Component<submitProps, {compileTraceback: string}> {
+type statusTabState = {
+  compileTraceback: string,
+  nvUploads?: any
+};
+export class StatusTab extends React.Component<submitProps, statusTabState> {
   constructor(props) {
     super(props);
     this.state = {
       compileTraceback: '',
     };
-    this.getTraceback(this.props.analysisId);
+    if ((this.props.analysisId !== undefined)) {
+      this.getTraceback(this.props.analysisId);
+      api.getNVUploads(this.props.analysisId).then(nvUploads => {
+        if (nvUploads !== null) {
+          this.setState({nvUploads: nvUploads});
+        }
+     });
+    }
   }
 
   getTraceback(id) {
@@ -183,9 +195,22 @@ export class StatusTab extends React.Component<submitProps, {compileTraceback: s
     if ((nextProps.status !== this.props.status) && (nextProps.status === 'FAILED')) {
       this.getTraceback(nextProps.analysisId);
     }
-    if ((nextProps.analysisId !== this.props.analysisId)) {
+    if ((nextProps.analysisId !== this.props.analysisId && nextProps.analysisId !== undefined)) {
       this.getTraceback(nextProps.analysisId);
+      api.getNVUploads(nextProps.analysisId).then(nvUploads => {
+        if (nvUploads !== null) {
+          this.setState({nvUploads: nvUploads});
+        }
+      });
     }
+  }
+
+  nvLink(collection_id: any) {
+    return (
+      <a href="https://neurovault.org/collections/{collection_id}/">
+        https://neurovault.org/collections/{collection_id}/
+      </a>
+    );
   }
 
   render() {
@@ -245,6 +270,36 @@ export class StatusTab extends React.Component<submitProps, {compileTraceback: s
         <div>
           <h3>Analysis Pending Generation</h3>
           <p>Analysis generation may take some time. This page will update when complete.</p>
+        </div>
+      }
+      {(this.state.nvUploads) &&
+        <div>
+        <h3>NeuroVault Uploads</h3>
+        {(this.state.nvUploads.pending) &&
+          <Alert
+            message="Latest Attempted Upload:"
+            description={`${this.state.nvUploads.pending.uploaded_at}`}
+            type="warning"
+          />
+        }
+        {(this.state.nvUploads.ok) &&
+          this.state.nvUploads.ok.map((x, i) => {
+            return (<Alert
+              key={x.collection_id}
+              message={this.nvLink(x.collection_id)}
+              description={`Uploaded at: ${x.uploaded_at}`}
+              type="success"
+            />);
+          })
+        }
+        {(this.state.nvUploads.failed) &&
+          <Alert
+            message="Last failed upload:"
+            description={`Failed at ${this.state.nvUploads.failed.uploaded_at}
+              <br/>${this.state.nvUploads.failed.traceback}`}
+            type="error"
+          />
+        }
         </div>
       }
       {this.props.children}
