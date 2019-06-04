@@ -49,6 +49,9 @@ export const api = {
         'pending': null as any,
         'ok': [] as any[]
       };
+      if (data.length === 0) {
+        return null;
+      }
       let failed = data.filter(x => x.status  === 'FAILED');
       if (failed.length > 0) {
         failed.sort((a, b) => b.uploaded_at.localeCompare(a.uploaded_at));
