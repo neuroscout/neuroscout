@@ -143,6 +143,9 @@ export class ContrastsTab extends React.Component<ContrastsTabProps, ContrastsTa
     let predictors = this.props.predictors;
     let newContrasts = [...this.props.contrasts];
     predictors.map((x) => {
+      if (x.source === 'fmriprep') {
+        return;
+      }
       let newContrast = emptyContrast();
       newContrast.Name = `${x.name}`;
       newContrast.ConditionList = predictors.map(y => y.name);
