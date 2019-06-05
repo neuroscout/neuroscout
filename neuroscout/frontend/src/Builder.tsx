@@ -567,8 +567,20 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
     } else {
       this.updateState('analysis', true)(analysis);
     }
+    this.setActiveTabs(analysis);
     return Promise.resolve(analysis);
   };
+
+  setActiveTabs = (analysis: Analysis) => {
+    if (analysis.contrasts.length) {
+      this.setState({
+        transformationsActive: true,
+        contrastsActive: true,
+        hrfActive: true,
+        reviewActive: true
+      });
+    }
+  }
 
   confirmSubmission = (build: boolean): void => {
     if (!this.submitEnabled()) return;
@@ -733,7 +745,7 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
     });
   };
 
-  updatePredictorState = (value: any, filteredPredictors: Predictor[], hrf: boolean = false) => {
+  updatePredictorState = (value: Predictor[], filteredPredictors: Predictor[], hrf: boolean = false) => {
     let stateUpdate: any = {};
     let newAnalysis = { ...this.state.analysis };
     let filteredIds = filteredPredictors.map(x => x.id);
@@ -981,6 +993,12 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
     );
   }
 
+  addAllHRF = () => {
+    // create HRF convolution transform for all variables that aren't from fmriprep
+    let predictors = this.state.selectedPredictors.filter(x => x.source !== 'fmriprep');
+    this.updatePredictorState(predictors, this.state.selectedPredictors, true);
+  }
+
   componentDidUpdate(prevProps, prevState) {
     // we really only need a valid JWT when creating the analysis
     if (editableStatus.includes(this.state.analysis.status)) {
@@ -1035,7 +1053,6 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
       this.postTabChange(activeTab);
     }
     return (
-      
       <div className="App">
           <Prompt
             when={unsavedChanges}
@@ -1107,6 +1124,11 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
                     updateSelection={this.updateHRFPredictorState}
                   />
                   <br/>
+                  <p>
+                  <Button type="default" onClick={this.addAllHRF}>
+                    <Icon type="plus" /> Select All Non-Confounds
+                  </Button>
+                  </p>
                   {this.navButtons()}
                   <br/>
                 </TabPane>}
