@@ -52,6 +52,7 @@ export const api = {
       if (data.length === 0) {
         return null;
       }
+      data.map(x => x.uploaded_at = x.uploaded_at.replace('T', ' '));
       let failed = data.filter(x => x.status  === 'FAILED');
       if (failed.length > 0) {
         failed.sort((a, b) => b.uploaded_at.localeCompare(a.uploaded_at));

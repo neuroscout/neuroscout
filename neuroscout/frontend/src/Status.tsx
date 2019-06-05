@@ -294,12 +294,14 @@ export class StatusTab extends React.Component<submitProps, statusTabState> {
           })
         }
         {(this.state.nvUploads.failed) &&
+          <p>
           <Alert
             message="Last failed upload:"
             description={`Failed at ${this.state.nvUploads.failed.uploaded_at}
               <br/>${this.state.nvUploads.failed.traceback}`}
             type="error"
           />
+          </p>
         }
         </div>
       }
