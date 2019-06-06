@@ -40,5 +40,37 @@ export const api = {
       displayError(error);
       return null;
     });
+  },
+  getNVUploads: (analysisId: (string)): Promise<(any | null)> => {
+    return jwtFetch(domainRoot + `/api/analyses/${analysisId}/upload`)
+    .then(data => {
+      let uploads = { 
+        'last_failed': null as any,
+        'pending': null as any,
+        'ok': [] as any[]
+      };
+      if (data.length === 0) {
+        return null;
+      }
+      data.map(x => x.uploaded_at = x.uploaded_at.replace('T', ' '));
+      let failed = data.filter(x => x.status  === 'FAILED');
+      if (failed.length > 0) {
+        failed.sort((a, b) => b.uploaded_at.localeCompare(a.uploaded_at));
+        uploads.last_failed = failed[0];
+      }
+      uploads.ok = data.filter(x => x.status === 'OK');
+      if (uploads.ok.length === 0) {
+       let pending = data.filter(x => x.status  === 'PENDING');
+       if (pending.length > 0) {
+         failed.sort((a, b) => b.uploaded_at.localeCompare(a.uploaded_at));
+         uploads.pending = pending[0];
+       }
+      }
+      return uploads;
+    })
+    .catch((error) => {
+      displayError(error);
+      return null;
+    });
   }
 };
