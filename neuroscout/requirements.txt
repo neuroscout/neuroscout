@@ -49,8 +49,6 @@ Pillow==5.4.1
 progressbar2
 py==1.4.33
 -e git+https://github.com/bids-standard/pybids.git#egg=pybids
-PyJWT==1.4.2
-pyparsing==2.2.0
 pytest==3.0.7
 python-dateutil==2.6.0
 python-magic==0.4.13
