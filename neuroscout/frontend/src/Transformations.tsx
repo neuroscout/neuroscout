@@ -5,7 +5,7 @@ This module comtains the following components:
  - XformEditor: component to add/edit a transformtion
 */
 import * as React from 'react';
-import { 
+import {
   Button,
   Checkbox,
   Col,
@@ -50,9 +50,6 @@ for (const item of transformDefinitions) {
 const FormItem = Form.Item;
 const RadioGroup = Radio.Group;
 
-function weightsRequired(name) {
-  return (['Sum'].indexOf(name) >= 0);
-}
 
 export function validateXform(xform: Transformation) {
   let errors: string[] = [];
@@ -62,28 +59,12 @@ export function validateXform(xform: Transformation) {
   if (xform.Input === undefined || xform.Input.length < 1) {
     errors.push('Please select at least one input for the transformation');
   }
-  if (weightsRequired(xform.Name) && (xform.Weights && xform.Input)) {
-    if (xform.Weights.length !== xform.Input.length) {
-      errors.push('Each weight requires a value');
-    }
-  }
   if ((xform.Name === 'Orthogonalize') && xform.Input !== undefined) {
     if (xform.Other === undefined || xform.Other.length < 1) {
       errors.push('Must orthoganalize with respect to at least one predictor');
     }
   }
-  if (xform.Name === 'Replace') {
-    let keys = Object.keys(xform.Replace);
-    let predecessor;
-    let replacement;
-    if (keys.length > 0) {
-      predecessor = keys[0];
-    }
-    if (predecessor === undefined || predecessor.length < 1) {
-      errors.push('Enter value to be replaced.');
-    }
-  }
-  
+
   return errors;
 }
 
@@ -575,7 +556,7 @@ export class XformsTab extends React.Component<XformsTabProps,  XformsTabState> 
                     <List.Item className={this.getStyle(index)}>
                       <Draggable key={index} draggableId={'' + index} index={index}>
                         {(providedDraggable: DraggableProvided, snapshotDraggable: DraggableStateSnapshot) => (
-                            <div 
+                            <div
                               style={{'width': '100%'}}
                               ref={providedDraggable.innerRef}
                               {...providedDraggable.dragHandleProps}

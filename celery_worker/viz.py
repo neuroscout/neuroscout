@@ -19,7 +19,7 @@ def melt_dm(dm):
 
 def plot_design_matrix(dm_wide, scale=True):
     if scale:
-        dm_wide = dm_wide.apply(lambda x: x / x.max())  # Scale for plotting
+        dm_wide = (dm_wide - dm_wide.mean()) / (dm_wide.max() - dm_wide.min())
     dm = melt_dm(dm_wide)
 
     pts = alt.selection_multi(encodings=['x'])
