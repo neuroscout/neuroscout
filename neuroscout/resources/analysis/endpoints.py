@@ -1,19 +1,20 @@
 from flask import send_file, current_app
 from flask_apispec import MethodResource, marshal_with, use_kwargs, doc
 from flask_jwt import current_identity
-from database import db
-from models import Analysis, Report
+from ...models import Analysis, Report
+from ...database import db
 from os.path import exists
 import datetime
 import webargs as wa
 import json
 
-from utils.db import put_record
+from ...utils.db import put_record
 from .bib import format_bibliography, find_predictor_citation, _flatten
 from ..utils import owner_required, auth_required, fetch_analysis, abort
 from ..predictor import get_predictors
-from .schemas import (AnalysisSchema, AnalysisFullSchema,
-                      AnalysisResourcesSchema, BibliographySchema)
+from ...schemas.analysis import (
+    AnalysisSchema, AnalysisFullSchema,
+    AnalysisResourcesSchema, BibliographySchema)
 
 
 @doc(tags=['analysis'])
@@ -220,7 +221,7 @@ class BibliographyResource(MethodResource):
 
         tools = [b['.*'] for k, b in bib.items()
                  if k in ['nipype', 'neuroscout', 'fitlins', 'nipype']]
-        all_csl_json = tools
+        all_csl_json = tools.copy()
 
         dataset_entry = bib.get(analysis.dataset.name, [])
         if dataset_entry:

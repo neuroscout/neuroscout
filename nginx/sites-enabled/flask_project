@@ -5,7 +5,7 @@ server {
     listen      443           ssl http2;
     listen [::]:443           ssl http2;
 
-    root /neuroscout/frontend/build;
+    root /neuroscout/neuroscout/frontend/build;
 
     ssl_certificate           /etc/letsencrypt/live/alpha.neuroscout.org/fullchain.pem;
     ssl_certificate_key       /etc/letsencrypt/live/alpha.neuroscout.org/privkey.pem;

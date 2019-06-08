@@ -3,7 +3,8 @@
 """
 from flask import render_template, current_app
 from flask_mail import Message
-from core import mail
+from .core import mail
+
 
 def send_confirm_mail(recipient, name, confirmation_link):
     """Send account confirmation email
@@ -19,6 +20,7 @@ def send_confirm_mail(recipient, name, confirmation_link):
                                name=name,
                                support_email='delavega@utexas.edu')
     mail.send(msg)
+
 
 def send_reset_mail(recipient, token, name):
     """Send a password reset email

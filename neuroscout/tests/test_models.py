@@ -1,12 +1,12 @@
 import pytest
 from sqlalchemy import func
-from models import (
-    Analysis, User, Dataset, Predictor, Stimulus, Run, RunStimulus, Result,
+from ..models import (
+    Analysis, User, Dataset, Predictor, Stimulus, Run, RunStimulus,
     ExtractedFeature, PredictorEvent, GroupPredictor, Task)
 
 from numpy import isclose
-from populate.convert import ingest_text_stimuli
-from populate.modify import update_annotations
+from ..populate.convert import ingest_text_stimuli
+from ..populate.modify import update_annotations
 
 
 def test_dataset_ingestion(session, add_task):
@@ -180,10 +180,6 @@ def test_analysis(session, add_analysis, add_predictor):
 
     assert clone.id > first_analysis.id
     assert clone.name == first_analysis.name
-
-
-def test_result(add_result):
-    assert Result.query.count() == 1
 
 
 def test_external_text(get_data_path, add_task):

@@ -7,11 +7,11 @@ services:
       - "8000"
     volumes:
       - ./postgres/migrations:/migrations
-      - ./neuroscout/:/neuroscout
+      - ./:/neuroscout
       - ${DATASET_DIR}:/datasets
       - ${KEY_DIR}:/keys
       - ${FILE_DATA}:/file-data
-    command: /usr/local/bin/gunicorn -w 2 -b :8000 core:app --log-level debug --timeout 120
+    command: /usr/local/bin/gunicorn -w 2 -b :8000 neuroscout.core:app --log-level debug --timeout 120
     env_file:
       - .env
       - .pliersenv
@@ -39,7 +39,9 @@ services:
       - '5432'
     environment:
       - POSTGRES_DB=neuroscout
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
     env_file:
+      - .env
       - .pliersenv
 
   swagger-ui:
@@ -54,28 +56,15 @@ services:
 
   worker:
     build:
-      context: ./celery_worker
-      dockerfile: Dockerfile
+      context: ./
+      dockerfile: celery_worker/Dockerfile
     depends_on:
       - redis
     entrypoint: celery -A tasks worker --loglevel=info
     volumes:
       - ${FILE_DATA}:/file-data
       - ${DATASET_DIR}:/datasets
-      - ./neuroscout/:/neuroscout
-      - ./celery_worker/:/celery_worker
-    env_file: .env
-
-  monitor:
-    build:
-      context: ./celery_worker
-      dockerfile: Dockerfile
-    ports:
-     - "5555:5555"
-    entrypoint: flower
-    command:  -A tasks --port=5555 --broker=redis://redis:6379/0
-    depends_on:
-      - redis
+      - ./celery_worker:/celery_worker
     env_file: .env
 
 volumes:

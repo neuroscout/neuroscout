@@ -3,6 +3,7 @@
  an analysis.
 */
 import { RouteComponentProps } from 'react-router';
+import { Redirect } from 'react-router-dom';
 import { createBrowserHistory } from 'history';
 import * as React from 'react';
 import {
@@ -122,7 +123,8 @@ let initializeStore = (): Store => ({
   activeContrastIndex: -1,
   xformErrors: [],
   contrastErrors: [],
-  fillAnalysis: false
+  fillAnalysis: false,
+  analysis404: false
 });
 
 // Get list of tasks from a given dataset
@@ -230,10 +232,16 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
       jwtFetch(`${domainRoot}/api/analyses/${props.id}`)
       // .then(response => response.json() as Promise<ApiAnalysis>)
       .then((data: ApiAnalysis) => {
-        this.loadAnalysis(data);
-        return data;
+        if ((data as any).statusCode === 404) {
+          this.setState({analysis404: true});
+          return;
+        } else {
+          this.loadAnalysis(data);
+          return data;
+        }
       })
       .then((data: ApiAnalysis) => {
+        if (this.state.analysis404) { return; }
         if (editableStatus.includes(data.status)) {
           this.setState({model: this.buildModel()});
         } else if (data.model !== undefined) {
@@ -253,7 +261,7 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
   buildModel = (): BidsModel => {
 
     let availableRuns = this.state.availableRuns;
-    let availableTasks = getTasks(this.state.datasets, this.state.analysis.datasetId);
+    let availableTasks = getTasks(this.props.datasets, this.state.analysis.datasetId);
 
     let task: string[] = availableTasks.filter(
       x => x.id === this.state.selectedTaskId
@@ -469,7 +477,7 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
             status: data.status,
             modifiedAt: data.modified_at
           },
-          postReports: true,
+          postReports: analysis.contrasts.length > 0,
           unsavedChanges: false
         });
         // will this mess with /fill workflow?
@@ -490,7 +498,7 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
   // Decode data returned by '/api/analyses/<id>' (ApiAnalysis) to convert it to the right shape (Analysis)
   // and fetch the associated runs
   loadAnalysis = (data: ApiAnalysis): Promise<Analysis> => {
-
+    if (this.state.analysis404) { return Promise.reject('404'); }
     data.transformations = [];
 
     // Extract transformations and contrasts from within step object of response.
@@ -559,8 +567,20 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
     } else {
       this.updateState('analysis', true)(analysis);
     }
+    this.setActiveTabs(analysis);
     return Promise.resolve(analysis);
   };
+
+  setActiveTabs = (analysis: Analysis) => {
+    if (analysis.contrasts.length) {
+      this.setState({
+        transformationsActive: true,
+        contrastsActive: true,
+        hrfActive: true,
+        reviewActive: true
+      });
+    }
+  }
 
   confirmSubmission = (build: boolean): void => {
     if (!this.submitEnabled()) return;
@@ -725,7 +745,7 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
     });
   };
 
-  updatePredictorState = (value: any, filteredPredictors: Predictor[], hrf: boolean = false) => {
+  updatePredictorState = (value: Predictor[], filteredPredictors: Predictor[], hrf: boolean = false) => {
     let stateUpdate: any = {};
     let newAnalysis = { ...this.state.analysis };
     let filteredIds = filteredPredictors.map(x => x.id);
@@ -805,7 +825,8 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
    since state changes aren't really user edits we don't want to set unsavedChanges.
   */
   updateState = (attrName: keyof Store, keepClean = false, saveToAPI = false) => (value: any) => {
-    const { analysis, availableRuns, availablePredictors, datasets } = this.state;
+    const { analysis, availableRuns, availablePredictors } = this.state;
+    const { datasets } = this.props;
     /*
     if (!editableStatus.includes(analysis.status) && !keepClean) {
       message.warning('This analysis is locked and cannot be edited');
@@ -829,7 +850,6 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
                 updatedAnalysis.runIds = this.runIdsFromModel(data, updatedAnalysis.model.Input);
               }
             }
-
             if (availTasks.length === 1) {
               stateUpdate = {
                 ...stateUpdate,
@@ -973,6 +993,12 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
     );
   }
 
+  addAllHRF = () => {
+    // create HRF convolution transform for all variables that aren't from fmriprep
+    let predictors = this.state.selectedPredictors.filter(x => x.source !== 'fmriprep');
+    this.updatePredictorState(predictors, this.state.selectedPredictors, true);
+  }
+
   componentDidUpdate(prevProps, prevState) {
     // we really only need a valid JWT when creating the analysis
     if (editableStatus.includes(this.state.analysis.status)) {
@@ -991,6 +1017,9 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
   }
 
   render() {
+    if (this.state.analysis404) {
+      return <Redirect to="/builder/" />;
+    }
     let {
       predictorsActive,
       transformationsActive,
@@ -1095,6 +1124,11 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
                     updateSelection={this.updateHRFPredictorState}
                   />
                   <br/>
+                  <p>
+                  <Button type="default" onClick={this.addAllHRF}>
+                    <Icon type="plus" /> Select All Non-Confounds
+                  </Button>
+                  </p>
                   {this.navButtons()}
                   <br/>
                 </TabPane>}
@@ -1116,7 +1150,7 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
                     updateBuilderState={this.updateState}
                   />
                   <br/>
-                  {this.navButtons()}
+                  {this.navButtons(!(this.state.analysis.contrasts.length > 0))}
                   <br/>
                 </TabPane>}
                 <TabPane tab="Review" key="review" disabled={((!reviewActive || !analysis.analysisId) && isDraft)}>
@@ -1131,7 +1165,7 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
                         model={this.state.model}
                         unsavedChanges={this.state.unsavedChanges}
                         availablePredictors={this.state.availablePredictors}
-                        dataset={this.state.datasets.find((x => x.id === this.state.analysis.datasetId))}
+                        dataset={this.props.datasets.find((x => x.id === this.state.analysis.datasetId))}
                       />
                       <br/>
                       {this.navButtons(false, isEditable)}

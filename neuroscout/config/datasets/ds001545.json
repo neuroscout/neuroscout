@@ -10,15 +10,17 @@
         "converters": [
         ],
         "extractors": [
-["GoogleVideoAPIShotDetectionExtractor", {"timeout": 100000}]
-        ],
+          ["PredefinedDictionaryExtractor", {"variables":
+            {"massiveauditorylexicaldecision":
+                ["StressPattern", "NumSylls", "NumPhones", "Duration",
+                  "OrthUP", "PhonND", "OrthND", "POS", "AllPOS", "FreqSUBTLEX",
+                  "FreqCOCA", "FreqCOCAspok", "FreqGoogle", "PhonUP", "StressCat",
+                  "PhonLev", "NumMorphs", "OrthLev"],
+               "calgarysemanticdecision": ["Concrete_rating"]
+              },
+            "missing": "n/a"} ]
+          ],
         "transformations": [
-    {
-      "function": "dummy_value",
-      "new_name": "shot_change",
-      "extractor_name": "GoogleVideoAPIShotDetectionExtractor",
-      "feature_name": "shot_id"
-    }
         ],
         "ingest_args": {
         }

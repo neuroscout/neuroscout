@@ -105,8 +105,8 @@ interface PredictorsParam {
 
 export type Parameter = BooleanParam | PredictorsParam;
 
-export type TransformName = 'Scale' | 'Orthogonalize' | 'Sum' | 'Product' | 'Threshold'
-  | 'Or' | 'And' | 'Not' | 'Convolve' | 'Replace';
+export type TransformName = 'Scale' | 'Orthogonalize' | 'Threshold'
+  | 'Or' | 'And' | 'Not' | 'Convolve';
 
 export type StepLevel = 'Run' | 'Session' | 'Subject' | 'Dataset';
 
@@ -183,6 +183,7 @@ export interface Store {
   xformErrors: string[];
   contrastErrors: string[];
   fillAnalysis: boolean;
+  analysis404: boolean;
 }
 
 export interface ApiRun {

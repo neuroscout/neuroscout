@@ -1,6 +1,6 @@
 {
   "bids_test": {
-    "path": "./tests/data/bids_test",
+    "path": "./neuroscout/tests/data/bids_test",
     "summary": "A test dataset",
     "url": "https://github.com/adelavega/bids_test",
     "tasks": {

@@ -1,20 +1,8 @@
-from marshmallow import Schema, fields
 from flask_apispec import MethodResource, marshal_with, use_kwargs, doc
 import webargs as wa
-from models import Run
+from ..models import Run
 from .utils import first_or_404
-
-
-class RunSchema(Schema):
-    id = fields.Int()
-    session = fields.Str(description='Session number')
-    acquisition = fields.Str(description='Acquisition')
-    subject = fields.Str(description='Subject id')
-    number = fields.Int(description='Run id')
-    duration = fields.Number(description='Total run duration in seconds.')
-    dataset_id = fields.Int(description='Dataset run belongs to.')
-    task = fields.Nested(
-        'TaskSchema', only='id', description="Task id and name")
+from ..schemas.run import RunSchema
 
 
 class RunResource(MethodResource):
@@ -28,13 +16,13 @@ class RunListResource(MethodResource):
     @doc(tags=['run'], summary='Returns list of runs.')
     @use_kwargs({
         'session': wa.fields.DelimitedList(
-            fields.Str(), description='Session number(s).'),
+            wa.fields.Str(), description='Session number(s).'),
         'number': wa.fields.DelimitedList(
-            fields.Int(), description='Run number(s).'),
+            wa.fields.Int(), description='Run number(s).'),
         'task_id': wa.fields.DelimitedList(
-            fields.Int(), description='Task id(s).'),
+            wa.fields.Int(), description='Task id(s).'),
         'subject': wa.fields.DelimitedList(
-            fields.Str(), description='Subject id(s).'),
+            wa.fields.Str(), description='Subject id(s).'),
         'dataset_id': wa.fields.Int(description='Dataset id.'),
     }, locations=['query'])
     @marshal_with(RunSchema(many=True))

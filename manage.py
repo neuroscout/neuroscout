@@ -10,9 +10,9 @@ from flask_script import Manager, Shell
 from flask_migrate import Migrate, MigrateCommand
 from flask_security.utils import encrypt_password
 
-import populate
-from core import app, db
-from models import user_datastore
+from neuroscout import populate
+from neuroscout.core import app, db
+from neuroscout.models import user_datastore
 
 app.config.from_object(os.environ['APP_SETTINGS'])
 migrate = Migrate(app, db, directory=app.config['MIGRATIONS_DIR'])
@@ -20,9 +20,9 @@ manager = Manager(app)
 
 
 def _make_context():
-    import models
-    from tests.request_utils import Client
-    import resources
+    from neuroscout import models
+    from neuroscout.tests.request_utils import Client
+    from neuroscout import resources
 
     try:
         client = Client(requests, 'http://127.0.0.1:80',

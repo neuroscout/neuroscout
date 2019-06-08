@@ -2,23 +2,24 @@
 To apply pliers converters to create new stimuli from original dataset stims.
 """
 from flask import current_app
-from database import db
+from ..database import db
 from pathlib import Path
 
 from pliers.stimuli import (TextStim, ImageStim, VideoFrameStim,
                             ComplexTextStim, VideoStim, AudioStim, load_stims)
 from pliers.transformers import get_transformer
 
-from models import Dataset, Task, Run, Stimulus, RunStimulus
-from utils.core import listify
+from ..models import Dataset, Task, Run, Stimulus, RunStimulus
+from ..utils.core import listify
 from .utils import hash_stim
 from .ingest import add_stimulus
 
 import pandas as pd
 
+
 def save_stim_filename(stimulus):
     """ Given a pliers stimulus object, create a hash, filename, and save.
-        If type if TextStim or ComplexTextStim, return content rather than path.
+        If type if TextStim or ComplexTextStim, return content rather than path
     """
     if isinstance(stimulus, TextStim):
         stimulus = ComplexTextStim(text=stimulus.data)
@@ -42,6 +43,7 @@ def save_stim_filename(stimulus):
         stimulus.save(path.as_posix())
 
         return stim_hash, path, None
+
 
 def create_new_stimuli(dataset_id, task_name, parent_id, new_stims, rs_orig,
                        transformer=None, transformer_params=None):
@@ -87,6 +89,7 @@ def create_new_stimuli(dataset_id, task_name, parent_id, new_stims, rs_orig,
 
     return [v[0].id for v in new_models.values()]
 
+
 def convert_stimuli(dataset_name, task_name, converters):
     """ Convert stimuli to different modality using pliers.
         Args:
@@ -121,26 +124,27 @@ def convert_stimuli(dataset_name, task_name, converters):
             results = []
             # Extract and flatten results (to a single unit)
             if conv._stim_matches_input_types(loaded_stim):
-                converted = conv.transform(loaded_stim)
-                try: # Add iterable
-                    results += converted
+                cstim = conv.transform(loaded_stim)
+                try:  # Add iterable
+                    results += cstim
                 except TypeError:
-                    if hasattr(converted, 'elements'):
-                        results += converted.elements
+                    if hasattr(cstim, 'elements'):
+                        results += cstim.elements
                     else:
-                        results.append(converted)
+                        results.append(cstim)
 
-            results = [res for res in results if hasattr(res, 'data') and res.data is not '']
+            results = [res for res in results
+                       if hasattr(res, 'data') and res.data != '']
             new_stims = create_new_stimuli(
                 dataset_id, task_name, stim.id, results, rs_orig,
-                transformer=converted.history.transformer_class,
-                transformer_params=converted.history.transformer_params)
+                transformer=cstim.history.transformer_class,
+                transformer_params=cstim.history.transformer_params)
 
         # De-activate previously generated stimuli from these converters.
         update = Stimulus.query.filter_by(parent_id=stim.id).filter(
             Stimulus.id.notin_(new_stims),
-            Stimulus.converter_name==converted.history.transformer_class,
-            Stimulus.converter_parameters==converted.history.transformer_params)
+            Stimulus.converter_name == cstim.history.transformer_class,
+            Stimulus.converter_parameters == cstim.history.transformer_params)
         if update.count():
             update.update(dict(active=False), synchronize_session='fetch')
         db.session.commit()
@@ -148,7 +152,8 @@ def convert_stimuli(dataset_name, task_name, converters):
 
     return total_new_stims
 
-def ingest_text_stimuli(filename, dataset_name, task_name, parent_ids,
+
+def ingest_text_stimuli(filename, dataset_name, task_name, parent_ids=None,
                         transformer='FAVEAlign', params=None, onsets=None,
                         resample_ratio=1):
     """ Ingest converted text stimuli from file.
@@ -160,16 +165,24 @@ def ingest_text_stimuli(filename, dataset_name, task_name, parent_ids,
         transformer - Transformer name
         params - Extra parameters to recordings
         onsets - onset of the parent stimulus relative to the transcript.
-        resample_ratio - Ratio to multiply onsets (after cropping) to adjust for
-                         variable play speeds.
+        resample_ratio - Ratio to multiply onsets (after cropping) to adjust
+                         for variable play speeds.
     """
-    df = pd.read_csv(filename, delimiter='\t')
+    dataset_id = Dataset.query.filter_by(name=dataset_name).one().id
+
+    # If no parent ids, find closest matching stimulus
+    if parent_ids is None:
+        stem = Path(filename).stem
+        parent_ids = Stimulus.query.filter_by(
+            dataset_id=dataset_id).filter(
+                Stimulus.path.contains(stem)).one().id
+
     parent_ids = listify(parent_ids)
     onsets = listify(onsets)
     if params is None:
         params = {}
 
-    dataset_id = Dataset.query.filter_by(name=dataset_name).one().id
+    df = pd.read_csv(filename, delimiter='\t').dropna()
 
     if onsets is None:
         onsets = [0] * len(parent_ids)
@@ -179,8 +192,10 @@ def ingest_text_stimuli(filename, dataset_name, task_name, parent_ids,
     for onset, parent_id in zip(onsets, parent_ids):
         # Trim and align trancript
         sub = df[df.onset > onset]
+        sub = sub[sub.duration > 0]
         sub['onset'] = (sub['onset'] - onset) * resample_ratio
 
+        # Calculate run duration
         duration = max(db.session.query(RunStimulus.duration).filter_by(
             stimulus_id=parent_id).distinct())[0]
         if onset < 0:

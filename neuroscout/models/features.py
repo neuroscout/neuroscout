@@ -1,4 +1,4 @@
-from database import db
+from ..database import db
 import datetime
 from sqlalchemy.dialects.postgresql import JSONB
 

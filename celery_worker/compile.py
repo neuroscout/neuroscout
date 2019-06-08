@@ -1,4 +1,3 @@
-from matplotlib import pyplot as plt
 import json
 import numpy as np
 from pathlib import Path
@@ -12,8 +11,6 @@ from collections import defaultdict
 from celery.utils.log import get_task_logger
 
 logger = get_task_logger(__name__)
-
-plt.set_cmap('viridis')
 
 PATHS = ['sub-{subject}_[ses-{session}_]task-{task}_[acq-{acquisition}_]'
          '[run-{run}_]events.tsv']

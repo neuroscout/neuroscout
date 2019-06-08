@@ -1,4 +1,4 @@
-from database import db
+from ..database import db
 
 
 class Stimulus(db.Model):
@@ -32,7 +32,7 @@ class Stimulus(db.Model):
 
     extracted_events = db.relationship('ExtractedEvent')
     runs = db.relationship('Run', secondary='run_stimulus')
-    run_stimuli = db.relationship('RunStimulus', backref='stimulus', 
+    run_stimuli = db.relationship('RunStimulus', backref='stimulus',
                                   lazy='dynamic')
 
     def __repr__(self):

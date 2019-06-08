@@ -1,5 +1,7 @@
-FROM python:3.6-onbuild
+FROM python:3.6
 ARG DEBIAN_FRONTEND=noninteractive
-ADD ./requirements.txt /requirements.txt
+ADD ./celery_worker/requirements.txt /requirements.txt
 RUN pip install -r /requirements.txt
+ADD ./ /neuroscout
+RUN pip install /neuroscout
 WORKDIR /celery_worker
