@@ -50,9 +50,6 @@ for (const item of transformDefinitions) {
 const FormItem = Form.Item;
 const RadioGroup = Radio.Group;
 
-function weightsRequired(name) {
-  return (['Sum'].indexOf(name) >= 0);
-}
 
 export function validateXform(xform: Transformation) {
   let errors: string[] = [];
@@ -61,11 +58,6 @@ export function validateXform(xform: Transformation) {
   }
   if (xform.Input === undefined || xform.Input.length < 1) {
     errors.push('Please select at least one input for the transformation');
-  }
-  if (weightsRequired(xform.Name) && (xform.Weights && xform.Input)) {
-    if (xform.Weights.length !== xform.Input.length) {
-      errors.push('Each weight requires a value');
-    }
   }
   if ((xform.Name === 'Orthogonalize') && xform.Input !== undefined) {
     if (xform.Other === undefined || xform.Other.length < 1) {

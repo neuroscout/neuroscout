@@ -40,13 +40,6 @@ const transformDefinitions: Transformation[] = [
     Other: []
   },
   {
-    Name: 'Sum',
-    Weights: []
-  },
-  {
-   Name: 'Product'
-  },
-  {
     Name: 'Threshold',
     Threshold: 0,
     Above: true,
@@ -60,10 +53,6 @@ const transformDefinitions: Transformation[] = [
   },
   {
     Name: 'Not'
-  },
-  {
-    Name: 'Replace',
-    Replace: {}
   }
 
 ];
