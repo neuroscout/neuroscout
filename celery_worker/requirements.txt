@@ -1,12 +1,8 @@
 altair
 grabbit
 docopt
-grabbit
 -e git+https://github.com/bids-standard/pybids.git#egg=pybids
 -e git+https://github.com/neurolearn/pynv#egg=pynv
-duecredit
-pandas
-patsy
 matplotlib
 nistats
 nilearn
@@ -21,6 +17,6 @@ pandas==0.23
 nibabel==2.1.0
 scipy
 patsy
-pybids==0.8.0
+pybids==08.0
 duecredit==0.6.1
 SQLAlchemy==1.3.0
