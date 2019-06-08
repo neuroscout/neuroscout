@@ -5,7 +5,7 @@ This module comtains the following components:
  - XformEditor: component to add/edit a transformtion
 */
 import * as React from 'react';
-import { 
+import {
   Button,
   Checkbox,
   Col,
@@ -72,18 +72,7 @@ export function validateXform(xform: Transformation) {
       errors.push('Must orthoganalize with respect to at least one predictor');
     }
   }
-  if (xform.Name === 'Replace') {
-    let keys = Object.keys(xform.Replace);
-    let predecessor;
-    let replacement;
-    if (keys.length > 0) {
-      predecessor = keys[0];
-    }
-    if (predecessor === undefined || predecessor.length < 1) {
-      errors.push('Enter value to be replaced.');
-    }
-  }
-  
+
   return errors;
 }
 
@@ -575,7 +564,7 @@ export class XformsTab extends React.Component<XformsTabProps,  XformsTabState> 
                     <List.Item className={this.getStyle(index)}>
                       <Draggable key={index} draggableId={'' + index} index={index}>
                         {(providedDraggable: DraggableProvided, snapshotDraggable: DraggableStateSnapshot) => (
-                            <div 
+                            <div
                               style={{'width': '100%'}}
                               ref={providedDraggable.innerRef}
                               {...providedDraggable.dragHandleProps}
