@@ -50,7 +50,6 @@ for (const item of transformDefinitions) {
 const FormItem = Form.Item;
 const RadioGroup = Radio.Group;
 
-
 export function validateXform(xform: Transformation) {
   let errors: string[] = [];
   if (!xform.Name) {
