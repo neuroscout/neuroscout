@@ -2,6 +2,7 @@ from ..database import db
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.ext.hybrid import hybrid_property
 from .stimulus import Stimulus
+from .run import Run
 
 
 class Dataset(db.Model):
@@ -27,7 +28,11 @@ class Dataset(db.Model):
         return [s[0] for s in Stimulus.query.filter_by(
             dataset_id=self.id).distinct('mimetype').values('mimetype')]
 
-    # Meta-data, such as preprocessed history, etc...
+    @hybrid_property
+    def n_subjects(self):
+        return Run.query.filter_by(
+            dataset_id=self.id).distinct('subject').count()
 
+    # Meta-data, such as preprocessed history, etc...
     def __repr__(self):
         return '<models.Dataset[name=%s]>' % self.name

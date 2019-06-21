@@ -24,3 +24,5 @@ class DatasetSchema(Schema):
         description='Preprocessed data remote address')
     active = fields.Boolean(
         description='Dataset is currently available for model creation')
+    n_subjects = fields.Int(
+        description='Number of unique subjects')
