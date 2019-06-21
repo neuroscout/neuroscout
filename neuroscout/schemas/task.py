@@ -6,6 +6,7 @@ class TaskSchema(Schema):
     name = fields.Str()
 
     dataset_id = fields.Int()
-    num_runs = fields.Int(description='Number of runs.')
+    n_subjects = fields.Int(
+        description='Number of unique subjects')
     TR = fields.Number()
     summary = fields.Str(description='Task summary description')

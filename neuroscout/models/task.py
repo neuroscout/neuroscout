@@ -1,6 +1,7 @@
 from ..database import db
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.ext.hybrid import hybrid_property
+from .run import Run
 
 
 class Task(db.Model):
@@ -20,9 +21,10 @@ class Task(db.Model):
     summary = db.Column(db.Text)  # Summary annotation
 
     @hybrid_property
-    def num_runs(self):
+    def n_subjects(self):
         """ List of mimetypes of stimuli in dataset """
-        return len(self.runs)
+        return Run.query.filter_by(
+            task_id=self.id).distinct('subject').count()
 
     def __repr__(self):
         return '<models.Task[name={}]>'.format(self.name)
