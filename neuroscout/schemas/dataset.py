@@ -17,7 +17,7 @@ class DatasetSchema(Schema):
     runs = fields.Nested(
         'RunSchema', many=True, only='id')
     tasks = fields.Nested(
-        'TaskSchema', many=True, only=['id', 'name', 'summary', 'num_runs'])
+        'TaskSchema', many=True, only=['id', 'name', 'summary', 'n_subjects'])
     dataset_address = fields.Str(
         description='BIDS Dataset remote address')
     preproc_address = fields.Str(

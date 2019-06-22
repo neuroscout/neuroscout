@@ -353,8 +353,6 @@ class XformEditor extends React.Component<XformEditorProps, XformEditorState> {
     const availableParameters = name ? Object.keys(xformRules[name]) : undefined;
     return (
       <div>
-        <DisplayErrorsInline errors={this.props.xformErrors} />
-
         <Form layout="horizontal">
           <Row type="flex">
             <Col lg={{span: 24}} xs={{span: 24}}>
@@ -404,6 +402,8 @@ class XformEditor extends React.Component<XformEditorProps, XformEditorState> {
                 })}
               <br />
             </div>}
+          <DisplayErrorsInline errors={this.props.xformErrors} />
+          <Space />
           <Button
             type="primary"
             onClick={this.onSave}

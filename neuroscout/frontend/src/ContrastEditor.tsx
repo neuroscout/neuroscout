@@ -76,6 +76,7 @@ export class ContrastEditor extends React.Component<
 
   // Validate and save contrast
   onSave = (): void => {
+    this.props.updateBuilderState('contrastErrors')([] as string[]);
     let errors = validateContrast(this.props.activeContrast);
     if (errors.length > 0) {
       this.props.updateBuilderState('contrastErrors')(errors);
@@ -131,7 +132,6 @@ export class ContrastEditor extends React.Component<
     const { availablePredictors } = this.props;
     return (
       <div>
-        <DisplayErrorsInline errors={this.props.contrastErrors} />
         <Form>
           <FormItem required={true} label={'Name of Contrast:'}>
             <Input
@@ -192,6 +192,8 @@ export class ContrastEditor extends React.Component<
             </RadioGroup>
           </FormItem>
         </Form>
+        <DisplayErrorsInline errors={this.props.contrastErrors} />
+        <Space />
         <Button
           type="primary"
           onClick={this.onSave}

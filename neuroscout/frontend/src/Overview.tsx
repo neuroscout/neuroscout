@@ -53,7 +53,7 @@ export class OverviewTab extends React.Component<OverviewTabProps, OverviewTabSt
     };
 
   applyFilter = (pagination, filters, sorter) => {
-      /* If we have no set filters, but some selected subjects and we change pages then all subjects will 
+      /* If we have no set filters, but some selected subjects and we change pages then all subjects will
        * be selected. To prevent this we return immediatly if no filters are set.
        */
       if (Object.keys(filters).map((y) => filters[y]).filter((z) => z.length > 0).length === 0) {
@@ -210,8 +210,8 @@ export class OverviewTab extends React.Component<OverviewTabProps, OverviewTabSt
 
       { title: 'Summary', dataIndex: 'summary' },
       {
-        title: '#Runs',
-        dataIndex: 'num_runs',
+        title: 'Subjects (N)',
+        dataIndex: 'n_subjects',
         sorter: (a, b) => a.numRuns - b.numRuns
       }
     ];
@@ -247,7 +247,7 @@ export class OverviewTab extends React.Component<OverviewTabProps, OverviewTabSt
     } else {
       runMsg = 'Runs: ' + analysis.runIds.length + '/' + this.props.availableRuns.length + ' selected';
     }
-    // This one almost could live in state set by task selection function, but the first selectedTaskId 
+    // This one almost could live in state set by task selection function, but the first selectedTaskId
     //  is being set in builder, and doesn't trip the selection function in the table.
     let taskMsg = '';
     if (this.props.selectedTaskId && availableTasks) {
@@ -295,7 +295,7 @@ export class OverviewTab extends React.Component<OverviewTabProps, OverviewTabSt
             rowKey="id"
             size="small"
             dataSource={datasets.filter((x) => {
-              return x.active === true || x.id === this.props.analysis.datasetId; 
+              return x.active === true || x.id === this.props.analysis.datasetId;
             })}
             rowSelection={datasetRowSelection}
             pagination={(datasets.length > 10) ? {'position': 'bottom'} : false}
