@@ -61,6 +61,7 @@ class AnalysisResource(AnalysisMethodResource):
     @use_kwargs(AnalysisSchema)
     @owner_required
     def put(self, analysis, **kwargs):
+        kwargs['modified_at'] = datetime.datetime.utcnow()
         if analysis.locked is True:
             abort(422, "Analysis is locked. It cannot be edited.")
         if analysis.status not in ['DRAFT', 'FAILED']:
@@ -68,7 +69,6 @@ class AnalysisResource(AnalysisMethodResource):
             kwargs = {k: v for k, v in kwargs.items() if k in excep}
         if not kwargs:
             abort(422, "Analysis is not editable. Try cloning it.")
-        kwargs['modified_at'] = datetime.datetime.utcnow()
         return put_record(kwargs, analysis), 200
 
     @doc(summary='Delete analysis.')
