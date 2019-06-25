@@ -291,6 +291,7 @@ export class OverviewTab extends React.Component<OverviewTabProps, OverviewTabSt
           </FormItem>
           <p>Select dataset</p>
           <Table
+            className="selectDataset"
             columns={datasetColumns}
             rowKey="id"
             size="small"
