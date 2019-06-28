@@ -1086,7 +1086,13 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
                   key="predictors"
                   disabled={(!predictorsActive || !isEditable) && !isFailed}
                 >
-                  <h2>Select Predictors</h2>
+                  <h2>Select Predictors&nbsp;&nbsp;
+                  <Tooltip
+                   title={'Use the search bar to find and select predictors to add to your analysis.\
+                   For example, try searching for "face" or "fmriprep"'}
+                  >
+                    <Icon type="info-circle" style={{ fontSize: '15px'}}/>
+                  </Tooltip></h2>
                   <PredictorSelector
                     availablePredictors={availablePredictors}
                     selectedPredictors={selectedPredictors}

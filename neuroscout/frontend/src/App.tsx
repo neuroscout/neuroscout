@@ -96,7 +96,6 @@ interface AppState {
   publicAnalyses: AppAnalysis[]; // List of public analyses
   auth: AuthStoreState;
   datasets: Dataset[];
-  isTourOpen: boolean;
 }
 
 // Convert analyses returned by API to the shape expected by the frontend
@@ -119,7 +118,6 @@ class App extends Reflux.Component<any, {}, AppState> {
       publicAnalyses: [],
       auth: authActions.getInitialState(),
       datasets: [],
-      isTourOpen: true
     };
     this.store = AuthStore;
     this.loadPublicAnalyses();
@@ -549,6 +547,12 @@ class App extends Reflux.Component<any, {}, AppState> {
                       <Link to="/faq">
                         FAQ
                       </Link>
+                     </Menu.Item>
+                     <Menu.Item
+                      key="launchTour"
+                      onClick={(e) => {return authActions.launchTour(); }}
+                     >
+                      Launch Tour
                      </Menu.Item>
                    </Menu.SubMenu>
 

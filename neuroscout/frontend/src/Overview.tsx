@@ -327,7 +327,13 @@ export class OverviewTab extends React.Component<OverviewTabProps, OverviewTabSt
                   onChange={this.applyFilter}
                 />
                 <div>
-                  <Button onClick={this.clearFilters}>Clear Filters</Button>
+                  <Button onClick={this.clearFilters}>Clear Filters</Button>&nbsp;&nbsp;
+                  <Tooltip
+                   title={'You can filter runs using the filter icon in each column,\
+                    and clear the filters using this button'}
+                  >
+                    <Icon type="info-circle" />
+                  </Tooltip>
                 </div>
               </Panel>
             </Collapse>
