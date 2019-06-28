@@ -130,12 +130,6 @@ class App extends Reflux.Component<any, {}, AppState> {
     });
   }
 
-  closeTour = () => {
-    this.setState({
-      isTourOpen: false
-    });
-  };
-
   // Load user's saved analyses from the server
   loadAnalyses = () => {
     if (this.state.auth.loggedIn) {
@@ -493,8 +487,8 @@ class App extends Reflux.Component<any, {}, AppState> {
           {openEnterResetToken && authActions.enterResetTokenModal()}
           <Layout>
             <Tour
-              isOpen={this.state.isTourOpen && this.state.auth.loggedIn}
-              closeTour={this.closeTour}
+              isOpen={this.state.auth.openTour}
+              closeTour={authActions.closeTour}
             />
             <Content style={{ background: '#fff' }}>
             <Row type="flex" justify="center" style={{padding: 0 }}>

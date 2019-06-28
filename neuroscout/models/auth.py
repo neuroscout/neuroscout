@@ -26,6 +26,8 @@ class User(db.Model, UserMixin):
 
     analyses = db.relationship('Analysis', backref='user')
 
+    first_login = db.Column(db.Boolean(), default=True)
+
     def __repr__(self):
         return '<models.User[email=%s]>' % self.email
 
