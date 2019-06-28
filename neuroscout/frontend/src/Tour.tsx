@@ -8,7 +8,7 @@ const Tour = withRouter(
   ({ isOpen, closeTour, location: { pathname }, history }) => {
     const steps = [
       {
-        content: 'Welcome to Neuroscout. Lets get oriented the interface.'
+        content: 'Welcome to Neuroscout. Let\'s go on a tour! You can close this at any time.'
       },
       {
         selector: '.browseMain',
@@ -16,7 +16,7 @@ const Tour = withRouter(
       },
       {
         selector: '.newAnalysis',
-        content: 'Or launch the builder to create a new analysis'
+        content: 'Or launch the builder to create a new analysis. Let\'s try it.'
       },
       ...(pathname === '/'
       ? [
@@ -28,11 +28,12 @@ const Tour = withRouter(
       ? [
           {
             selector: '.builderTabs',
-            content: 'Welcome to the builder. Here you can create an analysis from start to finish. '
+            content: 'Welcome to the builder. Here you can create new fMRI model from start to finish. '
           },
           {
             selector: '.selectDataset',
-            content: 'First, get started by selecting from one or curated set of naturalistic fMRI datasets'
+            content: 'Get started by naming your analysis and selecting from the\
+             curated set of naturalistic fMRI datasets.'
           }
         ]
         : [])

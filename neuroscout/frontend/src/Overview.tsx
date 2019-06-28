@@ -260,11 +260,11 @@ export class OverviewTab extends React.Component<OverviewTabProps, OverviewTabSt
     return (
       <div className="builderCol">
         <Form layout="vertical">
-          <FormItem label="Name" required={true}>
+          <FormItem label="Analysis name" required={true}>
             <Row type="flex" justify="space-between">
               <Col xs={24}>
                 <Input
-                  placeholder="Name your analysis"
+                  placeholder="You can change this later"
                   value={analysis.name}
                   onChange={this.updateAnalysisFromEvent('name')}
                   required={true}
@@ -275,21 +275,22 @@ export class OverviewTab extends React.Component<OverviewTabProps, OverviewTabSt
           </FormItem>
           <FormItem label="Description">
             <Input.TextArea
-              placeholder="Description of your analysis"
               value={analysis.description}
-              autosize={{ minRows: 2, maxRows: 10 }}
+              autosize={{ minRows: 1, maxRows: 10 }}
               onChange={this.updateAnalysisFromEvent('description')}
             />
           </FormItem>
-          <FormItem label="Predictions">
-            <Input.TextArea
-              placeholder="Enter your preditions about what you expect the results to look like"
-              value={analysis.predictions}
-              autosize={{ minRows: 2, maxRows: 10 }}
-              onChange={this.updateAnalysisFromEvent('predictions')}
-            />
-          </FormItem>
-          <p>Select dataset</p>
+          <FormItem
+            label={
+              <span>
+                Dataset&nbsp;&nbsp;
+                <Tooltip title="Choose from a curated set of openly available, naturalistic datasets.">
+                  <Icon type="info-circle" />
+                </Tooltip>
+              </span>
+            }
+            required={true}
+          >
           <Table
             className="selectDataset"
             columns={datasetColumns}
@@ -331,7 +332,7 @@ export class OverviewTab extends React.Component<OverviewTabProps, OverviewTabSt
               </Panel>
             </Collapse>
           </div>}
-          <br />
+          </FormItem>
         </Form>
       </div>
     );
