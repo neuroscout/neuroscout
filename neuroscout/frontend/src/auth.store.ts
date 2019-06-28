@@ -162,8 +162,14 @@ export class AuthStore extends Reflux.Store {
   };
 
   closeTour = () => {
-    this.setState({
+    this.update({
       openTour: false
+    });
+  };
+
+  launchTour = () => {
+    this.update({
+      openTour: true
     });
   };
 

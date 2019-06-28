@@ -34,6 +34,9 @@ const Tour = withRouter(
             selector: '.selectDataset',
             content: 'Get started by naming your analysis and selecting from the\
              curated set of naturalistic fMRI datasets.'
+          },
+          {
+            action: () => closeTour()
           }
         ]
         : [])

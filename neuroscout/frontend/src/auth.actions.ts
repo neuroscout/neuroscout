@@ -7,6 +7,7 @@ var authActions = Reflux.createActions({
   'login': {},
   'logout': {},
   'closeTour': {},
+  'launchTour': {},
   'signup': {},
   'confirmLogout': {},
   'resetPassword': {},
