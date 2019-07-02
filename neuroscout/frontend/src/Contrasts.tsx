@@ -43,7 +43,7 @@ const ContrastDisplay = (props: ContrastDisplayProps) => {
         </Button>
       </div>
       <div>
-        <b>{`${index + 1}: ${contrast.Name}`} </b>{`${contrast.ContrastType} test`}<br/>
+        <b>{`${contrast.Name}`} </b>{`${contrast.ContrastType} test`}<br/>
         {/*contrast.ConditionList && contrast.ConditionList.map((predictor, i) => {
           return(predictor + ': ' + contrast.Weights[i] + ' ');
         })*/}
@@ -212,7 +212,7 @@ export class ContrastsTab extends React.Component<ContrastsTabProps, ContrastsTa
                       <List.Item className={this.getStyle(index)}>
                         <Draggable key={index} draggableId={'' + index} index={index}>
                           {(providedDraggable: DraggableProvided, snapshotDraggable: DraggableStateSnapshot) => (
-                              <div 
+                              <div
                                 style={{'width': '100%'}}
                                 ref={providedDraggable.innerRef}
                                 {...providedDraggable.dragHandleProps}

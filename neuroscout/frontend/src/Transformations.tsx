@@ -114,7 +114,7 @@ const XformDisplay = (props: XformDisplayProps) => {
         </Button>
       </div>
       <div>
-        <b>{`${index + 1}: ${xform.Name}`} </b><br/>
+        <b>{`${xform.Name}`} </b><br/>
         {`Inputs: ${input!.join(', ')}`}
       </div>
     </div>
