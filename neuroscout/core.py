@@ -7,11 +7,9 @@ from flask_jwt import JWT
 from flask_security import Security
 from flask_security.confirmable import confirm_email_token_status, confirm_user
 from flask_cors import CORS
-from apispec import APISpec
-from flask_apispec.extension import FlaskApiSpec
 
-from .basic import create_app, file_plugin
-from .models import db
+from .basic import create_app
+from .models import db, user_datastore
 
 app = create_app()
 mail = Mail(app)
@@ -19,31 +17,20 @@ cache = Cache(
     config={'CACHE_TYPE': 'filesystem', 'CACHE_DIR': app.config['CACHE_DIR']})
 cache.init_app(app)
 # Enable CORS
-cors = CORS(app,
-            resources={r"/api/*": {"origins": "*"},
-                       r"/swagger/": {"origins": "*"}})
+cors = CORS(
+    app,
+    resources={r"/api/*": {"origins": "*"}, r"/swagger/": {"origins": "*"}})
+
+# These imports require the above
+from .auth import authenticate, load_user
+from .utils.factory import route_factory
+from .api_spec import docs
 
 # Setup Flask-Security and JWT
-from .auth import authenticate, load_user, add_auth_to_swagger
-from .models import *
-
 security = Security(app, user_datastore)
 jwt = JWT(app, authenticate, load_user)
 
-
-# Setup API and Swagger
-from .utils.core import route_factory
-spec = APISpec(
-    title='neuroscout',
-    version='v1',
-    plugins=[file_plugin],
-    openapi_version='2.0'
-)
-app.config.update({
-    'APISPEC_SPEC': spec})
-add_auth_to_swagger(spec)
-docs = FlaskApiSpec(app)
-
+# Set up API routes
 route_factory(
     app, docs,
     [
