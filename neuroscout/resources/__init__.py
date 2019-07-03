@@ -8,7 +8,7 @@ from .analysis import (AnalysisResource, AnalysisRootResource,
                        BibliographyResource)
 from .dataset import DatasetResource, DatasetListResource
 from .predictor import (PredictorListResource, PredictorResource,
-                        PredictorEventListResource)
+                        PredictorEventListResource, PredictorCreateResource)
 from .run import RunResource, RunListResource
 from .user import (UserRootResource, UserTriggerResetResource,
                    UserResetSubmitResource, UserResendConfirm)
@@ -31,6 +31,7 @@ __all__ = [
     'PredictorResource',
     'PredictorListResource',
     'PredictorEventListResource',
+    'PredictorCreateResource',
     'RunResource',
     'RunListResource',
     'UserRootResource',

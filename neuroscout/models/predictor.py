@@ -1,4 +1,5 @@
 from ..database import db
+import datetime
 
 
 class Predictor(db.Model):
@@ -53,3 +54,27 @@ class PredictorRun(db.Model):
     run_id = db.Column(db.Integer, db.ForeignKey('run.id'), primary_key=True)
     predictor_id = db.Column(db.Integer, db.ForeignKey('predictor.id'),
                              primary_key=True)
+
+
+# Association table between analysis and predictor.
+collection_predictor = db.Table(
+    'analysis_predictor',
+    db.Column('pc_id', db.Integer(), db.ForeignKey('predictor_collection.id')),
+    db.Column('predictor_id', db.Integer(), db.ForeignKey('predictor.id')))
+
+
+class PredictorCollection(db.Model):
+    """ Predictor Collection Upload """
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    predictors = db.relationship('Predictor', secondary=collection_predictor,
+                                 backref='analysis')
+
+    uploaded_at = db.Column(db.DateTime, default=datetime.datetime.utcnow)
+    collection_name = db.Column(db.Text, nullable=False)
+
+    task_id = db.Column(db.Text)
+    traceback = db.Column(db.Text)
+    status = db.Column(db.Text, default='PENDING')
+    __table_args__ = (
+        db.CheckConstraint(status.in_(['OK', 'FAILED', 'PENDING'])), )
