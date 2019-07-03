@@ -73,3 +73,9 @@ class PredictorEventListResource(MethodResource):
             query = query.filter(
                 getattr(PredictorEvent, param).in_(kwargs[param]))
         return dump_pe(query)
+
+
+class PredictorCreateResource(MethodResource):
+    @doc(tags=['predictors'], summary='Create a new predictor')
+    def post(self, **kwargs):
+        return {}
