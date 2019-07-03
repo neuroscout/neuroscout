@@ -1,40 +1,38 @@
 # -*- coding: utf-8 -*-
 """ Core Neuroscout App """
 from flask import send_file, render_template, url_for
-from .basic import create_app
-from .models import db
-
-app = create_app()
-
 from flask_mail import Mail
-mail = Mail(app)
-
 from flask_caching import Cache
-cache = Cache(config={'CACHE_TYPE': 'filesystem', 'CACHE_DIR': app.config['CACHE_DIR']})
-cache.init_app(app)
-
 from flask_jwt import JWT
 from flask_security import Security
 from flask_security.confirmable import confirm_email_token_status, confirm_user
+from flask_cors import CORS
+from apispec import APISpec
+from flask_apispec.extension import FlaskApiSpec
+
+from .basic import create_app, file_plugin
+from .models import db
+
+app = create_app()
+mail = Mail(app)
+cache = Cache(
+    config={'CACHE_TYPE': 'filesystem', 'CACHE_DIR': app.config['CACHE_DIR']})
+cache.init_app(app)
+# Enable CORS
+cors = CORS(app,
+            resources={r"/api/*": {"origins": "*"},
+                       r"/swagger/": {"origins": "*"}})
+
+# Setup Flask-Security and JWT
 from .auth import authenticate, load_user, add_auth_to_swagger
 from .models import *
 
-# Setup Flask-Security and JWT
 security = Security(app, user_datastore)
 jwt = JWT(app, authenticate, load_user)
 
-# Enable CORS
-from flask_cors import CORS
-cors = CORS(app, resources={r"/api/*": {"origins": "*"},
-                            r"/swagger/": {"origins": "*"}})
 
-# Setup API
-from apispec import APISpec
-from apispec.ext.marshmallow import MarshmallowPlugin
-from flask_apispec.extension import FlaskApiSpec
+# Setup API and Swagger
 from .utils.core import route_factory
-
-file_plugin = MarshmallowPlugin()
 spec = APISpec(
     title='neuroscout',
     version='v1',
@@ -44,8 +42,8 @@ spec = APISpec(
 app.config.update({
     'APISPEC_SPEC': spec})
 add_auth_to_swagger(spec)
-
 docs = FlaskApiSpec(app)
+
 route_factory(
     app, docs,
     [
@@ -80,8 +78,7 @@ route_factory(
 def confirm(token):
     ''' Serve confirmaton page '''
     expired, invalid, user = confirm_email_token_status(token)
-    name = None
-    confirmed = None
+    name, confirmed = None, None
     if user:
         if not expired and not invalid:
             confirmed = confirm_user(user)
@@ -89,10 +86,9 @@ def confirm(token):
         name = user.name
     else:
         confirmed = None
-    return render_template('confirm.html',
-                           confirmed=confirmed, expired=expired,
-                           invalid=invalid, name=name,
-                           action_url=url_for('index', _external=True))
+    return render_template(
+        'confirm.html', confirmed=confirmed, expired=expired, invalid=invalid,
+        name=name, action_url=url_for('index', _external=True))
 
 
 @app.route('/', defaults={'path': ''})
