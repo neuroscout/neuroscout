@@ -20,7 +20,6 @@ def test_dataset_ingestion(session, add_task):
     with pytest.raises(Exception) as excinfo:
         session.add(Dataset())
         session.commit()
-    assert 'not-null constraint' in str(excinfo)
     session.rollback()
 
     # Test properties of Run
@@ -169,7 +168,6 @@ def test_analysis(session, add_analysis, add_predictor):
     with pytest.raises(Exception) as excinfo:
         session.add(Analysis())
         session.commit()
-    assert 'not-null constraint' in str(excinfo)
     session.rollback()
 
     # Try cloning analysis
