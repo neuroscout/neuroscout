@@ -9,7 +9,10 @@ import pandas as pd
 
 from neuroscout.basic import create_app
 from neuroscout.models import (
-    Analysis, Report, NeurovaultCollection, PredictorCollection)
+    Analysis, Report, NeurovaultCollection, Predictor, PredictorCollection,
+    PredictorEvent, PredictorRun)
+from neuroscout.utils.db import get_or_create
+from neuroscout.database import db
 
 from app import celery_app
 from compile import build_analysis, PathBuilder, impute_confounds
@@ -266,14 +269,15 @@ def upload_collection(filenames, runs, dataset_id, collection_id):
 
     # Check columns are all the same across all files
     cols = [set(e.columns) for e in events]
-    if not len(set.intersection(*cols)) == len(cols[0]):
+    common_cols = set.intersection(*cols)
+    if not len(common_cols) == len(cols[0]):
         update_record(
             collection_object,
             traceback='Event files contain distinct columns'
         )
         raise Exception('Event files contain distinct columns')
 
-    if not all([c in set.intersection(*cols) for c in ['onset', 'duration']]):
+    if not set(['onset', 'duration']).issubset(common_cols):
         update_record(
             collection_object,
             traceback='Not all columns have "onset" and "duration"'
@@ -281,14 +285,31 @@ def upload_collection(filenames, runs, dataset_id, collection_id):
         raise Exception('Not all columns have "onset" and "duration"')
 
     try:
-        # Create predictors (loop?)
-        pass
+        pe_objects = []
+        for col in common_cols - set(['onset', 'duration']):
+            predictor, _ = get_or_create(
+                Predictor, name=col, source='upload', dataset_id=dataset_id)
 
+            for ix, e in enumerate(events):
+                for run_id in runs[ix]:
+                    # Add PredictorRun
+                    pr, _ = get_or_create(
+                        PredictorRun, predictor_id=predictor.id, run_id=run_id)
+                    for _, row in e.iterrows():
+                        pe_objects.append(
+                            PredictorEvent(
+                                predictor_id=predictor.id,
+                                run_id=run_id, onset=row.onset,
+                                duration=row.duration, value=row[col])
+                            )
+
+            db.session.bulk_save_objects(pe_objects)
+            db.session.commit()
     except Exception as e:
         update_record(
             collection_object,
             exception=e,
-            traceback='Error creating predictors'
+            traceback=f'Error creating predictors. Failed processing {col}'
         )
         raise
 
