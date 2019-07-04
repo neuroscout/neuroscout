@@ -42,3 +42,12 @@ class PredictorRunSchema(Schema):
     run_id = fields.Int()
     mean = fields.Number()
     stdev = fields.Number()
+
+
+class PredictorCollectionSchema(Schema):
+    """ Schema for report results """
+    uploaded_at = fields.Time(description='Time images upload began')
+    # predictor_id = fields.Dict(description='NeuroVault collection id')
+    status = fields.Str(description='Upload status')
+    traceback = fields.Str(
+        description='Traceback of error.')

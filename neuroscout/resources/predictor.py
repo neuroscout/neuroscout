@@ -3,7 +3,7 @@ import tempfile
 from flask_apispec import MethodResource, marshal_with, use_kwargs, doc
 from flask_jwt import current_identity
 from ..models import (Predictor, PredictorEvent, PredictorRun,
-                      PredictorCollectionUpload)
+                      PredictorCollection)
 from ..database import db
 from .utils import first_or_404
 from sqlalchemy import func
@@ -124,7 +124,7 @@ class PredictorCreateResource(MethodResource):
 
         # Send to Celery task
         # Create new upload
-        upload = PredictorCollectionUpload(
+        upload = PredictorCollection(
             collection_name=collection_name,
             user_id=current_identity.id,
             )
