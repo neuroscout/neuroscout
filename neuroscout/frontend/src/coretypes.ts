@@ -271,6 +271,7 @@ export interface AuthStoreState {
   openSignup: boolean;
   openReset: boolean;
   openEnterResetToken: boolean;
+  openTour: boolean;
   loginError: string;
   signupError: string;
   resetError: string;

@@ -13,6 +13,7 @@ class UserSchema(Schema):
                              only=['hash_id', 'name', 'status',
                                    'description', 'modified_at', 'dataset_id'],
                              many=True, dump_only=True)
+    first_login = fields.Bool(description='First time logging in.')
 
     @validates('password')
     def validate_pass(self, value):

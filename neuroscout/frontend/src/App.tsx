@@ -24,6 +24,7 @@ import Home from './Home';
 import Private from './Private';
 import Public from './Public';
 import { displayError, jwtFetch, timeout } from './utils';
+import Tour from './Tour';
 
 const FormItem = Form.Item;
 const DOMAINROOT = config.server_url;
@@ -116,7 +117,7 @@ class App extends Reflux.Component<any, {}, AppState> {
       analyses: [],
       publicAnalyses: [],
       auth: authActions.getInitialState(),
-      datasets: []
+      datasets: [],
     };
     this.store = AuthStore;
     this.loadPublicAnalyses();
@@ -483,7 +484,10 @@ class App extends Reflux.Component<any, {}, AppState> {
           {openSignup && signupModal}
           {openEnterResetToken && authActions.enterResetTokenModal()}
           <Layout>
-
+            <Tour
+              isOpen={this.state.auth.openTour}
+              closeTour={authActions.closeTour}
+            />
             <Content style={{ background: '#fff' }}>
             <Row type="flex" justify="center" style={{padding: 0 }}>
               <MainCol>
@@ -492,7 +496,7 @@ class App extends Reflux.Component<any, {}, AppState> {
                   style={{ lineHeight: '64px'}}
                   selectedKeys={[]}
                 >
-                  <Menu.Item key="home">
+                  <Menu.Item className="menuHome" key="home">
                      <Link to="/" style={{fontSize: 20}}>Neuroscout</Link>
                   </Menu.Item>
                   {this.state.auth.loggedIn ?
@@ -544,11 +548,18 @@ class App extends Reflux.Component<any, {}, AppState> {
                         FAQ
                       </Link>
                      </Menu.Item>
+                     <Menu.Item
+                      key="launchTour"
+                      onClick={(e) => {return authActions.launchTour(); }}
+                     >
+                      Launch Tour
+                     </Menu.Item>
                    </Menu.SubMenu>
 
                    <Menu.SubMenu
                     style={{float: 'right'}}
                     key="browse"
+                    className="browseMain"
                     title={<span><Icon type="search"/>Browse</span>}
                    >
 
@@ -560,6 +571,7 @@ class App extends Reflux.Component<any, {}, AppState> {
                        </Menu.Item>
                     }
                      <Menu.Item
+                      className="browsePublic"
                       key="public"
                      >
                      <Link to="/public">
@@ -569,7 +581,7 @@ class App extends Reflux.Component<any, {}, AppState> {
                    </Menu.SubMenu>
 
                    {this.state.auth.loggedIn &&
-                     <Menu.Item key="create" style={{float: 'right'}}>
+                     <Menu.Item className="newAnalysis" key="create" style={{float: 'right'}}>
                        <Link
                          to={{pathname: '/builder'}}
                        >
