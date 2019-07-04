@@ -2,6 +2,7 @@ import webargs as wa
 import tempfile
 from flask_apispec import MethodResource, marshal_with, use_kwargs, doc
 from flask_jwt import current_identity
+from flask import current_app
 from ..models import (Predictor, PredictorEvent, PredictorRun,
                       PredictorCollection)
 from ..database import db
@@ -96,9 +97,8 @@ class PredictorCreateResource(MethodResource):
             description="TSV files with additional Predictors to be created.\
             Required columns: onset, duration, any number of columns\
             with values for new Predictors."),
-        "runs": wa.fields.DelimitedList(
-            wa.fields.Int(), required=True,
-            description="Run ids that correspond to each event_file."),
+        "runs": wa.fields.List(
+            wa.fields.DelimitedList(wa.fields.Int())),
         "dataset_id": wa.fields.DelimitedList(
             wa.fields.Int(), required=True,
             description="Dataset id."
@@ -117,10 +117,10 @@ class PredictorCreateResource(MethodResource):
         filenames = []
         for e in event_files:
             with tempfile.NamedTemporaryFile(
-              suffix='_event.tsv',
-              dir='/file-data/events', delete=False) as f:
+              suffix=f'_{collection_name}.tsv',
+              dir='/file-data/predictor_collections', delete=False) as f:
                 e.save(f)
-                filenames.append(f)
+                filenames.append(f.name)
 
         # Send to Celery task
         # Create new upload

@@ -68,7 +68,7 @@ class PredictorCollection(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     predictors = db.relationship('Predictor', secondary=collection_predictor,
-                                 backref='analysis')
+                                 backref='predictor_collection')
 
     uploaded_at = db.Column(db.DateTime, default=datetime.datetime.utcnow)
     collection_name = db.Column(db.Text, nullable=False)
