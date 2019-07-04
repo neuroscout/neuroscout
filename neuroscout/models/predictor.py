@@ -58,7 +58,7 @@ class PredictorRun(db.Model):
 
 # Association table between analysis and predictor.
 collection_predictor = db.Table(
-    'analysis_predictor',
+    'collection_predictor',
     db.Column('pc_id', db.Integer(), db.ForeignKey('predictor_collection.id')),
     db.Column('predictor_id', db.Integer(), db.ForeignKey('predictor.id')))
 
