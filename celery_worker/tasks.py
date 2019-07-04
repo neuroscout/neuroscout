@@ -5,9 +5,11 @@ from pathlib import Path
 from celery.utils.log import get_task_logger
 from pynv import Client
 from hashids import Hashids
+import pandas as pd
 
 from neuroscout.basic import create_app
-from neuroscout.models import Analysis, Report, NeurovaultCollection
+from neuroscout.models import (
+    Analysis, Report, NeurovaultCollection, PredictorCollection)
 
 from app import celery_app
 from compile import build_analysis, PathBuilder, impute_confounds
@@ -235,5 +237,62 @@ def upload(img_tarball, hash_id, upload_id, timestamp=None, n_subjects=None):
     return update_record(
         upload_object,
         collection_id=collection['id'],
+        status='OK'
+    )
+
+
+@celery_app.task(name='collection.upload')
+def upload_collection(filenames, runs, dataset_id, collection_id):
+    """ Create new Predictors from TSV files
+    Args:
+        filenames list of (str): List of paths to TSVs
+        runs list of (int): List of run ids to apply events to
+        dataset_id (int): Dataset id.
+        collection_id (int): Id of collection object
+    """
+    collection_object = PredictorCollection.query.filter_by(
+        id=collection_id).one()
+
+    # Load into pandas
+    try:
+        events = [pd.read_csv(f, sep='\t') for f in filenames]
+    except Exception as e:
+        update_record(
+            collection_object,
+            exception=e,
+            traceback='Error reading event files'
+        )
+        raise
+
+    # Check columns are all the same across all files
+    cols = [set(e.columns) for e in events]
+    if not len(set.intersection(*cols)) == len(cols[0]):
+        update_record(
+            collection_object,
+            traceback='Event files contain distinct columns'
+        )
+        raise Exception('Event files contain distinct columns')
+
+    if not all([c in set.intersection(*cols) for c in ['onset', 'duration']]):
+        update_record(
+            collection_object,
+            traceback='Not all columns have "onset" and "duration"'
+        )
+        raise Exception('Not all columns have "onset" and "duration"')
+
+    try:
+        # Create predictors (loop?)
+        pass
+
+    except Exception as e:
+        update_record(
+            collection_object,
+            exception=e,
+            traceback='Error creating predictors'
+        )
+        raise
+
+    return update_record(
+        collection_object,
         status='OK'
     )

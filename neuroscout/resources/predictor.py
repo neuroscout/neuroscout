@@ -114,13 +114,13 @@ class PredictorCreateResource(MethodResource):
         if len(set(flat)) != len(flat):
             abort(422, "Runs can only be assigned to a single event file.")
 
-        tmp_filenames = []
+        filenames = []
         for e in event_files:
             with tempfile.NamedTemporaryFile(
               suffix='_event.tsv',
               dir='/file-data/events', delete=False) as f:
                 e.save(f)
-                tmp_filenames.append(f)
+                filenames.append(f)
 
         # Send to Celery task
         # Create new upload
@@ -133,7 +133,7 @@ class PredictorCreateResource(MethodResource):
 
         task = celery_app.send_task(
             'collection.upload',
-            args=[tmp_filenames,
+            args=[filenames,
                   runs,
                   dataset_id,
                   upload.id
