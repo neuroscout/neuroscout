@@ -56,9 +56,9 @@ def upload_collection(filenames, runs, dataset_id, collection_id):
         )
         raise Exception('Not all columns have "onset" and "duration"')
 
-    try:
-        pe_objects = []
-        for col in common_cols - set(['onset', 'duration']):
+    pe_objects = []
+    for col in common_cols - set(['onset', 'duration']):
+        try:
             predictor, _ = get_or_create(
                 Predictor, name=col, source='upload', dataset_id=dataset_id)
 
@@ -77,13 +77,14 @@ def upload_collection(filenames, runs, dataset_id, collection_id):
 
             db.session.bulk_save_objects(pe_objects)
             db.session.commit()
-    except Exception as e:
-        update_record(
-            collection_object,
-            exception=e,
-            traceback=f'Error creating predictors. Failed processing {col}'
-        )
-        raise
+        except Exception as e:
+            db.session.rollback()
+            update_record(
+                collection_object,
+                exception=e,
+                traceback=f'Error creating predictors. Failed processing {col}'
+            )
+            raise
 
     return update_record(
         collection_object,
