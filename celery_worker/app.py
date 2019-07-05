@@ -9,5 +9,5 @@ celery_app = Celery(
 
 
 # Push db context
-flask_app = create_app()
+flask_app, cache = create_app()
 flask_app.app_context().push()

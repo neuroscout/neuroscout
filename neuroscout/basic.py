@@ -1,6 +1,7 @@
 """ Basic Flask app creation """
 from .database import db
 from flask import Flask
+from flask_caching import Cache
 import os
 
 
@@ -20,4 +21,8 @@ def create_app():
     )
 
     db.init_app(app)
-    return app
+    cache = Cache(
+        config={
+            'CACHE_TYPE': 'filesystem', 'CACHE_DIR': app.config['CACHE_DIR']})
+    cache.init_app(app)
+    return app, cache

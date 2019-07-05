@@ -1,5 +1,5 @@
 import pandas as pd
-from app import celery_app
+from app import celery_app, cache
 from pynv import Client
 import tarfile
 import re
@@ -80,6 +80,7 @@ def upload_collection(filenames, runs, dataset_id, collection_id):
             collection_object.predictors.append(predictor)
             db.session.commit()
         except Exception as e:
+            cache.clear()
             db.session.rollback()
             update_record(
                 collection_object,
@@ -88,6 +89,7 @@ def upload_collection(filenames, runs, dataset_id, collection_id):
             )
             raise
 
+    cache.clear()
     return update_record(
         collection_object,
         status='OK'

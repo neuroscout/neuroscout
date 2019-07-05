@@ -2,7 +2,6 @@
 """ Core Neuroscout App """
 from flask import send_file, render_template, url_for
 from flask_mail import Mail
-from flask_caching import Cache
 from flask_jwt import JWT
 from flask_security import Security
 from flask_security.confirmable import confirm_email_token_status, confirm_user
@@ -11,11 +10,8 @@ from flask_cors import CORS
 from .basic import create_app
 from .models import db, user_datastore
 
-app = create_app()
+app, cache = create_app()
 mail = Mail(app)
-cache = Cache(
-    config={'CACHE_TYPE': 'filesystem', 'CACHE_DIR': app.config['CACHE_DIR']})
-cache.init_app(app)
 # Enable CORS
 cors = CORS(
     app,
