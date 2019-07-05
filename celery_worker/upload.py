@@ -59,8 +59,10 @@ def upload_collection(filenames, runs, dataset_id, collection_id):
     pe_objects = []
     for col in common_cols - set(['onset', 'duration']):
         try:
-            predictor, _ = get_or_create(
-                Predictor, name=col, source='upload', dataset_id=dataset_id)
+            predictor = Predictor(
+                name=col, source='upload', dataset_id=dataset_id)
+            db.session.add(predictor)
+            db.session.commit()
 
             for ix, e in enumerate(events):
                 for run_id in runs[ix]:
