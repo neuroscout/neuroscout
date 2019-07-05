@@ -78,3 +78,7 @@ class PredictorCollection(db.Model):
     status = db.Column(db.Text, default='PENDING')
     __table_args__ = (
         db.CheckConstraint(status.in_(['OK', 'FAILED', 'PENDING'])), )
+
+    def __repr__(self):
+        return '<models.PredictorCollection[uploaded_at={} status={}]>'.format(
+            self.uploaded_at, self.status)

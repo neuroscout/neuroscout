@@ -1,16 +1,15 @@
 import webargs as wa
 import tempfile
+from sqlalchemy import func
 from flask_apispec import MethodResource, marshal_with, use_kwargs, doc
 from flask_jwt import current_identity
-from flask import current_app
-from ..models import (Predictor, PredictorEvent, PredictorRun,
-                      PredictorCollection)
+
+from .utils import abort, auth_required, first_or_404
+from ..models import (
+    Predictor, PredictorEvent, PredictorRun, PredictorCollection)
 from ..database import db
-from .utils import first_or_404
-from sqlalchemy import func
 from ..core import cache
 from ..utils.db import dump_pe
-from .utils import abort, auth_required
 from ..schemas.predictor import PredictorSchema, PredictorCollectionSchema
 from ..api_spec import FileField
 from ..worker import celery_app
@@ -82,9 +81,9 @@ class PredictorEventListResource(MethodResource):
         return dump_pe(query)
 
 
+@doc(tags=['predictors'])
 class PredictorCreateResource(MethodResource):
     @doc(summary='Create a custom Predictor using uploaded annotations.',
-         tags=['predictors'],
          consumes=['multipart/form-data', 'application/x-www-form-urlencoded'])
     @marshal_with(PredictorCollectionSchema)
     @use_kwargs({
@@ -99,10 +98,7 @@ class PredictorCreateResource(MethodResource):
             with values for new Predictors."),
         "runs": wa.fields.List(
             wa.fields.DelimitedList(wa.fields.Int())),
-        "dataset_id": wa.fields.DelimitedList(
-            wa.fields.Int(), required=True,
-            description="Dataset id."
-        )
+        "dataset_id": wa.fields.Int(required=True, description="Dataset id.")
         }, locations=["files", "form"])
     @auth_required
     def post(self, collection_name, event_files, runs, dataset_id):
@@ -142,3 +138,11 @@ class PredictorCreateResource(MethodResource):
         upload.task_id = task.id
         db.session.commit()
         return upload
+
+    @doc(summary='Get predictor collection by id.')
+    @use_kwargs(
+        {'id': wa.fields.Int(description="Predictor Collection id.")},
+        locations=['query'])
+    @marshal_with(PredictorCollectionSchema)
+    def get(self, id):
+        return first_or_404(PredictorCollection.query.filter_by(id=id))

@@ -9,10 +9,15 @@ class UserSchema(Schema):
     password = fields.Str(load_only=True,
                           description='Password. Minimum 6 characters.')
     picture = fields.Str(allow_none=True)
-    analyses = fields.Nested('AnalysisSchema',
-                             only=['hash_id', 'name', 'status',
-                                   'description', 'modified_at', 'dataset_id'],
-                             many=True, dump_only=True)
+    analyses = fields.Nested(
+        'AnalysisSchema',  many=True, dump_only=True,
+        only=['hash_id', 'name', 'status', 'description',
+              'modified_at', 'dataset_id']
+        )
+    predictor_collections = fields.Nested(
+        'PredictorCollectionSchema', only=['id', 'collection_name'],
+        description='Predictor collections contributed by this user.',
+        many=True, dump_only=True)
     first_login = fields.Bool(description='First time logging in.')
 
     @validates('password')
