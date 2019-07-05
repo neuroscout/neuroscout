@@ -68,14 +68,16 @@ def upload_collection(filenames, runs, dataset_id, collection_id):
                     pr, _ = get_or_create(
                         PredictorRun, predictor_id=predictor.id, run_id=run_id)
                     for _, row in e.iterrows():
+                        row = row.to_dict()
                         pe_objects.append(
                             PredictorEvent(
                                 predictor_id=predictor.id,
-                                run_id=run_id, onset=row.onset,
-                                duration=row.duration, value=row[col])
+                                run_id=run_id, onset=row['onset'],
+                                duration=row['duration'], value=row[col])
                             )
 
             db.session.bulk_save_objects(pe_objects)
+            collection_object.predictors.append(predictor)
             db.session.commit()
         except Exception as e:
             db.session.rollback()
