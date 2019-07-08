@@ -184,6 +184,7 @@ export interface Store {
   contrastErrors: string[];
   fillAnalysis: boolean;
   analysis404: boolean;
+  doTooltip: boolean;
 }
 
 export interface ApiRun {

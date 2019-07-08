@@ -124,7 +124,8 @@ let initializeStore = (): Store => ({
   xformErrors: [],
   contrastErrors: [],
   fillAnalysis: false,
-  analysis404: false
+  analysis404: false,
+  doTooltip: false,
 });
 
 // Get list of tasks from a given dataset
@@ -220,6 +221,7 @@ type BuilderProps = {
   id?: string;
   updatedAnalysis: () => void;
   userOwns?: boolean;
+  doTour?: boolean;
   datasets: Dataset[];
 };
 
@@ -1015,6 +1017,16 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
       this.setState({loadInitialPredictors: false});
     }
   }
+//
+  componentDidMount() {
+    if (this.props.doTour) {
+      this.setState({doTooltip: true});
+    }
+  }
+
+  componentWillUnmount() {
+    this.setState({doTooltip: false});
+  }
 
   render() {
     if (this.state.analysis404) {
@@ -1090,7 +1102,7 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
                   <Tooltip
                    title={'Use the search bar to find and select predictors to add to your analysis.\
                    For example, try searching for "face" or "fmriprep"'}
-                   defaultVisible={true}
+                   defaultVisible={this.state.doTooltip}
                   >
                     <Icon type="info-circle" style={{ fontSize: '15px'}}/>
                   </Tooltip></h2>
@@ -1113,7 +1125,7 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
                   <Tooltip
                    title={'Add transformations to sequentially modify your predictors \
                    prior to constructing the final design matrix.'}
-                   defaultVisible={true}
+                   defaultVisible={this.state.doTooltip}
                   >
                     <Icon type="info-circle" style={{ fontSize: '15px'}}/>
                   </Tooltip></h2>
@@ -1136,7 +1148,7 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
                    title={'Select which variables to convolve with the hemodynamic response function. \
                    To convolve all variables that are not fMRIPrep confounds, \
                    click "Select All Non-Confounds"'}
-                   defaultVisible={true}
+                   defaultVisible={this.state.doTooltip}
                   >
                     <Icon type="info-circle" style={{ fontSize: '15px'}}/>
                   </Tooltip></h2>
@@ -1163,7 +1175,7 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
                   <Tooltip
                    title={'Here you can define statistical contrasts to compute from the fitted parameter estimates.\
                    To create identity contrasts [1, 0] for each predictor, use "Generate Automatic Contrasts"'}
-                   defaultVisible={true}
+                   defaultVisible={this.state.doTooltip}
                   >
                     <Icon type="info-circle" style={{ fontSize: '15px'}}/>
                   </Tooltip></h2>

@@ -548,12 +548,6 @@ class App extends Reflux.Component<any, {}, AppState> {
                         FAQ
                       </Link>
                      </Menu.Item>
-                     <Menu.Item
-                      key="launchTour"
-                      onClick={(e) => {return authActions.launchTour(); }}
-                     >
-                      Launch Tour
-                     </Menu.Item>
                    </Menu.SubMenu>
 
                    <Menu.SubMenu
@@ -614,6 +608,7 @@ class App extends Reflux.Component<any, {}, AppState> {
                       return <AnalysisBuilder
                                 updatedAnalysis={() => this.loadAnalyses()}
                                 key={props.location.key}
+                                doTour={this.state.auth.openTour}
                                 datasets={this.state.datasets}
                       />;
                     }
@@ -628,6 +623,7 @@ class App extends Reflux.Component<any, {}, AppState> {
                       id={props.match.params.id}
                       updatedAnalysis={() => this.loadAnalyses()}
                       userOwns={this.state.analyses.filter((x) => x.id === props.match.params.id).length > 0}
+                      doTooltip={true}
                       datasets={this.state.datasets}
                     />}
                 />
@@ -639,6 +635,7 @@ class App extends Reflux.Component<any, {}, AppState> {
                       id={props.match.params.id}
                       updatedAnalysis={() => this.loadAnalyses()}
                       userOwns={this.state.analyses.filter((x) => x.id === props.match.params.id).length > 0}
+                      doTooltip={true}
                       datasets={this.state.datasets}
                     />
                   }
