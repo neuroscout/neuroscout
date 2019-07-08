@@ -5,10 +5,12 @@ Top-level App component containing AppState. The App component is currently resp
 - Managing user's saved analyses (list display, clone and delete)
 */
 import * as React from 'react';
-import { BrowserRouter as Router, Route, Link, Redirect, Switch } from 'react-router-dom';
+import { Router, Route, Link, Redirect, Switch } from 'react-router-dom';
 import Reflux from 'reflux';
 import { Avatar, Divider, Tabs, Row, Col, Layout, Button, Menu, Modal, Icon, Input, Form, message } from 'antd';
+import ReactGA from 'react-ga';
 import { GoogleLogin } from 'react-google-login';
+import createHistory from 'history/createBrowserHistory';
 
 import NotFound from './404';
 import './App.css';
@@ -31,6 +33,14 @@ const GOOGLECLIENTID = config.google_client_id;
 const { localStorage } = window;
 
 const { Header, Content, Footer, Sider } = Layout;
+
+ReactGA.initialize(config.ga_key);
+
+const history = createHistory();
+history.listen(location => {
+  ReactGA.set({ page: location.pathname });
+  ReactGA.pageview(location.pathname);
+});
 
 type JWTChangeProps = {
   loadAnalyses:  () => any;
@@ -125,6 +135,10 @@ class App extends Reflux.Component<any, {}, AppState> {
         this.setState({ datasets });
       }
     });
+  }
+
+  componentDidMount() {
+    ReactGA.pageview(window.location.pathname);
   }
 
   // Load user's saved analyses from the server
@@ -471,7 +485,7 @@ class App extends Reflux.Component<any, {}, AppState> {
     );
 
     return (
-      <Router>
+      <Router history={history}>
         <div>
           <JWTChange
             loadAnalyses={this.loadAnalyses}
