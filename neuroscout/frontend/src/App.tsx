@@ -548,12 +548,6 @@ class App extends Reflux.Component<any, {}, AppState> {
                         FAQ
                       </Link>
                      </Menu.Item>
-                     <Menu.Item
-                      key="launchTour"
-                      onClick={(e) => {return authActions.launchTour(); }}
-                     >
-                      Launch Tour
-                     </Menu.Item>
                    </Menu.SubMenu>
 
                    <Menu.SubMenu
