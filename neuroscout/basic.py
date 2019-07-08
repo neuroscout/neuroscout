@@ -5,9 +5,12 @@ from flask_caching import Cache
 import os
 
 
-def create_app():
+def create_app(app_settings=None):
     app = Flask(__name__, static_folder='/static')
-    app.config.from_object(os.environ['APP_SETTINGS'])
+    if app_settings is not None:
+        app.config.from_object(app_settings)
+    else:
+        app.config.from_object(os.environ['APP_SETTINGS'])
     app.config.update(
         FEATURE_DATASTORE=str(app.config['FILE_DIR'] / 'feature-tracking.csv'),
         CACHE_DIR=str(app.config['FILE_DIR'] / 'cache'),

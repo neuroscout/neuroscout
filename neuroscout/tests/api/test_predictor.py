@@ -95,3 +95,39 @@ def test_get_predictor_data(auth_client, add_task):
     assert resp.status_code == 200
     pe_list_filt = decode_json(resp)
     assert len(pe_list_filt) == 4
+
+
+def test_predictor_create(auth_client, add_task, get_data_path):
+    events = (get_data_path / 'bids_test' / 'sub-01' / 'func').glob('*.tsv')
+    events = [e.open('rb') for e in events]
+
+    runs = []
+    for i in ['1', '2']:
+        resp = decode_json(
+            auth_client.get(
+                '/api/runs', params={'number': i}))
+        r = ','.join([str(r['id']) for r in resp])
+        runs.append(r)
+
+    dataset_id = decode_json(
+        auth_client.get('/api/datasets'))[0]['id']
+
+    # Test extracted_feature
+    resp = auth_client.post(
+        '/api/predictors/create',
+        data={
+            'collection_name': 'new_one',
+            'dataset_id': dataset_id,
+            'event_files': [events[0], events[1]],
+            'runs': runs
+            },
+        content_type='multipart/form-data',
+        json_dump=False
+        )
+    assert resp.status_code == 200
+    resp = decode_json(resp)
+    assert resp['collection_name'] == 'new_one'
+    assert resp['status'] == 'PENDING'
+
+    # Can't test for anything more because db is not written by Flask here
+    # So Celery can't see the task that is created
