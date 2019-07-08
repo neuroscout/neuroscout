@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { message, Tabs, Button, Collapse, Card, Icon, Spin, Tag } from 'antd';
+import { message, Tabs, Button, Collapse, Card, Tooltip, Icon, Spin, Tag } from 'antd';
 import { config } from './config';
 import vegaEmbed from 'vega-embed';
 
@@ -249,19 +249,32 @@ export class Report extends React.Component<ReportProps, ReportState> {
   render() {
     return (
       <div>
-        <Card title="Design Report" key="plots">
+        <Card
+         title="Design Report"
+         extra={
+           <Tooltip
+            title={'Here you can preview the final design and correlation matrices. \
+            \nClick on the design matrix columns to view the timecourse in detail.'}
+            defaultVisible={true}
+           >
+             <Icon type="info-circle" style={{ fontSize: '15px'}}/>
+           </Tooltip>
+           }
+         key="plots"
+        >
           <Spin spinning={!this.state.reportsLoaded}>
             <Plots plots={this.state.plots} corr_plots={this.state.corr_plots} />
           </Spin>
         </Card>
         <br/>
         {(this.state.reportTraceback || this.state.compileTraceback) &&
+        <div>
         <Card title="Errors" key="errors">
           <Tracebacks
             reportTraceback={this.state.reportTraceback}
             compileTraceback={this.state.compileTraceback}
           />
-        </Card>}
+        </Card><br/></div>}
       </div>
     );
   }

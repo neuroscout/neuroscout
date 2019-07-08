@@ -5,8 +5,6 @@ import { MainCol } from './HelperComponents';
 const Panel = Collapse.Panel;
 
 const faqs = [
-  [`How do I get started?`,
-    `See the Neuroscout tutorial here`],
   [`Is this service free to use?`,
     `Yes! Note, however, that Neuroscout is a web-based engine for fMRI analysis specification; at the moment,
     we don't provide free computing resources for the execution of the resulting analysis bundles.`],
@@ -48,7 +46,7 @@ const faqs = [
     to extract novel feature timecourses. To facility this process, we have developed a Python library for
     multimodal feature extraction called <a href="https://github.com/tyarkoni/pliers"> pliers</a>.
     Pliers allows us to extract a wide-variety of features across modalities using various external content
-    analysis services with ease. For example, we are able to use Google Vision API to encode various 
+    analysis services with ease. For example, we are able to use Google Vision API to encode various
     aspects of the visual elements of movie frames, such as when a face is present. In addition, pliers
     allows us to easily link up various feature extraction services; for example, we can use the IBM Watson
     Speech to Text API to transcribe the speech in a movie into words with precise onsets, and then use a

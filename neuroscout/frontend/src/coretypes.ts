@@ -184,6 +184,7 @@ export interface Store {
   contrastErrors: string[];
   fillAnalysis: boolean;
   analysis404: boolean;
+  doTooltip: boolean;
 }
 
 export interface ApiRun {
@@ -271,6 +272,7 @@ export interface AuthStoreState {
   openSignup: boolean;
   openReset: boolean;
   openEnterResetToken: boolean;
+  openTour: boolean;
   loginError: string;
   signupError: string;
   resetError: string;

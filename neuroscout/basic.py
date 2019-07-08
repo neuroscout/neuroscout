@@ -13,7 +13,8 @@ def create_app():
         STIMULUS_DIR=str(app.config['FILE_DIR'] / 'stimuli'),
         EXTRACTION_DIR=str(app.config['FILE_DIR'] / 'extracted'),
         FEATURE_SCHEMA=str(app.config['CONFIG_PATH'] / 'feature_schema.json'),
-        PREDICTOR_SCHEMA=str(app.config['CONFIG_PATH'] / 'predictor_schema.json'),
+        PREDICTOR_SCHEMA=str(
+            app.config['CONFIG_PATH'] / 'predictor_schema.json'),
         ALL_TRANSFORMERS=str(app.config['CONFIG_PATH'] / 'transformers.json'),
         BIBLIOGRAPHY=str(app.config['CONFIG_PATH'] / 'bibliography.json')
     )

@@ -124,7 +124,8 @@ let initializeStore = (): Store => ({
   xformErrors: [],
   contrastErrors: [],
   fillAnalysis: false,
-  analysis404: false
+  analysis404: false,
+  doTooltip: false,
 });
 
 // Get list of tasks from a given dataset
@@ -220,6 +221,7 @@ type BuilderProps = {
   id?: string;
   updatedAnalysis: () => void;
   userOwns?: boolean;
+  doTour?: boolean;
   datasets: Dataset[];
 };
 
@@ -1015,6 +1017,16 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
       this.setState({loadInitialPredictors: false});
     }
   }
+//
+  componentDidMount() {
+    if (this.props.doTour) {
+      this.setState({doTooltip: true});
+    }
+  }
+
+  componentWillUnmount() {
+    this.setState({doTooltip: false});
+  }
 
   render() {
     if (this.state.analysis404) {
@@ -1086,7 +1098,14 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
                   key="predictors"
                   disabled={(!predictorsActive || !isEditable) && !isFailed}
                 >
-                  <h2>Select Predictors</h2>
+                  <h2>Select Predictors&nbsp;&nbsp;
+                  <Tooltip
+                   title={'Use the search bar to find and select predictors to add to your analysis.\
+                   For example, try searching for "face" or "fmriprep"'}
+                   defaultVisible={this.state.doTooltip}
+                  >
+                    <Icon type="info-circle" style={{ fontSize: '15px'}}/>
+                  </Tooltip></h2>
                   <PredictorSelector
                     availablePredictors={availablePredictors}
                     selectedPredictors={selectedPredictors}
@@ -1102,7 +1121,14 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
                   key="transformations"
                   disabled={(!transformationsActive || !isEditable) && !isFailed}
                 >
-                  <h2>Add Transformations</h2>
+                  <h2>Add Transformations&nbsp;&nbsp;
+                  <Tooltip
+                   title={'Add transformations to sequentially modify your predictors \
+                   prior to constructing the final design matrix.'}
+                   defaultVisible={this.state.doTooltip}
+                  >
+                    <Icon type="info-circle" style={{ fontSize: '15px'}}/>
+                  </Tooltip></h2>
                   <XformsTab
                     predictors={selectedPredictors}
                     xforms={analysis.transformations.filter(x => x.Name !== 'Convolve')}
@@ -1117,7 +1143,15 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
                   <br/>
                 </TabPane>}
                 {isEditable && <TabPane tab="HRF" key="hrf" disabled={(!hrfActive || !isEditable) && !isFailed}>
-                  <h2>HRF Convolution</h2>
+                  <h2>HRF Convolution&nbsp;&nbsp;
+                  <Tooltip
+                   title={'Select which variables to convolve with the hemodynamic response function. \
+                   To convolve all variables that are not fMRIPrep confounds, \
+                   click "Select All Non-Confounds"'}
+                   defaultVisible={this.state.doTooltip}
+                  >
+                    <Icon type="info-circle" style={{ fontSize: '15px'}}/>
+                  </Tooltip></h2>
                   <PredictorSelector
                     availablePredictors={selectedPredictors}
                     selectedPredictors={selectedHRFPredictors}
@@ -1137,7 +1171,14 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
                   key="contrasts"
                   disabled={(!contrastsActive || !isEditable) && !isFailed}
                 >
-                  <h2>Add Contrasts</h2>
+                  <h2>Add Contrasts&nbsp;&nbsp;
+                  <Tooltip
+                   title={'Here you can define statistical contrasts to compute from the fitted parameter estimates.\
+                   To create identity contrasts [1, 0] for each predictor, use "Generate Automatic Contrasts"'}
+                   defaultVisible={this.state.doTooltip}
+                  >
+                    <Icon type="info-circle" style={{ fontSize: '15px'}}/>
+                  </Tooltip></h2>
                   <ContrastsTab
                     analysis={analysis}
                     contrasts={analysis.contrasts}
