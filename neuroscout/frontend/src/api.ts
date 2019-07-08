@@ -1,9 +1,11 @@
 /*
   calls against the python api may be put in here to help centralize which routes are being called.
  */
-import { displayError, jwtFetch } from './utils';
+import { _fetch, displayError, jwtFetch } from './utils';
 import {
   ApiDataset,
+  ApiAnalysis,
+  AppAnalysis,
   Dataset
 } from './coretypes';
 import { config } from './config';
@@ -19,9 +21,19 @@ const normalizeDataset = (d: ApiDataset): Dataset => {
   return { id, name, authors, url, description, tasks, active };
 };
 
+// Convert analyses returned by API to the shape expected by the frontend
+export const ApiToAppAnalysis = (data: ApiAnalysis): AppAnalysis => ({
+  id: data.hash_id!,
+  name: data.name,
+  description: data.description,
+  status: data.status,
+  datasetName: !!data.dataset_id ? '' + data.dataset_id : '',
+  modifiedAt: data.modified_at
+});
+
 export const api = {
   getDatasets:  (active_only = true): Promise<Dataset[]> => {
-    return jwtFetch(domainRoot + `/api/datasets?active_only=${active_only}`)
+    return jwtFetch(`${domainRoot}/api/datasets?active_only=${active_only}`)
     .then(data => {
       const datasets: Dataset[] = data.map(d => normalizeDataset(d));
       return datasets;
@@ -31,8 +43,9 @@ export const api = {
       return [] as Dataset[];
     });
   },
+
   getDataset: (datasetId: (number | string)): Promise<(Dataset | null)> => {
-    return jwtFetch(domainRoot + `/api/datasets/${datasetId}`)
+  return jwtFetch(`${domainRoot}/api/datasets/${datasetId}`)
     .then(data => {
       return normalizeDataset(data);
     })
@@ -41,8 +54,58 @@ export const api = {
       return null;
     });
   },
+
+  // Gets a logged in users own analyses
+  getAnalyses: (): Promise<AppAnalysis[]> => {
+    return jwtFetch(`${domainRoot}/api/user`)
+      .then(data => {
+        return (data.analyses || []).filter(x => !!x.status).map((x) => ApiToAppAnalysis(x));
+      })
+      .catch((error) => {
+        displayError(error);
+        return [] as AppAnalysis[];
+      });
+  },
+
+  getPublicAnalyses: (): Promise<AppAnalysis[]> => {
+    return _fetch(`${domainRoot}/api/analyses`)
+    .then((response) => {
+      return response.filter(x => !!x.status).map(x => ApiToAppAnalysis(x));
+    })
+    .catch((error) => {
+      displayError(error);
+      return [] as AppAnalysis[];
+    });
+  },
+
+  cloneAnalysis: (id: string): Promise<AppAnalysis | null> => {
+    return jwtFetch(`${domainRoot}/api/analyses/${id}/clone`, { method: 'post' })
+      .then((data: ApiAnalysis) => {
+        return ApiToAppAnalysis(data);
+      })
+      .catch((error) => {
+        displayError(error);
+        return null;
+      });
+  },
+
+  deleteAnalysis: (id: string): Promise<boolean> => {
+      return jwtFetch(`${domainRoot}/api/analyses/${id}`, { method: 'delete' })
+      .then((response) => {
+        if (response.statusCode === 200) {
+          return true;
+        } else {
+          return false;
+        }
+      })
+      .catch((error) => {
+        displayError(error);
+        return false;
+      });
+  },
+
   getNVUploads: (analysisId: (string)): Promise<(any | null)> => {
-    return jwtFetch(domainRoot + `/api/analyses/${analysisId}/upload`)
+    return jwtFetch(`${domainRoot}/api/analyses/${analysisId}/upload`)
     .then(data => {
       let uploads = { 
         'last_failed': null as any,

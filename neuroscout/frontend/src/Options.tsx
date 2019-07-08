@@ -46,7 +46,7 @@ export default class OptionsTab extends React.Component<OptionsTabProps, Options
     const { analysis, updateConfig } = this.props;
     const newConfig: AnalysisConfig = { ...analysis.config };
     const newPredictorConfig = { ...newConfig.predictorConfigs };
-    newPredictorConfig[id][key] = value;
+    newPredictorConfig[id][key] = (value as never);
     newConfig.predictorConfigs = newPredictorConfig;
     updateConfig(newConfig);
   };
