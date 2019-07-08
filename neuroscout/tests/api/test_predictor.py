@@ -1,5 +1,7 @@
 from ..request_utils import decode_json
 import pytest
+import os
+
 
 def test_get_predictor(auth_client, extract_features):
     # List of predictors
