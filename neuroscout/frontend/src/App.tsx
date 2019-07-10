@@ -29,6 +29,14 @@ const { Content } = Layout;
 
 ReactGA.initialize(config.ga_key);
 
+ReactGA.initialize(config.ga_key);
+
+const history = createHistory();
+history.listen(location => {
+  ReactGA.set({ page: location.pathname });
+  ReactGA.pageview(location.pathname);
+});
+
 type JWTChangeProps = {
   loadAnalyses:  () => any;
   checkAnalysesStatus: (key: number) => any;
@@ -82,6 +90,10 @@ class App extends Reflux.Component<any, {}, AppState> {
         this.setState({ datasets });
       }
     });
+  }
+
+  componentDidMount() {
+    ReactGA.pageview(window.location.pathname);
   }
 
   // Load user's saved analyses from the server
@@ -172,7 +184,7 @@ class App extends Reflux.Component<any, {}, AppState> {
     const AnalyticIndex = withTracker(Index);
 
     return (
-      <Router>
+      <Router history={history}>
         <div>
           <JWTChange
             loadAnalyses={this.loadAnalyses}
