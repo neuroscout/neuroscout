@@ -71,11 +71,8 @@ class App extends Reflux.Component<any, {}, AppState> {
       publicAnalyses: [],
       auth: authActions.getInitialState(),
       datasets: [],
-<<<<<<< HEAD
       onDelete: this.onDelete,
       cloneAnalysis: this.cloneAnalysis
-=======
->>>>>>> 302b37f4e378b1de3152634e09c6b68d4997d234
     };
     this.store = AuthStore;
     api.getPublicAnalyses().then((publicAnalyses) => {
