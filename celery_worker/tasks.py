@@ -1,13 +1,9 @@
-import tarfile
-import re
-from tempfile import mkdtemp
 from pathlib import Path
 from celery.utils.log import get_task_logger
-from pynv import Client
 from hashids import Hashids
 
-from neuroscout.basic import create_app
-from neuroscout.models import Analysis, Report, NeurovaultCollection
+from neuroscout.models import Analysis, Report
+from app import flask_app
 
 from app import celery_app
 from compile import build_analysis, PathBuilder, impute_confounds
@@ -16,10 +12,6 @@ from utils import update_record, write_jsons, write_tarball, dump_analysis
 
 logger = get_task_logger(__name__)
 FILE_DATA = Path('/file-data/')
-
-# Push db context
-flask_app = create_app()
-flask_app.app_context().push()
 
 
 @celery_app.task(name='workflow.compile')
@@ -181,59 +173,5 @@ def generate_report(hash_id, report_id, run_ids, sampling_rate, scale):
     return update_record(
         report_object,
         result=results,
-        status='OK'
-    )
-
-
-@celery_app.task(name='neurovault.upload')
-def upload(img_tarball, hash_id, upload_id, timestamp=None, n_subjects=None):
-    """ Upload results to NeuroVault
-    Args:
-        img_tarball (str): tarball path containg images
-        hash_id (str): Analysis hash_id
-        upload_id (int): NeurovaultCollection object id
-        timestamp (str): Current server timestamp
-        n_subjects (int): Number of subjects in analysis
-    """
-    upload_object = NeurovaultCollection.query.filter_by(id=upload_id).one()
-    timestamp = "_" + timestamp if timestamp is not None else ''
-    api = Client(access_token=flask_app.config['NEUROVAULT_ACCESS_TOKEN'])
-
-    try:
-        # Untar:
-        tmp_dir = Path(mkdtemp())
-        with tarfile.open(img_tarball, mode="r:gz") as tf:
-            tf.extractall(tmp_dir)
-    except Exception as e:
-        update_record(
-            upload_object,
-            exception=e,
-            traceback='Error decompressing image bundle'
-        )
-        raise
-
-    try:
-        collection = api.create_collection(
-            '{}{}'.format(hash_id, timestamp))
-
-        for img_path in tmp_dir.glob('*stat-t_statmap.nii.gz'):
-            contrast_name = re.findall('contrast-(.*)_', str(img_path))[0]
-            api.add_image(
-                collection['id'], img_path, name=contrast_name,
-                modality="fMRI-BOLD", map_type='T',
-                analysis_level='G', cognitive_paradigm_cogatlas='None',
-                number_of_subjects=n_subjects, is_valid=True)
-    except Exception as e:
-        update_record(
-            upload_object,
-            exception=e,
-            traceback='Error uploading, perhaps a \
-                collection with the same name exists?'
-        )
-        raise
-
-    return update_record(
-        upload_object,
-        collection_id=collection['id'],
         status='OK'
     )
