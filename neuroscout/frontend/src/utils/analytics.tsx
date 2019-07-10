@@ -12,10 +12,8 @@ export const withTracker = (WrappedComponent, options = {})  => {
     GoogleAnalytics.pageview(page);
   };
 
-  // eslint-disable-next-line
   const HOC = class extends React.Component<any, any> {
     componentDidMount() {
-      // eslint-disable-next-line
       const page = this.props.location.pathname + this.props.location.search;
       trackPage(page);
     }

@@ -287,6 +287,7 @@ export interface AuthStoreState {
 }
 
 export interface AppState {
+  loadAnalyses: () => void;
   analyses: AppAnalysis[]; // List of analyses belonging to the user
   publicAnalyses: AppAnalysis[]; // List of public analyses
   auth: AuthStoreState;

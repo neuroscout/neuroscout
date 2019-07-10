@@ -38,8 +38,10 @@ export default class Routes extends React.Component<AppState, {}> {
             // https://reacttraining.com/react-router/web/example/auth-workflow
             if (this.props.auth.loggedIn || this.props.auth.openLogin) {
               return <AnalysisBuilder
+                        updatedAnalysis={() => this.props.loadAnalyses()}
                         key={props.location.key}
                         datasets={this.props.datasets}
+                        doTour={this.props.auth.openTour} 
               />;
             }
             message.warning('Please log in first and try again');
@@ -51,8 +53,10 @@ export default class Routes extends React.Component<AppState, {}> {
           render={props =>
             <AnalysisBuilder
               id={props.match.params.id}
+              updatedAnalysis={() => this.props.loadAnalyses()}
               userOwns={this.props.analyses.filter((x) => x.id === props.match.params.id).length > 0}
               datasets={this.props.datasets}
+              doTooltip={true}
             />}
         />
         <Route
@@ -61,8 +65,10 @@ export default class Routes extends React.Component<AppState, {}> {
           render={props =>
             <AnalysisBuilder
               id={props.match.params.id}
+              updatedAnalysis={() => this.props.loadAnalyses()}
               userOwns={this.props.analyses.filter((x) => x.id === props.match.params.id).length > 0}
               datasets={this.props.datasets}
+              doTooltip={true}
             />
           }
         />

@@ -67,6 +67,11 @@ class App extends Reflux.Component<any, {}, AppState> {
   constructor(props) {
     super(props);
     this.state = {
+      loadAnalyses: () => {
+        api.getAnalyses().then(analyses => {
+          this.setState({ analyses });
+        });
+      },
       analyses: [],
       publicAnalyses: [],
       auth: authActions.getInitialState(),
@@ -88,13 +93,6 @@ class App extends Reflux.Component<any, {}, AppState> {
   componentDidMount() {
     ReactGA.pageview(window.location.pathname);
   }
-
-  // Load user's saved analyses from the server
-  loadAnalyses = () => {
-    api.getAnalyses().then(analyses => {
-      this.setState({ analyses });
-    });
-  };
 
   /* short polling function checking api for inprocess analyses to see if
    * there have been any changes
@@ -174,25 +172,32 @@ class App extends Reflux.Component<any, {}, AppState> {
       );
     }
 
-    const AnalyticIndex = withTracker(Index);
+    const AnalyticIndex = Index;
+    /*
+          const AnalyticIndex = withTracker(Index);
+          <Tour
+            isOpen={this.state.auth.openTour}
+            closeTour={authActions.closeTour}
+          />
+    */
 
     return (
       <Router>
         <div>
           <JWTChange
-            loadAnalyses={this.loadAnalyses}
+            loadAnalyses={this.state.loadAnalyses}
             checkAnalysesStatus={this.checkAnalysesStatus}
             key={this.state.auth.jwt}
           />
           {this.state.auth.openLogin && <LoginModal {...this.state.auth} />}
           {this.state.auth.openReset && <ResetPasswordModal {...this.state.auth} />}
           {this.state.auth.openSignup && <SignupModal {...this.state.auth} />}
-          <Tour
-            isOpen={this.state.auth.openTour}
-            closeTour={authActions.closeTour}
-          />
           <Navbar {...this.state.auth} />
-          <Route render={(routeProps) => <AnalyticIndex {...{...routeProps, ...this.state}} />}/>
+          <Route 
+            render={(routeProps) => 
+              <AnalyticIndex {...{...routeProps, ...this.state}} />
+            }
+          />
         </div>
       </Router>
     );
