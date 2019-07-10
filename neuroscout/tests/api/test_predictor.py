@@ -1,6 +1,4 @@
 from ..request_utils import decode_json
-import pytest
-import os
 
 
 def test_get_predictor(auth_client, extract_features):
@@ -99,9 +97,8 @@ def test_get_predictor_data(auth_client, add_task):
     assert len(pe_list_filt) == 4
 
 
-@pytest.mark.skipif('CELERY_BROKER_URL' not in os.environ,
-                    reason="requires redis")
 def test_predictor_create(auth_client, add_task, get_data_path):
+    assert 0
     events = (get_data_path / 'bids_test' / 'sub-01' / 'func').glob('*.tsv')
     events = [e.open('rb') for e in events]
 

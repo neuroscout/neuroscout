@@ -1,7 +1,5 @@
 from ..request_utils import decode_json
 from ...models import Analysis, Run
-import pytest
-import os
 import time
 
 
@@ -362,11 +360,10 @@ def test_autofill(auth_client, add_analysis, add_task, session):
     assert len(decode_json(resp)['model']['Steps'][0]["Contrasts"]) == 0
 
 
-@pytest.mark.skipif('CELERY_BROKER_URL' not in os.environ,
-                    reason="requires redis")
 def test_reports(auth_client, add_analysis):
     analysis = Analysis.query.filter_by(id=add_analysis).first()
-    # Test compiling
+    assert 0
+    # Test report
     resp = auth_client.post('/api/analyses/{}/report'.format(analysis.hash_id))
     assert resp.status_code == 200
 
@@ -395,8 +392,6 @@ def test_reports(auth_client, add_analysis):
     assert len(result['design_matrix']) == 4
 
 
-@pytest.mark.skipif('CELERY_BROKER_URL' not in os.environ,
-                    reason="requires redis")
 def test_compile(auth_client, add_analysis, add_analysis_fail):
     analysis = Analysis.query.filter_by(id=add_analysis).first()
     analysis_bad = Analysis.query.filter_by(id=add_analysis_fail).first()
