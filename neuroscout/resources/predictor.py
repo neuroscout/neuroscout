@@ -82,7 +82,7 @@ class PredictorEventListResource(MethodResource):
 
 
 @doc(tags=['predictors'])
-class PredictorCreateResource(MethodResource):
+class PredictorCollectionResource(MethodResource):
     @doc(summary='Create a custom Predictor using uploaded annotations.',
          consumes=['multipart/form-data', 'application/x-www-form-urlencoded'])
     @marshal_with(PredictorCollectionSchema)

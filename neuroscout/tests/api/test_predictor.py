@@ -118,7 +118,7 @@ def test_predictor_create(auth_client, add_task, get_data_path):
 
     # Test extracted_feature
     resp = auth_client.post(
-        '/api/predictors/create',
+        '/api/predictors/collection',
         data={
             'collection_name': 'new_one',
             'dataset_id': dataset_id,
