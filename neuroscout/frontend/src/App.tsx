@@ -176,7 +176,7 @@ class App extends Reflux.Component<any, {}, AppState> {
     const AnalyticIndex = withTracker(Index);
 
     return (
-      <Router history={history}>
+      <Router>
         <div>
           <JWTChange
             loadAnalyses={this.loadAnalyses}
