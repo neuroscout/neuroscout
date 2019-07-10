@@ -1,12 +1,18 @@
 import webargs as wa
-from flask_apispec import MethodResource, marshal_with, use_kwargs, doc
-from ..models import Predictor, PredictorEvent, PredictorRun
-from ..database import db
-from .utils import first_or_404
+import tempfile
 from sqlalchemy import func
+from flask_apispec import MethodResource, marshal_with, use_kwargs, doc
+from flask_jwt import current_identity
+
+from .utils import abort, auth_required, first_or_404
+from ..models import (
+    Predictor, PredictorEvent, PredictorRun, PredictorCollection)
+from ..database import db
 from ..core import cache
 from ..utils.db import dump_pe
-from ..schemas.predictor import PredictorSchema
+from ..schemas.predictor import PredictorSchema, PredictorCollectionSchema
+from ..api_spec import FileField
+from ..worker import celery_app
 
 
 class PredictorResource(MethodResource):
@@ -73,3 +79,70 @@ class PredictorEventListResource(MethodResource):
             query = query.filter(
                 getattr(PredictorEvent, param).in_(kwargs[param]))
         return dump_pe(query)
+
+
+@doc(tags=['predictors'])
+class PredictorCollectionResource(MethodResource):
+    @doc(summary='Create a custom Predictor using uploaded annotations.',
+         consumes=['multipart/form-data', 'application/x-www-form-urlencoded'])
+    @marshal_with(PredictorCollectionSchema)
+    @use_kwargs({
+        "collection_name": wa.fields.Str(
+            required=True,
+            description="Name of collection"
+        ),
+        "event_files": wa.fields.List(
+            FileField(), required=True,
+            description="TSV files with additional Predictors to be created.\
+            Required columns: onset, duration, any number of columns\
+            with values for new Predictors."),
+        "runs": wa.fields.List(
+            wa.fields.DelimitedList(wa.fields.Int())),
+        "dataset_id": wa.fields.Int(required=True, description="Dataset id.")
+        }, locations=["files", "form"])
+    @auth_required
+    def post(self, collection_name, event_files, runs, dataset_id):
+        if len(event_files) != len(runs):
+            abort(422, "The length of event_files and runs must be the same.")
+
+        # Assert that list of runs is non overlapping
+        flat = [item for sublist in runs for item in sublist]
+        if len(set(flat)) != len(flat):
+            abort(422, "Runs can only be assigned to a single event file.")
+
+        filenames = []
+        for e in event_files:
+            with tempfile.NamedTemporaryFile(
+              suffix=f'_{collection_name}.tsv',
+              dir='/file-data/predictor_collections', delete=False) as f:
+                e.save(f)
+                filenames.append(f.name)
+
+        # Send to Celery task
+        # Create new upload
+        upload = PredictorCollection(
+            collection_name=collection_name,
+            user_id=current_identity.id,
+            )
+        db.session.add(upload)
+        db.session.commit()
+
+        task = celery_app.send_task(
+            'collection.upload',
+            args=[filenames,
+                  runs,
+                  dataset_id,
+                  upload.id
+                  ])
+
+        upload.task_id = task.id
+        db.session.commit()
+        return upload
+
+    @doc(summary='Get predictor collection by id.')
+    @use_kwargs(
+        {'id': wa.fields.Int(description="Predictor Collection id.")},
+        locations=['query'])
+    @marshal_with(PredictorCollectionSchema)
+    def get(self, id):
+        return first_or_404(PredictorCollection.query.filter_by(id=id))

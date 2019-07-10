@@ -25,6 +25,8 @@ class User(db.Model, UserMixin):
     last_activity_ip = db.Column(db.String(255))
 
     analyses = db.relationship('Analysis', backref='user')
+    predictor_collections = db.relationship('PredictorCollection')
+    first_login = db.Column(db.Boolean(), default=True)
 
     def __repr__(self):
         return '<models.User[email=%s]>' % self.email

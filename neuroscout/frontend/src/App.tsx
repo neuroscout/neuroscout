@@ -21,6 +21,7 @@ import Routes from './Routes';
 import { displayError, jwtFetch, timeout } from './utils';
 import { withTracker } from './utils/analytics';
 import Navbar from './Navbar';
+import Tour from './Tour';
 
 const DOMAINROOT = config.server_url;
 const { localStorage } = window;
@@ -70,8 +71,11 @@ class App extends Reflux.Component<any, {}, AppState> {
       publicAnalyses: [],
       auth: authActions.getInitialState(),
       datasets: [],
+<<<<<<< HEAD
       onDelete: this.onDelete,
       cloneAnalysis: this.cloneAnalysis
+=======
+>>>>>>> 302b37f4e378b1de3152634e09c6b68d4997d234
     };
     this.store = AuthStore;
     api.getPublicAnalyses().then((publicAnalyses) => {
@@ -186,6 +190,10 @@ class App extends Reflux.Component<any, {}, AppState> {
           {this.state.auth.openLogin && <LoginModal {...this.state.auth} />}
           {this.state.auth.openReset && <ResetPasswordModal {...this.state.auth} />}
           {this.state.auth.openSignup && <SignupModal {...this.state.auth} />}
+          <Tour
+            isOpen={this.state.auth.openTour}
+            closeTour={authActions.closeTour}
+          />
           <Navbar {...this.state.auth} />
           <Route render={(routeProps) => <AnalyticIndex {...{...routeProps, ...this.state}} />}/>
         </div>

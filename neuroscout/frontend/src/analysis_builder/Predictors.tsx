@@ -196,7 +196,7 @@ export class PredictorSelector extends React.Component<
               />
             </div>
             <p style={{'float': 'right'}}>
-              {`Showing  ${filteredPredictors.length} out of ${availablePredictors.length} predictors.`}
+              {`Showing  ${filteredPredictors.length} of ${availablePredictors.length} predictors`}
             </p>
           </Col>
           <Col xl={{span: 1}}/>
