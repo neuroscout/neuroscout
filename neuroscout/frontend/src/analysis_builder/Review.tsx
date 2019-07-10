@@ -19,9 +19,8 @@ import {
   BidsModel,
   ImageInput,
   TransformName
-} from './coretypes';
-
-import { displayError, jwtFetch, alphaSort } from './utils';
+} from '../coretypes';
+import { displayError, jwtFetch, alphaSort } from '../utils';
 
 const Panel = Collapse.Panel;
 

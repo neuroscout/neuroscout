@@ -5,12 +5,12 @@ import * as React from 'react';
 import { Col, Collapse, Form, Icon, Input, AutoComplete, Row, Table, Tooltip, Switch, Button } from 'antd';
 import { ColumnProps, TableRowSelection } from 'antd/lib/table';
 
+import { getTasks } from './Builder';
+import { Analysis, Dataset, Run, Task } from '../coretypes';
+
 const FormItem = Form.Item;
 const InputGroup = Input.Group;
 const Panel = Collapse.Panel;
-
-import { getTasks } from './Builder';
-import { Analysis, Dataset, Run, Task } from './coretypes';
 
 interface OverviewTabProps {
   analysis: Analysis;

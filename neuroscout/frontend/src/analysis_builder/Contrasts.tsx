@@ -15,9 +15,10 @@ import {
   DropResult,
   DroppableStateSnapshot, DraggableProvided, DraggableStateSnapshot
 } from 'react-beautiful-dnd';
-import { Analysis, Predictor, Contrast } from './coretypes';
-import { displayError, moveItem, reorder } from './utils';
-import { DisplayErrorsInline, Space } from './HelperComponents';
+
+import { Analysis, Predictor, Contrast } from '../coretypes';
+import { displayError, moveItem, reorder } from '../utils';
+import { DisplayErrorsInline, Space } from '../HelperComponents';
 import { PredictorSelector } from './Predictors';
 import { ContrastEditor, emptyContrast } from './ContrastEditor';
 const Option = Select.Option;

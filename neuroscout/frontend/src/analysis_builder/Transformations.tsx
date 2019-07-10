@@ -28,6 +28,7 @@ import {
   DropResult,
   DroppableStateSnapshot, DraggableProvided, DraggableStateSnapshot
 } from 'react-beautiful-dnd';
+
 import {
   Analysis,
   Predictor,
@@ -35,9 +36,9 @@ import {
   Transformation,
   TransformName,
   XformRules,
-} from './coretypes';
-import { displayError, moveItem, reorder } from './utils';
-import { DisplayErrorsInline, Space } from './HelperComponents';
+} from '../coretypes';
+import { displayError, moveItem, reorder } from '../utils';
+import { DisplayErrorsInline, Space } from '../HelperComponents';
 import { PredictorSelector } from './Predictors';
 import transformDefinitions from './transforms';
 const Option = Select.Option;

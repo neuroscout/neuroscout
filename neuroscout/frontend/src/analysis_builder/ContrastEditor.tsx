@@ -3,9 +3,9 @@
 */
 import * as React from 'react';
 import { Form, Input, InputNumber, Button, Radio, message, Modal } from 'antd';
-import { Analysis, Predictor, Contrast, ContrastTypeEnum } from './coretypes';
+import { Analysis, Predictor, Contrast, ContrastTypeEnum } from '../coretypes';
 import { PredictorSelector } from './Predictors';
-import { DisplayErrorsInline, Space } from './HelperComponents';
+import { DisplayErrorsInline, Space } from '../HelperComponents';
 
 const FormItem = Form.Item;
 const RadioGroup = Radio.Group;

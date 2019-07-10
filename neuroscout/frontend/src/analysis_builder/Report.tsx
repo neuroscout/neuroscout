@@ -1,8 +1,8 @@
 import * as React from 'react';
 import { message, Tabs, Button, Collapse, Card, Icon, Spin, Tag } from 'antd';
-import { config } from './config';
 import vegaEmbed from 'vega-embed';
 
+import { config } from '../config';
 import {
   Store,
   Analysis,
@@ -20,9 +20,8 @@ import {
   BidsModel,
   ImageInput,
   TransformName
-} from './coretypes';
-
-import { displayError, jwtFetch, alphaSort, timeout } from './utils';
+} from '../coretypes';
+import { displayError, jwtFetch, alphaSort, timeout } from '../utils';
 
 const domainRoot = config.server_url;
 

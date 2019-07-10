@@ -1,4 +1,4 @@
-import { Transformation } from './coretypes';
+import { Transformation } from '../coretypes';
 
 // Todo: Add more transformations, from pybids
 // At first, only allow transformations that occur in place

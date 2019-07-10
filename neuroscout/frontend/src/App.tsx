@@ -84,6 +84,10 @@ class App extends Reflux.Component<any, {}, AppState> {
     });
   }
 
+  componentDidMount() {
+    ReactGA.pageview(window.location.pathname);
+  }
+
   // Load user's saved analyses from the server
   loadAnalyses = () => {
     api.getAnalyses().then(analyses => {
@@ -172,7 +176,7 @@ class App extends Reflux.Component<any, {}, AppState> {
     const AnalyticIndex = withTracker(Index);
 
     return (
-      <Router>
+      <Router history={history}>
         <div>
           <JWTChange
             loadAnalyses={this.loadAnalyses}

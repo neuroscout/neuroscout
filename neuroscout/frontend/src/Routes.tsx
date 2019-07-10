@@ -7,7 +7,7 @@ import './css/App.css';
 import { api } from './api';
 import { AuthStore } from './auth.store';
 import { authActions } from './auth.actions';
-import AnalysisBuilder from './Builder';
+import AnalysisBuilder from './analysis_builder/Builder';
 import { config } from './config';
 import { ApiUser, ApiAnalysis, AppAnalysis, AuthStoreState, Dataset, AppState } from './coretypes';
 import FAQ from './FAQ';

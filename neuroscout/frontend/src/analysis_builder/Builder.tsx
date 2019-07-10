@@ -17,7 +17,7 @@ import { ContrastsTab } from './Contrasts';
 import { XformsTab, validateXform } from './Transformations';
 import { Review } from './Review';
 import { Report } from './Report';
-import { Status, Submit, StatusTab } from './Status';
+import { Status, Submit, StatusTab } from '../Status';
 import { BibliographyTab } from './Bibliography';
 import OptionsTab from './Options';
 import {
@@ -39,12 +39,12 @@ import {
   ImageInput,
   TransformName,
   TabName
-} from './coretypes';
-import { displayError, jwtFetch, timeout } from './utils';
-import { MainCol, Space } from './HelperComponents';
-import { config } from './config';
-import { authActions } from './auth.actions';
-import { api } from './api';
+} from '../coretypes';
+import { displayError, jwtFetch, timeout } from '../utils';
+import { MainCol, Space } from '../HelperComponents';
+import { config } from '../config';
+import { authActions } from '../auth.actions';
+import { api } from '../api';
 
 const { TabPane } = Tabs;
 const { Footer, Content } = Layout;

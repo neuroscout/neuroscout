@@ -15,7 +15,7 @@ import {
   Checkbox,
   Select
 } from 'antd';
-import { Analysis, AnalysisConfig, Predictor, PredictorConfig } from './coretypes';
+import { Analysis, AnalysisConfig, Predictor, PredictorConfig } from '../coretypes';
 const FormItem = Form.Item;
 const Panel = Collapse.Panel;
 const Option = Select.Option;

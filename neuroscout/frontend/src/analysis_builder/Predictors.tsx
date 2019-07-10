@@ -6,7 +6,8 @@ filter the table down to predictors whose name or description match the entered 
 import * as React from 'react';
 import { Layout, Table, Input, Button, Row, Col, Tag } from 'antd';
 import { TableRowSelection } from 'antd/lib/table';
-import { Analysis, Predictor } from './coretypes';
+
+import { Analysis, Predictor } from '../coretypes';
 
 /*
 class PredictorTable extends React.Component<TableProps<any>, any> {
