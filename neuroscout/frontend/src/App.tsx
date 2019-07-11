@@ -49,19 +49,6 @@ class JWTChange extends React.Component<JWTChangeProps, {}> {
   render() { return null; }
 }
 
-class Index extends React.Component<AppState, {}> {
-  render() {
-    return (
-      <Layout>
-        <Content style={{ background: '#fff' }}>
-          <br />
-          <Routes {...this.props} />
-        </Content>
-      </Layout>
-    );
-  }
-}
-
 // Top-level App component
 class App extends Reflux.Component<any, {}, AppState> {
   constructor(props) {
@@ -88,10 +75,6 @@ class App extends Reflux.Component<any, {}, AppState> {
         this.setState({ datasets });
       }
     });
-  }
-
-  componentDidMount() {
-    ReactGA.pageview(window.location.pathname);
   }
 
   /* short polling function checking api for inprocess analyses to see if
@@ -163,6 +146,8 @@ class App extends Reflux.Component<any, {}, AppState> {
     });
   };
 
+  AnalyticIndex = withTracker(Routes);
+
   render() {
     if (this.state.auth.loggingOut) {
       return (
@@ -171,15 +156,6 @@ class App extends Reflux.Component<any, {}, AppState> {
         </Router>
       );
     }
-
-    const AnalyticIndex = Index;
-    /*
-          const AnalyticIndex = withTracker(Index);
-          <Tour
-            isOpen={this.state.auth.openTour}
-            closeTour={authActions.closeTour}
-          />
-    */
 
     return (
       <Router>
@@ -192,12 +168,20 @@ class App extends Reflux.Component<any, {}, AppState> {
           {this.state.auth.openLogin && <LoginModal {...this.state.auth} />}
           {this.state.auth.openReset && <ResetPasswordModal {...this.state.auth} />}
           {this.state.auth.openSignup && <SignupModal {...this.state.auth} />}
-          <Navbar {...this.state.auth} />
-          <Route 
-            render={(routeProps) => 
-              <AnalyticIndex {...{...routeProps, ...this.state}} />
-            }
+          <Tour
+            isOpen={this.state.auth.openTour}
+            closeTour={authActions.closeTour}
           />
+          <Layout>
+            <Content style={{ background: '#fff' }}>
+              <Navbar {...this.state.auth} />
+              <Route 
+                render={(routeProps) => 
+                  <this.AnalyticIndex {...{...routeProps, ...this.state}} />
+                }
+              />
+            </Content>
+          </Layout>
         </div>
       </Router>
     );
