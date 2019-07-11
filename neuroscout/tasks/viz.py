@@ -17,9 +17,7 @@ def melt_dm(dm):
     return dm.melt('scan_number', var_name='regressor', value_name='value')
 
 
-def plot_design_matrix(dm_wide, scale=True):
-    if scale:
-        dm_wide = (dm_wide - dm_wide.mean()) / (dm_wide.max() - dm_wide.min())
+def plot_design_matrix(dm_wide):
     dm = melt_dm(dm_wide)
 
     pts = alt.selection_multi(encodings=['x'])

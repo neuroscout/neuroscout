@@ -1,10 +1,9 @@
 """ utils """
 import json
 import tarfile
-from neuroscout.utils.db import put_record, dump_pe
-from neuroscout.models import Analysis, PredictorEvent
-from neuroscout.schemas.analysis import (AnalysisFullSchema,
-                                         AnalysisResourcesSchema)
+from ..utils.db import put_record, dump_pe
+from ..models import Analysis, PredictorEvent
+from ..schemas.analysis import AnalysisFullSchema, AnalysisResourcesSchema
 
 
 def update_record(model, exception=None, **fields):

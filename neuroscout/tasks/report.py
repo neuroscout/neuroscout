@@ -1,21 +1,16 @@
 from pathlib import Path
-from celery.utils.log import get_task_logger
 from hashids import Hashids
 
-from neuroscout.models import Analysis, Report
-from app import flask_app
+from ..models import Analysis, Report
+from .compile import build_analysis, PathBuilder, impute_confounds
+from .viz import plot_design_matrix, plot_corr_matrix, sort_dm
+from .utils import update_record, write_jsons, write_tarball, dump_analysis
 
-from app import celery_app
-from compile import build_analysis, PathBuilder, impute_confounds
-from viz import plot_design_matrix, plot_corr_matrix, sort_dm
-from utils import update_record, write_jsons, write_tarball, dump_analysis
 
-logger = get_task_logger(__name__)
 FILE_DATA = Path('/file-data/')
 
 
-@celery_app.task(name='workflow.compile')
-def compile(hash_id, run_ids=None, build=False):
+def compile(flask_app, hash_id, run_ids=None, build=False):
     """ Compile analysis_id. Validate analysis using pybids and
     writout analysis bundle
     Args:
@@ -83,8 +78,8 @@ def compile(hash_id, run_ids=None, build=False):
     )
 
 
-@celery_app.task(name='workflow.generate_report')
-def generate_report(hash_id, report_id, run_ids, sampling_rate, scale):
+def generate_report(flask_app, hash_id, report_id, run_ids,
+                    sampling_rate, scale):
     """ Generate report for analysis
     Args:
         hash_id (str): analysis hash_id
