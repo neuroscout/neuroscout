@@ -1,4 +1,6 @@
 apispec==1.1.0
+altair
+grabbit
 citeproc-py==0.4.0
 citeproc-py-styles==0.1.1
 celery

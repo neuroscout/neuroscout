@@ -67,7 +67,6 @@ services:
       - ./celery_worker:/celery_worker
     env_file:
       - .env
-      - .worker_env
 
 volumes:
   postgres-data:

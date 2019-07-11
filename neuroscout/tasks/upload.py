@@ -1,11 +1,11 @@
 import pandas as pd
-from app import cache
 from pynv import Client
 import tarfile
 import re
 from tempfile import mkdtemp
 from pathlib import Path
 
+from ..core import cache
 from ..utils.db import get_or_create
 from ..database import db
 from ..models import (
