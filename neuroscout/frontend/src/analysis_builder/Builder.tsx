@@ -17,7 +17,7 @@ import { ContrastsTab } from './Contrasts';
 import { XformsTab, validateXform } from './Transformations';
 import { Review } from './Review';
 import { Report } from './Report';
-import { Status, Submit, StatusTab } from '../Status';
+import { Submit, StatusTab } from './Status';
 import { BibliographyTab } from './Bibliography';
 import OptionsTab from './Options';
 import {

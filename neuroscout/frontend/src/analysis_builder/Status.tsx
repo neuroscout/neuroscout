@@ -1,35 +1,12 @@
 import * as React from 'react';
 import { Alert, Button, Card, Checkbox, Modal, Tag, Icon, Tooltip, Switch } from 'antd';
-import { config } from './config';
-import { displayError, jwtFetch, alphaSort, timeout } from './utils';
-import { ApiAnalysis, Analysis } from './coretypes';
-import { api } from './api';
+import { config } from '../config';
+import { displayError, jwtFetch, alphaSort, timeout } from '../utils';
+import { ApiAnalysis, Analysis } from '../coretypes';
+import { StatusTag } from '../HelperComponents';
+import { api } from '../api';
 
 const domainRoot = config.server_url;
-
-export class Status extends React.Component<{status?: string, analysisId?: string}, {}> {
-  render() {
-    let { analysisId, status } = this.props;
-    if (status === undefined) {
-      status = 'DRAFT';
-    }
-    const color: string = {
-      DRAFT: 'blue',
-      PENDING: 'orange',
-      FAILED: 'red',
-      PASSED: 'green'
-    }[status];
-
-    return(
-      <span>
-        <Tag color={color}>
-          {status === 'DRAFT' ? <Icon type="unlock" /> : <Icon type="lock" />}
-          {' ' + status}
-        </Tag>
-      </span>
-    );
-  }
-}
 
 export class DLLink extends React.Component<{status?: string, analysisId?: string}, {}> {
     render() {
@@ -163,6 +140,7 @@ type statusTabState = {
   compileTraceback: string,
   nvUploads?: any
 };
+
 export class StatusTab extends React.Component<submitProps, statusTabState> {
   constructor(props) {
     super(props);
@@ -223,7 +201,7 @@ export class StatusTab extends React.Component<submitProps, statusTabState> {
           <PubAccess private={this.props.private} updateAnalysis={this.props.updateAnalysis!} />
           <span>{' '}</span>
           </>}
-        <Status status={this.props.status} analysisId={this.props.analysisId} />
+        <StatusTag status={this.props.status} analysisId={this.props.analysisId} />
       </div>
       {(this.props.status === 'PASSED') &&
         <div>

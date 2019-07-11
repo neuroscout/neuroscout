@@ -2,7 +2,6 @@ import * as React from 'react';
 import { Route, Link, Redirect, Switch } from 'react-router-dom';
 import { message } from 'antd';
 
-import NotFound from './404';
 import './css/App.css';
 import AnalysisList from './AnalysisList';
 import { api } from './api';
@@ -12,7 +11,7 @@ import AnalysisBuilder from './analysis_builder/Builder';
 import { config } from './config';
 import { ApiUser, ApiAnalysis, AppAnalysis, AuthStoreState, Dataset, AppState } from './coretypes';
 import FAQ from './FAQ';
-import { MainCol, Space } from './HelperComponents';
+import { MainCol, Space, NotFound } from './HelperComponents';
 import Home from './Home';
 import { displayError, jwtFetch, timeout } from './utils';
 

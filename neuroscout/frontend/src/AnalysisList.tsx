@@ -4,9 +4,8 @@ the home page or on the 'browse public analysis' page
 */
 import * as React from 'react';
 import { Button, Row, Table } from 'antd';
-import { MainCol, Space } from './HelperComponents';
+import { MainCol, Space, StatusTag } from './HelperComponents';
 import { AppAnalysis, Dataset } from './coretypes';
-import { Status } from './Status';
 import { Link } from 'react-router-dom';
 
 export interface AnalysisListProps {
@@ -45,7 +44,7 @@ class AnalysisListTable extends React.Component<AnalysisListProps> {
       {
         title: 'Status',
         dataIndex: 'status',
-        render: (text, record) => <Status status={record.status} />,
+        render: (text, record) => <StatusTag status={record.status} />,
         sorter: (a, b) => a.status.localeCompare(b.status)
       },
       {
