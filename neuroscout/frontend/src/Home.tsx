@@ -9,7 +9,11 @@ import { AppAnalysis } from './coretypes';
 import { Link } from 'react-router-dom';
 import AnalysisList, { AnalysisListProps } from './AnalysisList';
 
-const titleStyle: any = {textAlign: ('center' as React.CSSProperties)};
+const titleStyle: any = {
+  textAlign: ('center' as React.CSSProperties),
+  fontSize: '20px',
+  padding: '0px 0px 0px 0px'
+};
 
 class Home extends React.Component<{}, {}> {
   render() {

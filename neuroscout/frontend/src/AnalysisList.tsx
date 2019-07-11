@@ -3,8 +3,8 @@ Resuable AnalysisList component used for displaying a list of analyses, e.g. on
 the home page or on the 'browse public analysis' page
 */
 import * as React from 'react';
-import { Button, Table } from 'antd';
-import { Space } from './HelperComponents';
+import { Button, Row, Table } from 'antd';
+import { MainCol, Space } from './HelperComponents';
 import { AppAnalysis, Dataset } from './coretypes';
 import { Status } from './Status';
 import { Link } from 'react-router-dom';
@@ -19,9 +19,7 @@ export interface AnalysisListProps {
   datasets: Dataset[];
 }
 
-class AnalysisTable extends Table<AppAnalysis> {}
-
-class AnalysisList extends React.Component<AnalysisListProps> {
+class AnalysisListTable extends React.Component<AnalysisListProps> {
   render() {
     const { analyses, datasets, publicList, cloneAnalysis, onDelete } = this.props;
 
@@ -96,7 +94,7 @@ class AnalysisList extends React.Component<AnalysisListProps> {
     ];
     return (
       <div>
-        <AnalysisTable
+        <Table
           columns={analysisTableColumns}
           rowKey="id"
           size="small"
@@ -111,5 +109,22 @@ class AnalysisList extends React.Component<AnalysisListProps> {
     );
   }
 }
+
+// wrap table in components for use by itself as route
+const AnalysisList = (props: AnalysisListProps) => {
+  return (
+    <div>
+      <Row type="flex" justify="center">
+        <MainCol>
+        <h3>
+          {props.publicList ? 'Public analyses' : 'Your saved analyses'}
+        </h3>
+          <br />
+          <AnalysisListTable {...props} />
+        </MainCol>
+      </Row>
+    </div>
+  );
+};
 
 export default AnalysisList;

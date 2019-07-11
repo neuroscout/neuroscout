@@ -4,6 +4,7 @@ import { message } from 'antd';
 
 import NotFound from './404';
 import './css/App.css';
+import AnalysisList from './AnalysisList';
 import { api } from './api';
 import { AuthStore } from './auth.store';
 import { authActions } from './auth.actions';
@@ -13,8 +14,6 @@ import { ApiUser, ApiAnalysis, AppAnalysis, AuthStoreState, Dataset, AppState } 
 import FAQ from './FAQ';
 import { MainCol, Space } from './HelperComponents';
 import Home from './Home';
-import Private from './Private';
-import Public from './Public';
 import { displayError, jwtFetch, timeout } from './utils';
 
 export default class Routes extends React.Component<AppState, {}> {
@@ -76,21 +75,23 @@ export default class Routes extends React.Component<AppState, {}> {
         exact={true}
         path="/public"
         render={props =>
-          <Public
+          <AnalysisList
             analyses={this.props.publicAnalyses}
             cloneAnalysis={this.props.cloneAnalysis}
             datasets={this.props.datasets}
+            publicList={true}
           />}
       />
       <Route
         exact={true}
         path="/myanalyses"
         render={props =>
-          <Private
+          <AnalysisList
             analyses={this.props.analyses}
             cloneAnalysis={this.props.cloneAnalysis}
             onDelete={this.props.onDelete}
             datasets={this.props.datasets}
+            publicList={false}
           />}
       />
       <Route
