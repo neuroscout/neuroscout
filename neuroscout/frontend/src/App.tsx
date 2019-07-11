@@ -33,6 +33,7 @@ ReactGA.initialize(config.ga_key);
 type JWTChangeProps = {
   loadAnalyses:  () => any;
   checkAnalysesStatus: (key: number) => any;
+  jwt: string;
 };
 
 // This global var lets the dumb polling loops know when to exit.
@@ -41,9 +42,11 @@ let checkCount = 0;
 class JWTChange extends React.Component<JWTChangeProps, {}> {
   constructor(props) {
     super(props);
-    props.loadAnalyses();
-    checkCount += 1;
-    props.checkAnalysesStatus(checkCount);
+    if (this.props.jwt !== '') {
+      props.loadAnalyses();
+      checkCount += 1;
+      props.checkAnalysesStatus(checkCount);
+    }
   }
 
   render() { return null; }
@@ -163,7 +166,7 @@ class App extends Reflux.Component<any, {}, AppState> {
           <JWTChange
             loadAnalyses={this.state.loadAnalyses}
             checkAnalysesStatus={this.checkAnalysesStatus}
-            key={this.state.auth.jwt}
+            jwt={this.state.auth.jwt}
           />
           {this.state.auth.openLogin && <LoginModal {...this.state.auth} />}
           {this.state.auth.openReset && <ResetPasswordModal {...this.state.auth} />}
