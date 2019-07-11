@@ -6,9 +6,9 @@ import re
 from tempfile import mkdtemp
 from pathlib import Path
 
-from neuroscout.utils.db import get_or_create
-from neuroscout.database import db
-from neuroscout.models import (
+from ..utils.db import get_or_create
+from ..database import db
+from ..models import (
     Predictor, PredictorCollection, PredictorEvent, PredictorRun,
     NeurovaultCollection)
 
