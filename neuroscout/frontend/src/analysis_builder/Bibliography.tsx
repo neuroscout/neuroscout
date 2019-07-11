@@ -1,7 +1,7 @@
 import * as React from 'react';
-import { Button, Card, Icon, Dropdown, Skeleton } from 'antd';
+import { Button, Card, Skeleton } from 'antd';
 import { config } from '../config';
-import { displayError, jwtFetch, alphaSort, timeout } from '../utils';
+import { jwtFetch } from '../utils';
 import '../css/Bibliography.css';
 
 const domainRoot = config.server_url;

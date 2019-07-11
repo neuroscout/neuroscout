@@ -2,14 +2,13 @@
  OverviewTab component
 */
 import * as React from 'react';
-import { Col, Collapse, Form, Icon, Input, AutoComplete, Row, Table, Tooltip, Switch, Button } from 'antd';
+import { Col, Collapse, Form, Icon, Input, Row, Table, Tooltip, Button } from 'antd';
 import { ColumnProps, TableRowSelection } from 'antd/lib/table';
 
 import { getTasks } from './Builder';
 import { Analysis, Dataset, Run, Task } from '../coretypes';
 
 const FormItem = Form.Item;
-const InputGroup = Input.Group;
 const Panel = Collapse.Panel;
 
 interface OverviewTabProps {
@@ -167,7 +166,6 @@ export class OverviewTab extends React.Component<OverviewTabProps, OverviewTabSt
       datasets,
       availableRuns,
       selectedTaskId,
-      predictorsActive,
     } = this.props;
 
     let availableTasks = getTasks(datasets, analysis.datasetId);

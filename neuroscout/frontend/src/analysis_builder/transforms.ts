@@ -8,27 +8,6 @@ import { Transformation } from '../coretypes';
 // but need to implement detecting new column names and making them available
 // for subsequent transformations.
 
-const transformationSchema = {
-  title: 'Transformation Schema',
-  type: 'array',
-  items: {
-    type: 'object',
-    properties: {
-      name: { enum: ['scale', 'orthogonalize'] },
-      parameters: {
-        type: 'array',
-        items: {
-          name: { type: 'string' },
-          kind: { type: 'boolean' },
-          value: {
-            anyOf: [{ type: 'boolean' }, { type: 'array' }]
-          }
-        }
-      }
-    }
-  }
-};
-
 const transformDefinitions: Transformation[] = [
   {
     Name: 'Scale',

@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Col, Collapse, Divider, Row } from 'antd';
+import { Collapse, Row } from 'antd';
 import { MainCol } from './HelperComponents';
 
 const Panel = Collapse.Panel;

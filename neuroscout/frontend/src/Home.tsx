@@ -2,12 +2,8 @@
  Home component for the homepage
 */
 import * as React from 'react';
-import { Divider, Icon, Tabs, Row, Col, Button, Card } from 'antd';
-import { displayError } from './utils';
-import { MainCol, Space } from './HelperComponents';
-import { AppAnalysis } from './coretypes';
-import { Link } from 'react-router-dom';
-import AnalysisList, { AnalysisListProps } from './AnalysisList';
+import { Divider, Row, Col, Button, Card } from 'antd';
+import { MainCol } from './HelperComponents';
 
 const titleStyle: any = {
   textAlign: ('center' as React.CSSProperties),

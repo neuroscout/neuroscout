@@ -1,10 +1,10 @@
 import * as React from 'react';
-import { Avatar, Divider, Tabs, Row, Col, Layout, Button, Menu, Modal, Icon, Input, Form, message } from 'antd';
+import { Avatar, Row, Button, Menu, Icon } from 'antd';
 import { Link } from 'react-router-dom';
 
 import { authActions } from './auth.actions';
 import { AuthStoreState } from './coretypes';
-import { MainCol, Space } from './HelperComponents';
+import { MainCol } from './HelperComponents';
 
 class Navbar extends React.Component<AuthStoreState, {}> {
   render() {

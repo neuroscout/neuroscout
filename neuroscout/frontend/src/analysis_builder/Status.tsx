@@ -1,8 +1,8 @@
 import * as React from 'react';
-import { Alert, Button, Card, Checkbox, Modal, Tag, Icon, Tooltip, Switch } from 'antd';
+import { Alert, Button, Card, Checkbox, Modal, Tooltip, Switch } from 'antd';
 import { config } from '../config';
-import { displayError, jwtFetch, alphaSort, timeout } from '../utils';
-import { ApiAnalysis, Analysis } from '../coretypes';
+import { jwtFetch } from '../utils';
+import { Analysis } from '../coretypes';
 import { StatusTag } from '../HelperComponents';
 import { api } from '../api';
 
@@ -87,7 +87,7 @@ export class Submit extends React.Component<submitProps, {tosAgree: boolean, val
   }
 
   render() {
-    let { analysisId, status } = this.props;
+    let { status } = this.props;
     if (status === undefined) {
       status = 'DRAFT';
     }

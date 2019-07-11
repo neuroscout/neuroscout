@@ -11,20 +11,19 @@ import { Layout, Modal, message } from 'antd';
 import ReactGA from 'react-ga';
 
 import './css/App.css';
-import { api, ApiToAppAnalysis } from './api';
+import { api } from './api';
 import { AuthStore } from './auth.store';
 import { authActions } from './auth.actions';
 import { config } from './config';
-import { ApiUser, ApiAnalysis, AppAnalysis, AuthStoreState, Dataset, AppState } from './coretypes';
-import { EnterResetTokenModal, LoginModal, ResetPasswordModal, SignupModal } from './Modals';
+import { ApiAnalysis, AppAnalysis, AppState } from './coretypes';
+import { LoginModal, ResetPasswordModal, SignupModal } from './Modals';
 import Routes from './Routes';
-import { displayError, jwtFetch, timeout } from './utils';
+import { jwtFetch, timeout } from './utils';
 import { withTracker } from './utils/analytics';
 import Navbar from './Navbar';
 import Tour from './Tour';
 
 const DOMAINROOT = config.server_url;
-const { localStorage } = window;
 
 const { Content } = Layout;
 

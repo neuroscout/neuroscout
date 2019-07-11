@@ -7,7 +7,7 @@ import { Redirect } from 'react-router-dom';
 import { createBrowserHistory } from 'history';
 import * as React from 'react';
 import {
-  Tag, Tabs, Row, Col, Layout, Button, Modal, Icon, message, Tooltip, Switch, Form, Input, Collapse, Divider
+  Tag, Tabs, Row, Button, Modal, Icon, message, Tooltip, Form, Input, Collapse
 } from 'antd';
 import { Prompt } from 'react-router-dom';
 import { OverviewTab } from './Overview';
@@ -17,9 +17,8 @@ import { ContrastsTab } from './Contrasts';
 import { XformsTab, validateXform } from './Transformations';
 import { Review } from './Review';
 import { Report } from './Report';
-import { Submit, StatusTab } from './Status';
+import { StatusTab } from './Status';
 import { BibliographyTab } from './Bibliography';
-import OptionsTab from './Options';
 import {
   Store,
   Analysis,
@@ -27,14 +26,11 @@ import {
   Task,
   Run,
   Predictor,
-  ApiDataset,
   ApiAnalysis,
   AnalysisConfig,
-  AnalysisStatus,
   Transformation,
   Contrast,
   Step,
-  StepModel,
   BidsModel,
   ImageInput,
   TransformName,
@@ -44,10 +40,8 @@ import { displayError, jwtFetch, timeout } from '../utils';
 import { MainCol, Space } from '../HelperComponents';
 import { config } from '../config';
 import { authActions } from '../auth.actions';
-import { api } from '../api';
 
 const { TabPane } = Tabs;
-const { Footer, Content } = Layout;
 const Panel = Collapse.Panel;
 const FormItem = Form.Item;
 const tabOrder = ['overview', 'predictors', 'transformations', 'hrf', 'contrasts', 'review', 'submit'];
@@ -262,7 +256,6 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
 
   buildModel = (): BidsModel => {
 
-    let availableRuns = this.state.availableRuns;
     let availableTasks = getTasks(this.props.datasets, this.state.analysis.datasetId);
 
     let task: string[] = availableTasks.filter(
@@ -843,7 +836,6 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
         jwtFetch(`${domainRoot}/api/runs?dataset_id=${updatedAnalysis.datasetId}`)
           .then((data: Run[]) => {
             let availTasks = getTasks(datasets, updatedAnalysis.datasetId);
-            let datasetIdUpdate: any = {};
             updatedAnalysis.runIds = data.map(x => x.id);
             if (updatedAnalysis.model && updatedAnalysis.model.Input) {
               if (analysis.datasetId !== null) {
@@ -1049,12 +1041,6 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
       selectedHRFPredictors,
       unsavedChanges
     } = this.state;
-
-    const statusText: string = {
-      DRAFT: 'This analysis has not yet been generated.',
-      PENDING: 'This analysis has been submitted for generation and is being processed.',
-      COMPILED: 'This analysis has been successfully generated'
-    }[analysis.status];
 
     let isDraft = (analysis.status === 'DRAFT');
     let isFailed = (analysis.status === 'FAILED');

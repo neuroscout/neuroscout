@@ -1,19 +1,14 @@
 import * as React from 'react';
-import { Route, Link, Redirect, Switch } from 'react-router-dom';
+import { Route, Redirect, Switch } from 'react-router-dom';
 import { message } from 'antd';
 
 import './css/App.css';
 import AnalysisList from './AnalysisList';
-import { api } from './api';
-import { AuthStore } from './auth.store';
-import { authActions } from './auth.actions';
 import AnalysisBuilder from './analysis_builder/Builder';
-import { config } from './config';
-import { ApiUser, ApiAnalysis, AppAnalysis, AuthStoreState, Dataset, AppState } from './coretypes';
+import { AppState } from './coretypes';
 import FAQ from './FAQ';
-import { MainCol, Space, NotFound } from './HelperComponents';
+import { NotFound } from './HelperComponents';
 import Home from './Home';
-import { displayError, jwtFetch, timeout } from './utils';
 
 export default class Routes extends React.Component<AppState, {}> {
   render() {

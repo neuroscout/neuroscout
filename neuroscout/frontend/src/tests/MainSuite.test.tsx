@@ -2,11 +2,10 @@
  Main frontend test suite
 */
 import * as React from 'react';
-import * as ReactDOM from 'react-dom';
 import { BrowserRouter }  from 'react-router-dom';
-import { shallow, mount } from 'enzyme';
+import { mount } from 'enzyme';
 import { moveItem } from '../utils';
-import { Analysis, Dataset } from '../coretypes';
+import { Analysis } from '../coretypes';
 import { OverviewTab } from '../analysis_builder/Overview';
 import AnalysisBuilder from '../analysis_builder/Builder';
 import App from '../App';
@@ -46,7 +45,7 @@ it('Overview tab renders without errors', () => {
     contrasts: [],
     autoContrast: true
   };
-  const tab = mount(
+  mount(
     <OverviewTab
       analysis={analysis}
       datasets={[]}
@@ -66,7 +65,7 @@ it('Analysis builder renders without errors', () => {
 });
 
 test('App renders without crashing and homepage looks ok', () => {
-  const div = document.createElement('div');
+  document.createElement('div');
   window.localStorage.removeItem('jwt');
   const wrapper = mount(<App />);
   // Create new analysis button

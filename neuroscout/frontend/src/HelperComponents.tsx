@@ -46,7 +46,7 @@ export class DisplayErrorsInline extends React.Component<{errors: string[]}, {}>
 // Make status strings pretty and color coded
 export class StatusTag extends React.Component<{status?: string, analysisId?: string}, {}> {
   render() {
-    let { analysisId, status } = this.props;
+    let { status } = this.props;
     if (status === undefined) {
       status = 'DRAFT';
     }

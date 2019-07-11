@@ -4,10 +4,10 @@ predictors. The component includes a table of predictors as well as search box t
 filter the table down to predictors whose name or description match the entered search term
 */
 import * as React from 'react';
-import { Layout, Table, Input, Button, Row, Col, Tag } from 'antd';
+import { Table, Input, Row, Col, Tag } from 'antd';
 import { TableRowSelection } from 'antd/lib/table';
 
-import { Analysis, Predictor } from '../coretypes';
+import { Predictor } from '../coretypes';
 
 /*
 class PredictorTable extends React.Component<TableProps<any>, any> {

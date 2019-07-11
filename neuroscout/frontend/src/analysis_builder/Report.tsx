@@ -1,42 +1,14 @@
 import * as React from 'react';
-import { message, Tabs, Button, Collapse, Card, Tooltip, Icon, Spin, Tag } from 'antd';
+import { Tabs, Collapse, Card, Tooltip, Icon, Spin } from 'antd';
 import vegaEmbed from 'vega-embed';
 
 import { config } from '../config';
-import {
-  Store,
-  Analysis,
-  Dataset,
-  Task,
-  Run,
-  Predictor,
-  ApiDataset,
-  ApiAnalysis,
-  AnalysisConfig,
-  Transformation,
-  Contrast,
-  Step,
-  StepModel,
-  BidsModel,
-  ImageInput,
-  TransformName
-} from '../coretypes';
-import { displayError, jwtFetch, alphaSort, timeout } from '../utils';
+import { jwtFetch, timeout } from '../utils';
 
 const domainRoot = config.server_url;
 
 const TabPane = Tabs.TabPane;
 const Panel = Collapse.Panel;
-
-let getSub = (x: string, pre: string) => {
-  let subRe = new RegExp(`${pre}-([a-zA-Z0-9]+)`);
-  let sub = '';
-  let _sub = subRe.exec(x);
-  if (_sub !== null) {
-    sub = _sub[1];
-  }
-  return sub;
-};
 
 class VegaPlot extends React.Component<{spec: string}, {}> {
   vegaContainer;
@@ -67,7 +39,7 @@ class Plots extends React.Component<{plots: any[], corr_plots: any[]}, {}> {
 
     render() {
       let display: any[] = [];
-      let plots = this.props.plots.map((x, i) => {
+      this.props.plots.map((x, i) => {
         let spec = x;
         display.push(
           <TabPane tab="First run" key={'' + i}>
@@ -87,24 +59,6 @@ class Plots extends React.Component<{plots: any[], corr_plots: any[]}, {}> {
           {display}
         </Tabs>
 
-      );
-    }
-}
-
-class Matrices extends React.Component<{matrices: string[]}, {}> {
-    render() {
-      let display: any[] = [];
-      let matrices = this.props.matrices.map((x) => {
-        let url = x;
-        let sub = getSub(x, 'sub');
-        if (x.indexOf('None') === 0) {
-          url = x.slice(4);
-        }
-        url = domainRoot + url;
-        display.push(<li key={url}>{sub}: <a href={url}>{url}</a><br/></li>);
-      });
-      return(
-        <ul>{display}</ul>
       );
     }
 }
