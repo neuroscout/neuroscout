@@ -12,7 +12,7 @@ from ..models import (
     Predictor, PredictorCollection, PredictorEvent, PredictorRun,
     NeurovaultCollection)
 
-from utils import update_record
+from .utils import update_record
 
 
 def upload_collection(flask_app, filenames, runs, dataset_id, collection_id):
@@ -147,4 +147,4 @@ def upload_neurovault(flask_app, img_tarball, hash_id, upload_id,
         upload_object,
         collection_id=collection['id'],
         status='OK'
-    )
+        )
