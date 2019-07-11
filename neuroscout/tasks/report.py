@@ -1,10 +1,18 @@
 from pathlib import Path
 from hashids import Hashids
 
+<<<<<<< HEAD
 from ..models import Analysis, Report
 from .compile import build_analysis, PathBuilder, impute_confounds
 from .viz import plot_design_matrix, plot_corr_matrix, sort_dm
 from .utils import update_record, write_jsons, write_tarball, dump_analysis
+=======
+from neuroscout.models import Analysis, Report
+
+from compile import build_analysis, PathBuilder, impute_confounds
+from viz import plot_design_matrix, plot_corr_matrix, sort_dm
+from utils import update_record, write_jsons, write_tarball, dump_analysis
+>>>>>>> 52e63de... Add tasks to NS
 
 
 FILE_DATA = Path('/file-data/')
