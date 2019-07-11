@@ -9,6 +9,8 @@ import { AppAnalysis } from './coretypes';
 import { Link } from 'react-router-dom';
 import AnalysisList, { AnalysisListProps } from './AnalysisList';
 
+const titleStyle: any = {textAlign: ('center' as React.CSSProperties)};
+
 class Home extends React.Component<{}, {}> {
   render() {
     return (
@@ -34,7 +36,7 @@ class Home extends React.Component<{}, {}> {
 
       <Row type="flex" justify="center" style={{ background: '#fff', padding: 0 }}>
       <Col xxl={{span: 5}} xl={{span: 6}} lg={{span: 7}} xs={{span: 8}} >
-      <Card title="Re-use public data" bordered={false}>
+      <Card title="Re-use public data" headStyle={titleStyle} bordered={false}>
       <img className="splashLogo" src="/static/browse.svg"/>
       <br/>
       Select from openly available naturalistic fMRI datasets,
@@ -45,7 +47,7 @@ class Home extends React.Component<{}, {}> {
       </Col>
 
       <Col xxl={{span: 5}} xl={{span: 6}} lg={{span: 7}} xs={{span: 8}} >
-      <Card title="Design your analysis" bordered={false}>
+      <Card title="Design your analysis" headStyle={titleStyle} bordered={false}>
       <img className="splashLogo" src="/static/design.svg"/>
       <br/>
       Browse hundreds of annotations automatically extracted from
@@ -55,7 +57,7 @@ class Home extends React.Component<{}, {}> {
       </Col>
 
       <Col xxl={{span: 5}} xl={{span: 6}} lg={{span: 7}} xs={{span: 8}} >
-      <Card title="Execute and share" bordered={false}>
+      <Card title="Execute and share" headStyle={titleStyle} bordered={false}>
       <img className="splashLogo" src="/static/share.svg"/>
       <br/>
       Portable BIDS pipelines enable execution with no configuration.
