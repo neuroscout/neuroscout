@@ -178,6 +178,7 @@ class App extends Reflux.Component<any, {}, AppState> {
           <Layout>
             <Content style={{ background: '#fff' }}>
               <Navbar {...this.state.auth} />
+              <br />
               <Route 
                 render={(routeProps) => 
                   <this.AnalyticIndex {...{...routeProps, ...this.state}} />
