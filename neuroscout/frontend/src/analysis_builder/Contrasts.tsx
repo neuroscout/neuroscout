@@ -5,22 +5,20 @@
  - ContrastDisplay: component to display a single contrast
 */
 import * as React from 'react';
-import { Table, Input, Button, Row, Col, Form, Select, Checkbox, Icon, List } from 'antd';
+import { Button, Row, Col, Icon, List } from 'antd';
 import {
   DragDropContext,
   Draggable,
   Droppable,
   DroppableProvided,
-  DraggableLocation,
   DropResult,
   DroppableStateSnapshot, DraggableProvided, DraggableStateSnapshot
 } from 'react-beautiful-dnd';
-import { Analysis, Predictor, Contrast } from './coretypes';
-import { displayError, moveItem, reorder } from './utils';
-import { DisplayErrorsInline, Space } from './HelperComponents';
-import { PredictorSelector } from './Predictors';
+
+import { Analysis, Predictor, Contrast } from '../coretypes';
+import { reorder } from '../utils';
+import { DisplayErrorsInline } from '../HelperComponents';
 import { ContrastEditor, emptyContrast } from './ContrastEditor';
-const Option = Select.Option;
 
 interface ContrastDisplayProps {
   index: number;
@@ -31,7 +29,6 @@ interface ContrastDisplayProps {
 
 const ContrastDisplay = (props: ContrastDisplayProps) => {
   const { contrast, index, onDelete, onEdit } = props;
-  const inputs = contrast.ConditionList || [];
   return (
     <div style={{'width': '100%'}}>
       <div  style={{'float': 'right'}}>
@@ -162,7 +159,6 @@ export class ContrastsTab extends React.Component<ContrastsTabProps, ContrastsTa
   };
 
   getStyle = (index: number): string => {
-    let style: any = {};
     if (index === this.props.activeContrastIndex) {
       return 'selectedXform';
     }
@@ -170,7 +166,7 @@ export class ContrastsTab extends React.Component<ContrastsTabProps, ContrastsTa
   }
 
   render() {
-    const { contrasts, predictors, activeContrastIndex, activeContrast } = this.props;
+    const { predictors, activeContrastIndex, activeContrast } = this.props;
     const { mode } = this.state;
 
     const AddMode = () => (

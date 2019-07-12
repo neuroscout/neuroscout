@@ -1,5 +1,5 @@
 import { message } from 'antd';
-import { authActions } from './auth.actions';
+import { authActions } from '../auth.actions';
 
 // Display error to user as a UI notification and log it to console
 export const displayError = (error: Error) => {
@@ -33,6 +33,39 @@ export const moveItem: MoveItem<any> = (array, index, direction) => {
   return newArray;
 };
 
+export const _fetch = (path: string, options?: object) => {
+  return fetch(path, options).then(response => {
+      // Need to figure this response out. openLogin triggers modal to popup,
+      // but in next cycle. Keep track of request, and after submit on modal
+      // run jwt fetch again?
+      if (response.status === 401) {
+        authActions.update({
+          openLogin: true,
+          loggedIn: false,
+        });
+        throw new Error('Please Login Again');
+      }
+      if (response.status >= 400) {
+        return { statusCode: response.status };
+      } else {
+        return response.json().then(json => {
+          // Always add statusCode to the data object or array returned by response.json()
+          // This is problematic if length is ever an attribute of a non array response from api.
+          let copy: any;
+          if ('length' in json) {
+            // array
+            copy = [...json];
+            (copy as any).statusCode = response.status;
+          } else {
+            // object
+            copy = { ...json, statusCode: response.status };
+          }
+          return copy;
+        });
+      }
+    });
+};
+
 // Wrapper around the standard 'fetch' that takes care of:
 // - Adding jwt to request header
 // - Decoding JSON response and adding the response status code to decoded JSON object
@@ -47,35 +80,7 @@ export const jwtFetch = (path: string, options?: object) => {
     }
   };
 
-  return fetch(path, newOptions).then(response => {
-    // Need to figure this response out. openLogin triggers modal to popup,
-    // but in next cycle. Keep track of request, and after submit on modal
-    // run jwt fetch again?
-    if (response.status === 401) {
-      authActions.update({
-        openLogin: true,
-        loggedIn: false,
-      });
-      throw new Error('Please Login Again');
-    }
-    if (response.status >= 400) {
-      return { statusCode: response.status };
-    } else {
-      return response.json().then(json => {
-        // Always add statusCode to the data object or array returned by response.json()
-        let copy: any;
-        if ('length' in json) {
-          // array
-          copy = [...json];
-          (copy as any).statusCode = response.status;
-        } else {
-          // object
-          copy = { ...json, statusCode: response.status };
-        }
-        return copy;
-      });
-    }
-  });
+  return _fetch(path, newOptions);
 };
 
 export const timeout = (ms: number) => {

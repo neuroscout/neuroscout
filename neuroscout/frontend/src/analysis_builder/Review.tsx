@@ -1,27 +1,15 @@
 
 import * as React from 'react';
-import { message, Button, Collapse, Card, Icon, Table } from 'antd';
+import { Collapse, Card, Table } from 'antd';
 
 import {
-  Store,
-  Analysis,
   Dataset,
-  Task,
-  Run,
   Predictor,
-  ApiDataset,
-  ApiAnalysis,
-  AnalysisConfig,
   Transformation,
   Contrast,
-  Step,
-  StepModel,
-  BidsModel,
-  ImageInput,
-  TransformName
-} from './coretypes';
-
-import { displayError, jwtFetch, alphaSort } from './utils';
+  BidsModel
+} from '../coretypes';
+import { alphaSort } from '../utils';
 
 const Panel = Collapse.Panel;
 
@@ -82,6 +70,8 @@ class ReviewObjects extends React.Component<{input: (Transformation | Contrast)[
   }
 }
 
+// <Panel header="Steps" key="Steps"><ModelSteps Steps={Steps as Step[]}/></Panel>
+/* Only displaying run level step right now so this is unused.
 class ModelStep extends React.Component<{step: Step}, {}> {
   render() {
     let step = this.props.step;
@@ -100,8 +90,6 @@ class ModelStep extends React.Component<{step: Step}, {}> {
   }
 }
 
-// <Panel header="Steps" key="Steps"><ModelSteps Steps={Steps as Step[]}/></Panel>
-// Only displaying run level step right now so this is unused.
 class ModelSteps extends React.Component<{Steps: Step[]}, {}> {
   render() {
       if (this.props.Steps === undefined) {
@@ -119,6 +107,7 @@ class ModelSteps extends React.Component<{Steps: Step[]}, {}> {
       );
   }
 }
+*/
 
 // In the future this will include the new named outputs from transformations.
 class X extends React.Component<{model: BidsModel, available: Predictor[]}, {}> {
@@ -149,7 +138,7 @@ export class Review extends React.Component<ReviewProps, {}> {
   render() {
     let model = this.props.model;
     let dataset = this.props.dataset;
-    let { Name, Description, Steps, Input } = model;
+    let { Name, Description, Steps } = model;
     if (model && model.Name) { Name = model.Name; }
     if (model && model.Steps) { Steps = model.Steps; }
 

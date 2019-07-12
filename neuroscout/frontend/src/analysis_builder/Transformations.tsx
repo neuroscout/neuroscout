@@ -16,28 +16,25 @@ import {
   List,
   Radio,
   Row,
-  Select,
-  Table
+  Select
 } from 'antd';
 import {
   DragDropContext,
   Draggable,
   Droppable,
   DroppableProvided,
-  DraggableLocation,
   DropResult,
   DroppableStateSnapshot, DraggableProvided, DraggableStateSnapshot
 } from 'react-beautiful-dnd';
+
 import {
-  Analysis,
   Predictor,
-  Parameter,
   Transformation,
   TransformName,
   XformRules,
-} from './coretypes';
-import { displayError, moveItem, reorder } from './utils';
-import { DisplayErrorsInline, Space } from './HelperComponents';
+} from '../coretypes';
+import { moveItem, reorder } from '../utils';
+import { DisplayErrorsInline, Space } from '../HelperComponents';
 import { PredictorSelector } from './Predictors';
 import transformDefinitions from './transforms';
 const Option = Select.Option;
@@ -67,31 +64,6 @@ export function validateXform(xform: Transformation) {
   return errors;
 }
 
-function renderParamItems(xform: Transformation) {
-    let reserved = ['input', 'name', 'output'];
-    let paramItems: any = [];
-    Object.keys(xform).map(key => {
-      if (key === 'weights' && xform && xform.Input) {
-        let weightItems: any = [];
-        xform.Input.map((elem, index) => {
-          if (xform && xform.Weights && xform.Weights[index]) {
-            weightItems.push(<li key={index}>{elem + ': ' + xform.Weights[index]}<br/></li>);
-          }
-        });
-        paramItems.push(
-          <li key={key}>{key + ':'}<br/><ul>{weightItems}</ul></li>
-        );
-      } else if (reserved.includes(key)) {
-        return;
-      } else {
-        paramItems.push(
-          <li key={key}>{key + ': ' + xform[key]}</li>
-        );
-      }
-    });
-    return paramItems;
-}
-
 interface XformDisplayProps {
   index: number;
   xform: Transformation;
@@ -102,7 +74,6 @@ interface XformDisplayProps {
 const XformDisplay = (props: XformDisplayProps) => {
   const { xform, index, onDelete, onEdit } = props;
   const input = xform.Input || [];
-  let paramItems = renderParamItems(xform);
   return (
     <div>
       <div  style={{'float': 'right'}}>
@@ -348,7 +319,6 @@ class XformEditor extends React.Component<XformEditorProps, XformEditorState> {
     // tslint:disable-next-line:no-shadowed-variable
     const { xform, xformRules, availableInputs } = this.props;
     const { name, input } = this.state;
-    const editMode = !!xform;
     const allowedXformNames = Object.keys(xformRules);
     const availableParameters = name ? Object.keys(xformRules[name]) : undefined;
     return (
@@ -506,7 +476,6 @@ export class XformsTab extends React.Component<XformsTabProps,  XformsTabState> 
   };
 
   getStyle = (index: number): string => {
-    let style: any = {};
     if (index === this.props.activeXformIndex) {
       return 'selectedXform';
     }
@@ -514,7 +483,7 @@ export class XformsTab extends React.Component<XformsTabProps,  XformsTabState> 
   }
 
   render() {
-    const {xforms,  predictors, activeXformIndex, activeXform } = this.props;
+    const { predictors, activeXformIndex, activeXform } = this.props;
     const {mode} = this.state;
     const AddMode = () => (
       <div style={{'marginTop': '-14px'}}>

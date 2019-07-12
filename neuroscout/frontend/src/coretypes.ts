@@ -285,3 +285,13 @@ export interface AuthStoreState {
   gAuth: any;
   avatar: string;
 }
+
+export interface AppState {
+  loadAnalyses: () => void;
+  analyses: AppAnalysis[]; // List of analyses belonging to the user
+  publicAnalyses: AppAnalysis[]; // List of public analyses
+  auth: AuthStoreState;
+  datasets: Dataset[];
+  cloneAnalysis: (number) => void;
+  onDelete:  (analysis: AppAnalysis) => void;
+}
