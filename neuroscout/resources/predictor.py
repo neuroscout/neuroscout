@@ -3,7 +3,8 @@ import tempfile
 from sqlalchemy import func
 from flask_apispec import MethodResource, marshal_with, use_kwargs, doc
 from flask_jwt import current_identity
-
+from flask import current_app
+from pathlib import Path
 from .utils import abort, auth_required, first_or_404
 from ..models import (
     Predictor, PredictorEvent, PredictorRun, PredictorCollection)
@@ -94,7 +95,9 @@ def prepare_upload(collection_name, event_files, runs, dataset_id):
     for e in event_files:
         with tempfile.NamedTemporaryFile(
           suffix=f'_{collection_name}.tsv',
-          dir='/file-data/predictor_collections', delete=False) as f:
+          dir=str(Path(
+              current_app.config['FILE_DATA']) / 'predictor_collections'),
+          delete=False) as f:
             e.save(f)
             filenames.append(f.name)
 

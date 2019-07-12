@@ -8,9 +8,6 @@ from .viz import plot_design_matrix, plot_corr_matrix, sort_dm
 from .utils import update_record, write_jsons, write_tarball, dump_analysis
 
 
-FILE_DATA = Path('/file-data/')
-
-
 def compile(flask_app, hash_id, run_ids=None, build=False):
     """ Compile analysis_id. Validate analysis using pybids and
     writout analysis bundle
@@ -19,6 +16,8 @@ def compile(flask_app, hash_id, run_ids=None, build=False):
         run_ids (list): Optional list of runs to include
         build (bool): Validate in pybids?
     """
+    FILE_DATA = Path(flask_app.config['FILE_DIR'])
+
     try:
         analysis_object = Analysis.query.filter_by(hash_id=hash_id).one()
     except Exception as e:
@@ -89,6 +88,8 @@ def generate_report(flask_app, hash_id, report_id,
         sampling_rate (float): Rate to re-sample design matrix in Hz
         scale (bool): Scale columns in dm plot
     """
+    FILE_DATA = Path(flask_app.config['FILE_DIR'])
+
     try:
         report_object = Report.query.filter_by(id=report_id).one()
     except Exception as e:
