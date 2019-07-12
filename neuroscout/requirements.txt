@@ -67,6 +67,7 @@ pytest==3.0.7
 python-dateutil==2.6.0
 python-magic==0.4.13
 pytz==2017.2
+-e git+https://github.com/neurolearn/pynv#egg=pynv
 requests==2.21.0
 SQLAlchemy==1.3.0
 tqdm==4.11.2
