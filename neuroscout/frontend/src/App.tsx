@@ -41,7 +41,7 @@ let checkCount = 0;
 class JWTChange extends React.Component<JWTChangeProps, {}> {
   constructor(props) {
     super(props);
-    if (this.props.jwt !== '') {
+    if (this.props.jwt !== '' && this.props.jwt !== null) {
       props.loadAnalyses();
       checkCount += 1;
       props.checkAnalysesStatus(checkCount);
