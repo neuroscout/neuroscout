@@ -32,6 +32,10 @@ export const ApiToAppAnalysis = (data: ApiAnalysis): AppAnalysis => ({
 });
 
 export const api = {
+  getUser: (): Promise<ApiUser> => {
+    return jwtFetch(`${domainRoot}/api/user`)
+  },
+
   getDatasets:  (active_only = true): Promise<Dataset[]> => {
     return jwtFetch(`${domainRoot}/api/datasets?active_only=${active_only}`)
     .then(data => {
@@ -42,6 +46,9 @@ export const api = {
       displayError(error);
       return [] as Dataset[];
     });
+  },
+
+  getPredictorCollection: (id: string): Promise<PredictorCollection[]> => {
   },
 
   getDataset: (datasetId: (number | string)): Promise<(Dataset | null)> => {
@@ -136,4 +143,5 @@ export const api = {
       return null;
     });
   }
+
 };

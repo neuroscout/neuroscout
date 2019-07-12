@@ -246,12 +246,27 @@ export interface ModelContrast {
   ContrastType: 't' | 'F';
 }
 
+export interface PredictorCollection {
+  id: string,
+  collection_name: string
+}
+
+export interface PredictorCollection {
+  id: string,
+  uploaded_at: string,
+  status: string,
+  traceback: string,
+  collection_name: string,
+  predictors: {id: string, name: string}[]
+}
+
 // Shape of User object as consumed/produced by the backend API
 export interface ApiUser {
   email: string;
   name: string;
   picture: string;
   analyses: ApiAnalysis[];
+  predictorCollections?: PredictorCollection[];
 }
 
 // The more condensed version of analysis object as returned by the user route
