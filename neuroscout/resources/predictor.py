@@ -96,7 +96,7 @@ def prepare_upload(collection_name, event_files, runs, dataset_id):
         with tempfile.NamedTemporaryFile(
           suffix=f'_{collection_name}.tsv',
           dir=str(Path(
-              current_app.config['FILE_DATA']) / 'predictor_collections'),
+              current_app.config['FILE_DIR']) / 'predictor_collections'),
           delete=False) as f:
             e.save(f)
             filenames.append(f.name)

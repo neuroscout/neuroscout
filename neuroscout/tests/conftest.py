@@ -1,4 +1,4 @@
-from os import environ
+from os import environ, makedirs
 from pathlib import Path
 import pytest
 from flask_security.utils import encrypt_password
@@ -22,6 +22,8 @@ def app():
     """Session-wide test `Flask` application."""
     if 'APP_SETTINGS' not in environ:
         _app.config.from_object('config.app.TestingConfig')
+
+    makedirs(_app.config['FILE_DIR'], exist_ok=True)
 
     # Establish an application context before running the tests.
     ctx = _app.app_context()
