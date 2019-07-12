@@ -1,23 +1,21 @@
 import pandas as pd
-from app import celery_app, cache
 from pynv import Client
 import tarfile
 import re
 from tempfile import mkdtemp
 from pathlib import Path
 
-from neuroscout.utils.db import get_or_create
-from neuroscout.database import db
-from neuroscout.models import (
+from ..core import cache
+from ..utils.db import get_or_create
+from ..database import db
+from ..models import (
     Predictor, PredictorCollection, PredictorEvent, PredictorRun,
     NeurovaultCollection)
 
-from tasks import flask_app
-from utils import update_record
+from .utils import update_record
 
 
-@celery_app.task(name='collection.upload')
-def upload_collection(filenames, runs, dataset_id, collection_id):
+def upload_collection(flask_app, filenames, runs, dataset_id, collection_id):
     """ Create new Predictors from TSV files
     Args:
         filenames list of (str): List of paths to TSVs
@@ -98,8 +96,8 @@ def upload_collection(filenames, runs, dataset_id, collection_id):
     )
 
 
-@celery_app.task(name='neurovault.upload')
-def upload(img_tarball, hash_id, upload_id, timestamp=None, n_subjects=None):
+def upload_neurovault(flask_app, img_tarball, hash_id, upload_id,
+                      timestamp=None, n_subjects=None):
     """ Upload results to NeuroVault
     Args:
         img_tarball (str): tarball path containg images
@@ -149,4 +147,4 @@ def upload(img_tarball, hash_id, upload_id, timestamp=None, n_subjects=None):
         upload_object,
         collection_id=collection['id'],
         status='OK'
-    )
+        )

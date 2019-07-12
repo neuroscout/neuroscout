@@ -65,7 +65,8 @@ services:
       - ${FILE_DATA}:/file-data
       - ${DATASET_DIR}:/datasets
       - ./celery_worker:/celery_worker
-    env_file: .env
+    env_file:
+      - .env
 
 volumes:
   postgres-data:
