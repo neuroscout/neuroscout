@@ -1,6 +1,8 @@
 from ..request_utils import decode_json
-from ...models import Analysis, Run
-import time
+from ...models import Analysis, Run, Report
+from ...tasks import report
+from ...core import app
+import pytest
 
 
 def test_get(session, auth_client, add_analysis):
@@ -360,26 +362,22 @@ def test_autofill(auth_client, add_analysis, add_task, session):
     assert len(decode_json(resp)['model']['Steps'][0]["Contrasts"]) == 0
 
 
-def test_reports(auth_client, add_analysis):
+def test_reports(session, auth_client, add_analysis):
     analysis = Analysis.query.filter_by(id=add_analysis).first()
-    assert 0
-    # Test report
-    resp = auth_client.post('/api/analyses/{}/report'.format(analysis.hash_id))
-    assert resp.status_code == 200
+
+    # Create new Report
+    r = Report(
+        analysis_id=analysis.hash_id
+        )
+    session.add(r)
+    session.commit()
+
+    # Trigger report
+    _ = report.generate_report(app, analysis.hash_id, r.id)
 
     # Get report
     resp = auth_client.get('/api/analyses/{}/report'.format(analysis.hash_id))
     assert resp.status_code == 200
-
-    timeout = time.time() + 60*1   # 1 minute timeout
-
-    while decode_json(resp)['status'] == 'PENDING':
-        time.sleep(0.2)
-        resp = auth_client.get('/api/analyses/{}/report'.format(
-            analysis.hash_id))
-        if time.time() > timeout:
-            assert 0
-            break
 
     if decode_json(resp)['status'] != 'OK':
         assert 0
@@ -396,23 +394,12 @@ def test_compile(auth_client, add_analysis, add_analysis_fail):
     analysis = Analysis.query.filter_by(id=add_analysis).first()
     analysis_bad = Analysis.query.filter_by(id=add_analysis_fail).first()
 
-    # Test analysis from user 2 - should fail compilation
-    resp = auth_client.post('/api/analyses/{}/compile'.format(
-        analysis_bad.hash_id))
-    assert resp.status_code == 200
-    locked_analysis = decode_json(resp)
+    with pytest.raises(Exception):
+        _ = report.compile(app, analysis_bad.hash_id)
 
-    # Test status after some time
+    # Test status
     resp = auth_client.get('/api/analyses/{}/compile'.format(
         analysis_bad.hash_id))
-    timeout = time.time() + 60*1   # 1 minute timeout
-    while decode_json(resp)['status'] == 'PENDING':
-        time.sleep(0.2)
-        resp = auth_client.get('/api/analyses/{}/compile'.format(
-            analysis_bad.hash_id))
-        if time.time() > timeout:
-            assert 0
-            break
 
     new_analysis = decode_json(resp)
     if new_analysis['status'] != 'FAILED':
@@ -423,18 +410,12 @@ def test_compile(auth_client, add_analysis, add_analysis_fail):
     assert resp.status_code == 404
 
     # Test compiling
-    resp = auth_client.post('/api/analyses/{}/compile'.format(
-        analysis.hash_id))
-    assert resp.status_code == 200
-    locked_analysis = decode_json(resp)
-
-    assert locked_analysis['status'] == 'PENDING'
+    _ = report.compile(app, analysis.hash_id)
 
     # Get full
     resp = auth_client.get('/api/analyses/{}'.format(analysis.hash_id))
     assert resp.status_code == 200
     locked_analysis = decode_json(resp)
-    assert locked_analysis['status'] == 'PENDING'
 
     # Test editing status
     locked_analysis['private'] = False
@@ -447,15 +428,6 @@ def test_compile(auth_client, add_analysis, add_analysis_fail):
 
     # Test status after some time
     resp = auth_client.get('/api/analyses/{}/compile'.format(analysis.hash_id))
-    timeout = time.time() + 60*1   # 1 minute timeout
-    while decode_json(resp)['status'] == 'PENDING':
-        time.sleep(0.2)
-        if time.time() > timeout:
-            assert 0
-            break
-        resp = auth_client.get('/api/analyses/{}/compile'.format(
-            analysis.hash_id))
-
     if decode_json(resp)['status'] != 'PASSED':
         assert 0
 

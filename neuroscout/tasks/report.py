@@ -79,8 +79,8 @@ def compile(flask_app, hash_id, run_ids=None, build=False):
     )
 
 
-def generate_report(flask_app,
-                    hash_id, report_id, run_ids, sampling_rate, scale):
+def generate_report(flask_app, hash_id, report_id,
+                    run_ids=None, sampling_rate=None, scale=None):
     """ Generate report for analysis
     Args:
         hash_id (str): analysis hash_id

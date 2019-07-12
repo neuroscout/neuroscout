@@ -66,7 +66,7 @@ collection_predictor = db.Table(
 class PredictorCollection(db.Model):
     """ Predictor Collection Upload """
     id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     predictors = db.relationship('Predictor', secondary=collection_predictor,
                                  backref='predictor_collection')
 

@@ -81,6 +81,35 @@ class PredictorEventListResource(MethodResource):
         return dump_pe(query)
 
 
+def prepare_upload(collection_name, event_files, runs, dataset_id):
+    if len(event_files) != len(runs):
+        abort(422, "The length of event_files and runs must be the same.")
+
+    # Assert that list of runs is non overlapping
+    flat = [item for sublist in runs for item in sublist]
+    if len(set(flat)) != len(flat):
+        abort(422, "Runs can only be assigned to a single event file.")
+
+    filenames = []
+    for e in event_files:
+        with tempfile.NamedTemporaryFile(
+          suffix=f'_{collection_name}.tsv',
+          dir='/file-data/predictor_collections', delete=False) as f:
+            e.save(f)
+            filenames.append(f.name)
+
+    # Send to Celery task
+    # Create new upload
+    pc = PredictorCollection(
+        collection_name=collection_name,
+        user_id=getattr(current_identity, 'id', None)
+        )
+    db.session.add(pc)
+    db.session.commit()
+
+    return pc, filenames
+
+
 @doc(tags=['predictors'])
 class PredictorCollectionResource(MethodResource):
     @doc(summary='Create a custom Predictor using uploaded annotations.',
@@ -102,42 +131,20 @@ class PredictorCollectionResource(MethodResource):
         }, locations=["files", "form"])
     @auth_required
     def post(self, collection_name, event_files, runs, dataset_id):
-        if len(event_files) != len(runs):
-            abort(422, "The length of event_files and runs must be the same.")
-
-        # Assert that list of runs is non overlapping
-        flat = [item for sublist in runs for item in sublist]
-        if len(set(flat)) != len(flat):
-            abort(422, "Runs can only be assigned to a single event file.")
-
-        filenames = []
-        for e in event_files:
-            with tempfile.NamedTemporaryFile(
-              suffix=f'_{collection_name}.tsv',
-              dir='/file-data/predictor_collections', delete=False) as f:
-                e.save(f)
-                filenames.append(f.name)
-
-        # Send to Celery task
-        # Create new upload
-        upload = PredictorCollection(
-            collection_name=collection_name,
-            user_id=current_identity.id,
-            )
-        db.session.add(upload)
-        db.session.commit()
+        pc, filenames = prepare_upload(
+            collection_name, event_files, runs, dataset_id)
 
         task = celery_app.send_task(
             'collection.upload',
             args=[filenames,
                   runs,
                   dataset_id,
-                  upload.id
+                  pc.id
                   ])
 
-        upload.task_id = task.id
+        pc.task_id = task.id
         db.session.commit()
-        return upload
+        return pc
 
     @doc(summary='Get predictor collection by id.')
     @use_kwargs(

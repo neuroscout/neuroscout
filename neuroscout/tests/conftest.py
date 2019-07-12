@@ -286,14 +286,3 @@ def add_predictor(session, add_task):
     session.commit()
 
     return pred.id
-
-
-"""" For testing Celery """
-
-
-@pytest.fixture(scope='session')
-def celery_config():
-    return {
-        'broker_url': 'amqp://',
-        'result_backend': 'rpc',
-    }
