@@ -8,12 +8,15 @@ const faqs = [
   [`Is this service free to use?`,
     `Yes! Note, however, that Neuroscout is a web-based engine for fMRI analysis specification; at the moment,
     we don't provide free computing resources for the execution of the resulting analysis bundles.`],
+  [`I plan to publish results I've obtained using Neuroscout, how do I cite Neuroscout?`,
+  `After you generate an analysis, a "Bibliography" tab will be shown which will auto-generate a reference list for
+  the dataset, feature extractors, and scientific software used for that analysis. In addition to these references,
+  be sure to include the unique analysis ID associated with any results.`],
   [`How do I get more help?`,
-   `Please see this page, and our tutorial, to learn about Neuroscout. Also, be aware that tooltips are
-    provided throughout to clarify aspects of the user interface. For usage questions not addressed in the
-    documentation, please open an issue on <a href="https://neurostars.org">NeuroStars</a>. For bug reports,
-    feature requests, feedback, etc., please open an issue on
-    <a href="https://github.com/neuroscout/neuroscout/issues"> GitHub</a>.`],
+   `First, please read this FAQ thoroughly! Also, be aware that tooltips are provided throughout to clarify
+    aspects of the user interface. For usage questions not addressed in the documentation, please open an
+    issue on <a href="https://neurostars.org">NeuroStars</a>. For bug reports, feature requests, feedback, etc.,
+    please open an issue on <a href="https://github.com/neuroscout/neuroscout/issues"> GitHub</a>.`],
   [`Are there any restrictions on analyses I create on Neuroscout?`,
    `<p>
     Yes. By using Neuroscout, you agree that once you have finalized and "compiled" an analysis, the analysis
@@ -23,8 +26,6 @@ const faqs = [
     </p>
     Also, in the event that you publish any results generated using the NeuroScout interface, you MUST provide
     a link to the corresponding analysis page(s) on the NeuroScout website.`],
-  [`I plan to publish results I've obtained using Neuroscout, how do I cite Neuroscout?`,
-   `Please cite (zenodo link for now?), and be sure to include all relevant analysis IDs.`],
   [`I have a naturalistic study I'd like to share on Neuroscout, how do I do so?`,
    `Due to the financial cost of extracting features from multi-modal stimuli using external APIs, the set of
     datasets we support is manually curated. However, we are continually expanding the list of supported
@@ -60,7 +61,10 @@ const faqs = [
     McNamara, Q., De La Vega, A., & Yarkoni, T. (2017, August). Developing a comprehensive framework for
     multimodal feature extraction. In Proceedings of the 23rd ACM SIGKDD International Conference on Knowledge
     Discovery and Data Mining (pp. 1567-1574). ACM.
-    </cite>`]
+    </cite>`],
+    [`Am I restricted to mass univariate GLMs, or can I use NeuroScout to specify other kinds of analyses?`,
+    `Currently, that is the case. However,the underlying BIDS-StatsModel is designed with more complex
+    models in mind, such as predictive and linear-mixed effect models.`]
 ];
 
 export default class FAQ extends React.Component<{}, {}> {
@@ -77,7 +81,7 @@ export default class FAQ extends React.Component<{}, {}> {
     return (
       <Row type="flex" justify="center" style={{padding: 0 }}>
         <MainCol>
-          <Collapse bordered={false}>
+          <Collapse bordered={false} defaultActiveKey={faqs.map((x, i) => '' + i)}>
             {faqsDisplay}
           </Collapse>
         </MainCol>
