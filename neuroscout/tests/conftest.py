@@ -23,7 +23,9 @@ def app():
     if 'APP_SETTINGS' not in environ:
         _app.config.from_object('config.app.TestingConfig')
 
-    makedirs(_app.config['FILE_DIR'], exist_ok=True)
+    makedirs(_app.config['FILE_DIR'] / 'predictor_collections', exist_ok=True)
+    makedirs(_app.config['FILE_DIR'] / 'analyses', exist_ok=True)
+    makedirs(_app.config['FILE_DIR'] / 'reports', exist_ok=True)
 
     # Establish an application context before running the tests.
     ctx = _app.app_context()
