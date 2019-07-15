@@ -227,7 +227,7 @@ export class SignupModal extends React.Component<AuthStoreState, {}> {
             <Input
               placeholder="Full name"
               size="large"
-              value={name}
+              value={this.props.name}
               onChange={(e) => authActions.updateFromInput('name', e)}
             />
           </FormItem>
