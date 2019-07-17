@@ -75,6 +75,7 @@ class Navbar extends React.Component<AuthStoreState, {}> {
              <Menu.SubMenu
               style={{float: 'right'}}
               key="browse"
+              className="browseMain"
               title={<span><Icon type="search"/>Browse</span>}
              >
                {this.props.loggedIn &&
@@ -94,7 +95,7 @@ class Navbar extends React.Component<AuthStoreState, {}> {
              </Menu.SubMenu>
 
              {this.props.loggedIn &&
-               <Menu.Item key="create" style={{float: 'right'}}>
+               <Menu.Item key="create" style={{float: 'right'}} className="newAnalysis">
                  <Link
                    to={{pathname: '/builder'}}
                  >

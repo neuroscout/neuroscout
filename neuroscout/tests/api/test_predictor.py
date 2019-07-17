@@ -1,6 +1,8 @@
 from ..request_utils import decode_json
-import pytest
-import os
+from ...resources.predictor import prepare_upload
+from ...tasks.upload import upload_collection
+from ...core import app
+from werkzeug.datastructures import FileStorage
 
 
 def test_get_predictor(auth_client, extract_features):
@@ -99,39 +101,47 @@ def test_get_predictor_data(auth_client, add_task):
     assert len(pe_list_filt) == 4
 
 
-@pytest.mark.skipif('CELERY_BROKER_URL' not in os.environ,
-                    reason="requires redis")
-def test_predictor_create(auth_client, add_task, get_data_path):
+def test_predictor_create(session,
+                          auth_client, add_users, add_task, get_data_path):
+    # Mock request to /predictors/create
     events = (get_data_path / 'bids_test' / 'sub-01' / 'func').glob('*.tsv')
-    events = [e.open('rb') for e in events]
+    events = [FileStorage(stream=e.open('rb')) for e in events]
+
+    (id_1, _), _ = add_users
 
     runs = []
     for i in ['1', '2']:
         resp = decode_json(
             auth_client.get(
                 '/api/runs', params={'number': i}))
-        r = ','.join([str(r['id']) for r in resp])
+        r = [str(r['id']) for r in resp]
         runs.append(r)
 
     dataset_id = decode_json(
         auth_client.get('/api/datasets'))[0]['id']
 
-    # Test extracted_feature
-    resp = auth_client.post(
-        '/api/predictors/collection',
-        data={
-            'collection_name': 'new_one',
-            'dataset_id': dataset_id,
-            'event_files': [events[0], events[1]],
-            'runs': runs
-            },
-        content_type='multipart/form-data',
-        json_dump=False
-        )
+    pc, filenames = prepare_upload(
+        'new_one', events, runs, dataset_id
+    )
+
+    pc.user_id = id_1
+    session.commit()
+
+    # Submit to celery task
+    results = upload_collection(app, filenames, runs, dataset_id, pc.id)
+    assert results['status'] == 'OK'
+
+    resp = auth_client.get('/api/predictors/collection',
+                           params={'id': pc.id})
     assert resp.status_code == 200
     resp = decode_json(resp)
-    assert resp['collection_name'] == 'new_one'
-    assert resp['status'] == 'PENDING'
 
-    # Can't test for anything more because db is not written by Flask here
-    # So Celery can't see the task that is created
+    assert resp['collection_name'] == 'new_one'
+    assert len(resp['predictors']) == 3
+    assert resp['status'] == 'OK'
+
+    # Get predictor from API
+    resp = decode_json(auth_client.get('/api/predictors/{}'.format(
+        resp['predictors'][0]['id'])))
+    assert resp['source'] == 'upload'
+    assert resp['name'] == 'trial_type'

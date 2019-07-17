@@ -4,6 +4,7 @@ from hashids import Hashids
 import webargs as wa
 from flask_apispec import doc, use_kwargs, MethodResource, marshal_with
 from flask import current_app
+from pathlib import Path
 
 from ...models import Report, NeurovaultCollection
 from ...database import db
@@ -130,7 +131,8 @@ class AnalysisUploadResource(MethodResource):
 
         with tempfile.NamedTemporaryFile(
           suffix='_{}.tar.gz'.format(analysis.hash_id),
-          dir='/file-data/uploads', delete=False) as f:
+          dir=str(Path(current_app.config['FILE_DATA']) / '/uploads'),
+          delete=False) as f:
             tarball.save(f)
 
         timestamp = datetime.datetime.utcnow().strftime('%Y-%m-%d_%H:%M')
