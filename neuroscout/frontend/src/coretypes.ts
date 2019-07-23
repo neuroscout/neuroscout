@@ -247,17 +247,12 @@ export interface ModelContrast {
 }
 
 export interface PredictorCollection {
-  id: string,
-  collection_name: string
-}
-
-export interface PredictorCollection {
-  id: string,
-  uploaded_at: string,
-  status: string,
-  traceback: string,
-  collection_name: string,
-  predictors: {id: string, name: string}[]
+  id: string;
+  uploaded_at?: string;
+  status?: string;
+  traceback?: string;
+  collection_name: string;
+  predictors?: {id: string, name: string}[];
 }
 
 // Shape of User object as consumed/produced by the backend API
@@ -309,4 +304,10 @@ export interface AppState {
   datasets: Dataset[];
   cloneAnalysis: (number) => void;
   onDelete:  (analysis: AppAnalysis) => void;
+}
+
+export interface RunFilters {
+  numbers: string[];
+  subjects: string[];
+  sessions: string[];
 }

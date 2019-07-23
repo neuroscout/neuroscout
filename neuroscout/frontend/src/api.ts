@@ -4,10 +4,13 @@
 import { _fetch, displayError, jwtFetch } from './utils';
 import {
   ApiDataset,
+  ApiUser,
   ApiAnalysis,
   AppAnalysis,
-  Dataset
+  Dataset,
+  Run
 } from './coretypes';
+//  PredictorCollection
 import { config } from './config';
 const domainRoot = config.server_url;
 
@@ -33,7 +36,7 @@ export const ApiToAppAnalysis = (data: ApiAnalysis): AppAnalysis => ({
 
 export const api = {
   getUser: (): Promise<ApiUser> => {
-    return jwtFetch(`${domainRoot}/api/user`)
+    return jwtFetch(`${domainRoot}/api/user`);
   },
 
   getDatasets:  (active_only = true): Promise<Dataset[]> => {
@@ -48,7 +51,8 @@ export const api = {
     });
   },
 
-  getPredictorCollection: (id: string): Promise<PredictorCollection[]> => {
+  getPredictorCollection: (id: string): any => {
+    return jwtFetch(`${domainRoot}/api/predictors/collection?id=${id}`);
   },
 
   getDataset: (datasetId: (number | string)): Promise<(Dataset | null)> => {
@@ -109,6 +113,10 @@ export const api = {
         displayError(error);
         return false;
       });
+  },
+
+  getRuns: (datasetId: string): Promise<Run[]> => {
+    return jwtFetch(`${domainRoot}/api/runs?dataset_id=${datasetId}`);
   },
 
   getNVUploads: (analysisId: (string)): Promise<(any | null)> => {
