@@ -17,12 +17,23 @@ type FilesAndRunsFormState = {
     runFilters: RunFilters,
     display: boolean
   }[],
+  collectionName: string
 };
+
+function _empty(filters) {
+  for (let x in filters) {
+    if (filters[x].length) {
+      return false;
+    }
+  }
+  return true;
+}
 
 class FilesAndRunsForm extends React.Component<{datasetId: string}, FilesAndRunsFormState> {
   constructor(props) {
     super(props);
     this.state = {
+      collectionName: '',
       availableFilters: filtersInit(),
       filesAndRuns: [filesAndRunsInit()]
     };
@@ -60,20 +71,31 @@ class FilesAndRunsForm extends React.Component<{datasetId: string}, FilesAndRuns
   addMore = () => {
     let filesAndRuns = this.state.filesAndRuns;
     // if (filesAndRuns[filesAndRuns.length - 1].file === '') { return; }
+    filesAndRuns.map(x => x.display = _empty(x.runFilters));
     filesAndRuns.push(filesAndRunsInit());
+    this.setState({filesAndRuns: filesAndRuns});
+  };
+
+  remove = (index: number) => () => {
+    let filesAndRuns = this.state.filesAndRuns.filter((x, i) => i !== index);
     this.setState({filesAndRuns: filesAndRuns});
   };
 
   onChange = (index: number) => (key: string) => (value) => {
     let filesAndRuns = this.state.filesAndRuns;
-    /* When an empty file is filled out add new empty form
     if (key === 'file' && filesAndRuns[index][key] === '' && value !== '') {
-      filesAndRuns.push(filesAndRunsInit());
+      /* When an empty file is filled out add new empty form
+        filesAndRuns.push(filesAndRunsInit());
+      */
+      filesAndRuns[index].display = true;
     }
-    */
     filesAndRuns[index][key] = value;
     this.setState({filesAndRuns: filesAndRuns});
   };
+
+  upload = () => {
+    return;
+  }
 
   render() {
     let formList: any[] = [];
@@ -87,6 +109,7 @@ class FilesAndRunsForm extends React.Component<{datasetId: string}, FilesAndRuns
                 <input type="file" onChange={(e) => this.onChange(i)('file')(e.target.value)} />
               </div>
             )}
+            extra={<Icon type="close" onClick={this.remove(i)} />}
           >
             {this.state.filesAndRuns[i].display &&
               <>
@@ -95,21 +118,28 @@ class FilesAndRunsForm extends React.Component<{datasetId: string}, FilesAndRuns
                   selectedFilters={this.state.filesAndRuns[i].runFilters}
                   onChange={this.onChange(i)('runFilters')}
                 />
-                <Button onClick={() => this.onChange(i)('display')(false)}>Apply</Button>
+                <Button onClick={() => this.onChange(i)('display')(false)}>Hide</Button>
               </>
             }
             {!this.state.filesAndRuns[i].display &&
-              <Button onClick={() => this.onChange(i)('display')(true)}>Select Runs</Button>
+              <Button onClick={() => this.onChange(i)('display')(true)}>Edit Runs</Button>
             }
           </Card>
+
         </Form>
       );
     });
 
     return (
       <div>
+        <Form>
+          <Form.Item label="Collection Name">
+            <Input onChange={(e) => this.setState({collectionName: e.target.value})} value={this.state.collectionName}/>
+          </Form.Item>
+        </Form>
         {formList}
-        <Button onClick={this.addMore}>Upload More</Button>
+        <Button onClick={this.addMore}>Add More</Button>
+        <Button onClick={this.upload}type="primary">Upload</Button>
       </div>
     );
   }

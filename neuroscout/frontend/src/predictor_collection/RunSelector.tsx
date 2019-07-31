@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Checkbox, Form, List } from 'antd';
+import { Button, Checkbox, Form, List } from 'antd';
 
 import { api } from '../api';
 import { RunFilters } from '../coretypes';
@@ -41,6 +41,10 @@ export class RunSelector extends React.Component<RunSelectorProps, {} > {
     sessions: this.onChange('sessions')
   };
 
+  selectAll = (key) => () => {
+    this.onChange(key)(this.props.availableFilters[key]);
+  };
+
   render() {
     var lists: any[] = [];
 
@@ -50,7 +54,17 @@ export class RunSelector extends React.Component<RunSelectorProps, {} > {
       }
       lists.push(
         <div key={key}>
-          <h4>{labelLookup[key]}:</h4>
+          <h4>
+            {labelLookup[key]}:
+            <Button
+              type="primary"
+              size="small"
+              onClick={this.selectAll(key)}
+              style={{ float: 'right' }}
+            >
+              All
+            </Button>
+          </h4>
           <Checkbox.Group
             options={this.props.availableFilters[key]}
             value={this.props.selectedFilters[key]}

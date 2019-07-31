@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Button, Card, Checkbox, Collapse, Form, Icon, Input, List, Row, Tabs, Table, Upload } from 'antd';
+import { Button, Card, Checkbox, Collapse, Form, Icon, Input, List, Modal, Row, Tabs, Table, Upload } from 'antd';
 import { TableRowSelection } from 'antd/lib/table';
 
 import { api } from '../api';
@@ -13,13 +13,14 @@ type CollectionListProps = {
 
 type CollectionListState = {
   formModal: boolean,
-  user: ApiUser
+  user?: ApiUser
 };
 
 export class PredictorCollectionList extends React.Component<CollectionListProps, CollectionListState> {
   constructor(props) {
     super(props);
     // get user preditcor collections
+    this.state = { formModal: false };
   }
   
   componentDidMount() {
@@ -41,7 +42,15 @@ export class PredictorCollectionList extends React.Component<CollectionListProps
            >
              <Icon type="plus" /> Add New Predictors
            </Button>
-          <AddPredictorsForm datasets={this.props.datasets} />
+          <Modal
+            title="Upload New Predictors"
+            width="70%"
+            visible={this.state.formModal}
+            onCancel={() => this.setState({formModal: false})}
+            okButtonProps={{ hidden: true }}
+          >
+            <AddPredictorsForm datasets={this.props.datasets} />
+          </Modal>
         </MainCol>
        </Row>
     );

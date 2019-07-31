@@ -69,16 +69,19 @@ export const _fetch = (path: string, options?: object) => {
 // Wrapper around the standard 'fetch' that takes care of:
 // - Adding jwt to request header
 // - Decoding JSON response and adding the response status code to decoded JSON object
-export const jwtFetch = (path: string, options?: object) => {
+export const jwtFetch = (path: string, options?: object, noCT?: boolean) => {
   const jwt = window.localStorage.getItem('jwt');
 
   const newOptions = {
     ...options,
     headers: {
-      'Content-type': 'application/json',
       Authorization: 'JWT ' + jwt,
     }
   };
+
+  if (!noCT) {
+      newOptions.headers['Content-type'] = 'application/json';
+  }
 
   return _fetch(path, newOptions);
 };
