@@ -6,6 +6,7 @@ import { api } from '../api';
 import { Dataset, Run, RunFilters } from '../coretypes';
 import { datasetColumns, MainCol } from '../HelperComponents';
 import { RunSelector } from './RunSelector';
+import { PredictorDescriptionForm } from  './PredictorDescriptionForm';
 
 const filtersInit = () => { return {numbers: [], subjects: [], sessions: []}; };
 const filesAndRunsInit = () => ({file: '', runFilters: filtersInit(), display: false});
@@ -18,6 +19,8 @@ type FilesAndRunsFormState = {
     display: boolean
   }[],
   collectionName: string
+  predictors: string[],
+  descriptions: string[]
 };
 
 function _empty(filters) {
@@ -35,7 +38,9 @@ class FilesAndRunsForm extends React.Component<{datasetId: string}, FilesAndRuns
     this.state = {
       collectionName: '',
       availableFilters: filtersInit(),
-      filesAndRuns: [filesAndRunsInit()]
+      filesAndRuns: [filesAndRunsInit()],
+      predictors: [] as string[],
+      descriptions: [] as string[]
     };
   }
   
@@ -81,10 +86,34 @@ class FilesAndRunsForm extends React.Component<{datasetId: string}, FilesAndRuns
     this.setState({filesAndRuns: filesAndRuns});
   };
 
+  parseContents = (evt: any) => {
+    if (evt && evt.target && evt.target.result) {
+      let contents = evt.target.result;
+      let rows = contents.split('\n');
+      let headers = rows[0].trim().split('\t');
+      this.setState({predictors: headers, descriptions: Array(headers.length).fill('')});
+    }
+  };
+
+  updateDescription = (index: number, value: string) => {
+    let descriptions = this.state.descriptions;
+    if (!(index < descriptions.length && index >= 0)) {
+      return;
+    }
+    descriptions[index] = value;
+    this.setState({ descriptions: descriptions });
+  }
+
   onChange = (index: number) => (key: string) => (value) => {
     let filesAndRuns = this.state.filesAndRuns;
     if (key === 'file' && filesAndRuns[index][key] === '' && value !== '') {
-      /* When an empty file is filled out add new empty form
+      if (index === 0) {
+        let reader = new FileReader();
+        reader.onload = this.parseContents; 
+        reader.readAsText(value);
+      }
+      /*
+        When an empty file is filled out add new empty form
         filesAndRuns.push(filesAndRunsInit());
       */
       filesAndRuns[index].display = true;
@@ -106,7 +135,14 @@ class FilesAndRunsForm extends React.Component<{datasetId: string}, FilesAndRuns
             title={(
               <div>
                 Select File to Upload:
-                <input type="file" onChange={(e) => this.onChange(i)('file')(e.target.value)} />
+                <input
+                  type="file"
+                  onChange={(e) => {
+                    if (e && e.target && e.target.files && e.target.files[0]) {
+                      this.onChange(i)('file')(e.target.files[0]);
+                    }
+                  }}
+                />
               </div>
             )}
             extra={<Icon type="close" onClick={this.remove(i)} />}
@@ -139,7 +175,14 @@ class FilesAndRunsForm extends React.Component<{datasetId: string}, FilesAndRuns
         </Form>
         {formList}
         <Button onClick={this.addMore}>Add More</Button>
-        <Button onClick={this.upload}type="primary">Upload</Button>
+        {!!this.state.predictors.length &&
+          <PredictorDescriptionForm
+            predictors={this.state.predictors}
+            descriptions={this.state.descriptions}
+            updateDescription={this.updateDescription}
+          />
+        }
+        <Button onClick={this.upload} type="primary">Upload</Button>
       </div>
     );
   }
