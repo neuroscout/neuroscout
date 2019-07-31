@@ -1,16 +1,17 @@
 # -*- coding: utf-8 -*-
 """ Core Neuroscout App """
 from flask import send_file, render_template, url_for
+from .basic import create_app
+from .models import db, user_datastore
+
+app, cache = create_app()
+
 from flask_mail import Mail
 from flask_jwt import JWT
 from flask_security import Security
 from flask_security.confirmable import confirm_email_token_status, confirm_user
 from flask_cors import CORS
 
-from .basic import create_app
-from .models import db, user_datastore
-
-app, cache = create_app()
 mail = Mail(app)
 # Enable CORS
 cors = CORS(
