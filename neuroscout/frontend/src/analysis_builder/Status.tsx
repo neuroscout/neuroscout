@@ -207,9 +207,8 @@ export class StatusTab extends React.Component<submitProps, statusTabState> {
         <div>
           <h3>Analysis Passed</h3>
           <p>
-            {this.props.userOwns && 'Congratulations!'} The analysis is finished compiling and is ready to be executed.
-            Once you have installed Docker you may run the analysis with the following command,
-            replacing '/local/directory' with a directory on your computer:
+            {this.props.userOwns && 'Congratulations!'} Congratulations, your analysis has been compiled!
+            Run the analysis with this this command, replacing '/local/outputdirectory' with a local directory:
           </p>
           <pre>
             <code>
@@ -221,6 +220,12 @@ export class StatusTab extends React.Component<submitProps, statusTabState> {
             See the <a href="https://github.com/neuroscout/neuroscout-cli">neuroscout-cli documentation </a>
              for more information on how to install and run analyses.
           </p>
+          <Card size="small" title="System Requirements" style={{ width: 400 }}>
+            <p>OS: Windows/Linux/Mac OS with <a href="https://docs.docker.com/install/">Docker</a></p>
+            <p>RAM: 8GB+ RAM</p>
+            <p>Disk space: 4GB + ~1 GB/subject</p>
+          </Card>
+          <br/>
         </div>
       }
       {(this.props.status === 'FAILED') &&
