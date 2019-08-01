@@ -15,16 +15,20 @@ from .utils import update_record
 
 
 def upload_collection(flask_app, filenames, runs, dataset_id, collection_id,
-                      cache=None):
+                      descriptions=None, cache=None):
     """ Create new Predictors from TSV files
     Args:
         filenames list of (str): List of paths to TSVs
         runs list of (int): List of run ids to apply events to
         dataset_id (int): Dataset id.
         collection_id (int): Id of collection object
+        descriptions (dict): Optional descriptions for each column
+        cache (obj): Optional flask cache object
     """
     if cache is None:
         from ..core import cache as cache
+    if descriptions is None:
+        descriptions = {}
 
     collection_object = PredictorCollection.query.filter_by(
         id=collection_id).one()
@@ -61,7 +65,8 @@ def upload_collection(flask_app, filenames, runs, dataset_id, collection_id,
     try:
         for col in common_cols - set(['onset', 'duration']):
             predictor = Predictor(
-                name=col, source='upload', dataset_id=dataset_id)
+                name=col, source='upload', dataset_id=dataset_id,
+                description=descriptions.get(col))
             db.session.add(predictor)
             db.session.commit()
 

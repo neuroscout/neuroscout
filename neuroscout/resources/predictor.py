@@ -129,11 +129,15 @@ class PredictorCollectionResource(MethodResource):
             Required columns: onset, duration, any number of columns\
             with values for new Predictors."),
         "runs": wa.fields.List(
-            wa.fields.DelimitedList(wa.fields.Int())),
-        "dataset_id": wa.fields.Int(required=True, description="Dataset id.")
+            wa.fields.DelimitedList(wa.fields.Int()),
+            required=True
+            ),
+        "dataset_id": wa.fields.Int(required=True, description="Dataset id."),
+        "descriptions": wa.fields.Dict(description="Column descriptions")
         }, locations=["files", "form"])
     @auth_required
-    def post(self, collection_name, event_files, runs, dataset_id):
+    def post(self, collection_name, event_files, runs, dataset_id,
+             descriptions=None):
         pc, filenames = prepare_upload(
             collection_name, event_files, runs, dataset_id)
 
@@ -142,7 +146,8 @@ class PredictorCollectionResource(MethodResource):
             args=[filenames,
                   runs,
                   dataset_id,
-                  pc.id
+                  pc.id,
+                  descriptions
                   ])
 
         pc.task_id = task.id
