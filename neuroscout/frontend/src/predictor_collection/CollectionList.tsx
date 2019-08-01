@@ -19,7 +19,6 @@ type CollectionListState = {
 export class PredictorCollectionList extends React.Component<CollectionListProps, CollectionListState> {
   constructor(props) {
     super(props);
-    // get user preditcor collections
     this.state = { formModal: false };
   }
   

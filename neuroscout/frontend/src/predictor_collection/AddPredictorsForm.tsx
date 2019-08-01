@@ -7,93 +7,58 @@ import { Dataset, Run, RunFilters } from '../coretypes';
 import { datasetColumns, MainCol } from '../HelperComponents';
 import { RunSelector } from './RunSelector';
 import { PredictorDescriptionForm } from  './PredictorDescriptionForm';
+import { FilesAndRunsForm } from './FilesAndRunsForm';
 
-const filtersInit = () => { return {numbers: [], subjects: [], sessions: []}; };
-const filesAndRunsInit = () => ({file: '', runFilters: filtersInit(), display: false});
-
-type FilesAndRunsFormState = {
-  availableFilters: RunFilters,
+/*
+  predictors - these are the new predictors extracted from tsv headers
+  descriptions - descriptions of new predictors
+  filesAndRuns - collection of tsv file contents and the runs they apply to
+*/
+type AddPredictorsFormState = {
+  datasetId: string,
+  predictors: string[],
+  descriptions: string[],
+  key: number,
+  collectionName: string
   filesAndRuns: {
     file: string,
     runFilters: RunFilters,
     display: boolean
-  }[],
-  collectionName: string
-  predictors: string[],
-  descriptions: string[]
+  }[]
 };
 
-function _empty(filters) {
-  for (let x in filters) {
-    if (filters[x].length) {
-      return false;
-    }
-  }
-  return true;
-}
+type Partial<T> = {
+    [P in keyof T]: T[P];
+};
 
-class FilesAndRunsForm extends React.Component<{datasetId: string}, FilesAndRunsFormState> {
+type PartialState = Partial<AddPredictorsFormState>;
+
+export class AddPredictorsForm extends React.Component<{datasets: Dataset[]}, AddPredictorsFormState> {
   constructor(props) {
     super(props);
     this.state = {
-      collectionName: '',
-      availableFilters: filtersInit(),
-      filesAndRuns: [filesAndRunsInit()],
+      datasetId: '',
+      filesAndRuns: [],
       predictors: [] as string[],
-      descriptions: [] as string[]
+      descriptions: [] as string[],
+      key: 1,
+      collectionName: ''
     };
   }
+
+  prevTab = () => {
+    this.setState({key: Math.max(this.state.key - 1, 1)});
+  };
+
+  nextTab = () => {
+    this.setState({key: Math.min(this.state.key + 1, 3)});
+  };
+
+  upload = () => {
+    return;
+  };
   
-  getRuns = () => {
-    api.getRuns(this.props.datasetId).then(runs => {
-      let availableFilters = filtersInit();
-      for (var key in availableFilters) {
-        if (!availableFilters.hasOwnProperty(key)) {
-          continue;
-        }
-        availableFilters[key] = Array.from(
-          new Set(
-            runs.map(x => '' + x[key.slice(0, -1)])
-              .filter(x => !!x && x !== 'null')
-              .sort((a, b) => a.localeCompare(b, undefined, {numeric: true})) as string[]
-          )
-        );
-      }
-      this.setState({availableFilters: availableFilters });
-    });
-  };
-
-  componentDidMount() {
-    this.getRuns();
-  }
-
-  componentDidUpdate(prevProps) {
-    if (this.props.datasetId !== prevProps.datasetId && this.props.datasetId !== '') {
-      this.getRuns();
-    }
-  }
-
-  addMore = () => {
-    let filesAndRuns = this.state.filesAndRuns;
-    // if (filesAndRuns[filesAndRuns.length - 1].file === '') { return; }
-    filesAndRuns.map(x => x.display = _empty(x.runFilters));
-    filesAndRuns.push(filesAndRunsInit());
-    this.setState({filesAndRuns: filesAndRuns});
-  };
-
-  remove = (index: number) => () => {
-    let filesAndRuns = this.state.filesAndRuns.filter((x, i) => i !== index);
-    this.setState({filesAndRuns: filesAndRuns});
-  };
-
-  parseContents = (evt: any) => {
-    if (evt && evt.target && evt.target.result) {
-      let contents = evt.target.result;
-      let rows = contents.split('\n');
-      let headers = rows[0].trim().split('\t');
-      this.setState({predictors: headers, descriptions: Array(headers.length).fill('')});
-    }
-  };
+  updateState = (value: PartialState) => this.setState({ ...value });
 
   updateDescription = (index: number, value: string) => {
     let descriptions = this.state.descriptions;
@@ -104,113 +69,18 @@ class FilesAndRunsForm extends React.Component<{datasetId: string}, FilesAndRuns
     this.setState({ descriptions: descriptions });
   }
 
-  onChange = (index: number) => (key: string) => (value) => {
-    let filesAndRuns = this.state.filesAndRuns;
-    if (key === 'file' && filesAndRuns[index][key] === '' && value !== '') {
-      if (index === 0) {
-        let reader = new FileReader();
-        reader.onload = this.parseContents; 
-        reader.readAsText(value);
-      }
-      /*
-        When an empty file is filled out add new empty form
-        filesAndRuns.push(filesAndRunsInit());
-      */
-      filesAndRuns[index].display = true;
-    }
-    filesAndRuns[index][key] = value;
-    this.setState({filesAndRuns: filesAndRuns});
-  };
-
-  upload = () => {
-    return;
-  }
-
-  render() {
-    let formList: any[] = [];
-    this.state.filesAndRuns.forEach((x, i) => {
-      formList.push(
-        <Form key={i}>
-          <Card
-            title={(
-              <div>
-                Select File to Upload:
-                <input
-                  type="file"
-                  onChange={(e) => {
-                    if (e && e.target && e.target.files && e.target.files[0]) {
-                      this.onChange(i)('file')(e.target.files[0]);
-                    }
-                  }}
-                />
-              </div>
-            )}
-            extra={<Icon type="close" onClick={this.remove(i)} />}
-          >
-            {this.state.filesAndRuns[i].display &&
-              <>
-                <RunSelector
-                  availableFilters={this.state.availableFilters}
-                  selectedFilters={this.state.filesAndRuns[i].runFilters}
-                  onChange={this.onChange(i)('runFilters')}
-                />
-                <Button onClick={() => this.onChange(i)('display')(false)}>Hide</Button>
-              </>
-            }
-            {!this.state.filesAndRuns[i].display &&
-              <Button onClick={() => this.onChange(i)('display')(true)}>Edit Runs</Button>
-            }
-          </Card>
-
-        </Form>
-      );
-    });
-
-    return (
-      <div>
-        <Form>
-          <Form.Item label="Collection Name">
-            <Input onChange={(e) => this.setState({collectionName: e.target.value})} value={this.state.collectionName}/>
-          </Form.Item>
-        </Form>
-        {formList}
-        <Button onClick={this.addMore}>Add More</Button>
-        {!!this.state.predictors.length &&
-          <PredictorDescriptionForm
-            predictors={this.state.predictors}
-            descriptions={this.state.descriptions}
-            updateDescription={this.updateDescription}
-          />
-        }
-        <Button onClick={this.upload} type="primary">Upload</Button>
-      </div>
-    );
-  }
-}
-
-type AddPredictorsFormState = {
-  datasetId: string,
-  uploads: {file: string, predictors: string[]}[]
-};
-
-export class AddPredictorsForm extends React.Component<{datasets: Dataset[]}, AddPredictorsFormState> {
-  constructor(props) {
-    super(props);
-    this.state = {datasetId: '', uploads: []};
-  }
-
   render() {
     const rowSelection: TableRowSelection<Dataset> = {
       type: 'radio',
       onSelect: (record, selected, selectedRows) => {
-        this.setState({datasetId: record.id});
+        this.setState({datasetId: record.id, key: 2});
       },
       selectedRowKeys: this.state.datasetId ? [ this.state.datasetId ] : []
     };
 
     return (
-      <Tabs activeKey={this.state.datasetId ? '2' : '1'}>
-        <Tabs.TabPane tab="Select Dataset" key={'1'}>
+      <Tabs activeKey={'' + this.state.key}>
+        <Tabs.TabPane tab="Select Dataset" key={'' + 1}>
           <Table
             className="selectDataset"
             columns={datasetColumns}
@@ -221,12 +91,30 @@ export class AddPredictorsForm extends React.Component<{datasets: Dataset[]}, Ad
             pagination={(this.props.datasets.length > 10) ? {'position': 'bottom'} : false}
           />
         </Tabs.TabPane>
-        <Tabs.TabPane tab="Select Files and Runs" key={'2'}>
+        <Tabs.TabPane tab="Select Files and Runs" key={'' + 2}>
         {this.state.datasetId &&
-          <div className="runSelectorContainer">
-            <FilesAndRunsForm datasetId={this.state.datasetId} />
-          </div>
+          <>
+            <div className="runSelectorContainer">
+              <FilesAndRunsForm
+                datasetId={this.state.datasetId}
+                updateState={this.updateState}
+                collectionName={this.state.collectionName}
+                filesAndRuns={this.state.filesAndRuns}
+              />
+            </div>
+            <Button onClick={this.prevTab}>Prev</Button>
+            <Button onClick={this.nextTab}>Next</Button>
+          </>
         }
+        </Tabs.TabPane>
+        <Tabs.TabPane tab="Predictor Descriptions" key={'' + 3}>
+          <PredictorDescriptionForm
+            predictors={this.state.predictors}
+            descriptions={this.state.descriptions}
+            updateDescription={this.updateDescription}
+          /> 
+          <Button onClick={this.prevTab}>Prev</Button>
+          <Button onClick={this.upload} type="primary">Upload</Button>
         </Tabs.TabPane>
       </Tabs>
     );
