@@ -148,6 +148,6 @@ def test_predictor_create(session,
     # Get predictor from API
     resp = decode_json(auth_client.get('/api/predictors/{}'.format(
         resp['predictors'][0]['id'])))
-    assert resp['source'] == 'upload'
+    assert resp['source'] == 'Collection: new_one'
     assert resp['name'] == 'trial_type'
     assert resp['description'] == 'new_description'
