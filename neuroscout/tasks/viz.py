@@ -45,7 +45,7 @@ def plot_design_matrix(dm_wide, scale=True):
     ).interactive()
     line = alt.Chart(
         dm,
-        title='Regressor timecourses (shift-click above to select)').mark_line(
+        title='Timecourse (shift-click columns to select)').mark_line(
             clip=True).encode(
         alt.X('scan_number',
               axis=alt.Axis(
