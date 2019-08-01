@@ -65,7 +65,8 @@ def upload_collection(flask_app, filenames, runs, dataset_id, collection_id,
     try:
         for col in common_cols - set(['onset', 'duration']):
             predictor = Predictor(
-                name=col, source=f'Collection: {collection_object.name}',
+                name=col,
+                source=f'Collection: {collection_object.collection_name}',
                 dataset_id=dataset_id,
                 description=descriptions.get(col))
             db.session.add(predictor)
