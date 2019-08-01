@@ -5,7 +5,6 @@ import re
 from tempfile import mkdtemp
 from pathlib import Path
 
-from ..core import cache
 from ..utils.db import get_or_create
 from ..database import db
 from ..models import (
@@ -15,7 +14,8 @@ from ..models import (
 from .utils import update_record
 
 
-def upload_collection(flask_app, filenames, runs, dataset_id, collection_id):
+def upload_collection(flask_app, filenames, runs, dataset_id, collection_id,
+                      cache=None):
     """ Create new Predictors from TSV files
     Args:
         filenames list of (str): List of paths to TSVs
@@ -23,6 +23,9 @@ def upload_collection(flask_app, filenames, runs, dataset_id, collection_id):
         dataset_id (int): Dataset id.
         collection_id (int): Id of collection object
     """
+    if cache is None:
+        from ..core import cache as cache
+
     collection_object = PredictorCollection.query.filter_by(
         id=collection_id).one()
 
@@ -55,19 +58,20 @@ def upload_collection(flask_app, filenames, runs, dataset_id, collection_id):
         raise Exception('Not all columns have "onset" and "duration"')
 
     pe_objects = []
-    for col in common_cols - set(['onset', 'duration']):
-        try:
+    try:
+        for col in common_cols - set(['onset', 'duration']):
             predictor = Predictor(
                 name=col, source='upload', dataset_id=dataset_id)
             db.session.add(predictor)
             db.session.commit()
 
             for ix, e in enumerate(events):
+                select = e[['onset', 'duration', col]].dropna()
                 for run_id in runs[ix]:
                     # Add PredictorRun
                     pr, _ = get_or_create(
                         PredictorRun, predictor_id=predictor.id, run_id=run_id)
-                    for _, row in e.iterrows():
+                    for _, row in select.iterrows():
                         row = row.to_dict()
                         pe_objects.append(
                             PredictorEvent(
@@ -75,19 +79,19 @@ def upload_collection(flask_app, filenames, runs, dataset_id, collection_id):
                                 run_id=run_id, onset=row['onset'],
                                 duration=row['duration'], value=row[col])
                             )
-
-            db.session.bulk_save_objects(pe_objects)
             collection_object.predictors.append(predictor)
-            db.session.commit()
-        except Exception as e:
-            cache.clear()
-            db.session.rollback()
-            update_record(
-                collection_object,
-                exception=e,
-                traceback=f'Error creating predictors. Failed processing {col}'
-            )
-            raise
+
+        db.session.bulk_save_objects(pe_objects)
+        db.session.commit()
+    except Exception as e:
+        cache.clear()
+        db.session.rollback()
+        update_record(
+            collection_object,
+            exception=e,
+            traceback=f'Error creating predictors. Failed processing {col}'
+        )
+        raise
 
     cache.clear()
     return update_record(
