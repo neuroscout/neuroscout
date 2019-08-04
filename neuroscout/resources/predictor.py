@@ -1,5 +1,6 @@
 import webargs as wa
 import tempfile
+import json
 from sqlalchemy import func
 from flask_apispec import MethodResource, marshal_with, use_kwargs, doc
 from flask_jwt import current_identity
@@ -133,11 +134,13 @@ class PredictorCollectionResource(MethodResource):
             required=True
             ),
         "dataset_id": wa.fields.Int(required=True, description="Dataset id."),
-        "descriptions": wa.fields.Dict(description="Column descriptions")
+        "descriptions": wa.fields.Str(description="Column descriptions")
         }, locations=["files", "form"])
     @auth_required
     def post(self, collection_name, event_files, runs, dataset_id,
              descriptions=None):
+        if descriptions is not None:
+            descriptions = json.loads(descriptions)
         pc, filenames = prepare_upload(
             collection_name, event_files, runs, dataset_id)
 
