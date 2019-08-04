@@ -137,7 +137,7 @@ def test_predictor_create(session,
     assert results['status'] == 'OK'
 
     resp = auth_client.get('/api/predictors/collection',
-                           params={'id': pc.id})
+                           params={'collection_id': pc.id})
     assert resp.status_code == 200
     resp = decode_json(resp)
 
