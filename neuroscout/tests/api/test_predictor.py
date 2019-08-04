@@ -127,8 +127,13 @@ def test_predictor_create(session,
     pc.user_id = id_1
     session.commit()
 
+    descriptions = {
+        "trial_type": "new_description"
+    }
+
     # Submit to celery task
-    results = upload_collection(app, filenames, runs, dataset_id, pc.id)
+    results = upload_collection(app, filenames, runs, dataset_id, pc.id,
+                                descriptions)
     assert results['status'] == 'OK'
 
     resp = auth_client.get('/api/predictors/collection',
@@ -143,5 +148,6 @@ def test_predictor_create(session,
     # Get predictor from API
     resp = decode_json(auth_client.get('/api/predictors/{}'.format(
         resp['predictors'][0]['id'])))
-    assert resp['source'] == 'upload'
+    assert resp['source'] == 'Collection: new_one'
     assert resp['name'] == 'trial_type'
+    assert resp['description'] == 'new_description'
