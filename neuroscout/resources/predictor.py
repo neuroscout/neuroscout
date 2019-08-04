@@ -156,4 +156,5 @@ class PredictorCollectionResource(MethodResource):
         locations=['query'])
     @marshal_with(PredictorCollectionSchema)
     def get(self, collection_id):
-        return first_or_404(PredictorCollection.query.filter_by(id=id))
+        return first_or_404(
+            PredictorCollection.query.filter_by(id=collection_id))
