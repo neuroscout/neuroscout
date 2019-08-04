@@ -156,8 +156,10 @@ class PredictorCollectionResource(MethodResource):
 
     @doc(summary='Get predictor collection by id.')
     @use_kwargs(
-        {'id': wa.fields.Int(description="Predictor Collection id.")},
+        {'collection_id': wa.fields.Int(description="Predictor Collection id.",
+                                        required=True)},
         locations=['query'])
     @marshal_with(PredictorCollectionSchema)
-    def get(self, id):
-        return first_or_404(PredictorCollection.query.filter_by(id=id))
+    def get(self, collection_id):
+        return first_or_404(
+            PredictorCollection.query.filter_by(id=collection_id))
