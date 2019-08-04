@@ -151,7 +151,8 @@ class PredictorCollectionResource(MethodResource):
 
     @doc(summary='Get predictor collection by id.')
     @use_kwargs(
-        {'id': wa.fields.Int(description="Predictor Collection id.")},
+        {'id': wa.fields.Int(description="Predictor Collection id.",
+                             required=True)},
         locations=['query'])
     @marshal_with(PredictorCollectionSchema)
     def get(self, id):
