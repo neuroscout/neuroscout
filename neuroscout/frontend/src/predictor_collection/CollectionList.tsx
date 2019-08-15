@@ -24,11 +24,19 @@ export class PredictorCollectionList extends React.Component<CollectionListProps
   
   componentDidMount() {
     api.getUser().then(user => {
+      // tslint:disable-next-line:no-console
+      console.log(user);
       if (user && user.predictorCollections) {
-        const col = user.predictorCollections.map((x) => {
+        const collections = user.predictorCollections.map((x) => {
           return api.getPredictorCollection(x.id);
         });
+        return Promise.all(collections);
+      } else {
+        return [];
       }
+    }).then((collections) => {
+      // tslint:disable-next-line:no-console
+      console.log(collections);
     });
   }
 

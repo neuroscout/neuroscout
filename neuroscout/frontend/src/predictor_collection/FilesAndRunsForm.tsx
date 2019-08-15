@@ -8,7 +8,7 @@ import { datasetColumns, MainCol } from '../HelperComponents';
 import { RunSelector } from './RunSelector';
 
 const filtersInit = () => { return {numbers: [], subjects: [], sessions: []}; };
-const filesAndRunsInit = () => ({file: '', runFilters: filtersInit(), display: false});
+const filesAndRunsInit = () => ({file: undefined, runFilters: filtersInit(), display: false});
 
 type FilesAndRunsFormState = {
   availableFilters: RunFilters,
@@ -19,7 +19,7 @@ type FilesAndRunsFormProps = {
   updateState: (value) => void,
   collectionName: string,
   filesAndRuns: {
-    file: string,
+    file?: File,
     runFilters: RunFilters,
     display: boolean
   }[]
@@ -98,7 +98,7 @@ export class FilesAndRunsForm extends React.Component<FilesAndRunsFormProps, Fil
 
   onChange = (index: number) => (key: string) => (value) => {
     let filesAndRuns = this.props.filesAndRuns;
-    if (key === 'file' && filesAndRuns[index][key] === '' && value !== '') {
+    if (key === 'file' && filesAndRuns[index][key] === undefined && value !== undefined) {
       if (index === 0) {
         let reader = new FileReader();
         reader.onload = this.parseContents; 

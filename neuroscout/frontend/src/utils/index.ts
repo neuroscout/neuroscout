@@ -34,6 +34,8 @@ export const moveItem: MoveItem<any> = (array, index, direction) => {
 };
 
 export const _fetch = (path: string, options?: object) => {
+  // tslint:disable-next-line:no-console
+  console.error(options);
   return fetch(path, options).then(response => {
       // Need to figure this response out. openLogin triggers modal to popup,
       // but in next cycle. Keep track of request, and after submit on modal
@@ -46,6 +48,8 @@ export const _fetch = (path: string, options?: object) => {
         throw new Error('Please Login Again');
       }
       if (response.status >= 400) {
+        // tslint:disable-next-line:no-console
+        console.error(response);
         return { statusCode: response.status };
       } else {
         return response.json().then(json => {

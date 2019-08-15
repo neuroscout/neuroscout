@@ -55,6 +55,12 @@ export const api = {
     return jwtFetch(`${domainRoot}/api/predictors/collection?id=${id}`);
   },
 
+  postPredictorCollection: (formData: FormData): any => {
+    // tslint:disable-next-line:no-console
+    console.log(formData);
+    return jwtFetch(`${domainRoot}/api/predictors/collection`, { method: 'POST', body: formData });
+  },
+
   getDataset: (datasetId: (number | string)): Promise<(Dataset | null)> => {
   return jwtFetch(`${domainRoot}/api/datasets/${datasetId}`)
     .then(data => {

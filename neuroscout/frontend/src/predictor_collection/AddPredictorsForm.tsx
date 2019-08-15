@@ -21,7 +21,7 @@ type AddPredictorsFormState = {
   key: number,
   collectionName: string
   filesAndRuns: {
-    file: string,
+    file?: File,
     runFilters: RunFilters,
     display: boolean
   }[]
@@ -55,6 +55,25 @@ export class AddPredictorsForm extends React.Component<{datasets: Dataset[]}, Ad
   };
 
   upload = () => {
+    let formData = new FormData();
+    api.getRuns(this.state.datasetId).then(runs => {
+      formData.append('dataset_id', this.state.datasetId);
+      formData.append('collection_name', this.state.collectionName);
+      this.state.filesAndRuns.map((x) => {
+        if (x.file === undefined) { return; }
+        formData.append('runs[]', runs.join(','));
+        formData.append('event_files[]', x.file, x.file.name);
+      });
+      // tslint:disable-next-line:no-console
+      console.log(formData);
+      // tslint:disable-next-line:no-console
+      console.log(this.state);
+      return api.postPredictorCollection(formData);
+    }).then(ret => {
+      // tslint:disable-next-line:no-console
+      console.log(ret);
+    });
+    
     return;
   };
   
