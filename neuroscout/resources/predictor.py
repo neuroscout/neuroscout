@@ -1,5 +1,6 @@
 import webargs as wa
 import tempfile
+import json
 from sqlalchemy import func
 from flask_apispec import MethodResource, marshal_with, use_kwargs, doc
 from flask_jwt import current_identity
@@ -129,11 +130,17 @@ class PredictorCollectionResource(MethodResource):
             Required columns: onset, duration, any number of columns\
             with values for new Predictors."),
         "runs": wa.fields.List(
-            wa.fields.DelimitedList(wa.fields.Int())),
-        "dataset_id": wa.fields.Int(required=True, description="Dataset id.")
+            wa.fields.DelimitedList(wa.fields.Int()),
+            required=True
+            ),
+        "dataset_id": wa.fields.Int(required=True, description="Dataset id."),
+        "descriptions": wa.fields.Str(description="Column descriptions")
         }, locations=["files", "form"])
     @auth_required
-    def post(self, collection_name, event_files, runs, dataset_id):
+    def post(self, collection_name, event_files, runs, dataset_id,
+             descriptions=None):
+        if descriptions is not None:
+            descriptions = json.loads(descriptions)
         pc, filenames = prepare_upload(
             collection_name, event_files, runs, dataset_id)
 
@@ -142,7 +149,8 @@ class PredictorCollectionResource(MethodResource):
             args=[filenames,
                   runs,
                   dataset_id,
-                  pc.id
+                  pc.id,
+                  descriptions
                   ])
 
         pc.task_id = task.id
@@ -151,8 +159,10 @@ class PredictorCollectionResource(MethodResource):
 
     @doc(summary='Get predictor collection by id.')
     @use_kwargs(
-        {'id': wa.fields.Int(description="Predictor Collection id.")},
+        {'collection_id': wa.fields.Int(description="Predictor Collection id.",
+                                        required=True)},
         locations=['query'])
     @marshal_with(PredictorCollectionSchema)
-    def get(self, id):
-        return first_or_404(PredictorCollection.query.filter_by(id=id))
+    def get(self, collection_id):
+        return first_or_404(
+            PredictorCollection.query.filter_by(id=collection_id))

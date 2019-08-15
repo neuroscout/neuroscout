@@ -131,7 +131,7 @@ class AnalysisUploadResource(MethodResource):
 
         with tempfile.NamedTemporaryFile(
           suffix='_{}.tar.gz'.format(analysis.hash_id),
-          dir=str(Path(current_app.config['FILE_DIR']) / '/uploads'),
+          dir=str(Path(current_app.config['FILE_DIR']) / 'uploads'),
           delete=False) as f:
             tarball.save(f)
 
