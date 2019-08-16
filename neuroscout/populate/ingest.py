@@ -191,7 +191,7 @@ def add_task(task_name, dataset_name=None, local_path=None,
     """ Parse every Run """
     print("Parsing runs")
     all_runs = layout.get(task=task_name, suffix='bold', extensions='.nii.gz',
-                          derivatives=False, **kwargs)
+                          desc=None, **kwargs)
     for img in progressbar(all_runs):
         """ Extract Run information """
         # Get entities
