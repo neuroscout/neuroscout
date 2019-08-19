@@ -1,0 +1,22 @@
+{
+  "SemanticNarrative": {
+    "preproc_address": "https://github.com/neuroscout-datasets/ds001510/",
+    "path": "/datasets/raw/ds001510/",
+    "summary": "Perception of schematic narrative movie clips",
+    "url": "https://openneuro.org/datasets/ds001510",
+    "tasks": {
+      "perception": {
+        "summary": "Audio/visual watching",
+        "converters": [
+        ],
+        "extractors": [
+["RMSExtractor", {"frame_length": 72000, "hop_length": 72000, "center": false}]
+          ],
+        "transformations": [
+        ],
+        "ingest_args": {
+        }
+      }
+    }
+  }
+}
