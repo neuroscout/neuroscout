@@ -38,7 +38,7 @@ class PredictorEvent(db.Model):
     object_id = db.Column(db.Integer)
 
     run_id = db.Column(db.Integer, db.ForeignKey('run.id'), nullable=False,
-                       index=True)
+                       index=False)
     predictor_id = db.Column(db.Integer, db.ForeignKey('predictor.id'),
                              nullable=False, index=True)
     stimulus_id = db.Column(db.Integer, db.ForeignKey('stimulus.id'))
