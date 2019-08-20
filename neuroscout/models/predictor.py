@@ -27,9 +27,6 @@ class Predictor(db.Model):
 
 class PredictorEvent(db.Model):
     """ An event within a Predictor. Onset is relative to run. """
-    __table_args__ = (
-        db.UniqueConstraint('onset', 'run_id', 'predictor_id', 'object_id'),
-    )
     id = db.Column(db.Integer, primary_key=True)
 
     onset = db.Column(db.Float, nullable=False)
