@@ -84,15 +84,17 @@ export class PredictorCollectionList extends React.Component<CollectionListProps
              <Icon type="plus" /> Add New Predictors
            </Button>
            <br />
-          <Modal
-            title="Upload New Predictors"
-            width="70%"
-            visible={this.state.formModal}
-            onCancel={() => this.setState({formModal: false})}
-            okButtonProps={{ hidden: true }}
-          >
-            <AddPredictorsForm datasets={this.props.datasets} closeModal={this.closeModal}/>
-          </Modal>
+          {!this.state.formModal &&
+            <Modal
+              title="Upload New Predictors"
+              width="70%"
+              visible={this.state.formModal}
+              onCancel={() => this.setState({formModal: false})}
+              okButtonProps={{ hidden: true }}
+            >
+              <AddPredictorsForm datasets={this.props.datasets} closeModal={this.closeModal} />
+            </Modal>
+          }
           {this.state.collections &&
             <Table
               rowKey="id"
