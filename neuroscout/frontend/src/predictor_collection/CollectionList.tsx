@@ -84,7 +84,7 @@ export class PredictorCollectionList extends React.Component<CollectionListProps
              <Icon type="plus" /> Add New Predictors
            </Button>
            <br />
-          {!this.state.formModal &&
+          {this.state.formModal &&
             <Modal
               title="Upload New Predictors"
               width="70%"
