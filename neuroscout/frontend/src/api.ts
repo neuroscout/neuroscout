@@ -8,6 +8,7 @@ import {
   ApiAnalysis,
   AppAnalysis,
   Dataset,
+  Predictor,
   Run
 } from './coretypes';
 //  PredictorCollection
@@ -52,13 +53,23 @@ export const api = {
   },
 
   getPredictorCollection: (id: string): any => {
-    return jwtFetch(`${domainRoot}/api/predictors/collection?id=${id}`);
+    return jwtFetch(`${domainRoot}/api/predictors/collection?collection_id=${id}`);
   },
 
   postPredictorCollection: (formData: FormData): any => {
-    // tslint:disable-next-line:no-console
-    console.log(formData);
-    return jwtFetch(`${domainRoot}/api/predictors/collection`, { method: 'POST', body: formData });
+    return jwtFetch(
+      `${domainRoot}/api/predictors/collection`,
+      {
+        headers: {'accept': 'application/json'},
+        method: 'POST',
+        body: formData 
+      },
+      true
+    );
+  },
+
+  getPredictor: (id: number): Promise<Predictor | null> => {
+    return jwtFetch(`${domainRoot}/api/predictors/${id}`);
   },
 
   getDataset: (datasetId: (number | string)): Promise<(Dataset | null)> => {
@@ -157,5 +168,4 @@ export const api = {
       return null;
     });
   }
-
 };

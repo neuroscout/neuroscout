@@ -27,13 +27,18 @@ type AddPredictorsFormState = {
   }[]
 };
 
+type AddPredictorsFormProps = {
+  datasets: Dataset[],
+  closeModal: () => void
+};
+
 type Partial<T> = {
     [P in keyof T]: T[P];
 };
 
 type PartialState = Partial<AddPredictorsFormState>;
 
-export class AddPredictorsForm extends React.Component<{datasets: Dataset[]}, AddPredictorsFormState> {
+export class AddPredictorsForm extends React.Component<AddPredictorsFormProps, AddPredictorsFormState> {
   constructor(props) {
     super(props);
     this.state = {
@@ -55,23 +60,18 @@ export class AddPredictorsForm extends React.Component<{datasets: Dataset[]}, Ad
   };
 
   upload = () => {
-    let formData = new FormData();
+    let formData: any = new FormData();
     api.getRuns(this.state.datasetId).then(runs => {
       formData.append('dataset_id', this.state.datasetId);
       formData.append('collection_name', this.state.collectionName);
       this.state.filesAndRuns.map((x) => {
         if (x.file === undefined) { return; }
-        formData.append('runs[]', runs.join(','));
-        formData.append('event_files[]', x.file, x.file.name);
+        formData.append('runs', [runs.map(run => run.id).join(',')]);
+        formData.append('event_files', x.file, x.file.name);
       });
-      // tslint:disable-next-line:no-console
-      console.log(formData);
-      // tslint:disable-next-line:no-console
-      console.log(this.state);
       return api.postPredictorCollection(formData);
     }).then(ret => {
-      // tslint:disable-next-line:no-console
-      console.log(ret);
+      this.props.closeModal();
     });
     
     return;

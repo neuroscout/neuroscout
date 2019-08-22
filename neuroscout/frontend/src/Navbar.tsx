@@ -33,9 +33,12 @@ class Navbar extends React.Component<AuthStoreState, {}> {
                   />
                 }
               >
-
                  <Menu.ItemGroup title={`${this.props.gAuth ? this.props.gAuth.profileObj.email : this.props.email}`}>
                    <Menu.Divider/>
+                   <Menu.Item key="predictorCollections">
+                     <Link to="/mycollections"> My Predictors </Link>
+                   </Menu.Item>
+                    
                    <Menu.Item
                     key="signout"
                     onClick={(e) => {return authActions.confirmLogout(); }}
@@ -58,19 +61,12 @@ class Navbar extends React.Component<AuthStoreState, {}> {
                    Sign in
                  </Menu.Item>
               }
-             <Menu.SubMenu
+             <Menu.Item
               style={{float: 'right'}}
               key="help"
-              title={<span><Icon type="question-circle"/>Help</span>}
              >
-               <Menu.Item
-                key="faq"
-               >
-                <Link to="/faq">
-                  FAQ
-                </Link>
-               </Menu.Item>
-             </Menu.SubMenu>
+               <Link to="/faq"><span><Icon type="question-circle"/>Help</span></Link>
+             </Menu.Item>
 
              <Menu.SubMenu
               style={{float: 'right'}}

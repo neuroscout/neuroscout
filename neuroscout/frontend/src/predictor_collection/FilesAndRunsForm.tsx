@@ -45,8 +45,6 @@ export class FilesAndRunsForm extends React.Component<FilesAndRunsFormProps, Fil
   
   getRuns = () => {
     api.getRuns(this.props.datasetId).then(runs => {
-      // tslint:disable-next-line:no-console
-      console.log(runs);
       let availableFilters = filtersInit();
       for (var key in availableFilters) {
         if (!availableFilters.hasOwnProperty(key)) {
@@ -92,6 +90,8 @@ export class FilesAndRunsForm extends React.Component<FilesAndRunsFormProps, Fil
       let contents = evt.target.result;
       let rows = contents.split('\n');
       let headers = rows[0].trim().split('\t');
+      /* should warnd here if onset and duration not present, upload will fail */
+      headers = headers.filter(x => x !== 'onset' && x !== 'duration');
       this.props.updateState({predictors: headers, descriptions: Array(headers.length).fill('')});
     }
   };

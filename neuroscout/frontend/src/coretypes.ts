@@ -261,7 +261,7 @@ export interface ApiUser {
   name: string;
   picture: string;
   analyses: ApiAnalysis[];
-  predictorCollections?: PredictorCollection[];
+  predictor_collections?: PredictorCollection[];
 }
 
 // The more condensed version of analysis object as returned by the user route

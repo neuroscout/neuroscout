@@ -34,8 +34,6 @@ export const moveItem: MoveItem<any> = (array, index, direction) => {
 };
 
 export const _fetch = (path: string, options?: object) => {
-  // tslint:disable-next-line:no-console
-  console.error(options);
   return fetch(path, options).then(response => {
       // Need to figure this response out. openLogin triggers modal to popup,
       // but in next cycle. Keep track of request, and after submit on modal
@@ -48,8 +46,6 @@ export const _fetch = (path: string, options?: object) => {
         throw new Error('Please Login Again');
       }
       if (response.status >= 400) {
-        // tslint:disable-next-line:no-console
-        console.error(response);
         return { statusCode: response.status };
       } else {
         return response.json().then(json => {
@@ -73,21 +69,19 @@ export const _fetch = (path: string, options?: object) => {
 // Wrapper around the standard 'fetch' that takes care of:
 // - Adding jwt to request header
 // - Decoding JSON response and adding the response status code to decoded JSON object
-export const jwtFetch = (path: string, options?: object, noCT?: boolean) => {
+export const jwtFetch = (path: string, options?: any, noCT?: boolean) => {
   const jwt = window.localStorage.getItem('jwt');
 
-  const newOptions = {
-    ...options,
-    headers: {
-      Authorization: 'JWT ' + jwt,
-    }
-  };
+  if (!options) { options = {}; }
+  if (!options.headers) { options.headers = {}; }
 
-  if (!noCT) {
-      newOptions.headers['Content-type'] = 'application/json';
+  options.headers.Authorization = 'JWT ' + jwt;
+
+  if (!options.headers['Content-type'] && !noCT) {
+    options.headers['Content-type'] = 'application/json';
   }
 
-  return _fetch(path, newOptions);
+  return _fetch(path, options);
 };
 
 export const timeout = (ms: number) => {
