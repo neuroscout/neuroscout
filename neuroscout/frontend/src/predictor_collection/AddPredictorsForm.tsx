@@ -109,6 +109,7 @@ export class AddPredictorsForm extends React.Component<AddPredictorsFormProps, A
             rowSelection={rowSelection}
             pagination={(this.props.datasets.length > 10) ? {'position': 'bottom'} : false}
           />
+          <Button disabled={!this.state.datasetId} onClick={this.nextTab}>Next</Button>
         </Tabs.TabPane>
         <Tabs.TabPane tab="Select Files and Runs" key={'' + 2}>
         {this.state.datasetId &&
