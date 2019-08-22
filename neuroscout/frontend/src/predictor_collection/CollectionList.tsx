@@ -78,11 +78,16 @@ export class PredictorCollectionList extends React.Component<CollectionListProps
     return (
       <Row type="flex" justify="center" style={{ background: '#fff', padding: 0 }}>
         <MainCol>
-           <Button
-             onClick={() => this.setState({formModal: true})}
-           >
-             <Icon type="plus" /> Add New Predictors
-           </Button>
+           <Row>
+             <span className="viewTitle"> My Predictor Collections: </span>
+             <span style={{float: 'right'}}>
+             <Button
+               onClick={() => this.setState({formModal: true})}
+             >
+               <Icon type="plus" /> Add New Predictors
+             </Button>
+             </span>
+           </Row>
            <br />
           {this.state.formModal &&
             <Modal
