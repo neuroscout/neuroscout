@@ -43,7 +43,7 @@ export class AddPredictorsForm extends React.Component<AddPredictorsFormProps, A
     super(props);
     this.state = {
       datasetId: '',
-      filesAndRuns: [],
+      filesAndRuns: [{file: undefined, runFilters: {numbers: [], subjects: [], sessions: []}, display: false}],
       predictors: [] as string[],
       descriptions: [] as string[],
       key: 1,

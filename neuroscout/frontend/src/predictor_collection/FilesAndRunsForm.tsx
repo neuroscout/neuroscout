@@ -115,12 +115,17 @@ export class FilesAndRunsForm extends React.Component<FilesAndRunsFormProps, Fil
   render() {
     let formList: any[] = [];
     this.props.filesAndRuns.forEach((x, i) => {
+      let fileName = 'No File'; 
+      if (x.file && x.file.name) {
+        fileName = x.file.name;
+      }
       formList.push(
         <Form key={i}>
+          {this.props.filesAndRuns[i].display &&
           <Card
             title={(
               <div>
-                Select File to Upload:
+                Select File to Upload
                 <input
                   type="file"
                   onChange={(e) => {
@@ -140,14 +145,25 @@ export class FilesAndRunsForm extends React.Component<FilesAndRunsFormProps, Fil
                   selectedFilters={this.props.filesAndRuns[i].runFilters}
                   onChange={this.onChange(i)('runFilters')}
                 />
-                <Button onClick={() => this.onChange(i)('display')(false)}>Ok</Button>
+                <Button
+                  className="runSelectorBtn"
+                  type="primary"
+                  onClick={() => this.onChange(i)('display')(false)}
+                >
+                  Ok
+                </Button>
               </>
             }
-            {!this.props.filesAndRuns[i].display &&
-              <Button onClick={() => this.onChange(i)('display')(true)}>Edit</Button>
-            }
           </Card>
-
+          }
+          {!this.props.filesAndRuns[i].display &&
+            <>
+              <span>{fileName}</span>
+              <Button style={{margin: '0 0 0 10px'}} onClick={() => this.onChange(i)('display')(true)}>
+                <Icon type="edit" /> Edit
+              </Button>
+            </>
+          }
         </Form>
       );
     });
@@ -163,7 +179,7 @@ export class FilesAndRunsForm extends React.Component<FilesAndRunsFormProps, Fil
           </Form.Item>
         </Form>
         {formList}
-        <Button onClick={this.addMore}>Add Event File</Button>
+        <Button style={{margin: '10px 0 0 0'}} onClick={this.addMore}><Icon type="plus" /> Add Event File</Button>
       </div>
     );
   }
