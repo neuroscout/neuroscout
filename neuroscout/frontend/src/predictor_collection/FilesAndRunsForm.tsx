@@ -42,7 +42,7 @@ export class FilesAndRunsForm extends React.Component<FilesAndRunsFormProps, Fil
       availableFilters: filtersInit()
     };
   }
-  
+
   getRuns = () => {
     api.getRuns(this.props.datasetId).then(runs => {
       let availableFilters = filtersInit();
@@ -99,11 +99,9 @@ export class FilesAndRunsForm extends React.Component<FilesAndRunsFormProps, Fil
   onChange = (index: number) => (key: string) => (value) => {
     let filesAndRuns = this.props.filesAndRuns;
     if (key === 'file' && filesAndRuns[index][key] === undefined && value !== undefined) {
-      if (index === 0) {
-        let reader = new FileReader();
-        reader.onload = this.parseContents; 
-        reader.readAsText(value);
-      }
+      let reader = new FileReader();
+      reader.onload = this.parseContents;
+      reader.readAsText(value);
       /*
         When an empty file is filled out add new empty form
         filesAndRuns.push(filesAndRunsInit());
