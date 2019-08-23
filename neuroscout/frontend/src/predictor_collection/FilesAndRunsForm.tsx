@@ -140,11 +140,11 @@ export class FilesAndRunsForm extends React.Component<FilesAndRunsFormProps, Fil
                   selectedFilters={this.props.filesAndRuns[i].runFilters}
                   onChange={this.onChange(i)('runFilters')}
                 />
-                <Button onClick={() => this.onChange(i)('display')(false)}>Hide</Button>
+                <Button onClick={() => this.onChange(i)('display')(false)}>Ok</Button>
               </>
             }
             {!this.props.filesAndRuns[i].display &&
-              <Button onClick={() => this.onChange(i)('display')(true)}>Edit Runs</Button>
+              <Button onClick={() => this.onChange(i)('display')(true)}>Edit</Button>
             }
           </Card>
 
@@ -163,7 +163,7 @@ export class FilesAndRunsForm extends React.Component<FilesAndRunsFormProps, Fil
           </Form.Item>
         </Form>
         {formList}
-        <Button onClick={this.addMore}>Add More</Button>
+        <Button onClick={this.addMore}>Add Event File</Button>
       </div>
     );
   }
