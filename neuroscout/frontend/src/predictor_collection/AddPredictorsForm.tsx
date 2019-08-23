@@ -59,6 +59,22 @@ export class AddPredictorsForm extends React.Component<AddPredictorsFormProps, A
     this.setState({key: Math.min(this.state.key + 1, 3)});
   };
 
+  applyRunFilter = (runs, filter) => {
+    let runIds: string[] = [];
+    for (var filterKey in filter) {
+      if (!filter[filterKey]) {
+        continue;
+      }
+      let runKey = filterKey.slice(0, -1); 
+      runs.forEach((run) => {
+        if (filter[filterKey].indexOf(run[runKey]) !== -1 && runIds.indexOf(run.id) === -1) {
+          runIds.push(run.id);
+        }
+      });
+    }
+    return runIds;
+  };
+
   upload = () => {
     let formData: any = new FormData();
     api.getRuns(this.state.datasetId).then(runs => {
@@ -66,18 +82,35 @@ export class AddPredictorsForm extends React.Component<AddPredictorsFormProps, A
       formData.append('collection_name', this.state.collectionName);
       this.state.filesAndRuns.map((x) => {
         if (x.file === undefined) { return; }
-        formData.append('runs', [runs.map(run => run.id).join(',')]);
+        let runIds = this.applyRunFilter(runs, x.runFilters).map(runId => parseInt(runId, 10));
+        formData.append('runs', runIds);
         formData.append('event_files', x.file, x.file.name);
       });
       return api.postPredictorCollection(formData);
     }).then(ret => {
-      this.props.closeModal();
+      if (ret.statusCode && ret.statusCode > 400) {
+        // need to figure out how to encode actual error message
+        // tslint:disable-next-line:no-console
+        console.log(ret);
+      } else {
+        this.props.closeModal();
+      }
     });
     
     return;
   };
   
-  updateState = (value: PartialState) => this.setState({ ...value });
+  updateState = (value: PartialState) => {
+    if ('predictors' in value) {
+      value.predictors = [...this.state.predictors, ...value.predictors];
+    }
+
+    if ('descriptions' in value) {
+      value.descriptions = [...this.state.descriptions, ...value.descriptions];
+    }
+
+    this.setState({ ...value });
+  }
 
   updateDescription = (index: number, value: string) => {
     let descriptions = this.state.descriptions;
