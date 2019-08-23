@@ -180,6 +180,7 @@ export class FilesAndRunsForm extends React.Component<FilesAndRunsFormProps, Fil
         </Form>
         {formList}
         <Button style={{margin: '10px 0 0 0'}} onClick={this.addMore}><Icon type="plus" /> Add Event File</Button>
+        {this.props.children}
       </div>
     );
   }
