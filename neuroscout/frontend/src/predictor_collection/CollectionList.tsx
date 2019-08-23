@@ -26,7 +26,7 @@ export class PredictorCollectionList extends React.Component<CollectionListProps
     this.state = { formModal: false };
   }
 
-  loadCollections() {
+  loadCollections = () => {
     api.getUser().then(user => {
       if (user && user.predictor_collections) {
         let collections = user.predictor_collections.map((x) => {
@@ -41,16 +41,16 @@ export class PredictorCollectionList extends React.Component<CollectionListProps
       collections.sort((a, b) => { return b.id - a.id; });
       this.setState({collections: collections});
     });
-  }
+  };
   
   componentDidMount() {
     this.loadCollections();
   }
 
-  closeModal() {
+  closeModal = ()  => {
     this.loadCollections();
     this.setState({formModal: false});
-  }
+  };
 
   render() {
     let collectionColumns = [
