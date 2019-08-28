@@ -111,51 +111,87 @@ class ReportResource(MethodResource):
         return report
 
 
+def _save_file(file, collection_id):
+    upload_dir = Path(
+        current_app.config['FILE_DIR']) / 'uploads' / collection['id']
+    with tempfile.NamedTemporaryFile(
+      suffix=f'_.tar.gz',
+      dir=str(upload_dir),
+      delete=False) as f:
+        file.save(f)
+
+    return f.name
+
 @doc(tags=['analysis'])
 class AnalysisUploadResource(MethodResource):
-    @doc(summary='Upload fitlins analysis tarball.',
+    @doc(summary='Upload fitlins analysis tarball. ',
          consumes=['multipart/form-data', 'application/x-www-form-urlencoded'])
     @marshal_with(NeurovaultCollectionSchema)
     @use_kwargs({
-        "tarball": FileField(required=True),
         "validation_hash": wa.fields.Str(required=True),
+        "image_file": FileField(required=False),
+        "collection_id": wa.fields.int(required=False),
         "force": wa.fields.Bool(),
         "n_subjects": wa.fields.Number(description='Number of subjects'),
         }, locations=["files", "form"])
     @fetch_analysis
-    def post(self, analysis, tarball, validation_hash, n_subjects=None,
-             force=False):
-        # Check hash_id
+    def post(self, analysis, validation_hash, image_file=None,
+             collection_id=None, n_subjects=None, force=False):
         if validation_hash != _validation_hash(analysis.id):
             abort(422, "Invalid validation hash.")
 
-        with tempfile.NamedTemporaryFile(
-          suffix='_{}.tar.gz'.format(analysis.hash_id),
-          dir=str(Path(current_app.config['FILE_DIR']) / 'uploads'),
-          delete=False) as f:
-            tarball.save(f)
+        if collection_id is not None:
+            if file is not None:
+                abort(422, "If no collection_id is provided,"
+                      "no files can be uploaded.")
 
-        timestamp = datetime.datetime.utcnow().strftime('%Y-%m-%d_%H:%M')
+            collection_name = analysis.name
+            if force is True:
+                timestamp = datetime.datetime.utcnow().strftime('%Y-%m-%d_%H:%M')
+                collection_name += f"_{timestamp}"
+            try:
+                api = Client(
+                    access_token=current_app.config['NEUROVAULT_ACCESS_TOKEN'])
+                collection = api.create_collection(collection_name)
+            except Exception as e:
+                abort(422, "Error creating collection, "
+                           "perhaps one with that name already exists?")
 
-        # Create new upload
-        upload = NeurovaultCollection(
-            analysis_id=analysis.hash_id,
-            uploaded_at=timestamp
-            )
-        db.session.add(upload)
-        db.session.commit()
+            # Create new NV collection
+            upload = NeurovaultCollection(
+                analysis_id=analysis.hash_id,
+                collection_id=collection['id'],
+                )
+            db.session.add(upload)
+            db.session.commit()
 
-        task = celery_app.send_task(
-            'neurovault.upload',
-            args=[f.name,
-                  analysis.hash_id,
-                  upload.id,
-                  timestamp if force else None,
-                  n_subjects
-                  ])
+            upload_dir = Path(
+                current_app.config['FILE_DIR']) / 'uploads' / collection['id']
+            upload_dir.mkdir(exist_ok=True)
 
-        upload.task_id = task.id
-        db.session.commit()
+        else:
+            upload = NeurovaultCollection.query.filter_by(
+                collection_id=colleciton_id).one()
+            filename = _save_file(image_file, collection_id)
+
+            # Create new file upload task
+            ### CAN I GET META-DATA FROM FILE NAME??
+            file_upload = NeurovaultFileUpload(
+                nv_collection_id=upload.id,
+                filename=filename,
+                )
+            db.session.add(upload)
+            db.session.commit()
+
+            task = celery_app.send_task(
+                'neurovault.upload',
+                args=[filename,
+                      upload.id,
+                      n_subjects]
+                )
+
+            file_upload.task_id = task.id
+            db.session.commit()
 
         return upload
 

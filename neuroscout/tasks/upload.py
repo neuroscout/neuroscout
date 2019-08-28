@@ -107,19 +107,15 @@ def upload_collection(flask_app, filenames, runs, dataset_id, collection_id,
     )
 
 
-def upload_neurovault(flask_app, img_tarball, hash_id, upload_id,
-                      timestamp=None, n_subjects=None):
+def upload_neurovault(flask_app, img_tarball, upload_id, n_subjects=None):
     """ Upload results to NeuroVault
     Args:
         img_tarball (str): tarball path containg images
-        hash_id (str): Analysis hash_id
         upload_id (int): NeurovaultCollection object id
-        timestamp (str): Current server timestamp
         n_subjects (int): Number of subjects in analysis
     """
-    upload_object = NeurovaultCollection.query.filter_by(id=upload_id).one()
-    timestamp = "_" + timestamp if timestamp is not None else ''
     api = Client(access_token=flask_app.config['NEUROVAULT_ACCESS_TOKEN'])
+    upload_object = NeurovaultCollection.query.filter_by(id=upload_id).one()
 
     try:
         # Untar:
@@ -134,28 +130,43 @@ def upload_neurovault(flask_app, img_tarball, hash_id, upload_id,
         )
         raise
 
-    try:
-        collection = api.create_collection(
-            '{}{}'.format(hash_id, timestamp))
 
-        for img_path in tmp_dir.glob('*stat-t_statmap.nii.gz'):
-            contrast_name = re.findall('contrast-(.*)_', str(img_path))[0]
-            api.add_image(
-                collection['id'], img_path, name=contrast_name,
-                modality="fMRI-BOLD", map_type='T',
-                analysis_level='G', cognitive_paradigm_cogatlas='None',
-                number_of_subjects=n_subjects, is_valid=True)
-    except Exception as e:
-        update_record(
-            upload_object,
-            exception=e,
-            traceback='Error uploading, perhaps a \
-                collection with the same name exists?'
-        )
-        raise
+    ## CAN I PARSE THIS INFO FROM FILE NAME?
+    if upload_object.level == 'GROUP':
+        try:
+            for img_path in tmp_dir.glob('*stat-t_statmap.nii.gz'):
+             contrast_name = re.findall('contrast-(.*)_', str(img_path))[0]
+             api.add_image(
+                 collection['id'], img_path, name=contrast_name,
+                 modality="fMRI-BOLD", map_type='T',
+                 analysis_level='G', cognitive_paradigm_cogatlas='None',
+                 number_of_subjects=n_subjects, is_valid=True)
+        except Exception as e:
+            update_record(
+                upload_object,
+                exception=e,
+                traceback='Error adding group-level maps to collection'
+            )
+            raise
+
+    else if upload_object.level == 'SUBJECT':
+        try:
+            for img_path in tmp_dir.glob('sub*/*stat-t_statmap.nii.gz'):
+             contrast_name = re.findall('contrast-(.*)_', str(img_path))[0]
+             api.add_image(
+                 collection['id'], img_path, name=contrast_name,
+                 modality="fMRI-BOLD", map_type='T',
+                 analysis_level='G', cognitive_paradigm_cogatlas='None',
+                 number_of_subjects=n_subjects, is_valid=True)
+        except Exception as e:
+            update_record(
+                upload_object,
+                exception=e,
+                traceback='Error adding group-level maps to collection'
+            )
+            raise
 
     return update_record(
         upload_object,
-        collection_id=collection['id'],
         status='OK'
         )
