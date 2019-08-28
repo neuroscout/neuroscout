@@ -78,6 +78,7 @@ interface ReportProps {
   analysisId?: string;
   runIds: string[];
   postReports: boolean;
+  defaultVisible: boolean;
 }
 
 interface ReportState {
@@ -208,7 +209,7 @@ export class Report extends React.Component<ReportProps, ReportState> {
            <Tooltip
             title={'Here you can preview the final design and correlation matrices. \
             \nClick on the design matrix columns to view the timecourse in detail.'}
-            defaultVisible={true}
+            defaultVisible={this.props.defaultVisible}
            >
              <Icon type="info-circle" style={{ fontSize: '15px'}}/>
            </Tooltip>

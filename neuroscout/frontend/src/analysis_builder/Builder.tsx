@@ -1201,6 +1201,7 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
                         analysisId={analysis.analysisId}
                         runIds={analysis.runIds}
                         postReports={this.state.postReports}
+                        defaultVisible={this.state.doTooltip && this.state.activeTab === ('review' as TabName)}
                       />
                       <Review
                         model={this.state.model}
