@@ -1,5 +1,4 @@
 import datetime
-import tempfile
 from hashids import Hashids
 import webargs as wa
 from flask_apispec import doc, use_kwargs, MethodResource, marshal_with
