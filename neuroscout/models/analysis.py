@@ -120,21 +120,23 @@ class NeurovaultCollection(db.Model):
     analysis_id = db.Column(db.Text, db.ForeignKey('analysis.hash_id'))
     uploaded_at = db.Column(db.DateTime, default=datetime.datetime.utcnow)
 
-    collection_id = db.Column(db.Integer, required=True, unique=True)
+    collection_id = db.Column(db.Integer, unique=True)
 
-    files = db.relationship('NeurovaultFileUpload')
+    files = db.relationship('NeurovaultFileUpload', backref='collection')
 
 
 class NeurovaultFileUpload(db.Model):
     """ NV file upload """
     id = db.Column(db.Integer, primary_key=True)
     nv_collection_id = db.Column(
-        db.Text, db.ForeignKey('neurovaultcollection.id'))
+        db.Integer, db.ForeignKey('neurovault_collection.id'),
+        nullable=False)
 
     task_id = db.Column(db.Text)
-    level = db.Column(db.Text)
+    level = db.Column(db.Text, nullable=False)
 
     status = db.Column(db.Text, default='PENDING')
     __table_args__ = (
         db.CheckConstraint(status.in_(['OK', 'FAILED', 'PENDING'])),
+        db.CheckConstraint(status.in_(['GROUP', 'SUBJECT'])),
         )

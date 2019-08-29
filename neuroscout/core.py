@@ -37,7 +37,6 @@ route_factory(
         ('AnalysisResource', 'analyses/<analysis_id>'),
         ('AnalysisFullResource', 'analyses/<analysis_id>/full'),
         ('AnalysisUploadResource', 'analyses/<analysis_id>/upload'),
-        ('AnalysisSubjectUploadResource', 'analyses/<analysis_id>/upload_subject'),
         ('BibliographyResource', 'analyses/<analysis_id>/bibliography'),
         ('CloneAnalysisResource', 'analyses/<analysis_id>/clone'),
         ('CompileAnalysisResource', 'analyses/<analysis_id>/compile'),

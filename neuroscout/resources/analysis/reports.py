@@ -5,8 +5,9 @@ import webargs as wa
 from flask_apispec import doc, use_kwargs, MethodResource, marshal_with
 from flask import current_app
 from pathlib import Path
+from pynv import Client
 
-from ...models import Report, NeurovaultCollection
+from ...models import Report, NeurovaultCollection, NeurovaultFileUpload
 from ...database import db
 from ...worker import celery_app
 from ...schemas.analysis import (
@@ -113,14 +114,41 @@ class ReportResource(MethodResource):
 
 def _save_file(file, collection_id):
     upload_dir = Path(
-        current_app.config['FILE_DIR']) / 'uploads' / collection['id']
-    with tempfile.NamedTemporaryFile(
-      suffix=f'_.tar.gz',
-      dir=str(upload_dir),
-      delete=False) as f:
-        file.save(f)
+        current_app.config['FILE_DIR']) / 'uploads' / collection_id
+    path = upload_dir / Path(file.filename).parts[-1]
 
-    return f.name
+    file.save(path)
+    return path
+
+
+def _create_collection(analysis, force=False):
+    collection_name = analysis.filenames
+    if force is True:
+        timestamp = datetime.datetime.utcnow().strftime(
+            '%Y-%m-%d_%H:%M')
+        collection_name += f"_{timestamp}"
+    try:
+        api = Client(
+            access_token=current_app.config['NEUROVAULT_ACCESS_TOKEN'])
+        collection = api.create_collection(collection_name)
+    except Exception:
+        abort(422, "Error creating collection, "
+                   "perhaps one with that name already exists?")
+
+    # Create new NV collection
+    upload = NeurovaultCollection(
+        analysis_id=analysis.hash_id,
+        collection_id=collection['id'],
+        )
+    db.session.add(upload)
+    db.session.commit()
+
+    upload_dir = Path(
+        current_app.config['FILE_DIR']) / 'uploads' / collection['id']
+    upload_dir.mkdir(exist_ok=True)
+
+    return upload
+
 
 @doc(tags=['analysis'])
 class AnalysisUploadResource(MethodResource):
@@ -130,55 +158,37 @@ class AnalysisUploadResource(MethodResource):
     @use_kwargs({
         "validation_hash": wa.fields.Str(required=True),
         "image_file": FileField(required=False),
-        "collection_id": wa.fields.int(required=False),
+        "collection_id": wa.fields.Int(required=False),
         "force": wa.fields.Bool(),
         "n_subjects": wa.fields.Number(description='Number of subjects'),
         }, locations=["files", "form"])
     @fetch_analysis
-    def post(self, analysis, validation_hash, image_file=None,
-             collection_id=None, n_subjects=None, force=False):
+    def post(self, analysis, validation_hash, collection_id=None,
+             image_file=None, level=None, n_subjects=None, force=False):
         if validation_hash != _validation_hash(analysis.id):
             abort(422, "Invalid validation hash.")
 
-        if collection_id is not None:
-            if file is not None:
-                abort(422, "If no collection_id is provided,"
-                      "no files can be uploaded.")
-
-            collection_name = analysis.name
-            if force is True:
-                timestamp = datetime.datetime.utcnow().strftime('%Y-%m-%d_%H:%M')
-                collection_name += f"_{timestamp}"
-            try:
-                api = Client(
-                    access_token=current_app.config['NEUROVAULT_ACCESS_TOKEN'])
-                collection = api.create_collection(collection_name)
-            except Exception as e:
-                abort(422, "Error creating collection, "
-                           "perhaps one with that name already exists?")
-
-            # Create new NV collection
-            upload = NeurovaultCollection(
-                analysis_id=analysis.hash_id,
-                collection_id=collection['id'],
-                )
-            db.session.add(upload)
-            db.session.commit()
-
-            upload_dir = Path(
-                current_app.config['FILE_DIR']) / 'uploads' / collection['id']
-            upload_dir.mkdir(exist_ok=True)
-
+        # Create or fetch NeurovaultCollection
+        if collection_id is None:
+            upload = _create_collection(analysis, force)
+            collection_id = upload.collection_id
         else:
             upload = NeurovaultCollection.query.filter_by(
-                collection_id=colleciton_id).one()
-            filename = _save_file(image_file, collection_id)
+                collection_id=collection_id).first()
+            if upload is None:
+                abort(404, 'No record of collection id.')
 
+        # If file, upload
+        if image_file is not None:
+            if level is None:
+                abort(422, "Must provide image level.")
+
+            filename = _save_file(image_file, collection_id)
             # Create new file upload task
-            ### CAN I GET META-DATA FROM FILE NAME??
             file_upload = NeurovaultFileUpload(
                 nv_collection_id=upload.id,
                 filename=filename,
+                level=level
                 )
             db.session.add(upload)
             db.session.commit()
@@ -186,7 +196,7 @@ class AnalysisUploadResource(MethodResource):
             task = celery_app.send_task(
                 'neurovault.upload',
                 args=[filename,
-                      upload.id,
+                      file_upload.id,
                       n_subjects]
                 )
 
