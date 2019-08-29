@@ -114,7 +114,7 @@ MAP_TYPE_CHOICES = {
 
 
 def upload_neurovault(flask_app, file_id, n_subjects=None):
-    """ Upload results to NeuroVault
+    """ Upload image file to NeuroVault
     Args:
         file_id (int): NeurovaultFileUpload object id
         n_subjects (int): Number of subjects in analysis
@@ -147,23 +147,6 @@ def upload_neurovault(flask_app, file_id, n_subjects=None):
             traceback='Error adding image to collection'
         )
         raise
-
-    # elif upload_object.level == 'SUBJECT':
-    #     try:
-    #         for img_path in tmp_dir.glob('sub*/*stat-t_statmap.nii.gz'):
-    #          contrast_name = re.findall('contrast-(.*)_', str(img_path))[0]
-    #          api.add_image(
-    #              collection['id'], img_path, name=contrast_name,
-    #              modality="fMRI-BOLD", map_type='T',
-    #              analysis_level='G', cognitive_paradigm_cogatlas='None',
-    #              number_of_subjects=n_subjects, is_valid=True)
-    #     except Exception as e:
-    #         update_record(
-    #             upload_object,
-    #             exception=e,
-    #             traceback='Error adding group-level maps to collection'
-    #         )
-    #         raise
 
     return update_record(
         file_object,
