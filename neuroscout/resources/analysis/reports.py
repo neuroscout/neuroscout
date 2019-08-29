@@ -190,7 +190,7 @@ class AnalysisUploadResource(MethodResource):
                 path=path,
                 level=level
                 )
-            db.session.add(upload)
+            db.session.add(file_upload)
             db.session.commit()
 
             task = celery_app.send_task(
