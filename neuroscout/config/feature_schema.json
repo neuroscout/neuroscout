@@ -128,10 +128,10 @@
       }
     }
   ],
-  "RMSEExtractor": [
+  "RMSExtractor": [
     {
       "features": {
-        "rmse": {
+        "rms": {
           "description": "Root mean square (RMS) energy from audio"
         }
       }
