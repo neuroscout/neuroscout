@@ -54,3 +54,4 @@ class PredictorCollectionSchema(Schema):
     collection_name = fields.Str(description='Name of collection')
     predictors = fields.Nested(
         'PredictorSchema', only=['id', 'name'], many=True)
+    private = fields.Bool(description='Collection private?')

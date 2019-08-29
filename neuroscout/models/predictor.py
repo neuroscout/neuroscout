@@ -72,6 +72,7 @@ class PredictorCollection(db.Model):
     task_id = db.Column(db.Text)
     traceback = db.Column(db.Text)
     status = db.Column(db.Text, default='PENDING')
+    private = db.Column(db.Boolean, default=True)
     __table_args__ = (
         db.CheckConstraint(status.in_(['OK', 'FAILED', 'PENDING'])), )
 
