@@ -116,7 +116,7 @@ def _save_file(file, collection_id):
         current_app.config['FILE_DIR']) / 'uploads' / str(collection_id)
     path = upload_dir / Path(file.filename).parts[-1]
 
-    file.save(path)
+    file.save(path.open('wb'))
     return path
 
 
