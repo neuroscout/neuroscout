@@ -16,9 +16,8 @@ def generate_report(hash_id, report_id, run_ids, sampling_rate, scale):
 
 
 @celery_app.task(name='neurovault.upload')
-def upload_neurovault(img_tarball, hash_id, upload_id, timestamp, n_subjects):
-    return upload.upload_neurovault(flask_app, img_tarball, hash_id,
-                                    upload_id, timestamp, n_subjects)
+def upload_neurovault(file_id, n_subjects):
+    return upload.upload_neurovault(flask_app, file_id, n_subjects)
 
 
 @celery_app.task(name='collection.upload')
