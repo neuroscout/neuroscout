@@ -105,6 +105,14 @@ def upload_collection(flask_app, filenames, runs, dataset_id, collection_id,
     )
 
 
+MAP_TYPE_CHOICES = {
+    't': 'T',
+    'p': 'P',
+    'effect': 'U',
+    'variance': 'Variance',
+}
+
+
 def upload_neurovault(flask_app, file_id, n_subjects=None):
     """ Upload results to NeuroVault
     Args:
@@ -115,23 +123,30 @@ def upload_neurovault(flask_app, file_id, n_subjects=None):
     file_object = NeurovaultFileUpload.query.filter_by(id=file_id).one()
     basename = Path(file_object.path).parts[-1]
 
-    # CAN I PARSE THIS INFO FROM FILE NAME?
+    contrast_name = re.findall('contrast-(.*)_', str(basename))[0]
+    map_type = re.findall('stat-(.*)_', str(basename))[0]
+    map_type = MAP_TYPE_CHOICES[map_type]
+
     if file_object.level == 'GROUP':
-        try:
-            contrast_name = re.findall('contrast-(.*)_', str(basename))[0]
-            api.add_image(
-                file_object.collection.collection_id, file_object.path,
-                name=contrast_name,
-                modality="fMRI-BOLD", map_type='T',
-                analysis_level='G', cognitive_paradigm_cogatlas='None',
-                number_of_subjects=n_subjects, is_valid=True)
-        except Exception as e:
-            update_record(
-                file_object,
-                exception=e,
-                traceback='Error adding group-level map to collection'
-            )
-            raise
+        analysis_level = 'G'
+    else:
+        analysis_level = 'S'
+        n_subjects = None
+
+    try:
+        api.add_image(
+            file_object.collection.collection_id, file_object.path,
+            name=contrast_name,
+            modality="fMRI-BOLD", map_type=map_type,
+            analysis_level=analysis_level, cognitive_paradigm_cogatlas='None',
+            number_of_subjects=n_subjects, is_valid=True)
+    except Exception as e:
+        update_record(
+            file_object,
+            exception=e,
+            traceback='Error adding image to collection'
+        )
+        raise
 
     # elif upload_object.level == 'SUBJECT':
     #     try:
