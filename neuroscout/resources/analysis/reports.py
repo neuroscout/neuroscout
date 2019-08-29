@@ -159,6 +159,7 @@ class AnalysisUploadResource(MethodResource):
         "image_file": FileField(required=False),
         "collection_id": wa.fields.Int(required=False),
         "force": wa.fields.Bool(),
+        "level": wa.fields.Str(),
         "n_subjects": wa.fields.Number(description='Number of subjects'),
         }, locations=["files", "form"])
     @fetch_analysis
