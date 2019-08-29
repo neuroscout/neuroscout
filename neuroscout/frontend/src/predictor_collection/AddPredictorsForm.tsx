@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Button, Card, Checkbox, Collapse, Form, Icon, Input, List, Row, Tabs, Table, Upload } from 'antd';
+import { Anchor, Button, Card, Checkbox, Collapse, Form, Icon, Input, List, Row, Tabs, Table, Upload } from 'antd';
 import { TableRowSelection } from 'antd/lib/table';
 
 import { api } from '../api';
@@ -8,6 +8,8 @@ import { datasetColumns, MainCol } from '../HelperComponents';
 import { RunSelector } from './RunSelector';
 import { PredictorDescriptionForm } from  './PredictorDescriptionForm';
 import { FilesAndRunsForm } from './FilesAndRunsForm';
+
+const { Link } = Anchor;
 
 /*
   predictors - these are the new predictors extracted from tsv headers
@@ -121,6 +123,10 @@ export class AddPredictorsForm extends React.Component<AddPredictorsFormProps, A
     this.setState({ descriptions: descriptions });
   }
 
+  onTabClick = (key: string) => {
+    this.setState({ key: parseInt(key, 10) });
+  }
+
   render() {
     const rowSelection: TableRowSelection<Dataset> = {
       type: 'radio',
@@ -131,7 +137,10 @@ export class AddPredictorsForm extends React.Component<AddPredictorsFormProps, A
     };
 
     return (
-      <Tabs activeKey={'' + this.state.key}>
+      <Tabs
+        activeKey={'' + this.state.key}
+        onTabClick={newTab => this.onTabClick(newTab)}
+      >
         <Tabs.TabPane tab="Select Dataset" key={'' + 1}>
           <Table
             className="selectDataset"
@@ -142,7 +151,6 @@ export class AddPredictorsForm extends React.Component<AddPredictorsFormProps, A
             rowSelection={rowSelection}
             pagination={(this.props.datasets.length > 10) ? {'position': 'bottom'} : false}
           />
-          <Button disabled={!this.state.datasetId} onClick={this.nextTab}>Next</Button>
         </Tabs.TabPane>
         <Tabs.TabPane tab="Select Files and Runs" key={'' + 2}>
         {this.state.datasetId &&
@@ -155,19 +163,31 @@ export class AddPredictorsForm extends React.Component<AddPredictorsFormProps, A
                 filesAndRuns={this.state.filesAndRuns}
               />
             </div>
-            <Button onClick={this.prevTab}>Prev</Button>
-            <Button onClick={this.nextTab}>Next</Button>
+            <Button type="primary" style={{ margin: '10px 0 0 0', float: 'right' }}onClick={this.nextTab}>Next</Button>
           </>
+        }
+        {!this.state.datasetId &&
+          <div>
+          Please select a dataset from the <a onClick={this.prevTab}>previous tab</a>
+          </div>
         }
         </Tabs.TabPane>
         <Tabs.TabPane tab="Predictor Descriptions" key={'' + 3}>
-          <PredictorDescriptionForm
-            predictors={this.state.predictors}
-            descriptions={this.state.descriptions}
-            updateDescription={this.updateDescription}
-          /> 
-          <Button onClick={this.prevTab}>Prev</Button>
-          <Button onClick={this.upload} type="primary">Upload</Button>
+        {this.state.filesAndRuns[0].file !== undefined &&
+          <>
+            <PredictorDescriptionForm
+              predictors={this.state.predictors}
+              descriptions={this.state.descriptions}
+              updateDescription={this.updateDescription}
+            />
+            <Button onClick={this.upload} type="primary">Upload</Button>
+          </>
+        }
+        {this.state.filesAndRuns[0].file === undefined &&
+          <div>
+            Please select at least one file to upload from the <a onClick={this.prevTab}>previous tab</a>
+          </div>
+        }
         </Tabs.TabPane>
       </Tabs>
     );
