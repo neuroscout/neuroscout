@@ -121,7 +121,7 @@ def _save_file(file, collection_id):
 
 
 def _create_collection(analysis, force=False):
-    collection_name = analysis.filenames
+    collection_name = analysis.name
     if force is True:
         timestamp = datetime.datetime.utcnow().strftime(
             '%Y-%m-%d_%H:%M')
@@ -151,7 +151,7 @@ def _create_collection(analysis, force=False):
 
 @doc(tags=['analysis'])
 class AnalysisUploadResource(MethodResource):
-    @doc(summary='Upload fitlins analysis tarball. ',
+    @doc(summary='Upload fitlins analysis results. ',
          consumes=['multipart/form-data', 'application/x-www-form-urlencoded'])
     @marshal_with(NeurovaultCollectionSchema)
     @use_kwargs({
