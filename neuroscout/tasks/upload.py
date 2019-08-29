@@ -9,7 +9,7 @@ from ..utils.db import get_or_create
 from ..database import db
 from ..models import (
     Predictor, PredictorCollection, PredictorEvent, PredictorRun,
-    NeurovaultCollection)
+    NeurovaultFileUpload)
 
 from .utils import update_record
 
@@ -110,41 +110,28 @@ def upload_collection(flask_app, filenames, runs, dataset_id, collection_id,
 def upload_neurovault(flask_app, file_id, n_subjects=None):
     """ Upload results to NeuroVault
     Args:
-        img_tarball (str): tarball path containg images
-        upload_id (int): NeurovaultCollection object id
+        file_id (int): NeurovaultFileUpload object id
         n_subjects (int): Number of subjects in analysis
     """
     api = Client(access_token=flask_app.config['NEUROVAULT_ACCESS_TOKEN'])
-    upload_object = NeurovaultCollection.query.filter_by(id=upload_id).one()
-
-    try:
-        # Untar:
-        tmp_dir = Path(mkdtemp())
-        with tarfile.open(img_tarball, mode="r:gz") as tf:
-            tf.extractall(tmp_dir)
-    except Exception as e:
-        update_record(
-            upload_object,
-            exception=e,
-            traceback='Error decompressing image bundle'
-        )
-        raise
+    file_object = NeurovaultFileUpload.query.filter_by(id=file_id).one()
+    basename = Path(file_object.path).parts[-1]
 
     # CAN I PARSE THIS INFO FROM FILE NAME?
-    if upload_object.level == 'GROUP':
+    if file_object.level == 'GROUP':
         try:
-            for img_path in tmp_dir.glob('*stat-t_statmap.nii.gz'):
-                contrast_name = re.findall('contrast-(.*)_', str(img_path))[0]
-                api.add_image(
-                    upload_object.collection_id, img_path, name=contrast_name,
-                    modality="fMRI-BOLD", map_type='T',
-                    analysis_level='G', cognitive_paradigm_cogatlas='None',
-                    number_of_subjects=n_subjects, is_valid=True)
+            contrast_name = re.findall('contrast-(.*)_', str(basename))[0]
+            api.add_image(
+                file_object.collection.collection_id, file_object.path,
+                name=contrast_name,
+                modality="fMRI-BOLD", map_type='T',
+                analysis_level='G', cognitive_paradigm_cogatlas='None',
+                number_of_subjects=n_subjects, is_valid=True)
         except Exception as e:
             update_record(
-                upload_object,
+                file_object,
                 exception=e,
-                traceback='Error adding group-level maps to collection'
+                traceback='Error adding group-level map to collection'
             )
             raise
 
@@ -166,6 +153,6 @@ def upload_neurovault(flask_app, file_id, n_subjects=None):
     #         raise
 
     return update_record(
-        upload_object,
+        file_object,
         status='OK'
         )

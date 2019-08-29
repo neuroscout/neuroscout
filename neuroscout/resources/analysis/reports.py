@@ -183,11 +183,11 @@ class AnalysisUploadResource(MethodResource):
             if level is None:
                 abort(422, "Must provide image level.")
 
-            filename = _save_file(image_file, collection_id)
+            path = _save_file(image_file, collection_id)
             # Create new file upload task
             file_upload = NeurovaultFileUpload(
                 nv_collection_id=upload.id,
-                filename=filename,
+                path=path,
                 level=level
                 )
             db.session.add(upload)
@@ -195,8 +195,7 @@ class AnalysisUploadResource(MethodResource):
 
             task = celery_app.send_task(
                 'neurovault.upload',
-                args=[filename,
-                      file_upload.id,
+                args=[file_upload.id,
                       n_subjects]
                 )
 

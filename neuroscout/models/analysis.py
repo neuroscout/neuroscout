@@ -132,8 +132,13 @@ class NeurovaultFileUpload(db.Model):
         db.Integer, db.ForeignKey('neurovault_collection.id'),
         nullable=False)
 
+    path = db.Column(db.Text, nullable=False)
+
     task_id = db.Column(db.Text)
     level = db.Column(db.Text, nullable=False)
+
+    exception = db.Column(db.Text)
+    traceback = db.Column(db.Text)
 
     status = db.Column(db.Text, default='PENDING')
     __table_args__ = (
