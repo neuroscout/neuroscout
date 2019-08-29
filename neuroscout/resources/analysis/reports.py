@@ -126,10 +126,16 @@ def _create_collection(analysis, force=False):
         timestamp = datetime.datetime.utcnow().strftime(
             '%Y-%m-%d_%H:%M')
         collection_name += f"_{timestamp}"
+    url = f"https://{current_app.config['SERVER_NAME']}"\
+          f"/builder/{analysis.hash_id}"
     try:
         api = Client(
             access_token=current_app.config['NEUROVAULT_ACCESS_TOKEN'])
-        collection = api.create_collection(collection_name)
+        collection = api.create_collection(
+            collection_name,
+            description=analysis.description,
+            paper_url=url,
+            full_dataset_url=analysis.dataset.url)
     except Exception:
         abort(422, "Error creating collection, "
                    "perhaps one with that name already exists?")
