@@ -117,7 +117,7 @@ def _save_file(file, collection_id):
     path = upload_dir / Path(file.filename).parts[-1]
 
     file.save(path.open('wb'))
-    return path
+    return str(path)
 
 
 def _create_collection(analysis, force=False):

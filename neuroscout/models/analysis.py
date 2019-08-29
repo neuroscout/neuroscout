@@ -143,5 +143,5 @@ class NeurovaultFileUpload(db.Model):
     status = db.Column(db.Text, default='PENDING')
     __table_args__ = (
         db.CheckConstraint(status.in_(['OK', 'FAILED', 'PENDING'])),
-        db.CheckConstraint(status.in_(['GROUP', 'SUBJECT'])),
+        db.CheckConstraint(level.in_(['GROUP', 'SUBJECT'])),
         )
