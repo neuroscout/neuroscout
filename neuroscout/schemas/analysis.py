@@ -129,13 +129,22 @@ class ReportSchema(Schema):
         description='Traceback of generation error.')
 
 
-class NeurovaultCollectionSchema(Schema):
-    """ Schema for report results """
-    uploaded_at = fields.Time(description='Time images upload began')
-    collection_id = fields.Dict(description='NeuroVault collection id')
+class NeurovaultFileUploadSchema(Schema):
+    level = fields.Str(
+        description='Image analysis level'
+    )
     status = fields.Str(description='Upload status')
     traceback = fields.Str(
         description='Traceback of upload error.')
+
+
+class NeurovaultCollectionSchema(Schema):
+    """ Schema for report results """
+    uploaded_at = fields.Time(description='Time collectio was created')
+    collection_id = fields.Dict(description='NeuroVault collection id')
+
+    files = fields.Nested(
+        NeurovaultFileUploadSchema, many=True)
 
 
 class BibliographySchema(Schema):
