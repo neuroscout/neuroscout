@@ -21,6 +21,7 @@ class PredictorSchema(Schema):
     mean = fields.Float(description="Mean value")
     stddev = fields.Float(description="Standard deviation of value")
     num_na = fields.Int(description="Number of missing values")
+    private = fields.Bool(description='Predictor private?')
 
     @post_dump
     def remove_null_values(self, data):
@@ -54,4 +55,3 @@ class PredictorCollectionSchema(Schema):
     collection_name = fields.Str(description='Name of collection')
     predictors = fields.Nested(
         'PredictorSchema', only=['id', 'name'], many=True)
-    private = fields.Bool(description='Collection private?')

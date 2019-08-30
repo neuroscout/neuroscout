@@ -40,7 +40,7 @@ def add_predictor_collection(collection, dataset_id, run_id,
         if annotated is not None:
             pred_props, pes_props = annotated
             predictor, _ = get_or_create(
-                Predictor, dataset_id=dataset_id, **pred_props)
+                Predictor, dataset_id=dataset_id **pred_props)
             for pe in pes_props:
                 pe_objects.append(PredictorEvent(
                                predictor_id=predictor.id, run_id=run_id, **pe))

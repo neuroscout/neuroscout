@@ -20,6 +20,7 @@ class Predictor(db.Model):
 
     predictor_run = db.relationship('PredictorRun')
     active = db.Column(db.Boolean, default=True)  # Actively display or not
+    private = db.Column(db.Boolean, default=False)
 
     def __repr__(self):
         return '<models.Predictor[name=%s]>' % self.name
@@ -72,7 +73,6 @@ class PredictorCollection(db.Model):
     task_id = db.Column(db.Text)
     traceback = db.Column(db.Text)
     status = db.Column(db.Text, default='PENDING')
-    private = db.Column(db.Boolean, default=True)
     __table_args__ = (
         db.CheckConstraint(status.in_(['OK', 'FAILED', 'PENDING'])), )
 
