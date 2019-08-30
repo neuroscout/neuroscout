@@ -1,12 +1,12 @@
 import datetime
-import tempfile
 from hashids import Hashids
 import webargs as wa
 from flask_apispec import doc, use_kwargs, MethodResource, marshal_with
 from flask import current_app
 from pathlib import Path
+from pynv import Client
 
-from ...models import Report, NeurovaultCollection
+from ...models import Report, NeurovaultCollection, NeurovaultFileUpload
 from ...database import db
 from ...worker import celery_app
 from ...schemas.analysis import (
@@ -111,51 +111,102 @@ class ReportResource(MethodResource):
         return report
 
 
+def _save_file(file, collection_id):
+    upload_dir = Path(
+        current_app.config['FILE_DIR']) / 'uploads' / str(collection_id)
+    path = upload_dir / Path(file.filename).parts[-1]
+
+    file.save(path.open('wb'))
+    return str(path)
+
+
+def _create_collection(analysis, force=False):
+    collection_name = analysis.name
+    if force is True:
+        timestamp = datetime.datetime.utcnow().strftime(
+            '%Y-%m-%d_%H:%M')
+        collection_name += f"_{timestamp}"
+    url = f"https://{current_app.config['SERVER_NAME']}"\
+          f"/builder/{analysis.hash_id}"
+    try:
+        api = Client(
+            access_token=current_app.config['NEUROVAULT_ACCESS_TOKEN'])
+        collection = api.create_collection(
+            collection_name,
+            description=analysis.description,
+            paper_url=url,
+            full_dataset_url=analysis.dataset.url)
+    except Exception:
+        abort(422, "Error creating collection, "
+                   "perhaps one with that name already exists?")
+
+    # Create new NV collection
+    upload = NeurovaultCollection(
+        analysis_id=analysis.hash_id,
+        collection_id=collection['id'],
+        )
+    db.session.add(upload)
+    db.session.commit()
+
+    upload_dir = Path(
+        current_app.config['FILE_DIR']) / 'uploads' / str(collection['id'])
+    upload_dir.mkdir(exist_ok=True)
+
+    return upload
+
+
 @doc(tags=['analysis'])
 class AnalysisUploadResource(MethodResource):
-    @doc(summary='Upload fitlins analysis tarball.',
+    @doc(summary='Upload fitlins analysis results. ',
          consumes=['multipart/form-data', 'application/x-www-form-urlencoded'])
     @marshal_with(NeurovaultCollectionSchema)
     @use_kwargs({
-        "tarball": FileField(required=True),
         "validation_hash": wa.fields.Str(required=True),
+        "image_file": FileField(required=False),
+        "collection_id": wa.fields.Int(required=False),
         "force": wa.fields.Bool(),
+        "level": wa.fields.Str(),
         "n_subjects": wa.fields.Number(description='Number of subjects'),
         }, locations=["files", "form"])
     @fetch_analysis
-    def post(self, analysis, tarball, validation_hash, n_subjects=None,
-             force=False):
-        # Check hash_id
+    def post(self, analysis, validation_hash, collection_id=None,
+             image_file=None, level=None, n_subjects=None, force=False):
         if validation_hash != _validation_hash(analysis.id):
             abort(422, "Invalid validation hash.")
 
-        with tempfile.NamedTemporaryFile(
-          suffix='_{}.tar.gz'.format(analysis.hash_id),
-          dir=str(Path(current_app.config['FILE_DIR']) / 'uploads'),
-          delete=False) as f:
-            tarball.save(f)
+        # Create or fetch NeurovaultCollection
+        if collection_id is None:
+            upload = _create_collection(analysis, force)
+            collection_id = upload.collection_id
+        else:
+            upload = NeurovaultCollection.query.filter_by(
+                collection_id=collection_id).first()
+            if upload is None:
+                abort(404, 'No record of collection id.')
 
-        timestamp = datetime.datetime.utcnow().strftime('%Y-%m-%d_%H:%M')
+        # If file, upload
+        if image_file is not None:
+            if level is None:
+                abort(422, "Must provide image level.")
 
-        # Create new upload
-        upload = NeurovaultCollection(
-            analysis_id=analysis.hash_id,
-            uploaded_at=timestamp
-            )
-        db.session.add(upload)
-        db.session.commit()
+            path = _save_file(image_file, collection_id)
+            # Create new file upload task
+            file_upload = NeurovaultFileUpload(
+                nv_collection_id=upload.id,
+                path=path,
+                level=level
+                )
+            db.session.add(file_upload)
+            db.session.commit()
 
-        task = celery_app.send_task(
-            'neurovault.upload',
-            args=[f.name,
-                  analysis.hash_id,
-                  upload.id,
-                  timestamp if force else None,
-                  n_subjects
-                  ])
+            task = celery_app.send_task(
+                'neurovault.upload',
+                args=[file_upload.id,
+                      n_subjects]
+                )
 
-        upload.task_id = task.id
-        db.session.commit()
+            file_upload.task_id = task.id
+            db.session.commit()
 
         return upload
 
