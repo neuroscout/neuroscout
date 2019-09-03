@@ -70,6 +70,7 @@ def create_pes(predictors, run_ids):
                         stimulus_id=ee.stimulus_id
                     )
                 )
+    return all_pes
 
 
 def dump_analysis(analysis_id, run_id=None):
@@ -105,5 +106,5 @@ def dump_analysis(analysis_id, run_id=None):
 
     pes += create_pes(ext_preds, run_id)
 
-    return (analysis.id, analysis_json, resources_json, dump_pe(pes),
+    return (analysis.id, analysis_json, resources_json, pes,
             analysis.dataset.local_path)
