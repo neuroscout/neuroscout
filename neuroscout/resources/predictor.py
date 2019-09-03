@@ -37,7 +37,9 @@ def get_predictors(newest=True, **kwargs):
         predictor_ids = predictor_ids.join(PredictorRun).filter(
             PredictorRun.run_id.in_(kwargs.pop('run_id')))
 
-    query = Predictor.query.filter(Predictor.id.in_(predictor_ids))
+    query = Predictor.query.filter(Predictor.id.in_(predictor_ids)).filter_by(
+        private=False
+    )
     for param in kwargs:
         query = query.filter(getattr(Predictor, param).in_(kwargs[param]))
 
