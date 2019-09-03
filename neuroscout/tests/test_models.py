@@ -122,14 +122,7 @@ def test_extracted_features(session, add_task, extract_features):
 
     # Check that the number of features extracted is the same as Stimuli
     assert len(ef_b.extracted_events) == Stimulus.query.count()
-
-    # Check for sensical value
-    assert isclose(float(session.query(func.max(PredictorEvent.value)).join(
-        Predictor).filter_by(ef_id=ef_b.id).one()[0]), 0.88, 0.1)
-
-    # And that a sensical onset was extracted
-    assert session.query(func.max(PredictorEvent.onset)).join(
-        Predictor).filter_by(ef_id=ef_b.id).one()[0] == 25.0
+    
 
     # Test that Predictors were created from EF
     pred = Predictor.query.filter_by(ef_id=ef_b.id).one()
