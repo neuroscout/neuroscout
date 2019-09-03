@@ -66,6 +66,7 @@ def upload_collection(flask_app, filenames, runs, dataset_id, collection_id,
                 name=col,
                 source=f'Collection: {collection_object.collection_name}',
                 dataset_id=dataset_id,
+                private=True,
                 description=descriptions.get(col))
             db.session.add(predictor)
             db.session.commit()
