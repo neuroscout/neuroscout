@@ -46,9 +46,9 @@ def write_tarball(paths, filename):
 
 def create_pes(predictors, run_ids):
     """ Create PredictorEvents from EFs """
+    all_pes = []
     for pred in predictors:
         ef = pred.extracted_feature
-        all_pes = []
         # For all instances for stimuli in this task's runs
         for ee in ef.extracted_events:
             # if ee.value:
