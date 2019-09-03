@@ -122,7 +122,6 @@ def test_extracted_features(session, add_task, extract_features):
 
     # Check that the number of features extracted is the same as Stimuli
     assert len(ef_b.extracted_events) == Stimulus.query.count()
-    
 
     # Test that Predictors were created from EF
     pred = Predictor.query.filter_by(ef_id=ef_b.id).one()
