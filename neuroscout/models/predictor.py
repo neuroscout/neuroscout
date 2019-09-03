@@ -20,6 +20,7 @@ class Predictor(db.Model):
 
     predictor_run = db.relationship('PredictorRun')
     active = db.Column(db.Boolean, default=True)  # Actively display or not
+    private = db.Column(db.Boolean, default=False)
 
     def __repr__(self):
         return '<models.Predictor[name=%s]>' % self.name
