@@ -48,7 +48,6 @@ route_factory(
         ('RunResource', 'runs/<int:run_id>'),
         ('PredictorListResource', 'predictors'),
         ('PredictorResource', 'predictors/<int:predictor_id>'),
-        ('PredictorEventListResource', 'predictor-events'),
         ('PredictorCollectionResource', 'predictors/collection'),
         ('UserRootResource', 'user'),
         ('UserTriggerResetResource', 'user/reset_password'),

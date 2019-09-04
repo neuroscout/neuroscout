@@ -29,15 +29,6 @@ class PredictorSchema(Schema):
         return data
 
 
-class PredictorEventSchema(Schema):
-    id = fields.Str()
-    onset = fields.Number(description="Onset in seconds.")
-    duration = fields.Number(description="Duration in seconds.")
-    value = fields.Str(description="Value, or amplitude.")
-    run_id = fields.Int()
-    predictor_id = fields.Int()
-
-
 class PredictorRunSchema(Schema):
     run_id = fields.Int()
     mean = fields.Number()

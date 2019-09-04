@@ -17,7 +17,7 @@ from pliers.transformers import get_transformer
 from pliers.extractors import merge_results
 
 from ..models import (
-    Dataset, Task, Predictor, PredictorEvent, PredictorRun, Run, Stimulus,
+    Dataset, Task, Predictor, PredictorRun, Run, Stimulus,
     RunStimulus, ExtractedFeature, ExtractedEvent)
 from .annotate import FeatureSerializer
 
@@ -130,7 +130,7 @@ def create_predictors(features, dataset_name, run_ids=None,
             features (object) - ExtractedFeature objects
             dataset_name (str) - Dataset name
             run_ids (list of ints) - Optional list of run_ids for which to
-                                     create PredictorEvents for.
+                                     create PredictorRun for.
     """
     print("Creating predictors")
 
@@ -151,37 +151,20 @@ def create_predictors(features, dataset_name, run_ids=None,
                 dataset_id=dataset.id,
                 source='extracted', ef_id=ef.id)[0])
 
-    # Create PredictorEvents and PredictorRuns
+    # Create PredictorRuns
     for ix, predictor in enumerate(progressbar(all_preds)):
         ef = features[ix]
-        all_pes = []
         all_rs = []
         # For all instances for stimuli in this task's runs
         for ee in ef.extracted_events:
-            # if ee.value:
             query = RunStimulus.query.filter_by(stimulus_id=ee.stimulus_id)
             if run_ids is not None:
                 query = query.filter(RunStimulus.run_id.in_(run_ids))
-            for rs in query:
-                all_rs.append((predictor.id, rs.run_id))
-                duration = ee.duration
-                if duration is None:
-                    duration = rs.duration
-                all_pes.append(
-                    PredictorEvent(
-                        onset=(ee.onset or 0) + rs.onset,
-                        value=ee.value,
-                        object_id=ee.object_id,
-                        duration=duration,
-                        predictor_id=predictor.id,
-                        run_id=rs.run_id,
-                        stimulus_id=ee.stimulus_id
-                    )
-                )
+            all_rs += [(predictor.id, rs.run_id) for rs in query]
 
         all_rs = [PredictorRun(predictor_id=pred_id, run_id=run_id)
                   for pred_id, run_id in set(all_rs)]
-        db.session.bulk_save_objects(all_pes + all_rs)
+        db.session.bulk_save_objects(all_rs)
         db.session.commit()
 
     return [p.id for p in all_preds]

@@ -8,10 +8,9 @@ from flask import current_app
 from pathlib import Path
 from .utils import abort, auth_required, first_or_404
 from ..models import (
-    Predictor, PredictorEvent, PredictorRun, PredictorCollection)
+    Predictor, PredictorRun, PredictorCollection)
 from ..database import db
 from ..core import cache
-from ..utils.db import dump_pe
 from ..schemas.predictor import PredictorSchema, PredictorCollectionSchema
 from ..api_spec import FileField
 from ..worker import celery_app
@@ -64,25 +63,6 @@ class PredictorListResource(MethodResource):
     def get(self, **kwargs):
         newest = kwargs.pop('newest')
         return get_predictors(newest=newest, **kwargs)
-
-
-class PredictorEventListResource(MethodResource):
-    @doc(tags=['predictors'], summary='Get events for predictor(s)',)
-    @use_kwargs({
-        'run_id': wa.fields.DelimitedList(
-            wa.fields.Int(),
-            description="Run id(s)"),
-        'predictor_id': wa.fields.DelimitedList(
-            wa.fields.Int(),
-            description="Predictor id(s)"),
-    }, locations=['query'])
-    @cache.cached(60 * 60 * 24 * 300, query_string=True)
-    def get(self, **kwargs):
-        query = PredictorEvent.query
-        for param in kwargs:
-            query = query.filter(
-                getattr(PredictorEvent, param).in_(kwargs[param]))
-        return dump_pe(query)
 
 
 def prepare_upload(collection_name, event_files, runs, dataset_id):
