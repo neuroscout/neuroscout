@@ -134,8 +134,7 @@ def _create_collection(analysis, force=False):
         collection = api.create_collection(
             collection_name,
             description=analysis.description,
-            paper_url=url,
-            full_dataset_url=analysis.dataset.url)
+            full_dataset_url=url)
     except Exception:
         abort(422, "Error creating collection, "
                    "perhaps one with that name already exists?")
