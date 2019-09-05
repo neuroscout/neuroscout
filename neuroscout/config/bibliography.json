@@ -39,6 +39,121 @@
             }
         ]
     },
+    "Sherlock": {
+      ".*": [
+        [
+        	{
+        		"type": "article-journal",
+        		"title": "Shared memories reveal shared structure in neural activity across individuals",
+        		"container-title": "Nature Neuroscience",
+        		"page": "115-125",
+        		"volume": "20",
+        		"issue": "1",
+        		"source": "DOI.org (Crossref)",
+        		"URL": "http://www.nature.com/articles/nn.4450",
+        		"DOI": "10.1038/nn.4450",
+        		"ISSN": "1097-6256, 1546-1726",
+        		"journalAbbreviation": "Nat Neurosci",
+        		"language": "en",
+        		"author": [
+        			{
+        				"family": "Chen",
+        				"given": "Janice"
+        			},
+        			{
+        				"family": "Leong",
+        				"given": "Yuan Chang"
+        			},
+        			{
+        				"family": "Honey",
+        				"given": "Christopher J"
+        			},
+        			{
+        				"family": "Yong",
+        				"given": "Chung H"
+        			},
+        			{
+        				"family": "Norman",
+        				"given": "Kenneth A"
+        			},
+        			{
+        				"family": "Hasson",
+        				"given": "Uri"
+        			}
+        		],
+        		"issued": {
+        			"date-parts": [
+        				[
+        					"2017",
+        					1
+        				]
+        			]
+        		},
+        		"accessed": {
+        			"date-parts": [
+        				[
+        					"2019",
+        					9,
+        					5
+        				]
+        			]
+        		}
+        	}
+        ]
+      ]
+    },
+    "SchematicNarrative": {
+      ".*": [
+        [
+      	{
+      		"type": "article-journal",
+      		"title": "Representation of Real-World Event Schemas during Narrative Perception",
+      		"container-title": "The Journal of Neuroscience",
+      		"page": "9689-9699",
+      		"volume": "38",
+      		"issue": "45",
+      		"source": "DOI.org (Crossref)",
+      		"URL": "http://www.jneurosci.org/lookup/doi/10.1523/JNEUROSCI.0251-18.2018",
+      		"DOI": "10.1523/JNEUROSCI.0251-18.2018",
+      		"ISSN": "0270-6474, 1529-2401",
+      		"journalAbbreviation": "J. Neurosci.",
+      		"language": "en",
+      		"author": [
+      			{
+      				"family": "Baldassano",
+      				"given": "Christopher"
+      			},
+      			{
+      				"family": "Hasson",
+      				"given": "Uri"
+      			},
+      			{
+      				"family": "Norman",
+      				"given": "Kenneth A."
+      			}
+      		],
+      		"issued": {
+      			"date-parts": [
+      				[
+      					"2018",
+      					11,
+      					7
+      				]
+      			]
+      		},
+      		"accessed": {
+      			"date-parts": [
+      				[
+      					"2019",
+      					9,
+      					5
+      				]
+      			]
+      		}
+      	}
+      ]
+      ]
+    },
     "HealthyBrainNetwork": {
         ".*": [
             {
