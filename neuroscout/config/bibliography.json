@@ -41,7 +41,6 @@
     },
     "Sherlock": {
       ".*": [
-        [
         	{
         		"id": "http://zotero.org/users/local/JXz6ijqB/items/6GX524AE",
         		"type": "article-journal",
@@ -101,11 +100,9 @@
         		}
         	}
         ]
-      ]
     },
     "SchematicNarrative": {
       ".*": [
-        [
       	{
       		"id": "http://zotero.org/users/local/JXz6ijqB/items/P8FFCNCT",
       		"type": "article-journal",
@@ -153,7 +150,6 @@
       			]
       		}
       	}
-      ]
       ]
     },
     "HealthyBrainNetwork": {
