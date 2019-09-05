@@ -43,6 +43,7 @@
       ".*": [
         [
         	{
+        		"id": "http://zotero.org/users/local/JXz6ijqB/items/6GX524AE",
         		"type": "article-journal",
         		"title": "Shared memories reveal shared structure in neural activity across individuals",
         		"container-title": "Nature Neuroscience",
@@ -106,6 +107,7 @@
       ".*": [
         [
       	{
+      		"id": "http://zotero.org/users/local/JXz6ijqB/items/P8FFCNCT",
       		"type": "article-journal",
       		"title": "Representation of Real-World Event Schemas during Narrative Perception",
       		"container-title": "The Journal of Neuroscience",
