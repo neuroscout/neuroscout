@@ -1080,7 +1080,7 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
                   {this.navButtons(!(!!this.state.analysis.name && this.state.analysis.runIds.length > 0), false)}
                   <br/>
                 </TabPane>}
-                {isEditable && 
+                {isEditable &&
                 <TabPane
                   tab="Predictors"
                   key="predictors"
@@ -1210,7 +1210,7 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
                         dataset={this.props.datasets.find((x => x.id === this.state.analysis.datasetId))}
                       />
                       <br/>
-                      {this.navButtons(false, isEditable)}
+                      {isEditable && this.navButtons(false, isEditable)}
                       <br/>
                     </div>
                   }

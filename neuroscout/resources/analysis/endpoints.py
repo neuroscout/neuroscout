@@ -225,6 +225,7 @@ class BibliographyResource(MethodResource):
         all_csl_json = tools.copy()
 
         dataset_entry = bib.get(analysis.dataset.name, [])
+        data = []
         if dataset_entry:
             data = [dataset_entry['.*']]
             all_csl_json += data
