@@ -11,7 +11,7 @@ RUN pip install clarifai duecredit google-api-python-client IndicoIo librosa>=0.
 RUN python -m pliers.support.download
 RUN apt-get install apt-transport-https
 
-RUN wget -O- http://neuro.debian.net/lists/stretch.us-nh.full | sudo tee /etc/apt/sources.list.d/neurodebian.sources.list
+RUN wget -O- http://neuro.debian.net/lists/stretch.us-nh.full | tee /etc/apt/sources.list.d/neurodebian.sources.list
 RUN apt-key adv --recv-keys --keyserver hkp://pool.sks-keyservers.net:80 0xA5D32F012649A5A9
 RUN apt-get update
 RUN apt-get install -yq datalad
