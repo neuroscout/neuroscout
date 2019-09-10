@@ -1,5 +1,5 @@
 server {
-     server_name alpha.neuroscout.org;
+     server_name neuroscout.org www.neuroscout.org alpha.neuroscout.org;
 
      location /.well-known {
          allow all;
