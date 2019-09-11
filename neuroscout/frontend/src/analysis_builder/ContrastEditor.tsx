@@ -2,10 +2,10 @@
  ContrastEditor module for adding/editing a contrast (used in the Contrasts tab)
 */
 import * as React from 'react';
-import { Form, Input, InputNumber, Button, Radio, message, Modal } from 'antd';
-import { Analysis, Predictor, Contrast, ContrastTypeEnum } from './coretypes';
+import { Form, Input, InputNumber, Button, Radio, Modal } from 'antd';
+import { Predictor, Contrast, ContrastTypeEnum } from '../coretypes';
 import { PredictorSelector } from './Predictors';
-import { DisplayErrorsInline, Space } from './HelperComponents';
+import { DisplayErrorsInline, Space } from '../HelperComponents';
 
 const FormItem = Form.Item;
 const RadioGroup = Radio.Group;
@@ -21,7 +21,7 @@ export function emptyContrast() {
 }
 
 export function validateContrast(contrast: Contrast): string[] {
-    const { Name, ConditionList, Weights, ContrastType } = contrast;
+    const { Name, ConditionList, Weights } = contrast;
     let errors: string[] = [];
     if (!Name) {
       errors.push('Please specify a name for the contrast');

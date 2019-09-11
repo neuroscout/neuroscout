@@ -1,35 +1,12 @@
 import * as React from 'react';
-import { Alert, Button, Card, Checkbox, Modal, Tag, Icon, Tooltip, Switch } from 'antd';
-import { config } from './config';
-import { displayError, jwtFetch, alphaSort, timeout } from './utils';
-import { ApiAnalysis, Analysis } from './coretypes';
-import { api } from './api';
+import { Alert, Button, Card, Checkbox, Modal, Tooltip, Switch } from 'antd';
+import { config } from '../config';
+import { jwtFetch } from '../utils';
+import { Analysis } from '../coretypes';
+import { StatusTag } from '../HelperComponents';
+import { api } from '../api';
 
 const domainRoot = config.server_url;
-
-export class Status extends React.Component<{status?: string, analysisId?: string}, {}> {
-  render() {
-    let { analysisId, status } = this.props;
-    if (status === undefined) {
-      status = 'DRAFT';
-    }
-    const color: string = {
-      DRAFT: 'blue',
-      PENDING: 'orange',
-      FAILED: 'red',
-      PASSED: 'green'
-    }[status];
-
-    return(
-      <span>
-        <Tag color={color}>
-          {status === 'DRAFT' ? <Icon type="unlock" /> : <Icon type="lock" />}
-          {' ' + status}
-        </Tag>
-      </span>
-    );
-  }
-}
 
 export class DLLink extends React.Component<{status?: string, analysisId?: string}, {}> {
     render() {
@@ -110,7 +87,7 @@ export class Submit extends React.Component<submitProps, {tosAgree: boolean, val
   }
 
   render() {
-    let { analysisId, status } = this.props;
+    let { status } = this.props;
     if (status === undefined) {
       status = 'DRAFT';
     }
@@ -163,6 +140,7 @@ type statusTabState = {
   compileTraceback: string,
   nvUploads?: any
 };
+
 export class StatusTab extends React.Component<submitProps, statusTabState> {
   constructor(props) {
     super(props);
@@ -223,15 +201,16 @@ export class StatusTab extends React.Component<submitProps, statusTabState> {
           <PubAccess private={this.props.private} updateAnalysis={this.props.updateAnalysis!} />
           <span>{' '}</span>
           </>}
-        <Status status={this.props.status} analysisId={this.props.analysisId} />
+        <StatusTag status={this.props.status} analysisId={this.props.analysisId} />
       </div>
       {(this.props.status === 'PASSED') &&
         <div>
           <h3>Analysis Passed</h3>
           <p>
-            {this.props.userOwns && 'Congratulations!'} The analysis is finished compiling and is ready to be executed.
-            Once you have installed Docker you may run the analysis with the following command,
-            replacing '/local/directory' with a directory on your computer:
+            {this.props.userOwns && 'Congratulations!'} Congratulations, your analysis has been compiled!
+            Run the analysis with this this command, replacing '/local/outputdirectory' with a local directory.
+            See the <a href="https://github.com/neuroscout/neuroscout-cli">neuroscout-cli documentation </a>
+             for more information.
           </p>
           <pre>
             <code>
@@ -239,10 +218,12 @@ export class StatusTab extends React.Component<submitProps, statusTabState> {
               neuroscout/neuroscout-cli run /out {this.props.analysisId}
             </code>
           </pre>
-          <p>
-            See the <a href="https://github.com/neuroscout/neuroscout-cli">neuroscout-cli documentation </a>
-             for more information on how to install and run analyses.
-          </p>
+          <Card size="small" title="System Requirements" style={{ width: 400 }}>
+            <p>OS: Windows/Linux/Mac OS with <a href="https://docs.docker.com/install/">Docker</a></p>
+            <p>RAM: 8GB+ RAM</p>
+            <p>Disk space: 4GB + ~1 GB/subject</p>
+          </Card>
+          <br/>
         </div>
       }
       {(this.props.status === 'FAILED') &&

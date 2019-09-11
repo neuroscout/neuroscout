@@ -1,7 +1,7 @@
 {
   "name": "frontend",
   "version": "0.1.0",
-  "proxy": "https://alpha.neuroscout.org:80",
+  "proxy": "http://neuroscout.org:80",
   "private": true,
   "dependencies": {
     "@types/antd": "^1.0.0",
@@ -19,11 +19,14 @@
     "react": "^16.3.2",
     "react-beautiful-dnd": "^10.0.3",
     "react-dom": "^16.3.2",
+    "react-ga": "^2.6.0",
     "react-google-login": "^3.2.1",
     "react-router": "^4.1.1",
     "react-router-dom": "^4.1.1",
     "react-scripts": "2.1.0",
+    "reactour": "^1.15.0",
     "reflux": "^6.4.1",
+    "styled-components": "^4.0.0",
     "vega": "5.3.4",
     "vega-embed": "^4.0.0",
     "vega-lite": "3.1.0"
@@ -33,6 +36,7 @@
     "enzyme": "^3.3.0",
     "enzyme-adapter-react-16": "^1.1.1",
     "react-scripts-ts": "3.1.0",
+    "tslint-etc": "^1.5.6",
     "tsutils": "^2.26.2",
     "typescript": "^3"
   },

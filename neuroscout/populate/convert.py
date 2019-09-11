@@ -133,12 +133,12 @@ def convert_stimuli(dataset_name, task_name, converters):
                     else:
                         results.append(cstim)
 
-            results = [res for res in results
-                       if hasattr(res, 'data') and res.data != '']
-            new_stims = create_new_stimuli(
-                dataset_id, task_name, stim.id, results, rs_orig,
-                transformer=cstim.history.transformer_class,
-                transformer_params=cstim.history.transformer_params)
+                results = [res for res in results
+                           if hasattr(res, 'data') and res.data != '']
+                new_stims += create_new_stimuli(
+                    dataset_id, task_name, stim.id, results, rs_orig,
+                    transformer=cstim.history.transformer_class,
+                    transformer_params=cstim.history.transformer_params)
 
         # De-activate previously generated stimuli from these converters.
         update = Stimulus.query.filter_by(parent_id=stim.id).filter(

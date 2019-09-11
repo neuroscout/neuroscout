@@ -15,9 +15,9 @@ from datalad.api import install
 from ..core import cache
 from .utils import hash_stim
 from ..utils.db import get_or_create
-from ..models import (Dataset, Task, Run, Predictor, PredictorEvent,
-                     PredictorRun, Stimulus, RunStimulus,
-                     GroupPredictor, GroupPredictorValue)
+from ..models import (
+    Dataset, Task, Run, Predictor, PredictorEvent, PredictorRun, Stimulus,
+    RunStimulus, GroupPredictor, GroupPredictorValue)
 from ..database import db
 from progressbar import progressbar
 from .annotate import PredictorSerializer

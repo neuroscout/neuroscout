@@ -61,6 +61,7 @@ class AnalysisResource(AnalysisMethodResource):
     @use_kwargs(AnalysisSchema)
     @owner_required
     def put(self, analysis, **kwargs):
+        kwargs['modified_at'] = datetime.datetime.utcnow()
         if analysis.locked is True:
             abort(422, "Analysis is locked. It cannot be edited.")
         if analysis.status not in ['DRAFT', 'FAILED']:
@@ -68,7 +69,6 @@ class AnalysisResource(AnalysisMethodResource):
             kwargs = {k: v for k, v in kwargs.items() if k in excep}
         if not kwargs:
             abort(422, "Analysis is not editable. Try cloning it.")
-        kwargs['modified_at'] = datetime.datetime.utcnow()
         return put_record(kwargs, analysis), 200
 
     @doc(summary='Delete analysis.')
@@ -220,10 +220,12 @@ class BibliographyResource(MethodResource):
         bib = json.load(open(current_app.config['BIBLIOGRAPHY']))
 
         tools = [b['.*'] for k, b in bib.items()
-                 if k in ['nipype', 'neuroscout', 'fitlins', 'nipype', 'pliers']]
+                 if k in [
+                     'nipype', 'neuroscout', 'fitlins', 'nipype', 'pliers']]
         all_csl_json = tools.copy()
 
         dataset_entry = bib.get(analysis.dataset.name, [])
+        data = []
         if dataset_entry:
             data = [dataset_entry['.*']]
             all_csl_json += data

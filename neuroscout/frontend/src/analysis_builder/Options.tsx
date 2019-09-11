@@ -4,9 +4,6 @@
 import * as React from 'react';
 import {
   Form,
-  Table,
-  Input,
-  Button,
   Row,
   Col,
   Slider,
@@ -15,7 +12,7 @@ import {
   Checkbox,
   Select
 } from 'antd';
-import { Analysis, AnalysisConfig, Predictor, PredictorConfig } from './coretypes';
+import { Analysis, AnalysisConfig, Predictor, PredictorConfig } from '../coretypes';
 const FormItem = Form.Item;
 const Panel = Collapse.Panel;
 const Option = Select.Option;
@@ -36,7 +33,7 @@ export default class OptionsTab extends React.Component<OptionsTabProps, Options
   state = {};
 
   updateGlobalConfig = (key: keyof AnalysisConfig) => (value: any) => {
-    const { analysis, updateConfig, updateAnalysis } = this.props;
+    const { analysis, updateConfig } = this.props;
     const newConfig: AnalysisConfig = { ...analysis.config };
     newConfig[key] = value;
     updateConfig(newConfig);
@@ -46,7 +43,7 @@ export default class OptionsTab extends React.Component<OptionsTabProps, Options
     const { analysis, updateConfig } = this.props;
     const newConfig: AnalysisConfig = { ...analysis.config };
     const newPredictorConfig = { ...newConfig.predictorConfigs };
-    newPredictorConfig[id][key] = value;
+    newPredictorConfig[id][key] = (value as never);
     newConfig.predictorConfigs = newPredictorConfig;
     updateConfig(newConfig);
   };
@@ -59,7 +56,7 @@ export default class OptionsTab extends React.Component<OptionsTabProps, Options
 
   render() {
     const { analysis, selectedPredictors } = this.props;
-    const { smoothing, predictorConfigs } = analysis.config;
+    const { predictorConfigs } = analysis.config;
     return (
       <div>
         <Form layout="horizontal">

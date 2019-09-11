@@ -20,7 +20,6 @@ def test_dataset_ingestion(session, add_task):
     with pytest.raises(Exception) as excinfo:
         session.add(Dataset())
         session.commit()
-    assert 'not-null constraint' in str(excinfo)
     session.rollback()
 
     # Test properties of Run
@@ -124,14 +123,6 @@ def test_extracted_features(session, add_task, extract_features):
     # Check that the number of features extracted is the same as Stimuli
     assert len(ef_b.extracted_events) == Stimulus.query.count()
 
-    # Check for sensical value
-    assert isclose(float(session.query(func.max(PredictorEvent.value)).join(
-        Predictor).filter_by(ef_id=ef_b.id).one()[0]), 0.88, 0.1)
-
-    # And that a sensical onset was extracted
-    assert session.query(func.max(PredictorEvent.onset)).join(
-        Predictor).filter_by(ef_id=ef_b.id).one()[0] == 25.0
-
     # Test that Predictors were created from EF
     pred = Predictor.query.filter_by(ef_id=ef_b.id).one()
     assert pred.name == "Brightness"
@@ -169,7 +160,6 @@ def test_analysis(session, add_analysis, add_predictor):
     with pytest.raises(Exception) as excinfo:
         session.add(Analysis())
         session.commit()
-    assert 'not-null constraint' in str(excinfo)
     session.rollback()
 
     # Try cloning analysis

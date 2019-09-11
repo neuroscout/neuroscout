@@ -41,6 +41,9 @@ def auth_required(function):
     @jwt_required()
     def wrapper(*args, **kwargs):
         # Record activity time and IP
+        if (current_identity.first_login and
+           current_identity.last_activity_at is not None):
+            current_identity.first_login = False
         current_identity.last_activity_at = datetime.datetime.now()
         current_identity.last_activity_ip = request.remote_addr
         db.session.commit()

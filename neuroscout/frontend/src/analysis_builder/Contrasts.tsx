@@ -5,22 +5,20 @@
  - ContrastDisplay: component to display a single contrast
 */
 import * as React from 'react';
-import { Table, Input, Button, Row, Col, Form, Select, Checkbox, Icon, List } from 'antd';
+import { Button, Row, Col, Icon, List } from 'antd';
 import {
   DragDropContext,
   Draggable,
   Droppable,
   DroppableProvided,
-  DraggableLocation,
   DropResult,
   DroppableStateSnapshot, DraggableProvided, DraggableStateSnapshot
 } from 'react-beautiful-dnd';
-import { Analysis, Predictor, Contrast } from './coretypes';
-import { displayError, moveItem, reorder } from './utils';
-import { DisplayErrorsInline, Space } from './HelperComponents';
-import { PredictorSelector } from './Predictors';
+
+import { Analysis, Predictor, Contrast } from '../coretypes';
+import { reorder } from '../utils';
+import { DisplayErrorsInline } from '../HelperComponents';
 import { ContrastEditor, emptyContrast } from './ContrastEditor';
-const Option = Select.Option;
 
 interface ContrastDisplayProps {
   index: number;
@@ -31,7 +29,6 @@ interface ContrastDisplayProps {
 
 const ContrastDisplay = (props: ContrastDisplayProps) => {
   const { contrast, index, onDelete, onEdit } = props;
-  const inputs = contrast.ConditionList || [];
   return (
     <div style={{'width': '100%'}}>
       <div  style={{'float': 'right'}}>
@@ -43,7 +40,7 @@ const ContrastDisplay = (props: ContrastDisplayProps) => {
         </Button>
       </div>
       <div>
-        <b>{`${index + 1}: ${contrast.Name}`} </b>{`${contrast.ContrastType} test`}<br/>
+        <b>{`${contrast.Name}`} </b>{`${contrast.ContrastType} test`}<br/>
         {/*contrast.ConditionList && contrast.ConditionList.map((predictor, i) => {
           return(predictor + ': ' + contrast.Weights[i] + ' ');
         })*/}
@@ -148,8 +145,8 @@ export class ContrastsTab extends React.Component<ContrastsTabProps, ContrastsTa
       }
       let newContrast = emptyContrast();
       newContrast.Name = `${x.name}`;
-      newContrast.ConditionList = predictors.map(y => y.name);
-      newContrast.Weights = predictors.map(y => y.name === x.name ? 1 : 0);
+      newContrast.ConditionList = [ x.name ];
+      newContrast.Weights = [ 1 ];
       newContrasts.push(newContrast);
     });
     this.props.onSave(newContrasts);
@@ -162,7 +159,6 @@ export class ContrastsTab extends React.Component<ContrastsTabProps, ContrastsTa
   };
 
   getStyle = (index: number): string => {
-    let style: any = {};
     if (index === this.props.activeContrastIndex) {
       return 'selectedXform';
     }
@@ -170,7 +166,7 @@ export class ContrastsTab extends React.Component<ContrastsTabProps, ContrastsTa
   }
 
   render() {
-    const { contrasts, predictors, activeContrastIndex, activeContrast } = this.props;
+    const { predictors, activeContrastIndex, activeContrast } = this.props;
     const { mode } = this.state;
 
     const AddMode = () => (
@@ -212,7 +208,7 @@ export class ContrastsTab extends React.Component<ContrastsTabProps, ContrastsTa
                       <List.Item className={this.getStyle(index)}>
                         <Draggable key={index} draggableId={'' + index} index={index}>
                           {(providedDraggable: DraggableProvided, snapshotDraggable: DraggableStateSnapshot) => (
-                              <div 
+                              <div
                                 style={{'width': '100%'}}
                                 ref={providedDraggable.innerRef}
                                 {...providedDraggable.dragHandleProps}

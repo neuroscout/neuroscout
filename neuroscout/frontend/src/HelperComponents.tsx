@@ -1,5 +1,6 @@
 import * as React from 'react';
-import { Alert, Col } from 'antd';
+import { Alert, Col, Divider, Icon, Row, Tag } from 'antd';
+import { createBrowserHistory } from 'history';
 
 // Simple space component to seperate buttons, etc.
 // tslint:disable-next-line:jsx-self-close
@@ -38,6 +39,46 @@ export class DisplayErrorsInline extends React.Component<{errors: string[]}, {}>
             <br />
           </div>}
       </>
+    );
+  }
+}
+
+// Make status strings pretty and color coded
+export class StatusTag extends React.Component<{status?: string, analysisId?: string}, {}> {
+  render() {
+    let { status } = this.props;
+    if (status === undefined) {
+      status = 'DRAFT';
+    }
+    const color: string = {
+      DRAFT: 'blue',
+      PENDING: 'orange',
+      FAILED: 'red',
+      PASSED: 'green'
+    }[status];
+
+    return(
+      <span>
+        <Tag color={color}>
+          {status === 'DRAFT' ? <Icon type="unlock" /> : <Icon type="lock" />}
+          {' ' + status}
+        </Tag>
+      </span>
+    );
+  }
+}
+
+export class NotFound extends React.Component<{}, {}> {
+  render() {
+    const history = createBrowserHistory();
+    return (
+      <Row type="flex" justify="center" style={{padding: 0 }}>
+        <MainCol>
+          <Divider>Not found</Divider>
+          The requested URL {history.location.pathname} was not found.
+          Go <a onClick={history.goBack}>back</a>?
+        </MainCol>
+      </Row>
     );
   }
 }

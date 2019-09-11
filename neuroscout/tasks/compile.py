@@ -145,4 +145,5 @@ class PathBuilder():
             {**self.entities, 'type': type, 'extension': extension},
             path_patterns=REPORT_PATHS)
         outfile = str(self.outdir / file)
+
         return outfile, '{}/reports/{}/{}'.format(self.domain, self.hash, file)

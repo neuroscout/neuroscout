@@ -29,16 +29,19 @@ class PredictorSchema(Schema):
         return data
 
 
-class PredictorEventSchema(Schema):
-    id = fields.Str()
-    onset = fields.Number(description="Onset in seconds.")
-    duration = fields.Number(description="Duration in seconds.")
-    value = fields.Str(description="Value, or amplitude.")
-    run_id = fields.Int()
-    predictor_id = fields.Int()
-
-
 class PredictorRunSchema(Schema):
     run_id = fields.Int()
     mean = fields.Number()
     stdev = fields.Number()
+
+
+class PredictorCollectionSchema(Schema):
+    """ Schema for report results """
+    id = fields.Int(description='Collection id')
+    uploaded_at = fields.Time(description='Time images upload began')
+    # predictor_id = fields.Dict(description='NeuroVault collection id')
+    status = fields.Str(description='Upload status')
+    traceback = fields.Str(description='Traceback of error.')
+    collection_name = fields.Str(description='Name of collection')
+    predictors = fields.Nested(
+        'PredictorSchema', only=['id', 'name'], many=True)

@@ -1,12 +1,13 @@
 ''' Model hierarchy. '''
 
 from .analysis import (Analysis, Report, NeurovaultCollection,
-                       analysis_predictor)
+                       NeurovaultFileUpload, analysis_predictor)
 from .auth import User, Role, roles_users, user_datastore
 from .group import GroupPredictor, GroupPredictorValue
 from .dataset import Dataset
 from .features import ExtractedFeature, ExtractedEvent
-from .predictor import Predictor, PredictorEvent, PredictorRun
+from .predictor import (Predictor, PredictorEvent, PredictorRun,
+                        PredictorCollection)
 from .run import Run, analysis_run
 from .stimulus import Stimulus, RunStimulus
 from .task import Task
@@ -27,8 +28,10 @@ __all__ = [
     'Predictor',
     'PredictorEvent',
     'PredictorRun',
+    'PredictorCollection',
     'Report',
     'NeurovaultCollection',
+    'NeurovaultFileUpload',
     'Run',
     'analysis_run',
     'Stimulus',

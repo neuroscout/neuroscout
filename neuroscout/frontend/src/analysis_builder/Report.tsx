@@ -1,43 +1,14 @@
 import * as React from 'react';
-import { message, Tabs, Button, Collapse, Card, Icon, Spin, Tag } from 'antd';
-import { config } from './config';
+import { Tabs, Collapse, Card, Tooltip, Icon, Spin } from 'antd';
 import vegaEmbed from 'vega-embed';
 
-import {
-  Store,
-  Analysis,
-  Dataset,
-  Task,
-  Run,
-  Predictor,
-  ApiDataset,
-  ApiAnalysis,
-  AnalysisConfig,
-  Transformation,
-  Contrast,
-  Step,
-  StepModel,
-  BidsModel,
-  ImageInput,
-  TransformName
-} from './coretypes';
-
-import { displayError, jwtFetch, alphaSort, timeout } from './utils';
+import { config } from '../config';
+import { jwtFetch, timeout } from '../utils';
 
 const domainRoot = config.server_url;
 
 const TabPane = Tabs.TabPane;
 const Panel = Collapse.Panel;
-
-let getSub = (x: string, pre: string) => {
-  let subRe = new RegExp(`${pre}-([a-zA-Z0-9]+)`);
-  let sub = '';
-  let _sub = subRe.exec(x);
-  if (_sub !== null) {
-    sub = _sub[1];
-  }
-  return sub;
-};
 
 class VegaPlot extends React.Component<{spec: string}, {}> {
   vegaContainer;
@@ -68,7 +39,7 @@ class Plots extends React.Component<{plots: any[], corr_plots: any[]}, {}> {
 
     render() {
       let display: any[] = [];
-      let plots = this.props.plots.map((x, i) => {
+      this.props.plots.map((x, i) => {
         let spec = x;
         display.push(
           <TabPane tab="First run" key={'' + i}>
@@ -92,24 +63,6 @@ class Plots extends React.Component<{plots: any[], corr_plots: any[]}, {}> {
     }
 }
 
-class Matrices extends React.Component<{matrices: string[]}, {}> {
-    render() {
-      let display: any[] = [];
-      let matrices = this.props.matrices.map((x) => {
-        let url = x;
-        let sub = getSub(x, 'sub');
-        if (x.indexOf('None') === 0) {
-          url = x.slice(4);
-        }
-        url = domainRoot + url;
-        display.push(<li key={url}>{sub}: <a href={url}>{url}</a><br/></li>);
-      });
-      return(
-        <ul>{display}</ul>
-      );
-    }
-}
-
 class Tracebacks extends React.Component<{reportTraceback: string, compileTraceback: string}, {}> {
     render() {
       return(
@@ -125,6 +78,7 @@ interface ReportProps {
   analysisId?: string;
   runIds: string[];
   postReports: boolean;
+  defaultVisible: boolean;
 }
 
 interface ReportState {
@@ -249,19 +203,32 @@ export class Report extends React.Component<ReportProps, ReportState> {
   render() {
     return (
       <div>
-        <Card title="Design Report" key="plots">
+        <Card
+         title="Design Report"
+         extra={
+           <Tooltip
+            title={'Here you can preview the final design and correlation matrices. \
+            \nClick on the design matrix columns to view the timecourse in detail.'}
+            defaultVisible={this.props.defaultVisible}
+           >
+             <Icon type="info-circle" style={{ fontSize: '15px'}}/>
+           </Tooltip>
+           }
+         key="plots"
+        >
           <Spin spinning={!this.state.reportsLoaded}>
             <Plots plots={this.state.plots} corr_plots={this.state.corr_plots} />
           </Spin>
         </Card>
         <br/>
         {(this.state.reportTraceback || this.state.compileTraceback) &&
+        <div>
         <Card title="Errors" key="errors">
           <Tracebacks
             reportTraceback={this.state.reportTraceback}
             compileTraceback={this.state.compileTraceback}
           />
-        </Card>}
+        </Card><br/></div>}
       </div>
     );
   }
