@@ -107,7 +107,10 @@ def dump_analysis(analysis_id, run_id=None):
 
     pes += create_pes(ext_preds, run_id)
 
-    dataset_path = str(
-        Path(analysis.dataset.local_path) / 'derivatives' / 'fmriprep')
+    dataset_path = Path(analysis.dataset.local_path)
+    preproc_path = dataset_path / 'derivatives' / 'fmriprep'
+
+    if preproc_path.exists():
+        dataset_path = preproc_path
     return (analysis.id, analysis_json, resources_json, pes,
-            dataset_path)
+            str(dataset_path))
