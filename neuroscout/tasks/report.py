@@ -89,6 +89,7 @@ def generate_report(flask_app, hash_id, report_id,
         scale (bool): Scale columns in dm plot
     """
     FILE_DATA = Path(flask_app.config['FILE_DIR'])
+    domain = flask_app.config['SERVER_NAME']
 
     try:
         report_object = Report.query.filter_by(id=report_id).one()
@@ -96,8 +97,6 @@ def generate_report(flask_app, hash_id, report_id,
         return {
             'traceback': f'Error loading {report_id} from db /n {str(e)}'
             }
-
-    domain = flask_app.config['SERVER_NAME']
 
     try:
         a_id, analysis, resources, predictor_events, bids_dir = dump_analysis(

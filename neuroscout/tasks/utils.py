@@ -1,6 +1,7 @@
 """ utils """
 import json
 import tarfile
+from pathlib import Path
 from ..utils.db import put_record, dump_pe
 from ..models import Analysis, PredictorEvent, Predictor, RunStimulus
 from ..schemas.analysis import AnalysisFullSchema, AnalysisResourcesSchema
@@ -106,5 +107,10 @@ def dump_analysis(analysis_id, run_id=None):
 
     pes += create_pes(ext_preds, run_id)
 
+    dataset_path = Path(analysis.dataset.local_path)
+    preproc_path = dataset_path / 'derivatives' / 'fmriprep'
+
+    if preproc_path.exists():
+        dataset_path = preproc_path
     return (analysis.id, analysis_json, resources_json, pes,
-            analysis.dataset.local_path)
+            str(dataset_path))
