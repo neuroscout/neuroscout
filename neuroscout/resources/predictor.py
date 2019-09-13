@@ -31,19 +31,21 @@ def get_predictors(newest=True, user=None, **kwargs):
     else:
         predictor_ids = db.session.query(Predictor.id)
 
-    if user is not None:
-        predictor_ids.join(PredictorCollection).filter_by(user_id=user.id)
-
     if 'run_id' in kwargs:
         # This following JOIN can be slow
         predictor_ids = predictor_ids.join(PredictorRun).filter(
             PredictorRun.run_id.in_(kwargs.pop('run_id')))
 
-    query = Predictor.query.filter(Predictor.id.in_(predictor_ids)).filter_by(
-        private=False
-    )
+    query = Predictor.query.filter(Predictor.id.in_(predictor_ids))
+
     for param in kwargs:
         query = query.filter(getattr(Predictor, param).in_(kwargs[param]))
+
+    if user is not None:
+        query = query.filter_by(private=True).join(PredictorCollection).filter_by(
+            user_id=user.id)
+    else:
+        query = query.filter_by(private=False)
 
     # Only display active predictors
     return query.filter_by(active=True).all()
