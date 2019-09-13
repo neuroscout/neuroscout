@@ -133,3 +133,7 @@ def test_predictor_create(session,
     assert resp['source'] == 'Collection: new_one'
     assert resp['name'] == 'trial_type'
     assert resp['description'] == 'new_description'
+
+    # Test user PC route:
+    resp = decode_json(auth_client.get('/api/user/predictors'))
+    assert len(resp) == 2
