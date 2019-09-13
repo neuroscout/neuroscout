@@ -9,7 +9,7 @@ from ..auth import register_user, reset_password, send_confirmation
 from .utils import abort, auth_required
 from ..utils.db import put_record
 from ..schemas.user import UserSchema, UserCreationSchema, UserResetSchema
-from ..schemas.predictors import PredictorSchema
+from ..schemas.predictor import PredictorSchema
 from .predictor import get_predictors
 
 
