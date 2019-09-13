@@ -53,7 +53,7 @@ route_factory(
         ('UserTriggerResetResource', 'user/reset_password'),
         ('UserResetSubmitResource', 'user/submit_token'),
         ('UserResendConfirm', 'user/resend_confirmation'),
-        ('UserPredictorListResource', 'user/predictors')
+        ('UserPredictorListResource', 'user/predictors'),
         ('TaskResource', 'tasks/<int:task_id>'),
         ('TaskListResource', 'tasks')
     ])
