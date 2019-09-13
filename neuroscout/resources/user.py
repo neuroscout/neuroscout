@@ -80,5 +80,5 @@ class UserPredictorListResource(MethodResource):
     @marshal_with(PredictorSchema(many=True))
     def get(self, **kwargs):
         newest = kwargs.pop('newest')
-        return get_predictors(newest=newest, identity=current_identity,
+        return get_predictors(newest=newest, user=current_identity,
                               **kwargs)

@@ -23,13 +23,16 @@ class PredictorResource(MethodResource):
         return first_or_404(Predictor.query.filter_by(id=predictor_id))
 
 
-def get_predictors(newest=True, **kwargs):
+def get_predictors(newest=True, user=None, **kwargs):
     """ Helper function for querying newest predictors """
     if newest:
         predictor_ids = db.session.query(
             func.max(Predictor.id)).group_by(Predictor.name)
     else:
         predictor_ids = db.session.query(Predictor.id)
+
+    if user is not None:
+        predictor_ids.join(PredictorCollection).filter_by(user_id=user.id)
 
     if 'run_id' in kwargs:
         # This following JOIN can be slow
