@@ -41,14 +41,16 @@ def get_predictors(newest=True, user=None, **kwargs):
     for param in kwargs:
         query = query.filter(getattr(Predictor, param).in_(kwargs[param]))
 
+    query = query.filter_by(active=True)
+
     if user is not None:
-        query = query.filter_by(private=True).join(PredictorCollection).filter_by(
-            user_id=user.id)
+        query = query.filter_by(private=True).join(
+            PredictorCollection).filter_by(user_id=user.id)
     else:
         query = query.filter_by(private=False)
 
     # Only display active predictors
-    return query.filter_by(active=True).all()
+    return query
 
 
 class PredictorListResource(MethodResource):
