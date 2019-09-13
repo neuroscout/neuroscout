@@ -50,7 +50,7 @@ def get_predictors(newest=True, user=None, **kwargs):
         query = query.filter_by(private=False)
 
     # Only display active predictors
-    return query
+    return query.all()
 
 
 class PredictorListResource(MethodResource):
