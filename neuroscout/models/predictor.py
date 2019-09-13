@@ -18,6 +18,9 @@ class Predictor(db.Model):
 
     predictor_events = db.relationship('PredictorEvent', backref='predictor')
 
+    predictor_collection_id = db.Column(
+        db.Integer, db.ForeignKey('predictor_collection.id'))
+
     predictor_run = db.relationship('PredictorRun')
     active = db.Column(db.Boolean, default=True)  # Actively display or not
     private = db.Column(db.Boolean, default=False)
