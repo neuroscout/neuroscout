@@ -23,7 +23,7 @@ class PredictorResource(MethodResource):
         return first_or_404(Predictor.query.filter_by(id=predictor_id))
 
 
-def get_predictors(newest=True, **kwargs):
+def get_predictors(newest=True, user=None, **kwargs):
     """ Helper function for querying newest predictors """
     if newest:
         predictor_ids = db.session.query(
@@ -36,14 +36,21 @@ def get_predictors(newest=True, **kwargs):
         predictor_ids = predictor_ids.join(PredictorRun).filter(
             PredictorRun.run_id.in_(kwargs.pop('run_id')))
 
-    query = Predictor.query.filter(Predictor.id.in_(predictor_ids)).filter_by(
-        private=False
-    )
+    query = Predictor.query.filter(Predictor.id.in_(predictor_ids))
+
     for param in kwargs:
         query = query.filter(getattr(Predictor, param).in_(kwargs[param]))
 
+    query = query.filter_by(active=True)
+
+    if user is not None:
+        query = query.filter_by(private=True).join(
+            PredictorCollection).filter_by(user_id=user.id)
+    else:
+        query = query.filter_by(private=False)
+
     # Only display active predictors
-    return query.filter_by(active=True).all()
+    return query.all()
 
 
 class PredictorListResource(MethodResource):
