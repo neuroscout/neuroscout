@@ -9,7 +9,7 @@ import sqlalchemy as sa
 import pandas as pd
 from flask import current_app
 from ..models import (Analysis, Predictor,
-                      PredictorEvent, User, Role, Dataset)
+                      PredictorRun, User, Role, Dataset)
 from .. import populate
 
 """
@@ -189,8 +189,8 @@ def add_analysis(session, add_users, add_task, extract_features):
         runs=dataset.runs)
 
     run_id = [r.id for r in dataset.runs]
-    pred_id = PredictorEvent.query.filter(
-        PredictorEvent.run_id.in_(run_id)).distinct(
+    pred_id = PredictorRun.query.filter(
+        PredictorRun.run_id.in_(run_id)).distinct(
             'predictor_id').with_entities('predictor_id').all()
 
     analysis.predictors = Predictor.query.filter(

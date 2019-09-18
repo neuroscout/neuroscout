@@ -32,7 +32,7 @@ def delete_task(dataset, task):
 
 
 def extend_extracted_objects(dataset_name, **selectors):
-    """ Creates PredictorEvents for newly ingest runs in a Dataset,
+    """ Links RunStimuli for newly ingest runs in a Dataset,
         for all ExtractedFeatures. Also links derived Stimuli with new Runs.
         Args:
             dataset_name (str) - dataset name
