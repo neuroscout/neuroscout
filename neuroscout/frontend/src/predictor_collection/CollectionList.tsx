@@ -42,7 +42,7 @@ export class PredictorCollectionList extends React.Component<CollectionListProps
       this.setState({collections: collections});
     });
   };
-  
+ 
   componentDidMount() {
     this.loadCollections();
   }
@@ -64,7 +64,8 @@ export class PredictorCollectionList extends React.Component<CollectionListProps
         dataIndex: 'status',
         sorter: (a, b) => a.status.localeCompare(b.status)
       },
-      { title: 'Predictors',
+      {
+        title: 'Predictors',
         dataIndex: 'predictors',
         render: (predictors, record, index) => {
           if (!record.traceback) {
@@ -72,7 +73,22 @@ export class PredictorCollectionList extends React.Component<CollectionListProps
           }
           return (<Text type="danger">{record.traceback}</Text>);
         }
-      }
+      },
+      {
+        title: 'Private',
+        dataIndex: 'predictors',
+        render: (predictors, record, index) => {
+          if (!predictors || !predictors.length) {
+            return ('');
+          } else if (predictors.every(x => x.private === true)) {
+            return (<span>Private</span>);
+          } else if (predictors.every(x => x.private === false)) {
+            return (<span>Public</span>);
+          } else {
+            return ('');
+          }
+        }
+      },
     ];
 
     return (

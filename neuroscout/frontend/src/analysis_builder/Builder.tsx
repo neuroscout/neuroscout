@@ -10,6 +10,8 @@ import {
   Tag, Tabs, Row, Button, Modal, Icon, message, Tooltip, Form, Input, Collapse
 } from 'antd';
 import { Prompt } from 'react-router-dom';
+
+import { api } from '../api';
 import { OverviewTab } from './Overview';
 import { PredictorSelector } from './Predictors';
 import { validateContrast } from './ContrastEditor';
@@ -916,8 +918,11 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
   loadPredictors = () => {
     let analysis = this.state.analysis;
     let runIds = this.state.analysis.runIds;
-    jwtFetch(`${domainRoot}/api/predictors?run_id=${runIds}`)
-    .then((data: Predictor[]) => {
+    api.getPredictors(runIds)
+    .then((data: (Predictor[] | null)) => {
+      if (data === null) {
+        return;
+      }
       // If there is a statusCode we do not have a list of predictors
       if ((data as any).statusCode === undefined) {
         this.setState({

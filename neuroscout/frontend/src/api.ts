@@ -72,6 +72,10 @@ export const api = {
     return jwtFetch(`${domainRoot}/api/predictors/${id}`);
   },
 
+  getPredictors: (ids: (number[] | string[])): Promise<Predictor[] | null> => {
+    return jwtFetch(`${domainRoot}/api/predictors?run_id=${ids}`);
+  },
+
   getDataset: (datasetId: (number | string)): Promise<(Dataset | null)> => {
   return jwtFetch(`${domainRoot}/api/datasets/${datasetId}`)
     .then(data => {

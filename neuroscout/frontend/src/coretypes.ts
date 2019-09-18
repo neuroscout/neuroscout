@@ -73,6 +73,7 @@ export interface Predictor {
   source: string | null;
   description: string | null;
   extracted_feature?: ExtractedFeature;
+  private: boolean;
 }
 
 export interface ExtractedFeature {
@@ -252,7 +253,8 @@ export interface PredictorCollection {
   status?: string;
   traceback?: string;
   collection_name: string;
-  predictors?: {id: string, name: string}[];
+  // predictors?: {id: string, name: string}[];
+  predictors?: Predictor[];
 }
 
 // Shape of User object as consumed/produced by the backend API

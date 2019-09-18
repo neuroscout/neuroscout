@@ -44,4 +44,4 @@ class PredictorCollectionSchema(Schema):
     traceback = fields.Str(description='Traceback of error.')
     collection_name = fields.Str(description='Name of collection')
     predictors = fields.Nested(
-        'PredictorSchema', only=['id', 'name'], many=True)
+        'PredictorSchema', only=['id', 'name', 'private'], many=True)
