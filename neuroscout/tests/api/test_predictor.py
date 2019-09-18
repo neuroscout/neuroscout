@@ -136,4 +136,4 @@ def test_predictor_create(session,
 
     # Test user PC route:
     resp = decode_json(auth_client.get('/api/user/predictors'))
-    assert len(resp) == 2
+    assert len(resp) == 3
