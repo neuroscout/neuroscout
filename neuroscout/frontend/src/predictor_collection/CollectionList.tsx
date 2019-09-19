@@ -1,6 +1,6 @@
 import * as React from 'react';
-import { Button, Card, Checkbox, Collapse, Form, Icon, Input, List, Modal, Row, Tabs, Table, Typography,
-         Upload } from 'antd';
+import { Button, Card, Checkbox, Collapse, Form, Icon, Input, List, Modal, Row, Tabs, Table, Tag,
+         Typography, Upload } from 'antd';
 import { TableRowSelection } from 'antd/lib/table';
 
 import { api } from '../api';
@@ -17,16 +17,18 @@ type CollectionListProps = {
 type CollectionListState = {
   formModal: boolean,
   user?: ApiUser,
-  collections?: PredictorCollection[]
+  collections?: PredictorCollection[],
+  loading: boolean
 };
 
 export class PredictorCollectionList extends React.Component<CollectionListProps, CollectionListState> {
   constructor(props) {
     super(props);
-    this.state = { formModal: false };
+    this.state = { formModal: false, loading: false };
   }
 
   loadCollections = () => {
+    this.setState({loading: true});
     api.getUser().then(user => {
       if (user && user.predictor_collections) {
         let collections = user.predictor_collections.map((x) => {
@@ -34,12 +36,13 @@ export class PredictorCollectionList extends React.Component<CollectionListProps
         });
         return Promise.all(collections);
       } else {
+        this.setState({loading: false});
         return [];
       }
     }).then((collections) => {
       /* need to get dataset id from first predictor in each collection */
       collections.sort((a, b) => { return b.id - a.id; });
-      this.setState({collections: collections});
+      this.setState({collections: collections, loading: false});
     });
   };
  
@@ -60,7 +63,7 @@ export class PredictorCollectionList extends React.Component<CollectionListProps
         sorter: (a, b) => a.collection_name.localeCompare(b.collection_name)
       },
       {
-        title: 'Status',
+        title: (<>Status <Icon type="reload" onClick={this.loadCollections} /></>),
         dataIndex: 'status',
         sorter: (a, b) => a.status.localeCompare(b.status)
       },
@@ -75,17 +78,17 @@ export class PredictorCollectionList extends React.Component<CollectionListProps
         }
       },
       {
-        title: 'Private',
+        title: 'Predictor Visibility',
         dataIndex: 'predictors',
         render: (predictors, record, index) => {
           if (!predictors || !predictors.length) {
             return ('');
           } else if (predictors.every(x => x.private === true)) {
-            return (<span>Private</span>);
+            return (<Tag>Private</Tag>);
           } else if (predictors.every(x => x.private === false)) {
-            return (<span>Public</span>);
+            return (<Tag color="blue">Public</Tag>);
           } else {
-            return ('');
+            return (<Tag color="yellow">Mixed</Tag>);
           }
         }
       },
@@ -122,6 +125,7 @@ export class PredictorCollectionList extends React.Component<CollectionListProps
               rowKey="id"
               columns={collectionColumns}
               dataSource={this.state.collections}
+              loading={this.state.loading}
             />
           }
         </MainCol>
