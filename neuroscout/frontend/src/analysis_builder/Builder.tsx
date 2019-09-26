@@ -940,8 +940,11 @@ export default class AnalysisBuilder extends Reflux.Component<any, BuilderProps 
           return x.predictors !== undefined &&
           x.predictors.length > 0 &&
           x.predictors[0].dataset_id + '' === this.state.analysis.datasetId;
-        }).map(x => x.predictors).filter(isDefined).flat();
-        data.push(...userPredictors);
+        }).map(x => x.predictors).filter(isDefined).flat().map(predictor => {
+          if (!data.some((elem => elem.id === predictor.id))) {
+            data.push(predictor);
+          }
+        });
       }
 
       const selectedPredictors = data.filter(
