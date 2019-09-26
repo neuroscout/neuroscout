@@ -74,6 +74,7 @@ export interface Predictor {
   description: string | null;
   extracted_feature?: ExtractedFeature;
   private: boolean;
+  dataset_id?: number;
 }
 
 export interface ExtractedFeature {
@@ -186,6 +187,7 @@ export interface Store {
   fillAnalysis: boolean;
   analysis404: boolean;
   doTooltip: boolean;
+  auth?: AuthStoreState;
 }
 
 export interface ApiRun {
@@ -263,7 +265,8 @@ export interface ApiUser {
   name: string;
   picture: string;
   analyses: ApiAnalysis[];
-  predictor_collections?: PredictorCollection[];
+  predictor_collections: PredictorCollection[];
+  first_login: boolean;
 }
 
 // The more condensed version of analysis object as returned by the user route
@@ -296,6 +299,7 @@ export interface AuthStoreState {
   nextURL: string | null; // will probably remove this and find a better solution to login redirects
   gAuth: any;
   avatar: string;
+  predictorCollections: PredictorCollection[];
 }
 
 export interface AppState {

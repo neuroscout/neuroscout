@@ -97,7 +97,10 @@ export default class Routes extends React.Component<AppState, {}> {
       <Route
         path="/mycollections"
         render={props =>
-          <PredictorCollectionList datasets={this.props.datasets} />}
+          <PredictorCollectionList
+            datasets={this.props.datasets}
+            collections={this.props.auth.predictorCollections}
+          />}
       />
       <Route component={NotFound} />
       </Switch>

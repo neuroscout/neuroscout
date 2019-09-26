@@ -105,3 +105,7 @@ export const reorder = (list: any[], startIndex: number, endIndex: number): any[
 
   return result;
 };
+
+export const isDefined = <T>(argument: T | undefined): argument is T => {
+    return argument !== undefined;
+};

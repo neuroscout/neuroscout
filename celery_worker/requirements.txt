@@ -11,7 +11,7 @@ networkx==1.9
 celery
 hashids==1.2.0
 marshmallow==2.19.1
-psycopg2==2.7.1
+psycopg2==2.8.3
 redis
 pandas==0.23
 nibabel==2.1.0

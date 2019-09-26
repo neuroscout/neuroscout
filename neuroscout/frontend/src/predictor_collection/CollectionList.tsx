@@ -4,6 +4,7 @@ import { Button, Card, Checkbox, Collapse, Form, Icon, Input, List, Modal, Row, 
 import { TableRowSelection } from 'antd/lib/table';
 
 import { api } from '../api';
+import { authActions } from '../auth.actions';
 import { ApiUser, Dataset, PredictorCollection, Run, RunFilters } from '../coretypes';
 import { datasetColumns, MainCol } from '../HelperComponents';
 import { AddPredictorsForm } from './AddPredictorsForm';
@@ -11,7 +12,8 @@ import { AddPredictorsForm } from './AddPredictorsForm';
 const { Text } = Typography;
 
 type CollectionListProps = {
-  datasets: Dataset[]
+  datasets: Dataset[],
+  collections: PredictorCollection[]
 };
 
 type CollectionListState = {
@@ -27,9 +29,11 @@ export class PredictorCollectionList extends React.Component<CollectionListProps
     this.state = { formModal: false, loading: false };
   }
 
+  // this duplicates code in auth.store but allows us to handle promise more easily and keep
+  // loading state local
   loadCollections = () => {
     this.setState({loading: true});
-    api.getUser().then(user => {
+    api.getUser().then((user: ApiUser): any => {
       if (user && user.predictor_collections) {
         let collections = user.predictor_collections.map((x) => {
           return api.getPredictorCollection(x.id);
@@ -40,9 +44,9 @@ export class PredictorCollectionList extends React.Component<CollectionListProps
         return [];
       }
     }).then((collections) => {
-      /* need to get dataset id from first predictor in each collection */
-      collections.sort((a, b) => { return b.id - a.id; });
-      this.setState({collections: collections, loading: false});
+      // collections.sort((a, b) => { return b.id - a.id; });
+      this.setState({loading: false});
+      authActions.update({predictorCollections: collections});
     });
   };
  
@@ -80,6 +84,7 @@ export class PredictorCollectionList extends React.Component<CollectionListProps
       {
         title: 'Predictor Visibility',
         dataIndex: 'predictors',
+        key: 'pred_visiblity',
         render: (predictors, record, index) => {
           if (!predictors || !predictors.length) {
             return ('');
@@ -120,11 +125,11 @@ export class PredictorCollectionList extends React.Component<CollectionListProps
               <AddPredictorsForm datasets={this.props.datasets} closeModal={this.closeModal} />
             </Modal>
           }
-          {this.state.collections &&
+          {this.props.collections &&
             <Table
-              rowKey="id"
               columns={collectionColumns}
-              dataSource={this.state.collections}
+              rowKey="id"
+              dataSource={this.props.collections}
               loading={this.state.loading}
             />
           }
