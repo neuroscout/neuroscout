@@ -15,6 +15,7 @@ class PredictorSchema(Schema):
     description = fields.Str(description="Predictor description")
     extracted_feature = fields.Nested('ExtractedFeatureSchema', skip_if=None)
     source = fields.Str()
+    private = fields.Boolean(description="Predictor visible to the public or not")
 
     max = fields.Float(description="Maximum value")
     min = fields.Float(description="Minimum value")
