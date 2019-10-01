@@ -41,4 +41,5 @@ matrix:
         yarn: true
       script:
         - cd ./neuroscout/frontend
+        - mv ./src/config.ts.examle ./src/config.ts
         - yarn install && yarn test
