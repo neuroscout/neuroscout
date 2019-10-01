@@ -13,5 +13,5 @@ let testProps = {
 test('PredictorDescriptionForm renders without crashing', () => {
   const wrapper = mount(<PredictorDescriptionForm {...testProps} />);
   // Create new analysis button
-  expect(wrapper.text().toLowerCase()).toContain(testData.testPredictor.name);
+  expect(wrapper.text().toLowerCase()).toContain(testData.testPredictor.name.toLowerCase());
 });
