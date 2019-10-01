@@ -39,3 +39,6 @@ matrix:
         - "lts/*"
       cache:
         yarn: true
+      script:
+        - cd ./neuroscout/frontend
+        - yarn test
