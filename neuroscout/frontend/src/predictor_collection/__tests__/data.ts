@@ -15,14 +15,16 @@ export const testDataset = {
   active: true
 };
 
-export const predictorArray = [{
+export const testPredictor = {
   id: '1',
   name: 'uploadedPred',
   source: 'collection name',
   description: 'predictor description',
   private: true,
   dataset_id: 1 
-}];
+};
+
+export const predictorArray = [testPredictor];
 
 export const testPredictorCollection = {
   id: '1',
@@ -30,4 +32,4 @@ export const testPredictorCollection = {
   predictors: predictorArray,
 };
 
-test('null test for data', () => {return undefined};
+test('null test for data', () => { return undefined; };

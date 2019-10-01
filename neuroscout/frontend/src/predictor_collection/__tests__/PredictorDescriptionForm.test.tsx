@@ -8,7 +8,7 @@ let testProps = {
   predictors: [testData.testPredictor.name],
   descriptions: [''],
   updateDescription: (x, y) => {}
-}
+};
 
 test('PredictorDescriptionForm renders without crashing', () => {
   const wrapper = mount(<PredictorDescriptionForm {...testProps} />);

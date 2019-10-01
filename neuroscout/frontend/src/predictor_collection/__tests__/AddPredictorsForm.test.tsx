@@ -7,7 +7,7 @@ import * as testData from './data';
 let testProps = {
   datasets: [testData.testDataset]
   closeModal: () => {}
-}
+};
 
 test('AddPredictorsForm renders without crashing', () => {
   const wrapper = mount(<AddPredictorsForm {...testProps} />);
