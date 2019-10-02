@@ -26,9 +26,7 @@ class Navbar extends React.Component<AuthStoreState, {}> {
                   <Avatar
                     shape="circle"
                     icon="user"
-                    src={this.props.avatar ?
-                          this.props.avatar :
-                          this.props.gAuth ?  this.props.gAuth.profileObj.imageUrl : ''}
+                    src={this.props.avatar}
                     className="headerAvatar"
                   />
                 }

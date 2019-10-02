@@ -60,6 +60,7 @@ export class PredictorCollectionList extends React.Component<CollectionListProps
   };
 
   render() {
+    let datasets = this.props.datasets.filter(x => x.active === true);
     let collectionColumns = [
       { 
         title: 'Name',
@@ -122,7 +123,7 @@ export class PredictorCollectionList extends React.Component<CollectionListProps
               okButtonProps={{ hidden: true }}
               cancelButtonProps={{ hidden: true }}
             >
-              <AddPredictorsForm datasets={this.props.datasets} closeModal={this.closeModal} />
+              <AddPredictorsForm datasets={datasets} closeModal={this.closeModal} />
             </Modal>
           }
           {this.props.collections &&
