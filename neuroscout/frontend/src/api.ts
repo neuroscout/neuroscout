@@ -4,10 +4,14 @@
 import { _fetch, displayError, jwtFetch } from './utils';
 import {
   ApiDataset,
+  ApiUser,
   ApiAnalysis,
   AppAnalysis,
-  Dataset
+  Dataset,
+  Predictor,
+  Run
 } from './coretypes';
+//  PredictorCollection
 import { config } from './config';
 const domainRoot = config.server_url;
 
@@ -32,6 +36,10 @@ export const ApiToAppAnalysis = (data: ApiAnalysis): AppAnalysis => ({
 });
 
 export const api = {
+  getUser: (): Promise<ApiUser> => {
+    return jwtFetch(`${domainRoot}/api/user`);
+  },
+
   getDatasets:  (active_only = true): Promise<Dataset[]> => {
     return jwtFetch(`${domainRoot}/api/datasets?active_only=${active_only}`)
     .then(data => {
@@ -42,6 +50,30 @@ export const api = {
       displayError(error);
       return [] as Dataset[];
     });
+  },
+
+  getPredictorCollection: (id: string): any => {
+    return jwtFetch(`${domainRoot}/api/predictors/collection?collection_id=${id}`);
+  },
+
+  postPredictorCollection: (formData: FormData): any => {
+    return jwtFetch(
+      `${domainRoot}/api/predictors/collection`,
+      {
+        headers: {'accept': 'application/json'},
+        method: 'POST',
+        body: formData 
+      },
+      true
+    );
+  },
+
+  getPredictor: (id: number): Promise<Predictor | null> => {
+    return jwtFetch(`${domainRoot}/api/predictors/${id}`);
+  },
+
+  getPredictors: (ids: (number[] | string[])): Promise<Predictor[] | null> => {
+    return jwtFetch(`${domainRoot}/api/predictors?run_id=${ids}`);
   },
 
   getDataset: (datasetId: (number | string)): Promise<(Dataset | null)> => {
@@ -102,6 +134,10 @@ export const api = {
         displayError(error);
         return false;
       });
+  },
+
+  getRuns: (datasetId: string): Promise<Run[]> => {
+    return jwtFetch(`${domainRoot}/api/runs?dataset_id=${datasetId}`);
   },
 
   getNVUploads: (analysisId: (string)): Promise<(any | null)> => {

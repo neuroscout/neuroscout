@@ -3,6 +3,7 @@
  The data models below are largely UI agonstic. This module is a good starting point to understand the
  shape of the data in the frontend app. All resusable type definitions should go into this module.
 */
+
 export type AnalysisStatus = 'DRAFT' | 'PENDING' | 'PASSED' | 'FAILED' | 'SUBMITTING';
 
 // Analysis type in Analysis Builder
@@ -73,6 +74,8 @@ export interface Predictor {
   source: string | null;
   description: string | null;
   extracted_feature?: ExtractedFeature;
+  private: boolean;
+  dataset_id?: number;
 }
 
 export interface ExtractedFeature {
@@ -185,6 +188,7 @@ export interface Store {
   fillAnalysis: boolean;
   analysis404: boolean;
   doTooltip: boolean;
+  auth?: AuthStoreState;
 }
 
 export interface ApiRun {
@@ -246,12 +250,24 @@ export interface ModelContrast {
   ContrastType: 't' | 'F';
 }
 
+export interface PredictorCollection {
+  id: string;
+  uploaded_at?: string;
+  status?: string;
+  traceback?: string;
+  collection_name: string;
+  // predictors?: {id: string, name: string}[];
+  predictors?: Predictor[];
+}
+
 // Shape of User object as consumed/produced by the backend API
 export interface ApiUser {
   email: string;
   name: string;
   picture: string;
   analyses: ApiAnalysis[];
+  predictor_collections: PredictorCollection[];
+  first_login: boolean;
 }
 
 // The more condensed version of analysis object as returned by the user route
@@ -284,6 +300,7 @@ export interface AuthStoreState {
   nextURL: string | null; // will probably remove this and find a better solution to login redirects
   gAuth: any;
   avatar: string;
+  predictorCollections: PredictorCollection[];
 }
 
 export interface AppState {
@@ -294,4 +311,10 @@ export interface AppState {
   datasets: Dataset[];
   cloneAnalysis: (number) => void;
   onDelete:  (analysis: AppAnalysis) => void;
+}
+
+export interface RunFilters {
+  numbers: string[];
+  subjects: string[];
+  sessions: string[];
 }

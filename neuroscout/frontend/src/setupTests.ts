@@ -4,8 +4,11 @@ Create mock matchMedia and localStorage for the tests to work.
 */
 import { configure } from 'enzyme';
 import Adapter from 'enzyme-adapter-react-16';
+import ReactGA from 'react-ga';
 
 configure({ adapter: new Adapter() });
+
+ReactGA.initialize('foo', { testMode: true });
 
 window.matchMedia =
   window.matchMedia ||
@@ -40,4 +43,5 @@ class LocalStorageMock {
   }
 }
 
-window.localStorage = new LocalStorageMock();
+let localStorageMock =  new LocalStorageMock();
+Object.defineProperty(window, 'localStorage', { value: localStorageMock });

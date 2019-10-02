@@ -10,6 +10,11 @@ import {
   Tag, Tabs, Row, Button, Modal, Icon, message, Tooltip, Form, Input, Collapse
 } from 'antd';
 import { Prompt } from 'react-router-dom';
+import Reflux from 'reflux';
+
+import { authActions } from '../auth.actions';
+import { AuthStore } from '../auth.store';
+import { api } from '../api';
 import { OverviewTab } from './Overview';
 import { PredictorSelector } from './Predictors';
 import { validateContrast } from './ContrastEditor';
@@ -36,10 +41,9 @@ import {
   TransformName,
   TabName
 } from '../coretypes';
-import { displayError, jwtFetch, timeout } from '../utils';
+import { displayError, jwtFetch, timeout, isDefined } from '../utils';
 import { MainCol, Space } from '../HelperComponents';
 import { config } from '../config';
-import { authActions } from '../auth.actions';
 
 const { TabPane } = Tabs;
 const Panel = Collapse.Panel;
@@ -219,10 +223,11 @@ type BuilderProps = {
   datasets: Dataset[];
 };
 
-export default class AnalysisBuilder extends React.Component<BuilderProps & RouteComponentProps<{}>, Store> {
+export default class AnalysisBuilder extends Reflux.Component<any, BuilderProps & RouteComponentProps<{}>, Store> {
   constructor(props: BuilderProps) {
     super(props);
     this.state = initializeStore();
+    this.store = AuthStore;
     // Load analysis from server if an analysis id is specified in the props
     if (!!props.id) {
       jwtFetch(`${domainRoot}/api/analyses/${props.id}`)
@@ -916,8 +921,11 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
   loadPredictors = () => {
     let analysis = this.state.analysis;
     let runIds = this.state.analysis.runIds;
-    jwtFetch(`${domainRoot}/api/predictors?run_id=${runIds}`)
-    .then((data: Predictor[]) => {
+    api.getPredictors(runIds)
+    .then((data: (Predictor[] | null)) => {
+      if (data === null) {
+        return;
+      }
       // If there is a statusCode we do not have a list of predictors
       if ((data as any).statusCode === undefined) {
         this.setState({
@@ -925,6 +933,20 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
         });
         return;
       }
+
+      // merge predictor collection predictors into available predictors
+      if (this.state.auth && this.state.auth.predictorCollections) {
+        let userPredictors = this.state.auth.predictorCollections.filter(x => {
+          return x.predictors !== undefined &&
+          x.predictors.length > 0 &&
+          x.predictors[0].dataset_id + '' === this.state.analysis.datasetId;
+        }).map(x => x.predictors).filter(isDefined).flat().map(predictor => {
+          if (!data.some((elem => elem.id === predictor.id))) {
+            data.push(predictor);
+          }
+        });
+      }
+
       const selectedPredictors = data.filter(
         p => analysis.predictorIds.indexOf(p.id) > -1
       );

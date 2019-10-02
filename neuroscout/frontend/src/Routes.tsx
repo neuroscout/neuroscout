@@ -9,6 +9,7 @@ import { AppState } from './coretypes';
 import FAQ from './FAQ';
 import { NotFound } from './HelperComponents';
 import Home from './Home';
+import { PredictorCollectionList } from './predictor_collection/CollectionList';
 
 export default class Routes extends React.Component<AppState, {}> {
   render() {
@@ -93,7 +94,15 @@ export default class Routes extends React.Component<AppState, {}> {
         path="/faq"
         render={() => <FAQ/>}
       />
-      <Route render={() => <NotFound/>} />
+      <Route
+        path="/mycollections"
+        render={props =>
+          <PredictorCollectionList
+            datasets={this.props.datasets}
+            collections={this.props.auth.predictorCollections}
+          />}
+      />
+      <Route component={NotFound} />
       </Switch>
     );
   }

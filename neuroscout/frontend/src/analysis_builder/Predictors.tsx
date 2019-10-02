@@ -7,6 +7,8 @@ import * as React from 'react';
 import { Table, Input, Row, Col, Tag } from 'antd';
 import { TableRowSelection } from 'antd/lib/table';
 
+import Reflux from 'reflux';
+
 import { Predictor } from '../coretypes';
 
 /*
@@ -168,6 +170,7 @@ export class PredictorSelector extends React.Component<
         </div>
       );
     }
+
     return (
       <div>
         <Row type="flex">

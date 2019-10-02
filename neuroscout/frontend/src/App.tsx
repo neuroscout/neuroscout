@@ -27,7 +27,9 @@ const DOMAINROOT = config.server_url;
 
 const { Content } = Layout;
 
-ReactGA.initialize(config.ga_key);
+if (config.ga_key) {
+  ReactGA.initialize(config.ga_key);
+}
 
 type JWTChangeProps = {
   loadAnalyses:  () => any;

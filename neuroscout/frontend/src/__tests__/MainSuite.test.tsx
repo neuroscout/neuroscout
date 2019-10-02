@@ -10,6 +10,8 @@ import { OverviewTab } from '../analysis_builder/Overview';
 import AnalysisBuilder from '../analysis_builder/Builder';
 import App from '../App';
 
+jest.mock('react-ga');
+
 describe('Test moveItem', () => {
   it('Move up', () => {
     expect(moveItem(['zero', 'one', 'two', 'three'], 2, 'up')).toEqual([
@@ -59,7 +61,7 @@ it('Overview tab renders without errors', () => {
 });
 
 it('Analysis builder renders without errors', () => {
-  const wrapper = mount(<BrowserRouter><AnalysisBuilder updatedAnalysis={() => {}} /></BrowserRouter>);
+  const wrapper = mount(<BrowserRouter><AnalysisBuilder updatedAnalysis={() => {}} datasets={[]} /></BrowserRouter>);
   // Expect 7 tabs
   expect(wrapper.find('div[role="tab"]').length).toBe(7);
 });
@@ -67,6 +69,7 @@ it('Analysis builder renders without errors', () => {
 test('App renders without crashing and homepage looks ok', () => {
   document.createElement('div');
   window.localStorage.removeItem('jwt');
+
   const wrapper = mount(<App />);
   // Create new analysis button
   expect(wrapper.text().toLowerCase()).toContain('neuroscout');
@@ -75,6 +78,10 @@ test('App renders without crashing and homepage looks ok', () => {
 });
 
 test('Homepage has 1 buttons with user is not logged in', () => {
+  const script = document.createElement('script');
+  script.type = 'text/javascript';
+  document.getElementsByTagName('head')[0].appendChild(script);
+
   window.localStorage.removeItem('jwt');
   const wrapper = mount(<App />);
   expect(wrapper.find('button').length).toBe(1);

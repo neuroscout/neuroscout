@@ -15,12 +15,14 @@ class PredictorSchema(Schema):
     description = fields.Str(description="Predictor description")
     extracted_feature = fields.Nested('ExtractedFeatureSchema', skip_if=None)
     source = fields.Str()
+    private = fields.Boolean(description="Predictor visible to the public or not")
 
     max = fields.Float(description="Maximum value")
     min = fields.Float(description="Minimum value")
     mean = fields.Float(description="Mean value")
     stddev = fields.Float(description="Standard deviation of value")
     num_na = fields.Int(description="Number of missing values")
+    dataset_id = fields.Int()
 
     @post_dump
     def remove_null_values(self, data):
@@ -44,4 +46,4 @@ class PredictorCollectionSchema(Schema):
     traceback = fields.Str(description='Traceback of error.')
     collection_name = fields.Str(description='Name of collection')
     predictors = fields.Nested(
-        'PredictorSchema', only=['id', 'name'], many=True)
+        'PredictorSchema', many=True)
