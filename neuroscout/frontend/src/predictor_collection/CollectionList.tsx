@@ -132,6 +132,7 @@ export class PredictorCollectionList extends React.Component<CollectionListProps
               rowKey="id"
               dataSource={this.props.collections}
               loading={this.state.loading}
+              locale={{ emptyText: 'No custom predictors uploaded.' }}
             />
           }
         </MainCol>
