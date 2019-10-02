@@ -59,18 +59,28 @@ def writeout_events(analysis, pes, outdir):
         entities = get_entities(run)
         entities['task'] = analysis['task_name']
 
+        out_cols = {}
         if run_events.empty is False:
             for name, df in run_events.groupby('predictor_id'):
                 df_col = df.groupby(['onset', 'duration'])['value'].max()
                 df_col = df_col.reset_index().rename(columns={'value': name})
+                out_cols[name] = df_col
 
-                # Write out BIDS path
-                fname = outdir / name / build_path(
-                    entities, path_patterns=PATHS)
-                fname.parent.mkdir(exist_ok=True)
-                paths.append(
-                    (str(fname), 'events/{}/{}'.format(name, fname.name)))
-                df_col.to_csv(fname, sep='\t', index=False)
+        # For any columns that don't have events, output n/a file
+        for name in set(predictor_names.values()) - out_cols.keys():
+            df_col = pd.DataFrame([[0, 0, 'n/a']],
+                                  columns=['onset', 'duration', name])
+            out_cols[name] = df_col
+
+        # Write out files
+        for name, df_col in out_cols.items():
+            # Write out BIDS path
+            fname = outdir / name / build_path(
+                entities, path_patterns=PATHS)
+            fname.parent.mkdir(exist_ok=True)
+            paths.append(
+                (str(fname), 'events/{}/{}'.format(name, fname.name)))
+            df_col.to_csv(fname, sep='\t', index=False)
 
     return paths
 
