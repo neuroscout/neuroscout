@@ -44,4 +44,4 @@ matrix:
         - yarn install
       script:
         - mv ./src/config.ts.example ./src/config.ts
-        - yarn test
+        - yarn build
