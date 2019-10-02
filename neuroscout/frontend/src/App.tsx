@@ -50,6 +50,12 @@ class JWTChange extends React.Component<JWTChangeProps, {}> {
     }
   }
 
+  componentDidUpdate(prevProps, prevState) {
+    if (!!this.props.jwt && this.props.jwt !== prevProps.jwt) {
+      this.props.loadAnalyses();
+    }
+  }
+
   render() { return null; }
 }
 
@@ -194,7 +200,10 @@ class App extends Reflux.Component<any, {}, AppState> {
 
   componentDidUpdate(prevProps, prevState) {
     // Need to do this so logout redirect only happens once, otherwise it'd be an infinite loop
-    if (this.state.auth.loggingOut) authActions.update({ loggingOut: false });
+    if (this.state.auth.loggingOut) {
+      authActions.update({ loggingOut: false });
+      this.setState({analyses: []});
+    }
   }
 }
 

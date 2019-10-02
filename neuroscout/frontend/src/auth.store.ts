@@ -107,7 +107,7 @@ export class AuthStore extends Reflux.Store {
       let { accountconfirmError } = this;
       fetch(DOMAINROOT + '/api/auth', {
         method: 'post',
-        body: JSON.stringify({ email: isGAuth ? 'GOOGLE' : email, password: password }),
+        body: JSON.stringify({ email: isGAuth === true ? 'GOOGLE' : email, password: password }),
         headers: {
           'Content-type': 'application/json'
         }
@@ -237,7 +237,8 @@ export class AuthStore extends Reflux.Store {
   logout = () => {
     localStorage.removeItem('jwt');
     localStorage.removeItem('email');
-    localStorage.removeItem('gAuth');
+    localStorage.removeItem('isGAuth');
+    localStorage.removeItem('avatar');
     this.update({
       loggedIn: false,
       name: undefined,
