@@ -43,6 +43,5 @@ matrix:
         - cd ./neuroscout/frontend
         - yarn install
       script:
-        - cd ./neuroscout/frontend
         - mv ./src/config.ts.example ./src/config.ts
         - yarn test
