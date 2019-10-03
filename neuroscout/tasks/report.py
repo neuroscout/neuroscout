@@ -8,7 +8,7 @@ from .viz import plot_design_matrix, plot_corr_matrix, sort_dm
 from .utils import update_record, write_jsons, write_tarball, dump_analysis
 
 
-MIN_CLI_VERSION = 0.3
+MIN_CLI_VERSION = '0.3'
 
 def compile(flask_app, hash_id, run_ids=None, build=False):
     """ Compile analysis_id. Validate analysis using pybids and
