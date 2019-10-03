@@ -149,8 +149,6 @@ export const api = {
         return null;
       }
 
-      // tslint:disable-next-line:no-console
-      console.log(data);
       data.map(collection => {
         let upload = {
           failed: 0,
