@@ -3,9 +3,10 @@
  */
 import { _fetch, displayError, jwtFetch } from './utils';
 import {
-  ApiDataset,
-  ApiUser,
   ApiAnalysis,
+  ApiDataset,
+  ApiUpload,
+  ApiUser,
   AppAnalysis,
   Dataset,
   Predictor,
@@ -142,29 +143,34 @@ export const api = {
 
   getNVUploads: (analysisId: (string)): Promise<(any | null)> => {
     return jwtFetch(`${domainRoot}/api/analyses/${analysisId}/upload`)
-    .then(data => {
-      let uploads = { 
-        'last_failed': null as any,
-        'pending': null as any,
-        'ok': [] as any[]
-      };
+    .then((data: ApiUpload[]) => {
+      let uploads = [] as any[];
       if (data.length === 0) {
         return null;
       }
-      data.map(x => x.uploaded_at = x.uploaded_at.replace('T', ' '));
-      let failed = data.filter(x => x.status  === 'FAILED');
-      if (failed.length > 0) {
-        failed.sort((a, b) => b.uploaded_at.localeCompare(a.uploaded_at));
-        uploads.last_failed = failed[0];
-      }
-      uploads.ok = data.filter(x => x.status === 'OK');
-      if (uploads.ok.length === 0) {
-       let pending = data.filter(x => x.status  === 'PENDING');
-       if (pending.length > 0) {
-         failed.sort((a, b) => b.uploaded_at.localeCompare(a.uploaded_at));
-         uploads.pending = pending[0];
-       }
-      }
+
+      data.map(collection => {
+        let upload = {
+          failed: 0,
+          pending: 0,
+          ok: 0,
+          total: 0,
+          id: 0,
+          tracebacks: [] as (string | null)[]
+        };
+        let tracebacks = [...new Set(
+          collection.files.filter(x => x.status === 'FAILED').filter(x => x.traceback !== null).map(x => x.traceback)
+        )];
+        if (tracebacks !== null && tracebacks.length > 0) {
+          upload.tracebacks = tracebacks;
+        }
+        upload.total = collection.files.length;
+        upload.failed = collection.files.filter(x => x.status  === 'FAILED').length;
+        upload.ok = collection.files.filter(x => x.status === 'OK').length;
+        upload.pending = collection.files.filter(x => x.status === 'PENDING').length;
+        upload.id = collection.collection_id;
+        uploads.push(upload);
+      });
       return uploads;
     })
     .catch((error) => {
