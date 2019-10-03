@@ -156,8 +156,14 @@ export const api = {
           ok: 0,
           total: 0,
           id: 0,
+          tracebacks: [] as (string | null)[]
         };
-
+        let tracebacks = [...new Set(
+          collection.files.filter(x => x.status === 'FAILED').filter(x => x.traceback !== null).map(x => x.traceback)
+        )];
+        if (tracebacks !== null && tracebacks.length > 0) {
+          upload.tracebacks = tracebacks;
+        }
         upload.total = collection.files.length;
         upload.failed = collection.files.filter(x => x.status  === 'FAILED').length;
         upload.ok = collection.files.filter(x => x.status === 'OK').length;

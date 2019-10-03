@@ -187,7 +187,7 @@ export class StatusTab extends React.Component<submitProps, statusTabState> {
     let url = `https://neurovault.org/collections/${collection_id}`;
     return (
       <a href={url} target="_blank">
-        https://neurovault.org/collections/{collection_id}/
+        Collection ID: {collection_id}
       </a>
     );
   }
@@ -204,22 +204,26 @@ export class StatusTab extends React.Component<submitProps, statusTabState> {
           {(x.pending > 0) &&
             <span>
             <Alert
-              message={`${x.pending}/{x.total} uploads pending`}
+              message={`${x.pending}/{x.total} image uploads pending`}
               type="warning"
             />
             </span>
           }
           {(x.ok > 0) &&
             <Alert
-              message={`${x.ok}/${x.total} uploads succeded`}
+              message={`${x.ok}/${x.total} image uploads succeded`}
               type="success"
             />
           }
           {(x.failed > 0) &&
-            <Alert
-              message={`${x.failed}/${x.total} uploads failed`}
-              type="error"
-            />
+            <Tooltip title={(<>{x.tracebacks.map((y, i) => <p key={i}>{y}</p>)}</>)}>
+              <div>
+                <Alert
+                  message={`${x.failed}/${x.total} image uploads failed`}
+                  type="error"
+                />
+              </div>
+            </Tooltip>
           }
         </Card>
       );
