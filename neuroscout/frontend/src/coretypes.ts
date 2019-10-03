@@ -318,3 +318,10 @@ export interface RunFilters {
   subjects: string[];
   sessions: string[];
 }
+
+// shape of objects returned by api/analyses/{id}/uploads
+export interface ApiUpload {
+  collection_id: number;
+  uploaded_at: string;
+  files: [{level: string, status: string, traceback: (null | string)}];
+}
