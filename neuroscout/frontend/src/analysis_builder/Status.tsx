@@ -211,7 +211,7 @@ export class StatusTab extends React.Component<submitProps, statusTabState> {
           }
           {(x.ok > 0) &&
             <Alert
-              message={`${x.ok}/${x.total} image uploads succeded`}
+              message={`${x.ok}/${x.total} image uploads succeeded`}
               type="success"
             />
           }
