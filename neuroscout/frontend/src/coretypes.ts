@@ -117,7 +117,7 @@ export type ReplaceNA = 'before' | 'after' | undefined;
 
 export interface Transformation {
   Name: TransformName;
-  ReplaceNa?: ReplaceNA;
+  ReplaceNA?: ReplaceNA;
   Input?: string[]; // predictor IDs
   Output?: string[];
   Demean?: boolean;

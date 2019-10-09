@@ -238,7 +238,7 @@ class ParameterField extends React.Component<ParameterFieldProps> {
           </div>
           </Row>
         )}
-        {name === 'replace_na' && this.ReplaceNAField()}
+        {name === 'ReplaceNA' && this.ReplaceNAField()}
       </span>
     );
   }

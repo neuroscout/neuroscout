@@ -1,4 +1,4 @@
-import { Transformation } from '../coretypes';
+import { Transformation, ReplaceNA } from '../coretypes';
 
 // Todo: Add more transformations, from pybids
 // At first, only allow transformations that occur in place
@@ -13,6 +13,7 @@ const transformDefinitions: Transformation[] = [
     Name: 'Scale',
     Demean: true,
     Rescale: true,
+    ReplaceNA: 'None' as ReplaceNA
   },
   {
     Name: 'Orthogonalize',
