@@ -107,6 +107,11 @@ export class PredictorSelector extends React.Component<
         title: 'Name',
         dataIndex: 'name',
         sorter: (a, b) => a.name.localeCompare(b.name),
+        render: (text, record) => (
+          <div style={{ wordWrap: 'break-word', wordBreak: 'break-word' }}>
+            {text}
+          </div>
+        ),
         width: '35%'
       },
       {
@@ -114,11 +119,21 @@ export class PredictorSelector extends React.Component<
         dataIndex: 'source',
         sorter: this.sourceCmp,
         defaultSortOrder: 'ascend' as 'ascend',
+        render: (text, record) => (
+          <div style={{ wordWrap: 'break-word', wordBreak: 'break-word' }}>
+            {text}
+          </div>
+        ),
         width: '30%'
       },
       {
         title: 'Description',
         dataIndex: 'description',
+        render: (text, record) => (
+          <div style={{ wordWrap: 'break-word', wordBreak: 'break-word' }}>
+            {text}
+          </div>
+        ),
         width: '35%'
       }
     ];
