@@ -74,7 +74,12 @@ export const api = {
   },
 
   getPredictors: (ids: (number[] | string[])): Promise<Predictor[] | null> => {
-    return jwtFetch(`${domainRoot}/api/predictors?run_id=${ids}`);
+    return jwtFetch(`${domainRoot}/api/predictors?run_id=${ids}`).then((data) => {
+      if (data.statusCode && data.statusCode === 422) {
+        return [] as Predictor[];
+      }
+      return data;
+    });
   },
 
   getDataset: (datasetId: (number | string)): Promise<(Dataset | null)> => {

@@ -926,6 +926,7 @@ export default class AnalysisBuilder extends Reflux.Component<any, BuilderProps 
       if (data === null) {
         return;
       }
+
       // If there is a statusCode we do not have a list of predictors
       if ((data as any).statusCode === undefined) {
         this.setState({
