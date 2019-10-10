@@ -11,7 +11,7 @@ from .database import db
 
 def create_app(app_settings=None):
     sentry_sdk.init(
-        dsn="https://60676be3b8de4a8ab43697356837bfed@sentry.io/1775918",
+        dsn="https://97420c15992548928d615f0ab0e44322@sentry.io/1776211",
         integrations=[FlaskIntegration()]
     )
     app = Flask(__name__, static_folder='/static')
