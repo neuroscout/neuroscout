@@ -1,11 +1,19 @@
 """ Basic Flask app creation """
-from .database import db
+import os
+
 from flask import Flask
 from flask_caching import Cache
-import os
+import sentry_sdk
+from sentry_sdk.integrations.flask import FlaskIntegration
+
+from .database import db
 
 
 def create_app(app_settings=None):
+    sentry_sdk.init(
+        dsn="https://60676be3b8de4a8ab43697356837bfed@sentry.io/1775918",
+        integrations=[FlaskIntegration()]
+    )
     app = Flask(__name__, static_folder='/static')
     if app_settings is not None:
         app.config.from_object(app_settings)
