@@ -204,7 +204,7 @@ export class StatusTab extends React.Component<submitProps, statusTabState> {
           {(x.pending > 0) &&
             <span>
             <Alert
-              message={`${x.pending}/{x.total} image uploads pending`}
+              message={`${x.pending}/${x.total} image uploads pending`}
               type="warning"
             />
             </span>
