@@ -226,7 +226,8 @@ def add_task(task_name, dataset_name=None, local_path=None,
             assert isfile(e)
 
         collection = layout.get_collections(
-            'run', scan_length=run_model.duration, **entities)[0]
+            'run', scan_length=run_model.duration, desc=None,
+            **entities)[0]
 
         if 'stim_file' in collection.variables:
             stims = collection.variables.pop('stim_file')
@@ -260,8 +261,9 @@ def add_task(task_name, dataset_name=None, local_path=None,
                 runstim, _ = get_or_create(
                     RunStimulus, stimulus_id=stim_model.id,
                     run_id=run_model.id,
-                    onset=stims.onset.tolist()[i],
-                    duration=stims.duration.tolist()[i])
+                    onset=stims.onset.tolist()[i])
+                runstim.duration = stims.duration.tolist()[i]
+                db.session.commit()
 
     """ Add GroupPredictors """
     print("Adding group predictors")
