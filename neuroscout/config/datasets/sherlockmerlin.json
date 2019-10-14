@@ -10,7 +10,6 @@
         "converters": [
         ],
         "extractors": [
-          ["PredefinedDictionaryExtractor", {"variables": ["subtlexusfrequency/Lg10WF"], "missing": "n/a"}]
         ],
         "transformations": [
         ]
