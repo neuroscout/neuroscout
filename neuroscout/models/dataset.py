@@ -21,6 +21,8 @@ class Dataset(db.Model):
     preproc_address = db.Column(db.Text)
     local_path = db.Column(db.Text)
 
+    known_issues = db.Column(db.Text) # Known issues free text
+
     @hybrid_property
     def mimetypes(self):
         """ List of mimetypes of stimuli in dataset """
