@@ -2,7 +2,7 @@
   "SherlockMerlin": {
     "preproc_address": "https://github.com/neuroscout-datasets/SherlockMerlin",
     "path": "/datasets/raw/SherlockMerlin/",
-    "summary": "Participants watched Sherlock movie and episode of Merlin show.",
+    "summary": "Audio/visual presentation of Sherlock and Merlin TV episodes",
     "url": "https://openneuro.org/datasets/ds001110",
     "tasks": {
       "MerlinMovie": {
@@ -10,6 +10,7 @@
         "converters": [
         ],
         "extractors": [
+            ["LengthExtractor", {}]
         ],
         "transformations": [
         ]
