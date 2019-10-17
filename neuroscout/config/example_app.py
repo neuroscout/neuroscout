@@ -41,11 +41,16 @@ class Config(object):
     ENV = 'production'
     NEUROVAULT_ACCESS_TOKEN = 'something'
 
+    SQLALCHEMY_DATABASE_URI = 'postgres://postgres:password@postgres:5432/neuroscout'
+    PROPAGATE_EXCEPTIONS = True
+
+
+class ProductionConfig(Config):
+    SENTRY_URI = ''
+
 
 class DevelopmentConfig(Config):
     ENV = 'development'
-    SQLALCHEMY_DATABASE_URI = 'postgres://postgres:password@postgres:5432/neuroscout'
-    PROPAGATE_EXCEPTIONS = True
 
 
 class TestingConfig(Config):

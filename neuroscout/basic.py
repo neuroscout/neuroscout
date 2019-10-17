@@ -1,11 +1,16 @@
 """ Basic Flask app creation """
-from .database import db
+import os
+
 from flask import Flask
 from flask_caching import Cache
-import os
+import sentry_sdk
+from sentry_sdk.integrations.flask import FlaskIntegration
+
+from .database import db
 
 
 def create_app(app_settings=None):
+
     app = Flask(__name__, static_folder='/static')
     if app_settings is not None:
         app.config.from_object(app_settings)
@@ -22,6 +27,13 @@ def create_app(app_settings=None):
         ALL_TRANSFORMERS=str(app.config['CONFIG_PATH'] / 'transformers.json'),
         BIBLIOGRAPHY=str(app.config['CONFIG_PATH'] / 'bibliography.json')
     )
+
+    sentry_uri = app.config.get('SENTRY_URI')
+    if sentry_uri:
+        sentry_sdk.init(
+            dsn=sentry_uri,
+            integrations=[FlaskIntegration()]
+        )
 
     db.init_app(app)
     cache = Cache(
