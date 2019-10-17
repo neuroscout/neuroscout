@@ -21,3 +21,5 @@ duecredit==0.6.1
 SQLAlchemy==1.3.0
 Flask-Caching==1.3.3
 flask_jwt
+sentry-sdk==0.13.0
+
