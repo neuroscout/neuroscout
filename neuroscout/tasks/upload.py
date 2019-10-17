@@ -111,7 +111,7 @@ MAP_TYPE_CHOICES = {
     't': 'T',
     'p': 'P',
     'effect': 'U',
-    'variance': 'Variance',
+    'variance': 'V',
 }
 
 
