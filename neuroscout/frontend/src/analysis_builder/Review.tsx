@@ -55,7 +55,7 @@ class ModelInput extends React.Component<{model: BidsModel}, {}> {
 }
 
 /* Object needs to have name as a key  */
-class ReviewObjects extends React.Component<{input: (Transformation | Contrast)[], autoContrasts?: boolean}, {}> {
+class ReviewObjects extends React.Component<{input: (Transformation | Contrast)[], autoContrasts?: string}, {}> {
   render() {
     let input = this.props.input;
     let display: any[] = [];
@@ -154,7 +154,7 @@ export class Review extends React.Component<ReviewProps, {}> {
       contrasts = Steps[0].Contrasts!;
     }
 
-    let autoContrasts: boolean = false;
+    let autoContrasts: string = '';
     if (Steps && Steps[0] && Steps[0].AutoContrasts) {
       autoContrasts = Steps[0].AutoContrasts!;
     }

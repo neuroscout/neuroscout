@@ -297,7 +297,6 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
         Level: 'Run',
         Transformations: this.state.analysis.transformations,
         Contrasts: this.state.analysis.contrasts,
-        AutoContrasts: this.state.analysis.autoContrast,
         Model: {
           X: X,
         }
@@ -306,12 +305,12 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
 
     steps.push({
       Level: 'Subject',
-      AutoContrasts: true
+      AutoContrasts: 'FEMA'
     });
 
     steps.push({
       Level: 'Dataset',
-      AutoContrasts: true
+      AutoContrasts: 't'
     });
 
     if (this.state.analysis.hrfPredictorIds) {
@@ -1078,7 +1077,7 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
                   {this.navButtons(!(!!this.state.analysis.name && this.state.analysis.runIds.length > 0), false)}
                   <br/>
                 </TabPane>}
-                {isEditable && 
+                {isEditable &&
                 <TabPane
                   tab="Predictors"
                   key="predictors"

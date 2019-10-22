@@ -231,7 +231,7 @@ export interface Step {
   Transformations?: Transformation[];
   Contrasts?: Contrast[];
   Level: string;
-  AutoContrasts?: boolean;
+  AutoContrasts?: string;
 }
 
 export interface StepModel {
