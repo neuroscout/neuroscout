@@ -3,9 +3,10 @@ from hashids import Hashids
 
 from ..models import Analysis, Report
 
-from .utils.build import build_analysis, dump_analysis, impute_confounds
+from .utils.build import build_analysis, impute_confounds
 from .utils.viz import plot_design_matrix, plot_corr_matrix, sort_dm
 from .utils.misc import update_record, PathBuilder, write_jsons, write_tarball
+from .utils.io import dump_analysis
 
 MIN_CLI_VERSION = '0.3'
 
