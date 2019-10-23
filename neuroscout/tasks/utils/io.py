@@ -1,6 +1,7 @@
 """ utils """
 import json
 import tarfile
+from pathlib import Path
 from grabbit.extensions.writable import build_path
 from ...utils.db import put_record, dump_pe
 from ...models import Analysis, PredictorEvent, Predictor, RunStimulus
