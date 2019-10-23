@@ -9,7 +9,7 @@ from ..models import (
     Predictor, PredictorCollection, PredictorEvent, PredictorRun,
     NeurovaultFileUpload)
 
-from .utils import update_record
+from .utils.misc import update_record
 
 
 def upload_collection(flask_app, filenames, runs, dataset_id, collection_id,

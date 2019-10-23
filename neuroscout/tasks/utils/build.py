@@ -1,35 +1,23 @@
 import json
 import numpy as np
-from pathlib import Path
-from tempfile import mkdtemp
-from bids.analysis import Analysis
-from bids.layout import BIDSLayout
-from grabbit.extensions.writable import build_path
-from copy import deepcopy
 import pandas as pd
 from collections import defaultdict
+from pathlib import Path
+from tempfile import mkdtemp
+from bids.analysis import Analysis as BIDSAnalysis
+from bids.layout import BIDSLayout
+from copy import deepcopy
 from celery.utils.log import get_task_logger
+from grabbit.extensions.writable import build_path
 
-logger = get_task_logger(__name__)
+from ...utils.db import dump_pe
+from ...models import Analysis, PredictorEvent, Predictor, RunStimulus
+from ...schemas.analysis import AnalysisFullSchema, AnalysisResourcesSchema
+
 
 PATHS = ['sub-{subject}_[ses-{session}_]task-{task}_[acq-{acquisition}_]'
          '[run-{run}_]events.tsv']
-REPORT_PATHS = ['sub-{subject}_[ses-{session}_]task-{task}_'
-                '[acq-{acquisition}_][run-{run}_]{type}.{extension}']
-
-
-def get_entities(run):
-    """ Get BIDS-entities from run object """
-    valid = ['number', 'session', 'subject', 'acquisition']
-    entities = {
-        r: v
-        for r, v in run.items()
-        if r in valid and v is not None
-        }
-
-    if 'number' in entities:
-        entities['run'] = entities.pop('number')
-    return entities
+logger = get_task_logger(__name__)
 
 
 def writeout_events(analysis, pes, outdir):
@@ -85,17 +73,6 @@ def writeout_events(analysis, pes, outdir):
     return paths
 
 
-def merge_dictionaries(*arg):
-    """ Set merge dictionaries """
-    dd = defaultdict(set)
-
-    for d in arg:  # you can list as many input dicts as you want here
-        for key, value in d.items():
-            dd[key].add(value)
-    return dict(((k, list(v)) if len(v) > 1 else (k, list(v)[0])
-                 for k, v in dd.items()))
-
-
 def build_analysis(analysis, predictor_events, bids_dir, run_id=None,
                    build=True):
     tmp_dir = Path(mkdtemp())
@@ -122,11 +99,107 @@ def build_analysis(analysis, predictor_events, bids_dir, run_id=None,
         # Load events and try applying transformations
         bids_layout = BIDSLayout(bids_dir, derivatives=str(tmp_dir),
                                  validate=False)
-        bids_analysis = Analysis(
+        bids_analysis = BIDSAnalysis(
             bids_layout, deepcopy(analysis.get('model')))
         bids_analysis.setup(**entities)
 
     return tmp_dir, paths, bids_analysis
+
+
+def create_pes(predictors, run_ids):
+    """ Create PredictorEvents from EFs """
+    all_pes = []
+    for pred in predictors:
+        ef = pred.extracted_feature
+        # For all instances for stimuli in this task's runs
+        for ee in ef.extracted_events:
+            # if ee.value:
+            query = RunStimulus.query.filter_by(stimulus_id=ee.stimulus_id)
+            if run_ids is not None:
+                query = query.filter(RunStimulus.run_id.in_(run_ids))
+            for rs in query:
+                duration = ee.duration
+                if duration is None:
+                    duration = rs.duration
+                all_pes.append(
+                    dict(
+                        onset=(ee.onset or 0) + rs.onset,
+                        value=ee.value,
+                        object_id=ee.object_id,
+                        duration=duration,
+                        predictor_id=pred.id,
+                        run_id=rs.run_id,
+                        stimulus_id=ee.stimulus_id
+                    )
+                )
+    return all_pes
+
+
+def dump_analysis(analysis_id, run_id=None):
+    """" Serialize analysis and related PredictorEvents to JSON.
+    Queries PredictorEvents to get all events for all runs and predictors. """
+
+    # Query for analysis
+    analysis = Analysis.query.filter_by(hash_id=analysis_id).one()
+
+    # Dump analysis JSON
+    analysis_json = AnalysisFullSchema().dump(analysis)[0]
+    resources_json = AnalysisResourcesSchema().dump(analysis)[0]
+
+    # Get run IDs
+    all_runs = [r['id'] for r in analysis_json['runs']]
+    if run_id is None:
+        run_id = all_runs
+    if not set(run_id) <= set(all_runs):
+        raise ValueError("Incorrect run id specified")
+
+    # Query and dump PredictorEvents
+    all_pred_ids = [(p['id']) for p in analysis_json['predictors']]
+    all_preds = Predictor.query.filter(Predictor.id.in_(all_pred_ids))
+
+    base_pred_ids = [p.id for p in all_preds.filter_by(ef_id=None)]
+    ext_preds = Predictor.query.filter(
+        Predictor.id.in_(set(all_pred_ids) - set(base_pred_ids)))
+
+    pes = PredictorEvent.query.filter(
+        (PredictorEvent.predictor_id.in_(base_pred_ids)) &
+        (PredictorEvent.run_id.in_(run_id)))
+    pes = dump_pe(pes)
+
+    pes += create_pes(ext_preds, run_id)
+
+    dataset_path = Path(analysis.dataset.local_path)
+    preproc_path = dataset_path / 'derivatives' / 'fmriprep'
+
+    if preproc_path.exists():
+        dataset_path = preproc_path
+    return (analysis.id, analysis_json, resources_json, pes,
+            str(dataset_path))
+
+
+def get_entities(run):
+    """ Get BIDS-entities from run object """
+    valid = ['number', 'session', 'subject', 'acquisition']
+    entities = {
+        r: v
+        for r, v in run.items()
+        if r in valid and v is not None
+        }
+
+    if 'number' in entities:
+        entities['run'] = entities.pop('number')
+    return entities
+
+
+def merge_dictionaries(*arg):
+    """ Set merge dictionaries """
+    dd = defaultdict(set)
+
+    for d in arg:  # you can list as many input dicts as you want here
+        for key, value in d.items():
+            dd[key].add(value)
+    return dict(((k, list(v)) if len(v) > 1 else (k, list(v)[0])
+                 for k, v in dd.items()))
 
 
 def impute_confounds(dense):
@@ -140,20 +213,3 @@ def impute_confounds(dense):
             # Impute the mean non-zero, non-NaN value
             dense[imputable][0] = np.nanmean(vals[vals != 0])
     return dense
-
-
-class PathBuilder():
-    def __init__(self, outdir, domain, hash, entities):
-        self.outdir = outdir
-        prepend = "https://" if "neuroscout.org" in domain else "http://"
-        self.domain = prepend + domain
-        self.hash = hash
-        self.entities = entities
-
-    def build(self, type, extension):
-        file = build_path(
-            {**self.entities, 'type': type, 'extension': extension},
-            path_patterns=REPORT_PATHS)
-        outfile = str(self.outdir / file)
-
-        return outfile, '{}/reports/{}/{}'.format(self.domain, self.hash, file)
