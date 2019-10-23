@@ -22,7 +22,6 @@ def plot_design_matrix(dm_wide, scale=True):
         dm_wide = (dm_wide - dm_wide.mean()) / (dm_wide.max() - dm_wide.min())
     dm = melt_dm(dm_wide)
 
-    pts = alt.selection_multi(encodings=['x'])
     time_labels = list(range(0, dm.scan_number.max(), 50))
 
     base_color = alt.Color(
@@ -36,16 +35,18 @@ def plot_design_matrix(dm_wide, scale=True):
         alt.X('regressor:N', sort=None, axis=alt.Axis(
             labelAngle=-45, title=None, ticks=False)),
         fill=base_color,
-        stroke=base_color,
-        opacity=alt.condition(pts, alt.value(1), alt.value(0.7))
+        stroke=base_color
     ).properties(
         width=750,
         height=450,
-        selection=pts
-    ).interactive()
+    )
+
+    selection = alt.selection_multi(fields=['regressor'])
+    color = alt.Color('regressor:N', legend=None)
+
     line = alt.Chart(
         dm,
-        title='Timecourse (shift-click columns to select)').mark_line(
+        title='Timecourse (shift-click legend to select)').mark_line(
             clip=True).encode(
         alt.X('scan_number',
               axis=alt.Axis(
@@ -54,18 +55,24 @@ def plot_design_matrix(dm_wide, scale=True):
               ),
         y=alt.Y('value:Q',
                 axis=alt.Axis(title='Amplitude (scaled for visualization)')),
-        color=alt.Color(
-            'regressor', sort=None, legend=alt.Legend(orient='right'))
+        color=color
     ).transform_filter(
-        pts
+        selection
     ).properties(
         width=650,
         height=225,
     )
 
+    legend = alt.Chart(dm).mark_square(size=200).encode(
+        y=alt.Y('regressor:N', axis=alt.Axis(orient='right')),
+        color=color
+    ).add_selection(
+        selection
+    )
+
     plt = alt.vconcat(
         heat,
-        line,
+        line | legend,
         resolve=alt.Resolve(
             scale=alt.LegendResolveMap(color=alt.ResolveMode('independent')))
     ).configure_scale(bandPaddingInner=0.0)

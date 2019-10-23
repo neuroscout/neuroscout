@@ -1,35 +1,17 @@
 import json
 import numpy as np
-from pathlib import Path
-from tempfile import mkdtemp
-from bids.analysis import Analysis
-from bids.layout import BIDSLayout
-from grabbit.extensions.writable import build_path
-from copy import deepcopy
 import pandas as pd
 from collections import defaultdict
-from celery.utils.log import get_task_logger
+from pathlib import Path
+from tempfile import mkdtemp
+from bids.analysis import Analysis as BIDSAnalysis
+from bids.layout import BIDSLayout
+from copy import deepcopy
+from grabbit.extensions.writable import build_path
 
-logger = get_task_logger(__name__)
 
 PATHS = ['sub-{subject}_[ses-{session}_]task-{task}_[acq-{acquisition}_]'
          '[run-{run}_]events.tsv']
-REPORT_PATHS = ['sub-{subject}_[ses-{session}_]task-{task}_'
-                '[acq-{acquisition}_][run-{run}_]{type}.{extension}']
-
-
-def get_entities(run):
-    """ Get BIDS-entities from run object """
-    valid = ['number', 'session', 'subject', 'acquisition']
-    entities = {
-        r: v
-        for r, v in run.items()
-        if r in valid and v is not None
-        }
-
-    if 'number' in entities:
-        entities['run'] = entities.pop('number')
-    return entities
 
 
 def writeout_events(analysis, pes, outdir):
@@ -85,17 +67,6 @@ def writeout_events(analysis, pes, outdir):
     return paths
 
 
-def merge_dictionaries(*arg):
-    """ Set merge dictionaries """
-    dd = defaultdict(set)
-
-    for d in arg:  # you can list as many input dicts as you want here
-        for key, value in d.items():
-            dd[key].add(value)
-    return dict(((k, list(v)) if len(v) > 1 else (k, list(v)[0])
-                 for k, v in dd.items()))
-
-
 def build_analysis(analysis, predictor_events, bids_dir, run_id=None,
                    build=True):
     tmp_dir = Path(mkdtemp())
@@ -122,11 +93,36 @@ def build_analysis(analysis, predictor_events, bids_dir, run_id=None,
         # Load events and try applying transformations
         bids_layout = BIDSLayout(bids_dir, derivatives=str(tmp_dir),
                                  validate=False)
-        bids_analysis = Analysis(
+        bids_analysis = BIDSAnalysis(
             bids_layout, deepcopy(analysis.get('model')))
         bids_analysis.setup(**entities)
 
     return tmp_dir, paths, bids_analysis
+
+
+def get_entities(run):
+    """ Get BIDS-entities from run object """
+    valid = ['number', 'session', 'subject', 'acquisition']
+    entities = {
+        r: v
+        for r, v in run.items()
+        if r in valid and v is not None
+        }
+
+    if 'number' in entities:
+        entities['run'] = entities.pop('number')
+    return entities
+
+
+def merge_dictionaries(*arg):
+    """ Set merge dictionaries """
+    dd = defaultdict(set)
+
+    for d in arg:  # you can list as many input dicts as you want here
+        for key, value in d.items():
+            dd[key].add(value)
+    return dict(((k, list(v)) if len(v) > 1 else (k, list(v)[0])
+                 for k, v in dd.items()))
 
 
 def impute_confounds(dense):
@@ -140,20 +136,3 @@ def impute_confounds(dense):
             # Impute the mean non-zero, non-NaN value
             dense[imputable][0] = np.nanmean(vals[vals != 0])
     return dense
-
-
-class PathBuilder():
-    def __init__(self, outdir, domain, hash, entities):
-        self.outdir = outdir
-        prepend = "https://" if "neuroscout.org" in domain else "http://"
-        self.domain = prepend + domain
-        self.hash = hash
-        self.entities = entities
-
-    def build(self, type, extension):
-        file = build_path(
-            {**self.entities, 'type': type, 'extension': extension},
-            path_patterns=REPORT_PATHS)
-        outfile = str(self.outdir / file)
-
-        return outfile, '{}/reports/{}/{}'.format(self.domain, self.hash, file)
