@@ -54,7 +54,7 @@ class Analysis(db.Model):
                                  backref='analysis')
     runs = db.relationship('Run', secondary='analysis_run')
     neurovault_collections = db.relationship(
-        'NeurovaultCollection', secondary='analysis_run')
+        'NeurovaultCollection')
 
     @hybrid_property
     def task_name(self):
