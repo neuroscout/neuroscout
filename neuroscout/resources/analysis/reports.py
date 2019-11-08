@@ -10,7 +10,7 @@ from ...models import Report, NeurovaultCollection, NeurovaultFileUpload
 from ...database import db
 from ...worker import celery_app
 from ...schemas.analysis import (
-    ReportSchema, AnalysisCompiledSchema, NeurovaultCollectionSchema)
+    ReportSchema, AnalysisCompiledSchema, NeurovaultCollectionSchemaStatus)
 from ...utils.db import put_record
 from ..utils import owner_required, abort, fetch_analysis
 from ...api_spec import FileField
@@ -158,7 +158,7 @@ def _create_collection(analysis, force=False):
 class AnalysisUploadResource(MethodResource):
     @doc(summary='Upload fitlins analysis results. ',
          consumes=['multipart/form-data', 'application/x-www-form-urlencoded'])
-    @marshal_with(NeurovaultCollectionSchema)
+    @marshal_with(NeurovaultCollectionSchemaStatus)
     @use_kwargs({
         "validation_hash": wa.fields.Str(required=True),
         "image_file": FileField(required=False),
@@ -209,7 +209,7 @@ class AnalysisUploadResource(MethodResource):
 
         return upload
 
-    @marshal_with(NeurovaultCollectionSchema(many=True))
+    @marshal_with(NeurovaultCollectionSchemaStatus(many=True))
     @doc(summary='Get uploads for analyses.')
     @fetch_analysis
     def get(self, analysis):
