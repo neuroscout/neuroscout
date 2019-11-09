@@ -110,6 +110,7 @@ jest_0
 .my-env
 .pliersenv
 celery_worker/src
+<<<<<<< Updated upstream
 .env
 *.dump
 *.sql
@@ -121,3 +122,6 @@ nginx/certs
 nginx/certs-data
 
 neuroscout/frontend/src/config.ts
+=======
+neuoscout/
+>>>>>>> Stashed changes

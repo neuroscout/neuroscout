@@ -1,0 +1,5 @@
+site_name: Neuroscout
+nav:
+    - Home: index.md
+    - User Guide: guide.md
+theme: readthedocs
