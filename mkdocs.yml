@@ -1,5 +1,13 @@
-site_name: Neuroscout
+site_name: Neuroscout Docs
+site_author: Alejandro de la Vega
+site_url: https://neuroscout.github.io/neuroscout/
 nav:
     - Home: index.md
-    - User Guide: guide.md
-theme: mkdocs
+    - Using neuroscout.org:
+      - Introduction: builder/intro.md
+    - Running analyses:
+      - Introduction: cli/intro.md
+    - FAQ: faq.md
+
+theme: flatly
+favicon: '../neuroscout/frontend/public/favicon.ico'
