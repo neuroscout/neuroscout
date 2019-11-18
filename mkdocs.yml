@@ -10,4 +10,3 @@ nav:
     - FAQ: faq.md
 
 theme: flatly
-favicon: '../neuroscout/frontend/public/favicon.ico'

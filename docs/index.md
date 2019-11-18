@@ -16,7 +16,7 @@ Analysis execution is achieved with no configuration using open neuroimaging sta
 
 In this documentation, we'll walk you through building and executing your own analysis on [neuroscout.org](https://neuroscout.org).
 In addition, the first time you use neuroscout.org, you will be given a tour of the interface. After the tour, be on the look out informational tooltips ("i" icon), provided throughout to clarify
- aspects of the user interface. 
+ aspects of the user interface. Finally, please read the [FAQ](faq.md) thoroughly!
 
-For usage questions not addressed in the documentation, please ask a question on  [NeuroStars](https://neurostars.org). For bug reports, feature requests, feedback, etc.,
+For usage questions not addressed here, please ask a question on  [NeuroStars](https://neurostars.org). For bug reports, feature requests, feedback, etc.,
 please open an issue on [open an issue on GitHub](https://github.com/neuroscout/neuroscout/issues).
