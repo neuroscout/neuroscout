@@ -58,9 +58,9 @@ then generate timecourses for each of these extracted features, creating novel p
 activity.  For more information of pliers, please see the [GitHub repository](https://github.com/tyarkoni/pliers) and the following
 paper:
 
-McNamara, Q., De La Vega, A., & Yarkoni, T. (2017, August). Developing a comprehensive framework for
-multimodal feature extraction. In Proceedings of the 23rd ACM SIGKDD International Conference on Knowledge
-Discovery and Data Mining (pp. 1567-1574). ACM.
+> McNamara, Q., De La Vega, A., & Yarkoni, T. (2017, August). Developing a comprehensive framework for
+> multimodal feature extraction. In Proceedings of the 23rd ACM SIGKDD International Conference on Knowledge
+> Discovery and Data Mining (pp. 1567-1574). ACM.
 
 ### Am I restricted to mass univariate GLMs, or can I use Neuroscout to specify other kinds of analyses?
 
