@@ -5,14 +5,19 @@
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <meta name="description" content="None">
-        
-        
+        <meta name="author" content="Alejandro de la Vega">
+        <link rel="canonical" href="https://neuroscout.github.io/neuroscout/">
         <link rel="shortcut icon" href="img/favicon.ico">
-        <title>Neuroscout</title>
+        <title>Neuroscout Docs</title>
         <link href="css/bootstrap-custom.min.css" rel="stylesheet">
         <link href="css/font-awesome.min.css" rel="stylesheet">
         <link href="css/base.css" rel="stylesheet">
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/docco.min.css">
+        <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+        <!--[if lt IE 9]>
+            <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+            <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+        <![endif]-->
 
         <script src="js/jquery-1.10.2.min.js" defer></script>
         <script src="js/bootstrap-3.0.3.min.js" defer></script>
@@ -34,7 +39,7 @@
                         <span class="icon-bar"></span>
                         <span class="icon-bar"></span>
                     </button>
-                    <a class="navbar-brand" href=".">Neuroscout</a>
+                    <a class="navbar-brand" href=".">Neuroscout Docs</a>
                 </div>
 
                 <!-- Expanded navigation -->
@@ -44,8 +49,26 @@
                             <li class="active">
                                 <a href=".">Home</a>
                             </li>
+                            <li class="dropdown">
+                                <a href="#" class="dropdown-toggle" data-toggle="dropdown">Using neuroscout.org <b class="caret"></b></a>
+                                <ul class="dropdown-menu">
+                                    
+<li >
+    <a href="builder/intro/">Introduction</a>
+</li>
+                                </ul>
+                            </li>
+                            <li class="dropdown">
+                                <a href="#" class="dropdown-toggle" data-toggle="dropdown">Running analyses <b class="caret"></b></a>
+                                <ul class="dropdown-menu">
+                                    
+<li >
+    <a href="cli/intro/">Introduction</a>
+</li>
+                                </ul>
+                            </li>
                             <li >
-                                <a href="guide/">User Guide</a>
+                                <a href="faq/">FAQ</a>
                             </li>
                         </ul>
 
@@ -61,7 +84,7 @@
                                 </a>
                             </li>
                             <li >
-                                <a rel="prev" href="guide/">
+                                <a rel="prev" href="builder/intro/">
                                     Next <i class="fa fa-arrow-right"></i>
                                 </a>
                             </li>
@@ -73,22 +96,27 @@
         <div class="container">
                 <div class="col-md-3"><div class="bs-sidebar hidden-print affix well" role="complementary">
     <ul class="nav bs-sidenav">
-        <li class="main active"><a href="#welcome-to-neuroscout">Welcome to Neuroscout</a></li>
-            <li><a href="#overview">Overview</a></li>
-            <li><a href="#example-command">Example command</a></li>
+        <li class="main active"><a href="#introduction">Introduction</a></li>
+            <li><a href="#what-is-neuroscout">What is Neuroscout?</a></li>
+            <li><a href="#motivation">Motivation</a></li>
+            <li><a href="#where-can-i-get-more-help">Where can I get more help?</a></li>
     </ul>
 </div></div>
                 <div class="col-md-9" role="main">
 
-<h1 id="welcome-to-neuroscout">Welcome to Neuroscout</h1>
-<p>Coming soon, there will be documentation on how to user Neuroscout here...</p>
-<h2 id="overview">Overview</h2>
-<ul>
-<li>First section</li>
-</ul>
-<h2 id="example-command">Example command</h2>
-<pre><code>neuroscout run /out 5xhbt
-</code></pre></div>
+<h1 id="introduction">Introduction</h1>
+<h2 id="what-is-neuroscout">What is Neuroscout?</h2>
+<p>Neuroscout is a web-based platform for fast and flexible analysis of fMRI data.</p>
+<h2 id="motivation">Motivation</h2>
+<p>fMRI studies using complex naturalistic stimulation, such as movies or audio narratives, hold great promise to reveal the neural activity underlying dynamic real-world perception. However, this potential utility is constrained by the resource-intensive nature of fMRI analysis, and further exacerbated by the difficulty of encoding relevant events in rich, multi-modal stimuli.</p>
+<p>Neuroscout leverages state-of-the-art feature extraction tools to automatically extract hundreds of annotations from stimuli. We pair this with a flexible and easy-to-use web interface, enabling researchers to flexibly define and explore novel theoretical models.</p>
+<p>Analysis execution is achieved with no configuration using open neuroimaging standards, and containerized model-fitting pipelines, ensuring high portability across execution environments, including HPCs and the cloud. Finally, we make it easy for researchers to share their results with interactive publication-like reports via the NeuroVault repository.</p>
+<h2 id="where-can-i-get-more-help">Where can I get more help?</h2>
+<p>In this documentation, we'll walk you through building and executing your own analysis on <a href="https://neuroscout.org">neuroscout.org</a>.
+In addition, the first time you use neuroscout.org, you will be given a tour of the interface. After the tour, be on the look out informational tooltips ("i" icon), provided throughout to clarify
+ aspects of the user interface. </p>
+<p>For usage questions not addressed in the documentation, please ask a question on  <a href="https://neurostars.org">NeuroStars</a>. For bug reports, feature requests, feedback, etc.,
+please open an issue on <a href="https://github.com/neuroscout/neuroscout/issues">open an issue on GitHub</a>.</p></div>
         </div>
 
         <footer class="col-md-12">
@@ -171,5 +199,5 @@
 
 <!--
 MkDocs version : 1.0.4
-Build Date UTC : 2019-11-09 00:05:26
+Build Date UTC : 2019-11-18 23:33:42
 -->
