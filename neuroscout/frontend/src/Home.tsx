@@ -71,7 +71,7 @@ class Home extends React.Component<{}, {}> {
       <Row type="flex" justify="center" style={{ background: '#fff', padding: 0 }}>
       <MainCol>
       <div className="splashButtonParent">
-      <Button size="large" className="splashButton" href="/faq">
+      <Button size="large" className="splashButton" href="https://neuroscout.github.io/neuroscout/">
          Learn more
       </Button>
       </div>
