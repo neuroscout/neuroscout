@@ -4,7 +4,8 @@ site_url: https://neuroscout.github.io/neuroscout/
 nav:
     - Home: index.md
     - Using neuroscout.org:
-      - Introduction: builder/intro.md
+      - Introduction: web/intro.md
+      - Analysis builder: web/builder.md
     - Running analyses:
       - Introduction: cli/intro.md
     - FAQ: faq.md
