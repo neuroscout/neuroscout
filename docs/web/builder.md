@@ -1,4 +1,4 @@
-# Analysis builder
+# Analysis Overview
 
 The first step is to give your analysis a `name`. This doesn't have to be a unique name (although that might be helpful), and you can always change it later.
 
@@ -42,3 +42,11 @@ To save your nascent analysis, click on the "Save" button. If the button is blue
 When you first save your analysis, it will be assigned a unique, permanent ID.
 
 Note that when you advance through tabs in the builder, the analysis will be automatically saved.
+
+Click on the `Next` button to advance to the `Predictors` selection tab.
+
+# Select Predictors
+
+In this tab, you can browse and search from 100+ automatically extracted predictors.
+
+![Select predictors](img/predictors.png)
