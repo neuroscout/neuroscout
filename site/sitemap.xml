@@ -2,22 +2,27 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
     <url>
      <loc>https://neuroscout.github.io/neuroscout/</loc>
-     <lastmod>2019-11-18</lastmod>
+     <lastmod>2019-11-19</lastmod>
      <changefreq>daily</changefreq>
     </url>
     <url>
-     <loc>https://neuroscout.github.io/neuroscout/builder/intro/</loc>
-     <lastmod>2019-11-18</lastmod>
+     <loc>https://neuroscout.github.io/neuroscout/web/intro/</loc>
+     <lastmod>2019-11-19</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+    <url>
+     <loc>https://neuroscout.github.io/neuroscout/web/builder/</loc>
+     <lastmod>2019-11-19</lastmod>
      <changefreq>daily</changefreq>
     </url>
     <url>
      <loc>https://neuroscout.github.io/neuroscout/cli/intro/</loc>
-     <lastmod>2019-11-18</lastmod>
+     <lastmod>2019-11-19</lastmod>
      <changefreq>daily</changefreq>
     </url>
     <url>
      <loc>https://neuroscout.github.io/neuroscout/faq/</loc>
-     <lastmod>2019-11-18</lastmod>
+     <lastmod>2019-11-19</lastmod>
      <changefreq>daily</changefreq>
     </url>
 </urlset>

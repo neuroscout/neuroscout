@@ -4,14 +4,14 @@
         <meta charset="utf-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <meta name="description" content="None">
+        
         <meta name="author" content="Alejandro de la Vega">
-        <link rel="canonical" href="https://neuroscout.github.io/neuroscout/">
-        <link rel="shortcut icon" href="img/favicon.ico">
-        <title>Neuroscout Docs</title>
-        <link href="css/bootstrap-custom.min.css" rel="stylesheet">
-        <link href="css/font-awesome.min.css" rel="stylesheet">
-        <link href="css/base.css" rel="stylesheet">
+        <link rel="canonical" href="https://neuroscout.github.io/neuroscout/web/intro/">
+        <link rel="shortcut icon" href="../../img/favicon.ico">
+        <title>Introduction - Neuroscout Docs</title>
+        <link href="../../css/bootstrap-custom.min.css" rel="stylesheet">
+        <link href="../../css/font-awesome.min.css" rel="stylesheet">
+        <link href="../../css/base.css" rel="stylesheet">
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/docco.min.css">
         <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
         <!--[if lt IE 9]>
@@ -19,13 +19,13 @@
             <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
         <![endif]-->
 
-        <script src="js/jquery-1.10.2.min.js" defer></script>
-        <script src="js/bootstrap-3.0.3.min.js" defer></script>
+        <script src="../../js/jquery-1.10.2.min.js" defer></script>
+        <script src="../../js/bootstrap-3.0.3.min.js" defer></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
         <script>hljs.initHighlightingOnLoad();</script> 
     </head>
 
-    <body class="homepage">
+    <body>
 
         <div class="navbar navbar-default navbar-fixed-top" role="navigation">
             <div class="container">
@@ -39,26 +39,26 @@
                         <span class="icon-bar"></span>
                         <span class="icon-bar"></span>
                     </button>
-                    <a class="navbar-brand" href=".">Neuroscout Docs</a>
+                    <a class="navbar-brand" href="../..">Neuroscout Docs</a>
                 </div>
 
                 <!-- Expanded navigation -->
                 <div class="navbar-collapse collapse">
                         <!-- Main navigation -->
                         <ul class="nav navbar-nav">
-                            <li class="active">
-                                <a href=".">Home</a>
+                            <li >
+                                <a href="../..">Home</a>
                             </li>
-                            <li class="dropdown">
+                            <li class="dropdown active">
                                 <a href="#" class="dropdown-toggle" data-toggle="dropdown">Using neuroscout.org <b class="caret"></b></a>
                                 <ul class="dropdown-menu">
                                     
-<li >
-    <a href="web/intro/">Introduction</a>
+<li class="active">
+    <a href="./">Introduction</a>
 </li>
                                     
 <li >
-    <a href="web/builder/">Analysis builder</a>
+    <a href="../builder/">Analysis builder</a>
 </li>
                                 </ul>
                             </li>
@@ -67,12 +67,12 @@
                                 <ul class="dropdown-menu">
                                     
 <li >
-    <a href="cli/intro/">Introduction</a>
+    <a href="../../cli/intro/">Introduction</a>
 </li>
                                 </ul>
                             </li>
                             <li >
-                                <a href="faq/">FAQ</a>
+                                <a href="../../faq/">FAQ</a>
                             </li>
                         </ul>
 
@@ -82,13 +82,13 @@
                                 <i class="fa fa-search"></i> Search
                             </a>
                         </li>
-                            <li class="disabled">
-                                <a rel="next" >
+                            <li >
+                                <a rel="next" href="../..">
                                     <i class="fa fa-arrow-left"></i> Previous
                                 </a>
                             </li>
                             <li >
-                                <a rel="prev" href="web/intro/">
+                                <a rel="prev" href="../builder/">
                                     Next <i class="fa fa-arrow-right"></i>
                                 </a>
                             </li>
@@ -100,27 +100,30 @@
         <div class="container">
                 <div class="col-md-3"><div class="bs-sidebar hidden-print affix well" role="complementary">
     <ul class="nav bs-sidenav">
-        <li class="main active"><a href="#introduction">Introduction</a></li>
-            <li><a href="#what-is-neuroscout">What is Neuroscout?</a></li>
-            <li><a href="#motivation">Motivation</a></li>
-            <li><a href="#where-can-i-get-more-help">Where can I get more help?</a></li>
+        <li class="main active"><a href="#using-neuroscoutorg">Using neuroscout.org</a></li>
+            <li><a href="#sign-up">Sign Up</a></li>
+            <li><a href="#ready-to-begin">Ready to begin?</a></li>
     </ul>
 </div></div>
                 <div class="col-md-9" role="main">
 
-<h1 id="introduction">Introduction</h1>
-<h2 id="what-is-neuroscout">What is Neuroscout?</h2>
-<p>Neuroscout is a web-based platform for fast and flexible analysis of fMRI data.</p>
-<h2 id="motivation">Motivation</h2>
-<p>fMRI studies using complex naturalistic stimulation, such as movies or audio narratives, hold great promise to reveal the neural activity underlying dynamic real-world perception. However, this potential utility is constrained by the resource-intensive nature of fMRI analysis, and further exacerbated by the difficulty of encoding relevant events in rich, multi-modal stimuli.</p>
-<p>Neuroscout leverages state-of-the-art feature extraction tools to automatically extract hundreds of annotations from stimuli. We pair this with a flexible and easy-to-use web interface, enabling researchers to flexibly define and explore novel theoretical models.</p>
-<p>Analysis execution is achieved with no configuration using open neuroimaging standards, and containerized model-fitting pipelines, ensuring high portability across execution environments, including HPCs and the cloud. Finally, we make it easy for researchers to share their results with interactive publication-like reports via the NeuroVault repository.</p>
-<h2 id="where-can-i-get-more-help">Where can I get more help?</h2>
-<p>In this documentation, we'll walk you through building and executing your own analysis on <a href="https://neuroscout.org">neuroscout.org</a>.
-In addition, the first time you use neuroscout.org, you will be given a tour of the interface. After the tour, be on the look out informational tooltips ("i" icon), provided throughout to clarify
- aspects of the user interface. Finally, please read the <a href="faq/">FAQ</a> thoroughly!</p>
-<p>For usage questions not addressed here, please ask a question on  <a href="https://neurostars.org">NeuroStars</a>. For bug reports, feature requests, feedback, etc.,
-please open an issue on <a href="https://github.com/neuroscout/neuroscout/issues">open an issue on GitHub</a>.</p></div>
+<h1 id="using-neuroscoutorg">Using neuroscout.org</h1>
+<p>This tutorial will guide you through the <a href="https://neuroscout.org">neuroscout.org</a> web interface.</p>
+<p>We will cover the various steps of creating a custom analysis, as well as browsing, managing and cloning existing analyses.</p>
+<h2 id="sign-up">Sign Up</h2>
+<p>First things first, you need to register for an account.</p>
+<p>Currently there are two supported sign up options:</p>
+<ul>
+<li>Create an account using an email address and password (old fashioned way)</li>
+<li>Use Google single sign on.</li>
+</ul>
+<p>The choice is yours, but be aware that accounts are linked using email addresses.
+Signing up twice using the same email address, will only result in a single account.</p>
+<h2 id="ready-to-begin">Ready to begin?</h2>
+<p>Once you've logged in, you can launch the analysis builder using the "New Analysis" navigation button.</p>
+<p>You can use the "Browse" button to view view analyses you've created by selecting "My Analyses", or publicly shared analyses under "Public analyses".
+Note that you don't need to log in to view public analyses.</p>
+<p>Next, let's dive into creating an analysis using the <a href="../builder/">builder</a>.</p></div>
         </div>
 
         <footer class="col-md-12">
@@ -128,11 +131,11 @@ please open an issue on <a href="https://github.com/neuroscout/neuroscout/issues
             <p>Documentation built with <a href="https://www.mkdocs.org/">MkDocs</a>.</p>
         </footer>
         <script>
-            var base_url = ".",
+            var base_url = "../..",
                 shortcuts = {"help": 191, "next": 78, "previous": 80, "search": 83};
         </script>
-        <script src="js/base.js" defer></script>
-        <script src="search/main.js" defer></script>
+        <script src="../../js/base.js" defer></script>
+        <script src="../../search/main.js" defer></script>
 
         <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="Search Modal" aria-hidden="true">
     <div class="modal-dialog">
@@ -200,8 +203,3 @@ please open an issue on <a href="https://github.com/neuroscout/neuroscout/issues
 
     </body>
 </html>
-
-<!--
-MkDocs version : 1.0.4
-Build Date UTC : 2019-11-19 22:36:09
--->

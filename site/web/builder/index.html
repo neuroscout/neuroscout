@@ -6,9 +6,9 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         
         <meta name="author" content="Alejandro de la Vega">
-        <link rel="canonical" href="https://neuroscout.github.io/neuroscout/builder/intro/">
+        <link rel="canonical" href="https://neuroscout.github.io/neuroscout/web/builder/">
         <link rel="shortcut icon" href="../../img/favicon.ico">
-        <title>Introduction - Neuroscout Docs</title>
+        <title>Analysis builder - Neuroscout Docs</title>
         <link href="../../css/bootstrap-custom.min.css" rel="stylesheet">
         <link href="../../css/font-awesome.min.css" rel="stylesheet">
         <link href="../../css/base.css" rel="stylesheet">
@@ -53,8 +53,12 @@
                                 <a href="#" class="dropdown-toggle" data-toggle="dropdown">Using neuroscout.org <b class="caret"></b></a>
                                 <ul class="dropdown-menu">
                                     
+<li >
+    <a href="../intro/">Introduction</a>
+</li>
+                                    
 <li class="active">
-    <a href="./">Introduction</a>
+    <a href="./">Analysis builder</a>
 </li>
                                 </ul>
                             </li>
@@ -79,7 +83,7 @@
                             </a>
                         </li>
                             <li >
-                                <a rel="next" href="../..">
+                                <a rel="next" href="../intro/">
                                     <i class="fa fa-arrow-left"></i> Previous
                                 </a>
                             </li>
@@ -96,22 +100,37 @@
         <div class="container">
                 <div class="col-md-3"><div class="bs-sidebar hidden-print affix well" role="complementary">
     <ul class="nav bs-sidenav">
-        <li class="main active"><a href="#neuroscout">Neuroscout</a></li>
-            <li><a href="#overview">Overview</a></li>
-            <li><a href="#example-command">Example command</a></li>
+        <li class="main active"><a href="#analysis-builder">Analysis builder</a></li>
+            <li><a href="#choosing-a-dataset">Choosing a dataset</a></li>
+            <li><a href="#selecting-task-and-runs">Selecting task and runs</a></li>
+            <li><a href="#saving-and-unique-id">Saving and unique ID</a></li>
     </ul>
 </div></div>
                 <div class="col-md-9" role="main">
 
-<h1 id="neuroscout">Neuroscout</h1>
-<p>Coming soon, there will be documentation on how to user Neuroscout here...</p>
-<h2 id="overview">Overview</h2>
-<ul>
-<li>First section</li>
-</ul>
-<h2 id="example-command">Example command</h2>
-<pre><code>neuroscout run /out 5xhbt
-</code></pre></div>
+<h1 id="analysis-builder">Analysis builder</h1>
+<p>The first step is to give your analysis a <code>name</code>. This doesn't have to be a unique name (although that might be helpful), and you can always change it later.</p>
+<p>Optionally, also give your analysis a <code>description</code>. If you make many analyses, this could be very helpful.</p>
+<h2 id="choosing-a-dataset">Choosing a dataset</h2>
+<p><img alt="Choose a dataset" src="../img/datasets.png" /></p>
+<p>Neuroscout currently indexes a curated set of nine public naturalstic fMRI datasets.</p>
+<p>Datasets were specifically chosen for their compliance to the BIDS standard, and availability of original naturalistic stimuli.
+You can find detailed information on each dataset by clicking on the blue link icon.</p>
+<p>All datasets are minimally preprocessed using <code>fmriprep</code> 1.2.2 or greater, and ready for model fitting.</p>
+<p>If you have a dataset you'd like to contribute, see this <a href="../../faq/#i-have-a-naturalistic-study-id-like-to-share-on-neuroscout-how-do-i-do-so">frequently asked question</a>.</p>
+<h2 id="selecting-task-and-runs">Selecting task and runs</h2>
+<p>Once you've selected a dataset, you'll be able to choose which task and runs you want to analyze.</p>
+<p>Currently, we only support analyzing one task at a time. By default, all runs for that task are selected.</p>
+<p>If you want to select specific runs to analyze, either to only analyses a group of subjects, or to omit certain runs that might have a known issue, you can use the run selector interface.</p>
+<p><img alt="Select runs" src="../img/runs.png" /></p>
+<p>Here you can browse and select specific runs.
+If you'd like to select groups of runs based on their BIDS entities (e.g. <code>Subject</code>, <code>Run Number</code>, etc..), click on the filter icon at the top of each column. A drop down menu will appear, allowing you to make a selection. Click "OK" to apply this filter.</p>
+<p>You can clear all filters and select all runs by clicking <code>Clear Filters</code> on the bottom left.</p>
+<h2 id="saving-and-unique-id">Saving and unique ID</h2>
+<p>To save your nascent analysis, click on the "Save" button. If the button is blue, that means there are unsaved changes.</p>
+<p><img alt="Select runs" src="../img/save.png" /></p>
+<p>When you first save your analysis, it will be assigned a unique, permanent ID.</p>
+<p>Note that when you advance through tabs in the builder, the analysis will be automatically saved.</p></div>
         </div>
 
         <footer class="col-md-12">
