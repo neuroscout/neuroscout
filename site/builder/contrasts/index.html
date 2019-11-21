@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <meta name="author" content="Alejandro de la Vega">
+  <link rel="shortcut icon" href="../../img/favicon.ico">
+  <title>Contrasts - Neuroscout Docs</title>
+  <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
+
+  <link rel="stylesheet" href="../../css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../css/theme_extra.css" type="text/css" />
+  <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css">
+  
+  <script>
+    // Current page data
+    var mkdocs_page_name = "Contrasts";
+    var mkdocs_page_input_path = "builder/contrasts.md";
+    var mkdocs_page_url = "/neuroscout/builder/contrasts/";
+  </script>
+  
+  <script src="../../js/jquery-2.1.1.min.js" defer></script>
+  <script src="../../js/modernizr-2.8.3.min.js" defer></script>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+  <script>hljs.initHighlightingOnLoad();</script> 
+  
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+      <div class="wy-side-nav-search">
+        <a href="../.." class="icon icon-home"> Neuroscout Docs</a>
+        <div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+	<ul class="current">
+	  
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="../..">Home</a>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <span class="caption-text">Building analyses</span>
+    <ul class="subnav">
+                <li class="">
+                    
+    <a class="" href="../">Getting started</a>
+                </li>
+                <li class="">
+                    
+    <a class="" href="../predictors/">Predictors</a>
+                </li>
+                <li class="">
+                    
+    <a class="" href="../transformations/">Transformations</a>
+                </li>
+                <li class="">
+                    
+    <a class="" href="../hrf/">HRF</a>
+                </li>
+                <li class=" current">
+                    
+    <a class="current" href="./">Contrasts</a>
+    <ul class="subnav">
+            
+    <li class="toctree-l3"><a href="#contrasts">Contrasts</a></li>
+    
+        <ul>
+        
+            <li><a class="toctree-l4" href="#defining-a-custom-contrast">Defining a custom contrast</a></li>
+        
+        </ul>
+    
+
+    </ul>
+                </li>
+                <li class="">
+                    
+    <a class="" href="../review/">Review</a>
+                </li>
+                <li class="">
+                    
+    <a class="" href="../run/">Run / Status</a>
+                </li>
+                <li class="">
+                    
+    <a class="" href="../bib/">Bibliography</a>
+                </li>
+    </ul>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <span class="caption-text">Running analyses</span>
+    <ul class="subnav">
+                <li class="">
+                    
+    <a class="" href="../../cli/">Introduction</a>
+                </li>
+    </ul>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="../../faq/">FAQ</a>
+	    </li>
+          
+        </ul>
+      </div>
+      &nbsp;
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="../..">Neuroscout Docs</a>
+      </nav>
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../..">Docs</a> &raquo;</li>
+    
+      
+        
+          <li>Building analyses &raquo;</li>
+        
+      
+    
+    <li>Contrasts</li>
+    <li class="wy-breadcrumbs-aside">
+      
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main">
+            <div class="section">
+              
+                <h1 id="contrasts">Contrasts</h1>
+<p>In this tab, you can define contrasts to compute at the first-level after the design-matrix is fit to the fMRI activation time-course.</p>
+<p>As there are often no experimental conditions in naturalistic studies, it often makes the most sense to simply propagate the individual estimates for each predictor of interest (e.g. non-confounds).</p>
+<p>We can achieve this using "Dummy" auto-contrasts, in which each Predictor is given a dummy-coded contrast of the same name.</p>
+<p>To do this for all non-confounds, simply click <code>Generate Auto Contrasts</code>.</p>
+<p><img alt="auto_contrasts" src="../img/contrasts.png" /></p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>If you go back to the <code>Predictors</code> tab and edit the predictor list, you may have to re-generate auto contrasts.</p>
+</div>
+<h2 id="defining-a-custom-contrast">Defining a custom contrast</h2>
+<p>To define a contrast, click <code>Add Contrast</code>. First, you must give the contrast a name.
+Next, select the predictors to include in this contrast. All predictors not selected will be given a weight of 0.
+Finally, enter the weights for the selected predictors.</p>
+<p><img alt="Add contrast" src="../img/contrasts_add.png" /></p>
+<p>In this example, we are contrasting <code>building</code> and <code>daylight</code> using <code>t</code> contrast.</p>
+<p>As in the transformations tab, you can re-order, trash, and edit existing contrasts.</p>
+              
+            </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="../review/" class="btn btn-neutral float-right" title="Review">Next <span class="icon icon-circle-arrow-right"></span></a>
+      
+      
+        <a href="../hrf/" class="btn btn-neutral" title="HRF"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+    
+  </div>
+
+  Built with <a href="http://www.mkdocs.org">MkDocs</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+      
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" style="cursor: pointer">
+    <span class="rst-current-version" data-toggle="rst-current-version">
+      
+      
+        <span><a href="../hrf/" style="color: #fcfcfc;">&laquo; Previous</a></span>
+      
+      
+        <span style="margin-left: 15px"><a href="../review/" style="color: #fcfcfc">Next &raquo;</a></span>
+      
+    </span>
+</div>
+    <script>var base_url = '../..';</script>
+    <script src="../../js/theme.js" defer></script>
+      <script src="../../search/main.js" defer></script>
+
+</body>
+</html>

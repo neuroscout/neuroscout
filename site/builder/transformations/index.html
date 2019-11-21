@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <meta name="author" content="Alejandro de la Vega">
+  <link rel="shortcut icon" href="../../img/favicon.ico">
+  <title>Transformations - Neuroscout Docs</title>
+  <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
+
+  <link rel="stylesheet" href="../../css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../css/theme_extra.css" type="text/css" />
+  <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css">
+  
+  <script>
+    // Current page data
+    var mkdocs_page_name = "Transformations";
+    var mkdocs_page_input_path = "builder/transformations.md";
+    var mkdocs_page_url = "/neuroscout/builder/transformations/";
+  </script>
+  
+  <script src="../../js/jquery-2.1.1.min.js" defer></script>
+  <script src="../../js/modernizr-2.8.3.min.js" defer></script>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+  <script>hljs.initHighlightingOnLoad();</script> 
+  
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+      <div class="wy-side-nav-search">
+        <a href="../.." class="icon icon-home"> Neuroscout Docs</a>
+        <div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+	<ul class="current">
+	  
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="../..">Home</a>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <span class="caption-text">Building analyses</span>
+    <ul class="subnav">
+                <li class="">
+                    
+    <a class="" href="../">Getting started</a>
+                </li>
+                <li class="">
+                    
+    <a class="" href="../predictors/">Predictors</a>
+                </li>
+                <li class=" current">
+                    
+    <a class="current" href="./">Transformations</a>
+    <ul class="subnav">
+            
+    <li class="toctree-l3"><a href="#add-transformations">Add Transformations</a></li>
+    
+        <ul>
+        
+            <li><a class="toctree-l4" href="#select-input">Select input</a></li>
+        
+            <li><a class="toctree-l4" href="#transformation-specific-options">Transformation-specific options</a></li>
+        
+            <li><a class="toctree-l4" href="#editing-and-order">Editing and order</a></li>
+        
+        </ul>
+    
+
+    </ul>
+                </li>
+                <li class="">
+                    
+    <a class="" href="../hrf/">HRF</a>
+                </li>
+                <li class="">
+                    
+    <a class="" href="../contrasts/">Contrasts</a>
+                </li>
+                <li class="">
+                    
+    <a class="" href="../review/">Review</a>
+                </li>
+                <li class="">
+                    
+    <a class="" href="../run/">Run / Status</a>
+                </li>
+                <li class="">
+                    
+    <a class="" href="../bib/">Bibliography</a>
+                </li>
+    </ul>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <span class="caption-text">Running analyses</span>
+    <ul class="subnav">
+                <li class="">
+                    
+    <a class="" href="../../cli/">Introduction</a>
+                </li>
+    </ul>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="../../faq/">FAQ</a>
+	    </li>
+          
+        </ul>
+      </div>
+      &nbsp;
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="../..">Neuroscout Docs</a>
+      </nav>
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../..">Docs</a> &raquo;</li>
+    
+      
+        
+          <li>Building analyses &raquo;</li>
+        
+      
+    
+    <li>Transformations</li>
+    <li class="wy-breadcrumbs-aside">
+      
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main">
+            <div class="section">
+              
+                <h1 id="add-transformations">Add Transformations</h1>
+<p>The next step in defining model is to transform the variables you've selected. This step is optional-- for many models you may not need to make any modifications to the input variables.</p>
+<p>To add a transformation, click <code>Add Transformation</code> and select an operation from the dropdown list.</p>
+<p><img alt="Add transformation" src="../img/transformation_add.png" /></p>
+<p>The transformations currently supported by Neuroscout are a subset of the complete set of transformations detailed in the <a href="https://docs.google.com/document/d/1bq5eNDHTb6Nkx3WUiOBgKvLNnaa5OMcGtD0AZ9yms2M/edit?usp=sharing">BIDS StatsModel specification</a> (in active development). As Neuroscout matures, the number of suppport transformations will grow.</p>
+<table>
+<thead>
+<tr>
+<th>Transformation</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Scale</td>
+<td>Standardize the value of one or more variables. Can independently choose to denmean and/or rescale.</td>
+</tr>
+<tr>
+<td>Orthogonalize</td>
+<td>Orthogonalizes one or more input columns with respect to one or more other columns.</td>
+</tr>
+<tr>
+<td>And/Or/Not</td>
+<td>Each of these transformations takes one or more columns, and performs a logical operation on the input column and a provided operand.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="select-input">Select input</h2>
+<p>For all transformation, you must select on which this transformation will operate.
+Most operations will operate on each column independently, but specifying multiple columns will save you from having to specify the same operation for multiple predictors.</p>
+<p><img alt="Select inputs" src="../img/transformation_inputs.png" /></p>
+<h2 id="transformation-specific-options">Transformation-specific options</h2>
+<p>Most transformations additional have specific options which you can specify.</p>
+<h3 id="scale">Scale</h3>
+<p><img alt="Scale" src="../img/transformation_scale.png" /></p>
+<ul>
+<li>Demean - If True, subtracts the mean from each input column (i.e., applies mean-centering).</li>
+<li>Rescale - If True, divides each column by its standard deviation.</li>
+<li>ReplaceNA - Whether/when to replace missing values with 0. "Don't replace"- no replacement is performed. If 'before', missing values are replaced with 0's before scaling. If 'after', missing values are replaced with 0 after scaling.</li>
+</ul>
+<h3 id="orthogonalize">Orthogonalize</h3>
+<p><img alt="Orthogonalize" src="../img/transformation_orth.png" /></p>
+<ul>
+<li>You must select the inputs to orthogonalize with respect to. The transformed variable will be uncorrelated to these variables.</li>
+</ul>
+<h3 id="threshold">Threshold</h3>
+<p><img alt="Threshold" src="../img/transformation_thresh.png" /></p>
+<ul>
+<li>Threshold - The value to binarize around (values above will be assigned 1, values below will be assigned 0)</li>
+<li>Binarize -  If True, binarizes all non-zero values (i.e., every non-zero value will be set to 1).</li>
+<li>Above -  Specifies which values to retain with respect to the cut-off. If True, all value above the threshold will be kept; if False, all values below the threshold will be kept.</li>
+<li>Signed - Specifies whether to treat the threshold as signed (default) or unsigned. For example, when passing above=True and threshold=3, if signed=True, all and only values above +3 would be retained. If signed=False, all absolute values &gt; 3 would be retained (i.e.,values in  the range -3 &lt; X &lt; 3 would be set to 0).</li>
+</ul>
+<h2 id="editing-and-order">Editing and order</h2>
+<p>It is important to note that transformations are applied sequentially, so the order of the transformation matters.
+To re-order transformation you can drag and drop transformations in the list.</p>
+<p><img alt="Drag" src="../img/transformation_drag.png" /></p>
+<p>You can also remove transformations you've created using the trash icon, and edit existing transformations with the blue edit icon.</p>
+              
+            </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="../hrf/" class="btn btn-neutral float-right" title="HRF">Next <span class="icon icon-circle-arrow-right"></span></a>
+      
+      
+        <a href="../predictors/" class="btn btn-neutral" title="Predictors"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+    
+  </div>
+
+  Built with <a href="http://www.mkdocs.org">MkDocs</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+      
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" style="cursor: pointer">
+    <span class="rst-current-version" data-toggle="rst-current-version">
+      
+      
+        <span><a href="../predictors/" style="color: #fcfcfc;">&laquo; Previous</a></span>
+      
+      
+        <span style="margin-left: 15px"><a href="../hrf/" style="color: #fcfcfc">Next &raquo;</a></span>
+      
+    </span>
+</div>
+    <script>var base_url = '../..';</script>
+    <script src="../../js/theme.js" defer></script>
+      <script src="../../search/main.js" defer></script>
+
+</body>
+</html>

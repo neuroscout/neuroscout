@@ -1,205 +1,250 @@
 <!DOCTYPE html>
-<html lang="en">
-    <head>
-        <meta charset="utf-8">
-        <meta http-equiv="X-UA-Compatible" content="IE=edge">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <meta name="description" content="None">
-        <meta name="author" content="Alejandro de la Vega">
-        <link rel="canonical" href="https://neuroscout.github.io/neuroscout/">
-        <link rel="shortcut icon" href="img/favicon.ico">
-        <title>Neuroscout Docs</title>
-        <link href="css/bootstrap-custom.min.css" rel="stylesheet">
-        <link href="css/font-awesome.min.css" rel="stylesheet">
-        <link href="css/base.css" rel="stylesheet">
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/docco.min.css">
-        <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
-        <!--[if lt IE 9]>
-            <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
-            <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
-        <![endif]-->
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="None">
+  <meta name="author" content="Alejandro de la Vega">
+  <link rel="shortcut icon" href="img/favicon.ico">
+  <title>Home - Neuroscout Docs</title>
+  <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
 
-        <script src="js/jquery-1.10.2.min.js" defer></script>
-        <script src="js/bootstrap-3.0.3.min.js" defer></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
-        <script>hljs.initHighlightingOnLoad();</script> 
-    </head>
+  <link rel="stylesheet" href="css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="css/theme_extra.css" type="text/css" />
+  <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css">
+  
+  <script>
+    // Current page data
+    var mkdocs_page_name = "Home";
+    var mkdocs_page_input_path = "index.md";
+    var mkdocs_page_url = "/neuroscout/";
+  </script>
+  
+  <script src="js/jquery-2.1.1.min.js" defer></script>
+  <script src="js/modernizr-2.8.3.min.js" defer></script>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+  <script>hljs.initHighlightingOnLoad();</script> 
+  
+</head>
 
-    <body class="homepage">
+<body class="wy-body-for-nav" role="document">
 
-        <div class="navbar navbar-default navbar-fixed-top" role="navigation">
-            <div class="container">
+  <div class="wy-grid-for-nav">
 
-                <!-- Collapsed navigation -->
-                <div class="navbar-header">
-                    <!-- Expander button -->
-                    <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
-                        <span class="sr-only">Toggle navigation</span>
-                        <span class="icon-bar"></span>
-                        <span class="icon-bar"></span>
-                        <span class="icon-bar"></span>
-                    </button>
-                    <a class="navbar-brand" href=".">Neuroscout Docs</a>
-                </div>
-
-                <!-- Expanded navigation -->
-                <div class="navbar-collapse collapse">
-                        <!-- Main navigation -->
-                        <ul class="nav navbar-nav">
-                            <li class="active">
-                                <a href=".">Home</a>
-                            </li>
-                            <li class="dropdown">
-                                <a href="#" class="dropdown-toggle" data-toggle="dropdown">Using neuroscout.org <b class="caret"></b></a>
-                                <ul class="dropdown-menu">
-                                    
-<li >
-    <a href="web/">Introduction</a>
-</li>
-                                    
-<li >
-    <a href="web/builder/">Analysis builder</a>
-</li>
-                                </ul>
-                            </li>
-                            <li class="dropdown">
-                                <a href="#" class="dropdown-toggle" data-toggle="dropdown">Running analyses <b class="caret"></b></a>
-                                <ul class="dropdown-menu">
-                                    
-<li >
-    <a href="cli/">Introduction</a>
-</li>
-                                </ul>
-                            </li>
-                            <li >
-                                <a href="faq/">FAQ</a>
-                            </li>
-                        </ul>
-
-                    <ul class="nav navbar-nav navbar-right">
-                        <li>
-                            <a href="#" data-toggle="modal" data-target="#mkdocs_search_modal">
-                                <i class="fa fa-search"></i> Search
-                            </a>
-                        </li>
-                            <li class="disabled">
-                                <a rel="next" >
-                                    <i class="fa fa-arrow-left"></i> Previous
-                                </a>
-                            </li>
-                            <li >
-                                <a rel="prev" href="web/">
-                                    Next <i class="fa fa-arrow-right"></i>
-                                </a>
-                            </li>
-                    </ul>
-                </div>
-            </div>
-        </div>
-
-        <div class="container">
-                <div class="col-md-3"><div class="bs-sidebar hidden-print affix well" role="complementary">
-    <ul class="nav bs-sidenav">
-        <li class="main active"><a href="#what-is-neuroscout">What is Neuroscout?</a></li>
-            <li><a href="#motivation">Motivation</a></li>
-            <li><a href="#where-can-i-get-more-help">Where can I get more help?</a></li>
-    </ul>
-</div></div>
-                <div class="col-md-9" role="main">
-
-<h1 id="what-is-neuroscout">What is Neuroscout?</h1>
-<p>Neuroscout is a web-based platform for fast and flexible analysis of fMRI data.</p>
-<h2 id="motivation">Motivation</h2>
-<p>fMRI studies using complex naturalistic stimulation, such as movies or audio narratives, hold great promise to reveal the neural activity underlying dynamic real-world perception. However, this potential utility is constrained by the resource-intensive nature of fMRI analysis, and further exacerbated by the difficulty of encoding relevant events in rich, multi-modal stimuli.</p>
-<p>Neuroscout leverages state-of-the-art feature extraction tools to automatically extract hundreds of neural predictors from experimental stimuli using a variety of algorithms and content-analysis services. We pair this with an easy-to-use model building interface, enabling researchers to flexibly define novel statistical models.</p>
-<p>Analysis execution is achieved with no configuration using self-contained bundles tied to unique analysis IDs, and run-time data retrieval using <a href="https://www.datalad.org/">DataLad</a>. Containerized model-fitting pipelines minimize software dependencies and ensure high portability across wide variety execution environments, including HPCs and the cloud.</p>
-<p>Finally, we make it easy for researchers to share their results with interactive publication-like reports and statistical image hosting with <a href="https://www.neurovault.org/">NeuroVault</a>.</p>
-<h2 id="where-can-i-get-more-help">Where can I get more help?</h2>
-<p>In this documentation, we'll walk you through building and executing your own analysis on <a href="https://neuroscout.org">neuroscout.org</a>.
-In addition, the first time you use neuroscout.org, you will be given a tour of the interface. After the tour, be on the look out informational tooltips ("i" icon), provided throughout to clarify aspects of the web interface. Finally, please read the <a href="faq/">FAQ</a> thoroughly!</p>
-<p>For usage questions not addressed here, please ask a question on  <a href="https://neurostars.org">NeuroStars</a>. For bug reports, feature requests, feedback, etc.,
-please open an issue on <a href="https://github.com/neuroscout/neuroscout/issues">open an issue on GitHub</a>.</p></div>
-        </div>
-
-        <footer class="col-md-12">
-            <hr>
-            <p>Documentation built with <a href="https://www.mkdocs.org/">MkDocs</a>.</p>
-        </footer>
-        <script>
-            var base_url = ".",
-                shortcuts = {"help": 191, "next": 78, "previous": 80, "search": 83};
-        </script>
-        <script src="js/base.js" defer></script>
-        <script src="search/main.js" defer></script>
-
-        <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="Search Modal" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
-                <h4 class="modal-title" id="exampleModalLabel">Search</h4>
-            </div>
-            <div class="modal-body">
-                <p>
-                    From here you can search these documents. Enter
-                    your search terms below.
-                </p>
-                <form role="form">
-                    <div class="form-group">
-                        <input type="text" class="form-control" placeholder="Search..." id="mkdocs-search-query" title="Type search term here">
-                    </div>
-                </form>
-                <div id="mkdocs-search-results"></div>
-            </div>
-            <div class="modal-footer">
-            </div>
-        </div>
-    </div>
-</div><div class="modal" id="mkdocs_keyboard_modal" tabindex="-1" role="dialog" aria-labelledby="Keyboard Shortcuts Modal" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
-                <h4 class="modal-title" id="exampleModalLabel">Keyboard Shortcuts</h4>
-            </div>
-            <div class="modal-body">
-              <table class="table">
-                <thead>
-                  <tr>
-                    <th style="width: 20%;">Keys</th>
-                    <th>Action</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td class="help shortcut"><kbd>?</kbd></td>
-                    <td>Open this help</td>
-                  </tr>
-                  <tr>
-                    <td class="next shortcut"><kbd>n</kbd></td>
-                    <td>Next page</td>
-                  </tr>
-                  <tr>
-                    <td class="prev shortcut"><kbd>p</kbd></td>
-                    <td>Previous page</td>
-                  </tr>
-                  <tr>
-                    <td class="search shortcut"><kbd>s</kbd></td>
-                    <td>Search</td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-            <div class="modal-footer">
-            </div>
-        </div>
-    </div>
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+      <div class="wy-side-nav-search">
+        <a href="." class="icon icon-home"> Neuroscout Docs</a>
+        <div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="./search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
+  </form>
 </div>
+      </div>
 
-    </body>
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+	<ul class="current">
+	  
+          
+            <li class="toctree-l1 current">
+		
+    <a class="current" href=".">Home</a>
+    <ul class="subnav">
+            
+    <li class="toctree-l2"><a href="#what-is-neuroscout">What is Neuroscout?</a></li>
+    
+        <ul>
+        
+            <li><a class="toctree-l3" href="#motivation">Motivation</a></li>
+        
+        </ul>
+    
+
+    <li class="toctree-l2"><a href="#getting-started">Getting started</a></li>
+    
+        <ul>
+        
+            <li><a class="toctree-l3" href="#sign-up">Sign Up</a></li>
+        
+            <li><a class="toctree-l3" href="#where-can-i-get-more-help">Where can I get more help?</a></li>
+        
+        </ul>
+    
+
+    </ul>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <span class="caption-text">Building analyses</span>
+    <ul class="subnav">
+                <li class="">
+                    
+    <a class="" href="builder/">Getting started</a>
+                </li>
+                <li class="">
+                    
+    <a class="" href="builder/predictors/">Predictors</a>
+                </li>
+                <li class="">
+                    
+    <a class="" href="builder/transformations/">Transformations</a>
+                </li>
+                <li class="">
+                    
+    <a class="" href="builder/hrf/">HRF</a>
+                </li>
+                <li class="">
+                    
+    <a class="" href="builder/contrasts/">Contrasts</a>
+                </li>
+                <li class="">
+                    
+    <a class="" href="builder/review/">Review</a>
+                </li>
+                <li class="">
+                    
+    <a class="" href="builder/run/">Run / Status</a>
+                </li>
+                <li class="">
+                    
+    <a class="" href="builder/bib/">Bibliography</a>
+                </li>
+    </ul>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <span class="caption-text">Running analyses</span>
+    <ul class="subnav">
+                <li class="">
+                    
+    <a class="" href="cli/">Introduction</a>
+                </li>
+    </ul>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="faq/">FAQ</a>
+	    </li>
+          
+        </ul>
+      </div>
+      &nbsp;
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href=".">Neuroscout Docs</a>
+      </nav>
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href=".">Docs</a> &raquo;</li>
+    
+      
+    
+    <li>Home</li>
+    <li class="wy-breadcrumbs-aside">
+      
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main">
+            <div class="section">
+              
+                <h1 id="what-is-neuroscout">What is Neuroscout?</h1>
+<p><em>Neuroscout is a web-based platform for fast and flexible analysis of fMRI data.</em></p>
+<h2 id="motivation">Motivation</h2>
+<p>fMRI studies using complex naturalistic stimulation, such as movies or audio narratives, hold great promise to reveal the neural activity underlying dynamic perception. However, this potential is limited by the resource-intensive nature of fMRI analysis, and exacerbated by the difficulty of encoding relevant events in rich, multi-modal stimuli.</p>
+<p>Neuroscout leverages state-of-the-art <em>feature extraction</em> tools to automatically extract hundreds of neural predictors from experimental stimuli. We pair this with an <em>easy-to-use analysis builder</em>, enabling researchers to flexibly define novel statistical models.</p>
+<p>Analysis execution is achieved with <em>no configuration</em> using self-contained bundles tied to unique analysis IDs, and run-time data retrieval using <a href="https://www.datalad.org/">DataLad</a>. Containerized <em>model-fitting pipelines</em> minimize software dependencies and ensure <em>high portability</em> across execution environments.</p>
+<p>Finally, we make it easy for researchers to <em>share their results</em> with interactive publication-like reports and statistical image hosting with <a href="https://www.neurovault.org/">NeuroVault</a>.</p>
+<h1 id="getting-started">Getting started</h1>
+<p>The <a href="https://neuroscout.org">neuroscout.org</a> web interface has the following features:</p>
+<ul>
+<li>Use the <a href="builder/">analysis builder</a> to create a custom fMRI analysis, drawing from hundreds of automatically extracted predictors.</li>
+<li>Manage and clone existing analyses.</li>
+<li>View uploaded results.</li>
+<li>Upload custom predictors.</li>
+</ul>
+<p>Once you have generated an analysis, you can use the <a href="cli/">neuroscout-cli</a> to execute a model-fitting pipeline, and automatically upload your results.</p>
+<h2 id="sign-up">Sign Up</h2>
+<p>First things first, you need to register for an account.</p>
+<p>Currently, there are two supported options, the choice is yours!</p>
+<ul>
+<li>Create an account using an email address and password (old fashioned way).</li>
+<li>Use Google single sign on.</li>
+</ul>
+<p>If you create an account with us, you'll be asked to validate your email, as usual.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Accounts are linked using email addresses. Signing up twice using the same email address, will result in a single account.</p>
+</div>
+<p>Once you've logged in, launch the <a href="builder.md">analysis builder</a> using the <code>New Analysis</code> navigation button.</p>
+<p>You can use the <code>Browse</code> button to view analyses you've created by selecting <code>My Analyses</code>, or publicly shared analyses under <code>Public analyses</code>.
+Note that you don't need to log in to view public analyses.</p>
+<h2 id="where-can-i-get-more-help">Where can I get more help?</h2>
+<p>The first time you use neuroscout.org, you will be given a tour of the interface. After the tour, be on the look out informational tooltips ("i" icon), provided throughout to clarify aspects of the web interface. Finally, please read the <a href="faq/">FAQ</a> thoroughly!</p>
+<p>For usage questions not addressed here, please ask a question on  <a href="https://neurostars.org">NeuroStars</a>. For bug reports, feature requests, feedback, etc.,
+please open an issue on <a href="https://github.com/neuroscout/neuroscout/issues">open an issue on GitHub</a>.</p>
+              
+            </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="builder/" class="btn btn-neutral float-right" title="Getting started">Next <span class="icon icon-circle-arrow-right"></span></a>
+      
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+    
+  </div>
+
+  Built with <a href="http://www.mkdocs.org">MkDocs</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+      
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" style="cursor: pointer">
+    <span class="rst-current-version" data-toggle="rst-current-version">
+      
+      
+      
+        <span style="margin-left: 15px"><a href="builder/" style="color: #fcfcfc">Next &raquo;</a></span>
+      
+    </span>
+</div>
+    <script>var base_url = '.';</script>
+    <script src="js/theme.js" defer></script>
+      <script src="search/main.js" defer></script>
+
+</body>
 </html>
 
 <!--
 MkDocs version : 1.0.4
-Build Date UTC : 2019-11-21 00:36:54
+Build Date UTC : 2019-11-21 22:12:51
 -->

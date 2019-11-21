@@ -3,13 +3,20 @@ site_author: Alejandro de la Vega
 site_url: https://neuroscout.github.io/neuroscout/
 nav:
     - Home: index.md
-    - Using neuroscout.org:
-      - Introduction: web/index.md
-      - Analysis builder: web/builder.md
+    - Building analyses:
+      - Getting started: builder/index.md
+      - Predictors: builder/predictors.md
+      - Transformations: builder/transformations.md
+      - HRF: builder/hrf.md
+      - Contrasts: builder/contrasts.md
+      - Review: builder/review.md
+      - Run / Status: builder/run.md
+      - Bibliography: builder/bib.md
+
     - Running analyses:
       - Introduction: cli/index.md
     - FAQ: faq.md
 
-theme: flatly
+theme: readthedocs
 markdown_extensions:
   - admonition
