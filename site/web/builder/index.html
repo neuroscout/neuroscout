@@ -105,12 +105,25 @@
             <li><a href="#selecting-task-and-runs">Selecting task and runs</a></li>
             <li><a href="#saving-and-unique-id">Saving and unique ID</a></li>
         <li class="main "><a href="#select-predictors">Select Predictors</a></li>
+        <li class="main "><a href="#add-transformations">Add Transformations</a></li>
+            <li><a href="#select-input">Select input</a></li>
+            <li><a href="#transformation-specific-options">Transformation-specific options</a></li>
+            <li><a href="#transformation-editing-and-order">Transformation editing and order</a></li>
+        <li class="main "><a href="#hrf-convolution">HRF Convolution</a></li>
+        <li class="main "><a href="#contrasts">Contrasts</a></li>
+            <li><a href="#defining-a-custom-contrast">Defining a custom contrast</a></li>
+        <li class="main "><a href="#review">Review</a></li>
+            <li><a href="#design-report">Design Report</a></li>
+            <li><a href="#analysis-overview_1">Analysis Overview</a></li>
+        <li class="main "><a href="#run">Run</a></li>
     </ul>
 </div></div>
                 <div class="col-md-9" role="main">
 
 <h1 id="analysis-overview">Analysis Overview</h1>
-<p>The first step is to give your analysis a <code>name</code>. This doesn't have to be a unique name (although that might be helpful), and you can always change it later.</p>
+<p>When you create a new analysis, you'll launch the analysis builder. You'll sequentially advance through tabs in the builder as you define your analysis.
+Later in the process, you can always go back to tabs that you've previously encountered, and make modifications.</p>
+<p>The first step after creating a new analysis is to give it a <code>name</code>. This doesn't have to be a unique name (although that might be helpful), and you can always change it later.</p>
 <p>Optionally, also give your analysis a <code>description</code>. If you make many analyses, this could be very helpful.</p>
 <h2 id="choosing-a-dataset">Choosing a dataset</h2>
 <p><img alt="Choose a dataset" src="../img/datasets.png" /></p>
@@ -134,8 +147,142 @@ If you'd like to select groups of runs based on their BIDS entities (e.g. <code>
 <p>Note that when you advance through tabs in the builder, the analysis will be automatically saved.</p>
 <p>Click on the <code>Next</code> button to advance to the <code>Predictors</code> selection tab.</p>
 <h1 id="select-predictors">Select Predictors</h1>
-<p>In this tab, you can browse and search from 100+ automatically extracted predictors.</p>
-<p><img alt="Select predictors" src="../img/predictors.png" /></p></div>
+<p>In this tab, you can browse and search from hundreds automatically extracted predictors to include in your model.</p>
+<p><img alt="Select predictors" src="../img/predictors.png" /></p>
+<p>Predictors each have a unique <code>Name</code>, and belong to a <code>Source</code>. They are also given a human readable <code>Description</code>.</p>
+<p>In the above example, we have selected the <code>building</code> predictor, that has the source <code>ClarifaiAPIImageExtractor</code>.
+This is an example of a predictor that was extracted from experimental stimuli. This predictor encodes the probability of a building in a given frame, according to the <code>Clarifai</code> Image Recognition API.</p>
+<p>You can use the search bar to filter predictors across all three columns. For example, here we searched for "image recognition", resulting in 67 matches.</p>
+<p>As you select predictors, they are displayed in the top right, helping you keep track of predictors not in the current search.
+You can click on the <code>x</code> on the right of each label to unselect that predictor.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The predictor interface is your sole interface for adding predictors to the design matrix, including "confounds".</p>
+<p>Since all datasets are pre-processed with <code>fmriprep</code>, use that as a search term to display available confounds. In this example, we have already selected six fmriprep confounds to include in the model (6 rigid-body transforms, such as <code>rot_x</code>).</p>
+<p>See the <a href="https://fmriprep.readthedocs.io/en/stable/outputs.html#confounds">fmriprep documentation</a> for in-depth information about these confound variables.</p>
+</div>
+<div class="admonition danger">
+<p class="admonition-title">Danger</p>
+<p>Very large models with dozens of predictors may be slow to compile and fit. We recommend starting with smaller models and building up to larger models as you've gained experience.</p>
+</div>
+<h1 id="add-transformations">Add Transformations</h1>
+<p>The next step in defining model is to transform the variables you've selected. This step is optional-- for many models you may not need to make any modifications to the input variables.</p>
+<p>To add a transformation, click <code>Add Transformation</code> and select an operation from the dropdown list.</p>
+<p><img alt="Add transformation" src="../img/transformation_add.png" /></p>
+<p>The transformations currently supported by Neuroscout are a subset of the complete set of transformations detailed in the <a href="https://docs.google.com/document/d/1bq5eNDHTb6Nkx3WUiOBgKvLNnaa5OMcGtD0AZ9yms2M/edit?usp=sharing">BIDS StatsModel specification</a> (in active development). As Neuroscout matures, the number of suppport transformations will grow.</p>
+<table>
+<thead>
+<tr>
+<th>Transformation</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Scale</td>
+<td>Standardize the value of one or more variables. Can independently choose to denmean and/or rescale.</td>
+</tr>
+<tr>
+<td>Orthogonalize</td>
+<td>Orthogonalizes one or more input columns with respect to one or more other columns.</td>
+</tr>
+<tr>
+<td>And/Or/Not</td>
+<td>Each of these transformations takes one or more columns, and performs a logical operation on the input column and a provided operand.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="select-input">Select input</h2>
+<p>For all transformation, you must select on which this transformation will operate.
+Most operations will operate on each column independently, but specifying multiple columns will save you from having to specify the same operation for multiple predictors.</p>
+<p><img alt="Select inputs" src="../img/transformation_inputs.png" /></p>
+<h2 id="transformation-specific-options">Transformation-specific options</h2>
+<p>Most transformations additional have specific options which you can specify.</p>
+<h3 id="scale">Scale</h3>
+<p><img alt="Scale" src="../img/transformation_scale.png" /></p>
+<ul>
+<li>Demean - If True, subtracts the mean from each input column (i.e., applies mean-centering).</li>
+<li>Rescale - If True, divides each column by its standard deviation.</li>
+<li>ReplaceNA - Whether/when to replace missing values with 0. "Don't replace"- no replacement is performed. If 'before', missing values are replaced with 0's before scaling. If 'after', missing values are replaced with 0 after scaling.</li>
+</ul>
+<h3 id="orthogonalize">Orthogonalize</h3>
+<p><img alt="Orthogonalize" src="../img/transformation_orth.png" /></p>
+<ul>
+<li>You must select the inputs to orthogonalize with respect to. The transformed variable will be uncorrelated to these variables.</li>
+</ul>
+<h3 id="threshold">Threshold</h3>
+<p><img alt="Threshold" src="../img/transformation_thresh.png" /></p>
+<ul>
+<li>Threshold - The value to binarize around (values above will be assigned 1, values below will be assigned 0)</li>
+<li>Binarize -  If True, binarizes all non-zero values (i.e., every non-zero value will be set to 1).</li>
+<li>Above -  Specifies which values to retain with respect to the cut-off. If True, all value above the threshold will be kept; if False, all values below the threshold will be kept.</li>
+<li>Signed - Specifies whether to treat the threshold as signed (default) or unsigned. For example, when passing above=True and threshold=3, if signed=True, all and only values above +3 would be retained. If signed=False, all absolute values &gt; 3 would be retained (i.e.,values in  the range -3 &lt; X &lt; 3 would be set to 0).</li>
+</ul>
+<h2 id="transformation-editing-and-order">Transformation editing and order</h2>
+<p>It is important to note that transformations are applied sequentially, so the order of the transformation matters.
+To re-order transformation you can drag and drop transformations in the list.</p>
+<p><img alt="Drag" src="../img/transformation_drag.png" /></p>
+<p>You can also remove transformations you've created using the trash icon, and edit existing transformations with the blue edit icon.</p>
+<h1 id="hrf-convolution">HRF Convolution</h1>
+<p>In this tab, you can select which predictors you'd like to convolve with the canonical haemodynamic-response function (HRF).</p>
+<p>Typically, you'll want to convolve all non-confounds. You can easily do this by clicking <code>Select All Non-Confounds</code>.</p>
+<p>As in the <code>Predictors</code> tab, you can perform a full-text search over all the predictors you previously selected.</p>
+<p>For now, we are applying a <a href="https://en.wikibooks.org/wiki/SPM/Haemodynamic_Response_Function">"SPM" style</a> HRF, with no derivatives.</p>
+<p><img alt="hrf" src="../img/hrf.png" /></p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>In reality, HRF convolution is another transformation that is applied after all other transformations.
+Thus, the transformed variables will be the ones that are convolved.</p>
+</div>
+<h1 id="contrasts">Contrasts</h1>
+<p>In this tab, you can define contrasts to compute at the first-level after the design-matrix is fit to the fMRI activation time-course.</p>
+<p>As there are often no experimental conditions in naturalistic studies, it often makes the most sense to simply propagate the individual estimates for each predictor of interest (e.g. non-confounds).</p>
+<p>We can achieve this using "Dummy" auto-contrasts, in which each Predictor is given a dummy-coded contrast of the same name.</p>
+<p>To do this for all non-confounds, simply click <code>Generate Auto Contrasts</code>.</p>
+<p><img alt="auto_contrasts" src="../img/contrasts.png" /></p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>If you go back to the <code>Predictors</code> tab and edit the predictor list, you may have to re-generate auto contrasts.</p>
+</div>
+<h2 id="defining-a-custom-contrast">Defining a custom contrast</h2>
+<p>To define a contrast, click <code>Add Contrast</code>. First, you must give the contrast a name.
+Next, select the predictors to include in this contrast. All predictors not selected will be given a weight of 0.
+Finally, enter the weights for the selected predictors.</p>
+<p><img alt="Add contrast" src="../img/contrasts_add.png" /></p>
+<p>In this example, we are contrasting <code>building</code> and <code>daylight</code> using <code>t</code> contrast.</p>
+<p>As in the transformations tab, you can re-order, trash, and edit existing contrasts.</p>
+<h1 id="review">Review</h1>
+<p>Once you have selected predictors, applied transformations, and defined your contrasts, you're ready to review the statistical model you've designed.</p>
+<h2 id="design-report">Design Report</h2>
+<p>Upon reaching the <code>Review</code> tab, a report is requested from the Neuroscout server that will validate your analysis, apply transformations and pre-compute the design matrix to be fit to the fMRI data.
+It may take a few minutes to receive the report.</p>
+<h3 id="design-matrix">Design Matrix</h3>
+<p><img alt="Design matrix" src="../img/review_dm.png" /></p>
+<p>Here you can interactively review the final design matrix that will be fit at the first-level of your analysis.
+The top plot will give you an overview of the design matrix, with each column of the design matrix on the x-axis and time on the y-axis.</p>
+<p>In the bottom plot, you can explore the predictor time courses in more detail. By clicking on the legend on the right, you can select specific predictors to plot. You may shift-click to select multiple predictors at once.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>For display purposes, each column is standardized prior to the creation of these plots, even if you did not request a <code>scale</code> transformation.
+This force re-scaling will not be performed when creating the actual design matrix.</p>
+</div>
+<h3 id="correlation-matrix">Correlation Matrix</h3>
+<p><img alt="Correlation matrix" src="../img/review_cm.png" /></p>
+<p>The correlation matrix provides you can opportunity to review the covariance between your predictors.
+Note that predictors that are highlight correlated with each other may result in a rank deficient design matrix which will cause model fitting to fail.</p>
+<div class="admonition hint">
+<p class="admonition-title">Hint</p>
+<p>Hover over values in the plot to see the correlation r-values.</p>
+</div>
+<h2 id="analysis-overview_1">Analysis Overview</h2>
+<p>Finally, a complete summary of your analysis is displayed in this tab. Here you can review all of the choices you've made and ensure you are happy with the analysis prior to continuing.</p>
+<p><img alt="Review overview" src="../img/review_overview.png" /></p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Neuroscout stores your model design using BIDS Stats-Model, an in-development JSON standard for representing fMRI models.
+This is the true, final representation of your model, so if you are having problems, or would like to meticulously review your analysis, review this section.</p>
+</div>
+<h1 id="run">Run</h1></div>
         </div>
 
         <footer class="col-md-12">

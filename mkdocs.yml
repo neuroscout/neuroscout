@@ -11,3 +11,5 @@ nav:
     - FAQ: faq.md
 
 theme: flatly
+markdown_extensions:
+  - admonition
