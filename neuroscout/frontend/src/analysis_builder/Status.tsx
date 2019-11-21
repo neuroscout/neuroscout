@@ -196,7 +196,7 @@ export class StatusTab extends React.Component<submitProps, statusTabState> {
     let statuses = [] as any[];
     uploads.map(x => {
       statuses.push(
-        <Card 
+        <Card
           key={x.id}
           title={this.nvLink(x.id)}
           style={{display: 'inline-block'}}
@@ -254,7 +254,7 @@ export class StatusTab extends React.Component<submitProps, statusTabState> {
         <div>
           <h3>Analysis Passed</h3>
           <p>
-            {this.props.userOwns && 'Congratulations!'} Congratulations, your analysis has been compiled!
+            {this.props.userOwns && 'Congratulations, your analysis has been compiled!'}
             Run the analysis with this this command, replacing '/local/outputdirectory' with a local directory.
             See the <a href="https://github.com/neuroscout/neuroscout-cli">neuroscout-cli documentation </a>
              for more information.
