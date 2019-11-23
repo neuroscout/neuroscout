@@ -7,12 +7,14 @@ nav:
       - Getting started: builder/index.md
       - Predictors: builder/predictors.md
       - Transformations: builder/transformations.md
-      - HRF: builder/hrf.md
+      - HRF Convolution: builder/hrf.md
       - Contrasts: builder/contrasts.md
       - Review: builder/review.md
       - Run / Status: builder/run.md
       - Bibliography: builder/bib.md
-
+    - Browse analyses:
+      - Browse & manage: browse/index.md
+      - Clone: browse/clone.md
     - Running analyses:
       - Introduction: cli/index.md
     - FAQ: faq.md

@@ -9,3 +9,7 @@ Coming soon, there will be documentation on how to user Neuroscout here...
 ## Example command
 
     neuroscout run /out 5xhbt
+
+
+!!! Note
+    You can sort by columns if you see the double arrow icon
