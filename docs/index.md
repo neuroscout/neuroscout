@@ -23,11 +23,12 @@ If you're ready to build your own analysis, head over to [Getting Started](build
     - [Review](builder/review.md)
     - [Run / Status](builder/run.md)
     - [Bibliography](builder/bib.md)
-- Browse & manage
-    - [Browse](browse/index.md)
+- Browse analyses
+    - [Browse & manage](browse/index.md)
     - [Clone](browse/clone.md)
 - Running analyses:
     - [Introduction](cli/index.md)
+    - [Usage](cli/usage.md)
 - [FAQ](faq.md)
 
 

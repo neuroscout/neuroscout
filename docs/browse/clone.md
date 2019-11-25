@@ -25,7 +25,7 @@ Otherwise, proceed to edit and submit this analysis as usual.
 
 ## Changing datasets, keeping predictors
 
-What if you want to clone an existing analysis in order to run the same model on a different dataset.
+What if you want to clone an existing analysis in order to run the same model on a different dataset?
 
 Simply select a new dataset from the list, and advance to the `Predictors` tab.
 
