@@ -57,16 +57,7 @@
     
         <ul>
         
-            <li><a class="toctree-l3" href="#motivation">Motivation</a></li>
-        
-        </ul>
-    
-
-    <li class="toctree-l2"><a href="#getting-started">Getting started</a></li>
-    
-        <ul>
-        
-            <li><a class="toctree-l3" href="#sign-up">Sign Up</a></li>
+            <li><a class="toctree-l3" href="#table-of-contents">Table of Contents</a></li>
         
             <li><a class="toctree-l3" href="#where-can-i-get-more-help">Where can I get more help?</a></li>
         
@@ -94,7 +85,7 @@
                 </li>
                 <li class="">
                     
-    <a class="" href="builder/hrf/">HRF</a>
+    <a class="" href="builder/hrf/">HRF Convolution</a>
                 </li>
                 <li class="">
                     
@@ -117,11 +108,30 @@
           
             <li class="toctree-l1">
 		
+    <span class="caption-text">Browse analyses</span>
+    <ul class="subnav">
+                <li class="">
+                    
+    <a class="" href="browse/">Browse & manage</a>
+                </li>
+                <li class="">
+                    
+    <a class="" href="browse/clone/">Clone</a>
+                </li>
+    </ul>
+	    </li>
+          
+            <li class="toctree-l1">
+		
     <span class="caption-text">Running analyses</span>
     <ul class="subnav">
                 <li class="">
                     
     <a class="" href="cli/">Introduction</a>
+                </li>
+                <li class="">
+                    
+    <a class="" href="cli/usage/">Usage</a>
                 </li>
     </ul>
 	    </li>
@@ -165,35 +175,35 @@
               
                 <h1 id="what-is-neuroscout">What is Neuroscout?</h1>
 <p><em>Neuroscout is a web-based platform for fast and flexible analysis of fMRI data.</em></p>
-<h2 id="motivation">Motivation</h2>
 <p>fMRI studies using complex naturalistic stimulation, such as movies or audio narratives, hold great promise to reveal the neural activity underlying dynamic perception. However, this potential is limited by the resource-intensive nature of fMRI analysis, and exacerbated by the difficulty of encoding relevant events in rich, multi-modal stimuli.</p>
-<p>Neuroscout leverages state-of-the-art <em>feature extraction</em> tools to automatically extract hundreds of neural predictors from experimental stimuli. We pair this with an <em>easy-to-use analysis builder</em>, enabling researchers to flexibly define novel statistical models.</p>
+<p>Neuroscout leverages state-of-the-art <em>feature extraction</em> tools to automatically extract hundreds of neural predictors from experimental stimuli. We pair this with an <em>easy-to-use <a href="builder/">analysis builder</a></em>, enabling researchers to flexibly define novel statistical models.</p>
 <p>Analysis execution is achieved with <em>no configuration</em> using self-contained bundles tied to unique analysis IDs, and run-time data retrieval using <a href="https://www.datalad.org/">DataLad</a>. Containerized <em>model-fitting pipelines</em> minimize software dependencies and ensure <em>high portability</em> across execution environments.</p>
 <p>Finally, we make it easy for researchers to <em>share their results</em> with interactive publication-like reports and statistical image hosting with <a href="https://www.neurovault.org/">NeuroVault</a>.</p>
-<h1 id="getting-started">Getting started</h1>
-<p>The <a href="https://neuroscout.org">neuroscout.org</a> web interface has the following features:</p>
+<p>If you're ready to build your own analysis, head over to <a href="builder/">Getting Started</a>.</p>
+<h2 id="table-of-contents">Table of Contents</h2>
 <ul>
-<li>Use the <a href="builder/">analysis builder</a> to create a custom fMRI analysis, drawing from hundreds of automatically extracted predictors.</li>
-<li>Manage and clone existing analyses.</li>
-<li>View uploaded results.</li>
-<li>Upload custom predictors.</li>
+<li>Building analyses<ul>
+<li><a href="builder/">Getting started</a></li>
+<li><a href="builder/predictors/">Predictors</a></li>
+<li><a href="builder/transformations/">Transformations</a></li>
+<li><a href="builder/hrf/">HRF Convolution</a></li>
+<li><a href="builder/contrasts/">Contrasts</a></li>
+<li><a href="builder/review/">Review</a></li>
+<li><a href="builder/run/">Run / Status</a></li>
+<li><a href="builder/bib/">Bibliography</a></li>
 </ul>
-<p>Once you have generated an analysis, you can use the <a href="cli/">neuroscout-cli</a> to execute a model-fitting pipeline, and automatically upload your results.</p>
-<h2 id="sign-up">Sign Up</h2>
-<p>First things first, you need to register for an account.</p>
-<p>Currently, there are two supported options, the choice is yours!</p>
-<ul>
-<li>Create an account using an email address and password (old fashioned way).</li>
-<li>Use Google single sign on.</li>
+</li>
+<li>Browse &amp; manage<ul>
+<li><a href="browse/">Browse</a></li>
+<li><a href="browse/clone/">Clone</a></li>
 </ul>
-<p>If you create an account with us, you'll be asked to validate your email, as usual.</p>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>Accounts are linked using email addresses. Signing up twice using the same email address, will result in a single account.</p>
-</div>
-<p>Once you've logged in, launch the <a href="builder.md">analysis builder</a> using the <code>New Analysis</code> navigation button.</p>
-<p>You can use the <code>Browse</code> button to view analyses you've created by selecting <code>My Analyses</code>, or publicly shared analyses under <code>Public analyses</code>.
-Note that you don't need to log in to view public analyses.</p>
+</li>
+<li>Running analyses:<ul>
+<li><a href="cli/">Introduction</a></li>
+</ul>
+</li>
+<li><a href="faq/">FAQ</a></li>
+</ul>
 <h2 id="where-can-i-get-more-help">Where can I get more help?</h2>
 <p>The first time you use neuroscout.org, you will be given a tour of the interface. After the tour, be on the look out informational tooltips ("i" icon), provided throughout to clarify aspects of the web interface. Finally, please read the <a href="faq/">FAQ</a> thoroughly!</p>
 <p>For usage questions not addressed here, please ask a question on  <a href="https://neurostars.org">NeuroStars</a>. For bug reports, feature requests, feedback, etc.,
@@ -246,5 +256,5 @@ please open an issue on <a href="https://github.com/neuroscout/neuroscout/issues
 
 <!--
 MkDocs version : 1.0.4
-Build Date UTC : 2019-11-21 22:12:51
+Build Date UTC : 2019-11-23 01:12:13
 -->

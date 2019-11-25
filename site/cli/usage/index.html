@@ -8,7 +8,7 @@
   
   <meta name="author" content="Alejandro de la Vega">
   <link rel="shortcut icon" href="../../img/favicon.ico">
-  <title>Contrasts - Neuroscout Docs</title>
+  <title>Usage - Neuroscout Docs</title>
   <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
 
   <link rel="stylesheet" href="../../css/theme.css" type="text/css" />
@@ -17,9 +17,9 @@
   
   <script>
     // Current page data
-    var mkdocs_page_name = "Contrasts";
-    var mkdocs_page_input_path = "builder/contrasts.md";
-    var mkdocs_page_url = "/neuroscout/builder/contrasts/";
+    var mkdocs_page_name = "Usage";
+    var mkdocs_page_input_path = "cli/usage.md";
+    var mkdocs_page_url = "/neuroscout/cli/usage/";
   </script>
   
   <script src="../../js/jquery-2.1.1.min.js" defer></script>
@@ -59,47 +59,35 @@
     <ul class="subnav">
                 <li class="">
                     
-    <a class="" href="../">Getting started</a>
+    <a class="" href="../../builder/">Getting started</a>
                 </li>
                 <li class="">
                     
-    <a class="" href="../predictors/">Predictors</a>
+    <a class="" href="../../builder/predictors/">Predictors</a>
                 </li>
                 <li class="">
                     
-    <a class="" href="../transformations/">Transformations</a>
+    <a class="" href="../../builder/transformations/">Transformations</a>
                 </li>
                 <li class="">
                     
-    <a class="" href="../hrf/">HRF Convolution</a>
-                </li>
-                <li class=" current">
-                    
-    <a class="current" href="./">Contrasts</a>
-    <ul class="subnav">
-            
-    <li class="toctree-l3"><a href="#contrasts">Contrasts</a></li>
-    
-        <ul>
-        
-            <li><a class="toctree-l4" href="#defining-a-custom-contrast">Defining a custom contrast</a></li>
-        
-        </ul>
-    
-
-    </ul>
+    <a class="" href="../../builder/hrf/">HRF Convolution</a>
                 </li>
                 <li class="">
                     
-    <a class="" href="../review/">Review</a>
+    <a class="" href="../../builder/contrasts/">Contrasts</a>
                 </li>
                 <li class="">
                     
-    <a class="" href="../run/">Run / Status</a>
+    <a class="" href="../../builder/review/">Review</a>
                 </li>
                 <li class="">
                     
-    <a class="" href="../bib/">Bibliography</a>
+    <a class="" href="../../builder/run/">Run / Status</a>
+                </li>
+                <li class="">
+                    
+    <a class="" href="../../builder/bib/">Bibliography</a>
                 </li>
     </ul>
 	    </li>
@@ -125,11 +113,25 @@
     <ul class="subnav">
                 <li class="">
                     
-    <a class="" href="../../cli/">Introduction</a>
+    <a class="" href="../">Introduction</a>
                 </li>
-                <li class="">
+                <li class=" current">
                     
-    <a class="" href="../../cli/usage/">Usage</a>
+    <a class="current" href="./">Usage</a>
+    <ul class="subnav">
+            
+    <li class="toctree-l3"><a href="#usage">Usage</a></li>
+    
+        <ul>
+        
+            <li><a class="toctree-l4" href="#mounting-volumes">Mounting Volumes</a></li>
+        
+            <li><a class="toctree-l4" href="#command-line-arguments">Command-Line Arguments</a></li>
+        
+        </ul>
+    
+
+    </ul>
                 </li>
     </ul>
 	    </li>
@@ -161,11 +163,11 @@
     
       
         
-          <li>Building analyses &raquo;</li>
+          <li>Running analyses &raquo;</li>
         
       
     
-    <li>Contrasts</li>
+    <li>Usage</li>
     <li class="wy-breadcrumbs-aside">
       
     </li>
@@ -175,23 +177,62 @@
           <div role="main">
             <div class="section">
               
-                <h1 id="contrasts">Contrasts</h1>
-<p>In this tab, you can define contrasts to compute at the first-level after the design-matrix is fit to the fMRI activation time-course.</p>
-<p>As there are often no experimental conditions in naturalistic studies, it often makes the most sense to simply propagate the individual estimates for each predictor of interest (e.g. non-confounds).</p>
-<p>We can achieve this using "Dummy" auto-contrasts, in which each Predictor is given a dummy-coded contrast of the same name.</p>
-<p>To do this for all non-confounds, simply click <code>Generate Auto Contrasts</code>.</p>
-<p><img alt="auto_contrasts" src="../img/contrasts.png" /></p>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>If you go back to the <code>Predictors</code> tab and edit the predictor list, you may have to re-generate auto contrasts.</p>
-</div>
-<h2 id="defining-a-custom-contrast">Defining a custom contrast</h2>
-<p>To define a contrast, click <code>Add Contrast</code>. First, you must give the contrast a name.
-Next, select the predictors to include in this contrast. All predictors not selected will be given a weight of 0.
-Finally, enter the weights for the selected predictors.</p>
-<p><img alt="Add contrast" src="../img/contrasts_add.png" /></p>
-<p>In this example, we are contrasting <code>building</code> and <code>daylight</code> using <code>t</code> contrast.</p>
-<p>As in the transformations tab, you can re-order, trash, and edit existing contrasts.</p>
+                <h1 id="usage">Usage</h1>
+<p>This assumes that you are using the Docker Container.
+Docker commands for <em>neuroscout-cli</em> will always being with:</p>
+<pre><code>docker run -it
+</code></pre>
+<p>Assuming you've already created an analysis on neuroscout.org, and have its analysis id (e.g.: <code>5xH93</code>), you can run it in one line:</p>
+<pre><code>docker run -it neuroscout/neuroscout-cli run /outdir 5xH93
+</code></pre>
+<p>Neuroscout will download the necessary images, analysis bundle, and fit your model.</p>
+<h2 id="mounting-volumes">Mounting Volumes</h2>
+<p>Most likely, you'll want to mount at least two volumes , in order to cache input data (<code>/data</code>), and inspect output results (<code>/out</code>)</p>
+<p>In this example, we mount both of these directories to local volumes:</p>
+<pre><code>docker run -it -v /local/datadir:/data -v /local/outdir:/out neuroscout/neuroscout-cli run /out 5xH937f
+</code></pre>
+<p>The necessary dataset will be downloaded to your local volume (<code>/local/datadir</code>), and next time you run a model with the same dataset, it will not need to re-download the fMRI data.
+The model-fitting outputs will also be locally saved at <code>/local/outdir</code>.</p>
+<h2 id="command-line-arguments">Command-Line Arguments</h2>
+<pre><code>neuroscout
+
+Usage:
+    neuroscout run [-ui &lt;dir&gt; -s &lt;k&gt; -w &lt;dir&gt; -c &lt;n&gt; -n &lt;nv&gt; -d] &lt;outdir&gt; &lt;bundle_id&gt;...
+    neuroscout install [-ui &lt;dir&gt;] &lt;bundle_id&gt;...
+    neuroscout ls &lt;bundle_id&gt;
+    neuroscout -h | --help
+    neuroscout --version
+</code></pre>
+<h3 id="commands-first-positional-argument">Commands (first positional argument)</h3>
+<h4 id="run">run</h4>
+<p>Runs analysis. Downloads data if necessary.</p>
+<h4 id="install">install</h4>
+<p>Download analysis bundle, and download data if necessary.</p>
+<h4 id="ls">ls</h4>
+<p>List input fMRI data files associated with this analysis, to be downloaded.</p>
+<h3 id="options">Options</h3>
+<h4 id="-i-install-dir">-i, --install-dir <dir></h4>
+<p>Directory to download data. Default is current directory, which is <code>/data</code>.</p>
+<h4 id="-w-work-dir">-w, --work-dir <dir></h4>
+<p>Path where intermediate results should be stored</p>
+<h4 id="-c-n-cpus">-c, --n-cpus <n></h4>
+<p>Maximum number of threads across all processes [default: 1]</p>
+<h4 id="-s-smoothing">-s, --smoothing <k></h4>
+<p>Smoothing kernel FWHM at group level [default: 4]</p>
+<h4 id="-u-unlock">-u, --unlock</h4>
+<p>Unlock datalad dataset (only necessary if mapping to local dataset)</p>
+<h4 id="-n-neurovault">-n, --neurovault <nv></h4>
+<p>Upload mode (disable, force, or enable) [default: enable]</p>
+<p>Options:</p>
+<ul>
+<li>Enable - Upload results to Neurovault</li>
+<li>Force - Force upload, with a new collection name if necessary.</li>
+<li>Disable - Don't upload to Neurovault.</li>
+</ul>
+<h4 id="-d-drop-missing">-d, --drop-missing</h4>
+<p>Drop missing inputs/contrasts in model fitting.
+Necessary in cases where a run has no events of a given type, and no inputs
+are available at the next level for fitting.</p>
               
             </div>
           </div>
@@ -199,10 +240,10 @@ Finally, enter the weights for the selected predictors.</p>
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="../review/" class="btn btn-neutral float-right" title="Review">Next <span class="icon icon-circle-arrow-right"></span></a>
+        <a href="../../faq/" class="btn btn-neutral float-right" title="FAQ">Next <span class="icon icon-circle-arrow-right"></span></a>
       
       
-        <a href="../hrf/" class="btn btn-neutral" title="HRF Convolution"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../" class="btn btn-neutral" title="Introduction"><span class="icon icon-circle-arrow-left"></span> Previous</a>
       
     </div>
   
@@ -228,10 +269,10 @@ Finally, enter the weights for the selected predictors.</p>
     <span class="rst-current-version" data-toggle="rst-current-version">
       
       
-        <span><a href="../hrf/" style="color: #fcfcfc;">&laquo; Previous</a></span>
+        <span><a href="../" style="color: #fcfcfc;">&laquo; Previous</a></span>
       
       
-        <span style="margin-left: 15px"><a href="../review/" style="color: #fcfcfc">Next &raquo;</a></span>
+        <span style="margin-left: 15px"><a href="../../faq/" style="color: #fcfcfc">Next &raquo;</a></span>
       
     </span>
 </div>

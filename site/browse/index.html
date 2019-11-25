@@ -7,23 +7,23 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
   <meta name="author" content="Alejandro de la Vega">
-  <link rel="shortcut icon" href="../../img/favicon.ico">
-  <title>Contrasts - Neuroscout Docs</title>
+  <link rel="shortcut icon" href="../img/favicon.ico">
+  <title>Browse & manage - Neuroscout Docs</title>
   <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
 
-  <link rel="stylesheet" href="../../css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="../../css/theme_extra.css" type="text/css" />
+  <link rel="stylesheet" href="../css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../css/theme_extra.css" type="text/css" />
   <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css">
   
   <script>
     // Current page data
-    var mkdocs_page_name = "Contrasts";
-    var mkdocs_page_input_path = "builder/contrasts.md";
-    var mkdocs_page_url = "/neuroscout/builder/contrasts/";
+    var mkdocs_page_name = "Browse & manage";
+    var mkdocs_page_input_path = "browse/index.md";
+    var mkdocs_page_url = "/neuroscout/browse/";
   </script>
   
-  <script src="../../js/jquery-2.1.1.min.js" defer></script>
-  <script src="../../js/modernizr-2.8.3.min.js" defer></script>
+  <script src="../js/jquery-2.1.1.min.js" defer></script>
+  <script src="../js/modernizr-2.8.3.min.js" defer></script>
   <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
   <script>hljs.initHighlightingOnLoad();</script> 
   
@@ -36,9 +36,9 @@
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
       <div class="wy-side-nav-search">
-        <a href="../.." class="icon icon-home"> Neuroscout Docs</a>
+        <a href=".." class="icon icon-home"> Neuroscout Docs</a>
         <div role="search">
-  <form id ="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
     <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
   </form>
 </div>
@@ -50,7 +50,7 @@
           
             <li class="toctree-l1">
 		
-    <a class="" href="../..">Home</a>
+    <a class="" href="..">Home</a>
 	    </li>
           
             <li class="toctree-l1">
@@ -59,47 +59,35 @@
     <ul class="subnav">
                 <li class="">
                     
-    <a class="" href="../">Getting started</a>
+    <a class="" href="../builder/">Getting started</a>
                 </li>
                 <li class="">
                     
-    <a class="" href="../predictors/">Predictors</a>
+    <a class="" href="../builder/predictors/">Predictors</a>
                 </li>
                 <li class="">
                     
-    <a class="" href="../transformations/">Transformations</a>
+    <a class="" href="../builder/transformations/">Transformations</a>
                 </li>
                 <li class="">
                     
-    <a class="" href="../hrf/">HRF Convolution</a>
-                </li>
-                <li class=" current">
-                    
-    <a class="current" href="./">Contrasts</a>
-    <ul class="subnav">
-            
-    <li class="toctree-l3"><a href="#contrasts">Contrasts</a></li>
-    
-        <ul>
-        
-            <li><a class="toctree-l4" href="#defining-a-custom-contrast">Defining a custom contrast</a></li>
-        
-        </ul>
-    
-
-    </ul>
+    <a class="" href="../builder/hrf/">HRF Convolution</a>
                 </li>
                 <li class="">
                     
-    <a class="" href="../review/">Review</a>
+    <a class="" href="../builder/contrasts/">Contrasts</a>
                 </li>
                 <li class="">
                     
-    <a class="" href="../run/">Run / Status</a>
+    <a class="" href="../builder/review/">Review</a>
                 </li>
                 <li class="">
                     
-    <a class="" href="../bib/">Bibliography</a>
+    <a class="" href="../builder/run/">Run / Status</a>
+                </li>
+                <li class="">
+                    
+    <a class="" href="../builder/bib/">Bibliography</a>
                 </li>
     </ul>
 	    </li>
@@ -108,13 +96,27 @@
 		
     <span class="caption-text">Browse analyses</span>
     <ul class="subnav">
-                <li class="">
+                <li class=" current">
                     
-    <a class="" href="../../browse/">Browse & manage</a>
+    <a class="current" href="./">Browse & manage</a>
+    <ul class="subnav">
+            
+    <li class="toctree-l3"><a href="#browsing-analyses">Browsing analyses</a></li>
+    
+        <ul>
+        
+            <li><a class="toctree-l4" href="#editing-analyses">Editing analyses</a></li>
+        
+            <li><a class="toctree-l4" href="#deleting-analyses">Deleting analyses</a></li>
+        
+        </ul>
+    
+
+    </ul>
                 </li>
                 <li class="">
                     
-    <a class="" href="../../browse/clone/">Clone</a>
+    <a class="" href="clone/">Clone</a>
                 </li>
     </ul>
 	    </li>
@@ -125,18 +127,18 @@
     <ul class="subnav">
                 <li class="">
                     
-    <a class="" href="../../cli/">Introduction</a>
+    <a class="" href="../cli/">Introduction</a>
                 </li>
                 <li class="">
                     
-    <a class="" href="../../cli/usage/">Usage</a>
+    <a class="" href="../cli/usage/">Usage</a>
                 </li>
     </ul>
 	    </li>
           
             <li class="toctree-l1">
 		
-    <a class="" href="../../faq/">FAQ</a>
+    <a class="" href="../faq/">FAQ</a>
 	    </li>
           
         </ul>
@@ -149,7 +151,7 @@
       
       <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
         <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-        <a href="../..">Neuroscout Docs</a>
+        <a href="..">Neuroscout Docs</a>
       </nav>
 
       
@@ -157,15 +159,15 @@
         <div class="rst-content">
           <div role="navigation" aria-label="breadcrumbs navigation">
   <ul class="wy-breadcrumbs">
-    <li><a href="../..">Docs</a> &raquo;</li>
+    <li><a href="..">Docs</a> &raquo;</li>
     
       
         
-          <li>Building analyses &raquo;</li>
+          <li>Browse analyses &raquo;</li>
         
       
     
-    <li>Contrasts</li>
+    <li>Browse & manage</li>
     <li class="wy-breadcrumbs-aside">
       
     </li>
@@ -175,23 +177,21 @@
           <div role="main">
             <div class="section">
               
-                <h1 id="contrasts">Contrasts</h1>
-<p>In this tab, you can define contrasts to compute at the first-level after the design-matrix is fit to the fMRI activation time-course.</p>
-<p>As there are often no experimental conditions in naturalistic studies, it often makes the most sense to simply propagate the individual estimates for each predictor of interest (e.g. non-confounds).</p>
-<p>We can achieve this using "Dummy" auto-contrasts, in which each Predictor is given a dummy-coded contrast of the same name.</p>
-<p>To do this for all non-confounds, simply click <code>Generate Auto Contrasts</code>.</p>
-<p><img alt="auto_contrasts" src="../img/contrasts.png" /></p>
+                <h1 id="browsing-analyses">Browsing analyses</h1>
+<p>Neuroscout let's you browse analyses you've created, as well as analyses that are publicly listed by other members of the community.</p>
+<p>To browse analyses, select <code>My analyses</code> or <code>Public analyses</code> under <code>Browse</code> in the navigation bar. Sort by any column by clicking on it.</p>
+<p><img alt="Browse" src="img/public.png" /></p>
+<h2 id="editing-analyses">Editing analyses</h2>
+<p>To launch the analysis builder, simply click the name of the analysis. Note that only analyses that are still in <code>DRAFT</code> mode (i.e. have not been submitted for bundle generation) are fully editable.
+However, you can launch the analysis in "view-only" mode for any analysis, including public ones.</p>
+<p>Remember that for your analyses, you can always change the <code>name</code>, <code>description</code> and <code>public/private</code> status.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>If you go back to the <code>Predictors</code> tab and edit the predictor list, you may have to re-generate auto contrasts.</p>
+<p>Instead of "editing" a <code>PASSED</code> analysis, you can use the <a href="clone/">clone</a> feature to make an editable copy.</p>
 </div>
-<h2 id="defining-a-custom-contrast">Defining a custom contrast</h2>
-<p>To define a contrast, click <code>Add Contrast</code>. First, you must give the contrast a name.
-Next, select the predictors to include in this contrast. All predictors not selected will be given a weight of 0.
-Finally, enter the weights for the selected predictors.</p>
-<p><img alt="Add contrast" src="../img/contrasts_add.png" /></p>
-<p>In this example, we are contrasting <code>building</code> and <code>daylight</code> using <code>t</code> contrast.</p>
-<p>As in the transformations tab, you can re-order, trash, and edit existing contrasts.</p>
+<h2 id="deleting-analyses">Deleting analyses</h2>
+<p>Similarly, only analyses that are still in <code>DRAFT</code> mode can be deleted. Simply click <code>Delete</code> in the right-most column.</p>
+<p>However, remember that you can always make an analysis <code>private</code> at any time.</p>
               
             </div>
           </div>
@@ -199,10 +199,10 @@ Finally, enter the weights for the selected predictors.</p>
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="../review/" class="btn btn-neutral float-right" title="Review">Next <span class="icon icon-circle-arrow-right"></span></a>
+        <a href="clone/" class="btn btn-neutral float-right" title="Clone">Next <span class="icon icon-circle-arrow-right"></span></a>
       
       
-        <a href="../hrf/" class="btn btn-neutral" title="HRF Convolution"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../builder/bib/" class="btn btn-neutral" title="Bibliography"><span class="icon icon-circle-arrow-left"></span> Previous</a>
       
     </div>
   
@@ -228,16 +228,16 @@ Finally, enter the weights for the selected predictors.</p>
     <span class="rst-current-version" data-toggle="rst-current-version">
       
       
-        <span><a href="../hrf/" style="color: #fcfcfc;">&laquo; Previous</a></span>
+        <span><a href="../builder/bib/" style="color: #fcfcfc;">&laquo; Previous</a></span>
       
       
-        <span style="margin-left: 15px"><a href="../review/" style="color: #fcfcfc">Next &raquo;</a></span>
+        <span style="margin-left: 15px"><a href="clone/" style="color: #fcfcfc">Next &raquo;</a></span>
       
     </span>
 </div>
-    <script>var base_url = '../..';</script>
-    <script src="../../js/theme.js" defer></script>
-      <script src="../../search/main.js" defer></script>
+    <script>var base_url = '..';</script>
+    <script src="../js/theme.js" defer></script>
+      <script src="../search/main.js" defer></script>
 
 </body>
 </html>
