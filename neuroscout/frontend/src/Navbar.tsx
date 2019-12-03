@@ -36,7 +36,7 @@ class Navbar extends React.Component<AuthStoreState, {}> {
                    <Menu.Item key="predictorCollections">
                      <Link to="/mycollections"> My Predictors </Link>
                    </Menu.Item>
-                    
+
                    <Menu.Item
                     key="signout"
                     onClick={(e) => {return authActions.confirmLogout(); }}
@@ -63,7 +63,8 @@ class Navbar extends React.Component<AuthStoreState, {}> {
               style={{float: 'right'}}
               key="help"
              >
-               <Link to="/faq"><span><Icon type="question-circle"/>Help</span></Link>
+               <a href="https://neuroscout.github.io/neuroscout/"><span>
+               <Icon type="question-circle"/>Help</span></a>
              </Menu.Item>
 
              <Menu.SubMenu
