@@ -1,9 +1,10 @@
 {
   "name": "frontend",
   "version": "0.1.0",
-  "proxy": "http://alpha.neuroscout.org:80",
+  "proxy": "http://neuroscout.org:80",
   "private": true,
   "dependencies": {
+    "@sentry/browser": "5.7.0",
     "@types/antd": "^1.0.0",
     "@types/jest": "^22.2.3",
     "@types/jquery": "^3.3.1",
@@ -36,12 +37,14 @@
     "enzyme": "^3.3.0",
     "enzyme-adapter-react-16": "^1.1.1",
     "react-scripts-ts": "3.1.0",
+    "source-map-explorer": "^2.0.1",
     "tslint-etc": "^1.5.6",
     "tsutils": "^2.26.2",
     "typescript": "^3"
   },
   "scripts": {
     "start": "react-scripts-ts start",
+    "analyze": "source-map-explorer 'build/static/js/*.js'",
     "build": "react-scripts-ts build",
     "test": "react-scripts-ts test --env=jsdom",
     "eject": "react-scripts-ts eject"

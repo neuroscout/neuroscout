@@ -8,10 +8,9 @@ from flask import current_app
 from pathlib import Path
 from .utils import abort, auth_required, first_or_404
 from ..models import (
-    Predictor, PredictorEvent, PredictorRun, PredictorCollection)
+    Predictor, PredictorRun, PredictorCollection)
 from ..database import db
 from ..core import cache
-from ..utils.db import dump_pe
 from ..schemas.predictor import PredictorSchema, PredictorCollectionSchema
 from ..api_spec import FileField
 from ..worker import celery_app
@@ -24,7 +23,7 @@ class PredictorResource(MethodResource):
         return first_or_404(Predictor.query.filter_by(id=predictor_id))
 
 
-def get_predictors(newest=True, **kwargs):
+def get_predictors(newest=True, user=None, **kwargs):
     """ Helper function for querying newest predictors """
     if newest:
         predictor_ids = db.session.query(
@@ -38,11 +37,20 @@ def get_predictors(newest=True, **kwargs):
             PredictorRun.run_id.in_(kwargs.pop('run_id')))
 
     query = Predictor.query.filter(Predictor.id.in_(predictor_ids))
+
     for param in kwargs:
         query = query.filter(getattr(Predictor, param).in_(kwargs[param]))
 
+    query = query.filter_by(active=True)
+
+    if user is not None:
+        query = query.filter_by(private=True).join(
+            PredictorCollection).filter_by(user_id=user.id)
+    else:
+        query = query.filter_by(private=False)
+
     # Only display active predictors
-    return query.filter_by(active=True).all()
+    return query.all()
 
 
 class PredictorListResource(MethodResource):
@@ -62,25 +70,6 @@ class PredictorListResource(MethodResource):
     def get(self, **kwargs):
         newest = kwargs.pop('newest')
         return get_predictors(newest=newest, **kwargs)
-
-
-class PredictorEventListResource(MethodResource):
-    @doc(tags=['predictors'], summary='Get events for predictor(s)',)
-    @use_kwargs({
-        'run_id': wa.fields.DelimitedList(
-            wa.fields.Int(),
-            description="Run id(s)"),
-        'predictor_id': wa.fields.DelimitedList(
-            wa.fields.Int(),
-            description="Predictor id(s)"),
-    }, locations=['query'])
-    @cache.cached(60 * 60 * 24 * 300, query_string=True)
-    def get(self, **kwargs):
-        query = PredictorEvent.query
-        for param in kwargs:
-            query = query.filter(
-                getattr(PredictorEvent, param).in_(kwargs[param]))
-        return dump_pe(query)
 
 
 def prepare_upload(collection_name, event_files, runs, dataset_id):

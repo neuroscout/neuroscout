@@ -3,9 +3,12 @@ from hashids import Hashids
 
 from ..models import Analysis, Report
 
-from .compile import build_analysis, PathBuilder, impute_confounds
-from .viz import plot_design_matrix, plot_corr_matrix, sort_dm
-from .utils import update_record, write_jsons, write_tarball, dump_analysis
+from .utils.build import build_analysis, impute_confounds
+from .utils.viz import plot_design_matrix, plot_corr_matrix, sort_dm
+from .utils.io import (
+    dump_analysis, update_record, PathBuilder, write_jsons, write_tarball)
+
+MIN_CLI_VERSION = '0.3'
 
 
 def compile(flask_app, hash_id, run_ids=None, build=False):
@@ -25,7 +28,7 @@ def compile(flask_app, hash_id, run_ids=None, build=False):
             'traceback': f'Error loading {hash_id} from db /n {str(e)}'
             }
     try:
-        a_id, analysis, resources, predictor_events, bids_dir = dump_analysis(
+        a_id, analysis, resources, pes, bids_dir = dump_analysis(
             hash_id)
     except Exception as e:
         update_record(
@@ -36,7 +39,7 @@ def compile(flask_app, hash_id, run_ids=None, build=False):
         raise
     try:
         tmp_dir, bundle_paths, _ = build_analysis(
-            analysis, predictor_events, bids_dir, run_ids, build=build)
+            analysis, pes, bids_dir, run_ids, build=build)
     except Exception as e:
         update_record(
             analysis_object,
@@ -50,6 +53,7 @@ def compile(flask_app, hash_id, run_ids=None, build=False):
         resources['validation_hash'] = Hashids(
             flask_app.config['SECONDARY_HASH_SALT'],
             min_length=10).encode(a_id)
+        resources['version_required'] = MIN_CLI_VERSION
 
         # Write out JSON files to tmp_dir
         bundle_paths += write_jsons([
@@ -89,6 +93,7 @@ def generate_report(flask_app, hash_id, report_id,
         scale (bool): Scale columns in dm plot
     """
     FILE_DATA = Path(flask_app.config['FILE_DIR'])
+    domain = flask_app.config['SERVER_NAME']
 
     try:
         report_object = Report.query.filter_by(id=report_id).one()
@@ -97,10 +102,8 @@ def generate_report(flask_app, hash_id, report_id,
             'traceback': f'Error loading {report_id} from db /n {str(e)}'
             }
 
-    domain = flask_app.config['SERVER_NAME']
-
     try:
-        a_id, analysis, resources, predictor_events, bids_dir = dump_analysis(
+        a_id, analysis, resources, pes, bids_dir = dump_analysis(
             hash_id)
     except Exception as e:
         update_record(
@@ -112,7 +115,7 @@ def generate_report(flask_app, hash_id, report_id,
 
     try:
         _, _, bids_analysis = build_analysis(
-            analysis, predictor_events, bids_dir, run_ids)
+            analysis, pes, bids_dir, run_ids)
     except Exception as e:
         # Todo: In future, could add more messages here
         update_record(

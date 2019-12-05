@@ -48,12 +48,12 @@ route_factory(
         ('RunResource', 'runs/<int:run_id>'),
         ('PredictorListResource', 'predictors'),
         ('PredictorResource', 'predictors/<int:predictor_id>'),
-        ('PredictorEventListResource', 'predictor-events'),
         ('PredictorCollectionResource', 'predictors/collection'),
         ('UserRootResource', 'user'),
         ('UserTriggerResetResource', 'user/reset_password'),
         ('UserResetSubmitResource', 'user/submit_token'),
         ('UserResendConfirm', 'user/resend_confirmation'),
+        ('UserPredictorListResource', 'user/predictors'),
         ('TaskResource', 'tasks/<int:task_id>'),
         ('TaskListResource', 'tasks')
     ])

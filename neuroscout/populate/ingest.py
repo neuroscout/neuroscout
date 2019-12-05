@@ -190,8 +190,8 @@ def add_task(task_name, dataset_name=None, local_path=None,
     stims_processed = {}
     """ Parse every Run """
     print("Parsing runs")
-    all_runs = layout.get(task=task_name, suffix='bold', extensions='.nii.gz',
-                          desc=None, **kwargs)
+    all_runs = layout.get(task=task_name, suffix='bold', extension='nii.gz',
+                          scope='raw', **kwargs)
     for img in progressbar(all_runs):
         """ Extract Run information """
         # Get entities
@@ -209,10 +209,10 @@ def add_task(task_name, dataset_name=None, local_path=None,
             entities['run'] = run_number
 
         # Get duration (helps w/ transformations)
-        if img.image is not None:
-            run_model.duration = img.image.shape[3] * \
-             img.image.header.get_zooms()[-1]
-        else:
+        try:
+            niimg = img.get_image()
+            run_model.duration = niimg.shape[3] * niimg.header.get_zooms()[-1]
+        except ValueError:
             run_model.duration = scan_length
 
         # Put back as int
@@ -226,7 +226,8 @@ def add_task(task_name, dataset_name=None, local_path=None,
             assert isfile(e)
 
         collection = layout.get_collections(
-            'run', scan_length=run_model.duration, **entities)[0]
+            'run', scan_length=run_model.duration, desc=None,
+            **entities)[0]
 
         if 'stim_file' in collection.variables:
             stims = collection.variables.pop('stim_file')
@@ -260,8 +261,9 @@ def add_task(task_name, dataset_name=None, local_path=None,
                 runstim, _ = get_or_create(
                     RunStimulus, stimulus_id=stim_model.id,
                     run_id=run_model.id,
-                    onset=stims.onset.tolist()[i],
-                    duration=stims.duration.tolist()[i])
+                    onset=stims.onset.tolist()[i])
+                runstim.duration = stims.duration.tolist()[i]
+                db.session.commit()
 
     """ Add GroupPredictors """
     print("Adding group predictors")

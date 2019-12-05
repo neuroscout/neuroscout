@@ -33,6 +33,11 @@ export const moveItem: MoveItem<any> = (array, index, direction) => {
   return newArray;
 };
 
+async function pres(res) {
+  // tslint:disable-next-line:no-console
+  console.log(await res);
+}
+
 export const _fetch = (path: string, options?: object) => {
   return fetch(path, options).then(response => {
       // Need to figure this response out. openLogin triggers modal to popup,
@@ -46,6 +51,7 @@ export const _fetch = (path: string, options?: object) => {
         throw new Error('Please Login Again');
       }
       if (response.status >= 400) {
+        pres(response);
         return { statusCode: response.status };
       } else {
         return response.json().then(json => {
@@ -69,18 +75,19 @@ export const _fetch = (path: string, options?: object) => {
 // Wrapper around the standard 'fetch' that takes care of:
 // - Adding jwt to request header
 // - Decoding JSON response and adding the response status code to decoded JSON object
-export const jwtFetch = (path: string, options?: object) => {
+export const jwtFetch = (path: string, options?: any, noCT?: boolean) => {
   const jwt = window.localStorage.getItem('jwt');
 
-  const newOptions = {
-    ...options,
-    headers: {
-      'Content-type': 'application/json',
-      Authorization: 'JWT ' + jwt,
-    }
-  };
+  if (!options) { options = {}; }
+  if (!options.headers) { options.headers = {}; }
 
-  return _fetch(path, newOptions);
+  options.headers.Authorization = 'JWT ' + jwt;
+
+  if (!options.headers['Content-type'] && !noCT) {
+    options.headers['Content-type'] = 'application/json';
+  }
+
+  return _fetch(path, options);
 };
 
 export const timeout = (ms: number) => {
@@ -97,4 +104,8 @@ export const reorder = (list: any[], startIndex: number, endIndex: number): any[
   result.splice(endIndex, 0, removed);
 
   return result;
+};
+
+export const isDefined = <T>(argument: T | undefined): argument is T => {
+    return argument !== undefined;
 };

@@ -6,9 +6,9 @@ import './css/App.css';
 import AnalysisList from './AnalysisList';
 import AnalysisBuilder from './analysis_builder/Builder';
 import { AppState } from './coretypes';
-import FAQ from './FAQ';
 import { NotFound } from './HelperComponents';
 import Home from './Home';
+import { PredictorCollectionList } from './predictor_collection/CollectionList';
 
 export default class Routes extends React.Component<AppState, {}> {
   render() {
@@ -34,7 +34,7 @@ export default class Routes extends React.Component<AppState, {}> {
                         updatedAnalysis={() => this.props.loadAnalyses()}
                         key={props.location.key}
                         datasets={this.props.datasets}
-                        doTour={this.props.auth.openTour} 
+                        doTour={this.props.auth.openTour}
               />;
             }
             message.warning('Please log in first and try again');
@@ -89,11 +89,14 @@ export default class Routes extends React.Component<AppState, {}> {
           />}
       />
       <Route
-        exact={true}
-        path="/faq"
-        render={() => <FAQ/>}
+        path="/mycollections"
+        render={props =>
+          <PredictorCollectionList
+            datasets={this.props.datasets}
+            collections={this.props.auth.predictorCollections}
+          />}
       />
-      <Route render={() => <NotFound/>} />
+      <Route component={NotFound} />
       </Switch>
     );
   }

@@ -145,8 +145,8 @@ export class ContrastsTab extends React.Component<ContrastsTabProps, ContrastsTa
       }
       let newContrast = emptyContrast();
       newContrast.Name = `${x.name}`;
-      newContrast.ConditionList = predictors.map(y => y.name);
-      newContrast.Weights = predictors.map(y => y.name === x.name ? 1 : 0);
+      newContrast.ConditionList = [ x.name ];
+      newContrast.Weights = [ 1 ];
       newContrasts.push(newContrast);
     });
     this.props.onSave(newContrasts);

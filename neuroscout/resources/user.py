@@ -1,5 +1,6 @@
 from flask_jwt import current_identity, jwt_required
 from flask_security.recoverable import reset_password_token_status
+import webargs as wa
 
 from flask_apispec import MethodResource, marshal_with, use_kwargs, doc
 from ..models.auth import User
@@ -8,21 +9,21 @@ from ..auth import register_user, reset_password, send_confirmation
 from .utils import abort, auth_required
 from ..utils.db import put_record
 from ..schemas.user import UserSchema, UserCreationSchema, UserResetSchema
+from ..schemas.predictor import PredictorSchema
+from .predictor import get_predictors
 
-# @doc(tags=['auth'])
+
 @marshal_with(UserSchema)
 class UserRootResource(MethodResource):
-    @doc(summary='Get current user information.')
+    @doc(tags=['user'], summary='Get current user information.')
     @auth_required
     def get(self):
         return current_identity
 
-    @doc(summary='Add a new user.')
     @use_kwargs(UserCreationSchema)
     def post(self, **kwargs):
         return register_user(**kwargs)
 
-    @doc(summary='Edit user information.')
     @use_kwargs(UserSchema)
     @auth_required
     def put(self, **kwargs):
@@ -32,12 +33,7 @@ class UserRootResource(MethodResource):
         return put_record(kwargs, current_identity)
 
 
-# @doc(tags=['auth'])
 class UserResendConfirm(MethodResource):
-    @doc(summary='Resend confirmation email.')
-    @doc(params={"authorization": {
-        "in": "header", "required": True,
-        "description": "Format:  JWT {authorization_token}"}})
     @jwt_required()
     def post(self):
         if send_confirmation(current_identity):
@@ -66,3 +62,23 @@ class UserResetSubmitResource(MethodResource):
             user.password = kwargs['password']
             db.session.commit()
             return {'message': 'Password reset succesfully.'}
+
+
+class UserPredictorListResource(MethodResource):
+    @doc(tags=['user'], summary='Get list of user predictors.',)
+    @use_kwargs({
+        'run_id': wa.fields.DelimitedList(
+            wa.fields.Int(), description="Run id(s). Warning, slow query."),
+        'name': wa.fields.DelimitedList(wa.fields.Str(),
+                                        description="Predictor name(s)"),
+        'newest': wa.fields.Boolean(
+            missing=True,
+            description="Return only newest Predictor by name")
+        },
+        locations=['query'])
+    @auth_required
+    @marshal_with(PredictorSchema(many=True))
+    def get(self, **kwargs):
+        newest = kwargs.pop('newest')
+        return get_predictors(newest=newest, user=current_identity,
+                              **kwargs)

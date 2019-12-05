@@ -3,9 +3,10 @@ import Reflux from 'reflux';
 
 var jwtDecode = require('jwt-decode');
 
+import { api } from './api';
 import { authActions } from './auth.actions';
 import { config } from './config';
-import { AuthStoreState } from './coretypes';
+import { ApiUser, AuthStoreState } from './coretypes';
 import { displayError } from './utils';
 
 const DOMAINROOT = config.server_url;
@@ -32,6 +33,8 @@ export class AuthStore extends Reflux.Store {
 
     let _email = localStorage.getItem('email');
     let email = _email == null ? undefined : _email;
+    let isGAuth = localStorage.getItem('isGAuth');
+    let avatar = localStorage.getItem('avatar');
 
     return { auth: {
       jwt: jwt ? jwt : '',
@@ -41,7 +44,7 @@ export class AuthStore extends Reflux.Store {
       loginError: '',
       signupError: '',
       resetError: '',
-      avatar: '',
+      avatar: avatar ? avatar : '',
       email: email,
       name: undefined,
       password: '',
@@ -51,7 +54,9 @@ export class AuthStore extends Reflux.Store {
       openEnterResetToken: false,
       loggingOut: false,
       token: null,
-      gAuth: null
+      gAuth: null, 
+      isGAuth: isGAuth,
+      predictorCollections: jwt ? this.loadPredictorCollections() : []
     }};
   }
 
@@ -98,11 +103,11 @@ export class AuthStore extends Reflux.Store {
   // Authenticate the user with the server. This function is called from login()
   authenticate(): Promise<string> {
     return new Promise((resolve, reject) => {
-      let { email, password } = this.state.auth;
+      let { email, password, avatar, isGAuth } = this.state.auth;
       let { accountconfirmError } = this;
       fetch(DOMAINROOT + '/api/auth', {
         method: 'post',
-        body: JSON.stringify({ email: email, password: password }),
+        body: JSON.stringify({ email: isGAuth === true ? 'GOOGLE' : email, password: password }),
         headers: {
           'Content-type': 'application/json'
         }
@@ -132,12 +137,16 @@ export class AuthStore extends Reflux.Store {
 
               } else {
                 message.success('Logged in.');
+
                 localStorage.setItem('jwt', token);
                 localStorage.setItem('email', email!);
-                response.json().then((user_data: {first_login: boolean}) => {
+                localStorage.setItem('avatar', avatar);
+                localStorage.setItem('isGAuth', isGAuth);
+                response.json().then((user_data: ApiUser) => {
                   this.update({ openTour: user_data.first_login });
+                  this.loadPredictorCollections(user_data);
                 });
-                resolve(token);
+                return resolve(token);
               }
             }).catch(displayError);
           }}
@@ -145,10 +154,28 @@ export class AuthStore extends Reflux.Store {
       });
     }
 
+  loadPredictorCollections = (user?: ApiUser) => {
+    (user ? Promise.resolve(user) : api.getUser()).then((_user: ApiUser): any => {
+      if (_user && _user.predictor_collections) {
+        let collections = _user.predictor_collections.map((x) => {
+          return api.getPredictorCollection(x.id);
+        });
+        return Promise.all(collections);
+      } else {
+        return [];
+      }
+    }).then((collections) => {
+      /* need to get dataset id from first predictor in each collection */
+      collections.sort((a, b) => { return b.id - a.id; });
+      this.update({predictorCollections: collections});
+    });
+  }
+
   // Log user in
   login = () => {
     return this.authenticate()
       .then((jwt: string) => {
+        this.loadPredictorCollections();
         this.update({
           jwt: jwt,
           password: '',
@@ -210,6 +237,8 @@ export class AuthStore extends Reflux.Store {
   logout = () => {
     localStorage.removeItem('jwt');
     localStorage.removeItem('email');
+    localStorage.removeItem('isGAuth');
+    localStorage.removeItem('avatar');
     this.update({
       loggedIn: false,
       name: undefined,

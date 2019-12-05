@@ -27,7 +27,9 @@ const DOMAINROOT = config.server_url;
 
 const { Content } = Layout;
 
-ReactGA.initialize(config.ga_key);
+if (config.ga_key) {
+  ReactGA.initialize(config.ga_key);
+}
 
 type JWTChangeProps = {
   loadAnalyses:  () => any;
@@ -45,6 +47,12 @@ class JWTChange extends React.Component<JWTChangeProps, {}> {
       props.loadAnalyses();
       checkCount += 1;
       props.checkAnalysesStatus(checkCount);
+    }
+  }
+
+  componentDidUpdate(prevProps, prevState) {
+    if (!!this.props.jwt && this.props.jwt !== prevProps.jwt) {
+      this.props.loadAnalyses();
     }
   }
 
@@ -192,7 +200,10 @@ class App extends Reflux.Component<any, {}, AppState> {
 
   componentDidUpdate(prevProps, prevState) {
     // Need to do this so logout redirect only happens once, otherwise it'd be an infinite loop
-    if (this.state.auth.loggingOut) authActions.update({ loggingOut: false });
+    if (this.state.auth.loggingOut) {
+      authActions.update({ loggingOut: false });
+      this.setState({analyses: []});
+    }
   }
 }
 

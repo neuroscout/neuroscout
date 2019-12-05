@@ -3,11 +3,16 @@
  */
 import { _fetch, displayError, jwtFetch } from './utils';
 import {
-  ApiDataset,
   ApiAnalysis,
+  ApiDataset,
+  ApiUpload,
+  ApiUser,
   AppAnalysis,
-  Dataset
+  Dataset,
+  Predictor,
+  Run
 } from './coretypes';
+//  PredictorCollection
 import { config } from './config';
 const domainRoot = config.server_url;
 
@@ -32,6 +37,10 @@ export const ApiToAppAnalysis = (data: ApiAnalysis): AppAnalysis => ({
 });
 
 export const api = {
+  getUser: (): Promise<ApiUser> => {
+    return jwtFetch(`${domainRoot}/api/user`);
+  },
+
   getDatasets:  (active_only = true): Promise<Dataset[]> => {
     return jwtFetch(`${domainRoot}/api/datasets?active_only=${active_only}`)
     .then(data => {
@@ -41,6 +50,35 @@ export const api = {
     .catch((error) => {
       displayError(error);
       return [] as Dataset[];
+    });
+  },
+
+  getPredictorCollection: (id: string): any => {
+    return jwtFetch(`${domainRoot}/api/predictors/collection?collection_id=${id}`);
+  },
+
+  postPredictorCollection: (formData: FormData): any => {
+    return jwtFetch(
+      `${domainRoot}/api/predictors/collection`,
+      {
+        headers: {'accept': 'application/json'},
+        method: 'POST',
+        body: formData 
+      },
+      true
+    );
+  },
+
+  getPredictor: (id: number): Promise<Predictor | null> => {
+    return jwtFetch(`${domainRoot}/api/predictors/${id}`);
+  },
+
+  getPredictors: (ids: (number[] | string[])): Promise<Predictor[] | null> => {
+    return jwtFetch(`${domainRoot}/api/predictors?run_id=${ids}`).then((data) => {
+      if (data.statusCode && data.statusCode === 422) {
+        return [] as Predictor[];
+      }
+      return data;
     });
   },
 
@@ -104,31 +142,40 @@ export const api = {
       });
   },
 
+  getRuns: (datasetId: string): Promise<Run[]> => {
+    return jwtFetch(`${domainRoot}/api/runs?dataset_id=${datasetId}`);
+  },
+
   getNVUploads: (analysisId: (string)): Promise<(any | null)> => {
     return jwtFetch(`${domainRoot}/api/analyses/${analysisId}/upload`)
-    .then(data => {
-      let uploads = { 
-        'last_failed': null as any,
-        'pending': null as any,
-        'ok': [] as any[]
-      };
+    .then((data: ApiUpload[]) => {
+      let uploads = [] as any[];
       if (data.length === 0) {
         return null;
       }
-      data.map(x => x.uploaded_at = x.uploaded_at.replace('T', ' '));
-      let failed = data.filter(x => x.status  === 'FAILED');
-      if (failed.length > 0) {
-        failed.sort((a, b) => b.uploaded_at.localeCompare(a.uploaded_at));
-        uploads.last_failed = failed[0];
-      }
-      uploads.ok = data.filter(x => x.status === 'OK');
-      if (uploads.ok.length === 0) {
-       let pending = data.filter(x => x.status  === 'PENDING');
-       if (pending.length > 0) {
-         failed.sort((a, b) => b.uploaded_at.localeCompare(a.uploaded_at));
-         uploads.pending = pending[0];
-       }
-      }
+
+      data.map(collection => {
+        let upload = {
+          failed: 0,
+          pending: 0,
+          ok: 0,
+          total: 0,
+          id: 0,
+          tracebacks: [] as (string | null)[]
+        };
+        let tracebacks = [...new Set(
+          collection.files.filter(x => x.status === 'FAILED').filter(x => x.traceback !== null).map(x => x.traceback)
+        )];
+        if (tracebacks !== null && tracebacks.length > 0) {
+          upload.tracebacks = tracebacks;
+        }
+        upload.total = collection.files.length;
+        upload.failed = collection.files.filter(x => x.status  === 'FAILED').length;
+        upload.ok = collection.files.filter(x => x.status === 'OK').length;
+        upload.pending = collection.files.filter(x => x.status === 'PENDING').length;
+        upload.id = collection.collection_id;
+        uploads.push(upload);
+      });
       return uploads;
     })
     .catch((error) => {

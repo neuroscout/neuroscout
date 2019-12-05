@@ -91,17 +91,6 @@ class AnalysisSchema(Schema):
         strict = True
 
 
-class AnalysisFullSchema(AnalysisSchema):
-    """ Analysis schema, with additional nested fields """
-    runs = fields.Nested(
-        RunSchema, many=True, description='Runs associated with analysis',
-        exclude=['dataset_id', 'task'], dump_only=True)
-
-    predictors = fields.Nested(
-        PredictorSchema, many=True, only=['id', 'name'],
-        description='Predictor id(s) associated with analysis', dump_only=True)
-
-
 class AnalysisResourcesSchema(Schema):
     """ Schema for Analysis resources. """
     preproc_address = fields.Nested(
@@ -120,6 +109,42 @@ class AnalysisCompiledSchema(Schema):
         description='Traceback of compilation error.')
 
 
+class NeurovaultFileUploadSchema(Schema):
+    level = fields.Str(
+        description='Image analysis level'
+    )
+    status = fields.Str(description='Upload status')
+    traceback = fields.Str(
+        description='Traceback of upload error.')
+
+
+class NeurovaultCollectionSchema(Schema):
+    """ Schema for report results """
+    uploaded_at = fields.Time(description='Time collections was created')
+    collection_id = fields.Dict(description='NeuroVault collection id')
+
+
+class NeurovaultCollectionSchemaStatus(NeurovaultCollectionSchema):
+    files = fields.Nested(
+        NeurovaultFileUploadSchema, many=True)
+
+
+class AnalysisFullSchema(AnalysisSchema):
+    """ Analysis schema, with additional nested fields """
+    runs = fields.Nested(
+        RunSchema, many=True, description='Runs associated with analysis',
+        exclude=['dataset_id', 'task'], dump_only=True)
+
+    predictors = fields.Nested(
+        PredictorSchema, many=True, only=['id', 'name'],
+        description='Predictor id(s) associated with analysis', dump_only=True)
+
+    neurovault_collections = fields.Nested(
+        NeurovaultCollectionSchema, many=True,
+        description="Neurovault Collections of analysis results"
+    )
+
+
 class ReportSchema(Schema):
     """ Schema for report results """
     generated_at = fields.Time(description='Time report was generated')
@@ -127,15 +152,6 @@ class ReportSchema(Schema):
     status = fields.Str(description='Report status')
     traceback = fields.Str(
         description='Traceback of generation error.')
-
-
-class NeurovaultCollectionSchema(Schema):
-    """ Schema for report results """
-    uploaded_at = fields.Time(description='Time images upload began')
-    collection_id = fields.Dict(description='NeuroVault collection id')
-    status = fields.Str(description='Upload status')
-    traceback = fields.Str(
-        description='Traceback of upload error.')
 
 
 class BibliographySchema(Schema):

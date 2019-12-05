@@ -14,7 +14,8 @@ var authActions = Reflux.createActions({
   'submitToken': {},
   'getInitialState': {},
   'updateFromInput': {},
-  'checkJWT': {}
+  'checkJWT': {},
+  'loadPredictorCollections': {}
 });
 
 export { authActions };

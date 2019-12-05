@@ -220,10 +220,12 @@ class BibliographyResource(MethodResource):
         bib = json.load(open(current_app.config['BIBLIOGRAPHY']))
 
         tools = [b['.*'] for k, b in bib.items()
-                 if k in ['nipype', 'neuroscout', 'fitlins', 'nipype', 'pliers']]
+                 if k in [
+                     'nipype', 'neuroscout', 'fitlins', 'nipype', 'pliers']]
         all_csl_json = tools.copy()
 
         dataset_entry = bib.get(analysis.dataset.name, [])
+        data = []
         if dataset_entry:
             data = [dataset_entry['.*']]
             all_csl_json += data

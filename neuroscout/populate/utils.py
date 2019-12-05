@@ -44,19 +44,3 @@ def hash_data(data):
     hasher.update(data)
 
     return hasher.hexdigest()
-
-
-def remote_resource_exists(base_address, resource, raise_exception=False,
-                 content_type='binary/octet-stream'):
-    """ Check if a remote address exists and content_type matches """
-    address = urllib.parse.urljoin(base_address, resource)
-    r = requests.head(address)
-    if not r.ok or r.headers.get('Content-Type') != content_type:
-        msg = "Remote resource {} not found".format(address)
-        if raise_exception:
-            raise ValueError(msg)
-        else:
-            warnings.warn(msg)
-            return False
-
-    return True

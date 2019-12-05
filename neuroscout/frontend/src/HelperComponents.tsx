@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Alert, Col, Divider, Icon, Row, Tag } from 'antd';
+import { Alert, Col, Divider, Icon, Row, Tag, Tooltip } from 'antd';
 import { createBrowserHistory } from 'history';
 
 // Simple space component to seperate buttons, etc.
@@ -82,3 +82,25 @@ export class NotFound extends React.Component<{}, {}> {
     );
   }
 }
+
+export const datasetColumns = [
+  {
+    title: 'Name',
+    dataIndex: 'name',
+    width: 130,
+    sorter: (a, b) => a.name.localeCompare(b.name),
+  },
+  { title: 'Description', dataIndex: 'description'},
+  { title: 'Author(s)', dataIndex: 'authors', width: 280,
+    render: (text) => {
+      if (text.length > 1) {
+        return (<Tooltip title={text.join(', ')}>{text[0]} ... {text[1]}</Tooltip>);
+      } else {
+        return (<>{text[0]}</>);
+      }
+    }
+  },
+  { dataIndex: 'url', width: 50,
+    render: text => <a href={text} target="_blank" rel="noopener"><Icon type="link" /></a>,
+  }
+];

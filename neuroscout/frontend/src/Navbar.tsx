@@ -26,16 +26,17 @@ class Navbar extends React.Component<AuthStoreState, {}> {
                   <Avatar
                     shape="circle"
                     icon="user"
-                    src={this.props.avatar ?
-                          this.props.avatar :
-                          this.props.gAuth ?  this.props.gAuth.profileObj.imageUrl : ''}
+                    src={this.props.avatar}
                     className="headerAvatar"
                   />
                 }
               >
-
                  <Menu.ItemGroup title={`${this.props.gAuth ? this.props.gAuth.profileObj.email : this.props.email}`}>
                    <Menu.Divider/>
+                   <Menu.Item key="predictorCollections">
+                     <Link to="/mycollections"> My Predictors </Link>
+                   </Menu.Item>
+
                    <Menu.Item
                     key="signout"
                     onClick={(e) => {return authActions.confirmLogout(); }}
@@ -58,19 +59,13 @@ class Navbar extends React.Component<AuthStoreState, {}> {
                    Sign in
                  </Menu.Item>
               }
-             <Menu.SubMenu
+             <Menu.Item
               style={{float: 'right'}}
               key="help"
-              title={<span><Icon type="question-circle"/>Help</span>}
              >
-               <Menu.Item
-                key="faq"
-               >
-                <Link to="/faq">
-                  FAQ
-                </Link>
-               </Menu.Item>
-             </Menu.SubMenu>
+               <a href="https://neuroscout.github.io/neuroscout/"><span>
+               <Icon type="question-circle"/>Help</span></a>
+             </Menu.Item>
 
              <Menu.SubMenu
               style={{float: 'right'}}
