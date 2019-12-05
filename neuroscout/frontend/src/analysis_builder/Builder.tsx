@@ -30,6 +30,7 @@ import {
   AnalysisConfig,
   Transformation,
   Contrast,
+  DummyContrast,
   Step,
   BidsModel,
   ImageInput,
@@ -86,7 +87,7 @@ let initializeStore = (): Store => ({
     config: defaultConfig,
     transformations: [],
     contrasts: [],
-    autoContrast: false,
+    dummyContrast: false,
     model: {
       Steps: [{
         Level: 'Run',
@@ -305,12 +306,16 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
 
     steps.push({
       Level: 'Subject',
-      AutoContrasts: 'FEMA'
+      DummyContrasts: {
+        Type: 'FEMA'
+      }
     });
 
     steps.push({
       Level: 'Dataset',
-      AutoContrasts: 't'
+      DummyContrasts: {
+        Type: 't'
+      }
     });
 
     if (this.state.analysis.hrfPredictorIds) {
@@ -495,7 +500,7 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
 
     // Extract transformations and contrasts from within step object of response.
     let contrasts;
-    let autoContrast;
+    let dummyContrast;
     let hrfPredictorIds: string[] = [];
     if (data && data.model && data.model.Steps) {
       for (var i = 0; i < data.model.Steps.length; i++) {
@@ -521,8 +526,8 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
           data.contrasts = data.model.Steps[i].Contrasts;
         }
 
-        if (data.model.Steps[i].AutoContrasts) {
-          autoContrast = data.model.Steps[i].AutoContrasts;
+        if (data.model.Steps[i].DummyContrasts) {
+          dummyContrast = data.model.Steps[i].DummyContrasts;
         }
       }
     }
@@ -545,7 +550,7 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
       transformations: data.transformations,
       contrasts: data.contrasts || [],
       model: data.model,
-      autoContrast: autoContrast,
+      dummyContrast: dummyContrast,
       private: data.private
     };
 
