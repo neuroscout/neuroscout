@@ -9,13 +9,12 @@ Currently, there are two supported options, the choice is yours!
 
 If you create an account with us, you'll be asked to validate your email, as usual.
 
-!!! Warning
-    Note that Google accounts are currently not supported by the Neuroscout API wrapper [pyNS](https://github.com/neuroscout/pyNS). To interact withe API using pyNS, create an account using email and password.
-
 
 !!! Note
     Accounts are linked using email addresses. Signing up twice using the same email address, will result in a single account.
 
+!!! Warning
+    Note that Google accounts are currently not supported by the Neuroscout API wrapper [pyNS](https://github.com/neuroscout/pyNS). To interact with the API using pyNS, create an account using email and password.
 
 Once you've logged in, launch the [analysis builder](builder.md) using the `New Analysis` navigation button.
 
