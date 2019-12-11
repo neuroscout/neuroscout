@@ -45,7 +45,7 @@ it('Overview tab renders without errors', () => {
     config: { smoothing: 10, predictorConfigs: {} },
     transformations: [],
     contrasts: [],
-    autoContrast: true
+    dummyContrast: true
   };
   mount(
     <OverviewTab

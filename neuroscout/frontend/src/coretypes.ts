@@ -23,7 +23,7 @@ export interface Analysis {
   transformations: Transformation[];
   contrasts: Contrast[];
   model?: BidsModel;
-  autoContrast: boolean;
+  dummyContrast: boolean;
 }
 
 // Normalized dataset object in Analysis Builder
@@ -235,7 +235,7 @@ export interface Step {
   Transformations?: Transformation[];
   Contrasts?: Contrast[];
   Level: string;
-  AutoContrasts?: boolean;
+  DummyContrasts?: object;
 }
 
 export interface StepModel {

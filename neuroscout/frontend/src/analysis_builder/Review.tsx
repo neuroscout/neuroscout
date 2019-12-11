@@ -55,12 +55,12 @@ class ModelInput extends React.Component<{model: BidsModel}, {}> {
 }
 
 /* Object needs to have name as a key  */
-class ReviewObjects extends React.Component<{input: (Transformation | Contrast)[], autoContrasts?: boolean}, {}> {
+class ReviewObjects extends React.Component<{input: (Transformation | Contrast)[], dummyContrasts?: object}, {}> {
   render() {
     let input = this.props.input;
     let display: any[] = [];
-    if (this.props.autoContrasts !== undefined) {
-      display.push(<div key="ac"><h3>Auto Contrasts:</h3>{'' + this.props.autoContrasts}</div>);
+    if (this.props.dummyContrasts !== undefined) {
+      display.push(<div key="ac"><h3>Auto Contrasts:</h3>{'' + this.props.dummyContrasts}</div>);
     }
     input.map((x, i) => display.push(<div key={i}><h3>{x.Name}:</h3><pre>{JSON.stringify(x, null, 2)}</pre></div>));
 
@@ -154,9 +154,9 @@ export class Review extends React.Component<ReviewProps, {}> {
       contrasts = Steps[0].Contrasts!;
     }
 
-    let autoContrasts: boolean = false;
-    if (Steps && Steps[0] && Steps[0].AutoContrasts) {
-      autoContrasts = Steps[0].AutoContrasts!;
+    let dummyContrasts: object = {};
+    if (Steps && Steps[0] && Steps[0].DummyContrasts) {
+      dummyContrasts = Steps[0].DummyContrasts!;
     }
 
     return (
@@ -172,7 +172,7 @@ export class Review extends React.Component<ReviewProps, {}> {
         </Panel>
         <Panel header="Transformations" key="xforms"><ReviewObjects input={xforms}/></Panel>
         <Panel header="Contrasts" key="contrasts">
-          <ReviewObjects input={contrasts} autoContrasts={autoContrasts}/>
+          <ReviewObjects input={contrasts} dummyContrasts={dummyContrasts}/>
         </Panel>
         <Panel header="BIDS StatsModel" key="model"><pre>{JSON.stringify(this.props.model, null, 2)}</pre></Panel>
         </Collapse>
