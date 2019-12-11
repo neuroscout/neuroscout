@@ -55,7 +55,7 @@ class ModelInput extends React.Component<{model: BidsModel}, {}> {
 }
 
 /* Object needs to have name as a key  */
-class ReviewObjects extends React.Component<{input: (Transformation | Contrast)[], dummyContrasts?: string}, {}> {
+class ReviewObjects extends React.Component<{input: (Transformation | Contrast)[], dummyContrasts?: object}, {}> {
   render() {
     let input = this.props.input;
     let display: any[] = [];
@@ -154,7 +154,7 @@ export class Review extends React.Component<ReviewProps, {}> {
       contrasts = Steps[0].Contrasts!;
     }
 
-    let dummyContrasts: string = '';
+    let dummyContrasts: object = {};
     if (Steps && Steps[0] && Steps[0].DummyContrasts) {
       dummyContrasts = Steps[0].DummyContrasts!;
     }
