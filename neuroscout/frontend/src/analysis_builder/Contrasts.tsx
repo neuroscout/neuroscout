@@ -239,7 +239,7 @@ export class ContrastsTab extends React.Component<ContrastsTabProps, ContrastsTa
         </Button>
         <p />
         <Button type="default" onClick={this.addDummyContrasts}>
-          <Icon type="plus" /> Generate Automatic Contrasts
+          <Icon type="plus" /> Generate Dummy Contrasts
         </Button>
       </div>
     );
