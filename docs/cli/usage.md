@@ -13,7 +13,7 @@ Neuroscout will download the necessary images, analysis bundle, and fit your mod
 
 ## Mounting Volumes
 
-Most likely, you'll want to mount at least two volumes , in order to cache input data (`/data`), and inspect output results (`/out`)
+Most likely, you'll want to mount at least two volumes , in order to cache input data (`/data`), and inspect output results (`/out`). Note that you need to specify absolute paths for both directories.
 
 In this example, we mount both of these directories to local volumes:
 
