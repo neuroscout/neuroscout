@@ -2,7 +2,7 @@
   "LearningTemporalStructure": {
     "preproc_address": "https://github.com/neuroscout-datasets/LearningTemporalStructure.git",
     "path": "/datasets/raw/ds001545/",
-    "summary": "Passiving watching of three clips from the movie 'The Grand Budapest Hotel', six times each",
+    "summary": "Passive watching of three clips from the movie 'The Grand Budapest Hotel', six times each",
     "url": "https://openneuro.org/datasets/ds001545",
     "tasks": {
       "movie": {
