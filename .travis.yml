@@ -22,7 +22,7 @@ matrix:
         - CI="true"
         - python -m pliers.support.download
       before_install:
-        - sudo add-apt-repository -y ppa:jonathonf/ffmpeg-4 && sudo apt-get -qq update && sudo apt-get install -y ffmpeg
+        - sudo apt-get install libavformat-dev libavfilter-dev libavdevice-dev ffmpeg
         - bash <(wget -q -O- http://neuro.debian.net/_files/neurodebian-travis.sh)
         - curl -sL https://deb.nodesource.com/setup_11.x | sudo bash -
         - curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | sudo apt-key add -
