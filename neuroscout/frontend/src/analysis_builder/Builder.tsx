@@ -35,7 +35,6 @@ import {
   AnalysisConfig,
   Transformation,
   Contrast,
-  DummyContrast,
   Step,
   BidsModel,
   ImageInput,
