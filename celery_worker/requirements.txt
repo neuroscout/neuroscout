@@ -1,7 +1,6 @@
 altair
 grabbit
 docopt
--e git+https://github.com/bids-standard/pybids.git#egg=pybids
 -e git+https://github.com/neurolearn/pynv#egg=pynv
 matplotlib
 nistats
@@ -22,4 +21,4 @@ SQLAlchemy==1.3.0
 Flask-Caching==1.3.3
 flask_jwt
 sentry-sdk==0.13.0
-
+pybids==0.10.0

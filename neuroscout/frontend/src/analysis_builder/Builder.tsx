@@ -90,7 +90,7 @@ let initializeStore = (): Store => ({
     config: defaultConfig,
     transformations: [],
     contrasts: [],
-    autoContrast: false,
+    dummyContrast: false,
     model: {
       Steps: [{
         Level: 'Run',
@@ -302,23 +302,24 @@ export default class AnalysisBuilder extends Reflux.Component<any, BuilderProps 
         Level: 'Run',
         Transformations: this.state.analysis.transformations,
         Contrasts: this.state.analysis.contrasts,
-        AutoContrasts: this.state.analysis.autoContrast,
         Model: {
           X: X,
         }
       }
     ];
 
-    if (runs.length > 1) {
-      steps.push({
-        Level: 'Subject',
-        AutoContrasts: true
-      });
-    }
+    steps.push({
+      Level: 'Subject',
+      DummyContrasts: {
+        Type: 'FEMA'
+      }
+    });
 
     steps.push({
       Level: 'Dataset',
-      AutoContrasts: true
+      DummyContrasts: {
+        Type: 't'
+      }
     });
 
     if (this.state.analysis.hrfPredictorIds) {
@@ -503,7 +504,7 @@ export default class AnalysisBuilder extends Reflux.Component<any, BuilderProps 
 
     // Extract transformations and contrasts from within step object of response.
     let contrasts;
-    let autoContrast;
+    let dummyContrast;
     let hrfPredictorIds: string[] = [];
     if (data && data.model && data.model.Steps) {
       for (var i = 0; i < data.model.Steps.length; i++) {
@@ -529,8 +530,8 @@ export default class AnalysisBuilder extends Reflux.Component<any, BuilderProps 
           data.contrasts = data.model.Steps[i].Contrasts;
         }
 
-        if (data.model.Steps[i].AutoContrasts) {
-          autoContrast = data.model.Steps[i].AutoContrasts;
+        if (data.model.Steps[i].DummyContrasts) {
+          dummyContrast = data.model.Steps[i].DummyContrasts;
         }
       }
     }
@@ -553,7 +554,7 @@ export default class AnalysisBuilder extends Reflux.Component<any, BuilderProps 
       transformations: data.transformations,
       contrasts: data.contrasts || [],
       model: data.model,
-      autoContrast: autoContrast,
+      dummyContrast: dummyContrast,
       private: data.private
     };
 

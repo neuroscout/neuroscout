@@ -4,9 +4,9 @@ In this tab, you can define contrasts to compute at the first-level after the de
 
 As there are often no experimental conditions in naturalistic studies, it often makes the most sense to simply propagate the individual estimates for each predictor of interest (e.g. non-confounds).
 
-We can achieve this using "Dummy" auto-contrasts, in which each Predictor is given a dummy-coded contrast of the same name.
+We can achieve this using "dummy contrasts", in which each Predictor is given a dummy-coded contrast of the same name.
 
-To do this for all non-confounds, simply click `Generate Auto Contrasts`.
+To do this for all non-confounds, simply click `Generate Dummy Contrasts`.
 
 ![auto_contrasts](img/contrasts.png)
 
