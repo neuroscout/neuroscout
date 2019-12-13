@@ -13,15 +13,14 @@ Neuroscout will download the necessary images, analysis bundle, and fit your mod
 
 ## Mounting Volumes
 
-Most likely, you'll want to mount at least two volumes , in order to cache input data (`/data`), and inspect output results (`/out`). Note that you need to specify absolute paths for both directories.
+Most likely, you'll want to mount at least two volumes, in order to cache input data (`/work`), and inspect output results (`/out`). 
 
 In this example, we mount both of these directories to local volumes:
 
-    docker run -it -v /local/datadir:/data -v /local/outdir:/out neuroscout/neuroscout-cli run /out 5xH937f
+    docker run -it -v /local/datadir:/work -v /local/outdir:/out neuroscout/neuroscout-cli run /out 5xH937f
 
-The necessary dataset will be downloaded to your local volume (`/local/datadir`), and next time you run a model with the same dataset, it will not need to re-download the fMRI data.
-The model-fitting outputs will also be locally saved at `/local/outdir`.
-
+In this command, the path preceding `:/work` specifies the directory where the data will be stored (i.e. your local volume `/local/datadir`). The next time you run a model with the same dataset, it will not need to re-download the fMRI data. The path preceding `:/out` specifies the directory where the model-fitting outputs will be saved (`/local/outdir`). </br>
+Note that you need to specify **absolute paths** for both directories.
 
 ## Command-Line Arguments
 
