@@ -3,11 +3,11 @@
 This assumes that you are using the Docker Container.
 Docker commands for _neuroscout-cli_ will always being with:
 
-    docker run -it
+    docker run -it --rm
 
 Assuming you've already created an analysis on neuroscout.org, and have its analysis id (e.g.: `5xH93`), you can run it in one line:
 
-    docker run -it neuroscout/neuroscout-cli run /outdir 5xH93
+    docker run -it --rm neuroscout/neuroscout-cli run /out 5xH93
 
 Neuroscout will download the necessary images, analysis bundle, and fit your model.
 
@@ -17,7 +17,7 @@ Most likely, you'll want to mount at least two volumes, in order to cache input 
 
 In this example, we mount both of these directories to local volumes:
 
-    docker run -it -v /local/datadir:/work -v /local/outdir:/out neuroscout/neuroscout-cli run /out 5xH937f
+    docker run -it --rm -v /local/datadir:/work -v /local/outdir:/out neuroscout/neuroscout-cli run /out 5xH937f
 
 In this command, the path preceding `:/work` specifies the directory where the data will be stored (i.e. your local volume `/local/datadir`). The next time you run a model with the same dataset, it will not need to re-download the fMRI data. The path preceding `:/out` specifies the directory where the model-fitting outputs will be saved (`/local/outdir`). </br>
 Note that you need to specify **absolute paths** for both directories.
