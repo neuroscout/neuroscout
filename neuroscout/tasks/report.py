@@ -8,7 +8,7 @@ from .utils.viz import plot_design_matrix, plot_corr_matrix, sort_dm
 from .utils.io import (
     dump_analysis, update_record, PathBuilder, write_jsons, write_tarball)
 
-MIN_CLI_VERSION = '0.3'
+MIN_CLI_VERSION = '0.3.3'
 
 
 def compile(flask_app, hash_id, run_ids=None, build=False):
