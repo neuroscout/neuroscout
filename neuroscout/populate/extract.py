@@ -120,10 +120,10 @@ def extract_features(dataset_name, task_name, extractors):
         db.session.commit()
 
     return create_predictors([ef for ef in ext_feats.values() if ef.active],
-                             dataset_name)
+                             dataset_name, task_name)
 
 
-def create_predictors(features, dataset_name, run_ids=None,
+def create_predictors(features, dataset_name, task_name, run_ids=None,
                       percentage_include=.9):
     """ Create Predictors from Extracted Features.
         Args:
@@ -135,6 +135,7 @@ def create_predictors(features, dataset_name, run_ids=None,
     print("Creating predictors")
 
     dataset = Dataset.query.filter_by(name=dataset_name).one()
+    task = Task.query.filter_by(name=task_name).one()
 
     # Create/Get Predictors
     all_preds = []
@@ -145,7 +146,7 @@ def create_predictors(features, dataset_name, run_ids=None,
                 set([ee.stimulus_id for ee in ef.extracted_events]))).\
                 distinct('run_id')
 
-        if unique_runs.count() / len(dataset.runs) > percentage_include:
+        if unique_runs.count() / len(task.runs) > percentage_include:
             all_preds.append(get_or_create(
                 Predictor, name=ef.feature_name, description=ef.description,
                 dataset_id=dataset.id,
