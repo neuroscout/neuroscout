@@ -1,6 +1,6 @@
 """" Custom transformations of extracted features """
 from ..models import (Dataset, ExtractedFeature, ExtractedEvent,
-                    Stimulus, RunStimulus, Run, Task)
+                      Stimulus, RunStimulus, Run, Task)
 from ..database import db
 from flask import current_app
 from sqlalchemy import func
@@ -9,10 +9,12 @@ from .extract import create_predictors
 import pandas as pd
 import json
 
+
 class Postprocessing(object):
     """ Functions applied to one or more ExtractedFeatures """
     def __init__(self, dataset_name, task_name=None):
         self.dataset_name = dataset_name
+        self.task_name = task_name
 
         ef_ids = db.session.query(func.max(ExtractedFeature.id)).join(
                 ExtractedEvent).join(Stimulus).join(Dataset).filter_by(
@@ -92,27 +94,31 @@ class Postprocessing(object):
         # Query EFs
         efs = self.efs.filter_by(**filter)
 
-        # Create EF
-        ext_name = efs.first().extractor_name
+        if efs.count() > 0:
+            # Create EF
+            ext_name = efs.first().extractor_name
 
-        new_ef = ExtractedFeature(
-            extractor_name=ext_name, feature_name=new_name,
-            active=True, sha1_hash=hash_data(ext_name + new_name),
-            transformed=True,
-            **self._get_annotations(new_name, ext_name))
-        db.session.add(new_ef)
-        db.session.commit()
+            new_ef = ExtractedFeature(
+                extractor_name=ext_name, feature_name=new_name,
+                active=True, sha1_hash=hash_data(ext_name + new_name),
+                transformed=True,
+                **self._get_annotations(new_name, ext_name))
+            db.session.add(new_ef)
+            db.session.commit()
 
-        # Apply function, get new EE values, and create models
-        ee_results = getattr(self, function)(self._ef_to_df(efs), **func_args)
+            # Apply function, get new EE values, and create models
+            ee_results = getattr(self, function)(
+                self._ef_to_df(efs), **func_args)
 
-        # Create EEs and predictor
-        db.session.bulk_save_objects(
-            [ExtractedEvent(ef_id=new_ef.id, **ee) for ee in ee_results]
-            )
-        db.session.commit()
+            # Create EEs and predictor
+            db.session.bulk_save_objects(
+                [ExtractedEvent(ef_id=new_ef.id, **ee) for ee in ee_results]
+                )
+            db.session.commit()
 
-        # Create Predictors from EFs
-        create_predictors([new_ef], self.dataset_name)
+            # Create Predictors from EFs
+            create_predictors([new_ef], self.dataset_name, self.task_name)
 
-        return new_ef.id
+            return new_ef.id
+        else:
+            print(f"No EFs match transformation {function}")
