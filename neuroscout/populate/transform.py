@@ -118,3 +118,5 @@ class Postprocessing(object):
             create_predictors([new_ef], self.dataset_name)
 
             return new_ef.id
+        else:
+            print(f"No EFs match transformation {function}")
