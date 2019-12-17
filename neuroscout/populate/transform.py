@@ -1,6 +1,6 @@
 """" Custom transformations of extracted features """
 from ..models import (Dataset, ExtractedFeature, ExtractedEvent,
-                    Stimulus, RunStimulus, Run, Task)
+                      Stimulus, RunStimulus, Run, Task)
 from ..database import db
 from flask import current_app
 from sqlalchemy import func
@@ -9,10 +9,12 @@ from .extract import create_predictors
 import pandas as pd
 import json
 
+
 class Postprocessing(object):
     """ Functions applied to one or more ExtractedFeatures """
     def __init__(self, dataset_name, task_name=None):
         self.dataset_name = dataset_name
+        self.task_name = task_name
 
         ef_ids = db.session.query(func.max(ExtractedFeature.id)).join(
                 ExtractedEvent).join(Stimulus).join(Dataset).filter_by(
@@ -115,7 +117,7 @@ class Postprocessing(object):
             db.session.commit()
 
             # Create Predictors from EFs
-            create_predictors([new_ef], self.dataset_name)
+            create_predictors([new_ef], self.dataset_name, self.task_name)
 
             return new_ef.id
         else:
