@@ -24,12 +24,8 @@ matrix:
       before_install:
         - sudo apt-get install libavformat-dev libavfilter-dev libavdevice-dev ffmpeg
         - bash <(wget -q -O- http://neuro.debian.net/_files/neurodebian-travis.sh)
-        - curl -sL https://deb.nodesource.com/setup_11.x | sudo bash -
-        - curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | sudo apt-key add -
-        - echo "deb https://dl.yarnpkg.com/debian/ stable main" | sudo tee /etc/apt/sources.list.d/yarn.list
         - sudo apt-get -qq update
         - sudo apt-get install -yq git-annex-standalone tesseract-ocr
-        - sudo apt-get install -yq nodejs yarn
 
       after_success:
         - bash <(curl -s https://codecov.io/bash)
