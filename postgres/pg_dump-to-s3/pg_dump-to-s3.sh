@@ -1,5 +1,5 @@
 #!/bin/bash
-PATH=/usr/lib/postgresql/9.6/bin/:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+PATH=/usr/lib/postgresql/12/bin/:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 
 set -e
 
