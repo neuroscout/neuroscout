@@ -42,10 +42,10 @@ class Plots extends React.Component<{plots: any[], corr_plots: any[]}, {}> {
       this.props.plots.map((x, i) => {
         let spec = x;
         display.push(
-          <TabPane tab="First run" key={'' + i}>
+          <TabPane tab={'First Run'} key={'' + i}>
             <Collapse bordered={false} defaultActiveKey={['dm']}>
              <Panel header="Design Matrix" key="dm">
-              <VegaPlot spec={spec}/>
+              <VegaPlot spec={this.props.plots[i]}/>
              </Panel>
              <Panel header="Correlation Matrix" key="cm">
               <VegaPlot spec={this.props.corr_plots[i]}/>
@@ -138,13 +138,15 @@ export class Report extends React.Component<ReportProps, ReportState> {
     if (this.state.reportsLoaded === true) {
       return;
     }
+
     let state = {...this.state};
-    jwtFetch(`${domainRoot}/api/analyses/${id}/report`)
+    jwtFetch(`${domainRoot}/api/analyses/${id}/report?run_id=${this.state.selectedRunIds}`)
     .then((res) => {
       if (res.status === 'OK') {
         if (res.result === undefined) {
           return;
         }
+
         state.matrices = res.result.design_matrix;
         state.plots = res.result.design_matrix_plot;
         state.corr_plots = res.result.design_matrix_corrplot;
@@ -156,13 +158,15 @@ export class Report extends React.Component<ReportProps, ReportState> {
         }
       } else if (res.status === 'FAILED') {
         state.reportTraceback = res.traceback;
+        this.setState({reportsPosted: true});
       } else if (res.statusCode === 404 && !this.state.reportsPosted) {
         this.generateReport();
-        this.setState({reportsPosted: true});
+        this.setState({reportsPosted: true, reportsLoaded: false});
         return;
       } else {
         return;
       }
+      
       state.reportsLoaded = true;
       this.setState({...state});
     });
@@ -188,15 +192,18 @@ export class Report extends React.Component<ReportProps, ReportState> {
     }
   }
 
-  componentWillReceiveProps(nextProps: ReportProps) {
-    if (nextProps.postReports) {
+  componentDidUpdate(prevProps, prevState) {
+    if (prevProps.postReports === false && this.props.postReports === true) {
       this.setState(
         {
           reportsLoaded: false,
           reportsPosted: false,
         },
-        () => this.checkReportStatus()
       );
+      this.checkReportStatus();
+    }
+    if (prevState.reportsLoaded === true && this.state.reportsLoaded === false) {
+      this.checkReportStatus();
     }
   }
 
