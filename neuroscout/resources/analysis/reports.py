@@ -121,7 +121,7 @@ def _save_file(file, collection_id):
 
 
 def _create_collection(analysis, force=False):
-    collection_name = analysis.name
+    collection_name = f"{analysis.name} - {analysis.hash_id}"
     if force is True:
         timestamp = datetime.datetime.utcnow().strftime(
             '%Y-%m-%d_%H:%M')
