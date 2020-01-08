@@ -1219,12 +1219,12 @@ export default class AnalysisBuilder extends Reflux.Component<any, BuilderProps 
                   <br/>
                 </TabPane>}
                 <TabPane tab="Review" key="review" disabled={((!reviewActive || !analysis.analysisId) && isDraft)}>
-                  {this.state.model &&
+                  {this.state.model && this.state.activeTab === ('review' as TabName) &&
                     <div>
                       <Report
                         analysisId={analysis.analysisId}
                         runIds={analysis.runIds}
-                        postReports={this.state.postReports}
+                        postReports={this.state.activeTab === ('review' as TabName)}
                         defaultVisible={this.state.doTooltip && this.state.activeTab === ('review' as TabName)}
                       />
                       <Review
