@@ -1,4 +1,4 @@
-FROM postgres:latest
+FROM postgres:12
 RUN apt-get update && apt-get install -y dos2unix
 RUN apt-get install -yq python-pip python-dev build-essential
 RUN pip install awscli

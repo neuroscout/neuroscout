@@ -5,12 +5,23 @@
     "summary": "Audio/visual presentation of Sherlock and Merlin TV episodes",
     "url": "https://openneuro.org/datasets/ds001110",
     "tasks": {
+      "SherlockMovie": {
+	"summary": "AV Presentation: Sherlock Episode",
+        "converters": [
+        ],
+        "extractors": [
+["GoogleVisionAPISafeSearchExtractor", {}]
+        ],
+        "transformations": [
+        ]
+      },
       "MerlinMovie": {
         "summary": "AV Presentation: Merlin Episode",
         "converters": [
         ],
         "extractors": [
-            ["LengthExtractor", {}]
+["GoogleVisionAPISafeSearchExtractor", {}]
+
         ],
         "transformations": [
         ]

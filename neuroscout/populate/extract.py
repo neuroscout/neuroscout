@@ -135,7 +135,7 @@ def create_predictors(features, dataset_name, task_name, run_ids=None,
     print("Creating predictors")
 
     dataset = Dataset.query.filter_by(name=dataset_name).one()
-    task = Task.query.filter_by(name=task_name).one()
+    task = Task.query.filter_by(name=task_name, dataset_id=dataset.id).one()
 
     # Create/Get Predictors
     all_preds = []
