@@ -1066,6 +1066,7 @@ export default class AnalysisBuilder extends Reflux.Component<any, BuilderProps 
       unsavedChanges
     } = this.state;
 
+    let reportRuns = this.state.availableRuns.filter(x => this.state.analysis.runIds.find(runId => runId === x.id));
     let isDraft = (analysis.status === 'DRAFT');
     let isFailed = (analysis.status === 'FAILED');
     let isEditable = editableStatus.includes(analysis.status);
@@ -1223,7 +1224,7 @@ export default class AnalysisBuilder extends Reflux.Component<any, BuilderProps 
                     <div>
                       <Report
                         analysisId={analysis.analysisId}
-                        runIds={analysis.runIds}
+                        runs={reportRuns}
                         postReports={this.state.activeTab === ('review' as TabName)}
                         defaultVisible={this.state.doTooltip && this.state.activeTab === ('review' as TabName)}
                       />

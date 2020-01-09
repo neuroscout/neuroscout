@@ -129,3 +129,17 @@ pre {
   height: 32px;
   padding: 0px 15px;
 } 
+
+.plotRunSelectorContainer {
+    display: flex;
+    margin: 10px 0;
+}
+
+.plotRunSelector {
+    flex: 1;
+}
+
+.plotRunSelectorBtn {
+    margin: 0 0 0 10px;
+    float: right;
+}

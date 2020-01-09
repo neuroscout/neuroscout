@@ -1,14 +1,16 @@
 import * as React from 'react';
-import { Tabs, Collapse, Card, Tooltip, Icon, Spin } from 'antd';
+import { Button, Tabs, Collapse, Card, Tooltip, Icon, Select, Spin } from 'antd';
 import vegaEmbed from 'vega-embed';
 
 import { config } from '../config';
 import { jwtFetch, timeout } from '../utils';
 
+import { Run } from '../coretypes';
 const domainRoot = config.server_url;
 
 const TabPane = Tabs.TabPane;
 const Panel = Collapse.Panel;
+const { Option } = Select;
 
 class VegaPlot extends React.Component<{spec: string}, {}> {
   vegaContainer;
@@ -30,7 +32,7 @@ class VegaPlot extends React.Component<{spec: string}, {}> {
 
 }
 
-class Plots extends React.Component<{plots: any[], corr_plots: any[]}, {}> {
+class Plots extends React.Component<{plots: any[], corr_plots: any[], runTitles: string[]}, {}> {
     plotContainer;
     constructor(props) {
       super(props);
@@ -42,7 +44,7 @@ class Plots extends React.Component<{plots: any[], corr_plots: any[]}, {}> {
       this.props.plots.map((x, i) => {
         let spec = x;
         display.push(
-          <TabPane tab={'First Run'} key={'' + i}>
+          <TabPane tab={this.props.runTitles[i]} key={'' + i}>
             <Collapse bordered={false} defaultActiveKey={['dm']}>
              <Panel header="Design Matrix" key="dm">
               <VegaPlot spec={this.props.plots[i]}/>
@@ -76,7 +78,7 @@ class Tracebacks extends React.Component<{reportTraceback: string, compileTraceb
 
 interface ReportProps {
   analysisId?: string;
-  runIds: string[];
+  runs: Run[];
   postReports: boolean;
   defaultVisible: boolean;
 }
@@ -93,6 +95,7 @@ interface ReportState {
   compileLoaded: boolean;
   status?: string;
   selectedRunIds: string[];
+  runTitles: string[];
 }
 
 export class Report extends React.Component<ReportProps, ReportState> {
@@ -108,7 +111,8 @@ export class Report extends React.Component<ReportProps, ReportState> {
       compileLoaded: false,
       reportTraceback: '',
       compileTraceback: '',
-      selectedRunIds: [this.props.runIds[0]]
+      selectedRunIds: ['' + this.props.runs[0].id],
+      runTitles: [this.formatRun(this.props.runs[0])]
     };
     this.state = state;
   }
@@ -172,6 +176,14 @@ export class Report extends React.Component<ReportProps, ReportState> {
     });
   }
 
+  updateSelectedRunIds = (values: string[]) => {
+    let runTitles =  this.props.runs.filter(x => values.includes('' + x.id)).map(x => this.formatRun(x));
+    this.setState({
+      selectedRunIds: values,
+      runTitles: runTitles
+    });
+  }
+
   componentDidMount() {
     if (this.state.reportsLoaded === false) {
       this.checkReportStatus();
@@ -207,24 +219,80 @@ export class Report extends React.Component<ReportProps, ReportState> {
     }
   }
 
+  updateReports = () => {
+    this.setState(
+      {
+        reportsLoaded: false,
+        reportsPosted: false
+      }
+    );
+  }
+ 
+  formatRun = (run: Run) => {
+    let ret = '';
+    if (!!run.number) {
+      ret = ret.concat('Run - ', run.number, ' ');
+    }
+    if (!!run.session) {
+      ret = ret.concat('Session - ', run.session, ' ');
+    }
+    if (!!run.subject) {
+      ret = ret.concat('subject - ', run.subject, ' ');
+    }
+    if (ret === '') {
+      ret = run.id;
+    }
+    return ret;
+  }
+
   render() {
+    const runIdsOptions: JSX.Element[] = [];
+    this.props.runs.map(x => runIdsOptions.push(<Option key={'' + x.id}>{this.formatRun(x)}</Option>));
+    const cardTitle = (
+      <>
+          Design Reports
+      </>
+    );
+    const cardExtra = (
+      <>
+        <Tooltip
+          title={'Here you can preview the final design and correlation matrices. \
+          \nClick on the design matrix columns to view the timecourse in detail.'}
+          defaultVisible={this.props.defaultVisible}
+        >
+          <Icon type="info-circle" style={{ fontSize: '15px'}}/>
+        </Tooltip>
+      </>
+    );
+
     return (
       <div>
         <Card
-         title="Design Report"
-         extra={
-           <Tooltip
-            title={'Here you can preview the final design and correlation matrices. \
-            \nClick on the design matrix columns to view the timecourse in detail.'}
-            defaultVisible={this.props.defaultVisible}
-           >
-             <Icon type="info-circle" style={{ fontSize: '15px'}}/>
-           </Tooltip>
-           }
+         title={cardTitle}
+         extra={cardExtra}
          key="plots"
         >
           <Spin spinning={!this.state.reportsLoaded}>
-            <Plots plots={this.state.plots} corr_plots={this.state.corr_plots} />
+            <div className="plotRunSelectorContainer">
+              <Select
+                mode="multiple"
+                onChange={this.updateSelectedRunIds}
+                defaultValue={this.state.selectedRunIds}
+                className="plotRunSelector"
+              >
+                {runIdsOptions}
+              </Select>
+              <Button
+                onClick={this.updateReports}
+                loading={!this.state.reportsLoaded}
+                type="primary"
+                className="plotRunSelectorBtn"
+              >
+                Get Reports
+              </Button>
+            </div>
+
+            <Plots plots={this.state.plots} corr_plots={this.state.corr_plots} runTitles={this.state.runTitles}/>
           </Spin>
         </Card>
         <br/>
