@@ -103,6 +103,7 @@ interface ReportState {
 export class Report extends React.Component<ReportProps, ReportState> {
   constructor(props) {
     super(props);
+    this._timer = null;
     let state: ReportState = {
       matrices: [],
       plots: [],
@@ -119,6 +120,8 @@ export class Report extends React.Component<ReportProps, ReportState> {
     this.state = state;
   }
 
+  _timer: any = null;
+
   generateReport = (): void => {
     let id = this.props.analysisId;
     let url = `${domainRoot}/api/analyses/${id}/report?run_id=${this.state.selectedRunIds}`;
@@ -128,9 +131,18 @@ export class Report extends React.Component<ReportProps, ReportState> {
   };
 
   checkReportStatus = async () => {
-    while (!this.state.reportsLoaded) {
-      this.loadReports();
-      await timeout(3000);
+    if (this._timer === null) {
+      this._timer = setInterval(
+        () => {
+          if (this.state.reportsLoaded) {
+            clearInterval(this._timer);
+            this._timer = null;
+          } else {
+            this.loadReports();
+          }
+        },
+        4000
+      );
     }
   };
 
@@ -217,6 +229,11 @@ export class Report extends React.Component<ReportProps, ReportState> {
     if (prevState.reportsLoaded === true && this.state.reportsLoaded === false) {
       this.checkReportStatus();
     }
+  }
+
+  componentWillUnmount() {
+    clearInterval(this._timer);
+    this._timer = null;
   }
 
   updateReports = () => {
