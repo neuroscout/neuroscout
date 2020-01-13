@@ -23,6 +23,7 @@ const transformDefinitions: Transformation[] = [
     Name: 'Threshold',
     Threshold: 0,
     Above: true,
+    Binarize: false,
     Signed: true
   },
   {
