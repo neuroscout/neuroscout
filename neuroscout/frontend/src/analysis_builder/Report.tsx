@@ -260,14 +260,14 @@ export class Report extends React.Component<ReportProps, ReportState> {
  
   formatRun = (run: Run) => {
     let ret = '';
-    if (!!run.number) {
-      ret = ret.concat('Run - ', run.number, ' ');
+    if (!!run.subject) {
+      ret = ret.concat('subject - ', run.subject, ' ');
     }
     if (!!run.session) {
       ret = ret.concat('Session - ', run.session, ' ');
     }
-    if (!!run.subject) {
-      ret = ret.concat('subject - ', run.subject, ' ');
+    if (!!run.number) {
+      ret = ret.concat('Run - ', run.number, ' ');
     }
     if (ret === '') {
       ret = run.id;
