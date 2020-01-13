@@ -2,10 +2,12 @@ import * as React from 'react';
 import { Button, Tabs, Collapse, Card, Tooltip, Icon, Select, Spin } from 'antd';
 import vegaEmbed from 'vega-embed';
 
+import { OptionProps } from 'antd/lib/select';
+
 import { config } from '../config';
 import { jwtFetch, timeout } from '../utils';
 
-import { Run } from '../coretypes';
+import { Run, TabName } from '../coretypes';
 const domainRoot = config.server_url;
 
 const TabPane = Tabs.TabPane;
@@ -29,7 +31,6 @@ class VegaPlot extends React.Component<{spec: string}, {}> {
       <div ref={this.vegaContainer}/>
     );
   }
-
 }
 
 class Plots extends React.Component<{plots: any[], corr_plots: any[], runTitles: string[]}, {}> {
@@ -81,6 +82,7 @@ interface ReportProps {
   runs: Run[];
   postReports: boolean;
   defaultVisible: boolean;
+  activeTab: TabName;
 }
 
 interface ReportState {
@@ -177,10 +179,8 @@ export class Report extends React.Component<ReportProps, ReportState> {
   }
 
   updateSelectedRunIds = (values: string[]) => {
-    let runTitles =  this.props.runs.filter(x => values.includes('' + x.id)).map(x => this.formatRun(x));
     this.setState({
-      selectedRunIds: values,
-      runTitles: runTitles
+      selectedRunIds: values
     });
   }
 
@@ -220,12 +220,25 @@ export class Report extends React.Component<ReportProps, ReportState> {
   }
 
   updateReports = () => {
+    let runTitles =  this.props.runs.filter((x) => {
+      return this.state.selectedRunIds.includes('' + x.id);
+    }).map(x => this.formatRun(x));
+
     this.setState(
       {
         reportsLoaded: false,
-        reportsPosted: false
+        reportsPosted: false,
+        runTitles: runTitles
       }
     );
+  }
+
+  filterRuns = (inputValue: string, option:  React.ReactElement<OptionProps>): boolean => {
+    
+    if (option.props.children) {
+      return ('' + option.props.children).includes(inputValue);
+    }
+    return false;
   }
  
   formatRun = (run: Run) => {
@@ -277,6 +290,7 @@ export class Report extends React.Component<ReportProps, ReportState> {
               <Select
                 mode="multiple"
                 onChange={this.updateSelectedRunIds}
+                filterOption={this.filterRuns}
                 defaultValue={this.state.selectedRunIds}
                 className="plotRunSelector"
               >
@@ -308,4 +322,3 @@ export class Report extends React.Component<ReportProps, ReportState> {
     );
   }
 }
-// <Status status={this.state.status} analysisId={this.props.analysisId} />
