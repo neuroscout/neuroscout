@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Button, Tabs, Collapse, Card, Tooltip, Icon, Select, Spin } from 'antd';
+import { Button, Tabs, Collapse, Card, Tooltip, Icon, Select, Spin, Popconfirm } from 'antd';
 import vegaEmbed from 'vega-embed';
 
 import { OptionProps } from 'antd/lib/select';
@@ -98,6 +98,7 @@ interface ReportState {
   status?: string;
   selectedRunIds: string[];
   runTitles: string[];
+  warnVisible: boolean;
 }
 
 export class Report extends React.Component<ReportProps, ReportState> {
@@ -115,7 +116,8 @@ export class Report extends React.Component<ReportProps, ReportState> {
       reportTraceback: '',
       compileTraceback: '',
       selectedRunIds: ['' + this.props.runs[0].id],
-      runTitles: [this.formatRun(this.props.runs[0])]
+      runTitles: [this.formatRun(this.props.runs[0])],
+      warnVisible: false
     };
     this.state = state;
   }
@@ -275,6 +277,27 @@ export class Report extends React.Component<ReportProps, ReportState> {
     return ret;
   }
 
+  handleVisibleChange = visible => {
+    if (!visible) {
+      this.setState({ warnVisible: visible });
+      return;
+    }
+    if (this.state.selectedRunIds.length < 3) {
+      this.confirm();
+    } else {
+      this.setState({ warnVisible: visible });
+    }
+  };
+
+  confirm = () => {
+    this.setState({ warnVisible: false });
+    this.updateReports();
+  };
+
+  cancel = () => {
+    this.setState({ warnVisible: false });
+  };
+
   render() {
     const runIdsOptions: JSX.Element[] = [];
     this.props.runs.map(x => runIdsOptions.push(<Option key={'' + x.id}>{this.formatRun(x)}</Option>));
@@ -313,14 +336,23 @@ export class Report extends React.Component<ReportProps, ReportState> {
               >
                 {runIdsOptions}
               </Select>
-              <Button
-                onClick={this.updateReports}
-                loading={!this.state.reportsLoaded}
-                type="primary"
-                className="plotRunSelectorBtn"
+              <Popconfirm
+                visible={this.state.warnVisible}
+                title="Loading too many reports at once may affect performance."
+                onVisibleChange={this.handleVisibleChange}
+                onConfirm={this.confirm}
+                onCancel={this.cancel}
+                okText="Ok"
+                cancelText="Cancel"
               >
-                Get Reports
-              </Button>
+                <Button
+                  loading={!this.state.reportsLoaded}
+                  type="primary"
+                  className="plotRunSelectorBtn"
+                >
+                  Get Reports
+                </Button>
+              </Popconfirm>
             </div>
 
             <Plots plots={this.state.plots} corr_plots={this.state.corr_plots} runTitles={this.state.runTitles}/>
