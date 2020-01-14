@@ -66,12 +66,14 @@ class Plots extends React.Component<{plots: any[], corr_plots: any[], runTitles:
           <TabPane tab={this.props.runTitles[i]} key={'' + i}>
             <Collapse bordered={false} defaultActiveKey={['dm']}>
              <Panel header="Design Matrix" key="dm">
-              <VegaPlot spec={this.props.plots[i]}/>
+               <VegaPlot
+                 spec={this.props.plots[i]}
+                 title={this.props.runTitles[i].replace(/ /g, '').concat('.png')}
+               />
              </Panel>
              <Panel header="Correlation Matrix" key="cm">
                <VegaPlot
                  spec={this.props.corr_plots[i]}
-                 title={this.props.runTitles[i].replace(/ /g, '').concat('.png')}
                />
              </Panel>
             </Collapse>
