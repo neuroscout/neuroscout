@@ -109,3 +109,20 @@ export const reorder = (list: any[], startIndex: number, endIndex: number): any[
 export const isDefined = <T>(argument: T | undefined): argument is T => {
     return argument !== undefined;
 };
+
+// Number column can be a mixture of ints and strings sometimes, hence the cast to string
+// number is stored as text in postgres, should see about treating it consistently in app
+const _sortRuns = (keys, a, b) => {
+  for (var i = 0; i < keys.length; i++) {
+    let _a = String(a[keys[i]]);
+    let _b = String(b[keys[i]]);
+    let cmp = _a.localeCompare(_b, undefined, {numeric: true});
+    if (cmp !== 0) { return cmp; }
+  }
+  return 0;
+};
+
+// Comparison functions to pass to sort for arrays of type Run by differnt keys
+export const sortSub = _sortRuns.bind(null, ['subject', 'number', 'session']);
+export const sortNum = _sortRuns.bind(null, ['number', 'subject',  'session']);
+export const sortSes = _sortRuns.bind(null, ['session', 'subject', 'number']);

@@ -41,7 +41,7 @@ import {
   TransformName,
   TabName
 } from '../coretypes';
-import { displayError, jwtFetch, timeout, isDefined } from '../utils';
+import { displayError, jwtFetch, sortSub, timeout, isDefined } from '../utils';
 import { MainCol, Space } from '../HelperComponents';
 import { config } from '../config';
 
@@ -471,6 +471,7 @@ export default class AnalysisBuilder extends Reflux.Component<any, BuilderProps 
         if (data.hash_id !== undefined) {
           analysisId = data.hash_id;
         }
+
         this.setState({
           analysis: {
             ...analysis,
@@ -479,7 +480,7 @@ export default class AnalysisBuilder extends Reflux.Component<any, BuilderProps 
             modifiedAt: data.modified_at
           },
           postReports: analysis.contrasts.length > 0,
-          unsavedChanges: false
+          unsavedChanges: false,
         });
         // will this mess with /fill workflow?
         // can't remember reason behind having to call this so often
@@ -563,11 +564,12 @@ export default class AnalysisBuilder extends Reflux.Component<any, BuilderProps 
         .then(fetch_data => {
           this.setState({ selectedTaskId: fetch_data.task.id });
           this.updateState('analysis', true)(analysis);
-        })
+         })
         .catch(displayError);
     } else {
       this.updateState('analysis', true)(analysis);
     }
+
     this.setActiveTabs(analysis);
     return Promise.resolve(analysis);
   };
@@ -1066,6 +1068,9 @@ export default class AnalysisBuilder extends Reflux.Component<any, BuilderProps 
       unsavedChanges
     } = this.state;
 
+    let reportRuns = this.state.availableRuns.filter(
+      x => this.state.analysis.runIds.find(runId => runId === x.id)
+    ).sort(sortSub);
     let isDraft = (analysis.status === 'DRAFT');
     let isFailed = (analysis.status === 'FAILED');
     let isEditable = editableStatus.includes(analysis.status);
@@ -1219,13 +1224,14 @@ export default class AnalysisBuilder extends Reflux.Component<any, BuilderProps 
                   <br/>
                 </TabPane>}
                 <TabPane tab="Review" key="review" disabled={((!reviewActive || !analysis.analysisId) && isDraft)}>
-                  {this.state.model && this.state.activeTab === ('review' as TabName) &&
+                  {this.state.model && activeTab === ('review' as TabName) && reportRuns.length > 0 &&
                     <div>
                       <Report
                         analysisId={analysis.analysisId}
-                        runIds={analysis.runIds}
-                        postReports={this.state.activeTab === ('review' as TabName)}
+                        runs={reportRuns}
+                        postReports={activeTab === ('review' as TabName)}
                         defaultVisible={this.state.doTooltip && this.state.activeTab === ('review' as TabName)}
+                        activeTab={activeTab}
                       />
                       <Review
                         model={this.state.model}

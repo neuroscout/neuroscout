@@ -1,14 +1,18 @@
 import * as React from 'react';
-import { Tabs, Collapse, Card, Tooltip, Icon, Spin } from 'antd';
+import { Button, Tabs, Collapse, Card, Tooltip, Icon, Select, Spin, Popconfirm } from 'antd';
 import vegaEmbed from 'vega-embed';
+
+import { OptionProps } from 'antd/lib/select';
 
 import { config } from '../config';
 import { jwtFetch, timeout } from '../utils';
 
+import { Run, TabName } from '../coretypes';
 const domainRoot = config.server_url;
 
 const TabPane = Tabs.TabPane;
 const Panel = Collapse.Panel;
+const { Option } = Select;
 
 class VegaPlot extends React.Component<{spec: string}, {}> {
   vegaContainer;
@@ -27,10 +31,9 @@ class VegaPlot extends React.Component<{spec: string}, {}> {
       <div ref={this.vegaContainer}/>
     );
   }
-
 }
 
-class Plots extends React.Component<{plots: any[], corr_plots: any[]}, {}> {
+class Plots extends React.Component<{matrices: string[], plots: any[], corr_plots: any[], runTitles: string[]}, {}> {
     plotContainer;
     constructor(props) {
       super(props);
@@ -42,10 +45,12 @@ class Plots extends React.Component<{plots: any[], corr_plots: any[]}, {}> {
       this.props.plots.map((x, i) => {
         let spec = x;
         display.push(
-          <TabPane tab={'First Run'} key={'' + i}>
+          <TabPane tab={this.props.runTitles[i]} key={'' + i}>
             <Collapse bordered={false} defaultActiveKey={['dm']}>
              <Panel header="Design Matrix" key="dm">
               <VegaPlot spec={this.props.plots[i]}/>
+              <br/>
+              <a href={this.props.matrices[i]}>Download Design Matrix</a>
              </Panel>
              <Panel header="Correlation Matrix" key="cm">
               <VegaPlot spec={this.props.corr_plots[i]}/>
@@ -76,9 +81,10 @@ class Tracebacks extends React.Component<{reportTraceback: string, compileTraceb
 
 interface ReportProps {
   analysisId?: string;
-  runIds: string[];
+  runs: Run[];
   postReports: boolean;
   defaultVisible: boolean;
+  activeTab: TabName;
 }
 
 interface ReportState {
@@ -93,11 +99,14 @@ interface ReportState {
   compileLoaded: boolean;
   status?: string;
   selectedRunIds: string[];
+  runTitles: string[];
+  warnVisible: boolean;
 }
 
 export class Report extends React.Component<ReportProps, ReportState> {
   constructor(props) {
     super(props);
+    this._timer = null;
     let state: ReportState = {
       matrices: [],
       plots: [],
@@ -108,10 +117,14 @@ export class Report extends React.Component<ReportProps, ReportState> {
       compileLoaded: false,
       reportTraceback: '',
       compileTraceback: '',
-      selectedRunIds: [this.props.runIds[0]]
+      selectedRunIds: ['' + this.props.runs[0].id],
+      runTitles: [this.formatRun(this.props.runs[0])],
+      warnVisible: false
     };
     this.state = state;
   }
+
+  _timer: any = null;
 
   generateReport = (): void => {
     let id = this.props.analysisId;
@@ -122,9 +135,18 @@ export class Report extends React.Component<ReportProps, ReportState> {
   };
 
   checkReportStatus = async () => {
-    while (!this.state.reportsLoaded) {
-      this.loadReports();
-      await timeout(3000);
+    if (this._timer === null) {
+      this._timer = setInterval(
+        () => {
+          if (this.state.reportsLoaded) {
+            clearInterval(this._timer);
+            this._timer = null;
+          } else {
+            this.loadReports();
+          }
+        },
+        4000
+      );
     }
   };
 
@@ -146,7 +168,6 @@ export class Report extends React.Component<ReportProps, ReportState> {
         if (res.result === undefined) {
           return;
         }
-
         state.matrices = res.result.design_matrix;
         state.plots = res.result.design_matrix_plot;
         state.corr_plots = res.result.design_matrix_corrplot;
@@ -169,6 +190,12 @@ export class Report extends React.Component<ReportProps, ReportState> {
       
       state.reportsLoaded = true;
       this.setState({...state});
+    });
+  }
+
+  updateSelectedRunIds = (values: string[]) => {
+    this.setState({
+      selectedRunIds: values
     });
   }
 
@@ -207,24 +234,134 @@ export class Report extends React.Component<ReportProps, ReportState> {
     }
   }
 
+  componentWillUnmount() {
+    clearInterval(this._timer);
+    this._timer = null;
+  }
+
+  updateReports = () => {
+    let runTitles =  this.props.runs.filter((x) => {
+      return this.state.selectedRunIds.includes('' + x.id);
+    }).map(x => this.formatRun(x));
+
+    this.setState(
+      {
+        reportsLoaded: false,
+        reportsPosted: false,
+        runTitles: runTitles
+      }
+    );
+  }
+
+  filterRuns = (inputValue: string, option:  React.ReactElement<OptionProps>): boolean => {
+    
+    if (option.props.children) {
+      return ('' + option.props.children).includes(inputValue);
+    }
+    return false;
+  }
+ 
+  formatRun = (run: Run) => {
+    let ret = '';
+    if (!!run.subject) {
+      ret = ret.concat('subject - ', run.subject, ' ');
+    }
+    if (!!run.session) {
+      ret = ret.concat('Session - ', run.session, ' ');
+    }
+    if (!!run.number) {
+      ret = ret.concat('Run - ', run.number, ' ');
+    }
+    if (ret === '') {
+      ret = run.id;
+    }
+    return ret;
+  }
+
+  handleVisibleChange = visible => {
+    if (!visible) {
+      this.setState({ warnVisible: visible });
+      return;
+    }
+    if (this.state.selectedRunIds.length < 3) {
+      this.confirm();
+    } else {
+      this.setState({ warnVisible: visible });
+    }
+  };
+
+  confirm = () => {
+    this.setState({ warnVisible: false });
+    this.updateReports();
+  };
+
+  cancel = () => {
+    this.setState({ warnVisible: false });
+  };
+
   render() {
+    const runIdsOptions: JSX.Element[] = [];
+    this.props.runs.map(x => runIdsOptions.push(<Option key={'' + x.id}>{this.formatRun(x)}</Option>));
+    const cardTitle = (
+      <>
+          Design Reports
+      </>
+    );
+    const cardExtra = (
+      <>
+        <Tooltip
+          title={'Here you can preview the final design and correlation matrices. \
+          \nClick on the design matrix columns to view the timecourse in detail.'}
+          defaultVisible={this.props.defaultVisible}
+        >
+          <Icon type="info-circle" style={{ fontSize: '15px'}}/>
+        </Tooltip>
+      </>
+    );
+
     return (
       <div>
         <Card
-         title="Design Report"
-         extra={
-           <Tooltip
-            title={'Here you can preview the final design and correlation matrices. \
-            \nClick on the design matrix columns to view the timecourse in detail.'}
-            defaultVisible={this.props.defaultVisible}
-           >
-             <Icon type="info-circle" style={{ fontSize: '15px'}}/>
-           </Tooltip>
-           }
+         title={cardTitle}
+         extra={cardExtra}
          key="plots"
         >
           <Spin spinning={!this.state.reportsLoaded}>
-            <Plots plots={this.state.plots} corr_plots={this.state.corr_plots} />
+            <div className="plotRunSelectorContainer">
+              <Select
+                mode="multiple"
+                onChange={this.updateSelectedRunIds}
+                filterOption={this.filterRuns}
+                defaultValue={this.state.selectedRunIds}
+                className="plotRunSelector"
+              >
+                {runIdsOptions}
+              </Select>
+              <Popconfirm
+                visible={this.state.warnVisible}
+                title="Loading too many reports at once may affect performance."
+                onVisibleChange={this.handleVisibleChange}
+                onConfirm={this.confirm}
+                onCancel={this.cancel}
+                okText="Ok"
+                cancelText="Cancel"
+              >
+                <Button
+                  loading={!this.state.reportsLoaded}
+                  type="primary"
+                  className="plotRunSelectorBtn"
+                >
+                  Get Reports
+                </Button>
+              </Popconfirm>
+            </div>
+
+            <Plots
+              matrices={this.state.matrices}
+              plots={this.state.plots}
+              corr_plots={this.state.corr_plots}
+              runTitles={this.state.runTitles}
+            />
           </Spin>
         </Card>
         <br/>
@@ -240,4 +377,3 @@ export class Report extends React.Component<ReportProps, ReportState> {
     );
   }
 }
-// <Status status={this.state.status} analysisId={this.props.analysisId} />

@@ -8,6 +8,7 @@ import { ColumnProps, TableRowSelection } from 'antd/lib/table';
 import { getTasks } from './Builder';
 import { Analysis, Dataset, Run, Task } from '../coretypes';
 import { datasetColumns } from '../HelperComponents';
+import { sortSub, sortNum, sortSes } from '../utils';
 
 const FormItem = Form.Item;
 const Panel = Collapse.Panel;
@@ -83,9 +84,9 @@ export class OverviewTab extends React.Component<OverviewTabProps, OverviewTabSt
     }
 
     if (this.props.availableRuns.length !== prevProps.availableRuns.length) {
-      let subCol = this.makeCol('Subject', 'subject', this.sortSub);
-      let runCol = this.makeCol('Run Number', 'number', this.sortNum);
-      let sesCol = this.makeCol('Session', 'session', this.sortSes);
+      let subCol = this.makeCol('Subject', 'subject', sortSub);
+      let runCol = this.makeCol('Run Number', 'number', sortNum);
+      let sesCol = this.makeCol('Session', 'session', sortSes);
       let _runColumns = [subCol, runCol, sesCol].filter(x => x !== undefined) as ColumnProps<any>[];
       if (_runColumns[0]) { _runColumns[0].defaultSortOrder = 'ascend' as 'ascend'; }
       if (this.state.clearFilteredVal) {
@@ -94,22 +95,6 @@ export class OverviewTab extends React.Component<OverviewTabProps, OverviewTabSt
       this.setState({runColumns: _runColumns, clearFilteredVal: false});
     }
   }
-
-  // Number column can be a mixture of ints and strings sometimes, hence the cast to string
-  // number is stored as text in postgres, should see about treating it consistently in app
-  _sortRuns = (keys, a, b) => {
-    for (var i = 0; i < keys.length; i++) {
-      let _a = String(a[keys[i]]);
-      let _b = String(b[keys[i]]);
-      let cmp = _a.localeCompare(_b, undefined, {numeric: true});
-      if (cmp !== 0) { return cmp; }
-    }
-    return 0;
-  }
-
-  sortSub = this._sortRuns.bind(null, ['subject', 'number', 'session']);
-  sortNum = this._sortRuns.bind(null, ['number', 'subject',  'session']);
-  sortSes = this._sortRuns.bind(null, ['session', 'subject', 'number']);
 
   /* Run column settings were largely similar, this function creates them.
      The cast to String before sort is to account for run numbers being a
@@ -298,7 +283,7 @@ export class OverviewTab extends React.Component<OverviewTabProps, OverviewTabSt
                   columns={this.state.runColumns}
                   rowKey="id"
                   size="small"
-                  dataSource={availableRuns.filter(r => r.task === selectedTaskId).sort(this.sortSub)}
+                  dataSource={availableRuns.filter(r => r.task === selectedTaskId).sort(sortSub)}
                   pagination={(availableRuns.length > 10) ? {'position': 'bottom'} : false}
                   rowSelection={runRowSelection}
                   onChange={this.applyFilter}
