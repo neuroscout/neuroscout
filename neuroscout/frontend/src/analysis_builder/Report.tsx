@@ -1,8 +1,10 @@
 import * as React from 'react';
-import { Button, Tabs, Collapse, Card, Tooltip, Icon, Select, Spin, Popconfirm } from 'antd';
+import { Button, Tabs, Collapse, Card, Tooltip, Icon, Select, Spin, Popconfirm, Anchor } from 'antd';
 import vegaEmbed from 'vega-embed';
 
 import { OptionProps } from 'antd/lib/select';
+
+import { View as view_t } from 'vega-typings';
 
 import { config } from '../config';
 import { jwtFetch, timeout } from '../utils';
@@ -10,25 +12,40 @@ import { jwtFetch, timeout } from '../utils';
 import { Run, TabName } from '../coretypes';
 const domainRoot = config.server_url;
 
-const TabPane = Tabs.TabPane;
-const Panel = Collapse.Panel;
+const { TabPane } = Tabs;
+const { Panel } = Collapse;
 const { Option } = Select;
+const { Link } = Anchor;
 
-class VegaPlot extends React.Component<{spec: string}, {}> {
+class VegaPlot extends React.Component<{spec: string, title?: string}, {imageUrl?: string}> {
   vegaContainer;
 
   constructor(props) {
     super(props);
     this.vegaContainer = React.createRef();
+    this.state = {imageUrl: ''};
   }
 
   componentDidMount() {
-      vegaEmbed(this.vegaContainer.current, this.props.spec, { renderer: 'svg' });
+      vegaEmbed(this.vegaContainer.current, this.props.spec, { renderer: 'svg' })
+      .then((result) => { return result.view.toImageURL('png'); })
+      .then((res) => this.setState({imageUrl: res}));
+
   }
 
   render () {
     return(
-      <div ref={this.vegaContainer}/>
+      <>
+        <div ref={this.vegaContainer}/>
+        { this.props.title && !!this.state.imageUrl &&
+        <>
+          <br />
+          <a href={this.state.imageUrl} download={this.props.title}>
+            Download as PNG
+          </a>
+        </>
+        }
+      </>
     );
   }
 }
@@ -41,6 +58,7 @@ class Plots extends React.Component<{plots: any[], corr_plots: any[], runTitles:
     }
 
     render() {
+
       let display: any[] = [];
       this.props.plots.map((x, i) => {
         let spec = x;
@@ -51,7 +69,10 @@ class Plots extends React.Component<{plots: any[], corr_plots: any[], runTitles:
               <VegaPlot spec={this.props.plots[i]}/>
              </Panel>
              <Panel header="Correlation Matrix" key="cm">
-              <VegaPlot spec={this.props.corr_plots[i]}/>
+               <VegaPlot
+                 spec={this.props.corr_plots[i]}
+                 title={this.props.runTitles[i].replace(/ /g, '').concat('.png')}
+               />
              </Panel>
             </Collapse>
           </TabPane>
