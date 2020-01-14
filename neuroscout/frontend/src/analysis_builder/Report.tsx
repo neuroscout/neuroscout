@@ -49,6 +49,7 @@ class Plots extends React.Component<{matrices: string[], plots: any[], corr_plot
             <Collapse bordered={false} defaultActiveKey={['dm']}>
              <Panel header="Design Matrix" key="dm">
               <VegaPlot spec={this.props.plots[i]}/>
+              <br/>
               <a href={this.props.matrices[i]}>Download Design Matrix</a>
              </Panel>
              <Panel header="Correlation Matrix" key="cm">
