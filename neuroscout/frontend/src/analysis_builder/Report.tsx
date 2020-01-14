@@ -33,7 +33,7 @@ class VegaPlot extends React.Component<{spec: string}, {}> {
   }
 }
 
-class Plots extends React.Component<{plots: any[], corr_plots: any[], runTitles: string[]}, {}> {
+class Plots extends React.Component<{matrices: string[], plots: any[], corr_plots: any[], runTitles: string[]}, {}> {
     plotContainer;
     constructor(props) {
       super(props);
@@ -49,6 +49,7 @@ class Plots extends React.Component<{plots: any[], corr_plots: any[], runTitles:
             <Collapse bordered={false} defaultActiveKey={['dm']}>
              <Panel header="Design Matrix" key="dm">
               <VegaPlot spec={this.props.plots[i]}/>
+              <a href={this.props.matrices[i]}>Download Design Matrix</a>
              </Panel>
              <Panel header="Correlation Matrix" key="cm">
               <VegaPlot spec={this.props.corr_plots[i]}/>
@@ -166,7 +167,6 @@ export class Report extends React.Component<ReportProps, ReportState> {
         if (res.result === undefined) {
           return;
         }
-
         state.matrices = res.result.design_matrix;
         state.plots = res.result.design_matrix_plot;
         state.corr_plots = res.result.design_matrix_corrplot;
@@ -355,7 +355,12 @@ export class Report extends React.Component<ReportProps, ReportState> {
               </Popconfirm>
             </div>
 
-            <Plots plots={this.state.plots} corr_plots={this.state.corr_plots} runTitles={this.state.runTitles}/>
+            <Plots
+              matrices={this.state.matrices}
+              plots={this.state.plots}
+              corr_plots={this.state.corr_plots}
+              runTitles={this.state.runTitles}
+            />
           </Spin>
         </Card>
         <br/>
