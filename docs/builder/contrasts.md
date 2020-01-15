@@ -11,7 +11,7 @@ To do this for all non-confounds, simply click `Generate Dummy Contrasts`.
 ![auto_contrasts](img/contrasts.png)
 
 !!! Note
-    If you go back to the `Predictors` tab and edit the predictor list, you may have to re-generate auto contrasts.
+    If you go back to the `Predictors` tab and edit the predictor list, you may have to re-generate dummy contrasts.
 
 
 ## Defining a custom contrast

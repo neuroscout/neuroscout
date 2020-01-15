@@ -180,19 +180,19 @@
                 <h1 id="usage">Usage</h1>
 <p>This assumes that you are using the Docker Container.
 Docker commands for <em>neuroscout-cli</em> will always being with:</p>
-<pre><code>docker run -it
+<pre><code>docker run -it --rm
 </code></pre>
 <p>Assuming you've already created an analysis on neuroscout.org, and have its analysis id (e.g.: <code>5xH93</code>), you can run it in one line:</p>
-<pre><code>docker run -it neuroscout/neuroscout-cli run /outdir 5xH93
+<pre><code>docker run -it --rm neuroscout/neuroscout-cli run /out 5xH93
 </code></pre>
 <p>Neuroscout will download the necessary images, analysis bundle, and fit your model.</p>
 <h2 id="mounting-volumes">Mounting Volumes</h2>
-<p>Most likely, you'll want to mount at least two volumes , in order to cache input data (<code>/data</code>), and inspect output results (<code>/out</code>)</p>
+<p>Most likely, you'll want to mount at least two volumes, in order to cache input data (<code>/work</code>), and inspect output results (<code>/out</code>). </p>
 <p>In this example, we mount both of these directories to local volumes:</p>
-<pre><code>docker run -it -v /local/datadir:/data -v /local/outdir:/out neuroscout/neuroscout-cli run /out 5xH937f
+<pre><code>docker run -it --rm -v /local/datadir:/work -v /local/outdir:/out neuroscout/neuroscout-cli run /out 5xH937f
 </code></pre>
-<p>The necessary dataset will be downloaded to your local volume (<code>/local/datadir</code>), and next time you run a model with the same dataset, it will not need to re-download the fMRI data.
-The model-fitting outputs will also be locally saved at <code>/local/outdir</code>.</p>
+<p>In this command, the path preceding <code>:/work</code> specifies the directory where the data will be stored (i.e. your local volume <code>/local/datadir</code>). The next time you run a model with the same dataset, it will not need to re-download the fMRI data. The path preceding <code>:/out</code> specifies the directory where the model-fitting outputs will be saved (<code>/local/outdir</code>). </br>
+Note that you need to specify <strong>absolute paths</strong> for both directories.</p>
 <h2 id="command-line-arguments">Command-Line Arguments</h2>
 <pre><code>neuroscout
 
