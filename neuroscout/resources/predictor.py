@@ -161,7 +161,7 @@ class PredictorCollectionResource(MethodResource):
 
 class PredictorEventListResource(MethodResource):
     @doc(tags=['predictors'], summary='Get events for predictor(s)',)
-    @marshal_with(PredictorEventSchema)
+    @marshal_with(PredictorEventSchema(many=True))
     @use_kwargs({
         'run_id': wa.fields.DelimitedList(
             wa.fields.Int(),

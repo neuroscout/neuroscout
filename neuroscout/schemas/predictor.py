@@ -50,7 +50,6 @@ class PredictorCollectionSchema(Schema):
 
 
 class PredictorEventSchema(Schema):
-    id = fields.Str()
     onset = fields.Number(description="Onset in seconds.")
     duration = fields.Number(description="Duration in seconds.")
     value = fields.Str(description="Value, or amplitude.")

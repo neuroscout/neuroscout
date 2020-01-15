@@ -139,12 +139,17 @@ def test_predictor_create(session,
     assert len(resp) == 3
 
 
-def test_get_predictor_data(auth_client, add_task):
-    # List of predictors
-    resp = auth_client.get('/api/predictor-events')
+def test_get_predictor_data(auth_client, add_task, extract_features):
+    # List of predictors (includes both regular and extracted PEs)
+    pids = [
+        str(p['id']) for p in decode_json(auth_client.get('/api/predictors'))]
+
+    resp = auth_client.get('/api/predictor-events',
+                           params={'predictor_id': ",".join(pids)})
+
     assert resp.status_code == 200
     pe_list = decode_json(resp)
-    assert len(pe_list) == 36
+    assert len(pe_list) == 52
 
     pe = pe_list[0]
     # Get PEs only for one run

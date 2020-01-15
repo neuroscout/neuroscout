@@ -46,7 +46,7 @@ def dump_pe(pes):
     res = db.session.connection().execute(statement, params)
     return [
         dict(
-            zip(('onset', 'duration', 'value', 'object_id', 'run_id',
+            zip(('id', 'onset', 'duration', 'value', 'object_id', 'run_id',
                  'predictor_id', 'stimulus_id'), r))
         for r in res
         ]
@@ -69,12 +69,12 @@ def dump_predictor_events(predictor_ids, run_ids=None):
     pes = PredictorEvent.query.filter(
         (PredictorEvent.predictor_id.in_(raw_pred_ids)))
     if run_ids is not None:
-        pes.filter((PredictorEvent.run_id.in_(run_ids)))
+        pes = pes.filter((PredictorEvent.run_id.in_(run_ids)))
+
     pes = dump_pe(pes)
 
     # Create & dump Extracted PEs
     pes += create_pes(ext_preds, run_ids)
-
     return pes
 
 
