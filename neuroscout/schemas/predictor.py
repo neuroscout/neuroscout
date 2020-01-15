@@ -15,8 +15,8 @@ class PredictorSchema(Schema):
     description = fields.Str(description="Predictor description")
     extracted_feature = fields.Nested('ExtractedFeatureSchema', skip_if=None)
     source = fields.Str()
-    private = fields.Boolean(description="Predictor visible to the public or not")
-
+    private = fields.Boolean(
+        description="Predictor visible to the public or not")
     max = fields.Float(description="Maximum value")
     min = fields.Float(description="Minimum value")
     mean = fields.Float(description="Mean value")
@@ -47,3 +47,12 @@ class PredictorCollectionSchema(Schema):
     collection_name = fields.Str(description='Name of collection')
     predictors = fields.Nested(
         'PredictorSchema', many=True)
+
+
+class PredictorEventSchema(Schema):
+    id = fields.Str()
+    onset = fields.Number(description="Onset in seconds.")
+    duration = fields.Number(description="Duration in seconds.")
+    value = fields.Str(description="Value, or amplitude.")
+    run_id = fields.Int()
+    predictor_id = fields.Int()
