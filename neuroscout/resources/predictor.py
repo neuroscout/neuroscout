@@ -11,9 +11,11 @@ from ..models import (
     Predictor, PredictorRun, PredictorCollection)
 from ..database import db
 from ..core import cache
-from ..schemas.predictor import PredictorSchema, PredictorCollectionSchema
+from ..schemas.predictor import (
+    PredictorSchema, PredictorEventSchema, PredictorCollectionSchema)
 from ..api_spec import FileField
 from ..worker import celery_app
+from ..utils.db import dump_predictor_events
 
 
 class PredictorResource(MethodResource):
@@ -155,3 +157,20 @@ class PredictorCollectionResource(MethodResource):
     def get(self, collection_id):
         return first_or_404(
             PredictorCollection.query.filter_by(id=collection_id))
+
+
+class PredictorEventListResource(MethodResource):
+    @doc(tags=['predictors'], summary='Get events for predictor(s)',)
+    @marshal_with(PredictorEventSchema(many=True))
+    @use_kwargs({
+        'run_id': wa.fields.DelimitedList(
+            wa.fields.Int(),
+            description="Run id(s)"),
+        'predictor_id': wa.fields.DelimitedList(
+            wa.fields.Int(),
+            description="Predictor id(s)",
+            required=True),
+    }, locations=['query'])
+    @cache.cached(60 * 60 * 24 * 300, query_string=True)
+    def get(self, predictor_id, run_id=None):
+        return dump_predictor_events(predictor_id, run_id)

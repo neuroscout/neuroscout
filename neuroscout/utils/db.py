@@ -3,11 +3,39 @@
 """
 from flask import abort, current_app
 from sqlalchemy.exc import SQLAlchemyError
-from ..models import Analysis
+from ..models import Analysis, RunStimulus, Predictor, PredictorEvent
 from ..database import db
 from sqlalchemy.event import listens_for
 from sqlalchemy.dialects import postgresql
 from hashids import Hashids
+
+
+def create_pes(predictors, run_ids=None):
+    """ Create PredictorEvents from EFs """
+    all_pes = []
+    for pred in predictors:
+        ef = pred.extracted_feature
+        # For all instances for stimuli in this task's runs
+        for ee in ef.extracted_events:
+            query = RunStimulus.query.filter_by(stimulus_id=ee.stimulus_id)
+            if run_ids is not None:
+                query = query.filter(RunStimulus.run_id.in_(run_ids))
+            for rs in query:
+                duration = ee.duration
+                if duration is None:
+                    duration = rs.duration
+                all_pes.append(
+                    dict(
+                        onset=(ee.onset or 0) + rs.onset,
+                        duration=duration,
+                        value=ee.value,
+                        run_id=rs.run_id,
+                        predictor_id=pred.id,
+                        object_id=ee.object_id,
+                        stimulus_id=ee.stimulus_id
+                    )
+                )
+    return all_pes
 
 
 def dump_pe(pes):
@@ -16,14 +44,38 @@ def dump_pe(pes):
     statement = str(pes.statement.compile(dialect=postgresql.dialect()))
     params = pes.statement.compile(dialect=postgresql.dialect()).params
     res = db.session.connection().execute(statement, params)
-    return [{
-      'id': r[0],
-      'onset': r[1],
-      'duration': r[2],
-      'value':  r[3],
-      'run_id': r[5],
-      'predictor_id': r[6]
-      } for r in res]
+    return [
+        dict(
+            zip(('id', 'onset', 'duration', 'value', 'object_id', 'run_id',
+                 'predictor_id', 'stimulus_id'), r))
+        for r in res
+        ]
+
+
+def dump_predictor_events(predictor_ids, run_ids=None):
+    """ Query & serialize PredictorEvents, for both Raw and Extracted
+    Predictors (which require creating PEs from EEs)
+    """
+
+    # Query Predictors
+    all_preds = Predictor.query.filter(Predictor.id.in_(predictor_ids))
+
+    # Separate raw and extracted predictors
+    raw_pred_ids = [p.id for p in all_preds.filter_by(ef_id=None)]
+    ext_preds = Predictor.query.filter(
+        Predictor.id.in_(set(predictor_ids) - set(raw_pred_ids)))
+
+    # Query & dump raw PEs
+    pes = PredictorEvent.query.filter(
+        (PredictorEvent.predictor_id.in_(raw_pred_ids)))
+    if run_ids is not None:
+        pes = pes.filter((PredictorEvent.run_id.in_(run_ids)))
+
+    pes = dump_pe(pes)
+
+    # Create & dump Extracted PEs
+    pes += create_pes(ext_preds, run_ids)
+    return pes
 
 
 @listens_for(Analysis, "after_insert")
