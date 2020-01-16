@@ -98,9 +98,11 @@ def generate_report(flask_app, hash_id, report_id,
     try:
         report_object = Report.query.filter_by(id=report_id).one()
     except Exception as e:
-        return {
-            'traceback': f'Error loading {report_id} from db /n {str(e)}'
-            }
+        update_record(
+            report_object,
+            exception=e,
+            traceback=f'Error loading {report_id} from db /n {str(e)}'
+        )
 
     try:
         a_id, analysis, resources, pes, bids_dir = dump_analysis(
