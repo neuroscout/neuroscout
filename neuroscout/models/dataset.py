@@ -20,14 +20,18 @@ class Dataset(db.Model):
     dataset_address = db.Column(db.Text)
     preproc_address = db.Column(db.Text)
     local_path = db.Column(db.Text)
-
-    known_issues = db.Column(db.Text) # Known issues free text
+    known_issues = db.Column(db.Text)  # Known issues free text
 
     @hybrid_property
     def mimetypes(self):
         """ List of mimetypes of stimuli in dataset """
-        return [s[0] for s in Stimulus.query.filter_by(
-            dataset_id=self.id).distinct('mimetype').values('mimetype')]
+        return [
+            x[1]
+            for x in sorted(
+                Stimulus.query.filter_by(
+                    dataset_id=self.id).distinct(
+                        'mimetype').values('id', 'mimetype'))
+            ]
 
     # Meta-data, such as preprocessed history, etc...
     def __repr__(self):
