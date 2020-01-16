@@ -33,7 +33,6 @@ interface PredictorsSelectorState {
   searchText: string;  // Search term entered in search box
   filteredPredictors: Predictor[]; // Subset of available preditors whose name or description match the search term
   selectedPredictors: Predictor[]; // List of selected predictors (when used as an uncontrolled component)
-  predictorsLoad?: boolean;
   selectedText?: string;
 }
 
@@ -43,12 +42,11 @@ export class PredictorSelector extends React.Component<
 > {
   constructor(props: PredictorSelectorProps) {
     super(props);
-    const { availablePredictors, selectedPredictors, predictorsLoad, selectedText } = props;
+    const { availablePredictors, selectedPredictors, selectedText } = props;
     this.state = {
       searchText: '',
       filteredPredictors: availablePredictors,
       selectedPredictors,
-      predictorsLoad: predictorsLoad,
       selectedText: selectedText ? selectedText : ''
     };
   }
@@ -75,6 +73,8 @@ export class PredictorSelector extends React.Component<
     this.props.updateSelection(newSelection, this.props.selectedPredictors);
   };
 
+  // Refactor. What this wants to do is when a new predictor is added it sets the correct description and source
+  // text used by filteredPredictors? memoize
   componentWillReceiveProps(nextProps: PredictorSelectorProps) {
     if (this.props.availablePredictors.length !== nextProps.availablePredictors.length) {
       let filteredPredictors = nextProps.availablePredictors;
@@ -90,7 +90,6 @@ export class PredictorSelector extends React.Component<
       );
       this.setState({ filteredPredictors: filteredPredictors, searchText: '' });
     }
-    this.setState({predictorsLoad: nextProps.predictorsLoad});
   }
 
   sourceCmp = (a, b) => {
@@ -177,7 +176,7 @@ export class PredictorSelector extends React.Component<
                   dataSource={this.state.filteredPredictors}
                   rowSelection={rowSelection}
                   bordered={true}
-                  loading={this.state.predictorsLoad}
+                  loading={this.props.predictorsLoad}
                 />
               </div>
             </Col>
@@ -210,7 +209,7 @@ export class PredictorSelector extends React.Component<
                 dataSource={this.state.filteredPredictors}
                 rowSelection={rowSelection}
                 bordered={true}
-                loading={this.state.predictorsLoad}
+                loading={this.props.predictorsLoad}
               />
             </div>
             <p style={{'float': 'right'}}>
