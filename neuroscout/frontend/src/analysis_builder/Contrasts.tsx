@@ -143,6 +143,11 @@ export class ContrastsTab extends React.Component<ContrastsTabProps, ContrastsTa
       if (x.source === 'fmriprep') {
         return;
       }
+      if (newContrasts.filter(y => {
+        return (y.Name === x.name && y.ConditionList.length === 1 && y.ConditionList[0] === x.name);
+      }).length > 0) {
+        return;
+      }
       let newContrast = emptyContrast();
       newContrast.Name = `${x.name}`;
       newContrast.ConditionList = [ x.name ];

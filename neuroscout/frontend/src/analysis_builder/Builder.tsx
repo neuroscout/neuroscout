@@ -789,6 +789,13 @@ export default class AnalysisBuilder extends Reflux.Component<any, BuilderProps 
           return stateUpdate.analysis.predictorIds.indexOf(x) > -1;
         }
       );
+      let predictorNames = stateUpdate[selectedPredictors].map(x => x.name);
+      stateUpdate.analysis.contrasts = stateUpdate.analysis.contrasts.filter(cont => {
+        return cont.ConditionList.filter(cond => !predictorNames.includes(cond)).length === 0;
+      });
+      stateUpdate.analysis.transformations = stateUpdate.analysis.transformations.filter(xform => {
+        return xform.Input.filter(in_pred => !predictorNames.includes(in_pred)).length === 0;
+      });
     }
 
     stateUpdate.unsavedChanges = true;
