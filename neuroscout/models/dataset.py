@@ -47,6 +47,17 @@ class Dataset(db.Model):
         else:
             return None
 
+    def percent_female(self):
+        values = GroupPredictorValue.query.join(GroupPredictor).filter_by(
+            dataset_id=self.id).filter(
+                GroupPredictor.name.in_(['gender', 'sex'])).values('value')
+        fem = [1 if v[0] in ['f', 'F'] else 0 for v in values]
+
+        if fem:
+            return statistics.mean(fem)
+        else:
+            return None
+
     # Meta-data, such as preprocessed history, etc...
     def __repr__(self):
         return '<models.Dataset[name=%s]>' % self.name

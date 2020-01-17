@@ -8,5 +8,11 @@ class TaskSchema(Schema):
     dataset_id = fields.Int()
     n_subjects = fields.Int(
         description='Number of unique subjects')
-    TR = fields.Number()
-    summary = fields.Str(description='Task summary description')
+    n_runs_subject = fields.Int(
+        description='Number of runs per subject')
+    avg_run_duration = fields.Int(
+        description='Average run duration in seconds')
+    TR = fields.Number(
+        description='Repetition Time')
+    summary = fields.Str(
+        description='Task summary description')

@@ -1,7 +1,9 @@
-from ..database import db
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.ext.hybrid import hybrid_property
+import statistics
+from sqlalchemy import func
 from .run import Run
+from ..database import db
 
 
 class Task(db.Model):
@@ -22,9 +24,23 @@ class Task(db.Model):
 
     @hybrid_property
     def n_subjects(self):
-        """ List of mimetypes of stimuli in dataset """
+        """ Number of subjects in task """
         return Run.query.filter_by(
             task_id=self.id).distinct('subject').count()
+
+    @hybrid_property
+    def n_runs_subject(self):
+        """ Number of runs per subject """
+        return statistics.mean(
+            [r[1] for r in db.session.query(
+                Run.subject, func.count(Run.id)).filter_by(
+                    task_id=self.id).group_by(Run.subject)])
+
+    @hybrid_property
+    def avg_run_duration(self):
+        """ Average run duration (seconds) """
+        return round(db.session.query(func.avg(Run.duration)).filter_by(
+            task_id=self.id).all()[0][0], 2)
 
     def __repr__(self):
         return '<models.Task[name={}]>'.format(self.name)
