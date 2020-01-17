@@ -35,6 +35,7 @@ export interface Dataset {
   description: string;
   tasks: Task[];
   active: boolean;
+  modality: string;
 }
 
 // Dataset object as returned by /api/datasets
@@ -50,6 +51,7 @@ export interface ApiDataset {
   summary: string;
   tasks: Task[];
   active: boolean;
+  mimetypes: string[];
 }
 
 export interface Run {

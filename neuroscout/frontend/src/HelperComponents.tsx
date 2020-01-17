@@ -90,6 +90,7 @@ export const datasetColumns = [
     width: 130,
     sorter: (a, b) => a.name.localeCompare(b.name),
   },
+  { title: 'Modality', dataIndex: 'modality' },
   { title: 'Description', dataIndex: 'description'},
   { title: 'Author(s)', dataIndex: 'authors', width: 280,
     render: (text) => {
@@ -99,8 +100,5 @@ export const datasetColumns = [
         return (<>{text[0]}</>);
       }
     }
-  },
-  { dataIndex: 'url', width: 50,
-    render: text => <a href={text} target="_blank" rel="noopener"><Icon type="link" /></a>,
   }
 ];
