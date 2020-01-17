@@ -1,7 +1,9 @@
 from ..database import db
+from .group import GroupPredictor, GroupPredictorValue
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.ext.hybrid import hybrid_property
 from .stimulus import Stimulus
+import statistics
 
 
 class Dataset(db.Model):
@@ -32,6 +34,18 @@ class Dataset(db.Model):
                     dataset_id=self.id).distinct(
                         'mimetype').values('id', 'mimetype'))
             ]
+
+    @hybrid_property
+    def mean_age(self):
+        val = GroupPredictorValue.query.join(GroupPredictor).filter_by(
+            dataset_id=self.id, name='age').values('value')
+        age_map = {'20-25': 22.5, '25-30': 27.5, '30-35': 32.5, '35-40': 37.5}
+        val = [age_map[v[0]] if v[0] in age_map else float(v[0]) for v in val]
+
+        if val:
+            return statistics.mean(val)
+        else:
+            return None
 
     # Meta-data, such as preprocessed history, etc...
     def __repr__(self):
