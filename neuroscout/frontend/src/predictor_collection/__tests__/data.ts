@@ -12,7 +12,8 @@ export const testDataset = {
   url: 'https://example.com',
   description: 'dataset description',
   tasks: [testTask],
-  active: true
+  active: true,
+  modality: ''
 };
 
 export const testPredictor = {

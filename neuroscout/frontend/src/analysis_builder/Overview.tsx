@@ -146,6 +146,10 @@ export class OverviewTab extends React.Component<OverviewTabProps, OverviewTabSt
       (this.props.availableRuns.map(x => x.id));
   };
 
+  datasetExpandRow = (record, index, indent, expanded) => {
+    return (<a href="{record.url}">{record.url}</a>);
+  }
+
   render() {
     let {
       analysis,
@@ -163,8 +167,8 @@ export class OverviewTab extends React.Component<OverviewTabProps, OverviewTabSt
       onSelect: (record, selected, selectedRows) => {
         this.updateAnalysis('datasetId')(record.id);
       },
-      // selections: datasetSelections,
-      selectedRowKeys: selectedDatasetId
+      selectedRowKeys: selectedDatasetId,
+      columnWidth: '10px'
     };
 
     const taskColumns = [
@@ -263,6 +267,7 @@ export class OverviewTab extends React.Component<OverviewTabProps, OverviewTabSt
             })}
             rowSelection={datasetRowSelection}
             pagination={(datasets.length > 10) ? {'position': 'bottom'} : false}
+            expandedRowRender={this.datasetExpandRow}
           />
           <br />
           {availableRuns.length > 0 &&

@@ -22,8 +22,9 @@ const normalizeDataset = (d: ApiDataset): Dataset => {
   const description = d.summary;
   const url = d.url;
   const id = d.id.toString();
+  const modality = d.mimetypes.length > 0 ? d.mimetypes[0].split('/')[0] : '';
   const { name, tasks, active } = d;
-  return { id, name, authors, url, description, tasks, active };
+  return { id, name, authors, url, description, tasks, active, modality };
 };
 
 // Convert analyses returned by API to the shape expected by the frontend
