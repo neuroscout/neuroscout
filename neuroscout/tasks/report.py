@@ -5,8 +5,7 @@ from ..models import Analysis, Report
 
 from .utils.build import build_analysis, impute_confounds
 from .utils.viz import plot_design_matrix, plot_corr_matrix, sort_dm
-from .utils.io import (
-    dump_analysis, update_record, PathBuilder, write_jsons, write_tarball)
+from .utils.io import update_record, PathBuilder, write_jsons, write_tarball
 
 MIN_CLI_VERSION = '0.3.3'
 
@@ -27,19 +26,10 @@ def compile(flask_app, hash_id, run_ids=None, build=False):
         return {
             'traceback': f'Error loading {hash_id} from db /n {str(e)}'
             }
+
     try:
-        a_id, analysis, resources, pes, bids_dir = dump_analysis(
-            hash_id)
-    except Exception as e:
-        update_record(
-            analysis_object,
-            exception=e,
-            traceback='Error deserializing analysis'
-        )
-        raise
-    try:
-        tmp_dir, bundle_paths, _ = build_analysis(
-            analysis, pes, bids_dir, run_ids, build=build)
+        tmp_dir, bundle_paths, _, analysis, resources = build_analysis(
+            hash_id, run_ids, build=build)
     except Exception as e:
         update_record(
             analysis_object,
@@ -52,7 +42,7 @@ def compile(flask_app, hash_id, run_ids=None, build=False):
         sidecar = {'RepetitionTime': analysis['TR']}
         resources['validation_hash'] = Hashids(
             flask_app.config['SECONDARY_HASH_SALT'],
-            min_length=10).encode(a_id)
+            min_length=10).encode(hash_id)
         resources['version_required'] = MIN_CLI_VERSION
 
         # Write out JSON files to tmp_dir
@@ -105,25 +95,13 @@ def generate_report(flask_app, hash_id, report_id,
         )
 
     try:
-        a_id, analysis, resources, pes, bids_dir = dump_analysis(
-            hash_id)
+        _, _, bids_analysis, analysis, resouces = build_analysis(
+            hash_id, run_ids)
     except Exception as e:
         update_record(
             report_object,
             exception=e,
-            traceback='Error deserializing analysis'
-        )
-        raise
-
-    try:
-        _, _, bids_analysis = build_analysis(
-            analysis, pes, bids_dir, run_ids)
-    except Exception as e:
-        # Todo: In future, could add more messages here
-        update_record(
-            report_object,
-            exception=e,
-            traceback='Error validating analysis'
+            traceback='Error building/validating analysis'
         )
         raise
 

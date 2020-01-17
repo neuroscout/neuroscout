@@ -8,7 +8,7 @@ from bids.analysis import Analysis as BIDSAnalysis
 from bids.layout import BIDSLayout
 from copy import deepcopy
 from grabbit.extensions.writable import build_path
-
+from .build import dump_analysis
 
 PATHS = ['sub-{subject}_[ses-{session}_]task-{task}_[acq-{acquisition}_]'
          '[run-{run}_]events.tsv']
@@ -67,8 +67,10 @@ def writeout_events(analysis, pes, outdir):
     return paths
 
 
-def build_analysis(analysis, predictor_events, bids_dir, run_id=None,
-                   build=True):
+def build_analysis(hash_id, predictor_events, run_id=None, build=True):
+    """ Dump and build analysis object """
+    analysis, resources, predictor_events, bids_dir = dump_analysis(hash_id)
+
     tmp_dir = Path(mkdtemp())
 
     entities = [{}]
@@ -97,7 +99,7 @@ def build_analysis(analysis, predictor_events, bids_dir, run_id=None,
             bids_layout, deepcopy(analysis.get('model')))
         bids_analysis.setup(**entities)
 
-    return tmp_dir, paths, bids_analysis
+    return tmp_dir, paths, bids_analysis, analysis, resources
 
 
 def get_entities(run):
