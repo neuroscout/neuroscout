@@ -23,9 +23,7 @@ def compile(flask_app, hash_id, run_ids=None, build=False):
     try:
         analysis_object = Analysis.query.filter_by(hash_id=hash_id).one()
     except Exception as e:
-        return {
-            'traceback': f'Error loading {hash_id} from db /n {str(e)}'
-            }
+        return {'traceback': f'Error loading {hash_id} from db /n {str(e)}'}
 
     try:
         tmp_dir, bundle_paths, _, analysis, resources = build_analysis(
