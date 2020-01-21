@@ -11,6 +11,7 @@ class Dataset(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     description = db.Column(JSONB)  # BIDS description
     summary = db.Column(db.Text)  # Hand crafted summary
+    long_description = db.Column(db.Text) # Custom long description
     url = db.Column(db.Text)  # External resource / link
     active = db.Column(db.Boolean, default=True)
     name = db.Column(db.Text, unique=True, nullable=False)
@@ -22,7 +23,6 @@ class Dataset(db.Model):
     dataset_address = db.Column(db.Text)
     preproc_address = db.Column(db.Text)
     local_path = db.Column(db.Text)
-    known_issues = db.Column(db.Text)  # Known issues free text
 
     @hybrid_property
     def mimetypes(self):
