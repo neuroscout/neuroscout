@@ -31,7 +31,7 @@ def delete_task(dataset, task):
     db.session.commit()
 
 
-def extend_extracted_objects(dataset_name, **selectors):
+def extend_extracted_objects(dataset_name, task_name, **selectors):
     """ Links RunStimuli for newly ingest runs in a Dataset,
         for all ExtractedFeatures. Also links derived Stimuli with new Runs.
         Args:
@@ -42,8 +42,8 @@ def extend_extracted_objects(dataset_name, **selectors):
     run_ids = Run.query
     for key, value in selectors.items():
         run_ids = run_ids.filter(getattr(Run, key).in_(value))
-    runs = run_ids.join(Dataset).filter_by(
-        name=dataset_name)
+    runs = run_ids.join(Task).filter_by(name=task_name).join(
+        Dataset).filter_by(name=dataset_name)
 
     # Create RunStimulus associations with derived stimuli
     new_rs = []
@@ -69,7 +69,7 @@ def extend_extracted_objects(dataset_name, **selectors):
         ExtractedEvent).join(Stimulus).join(
             RunStimulus).filter(RunStimulus.run_id.in_(run_ids)).all()
 
-    create_predictors(efs, dataset_name, run_ids)
+    create_predictors(efs, dataset_name, task_name, run_ids)
 
 
 def update_annotations(mode='predictors', **kwargs):
