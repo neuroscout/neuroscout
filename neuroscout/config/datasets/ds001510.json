@@ -2,7 +2,7 @@
   "SchematicNarrative": {
     "preproc_address": "https://github.com/neuroscout-datasets/SchematicNarrative/",
     "path": "/datasets/raw/ds001510/",
-    "summary": "Perception of schematic narrative movie clips",
+    "summary": "Watching of schematic narrative movie clips",
     "url": "https://openneuro.org/datasets/ds001510",
     "tasks": {
       "perception": {

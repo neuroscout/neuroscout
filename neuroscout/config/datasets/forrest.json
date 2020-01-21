@@ -2,7 +2,7 @@
   "studyforrest": {
     "preproc_address": "https://github.com/neuroscout-datasets/studyforrest/",
     "path": "/datasets/raw/studyforrest/",
-    "summary": "Forrest Gump movie watching task, in German",
+    "summary": "Forrest Gump movie watching, in German",
     "url": "http://studyforrest.org/",
     "tasks": {
       "movie": {

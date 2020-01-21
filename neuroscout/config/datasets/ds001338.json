@@ -2,7 +2,7 @@
   "ParanoiaStory": {
     "preproc_address": "https://github.com/neuroscout-datasets/ParanoiaStory/",
     "path": "/datasets/raw/ds001338/",
-    "summary": "Passive listening of audio narrative designed to elicit individual variation in paranoia",
+    "summary": "Listening of narrative designed to elicit individual variation in paranoia",
     "url": "https://openneuro.org/datasets/ds001338",
     "tasks": {
       "story": {

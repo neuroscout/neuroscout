@@ -2,10 +2,10 @@
   "TwilightZone": {
     "preproc_address": "https://github.com/neuroscout-datasets/ds001145/",
     "path": "/datasets/raw/ds001145/",
-    "summary": "Passive watching of 25-minute black-and-white television episode.",
+    "summary": "Watching of black-and-white TV episode",
     "url": "https://openneuro.org/datasets/ds001145",
     "tasks": {
-      "watchmovie": 
+      "watchmovie":
         "summary": "Audio Visual B/W movie",
         "converters": [
         ],

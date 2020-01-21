@@ -2,7 +2,7 @@
   "Sherlock": {
     "preproc_address": "https://github.com/neuroscout-datasets/Sherlock/",
     "path": "/datasets/raw/ds001132/",
-    "summary": "Audio/visual presentation of Sherlock episode",
+    "summary": "Watching of Sherlock episode",
     "url": "https://openneuro.org/datasets/ds001132/",
     "tasks": {
       "sherlockPart1": {
