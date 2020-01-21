@@ -90,12 +90,12 @@ export const datasetColumns = [
     width: 130,
     sorter: (a, b) => a.name.localeCompare(b.name),
   },
-  { title: 'Modality', dataIndex: 'modality' },
+  { title: 'Modality', dataIndex: 'modality', sorter: (a, b) => a.name.localeCompare(b.name)},
   { title: 'Description', dataIndex: 'description'},
-  { title: 'Author(s)', dataIndex: 'authors', width: 280,
+  { title: 'Author(s)', dataIndex: 'authors', width: 200,
     render: (text) => {
       if (text.length > 1) {
-        return (<Tooltip title={text.join(', ')}>{text[0]} ... {text[1]}</Tooltip>);
+        return (<Tooltip title={text.join(', ')}>{text[0]}, et al.</Tooltip>);
       } else {
         return (<>{text[0]}</>);
       }

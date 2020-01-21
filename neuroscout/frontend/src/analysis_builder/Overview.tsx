@@ -146,8 +146,35 @@ export class OverviewTab extends React.Component<OverviewTabProps, OverviewTabSt
       (this.props.availableRuns.map(x => x.id));
   };
 
+  taskColumns = [
+    { title: 'Name', dataIndex: 'name', sorter: (a, b) => a.name.localeCompare(b.name)},
+    { title: 'Summary', dataIndex: 'summary' },
+    {
+      title: 'Subjects (N)',
+      dataIndex: 'n_subjects',
+      sorter: (a, b) => a.numRuns - b.numRuns
+    },
+    {
+      title: 'Runs Per Subject',
+      dataIndex: 'n_runs_subject'
+    },
+    {
+      title: 'Average Run Length',
+      dataIndex: 'avg_run_duration',
+      render: (text) => text + ' seconds'
+    },
+    { title: 'TR', dataIndex: 'TR' }
+  ];
+
   datasetExpandRow = (record, index, indent, expanded) => {
-    return (<a href="{record.url}">{record.url}</a>);
+    return (
+      <>
+        {record.meanAge && <>Mean Age: {record.meanAge.toFixed(1)}<br/></>}
+        {record.percentFemale && <>Percent Female: {(record.percentFemale * 100).toFixed(1)}<br/></>}
+        {record.knownIssues && <>Known Issues: {record.knownIssues}<br/></>}
+        <a href="{record.url}">{record.url}</a><br/>
+      </>
+    );
   }
 
   render() {
@@ -170,17 +197,6 @@ export class OverviewTab extends React.Component<OverviewTabProps, OverviewTabSt
       selectedRowKeys: selectedDatasetId,
       columnWidth: '10px'
     };
-
-    const taskColumns = [
-      { title: 'Name', dataIndex: 'name', sorter: (a, b) => a.name.localeCompare(b.name)},
-
-      { title: 'Summary', dataIndex: 'summary' },
-      {
-        title: 'Subjects (N)',
-        dataIndex: 'n_subjects',
-        sorter: (a, b) => a.numRuns - b.numRuns
-      }
-    ];
 
     const taskRowSelection: TableRowSelection<Task> = {
       type: 'radio',
@@ -208,10 +224,13 @@ export class OverviewTab extends React.Component<OverviewTabProps, OverviewTabSt
 
     // these should be able to live outside of render:
     let runMsg;
-    if (analysis.runIds.length === this.props.availableRuns.length) {
+    const availableTaskRuns = this.props.availableRuns.filter((r) => r.task === selectedTaskId);
+    if (availableTaskRuns.length === 0) {
+      runMsg = 'No Task Selected';
+    } else if (analysis.runIds.length === availableTaskRuns.length) {
       runMsg = 'Runs: All selected';
     } else {
-      runMsg = 'Runs: ' + analysis.runIds.length + '/' + this.props.availableRuns.length + ' selected';
+      runMsg = 'Runs: ' + analysis.runIds.length + '/' + availableTaskRuns.length + ' selected';
     }
     // This one almost could live in state set by task selection function, but the first selectedTaskId
     //  is being set in builder, and doesn't trip the selection function in the table.
@@ -275,7 +294,7 @@ export class OverviewTab extends React.Component<OverviewTabProps, OverviewTabSt
             <Collapse accordion={true} bordered={false} defaultActiveKey={['task']}>
               <Panel header={`Task: ${taskMsg}`} key="task">
                   <Table
-                    columns={taskColumns}
+                    columns={this.taskColumns}
                     rowKey="id"
                     size="small"
                     dataSource={availableTasks}
