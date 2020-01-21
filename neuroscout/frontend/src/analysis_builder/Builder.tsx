@@ -865,6 +865,11 @@ export default class AnalysisBuilder extends Reflux.Component<any, BuilderProps 
                 selectedTaskId: availTasks[0].id,
                 predictorsLoad: true,
               };
+            } else {
+              stateUpdate = {
+                ...stateUpdate,
+                selectedTaskId: null
+              };
             }
 
             stateUpdate = {
@@ -1113,7 +1118,10 @@ export default class AnalysisBuilder extends Reflux.Component<any, BuilderProps 
                     updateAnalysis={this.updateState('analysis')}
                     updateSelectedTaskId={this.updateState('selectedTaskId')}
                   />
-                  {this.navButtons(!(!!this.state.analysis.name && this.state.analysis.runIds.length > 0), false)}
+                  {this.navButtons(
+                    !(!!this.state.analysis.name && this.state.analysis.runIds.length > 0 && selectedTaskId !== null),
+                    false
+                  )}
                   <br/>
                 </TabPane>}
                 {isEditable &&
