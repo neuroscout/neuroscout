@@ -36,6 +36,9 @@ export interface Dataset {
   tasks: Task[];
   active: boolean;
   modality: string;
+  meanAge?: number;
+  percentFemale?: number;
+  knownIssues?: string;
 }
 
 // Dataset object as returned by /api/datasets
@@ -52,6 +55,9 @@ export interface ApiDataset {
   tasks: Task[];
   active: boolean;
   mimetypes: string[];
+  mean_age?: number;
+  percent_female?: number;
+  known_issues?: string;
 }
 
 export interface Run {
@@ -68,6 +74,10 @@ export interface Task {
   description?: string;
   numRuns: number;
   summary?: string;
+  n_subjects?: number;
+  n_runs_subject?: number;
+  avg_run_duration?: number;
+  TR?: number;
 }
 
 export interface Predictor {

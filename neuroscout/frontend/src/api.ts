@@ -18,13 +18,20 @@ const domainRoot = config.server_url;
 
 // Normalize dataset object returned by /api/datasets
 const normalizeDataset = (d: ApiDataset): Dataset => {
-  const authors = d.description.Authors ? d.description.Authors : ['No authors listed'];
-  const description = d.summary;
-  const url = d.url;
-  const id = d.id.toString();
-  const modality = d.mimetypes.length > 0 ? d.mimetypes[0].split('/')[0] : '';
-  const { name, tasks, active } = d;
-  return { id, name, authors, url, description, tasks, active, modality };
+  const dataset: Dataset = {
+    authors: d.description.Authors ? d.description.Authors : ['No authors listed'],
+    description: d.summary,
+    url: d.url,
+    id: d.id.toString(),
+    modality: d.mimetypes.length > 0 ? d.mimetypes[0].split('/')[0] : '',
+    name: d.name,
+    tasks: d.tasks,
+    active: d.active
+  };
+  d.mean_age !== null ? dataset.meanAge = d.mean_age : null;
+  d.percent_female !== null ? dataset.percentFemale = d.percent_female : null;
+  d.known_issues !== null ? dataset.knownIssues = d.known_issues : null;
+  return dataset;
 };
 
 // Convert analyses returned by API to the shape expected by the frontend
