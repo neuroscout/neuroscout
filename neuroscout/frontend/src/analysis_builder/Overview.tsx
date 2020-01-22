@@ -165,10 +165,11 @@ export class OverviewTab extends React.Component<OverviewTabProps, OverviewTabSt
     },
     { title: 'TR', dataIndex: 'TR' }
   ];
-  
+
   datasetExpandRow = (record, index, indent, expanded) => {
     let rowData: {title: string, content: string, span?: number}[] = [
       {'title': 'Description', 'content': record.longDescription ? record.longDescription : 'n/a'},
+      {'title': 'Authors', 'content': record.authors.join(', ')},
       {'title': 'Mean Age', 'content': record.meanAge ? record.meanAge.toFixed(1) : 'n/a', 'span': 1},
       {
         'title': 'Percent Female',
@@ -176,12 +177,11 @@ export class OverviewTab extends React.Component<OverviewTabProps, OverviewTabSt
         'span': 1
       },
       {'title': 'References and Links', 'content': (<a href={record.url}>{record.url}</a>)},
-      {'title': 'Authors', 'content': record.authors.join(', ')}
     ];
 
     return (
       <Descriptions column={2} size="small">
-        {rowData.map((x, i) => 
+        {rowData.map((x, i) =>
           <Descriptions.Item label={x.title} key={i} span={x.span ? x.span : 2}>{x.content}</Descriptions.Item>)}
       </Descriptions>
     );
