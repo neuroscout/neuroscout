@@ -91,7 +91,7 @@ export const datasetColumns = [
     sorter: (a, b) => a.name.localeCompare(b.name),
   },
   { title: 'Summary', dataIndex: 'summary'},
-  { title: 'Modality', dataIndex: 'modality', sorter: (a, b) => a.name.localeCompare(b.name)},
+  { title: 'Modality', dataIndex: 'modality', width: 130, sorter: (a, b) => a.name.localeCompare(b.name)},
   { title: 'Author(s)', dataIndex: 'authors', width: 200,
     render: (text) => {
       if (text.length > 1) {

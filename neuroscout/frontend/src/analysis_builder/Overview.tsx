@@ -180,12 +180,10 @@ export class OverviewTab extends React.Component<OverviewTabProps, OverviewTabSt
     ];
 
     return (
-      <p style={{ margin: 0 }}>
       <Descriptions column={5} size="small">
         {rowData.map((x, i) =>
           <Descriptions.Item label={x.title} key={i} span={x.span ? x.span : 5}>{x.content}</Descriptions.Item>)}
       </Descriptions>
-      </p>
     );
   }
 
