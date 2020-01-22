@@ -159,11 +159,11 @@ export class OverviewTab extends React.Component<OverviewTabProps, OverviewTabSt
       dataIndex: 'n_runs_subject'
     },
     {
-      title: 'Average Run Length',
+      title: 'Avg Run Length',
       dataIndex: 'avg_run_duration',
       render: (text) => text + ' s'
     },
-    { title: 'TR', dataIndex: 'TR' }
+    { title: 'TR', dataIndex: 'TR', render: (text) => text + ' s'}
   ];
 
   datasetExpandRow = (record, index, indent, expanded) => {
@@ -176,7 +176,7 @@ export class OverviewTab extends React.Component<OverviewTabProps, OverviewTabSt
         'content': record.percentFemale ? (record.percentFemale * 100).toFixed(1) : 'n/a',
         'span': 1
       },
-      {'title': 'References and Links', 'content': (<a href={record.url}>{record.url}</a>)},
+      {'title': 'References and Links', 'content': (<a href={record.url}>{record.url}</a>)}
     ];
 
     return (
