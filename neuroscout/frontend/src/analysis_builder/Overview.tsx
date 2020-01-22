@@ -2,7 +2,7 @@
  OverviewTab component
 */
 import * as React from 'react';
-import { Col, Collapse, Form, Icon, Input, Row, Table, Tooltip, Button } from 'antd';
+import { Col, Collapse, Form, Icon, Input, Row, Table, Tooltip, Button, List, Descriptions } from 'antd';
 import { ColumnProps, TableRowSelection } from 'antd/lib/table';
 
 import { getTasks } from './Builder';
@@ -165,16 +165,20 @@ export class OverviewTab extends React.Component<OverviewTabProps, OverviewTabSt
     },
     { title: 'TR', dataIndex: 'TR' }
   ];
-
+  
   datasetExpandRow = (record, index, indent, expanded) => {
+    let rowData = [
+      {'title': 'Extended Description', 'content': record.longDescription ? record.longDescription : 'n/a'},
+      {'title': 'Mean Age', 'content': record.meanAge ? record.meanAge.toFixed(1) : 'n/a'},
+      {'title': 'Percent Female', 'content': record.percentFemale ? (record.percentFemale * 100).toFixed(1) : 'n/a'},
+      {'title': 'References and Links', 'content': (<a href="{record.url}">{record.url}</a>)},
+      {'title': 'Authors', 'content': record.authors.join(', ')}
+    ];
+
     return (
-      <>
-        <>Extended Description: {record.longDescription ? record.longDescription : 'n/a'}<br/></>
-        <>Mean Age: {record.meanAge ? record.meanAge.toFixed(1) : 'n/a'} <br/></>
-        <>Percent Female: {record.percentFemale ? (record.percentFemale * 100).toFixed(1) : 'n/a'}<br/></>
-        References and Links: <a href="{record.url}">{record.url}</a><br/>
-        Authors: {record.authors.join(', ')}<br/>
-      </>
+      <Descriptions column={1} size="small">
+        {rowData.map((x, i) => <Descriptions.Item label={x.title} key={i}>{x.content}</Descriptions.Item>)}
+      </Descriptions>
     );
   }
 
