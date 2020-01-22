@@ -2,7 +2,7 @@
  OverviewTab component
 */
 import * as React from 'react';
-import { Col, Collapse, Form, Icon, Input, Row, Table, Tooltip, Button } from 'antd';
+import { Col, Collapse, Form, Icon, Input, Row, Table, Tooltip, Button, List, Descriptions } from 'antd';
 import { ColumnProps, TableRowSelection } from 'antd/lib/table';
 
 import { getTasks } from './Builder';
@@ -150,7 +150,7 @@ export class OverviewTab extends React.Component<OverviewTabProps, OverviewTabSt
     { title: 'Name', dataIndex: 'name', sorter: (a, b) => a.name.localeCompare(b.name)},
     { title: 'Summary', dataIndex: 'summary' },
     {
-      title: 'Subjects (N)',
+      title: 'Subjects',
       dataIndex: 'n_subjects',
       sorter: (a, b) => a.numRuns - b.numRuns
     },
@@ -161,19 +161,24 @@ export class OverviewTab extends React.Component<OverviewTabProps, OverviewTabSt
     {
       title: 'Average Run Length',
       dataIndex: 'avg_run_duration',
-      render: (text) => text + ' seconds'
+      render: (text) => text + ' s'
     },
     { title: 'TR', dataIndex: 'TR' }
   ];
-
+  
   datasetExpandRow = (record, index, indent, expanded) => {
+    let rowData = [
+      {'title': 'Extended Description', 'content': record.longDescription ? record.longDescription : 'n/a'},
+      {'title': 'Mean Age', 'content': record.meanAge ? record.meanAge.toFixed(1) : 'n/a'},
+      {'title': 'Percent Female', 'content': record.percentFemale ? (record.percentFemale * 100).toFixed(1) : 'n/a'},
+      {'title': 'References and Links', 'content': (<a href="{record.url}">{record.url}</a>)},
+      {'title': 'Authors', 'content': record.authors.join(', ')}
+    ];
+
     return (
-      <>
-        {record.meanAge && <>Mean Age: {record.meanAge.toFixed(1)}<br/></>}
-        {record.percentFemale && <>Percent Female: {(record.percentFemale * 100).toFixed(1)}<br/></>}
-        {record.knownIssues && <>Known Issues: {record.knownIssues}<br/></>}
-        <a href="{record.url}">{record.url}</a><br/>
-      </>
+      <Descriptions column={1} size="small">
+        {rowData.map((x, i) => <Descriptions.Item label={x.title} key={i}>{x.content}</Descriptions.Item>)}
+      </Descriptions>
     );
   }
 
