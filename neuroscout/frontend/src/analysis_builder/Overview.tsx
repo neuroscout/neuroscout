@@ -161,7 +161,7 @@ export class OverviewTab extends React.Component<OverviewTabProps, OverviewTabSt
     {
       title: 'Avg Run Length',
       dataIndex: 'avg_run_duration',
-      render: (text) => text + ' s'
+      render: (text) => text + 's'
     },
     { title: 'TR', dataIndex: 'TR', render: (text) => text + 's'}
   ];
