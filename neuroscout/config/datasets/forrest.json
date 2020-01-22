@@ -2,7 +2,10 @@
   "studyforrest": {
     "preproc_address": "https://github.com/neuroscout-datasets/studyforrest/",
     "path": "/datasets/raw/studyforrest/",
-    "summary": "Forrest Gump movie watching, in German",
+    "summary": "Forrest Gump movie, in German",
+    "long_description": "Participants watched the movie 'Forrest Gump' in eight segments.
+
+    Due to the movie being present in German, speech related features are not currently available",
     "url": "http://studyforrest.org/",
     "tasks": {
       "movie": {
