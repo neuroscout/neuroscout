@@ -13,7 +13,7 @@
           ["VibranceExtractor", {}]
         ],
         "filters": {
-          "subject": "01",
+          "subject": "01"
         }
       }
     }
