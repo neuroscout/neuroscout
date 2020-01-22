@@ -20,7 +20,7 @@ const domainRoot = config.server_url;
 const normalizeDataset = (d: ApiDataset): Dataset => {
   const dataset: Dataset = {
     authors: d.description.Authors ? d.description.Authors : ['No authors listed'],
-    description: d.summary,
+    summary: d.summary,
     url: d.url,
     id: d.id.toString(),
     modality: d.mimetypes.length > 0 ? d.mimetypes[0].split('/')[0] : '',
@@ -30,7 +30,7 @@ const normalizeDataset = (d: ApiDataset): Dataset => {
   };
   d.mean_age !== null ? dataset.meanAge = d.mean_age : null;
   d.percent_female !== null ? dataset.percentFemale = d.percent_female : null;
-  d.known_issues !== null ? dataset.knownIssues = d.known_issues : null;
+  d.long_description !== null ? dataset.longDescription = d.long_description : null;
   return dataset;
 };
 

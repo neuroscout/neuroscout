@@ -150,7 +150,7 @@ export class OverviewTab extends React.Component<OverviewTabProps, OverviewTabSt
     { title: 'Name', dataIndex: 'name', sorter: (a, b) => a.name.localeCompare(b.name)},
     { title: 'Summary', dataIndex: 'summary' },
     {
-      title: 'Subjects (N)',
+      title: 'Subjects',
       dataIndex: 'n_subjects',
       sorter: (a, b) => a.numRuns - b.numRuns
     },
@@ -161,7 +161,7 @@ export class OverviewTab extends React.Component<OverviewTabProps, OverviewTabSt
     {
       title: 'Average Run Length',
       dataIndex: 'avg_run_duration',
-      render: (text) => text + ' seconds'
+      render: (text) => text + ' s'
     },
     { title: 'TR', dataIndex: 'TR' }
   ];
@@ -169,10 +169,11 @@ export class OverviewTab extends React.Component<OverviewTabProps, OverviewTabSt
   datasetExpandRow = (record, index, indent, expanded) => {
     return (
       <>
-        {record.meanAge && <>Mean Age: {record.meanAge.toFixed(1)}<br/></>}
-        {record.percentFemale && <>Percent Female: {(record.percentFemale * 100).toFixed(1)}<br/></>}
-        {record.knownIssues && <>Known Issues: {record.knownIssues}<br/></>}
-        <a href="{record.url}">{record.url}</a><br/>
+        <>Extended Description: {record.longDescription ? record.longDescription : 'n/a'}<br/></>
+        <>Mean Age: {record.meanAge ? record.meanAge.toFixed(1) : 'n/a'} <br/></>
+        <>Percent Female: {record.percentFemale ? (record.percentFemale * 100).toFixed(1) : 'n/a'}<br/></>
+        References and Links: <a href="{record.url}">{record.url}</a><br/>
+        Authors: {record.authors.join(', ')}<br/>
       </>
     );
   }

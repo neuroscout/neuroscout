@@ -8,6 +8,8 @@ class DatasetSchema(Schema):
         description='Dataset name')
     description = fields.Dict(
         description='Dataset description from BIDS dataset')
+    long_description = fields.Dict(
+        description='Long description of dataset')
     summary = fields.Str(
         description='Dataset summary description')
     url = fields.Str(

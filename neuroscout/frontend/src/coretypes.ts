@@ -32,13 +32,13 @@ export interface Dataset {
   id: string;
   authors: string[];
   url: string;
-  description: string;
+  summary: string;
+  longDescription?: string;
   tasks: Task[];
   active: boolean;
   modality: string;
   meanAge?: number;
   percentFemale?: number;
-  knownIssues?: string;
 }
 
 // Dataset object as returned by /api/datasets
@@ -51,13 +51,13 @@ export interface ApiDataset {
     URL: string;
   };
   url: string;
+  long_description?: string;
   summary: string;
   tasks: Task[];
   active: boolean;
   mimetypes: string[];
   mean_age?: number;
   percent_female?: number;
-  known_issues?: string;
 }
 
 export interface Run {
