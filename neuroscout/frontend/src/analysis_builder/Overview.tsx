@@ -167,17 +167,22 @@ export class OverviewTab extends React.Component<OverviewTabProps, OverviewTabSt
   ];
   
   datasetExpandRow = (record, index, indent, expanded) => {
-    let rowData = [
-      {'title': 'Extended Description', 'content': record.longDescription ? record.longDescription : 'n/a'},
-      {'title': 'Mean Age', 'content': record.meanAge ? record.meanAge.toFixed(1) : 'n/a'},
-      {'title': 'Percent Female', 'content': record.percentFemale ? (record.percentFemale * 100).toFixed(1) : 'n/a'},
-      {'title': 'References and Links', 'content': (<a href="{record.url}">{record.url}</a>)},
+    let rowData: {title: string, content: string, span?: number}[] = [
+      {'title': 'Description', 'content': record.longDescription ? record.longDescription : 'n/a'},
+      {'title': 'Mean Age', 'content': record.meanAge ? record.meanAge.toFixed(1) : 'n/a', 'span': 1},
+      {
+        'title': 'Percent Female',
+        'content': record.percentFemale ? (record.percentFemale * 100).toFixed(1) : 'n/a',
+        'span': 1
+      },
+      {'title': 'References and Links', 'content': (<a href={record.url}>{record.url}</a>)},
       {'title': 'Authors', 'content': record.authors.join(', ')}
     ];
 
     return (
-      <Descriptions column={1} size="small">
-        {rowData.map((x, i) => <Descriptions.Item label={x.title} key={i}>{x.content}</Descriptions.Item>)}
+      <Descriptions column={2} size="small">
+        {rowData.map((x, i) => 
+          <Descriptions.Item label={x.title} key={i} span={x.span ? x.span : 2}>{x.content}</Descriptions.Item>)}
       </Descriptions>
     );
   }
