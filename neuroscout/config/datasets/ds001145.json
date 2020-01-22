@@ -3,9 +3,7 @@
     "preproc_address": "https://github.com/neuroscout-datasets/ds001145/",
     "path": "/datasets/raw/ds001145/",
     "summary": "Black-and-white Twilight Zone episode",
-    "long_description": "24 subjects watched a complete 25-minute
-    black-and-white television episode (the Twilight Zone, https://en.wikipedia.org/wiki/The_Lateness_of_the_Hour).
-    They had no instructions other than to attend to the movie.",
+    "long_description": "24 subjects watched a complete 25-minute black-and-white television episode (the Twilight Zone, https://en.wikipedia.org/wiki/The_Lateness_of_the_Hour). They had no instructions other than to attend to the movie.",
     "url": "https://openneuro.org/datasets/ds001145",
     "tasks": {
       "watchmovie":

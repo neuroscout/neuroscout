@@ -3,9 +3,7 @@
     "preproc_address": "https://github.com/neuroscout-datasets/SherlockMerlin",
     "path": "/datasets/raw/SherlockMerlin/",
     "summary": "Sherlock and Merlin TV episodes",
-    "long_description": "
-    This dataset includes the data of 18 particpants who watched Sherlock
-    movie and data of 18 particpants who watched Merlin movie.",
+    "long_description": "This dataset includes the data of 18 particpants who watched Sherlock movie and data of 18 particpants who watched Merlin movie.",
     "url": "https://openneuro.org/datasets/ds001110",
     "tasks": {
       "SherlockMovie": {

@@ -2,10 +2,7 @@
   "HealthyBrainNetwork": {
     "path": "/datasets/raw/HealthyBrainNetwork/",
     "summary": "Movie clips from an adolescent development study",
-    "long_description": "The Healthy Brain Network is an initiative focused on creating a biobank comprised of data from 10,000 New York City area children and adolescents (ages 5-21), with a focused recruitment on children with one or more psychiatric symptoms.
-
-    Two short naturalistic clips (10-mins each) were watched during fMRI scanning as part of this broader protocol.
-    Currently, data from a small subset of participants is available for these tasks.",
+    "long_description": "The Healthy Brain Network is an initiative focused on creating a biobank comprised of data from 10,000 New York City area children and adolescents (ages 5-21), with a focused recruitment on children with one or more psychiatric symptoms.  Two short naturalistic clips (10-mins each) were watched during fMRI scanning as part of this broader protocol. Currently, data from a small subset of participants is available for these tasks.",
     "url": "http://fcon_1000.projects.nitrc.org/indi/cmi_healthy_brain_network/",
     "tasks": {
       "movieDM": {

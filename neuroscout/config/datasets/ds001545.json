@@ -3,13 +3,7 @@
     "preproc_address": "https://github.com/neuroscout-datasets/LearningTemporalStructure.git",
     "path": "/datasets/raw/ds001545/",
     "summary": "Clips from the movie 'The Grand Budapest Hotel'",
-    "long_description": "Participants watched three different clips from the
-    movie 'The Grand Budapest Hotel', six times each.
-    One clip was 'intact' (viewed in its original order);
-    one clip was scrambled but viewed in the same scrambled order
-    for all six repetitions ('scrambled-fixed'). The last clip was
-    also scrambled, but viewed in a different scrambled order for each of the
-    six repetitions ('scrambled-random').",
+    "long_description": "Participants watched three different clips from the movie 'The Grand Budapest Hotel', six times each. One clip was 'intact' (viewed in its original order); one clip was scrambled but viewed in the same scrambled order for all six repetitions ('scrambled-fixed'). The last clip was also scrambled, but viewed in a different scrambled order for each of the six repetitions ('scrambled-random').",
     "url": "https://openneuro.org/datasets/ds001545",
     "tasks": {
       "movie": {
