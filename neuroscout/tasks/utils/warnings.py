@@ -19,8 +19,8 @@ def _check_scale_variance(pes_df, transformations):
                 no_var.append(n)
 
     if no_var:
-        return [f'Applying Scale transformation to variables with no '
-                'variance will fail. {', '.join(no_var)}']
+        return ["Applying Scale transformation to variables with no "
+                f"variance will fail. ({', '.join(no_var)})"]
     else:
         return []
 
@@ -38,5 +38,5 @@ def add_warnings(analysis, pes, report_object):
     if warnings:
         update_record(
             report_object,
-            warnings=[],
+            warnings=warnings,
         )
