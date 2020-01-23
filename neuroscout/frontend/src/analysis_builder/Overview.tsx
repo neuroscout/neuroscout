@@ -60,7 +60,7 @@ export class OverviewTab extends React.Component<OverviewTabProps, OverviewTabSt
       if (Object.keys(filters).map((y) => filters[y]).filter((z) => z.length > 0).length === 0) {
         return;
       }
-      let newRunIds = this.props.availableRuns;
+      let newRunIds = this.props.availableRuns.filter(x => x.task === this.props.selectedTaskId);
       let newRunColumns = this.state.runColumns;
       Object.keys(filters).map(key => {
         if (filters[key] === null || filters[key].length === 0) { return; }
