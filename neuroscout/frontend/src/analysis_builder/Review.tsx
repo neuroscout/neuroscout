@@ -25,7 +25,7 @@ class DatasetInfo extends React.Component<{dataset: Dataset}, {}> {
     let dataset = this.props.dataset;
     return (
       <>
-        <p>{dataset.description}</p>
+        <p>{dataset.summary}</p>
         <p>Authors:<br/> {dataset.authors}</p>
         <a href={dataset.url} target="_blank" rel="noopener">{dataset.url}</a>
       </>

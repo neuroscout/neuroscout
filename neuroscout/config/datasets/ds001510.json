@@ -2,7 +2,8 @@
   "SchematicNarrative": {
     "preproc_address": "https://github.com/neuroscout-datasets/SchematicNarrative/",
     "path": "/datasets/raw/ds001510/",
-    "summary": "Perception of schematic narrative movie clips",
+    "summary": "Movie clips of schematic narratives",
+    "long_description": "Subjects were presented with 16 three-minute stories, consisting of four schematic events drawn from two different scripts (eating at a restaurant or going through the airport). Aside from this shared script structure, the stories varied widely in terms of their characters and storylines, and were presented in two highly dissimilar formats (audiovisual clips or spoken narration).",
     "url": "https://openneuro.org/datasets/ds001510",
     "tasks": {
       "perception": {

@@ -123,7 +123,12 @@ def upload_neurovault(flask_app, file_id, n_subjects=None):
     """
     api = Client(access_token=flask_app.config['NEUROVAULT_ACCESS_TOKEN'])
     file_object = NeurovaultFileUpload.query.filter_by(id=file_id).one()
-    basename = Path(file_object.path).parts[-1]
+    path = Path(file_object.path)
+
+    new_p = Path(str(path).replace('space-MNI152NLin2009cAsym_', ''))
+    path.rename(new_p)
+
+    basename = new_p.parts[-1]
 
     contrast_name = re.findall('contrast-(.*)_', str(basename))[0]
     map_type = re.findall('stat-(.*)_', str(basename))[0]

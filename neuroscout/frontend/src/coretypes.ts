@@ -32,9 +32,13 @@ export interface Dataset {
   id: string;
   authors: string[];
   url: string;
-  description: string;
+  summary: string;
+  longDescription?: string;
   tasks: Task[];
   active: boolean;
+  modality: string;
+  meanAge?: number;
+  percentFemale?: number;
 }
 
 // Dataset object as returned by /api/datasets
@@ -47,9 +51,13 @@ export interface ApiDataset {
     URL: string;
   };
   url: string;
+  long_description?: string;
   summary: string;
   tasks: Task[];
   active: boolean;
+  mimetypes: string[];
+  mean_age?: number;
+  percent_female?: number;
 }
 
 export interface Run {
@@ -66,6 +74,10 @@ export interface Task {
   description?: string;
   numRuns: number;
   summary?: string;
+  n_subjects?: number;
+  n_runs_subject?: number;
+  avg_run_duration?: number;
+  TR?: number;
 }
 
 export interface Predictor {

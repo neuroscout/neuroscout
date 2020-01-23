@@ -10,9 +10,10 @@ export const testDataset = {
   id: '1',
   authors: ['test author'],
   url: 'https://example.com',
-  description: 'dataset description',
+  summary: 'dataset description',
   tasks: [testTask],
-  active: true
+  active: true,
+  modality: ''
 };
 
 export const testPredictor = {
