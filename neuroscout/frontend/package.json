@@ -13,7 +13,9 @@
     "@types/reflux": "^6.4.1",
     "antd": "^3.13.2",
     "handlebars": "^4.3.0",
+    "js-yaml": "^3.13.1",
     "jwt-decode": "^2.2.0",
+    "mem": "^4.0.0",
     "react": "^16.3.2",
     "react-beautiful-dnd": "^10.0.3",
     "react-dom": "^16.3.2",
@@ -23,10 +25,12 @@
     "react-router-dom": "^4.1.1",
     "reactour": "^1.15.0",
     "reflux": "^6.4.1",
+    "serialize-javascript": "^2.1.1",
     "styled-components": "^4.0.0",
     "vega": "^5.9.0",
     "vega-embed": "^4.0.0",
-    "vega-lite": "^4.0.0"
+    "vega-lite": "^4.0.0",
+    "webpack-dev-server": "^3.1.11"
   },
   "devDependencies": {
     "@types/enzyme": "^3.1.10",
