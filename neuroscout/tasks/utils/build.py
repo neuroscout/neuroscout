@@ -8,7 +8,6 @@ from bids.analysis import Analysis as BIDSAnalysis
 from bids.layout import BIDSLayout
 from copy import deepcopy
 from grabbit.extensions.writable import build_path
-from .io import dump_analysis
 
 PATHS = ['sub-{subject}_[ses-{session}_]task-{task}_[acq-{acquisition}_]'
          '[run-{run}_]events.tsv']
@@ -38,7 +37,7 @@ def writeout_events(analysis, pes, outdir):
     for run in analysis.get('runs'):
         # Write out event files for each run_id
         run_events = pes[pes.run_id == run['id']].drop('run_id', axis=1)
-        entities = get_entities(run)
+        entities = _get_entities(run)
         entities['task'] = analysis['task_name']
 
         out_cols = {}
@@ -67,22 +66,22 @@ def writeout_events(analysis, pes, outdir):
     return paths
 
 
-def build_analysis(hash_id, predictor_events, run_id=None, build=True):
-    """ Dump and build analysis object """
-    analysis, resources, predictor_events, bids_dir = dump_analysis(hash_id)
-
+def build_analysis(analysis, predictor_events, bids_dir,
+                   run_id=None, build=True):
+    """ Write out and build analysis object """
     tmp_dir = Path(mkdtemp())
 
+    # Get set of entities across analysis
     entities = [{}]
     if run_id is not None:
         # Get entities of runs, and add to kwargs
         for rid in run_id:
             for run in analysis['runs']:
                 if rid == run['id']:
-                    entities.append(get_entities(run))
+                    entities.append(_get_entities(run))
                     break
 
-    entities = merge_dictionaries(*entities)
+    entities = _merge_dictionaries(*entities)
     entities['scan_length'] = max([r['duration'] for r in analysis['runs']])
     entities['task'] = analysis['task_name']
 
@@ -94,15 +93,15 @@ def build_analysis(hash_id, predictor_events, run_id=None, build=True):
     else:
         # Load events and try applying transformations
         bids_layout = BIDSLayout(bids_dir, derivatives=str(tmp_dir),
-                                 validate=False)
+                                 validate=False, index_metadata=False)
         bids_analysis = BIDSAnalysis(
             bids_layout, deepcopy(analysis.get('model')))
         bids_analysis.setup(**entities)
 
-    return tmp_dir, paths, bids_analysis, analysis, resources
+    return tmp_dir, paths, bids_analysis
 
 
-def get_entities(run):
+def _get_entities(run):
     """ Get BIDS-entities from run object """
     valid = ['number', 'session', 'subject', 'acquisition']
     entities = {
@@ -116,7 +115,7 @@ def get_entities(run):
     return entities
 
 
-def merge_dictionaries(*arg):
+def _merge_dictionaries(*arg):
     """ Set merge dictionaries """
     dd = defaultdict(set)
 

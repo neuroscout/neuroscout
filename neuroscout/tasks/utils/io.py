@@ -66,7 +66,7 @@ class PathBuilder():
         return outfile, '{}/reports/{}/{}'.format(self.domain, self.hash, file)
 
 
-def dump_analysis(analysis_id, run_id=None):
+def analysis_to_json(analysis_id, run_id=None):
     """" Serialize analysis and related PredictorEvents to JSON.
     Queries PredictorEvents to get all events for all runs and predictors. """
 

@@ -5,7 +5,8 @@ from ..models import Analysis, Report
 
 from .utils.build import build_analysis, impute_confounds
 from .utils.viz import plot_design_matrix, plot_corr_matrix, sort_dm
-from .utils.io import update_record, PathBuilder, write_jsons, write_tarball
+from .utils.io import (
+    update_record, PathBuilder, write_jsons, write_tarball, analysis_to_json)
 
 MIN_CLI_VERSION = '0.3.3'
 
@@ -19,20 +20,27 @@ def compile(flask_app, hash_id, run_ids=None, build=False):
         build (bool): Validate in pybids?
     """
     FILE_DATA = Path(flask_app.config['FILE_DIR'])
+    analysis_object = Analysis.query.filter_by(hash_id=hash_id).one()
 
     try:
-        analysis_object = Analysis.query.filter_by(hash_id=hash_id).one()
-    except Exception as e:
-        return {'traceback': f'Error loading {hash_id} from db /n {str(e)}'}
-
-    try:
-        tmp_dir, bundle_paths, _, analysis, resources = build_analysis(
-            hash_id, run_ids, build=build)
+        analysis, resources, pes, bids_dir = analysis_to_json(
+            hash_id, run_ids)
     except Exception as e:
         update_record(
             analysis_object,
             exception=e,
-            traceback='Error validating analysis'
+            traceback='Error deserializing analysis'
+        )
+        raise
+
+    try:
+        tmp_dir, bundle_paths, _ = build_analysis(
+            analysis, pes, bids_dir, run_ids, build=build)
+    except Exception as e:
+        update_record(
+            analysis_object,
+            exception=e,
+            traceback='Error building analysis'
         )
         raise
 
@@ -82,19 +90,21 @@ def generate_report(flask_app, hash_id, report_id,
     """
     FILE_DATA = Path(flask_app.config['FILE_DIR'])
     domain = flask_app.config['SERVER_NAME']
+    report_object = Report.query.filter_by(id=report_id).one()
 
     try:
-        report_object = Report.query.filter_by(id=report_id).one()
+        analysis, resources, pes, bids_dir = analysis_to_json(
+            hash_id, run_ids)
     except Exception as e:
         update_record(
             report_object,
             exception=e,
-            traceback=f'Error loading {report_id} from db /n {str(e)}'
+            traceback='Error deserializing analysis'
         )
 
     try:
         _, _, bids_analysis, analysis, resouces = build_analysis(
-            hash_id, run_ids)
+            analysis, pes, bids_dir, run_ids)
     except Exception as e:
         update_record(
             report_object,
