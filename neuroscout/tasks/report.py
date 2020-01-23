@@ -7,6 +7,7 @@ from .utils.build import build_analysis, impute_confounds
 from .utils.viz import plot_design_matrix, plot_corr_matrix, sort_dm
 from .utils.io import (
     update_record, PathBuilder, write_jsons, write_tarball, analysis_to_json)
+from .utils.warnings import add_warnings
 
 MIN_CLI_VERSION = '0.3.3'
 
@@ -101,6 +102,8 @@ def generate_report(flask_app, hash_id, report_id,
             exception=e,
             traceback='Error deserializing analysis'
         )
+
+    add_warnings(analysis, pes, report_object)
 
     try:
         _, _, bids_analysis = build_analysis(
