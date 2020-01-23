@@ -8,7 +8,7 @@ from bids.analysis import Analysis as BIDSAnalysis
 from bids.layout import BIDSLayout
 from copy import deepcopy
 from grabbit.extensions.writable import build_path
-from .build import dump_analysis
+from .io import dump_analysis
 
 PATHS = ['sub-{subject}_[ses-{session}_]task-{task}_[acq-{acquisition}_]'
          '[run-{run}_]events.tsv']
