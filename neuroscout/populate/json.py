@@ -100,6 +100,7 @@ def ingest_from_json(config_file, update_features=False, reingest=False):
                 reingest=reingest,
                 url=items.get('url'),
                 dataset_summary=items.get('summary'),
+                dataset_long_description=items.get('long_description'),
                 task_summary=params.get('summary'),
                 **dp)
             dataset_ids.append(dataset_id)

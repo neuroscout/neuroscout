@@ -121,7 +121,8 @@ def add_task(task_name, dataset_name=None, local_path=None,
              dataset_address=None, preproc_address=None,
              include_predictors=None, exclude_predictors=None,
              reingest=False, scan_length=1000,
-             dataset_summary=None, url=None, task_summary=None, **kwargs):
+             dataset_summary=None, dataset_long_description=None,
+             url=None, task_summary=None, **kwargs):
     """ Adds a BIDS dataset task to the database.
         Args:
             task_name - task to add
@@ -134,6 +135,7 @@ def add_task(task_name, dataset_name=None, local_path=None,
             reingest - force reingesting even if dataset already exists
             scan_length - default scan length in case it cant be found in image
             dataset_summary - Dataset summary description,
+            dataset_summary - Dataset long description,
             url - Dataset external link,
             task_summary - Task summary description,
             kwargs - arguments to filter runs by
@@ -167,6 +169,7 @@ def add_task(task_name, dataset_name=None, local_path=None,
     if new_ds:
         dataset_model.description = layout.description
         dataset_model.summary = dataset_summary,
+        dataset_model.long_description = dataset_long_description,
         dataset_model.url = url,
         dataset_model.dataset_address = dataset_address
         dataset_model.preproc_address = preproc_address

@@ -1,7 +1,9 @@
 from ..database import db
+from .group import GroupPredictor, GroupPredictorValue
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.ext.hybrid import hybrid_property
 from .stimulus import Stimulus
+import statistics
 
 
 class Dataset(db.Model):
@@ -9,6 +11,7 @@ class Dataset(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     description = db.Column(JSONB)  # BIDS description
     summary = db.Column(db.Text)  # Hand crafted summary
+    long_description = db.Column(db.Text) # Custom long description
     url = db.Column(db.Text)  # External resource / link
     active = db.Column(db.Boolean, default=True)
     name = db.Column(db.Text, unique=True, nullable=False)
@@ -21,13 +24,39 @@ class Dataset(db.Model):
     preproc_address = db.Column(db.Text)
     local_path = db.Column(db.Text)
 
-    known_issues = db.Column(db.Text) # Known issues free text
-
     @hybrid_property
     def mimetypes(self):
         """ List of mimetypes of stimuli in dataset """
-        return [s[0] for s in Stimulus.query.filter_by(
-            dataset_id=self.id).distinct('mimetype').values('mimetype')]
+        return [
+            x[1]
+            for x in sorted(
+                Stimulus.query.filter_by(
+                    dataset_id=self.id).distinct(
+                        'mimetype').values('id', 'mimetype'))
+            ]
+
+    @hybrid_property
+    def mean_age(self):
+        val = GroupPredictorValue.query.join(GroupPredictor).filter_by(
+            dataset_id=self.id, name='age').values('value')
+        age_map = {'20-25': 22.5, '25-30': 27.5, '30-35': 32.5, '35-40': 37.5}
+        val = [age_map[v[0]] if v[0] in age_map else float(v[0]) for v in val]
+
+        if val:
+            return statistics.mean(val)
+        else:
+            return None
+
+    def percent_female(self):
+        values = GroupPredictorValue.query.join(GroupPredictor).filter_by(
+            dataset_id=self.id).filter(
+                GroupPredictor.name.in_(['gender', 'sex'])).values('value')
+        fem = [1 if v[0] in ['f', 'F'] else 0 for v in values]
+
+        if fem:
+            return statistics.mean(fem)
+        else:
+            return None
 
     # Meta-data, such as preprocessed history, etc...
     def __repr__(self):

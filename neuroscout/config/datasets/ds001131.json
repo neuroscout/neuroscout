@@ -2,7 +2,8 @@
   "Milky-Vodka": {
     "preproc_address": "https://github.com/neuroscout-datasets/ds001131/",
     "path": "/datasets/raw/ds001131/",
-    "summary": "Passive listening of two audio stories ('Milky Way' and 'Vodka')",
+    "summary": "Two audio narratives",
+    "long_description": "Two distinct narratives were created by changing only a few words in each sentence (e.g., “he” to “she” or “sobbing” to “laughing”) while preserving the grammatical structure across stories. 18 subjects listened to story 1; 18 subjects listened to story 2, and 18 subjects listened to both synonym and scrambled control conditions.",
     "url": "https://openneuro.org/datasets/ds001131",
     "tasks": {
       "milky": {
