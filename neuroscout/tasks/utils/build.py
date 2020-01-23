@@ -93,7 +93,7 @@ def build_analysis(analysis, predictor_events, bids_dir,
     else:
         # Load events and try applying transformations
         bids_layout = BIDSLayout(bids_dir, derivatives=str(tmp_dir),
-                                 validate=False, index_metadata=False)
+                                 validate=False)
         bids_analysis = BIDSAnalysis(
             bids_layout, deepcopy(analysis.get('model')))
         bids_analysis.setup(**entities)
