@@ -23,7 +23,7 @@ def compile(flask_app, hash_id, run_ids=None, build=False):
     analysis_object = Analysis.query.filter_by(hash_id=hash_id).one()
 
     try:
-        analysis, resources, pes, bids_dir = analysis_to_json(
+        a_id, analysis, resources, pes, bids_dir = analysis_to_json(
             hash_id, run_ids)
     except Exception as e:
         update_record(
@@ -48,7 +48,7 @@ def compile(flask_app, hash_id, run_ids=None, build=False):
         sidecar = {'RepetitionTime': analysis['TR']}
         resources['validation_hash'] = Hashids(
             flask_app.config['SECONDARY_HASH_SALT'],
-            min_length=10).encode(hash_id)
+            min_length=10).encode(a_id)
         resources['version_required'] = MIN_CLI_VERSION
 
         # Write out JSON files to tmp_dir
@@ -93,7 +93,7 @@ def generate_report(flask_app, hash_id, report_id,
     report_object = Report.query.filter_by(id=report_id).one()
 
     try:
-        analysis, resources, pes, bids_dir = analysis_to_json(
+        _, analysis, resources, pes, bids_dir = analysis_to_json(
             hash_id, run_ids)
     except Exception as e:
         update_record(
