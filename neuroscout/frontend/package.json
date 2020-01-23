@@ -12,6 +12,7 @@
     "@types/react-dom": "^16.0.5",
     "@types/reflux": "^6.4.1",
     "antd": "^3.13.2",
+    "handlebars": "^4.3.0",
     "jwt-decode": "^2.2.0",
     "react": "^16.3.2",
     "react-beautiful-dnd": "^10.0.3",

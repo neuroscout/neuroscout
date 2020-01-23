@@ -4765,7 +4765,7 @@ handle-thing@^1.2.5:
   resolved "https://registry.yarnpkg.com/handle-thing/-/handle-thing-1.2.5.tgz#fd7aad726bf1a5fd16dfc29b2f7a6601d27139c4"
   integrity sha1-/Xqtcmvxpf0W38KbL3pmAdJxOcQ=
 
-handlebars@^4.0.3:
+handlebars@^4.0.3, handlebars@^4.3.0:
   version "4.7.2"
   resolved "https://registry.yarnpkg.com/handlebars/-/handlebars-4.7.2.tgz#01127b3840156a0927058779482031afe0e730d7"
   integrity sha512-4PwqDL2laXtTWZghzzCtunQUTLbo31pcCJrd/B/9JP8XbhVzpS5ZXuKqlOzsd1rtcaLo4KqAn8nl8mkknS4MHw==
