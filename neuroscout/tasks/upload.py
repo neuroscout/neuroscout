@@ -142,7 +142,7 @@ def upload_neurovault(flask_app, file_id, n_subjects=None):
 
     try:
         api.add_image(
-            file_object.collection.collection_id, file_object.path,
+            file_object.collection.collection_id, str(new_p),
             name=contrast_name,
             modality="fMRI-BOLD", map_type=map_type,
             analysis_level=analysis_level, cognitive_paradigm_cogatlas='None',
