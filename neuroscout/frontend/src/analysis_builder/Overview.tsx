@@ -167,8 +167,8 @@ export class OverviewTab extends React.Component<OverviewTabProps, OverviewTabSt
   ];
 
   datasetExpandRow = (record, index, indent, expanded) => {
-    let rowData: {title: string, content: string, span?: number}[] = [
-      {'title': 'Description', 'content': record.longDescription ? record.longDescription : 'n/a'},
+    let rowData: {title?: string, content: string, span?: number}[] = [
+      {'content': record.longDescription ? record.longDescription : 'n/a'},
       {'title': 'Authors', 'content': record.authors.join(', ')},
       {'title': 'Mean Age', 'content': record.meanAge ? record.meanAge.toFixed(1) : 'n/a', 'span': 1},
       {

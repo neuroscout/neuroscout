@@ -3,11 +3,7 @@
     "preproc_address": "https://github.com/neuroscout-datasets/Sherlock/",
     "path": "/datasets/raw/ds001132/",
     "summary": "BBC's Sherlock episode",
-    "long_description": "Sixteen subjects watched the first 50 minutes of Episode 1 of BBC's Sherlock.
-    The movie was split into two parts of approximately equal length.
-    Immediately afterward, subjects described aloud what they recalled from the movie.
-
-    Note: Due to missing stimuli, only the first run is currently available.",
+    "long_description": "Sixteen subjects watched the first 50 minutes of Episode 1 of BBC's Sherlock. The movie was split into two parts of approximately equal length. Immediately afterward, subjects described aloud what they recalled from the movie. Note: Due to missing stimuli, only the first run is currently available.",
     "url": "https://openneuro.org/datasets/ds001132/",
     "tasks": {
       "sherlockPart1": {

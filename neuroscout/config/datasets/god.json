@@ -3,7 +3,7 @@
     "dataset_address": "https://openneuro.org/api/snapshots/download?ticket=89964776-f476-4b4e-bf02-8a4b776c65ce",
     "preproc_address": "https://s3.amazonaws.com/openneuro.outputs/ba961fb8708c04f8f181206ab03d6548/60dd91b5-e059-4be8-a75d-de3910eb2635/fmriprep/",
     "path": "/datasets/raw/generic_object_decoding/",
-    "summary": "1,200 object images from various categories"
+    "summary": "1,200 object images from various categories",
     "url": "https://openneuro.org/datasets/ds001246/",
     "tasks": {
       "perception": {
@@ -13,7 +13,7 @@
           ["VibranceExtractor", {}]
         ],
         "filters": {
-          "subject": "01",
+          "subject": "01"
         }
       }
     }
