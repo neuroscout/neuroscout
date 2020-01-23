@@ -103,7 +103,7 @@ def generate_report(flask_app, hash_id, report_id,
         )
 
     try:
-        _, _, bids_analysis, analysis, resouces = build_analysis(
+        _, _, bids_analysis = build_analysis(
             analysis, pes, bids_dir, run_ids)
     except Exception as e:
         update_record(
