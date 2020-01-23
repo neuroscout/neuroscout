@@ -150,6 +150,8 @@ class ReportSchema(Schema):
     generated_at = fields.Time(description='Time report was generated')
     result = fields.Dict(description='Links to report resources')
     status = fields.Str(description='Report status')
+    warnings = fields.List(
+        fields.Str(), description='Report warnings')
     traceback = fields.Str(
         description='Traceback of generation error.')
 
