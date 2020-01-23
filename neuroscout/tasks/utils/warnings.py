@@ -20,7 +20,7 @@ def _check_scale_variance(pes_df, transformations):
 
     if no_var:
         return ["Applying Scale transformation to variables with no "
-                f"variance will fail. ({', '.join(no_var)})"]
+                f"variance will fail. ({', '.join(set(no_var))})"]
     else:
         return []
 
