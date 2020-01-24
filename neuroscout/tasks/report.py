@@ -112,7 +112,7 @@ def generate_report(flask_app, hash_id, report_id,
         update_record(
             report_object,
             exception=e,
-            traceback='Error building/validating analysis'
+            traceback='Error validating analysis'
         )
         raise
 

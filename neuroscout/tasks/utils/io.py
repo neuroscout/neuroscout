@@ -14,8 +14,7 @@ REPORT_PATHS = ['sub-{subject}_[ses-{session}_]task-{task}_'
 def update_record(model, exception=None, **fields):
     if exception is not None:
         if 'traceback' in fields:
-            fields['traceback'] = f"{fields['traceback']}. \
-             Error:{str(exception)}"
+            fields['traceback'] = f"{fields['traceback']}.\n{str(exception)}"
         if 'status' not in fields:
             fields['status'] = 'FAILED'
     put_record(fields, model)
