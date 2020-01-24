@@ -208,6 +208,11 @@ export class Report extends React.Component<ReportProps, ReportState> {
     let state = {...this.state};
     jwtFetch(`${domainRoot}/api/analyses/${id}/report?run_id=${this.state.selectedRunIds}`)
     .then((res) => {
+      if (res.warnings) {
+        state.warnings = res.warnings;
+      } else {
+        state.warnings = [];
+      }
       if (res.status === 'OK') {
         if (res.result === undefined) {
           return;
@@ -215,11 +220,6 @@ export class Report extends React.Component<ReportProps, ReportState> {
         state.matrices = res.result.design_matrix;
         state.plots = res.result.design_matrix_plot;
         state.corr_plots = res.result.design_matrix_corrplot;
-        if (res.warnings) {
-          state.warnings = res.warnings;
-        } else {
-          state.warnings = [];
-        }
         state.reportTimestamp = res.generated_at;
         if (res.traceback) {
           state.reportTraceback = res.traceback;
@@ -411,12 +411,11 @@ export class Report extends React.Component<ReportProps, ReportState> {
               runTitles={this.state.runTitles}
             />
 
-            <Warnings
-              warnings={this.state.warnings}
-            />
-
           </Spin>
         </Card>
+        <Warnings
+          warnings={this.state.warnings}
+        />
         <br/>
         {(this.state.reportTraceback || this.state.compileTraceback) &&
         <div>
