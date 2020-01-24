@@ -92,10 +92,30 @@ class Plots extends React.Component<{matrices: string[], plots: any[], corr_plot
 
 class Tracebacks extends React.Component<{reportTraceback: string, compileTraceback: string}, {}> {
     render() {
+      let display: any[] = [];
+      if (this.props.compileTraceback) {
+        display.push(
+          <Alert
+            message="Error"
+            description={this.props.compileTraceback}
+            type="error"
+            showIcon={true}
+          />
+        );
+      }
+      if (this.props.reportTraceback) {
+        display.push(
+          <Alert
+            message="Error"
+            description={this.props.reportTraceback}
+            type="error"
+            showIcon={true}
+          />
+        );
+      }
       return(
       <div>
-        <p>{this.props.reportTraceback}</p>
-        <p>{this.props.compileTraceback}</p>
+      {display}
       </div>
       );
     }
@@ -400,12 +420,11 @@ export class Report extends React.Component<ReportProps, ReportState> {
         <br/>
         {(this.state.reportTraceback || this.state.compileTraceback) &&
         <div>
-        <Card title="Errors" key="errors">
           <Tracebacks
             reportTraceback={this.state.reportTraceback}
             compileTraceback={this.state.compileTraceback}
           />
-        </Card><br/></div>}
+        <br/></div>}
       </div>
     );
   }
