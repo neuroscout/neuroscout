@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Button, Tabs, Collapse, Card, Tooltip, Icon, Select, Spin, Popconfirm } from 'antd';
+import { Alert, Button, Tabs, Collapse, Card, Tooltip, Icon, Select, Spin, Popconfirm } from 'antd';
 import vegaEmbed from 'vega-embed';
 
 import { OptionProps } from 'antd/lib/select';
@@ -29,6 +29,28 @@ class VegaPlot extends React.Component<{spec: string}, {}> {
   render () {
     return(
       <div ref={this.vegaContainer}/>
+    );
+  }
+}
+
+class Warnings extends React.Component<{warnings: string[]}> {
+  render() {
+    let alerts: any[] = [];
+    this.props.warnings.map((x, i) => {
+      alerts.push(
+        <Alert
+          message="Warning"
+          description={x}
+          type="warning"
+          showIcon={true}
+        />
+      );
+    });
+    return(
+      <div>
+      <br/>
+      {alerts}
+      </div>
     );
   }
 }
@@ -91,6 +113,7 @@ interface ReportState {
   matrices: string[];
   plots: string[];
   corr_plots: string[];
+  warnings: string[];
   reportTimestamp: string;
   reportTraceback: string;
   compileTraceback: string;
@@ -111,6 +134,7 @@ export class Report extends React.Component<ReportProps, ReportState> {
       matrices: [],
       plots: [],
       corr_plots: [],
+      warnings: [],
       reportTimestamp: '',
       reportsLoaded: false,
       reportsPosted: false,
@@ -171,6 +195,11 @@ export class Report extends React.Component<ReportProps, ReportState> {
         state.matrices = res.result.design_matrix;
         state.plots = res.result.design_matrix_plot;
         state.corr_plots = res.result.design_matrix_corrplot;
+        if (res.warnings) {
+          state.warnings = res.warnings;
+        } else {
+          state.warnings = [];
+        }
         state.reportTimestamp = res.generated_at;
         if (res.traceback) {
           state.reportTraceback = res.traceback;
@@ -187,7 +216,6 @@ export class Report extends React.Component<ReportProps, ReportState> {
       } else {
         return;
       }
-      
       state.reportsLoaded = true;
       this.setState({...state});
     });
@@ -254,13 +282,13 @@ export class Report extends React.Component<ReportProps, ReportState> {
   }
 
   filterRuns = (inputValue: string, option:  React.ReactElement<OptionProps>): boolean => {
-    
+
     if (option.props.children) {
       return ('' + option.props.children).includes(inputValue);
     }
     return false;
   }
- 
+
   formatRun = (run: Run) => {
     let ret = '';
     if (!!run.subject) {
@@ -362,6 +390,11 @@ export class Report extends React.Component<ReportProps, ReportState> {
               corr_plots={this.state.corr_plots}
               runTitles={this.state.runTitles}
             />
+
+            <Warnings
+              warnings={this.state.warnings}
+            />
+
           </Spin>
         </Card>
         <br/>
