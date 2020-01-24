@@ -19,8 +19,11 @@ def _check_scale_variance(pes_df, transformations):
                 no_var.append(n)
 
     if no_var:
-        return ["Applying Scale transformation to variables with no "
-                f"variance will fail. ({', '.join(set(no_var))})"]
+        return [
+            f"The following variables have no variance: "
+            f"{', '.join(set(no_var))}."
+            "Scale transformation will fail, and variables will be "
+            "removed from design matrix."]
     else:
         return []
 
