@@ -413,9 +413,9 @@ export class Report extends React.Component<ReportProps, ReportState> {
 
           </Spin>
         </Card>
-        <Warnings
-          warnings={this.state.warnings}
-        />
+
+        {this.state.warnings.length && <Warnings warnings={this.state.warnings} />}
+
         <br/>
         {(this.state.reportTraceback || this.state.compileTraceback) &&
         <div>
