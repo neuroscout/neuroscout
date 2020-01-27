@@ -7,6 +7,9 @@ def _flatten(li):
 
 
 def _check_scale_variance(pes_df, transformations):
+    # To numeric and coerce
+    pes_df['value'] = pd.to_numeric(pes_df.value, errors='coerce')
+
     # Check for inputs to Scale with no variance
     in_scale = [t['Input'] for t in transformations if t['Name'] == 'Scale']
     in_scale = _flatten(in_scale)
@@ -20,7 +23,7 @@ def _check_scale_variance(pes_df, transformations):
 
     if no_var:
         return [
-            f"The following variables have no variance: "
+            f"The following variables have no variance in at least one run: "
             f"{', '.join(set(no_var))}."
             "Scale transformation will fail, and variables will be "
             "removed from design matrix."]

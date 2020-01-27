@@ -103,7 +103,14 @@ def generate_report(flask_app, hash_id, report_id,
             traceback='Error deserializing analysis'
         )
 
-    add_warnings(analysis, pes, report_object)
+    try:
+        add_warnings(analysis, pes, report_object)
+    except Exception as e:
+        update_record(
+            report_object,
+            exception=e,
+            traceback='Error generating warnings'
+        )
 
     try:
         _, _, bids_analysis = build_analysis(
