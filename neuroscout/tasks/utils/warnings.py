@@ -7,6 +7,8 @@ def _flatten(li):
 
 
 def _check_scale_variance(pes_df, transformations):
+    """ Warns if Scale transformation is applied to any variables with
+    no variance in a given run. """
     # To numeric and coerce
     pes_df['value'] = pd.to_numeric(pes_df.value, errors='coerce')
 
@@ -31,7 +33,10 @@ def _check_scale_variance(pes_df, transformations):
         return []
 
 
-def add_warnings(analysis, pes, report_object):
+def pre_warnings(analysis, pes, report_object):
+    """ Generate warnings that are relevant prior to running pyBIDS.
+    This includes warnings that might result in pyBIDS crashes, and make sense
+    to catch early """
     warnings = []
 
     pes_df = pd.DataFrame(pes)
