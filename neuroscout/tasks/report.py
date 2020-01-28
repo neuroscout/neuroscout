@@ -30,7 +30,7 @@ def compile(flask_app, hash_id, run_ids=None, build=False):
         update_record(
             analysis_object,
             exception=e,
-            compile_traceback='Error deserializing analysis'
+            traceback='Error deserializing analysis'
         )
         raise
 
@@ -41,7 +41,7 @@ def compile(flask_app, hash_id, run_ids=None, build=False):
         update_record(
             analysis_object,
             exception=e,
-            compile_traceback='Error building analysis'
+            traceback='Error building analysis'
         )
         raise
 
@@ -68,7 +68,7 @@ def compile(flask_app, hash_id, run_ids=None, build=False):
         update_record(
             analysis_object,
             exception=e,
-            compile_traceback='Error writing tarball bundle'
+            traceback='Error writing tarball bundle'
         )
         raise
 
