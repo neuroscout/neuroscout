@@ -25,7 +25,7 @@ class PredictorResource(MethodResource):
         return first_or_404(Predictor.query.filter_by(id=predictor_id))
 
 
-def get_predictors(newest=True, user=None, **kwargs):
+def get_predictors(newest=True, active=True, user=None, **kwargs):
     """ Helper function for querying newest predictors """
     if newest:
         predictor_ids = db.session.query(
@@ -43,7 +43,7 @@ def get_predictors(newest=True, user=None, **kwargs):
     for param in kwargs:
         query = query.filter(getattr(Predictor, param).in_(kwargs[param]))
 
-    query = query.filter_by(active=True)
+    query = query.filter_by(active=active)
 
     if user is not None:
         query = query.filter_by(private=True).join(
@@ -62,6 +62,9 @@ class PredictorListResource(MethodResource):
             wa.fields.Int(), description="Run id(s). Warning, slow query."),
         'name': wa.fields.DelimitedList(wa.fields.Str(),
                                         description="Predictor name(s)"),
+        'active': wa.fields.Boolean(
+            missing=True,
+            description="Return only active Predictors"),
         'newest': wa.fields.Boolean(
             missing=True,
             description="Return only newest Predictor by name")
@@ -71,7 +74,8 @@ class PredictorListResource(MethodResource):
     @marshal_with(PredictorSchema(many=True))
     def get(self, **kwargs):
         newest = kwargs.pop('newest')
-        return get_predictors(newest=newest, **kwargs)
+        active = kwargs.pop('active')
+        return get_predictors(newest=newest, active=active, **kwargs)
 
 
 def prepare_upload(collection_name, event_files, runs, dataset_id):
