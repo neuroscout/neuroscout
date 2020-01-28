@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Button, Tabs, Collapse, Card, Tooltip, Icon, Select, Spin, Popconfirm } from 'antd';
+import { Alert, Button, Tabs, Collapse, Card, Tooltip, Icon, Select, Spin, Popconfirm } from 'antd';
 import vegaEmbed from 'vega-embed';
 
 import { OptionProps } from 'antd/lib/select';
@@ -29,6 +29,28 @@ class VegaPlot extends React.Component<{spec: string}, {}> {
   render () {
     return(
       <div ref={this.vegaContainer}/>
+    );
+  }
+}
+
+class Warnings extends React.Component<{warnings: string[]}> {
+  render() {
+    let alerts: any[] = [];
+    this.props.warnings.map((x, i) => {
+      alerts.push(
+        <Alert
+          message="Warning"
+          description={x}
+          type="warning"
+          showIcon={true}
+        />
+      );
+    });
+    return(
+      <div>
+      <br/>
+      {alerts}
+      </div>
     );
   }
 }
@@ -68,12 +90,28 @@ class Plots extends React.Component<{matrices: string[], plots: any[], corr_plot
     }
 }
 
-class Tracebacks extends React.Component<{reportTraceback: string, compileTraceback: string}, {}> {
+export class Tracebacks extends React.Component<{traceback: string, message: string}, {}> {
     render() {
+      let display: any[] = [];
+      if (this.props.traceback) {
+        display.push(
+          <Alert
+            message={this.props.message}
+            description={
+              <div><p>{this.props.traceback}</p>
+              If you don't know what this error means, feel free to ask
+              on <a href="https://neurostars.org/">NeuroStars</a>.<br/>
+              If you believe this is a bug, please open an issue on open an
+              <a href="https://github.com/neuroscout/neuroscout/issues"> issue on GitHub</a>.
+              </div>}
+            type="error"
+            showIcon={true}
+          />
+        );
+      }
       return(
       <div>
-        <p>{this.props.reportTraceback}</p>
-        <p>{this.props.compileTraceback}</p>
+      {display}
       </div>
       );
     }
@@ -91,9 +129,9 @@ interface ReportState {
   matrices: string[];
   plots: string[];
   corr_plots: string[];
+  warnings: string[];
   reportTimestamp: string;
   reportTraceback: string;
-  compileTraceback: string;
   reportsLoaded: boolean;
   reportsPosted: boolean;
   compileLoaded: boolean;
@@ -111,12 +149,12 @@ export class Report extends React.Component<ReportProps, ReportState> {
       matrices: [],
       plots: [],
       corr_plots: [],
+      warnings: [],
       reportTimestamp: '',
       reportsLoaded: false,
       reportsPosted: false,
       compileLoaded: false,
       reportTraceback: '',
-      compileTraceback: '',
       selectedRunIds: ['' + this.props.runs[0].id],
       runTitles: [this.formatRun(this.props.runs[0])],
       warnVisible: false
@@ -164,6 +202,11 @@ export class Report extends React.Component<ReportProps, ReportState> {
     let state = {...this.state};
     jwtFetch(`${domainRoot}/api/analyses/${id}/report?run_id=${this.state.selectedRunIds}`)
     .then((res) => {
+      if (res.warnings) {
+        state.warnings = res.warnings;
+      } else {
+        state.warnings = [];
+      }
       if (res.status === 'OK') {
         if (res.result === undefined) {
           return;
@@ -187,7 +230,6 @@ export class Report extends React.Component<ReportProps, ReportState> {
       } else {
         return;
       }
-      
       state.reportsLoaded = true;
       this.setState({...state});
     });
@@ -211,9 +253,6 @@ export class Report extends React.Component<ReportProps, ReportState> {
       .then((res) => {
         state.status = res.status;
         state.compileLoaded = true;
-        if (res.traceback) {
-          state.compileTraceback = res.traceback;
-        }
         this.setState({...state});
       });
     }
@@ -254,13 +293,13 @@ export class Report extends React.Component<ReportProps, ReportState> {
   }
 
   filterRuns = (inputValue: string, option:  React.ReactElement<OptionProps>): boolean => {
-    
+
     if (option.props.children) {
       return ('' + option.props.children).includes(inputValue);
     }
     return false;
   }
- 
+
   formatRun = (run: Run) => {
     let ret = '';
     if (!!run.subject) {
@@ -362,17 +401,20 @@ export class Report extends React.Component<ReportProps, ReportState> {
               corr_plots={this.state.corr_plots}
               runTitles={this.state.runTitles}
             />
+
+            {(this.state.warnings.length > 0) && <Warnings warnings={this.state.warnings} />}
+
+            {(this.state.reportTraceback) &&
+            <div>
+              <br/>
+              <Tracebacks
+                message="Report failed to generate"
+                traceback={this.state.reportTraceback}
+              />
+            <br/></div>}
           </Spin>
         </Card>
         <br/>
-        {(this.state.reportTraceback || this.state.compileTraceback) &&
-        <div>
-        <Card title="Errors" key="errors">
-          <Tracebacks
-            reportTraceback={this.state.reportTraceback}
-            compileTraceback={this.state.compileTraceback}
-          />
-        </Card><br/></div>}
       </div>
     );
   }

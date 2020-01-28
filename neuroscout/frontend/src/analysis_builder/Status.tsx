@@ -5,7 +5,7 @@ import { jwtFetch } from '../utils';
 import { Analysis } from '../coretypes';
 import { StatusTag } from '../HelperComponents';
 import { api } from '../api';
-
+import { Tracebacks } from './Report';
 const domainRoot = config.server_url;
 
 export class DLLink extends React.Component<{status?: string, analysisId?: string}, {}> {
@@ -163,8 +163,8 @@ export class StatusTab extends React.Component<submitProps, statusTabState> {
       }
       jwtFetch(`${domainRoot}/api/analyses/${id}/compile`)
       .then((res) => {
-        if (res.compile_traceback) {
-          this.setState({compileTraceback: res.compile_traceback});
+        if (res.traceback) {
+          this.setState({compileTraceback: res.traceback});
         }
       });
   }
@@ -273,20 +273,6 @@ export class StatusTab extends React.Component<submitProps, statusTabState> {
           <br/>
         </div>
       }
-      {(this.props.status === 'FAILED') &&
-        <div>
-          <h3>Analysis Failed to Compile</h3>
-          <p>
-            Oh no! It looks like your analysis failed to compile.
-            Once you make changes to fix the analysis you can re-run it below.
-            If the issue remains, please file a
-            <a href="https://github.com/neuroscout/neuroscout/issues"> bugreport</a>.
-          </p>
-          <Card title="Errors" key="errors">
-            <pre>{this.state.compileTraceback}</pre>
-          </Card>
-        </div>
-      }
       {(this.props.status === 'DRAFT' || this.props.status === 'FAILED') &&
         <Submit
           status={this.props.status}
@@ -294,6 +280,16 @@ export class StatusTab extends React.Component<submitProps, statusTabState> {
           confirmSubmission={this.props.confirmSubmission}
           private={this.props.private}
         />
+      }
+      {(this.props.status === 'FAILED') &&
+        <div>
+          <br/>
+          <Tracebacks
+            message="Analysis failed to compile"
+            traceback={this.state.compileTraceback}
+          />
+          <br/>
+        </div>
       }
       {(this.props.status === 'PENDING' || this.props.status === 'SUBMITTING') &&
         <div>

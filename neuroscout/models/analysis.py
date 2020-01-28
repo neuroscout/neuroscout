@@ -109,6 +109,7 @@ class Report(db.Model):
     generated_at = db.Column(db.DateTime, default=datetime.datetime.utcnow)
     task_id = db.Column(db.Text)   # Celery task id
     result = db.Column(JSONB)  # JSON result from Celery (once finished)
+    warnings = db.Column(JSONB, default=[])
     traceback = db.Column(db.Text)
 
     status = db.Column(db.Text, default='PENDING')
