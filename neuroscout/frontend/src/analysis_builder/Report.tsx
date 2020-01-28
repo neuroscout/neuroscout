@@ -90,24 +90,20 @@ class Plots extends React.Component<{matrices: string[], plots: any[], corr_plot
     }
 }
 
-class Tracebacks extends React.Component<{reportTraceback: string, compileTraceback: string}, {}> {
+export class Tracebacks extends React.Component<{traceback: string, message: string}, {}> {
     render() {
       let display: any[] = [];
-      if (this.props.compileTraceback) {
+      if (this.props.traceback) {
         display.push(
           <Alert
-            message="Error"
-            description={this.props.compileTraceback}
-            type="error"
-            showIcon={true}
-          />
-        );
-      }
-      if (this.props.reportTraceback) {
-        display.push(
-          <Alert
-            message="Error"
-            description={this.props.reportTraceback}
+            message={this.props.message}
+            description={
+              <div><p>{this.props.traceback}</p>
+              If you don't know what this error means, feel free to ask
+              on <a href="https://neurostars.org/">NeuroStars</a>.<br/>
+              If you believe this is a bug, please open an issue on open an
+              <a href="https://github.com/neuroscout/neuroscout/issues"> issue on GitHub</a>.
+              </div>}
             type="error"
             showIcon={true}
           />
@@ -136,7 +132,6 @@ interface ReportState {
   warnings: string[];
   reportTimestamp: string;
   reportTraceback: string;
-  compileTraceback: string;
   reportsLoaded: boolean;
   reportsPosted: boolean;
   compileLoaded: boolean;
@@ -160,7 +155,6 @@ export class Report extends React.Component<ReportProps, ReportState> {
       reportsPosted: false,
       compileLoaded: false,
       reportTraceback: '',
-      compileTraceback: '',
       selectedRunIds: ['' + this.props.runs[0].id],
       runTitles: [this.formatRun(this.props.runs[0])],
       warnVisible: false
@@ -259,9 +253,6 @@ export class Report extends React.Component<ReportProps, ReportState> {
       .then((res) => {
         state.status = res.status;
         state.compileLoaded = true;
-        if (res.traceback) {
-          state.compileTraceback = res.traceback;
-        }
         this.setState({...state});
       });
     }
@@ -411,19 +402,19 @@ export class Report extends React.Component<ReportProps, ReportState> {
               runTitles={this.state.runTitles}
             />
 
+            {(this.state.warnings.length > 0) && <Warnings warnings={this.state.warnings} />}
+
+            {(this.state.reportTraceback) &&
+            <div>
+              <br/>
+              <Tracebacks
+                message="Report failed to generate"
+                traceback={this.state.reportTraceback}
+              />
+            <br/></div>}
           </Spin>
         </Card>
-
-        {this.state.warnings.length && <Warnings warnings={this.state.warnings} />}
-
         <br/>
-        {(this.state.reportTraceback || this.state.compileTraceback) &&
-        <div>
-          <Tracebacks
-            reportTraceback={this.state.reportTraceback}
-            compileTraceback={this.state.compileTraceback}
-          />
-        <br/></div>}
       </div>
     );
   }
