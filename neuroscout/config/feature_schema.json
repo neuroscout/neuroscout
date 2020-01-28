@@ -167,28 +167,36 @@
           "description": "Face landmarking confidence"
         },
         "joyLikelihood": {
-          "description": "Joy likelihood."
+          "description": "Joy likelihood.",
+          "active": false
         },
         "sorrowLikelihood": {
-          "description": "Sorrow likelihood."
+          "description": "Sorrow likelihood.",
+          "active": false
         },
         "angerLikelihood": {
-          "description": "Anger likelihood"
+          "description": "Anger likelihood",
+          "active": false
         },
         "surpriseLikelihood": {
-          "description": "Surprise likelihood"
+          "description": "Surprise likelihood",
+          "active": false
         },
         "underExposedLikelihood": {
-          "description": "Under-exposed likelihood."
+          "description": "Under-exposed likelihood.",
+          "active": false
         },
         "blurredLikelihood": {
-          "description" : "Blurred likelihood"
+          "description" : "Blurred likelihood",
+          "active": false
         },
         "headwearLikelihood": {
-          "description": "Headwear likelihood"
+          "description": "Headwear likelihood",
+          "active": false
         },
         "num_faces": {
-          "description": "Number of detected faces in scene"
+          "description": "Number of detected faces in scene",
+          "active": false
         }
       }
     }
@@ -219,19 +227,24 @@
     {
       "features": {
         "adult": {
-          "description": "Likelihood of nudity, pornographic images or cartoons, or sexual activities"
+          "description": "Likelihood of nudity, pornographic images or cartoons, or sexual activities",
+          "active": false
         },
         "spoof": {
-          "description": "Likelihood that an modification was made to the image's canonical version to make it appear funny or offensive"
+          "description": "Likelihood that an modification was made to the image's canonical version to make it appear funny or offensive",
+          "active": false
         },
         "medical": {
-          "description": "Likelihood that this is a medical image"
+          "description": "Likelihood that this is a medical image",
+          "active": false
         },
         "violence": {
-          "description": "Likelihood that this image contains violent content"
+          "description": "Likelihood that this image contains violent content",
+          "active": false
         },
         "racy": {
-          "description": "Likelihood that this image contains racy content"
+          "description": "Likelihood that this image contains racy content",
+          "active": false
           }
       }
 
