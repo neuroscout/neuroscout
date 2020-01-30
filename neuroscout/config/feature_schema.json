@@ -196,7 +196,6 @@
         },
         "num_faces": {
           "description": "Number of detected faces in scene",
-          "active": false
         }
       }
     }
