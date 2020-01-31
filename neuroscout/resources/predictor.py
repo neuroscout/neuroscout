@@ -43,7 +43,8 @@ def get_predictors(newest=True, active=True, user=None, **kwargs):
     for param in kwargs:
         query = query.filter(getattr(Predictor, param).in_(kwargs[param]))
 
-    query = query.filter_by(active=active)
+    if active:
+        query = query.filter_by(active=active)
 
     if user is not None:
         query = query.filter_by(private=True).join(
@@ -62,7 +63,7 @@ class PredictorListResource(MethodResource):
             wa.fields.Int(), description="Run id(s). Warning, slow query."),
         'name': wa.fields.DelimitedList(wa.fields.Str(),
                                         description="Predictor name(s)"),
-        'active': wa.fields.Boolean(
+        'active_only': wa.fields.Boolean(
             missing=True,
             description="Return only active Predictors"),
         'newest': wa.fields.Boolean(
@@ -74,7 +75,7 @@ class PredictorListResource(MethodResource):
     @marshal_with(PredictorSchema(many=True))
     def get(self, **kwargs):
         newest = kwargs.pop('newest')
-        active = kwargs.pop('active')
+        active = kwargs.pop('active_only')
         return get_predictors(newest=newest, active=active, **kwargs)
 
 
