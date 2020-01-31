@@ -22,12 +22,13 @@ def save_stim_filename(stimulus):
         If type if TextStim or ComplexTextStim, return content rather than path
     """
     if isinstance(stimulus, TextStim):
-        stimulus = ComplexTextStim(text=stimulus.data)
+        stimulus = ComplexTextStim(text=stimulus.data, onset=stimulus.onset,
+                                   duration=stimulus.duration)
 
     stim_hash = hash_stim(stimulus)
 
     if isinstance(stimulus, ComplexTextStim):
-        return stim_hash, None, stimulus.data
+        return stim_hash, None, stimulus.data, stimulus.name
     else:
         basepath = Path(current_app.config['STIMULUS_DIR']).absolute()
 
@@ -49,17 +50,19 @@ def create_new_stimuli(dataset_id, task_name, parent_id, new_stims, rs_orig,
                        transformer=None, transformer_params=None):
     new_models = {}
     for stim in new_stims:
-        stim_hash, path, content = save_stim_filename(stim)
+        stim_hash, path, content, stim_name = save_stim_filename(stim)
 
         stim_model, stims = new_models.get(stim_hash, (None, []))
 
         if stim_model is None:
+            mimetype = 'text/csv' if stim_name == 'FULL_TRANSCRIPT' else None
             # Create stimulus model
             stim_model, new = add_stimulus(
                 stim_hash, path=path, content=content, parent_id=parent_id,
                 converter_name=transformer,
                 converter_params=transformer_params,
-                dataset_id=dataset_id)
+                dataset_id=dataset_id,
+                mimetype=mimetype)
 
             if not new:
                 # Delete previous RS associations with this derived stim
@@ -211,9 +214,15 @@ def ingest_text_stimuli(filename, dataset_name, task_name, parent_ids=None,
 
         # Create new stimuli
         new_stims = [
-            ComplexTextStim(text=row['text'], onset=row['onset'],
-                            duration=row.get('duration'))
+            TextStim(text=row['text'], onset=row['onset'],
+                     duration=row.get('duration'))
             for ix, row in sub.iterrows()]
+
+        # Complete transcript stimulus stand in
+        transcript_stim = ComplexTextStim(
+            elements=new_stims)
+        transcript_stim.name = 'FULL_TRANSCRIPT'
+        new_stims.append(transcript_stim)
 
         params['onset'] = onset
         params['duration'] = duration

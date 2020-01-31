@@ -35,11 +35,15 @@ def _load_stim_models(dataset_name, task_name):
     print("Loading stim models...")
     for stim_model in progressbar(stim_models):
         if stim_model.path is None:
-            # Load both ways for Text stimuli
-            stims.append(
-                (stim_model, ComplexTextStim(text=stim_model.content)))
-            stims.append(
-                (stim_model, TextStim(text=stims[-1][1].data)))
+            if stim_model.mimetype == 'text/csv':
+                pass
+            else:
+                # Load both ways for Text stimuli
+                stims.append(
+                    (stim_model, ComplexTextStim(text=stim_model.content)))
+                stims.append(
+                    (stim_model, TextStim(text=stims[-1][1].data)))
+
         else:
             stims.append(
                 (stim_model, load_stims(stim_model.path)))

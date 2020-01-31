@@ -93,15 +93,17 @@ def add_group_predictors(dataset_id, participants):
 
 
 def add_stimulus(stim_hash, dataset_id, parent_id=None, path=None,
-                 content=None, converter_name=None, converter_params=None):
+                 content=None, converter_name=None, converter_params=None,
+                 mimetype=None):
     """ Create stimulus model """
-    if path is None and content is None:
-        raise ValueError("Stimulus path and data cannot both be None")
-    if path is not None:
-        path = path.resolve().as_posix()
-        mimetype = magic.from_file(path, mime=True)
-    elif content is not None:
-        mimetype = 'text/plain'
+    if mimetype is None:
+        if path is None and content is None:
+            raise ValueError("Stimulus path and data cannot both be None")
+        if path is not None:
+            path = path.resolve().as_posix()
+            mimetype = magic.from_file(path, mime=True)
+        elif content is not None:
+            mimetype = 'text/plain'
 
     model, new = get_or_create(
         Stimulus, commit=False, sha1_hash=stim_hash, parent_id=parent_id,
