@@ -27,7 +27,8 @@ socket.setdefaulttimeout(10000)
 def _load_stim_models(dataset_name, task_name):
     """ Given a dataset and task, load all available stimuli as Pliers
     stimuli, and pair them with original database stim object. """
-    stim_models = Stimulus.query.filter_by(active=True).join(
+    stim_models = Stimulus.query.filter_by(active=True).filter(
+        Stimulus.mimetype != 'text/csv').join(
         RunStimulus).join(Run).join(Task).filter_by(name=task_name).join(
             Dataset).filter_by(name=dataset_name)
 
@@ -35,14 +36,10 @@ def _load_stim_models(dataset_name, task_name):
     print("Loading stim models...")
     for stim_model in progressbar(stim_models):
         if stim_model.path is None:
-            if stim_model.mimetype == 'text/csv':
-                pass
-            else:
-                # Load both ways for Text stimuli
-                stims.append(
-                    (stim_model, ComplexTextStim(text=stim_model.content)))
-                stims.append(
-                    (stim_model, TextStim(text=stims[-1][1].data)))
+            stims.append(
+                (stim_model, ComplexTextStim(text=stim_model.content)))
+            stims.append(
+                (stim_model, TextStim(text=stims[-1][1].data)))
 
         else:
             stims.append(
@@ -182,5 +179,30 @@ def extract_features(dataset_name, task_name, extractors):
 
 
 def extract_tokenized_features(dataset_name, task_name, extractors):
+    cache.clear()
 
-    pass
+    stim_models = Stimulus.query.filter_by(
+        active=True, mimetype='text/csv').join(
+            RunStimulus).join(Run).join(Task).filter_by(name=task_name).join(
+            Dataset).filter_by(name=dataset_name)
+
+    stims = []
+    print("Loading stim models...")
+    for stim_model in progressbar(stim_models):
+        # Reconstruct complete ComplexTextStim
+        rs_transcript = stim_model.run_stimuli.first()
+        run_words = Stimulus.query.filter_by(
+            mimetype='text/plain').join(RunStimulus).filter_by(
+                run_id=rs_transcript.run_id)
+
+        word_stims = []
+        for w in run_words:
+            for w_rs in w.run_stimuli.filter_by(run_id=rs_transcript.run_id):
+                word_stims.append(
+                    TextStim(
+                        text=w.content, onset=w_rs.onset-rs_transcript.onset,
+                        duration=w_rs.duration)
+                    )
+        stims.append((stim_model, ComplexTextStim(elements=word_stims)))
+
+    return stims
