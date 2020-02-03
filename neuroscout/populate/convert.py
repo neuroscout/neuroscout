@@ -158,7 +158,7 @@ def convert_stimuli(dataset_name, task_name, converters):
 
 def ingest_text_stimuli(filename, dataset_name, task_name, parent_ids=None,
                         transformer='FAVEAlign', params=None, onsets=None,
-                        resample_ratio=1):
+                        resample_ratio=1, complete_only=False):
     """ Ingest converted text stimuli from file.
     Args:
         filename - aligned transcript, with onset, duration and text columns
@@ -170,6 +170,7 @@ def ingest_text_stimuli(filename, dataset_name, task_name, parent_ids=None,
         onsets - onset of the parent stimulus relative to the transcript.
         resample_ratio - Ratio to multiply onsets (after cropping) to adjust
                          for variable play speeds.
+        complete_only - Only add complete transcript ComplexTextStim
     """
     dataset_id = Dataset.query.filter_by(name=dataset_name).one().id
 
@@ -222,7 +223,11 @@ def ingest_text_stimuli(filename, dataset_name, task_name, parent_ids=None,
         transcript_stim = ComplexTextStim(
             elements=new_stims)
         transcript_stim.name = 'FULL_TRANSCRIPT'
-        new_stims.append(transcript_stim)
+
+        if complete_only:
+            new_stims = [transcript_stim]
+        else:
+            new_stims.append(transcript_stim)
 
         params['onset'] = onset
         params['duration'] = duration
