@@ -190,7 +190,7 @@ def test_external_text(get_data_path, add_task):
 
     first_stim = [s for s in data if s.content == 'no'][0]
 
-    assert len(data) == 2
+    assert len(data) == 3
     assert first_stim.run_stimuli.count() == 4
     assert 2.2 in [s.onset for s in first_stim.run_stimuli.all()]
 
