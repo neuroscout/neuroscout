@@ -22,8 +22,6 @@
     ["IndicoAPIImageExtractor", { "models": [
       "fer", "content_filtering", "image_recognition"] }],
     ["STFTAudioExtractor", {}],
-    ["IndicoAPITextExtractor", { "models": [
-      "sentiment", "sentiment_hq", "text_tags", "personality", "emotion"] }],
     ["MeanAmplitudeExtractor", {}],
     ["SpectralCentroidExtractor", {}],
     ["VADERSentimentExtractor", {}],

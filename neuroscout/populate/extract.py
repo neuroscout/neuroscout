@@ -82,22 +82,7 @@ def _to_csv(results, dataset_name, task_name):
         results_df.to_csv(outfile)
 
 
-def extract_features(dataset_name, task_name, extractors):
-    """ Extract features using pliers for a dataset/task
-        Args:
-            dataset_name - dataset name
-            task_name - task name
-            extractors - dictionary of extractor names to parameters
-        Output:
-            list of db ids of extracted features
-    """
-    cache.clear()
-    stims = _load_stim_models(dataset_name, task_name)
-
-    results = _extract(extractors, stims)
-
-    _to_csv(results, dataset_name, task_name)
-
+def _create_efs(results):
     ext_feats = {}
     print("Creating ExtractedFeatures...")
     for stim_object, result in progressbar(results):
@@ -123,8 +108,7 @@ def extract_features(dataset_name, task_name, extractors):
         db.session.bulk_save_objects(bulk_ees)
         db.session.commit()
 
-    return create_predictors([ef for ef in ext_feats.values() if ef.active],
-                             dataset_name, task_name)
+    return ext_feats
 
 
 def create_predictors(features, dataset_name, task_name, run_ids=None,
@@ -173,3 +157,30 @@ def create_predictors(features, dataset_name, task_name, run_ids=None,
         db.session.commit()
 
     return [p.id for p in all_preds]
+
+
+def extract_features(dataset_name, task_name, extractors):
+    """ Extract features using pliers for a dataset/task
+        Args:
+            dataset_name - dataset name
+            task_name - task name
+            extractors - dictionary of extractor names to parameters
+        Output:
+            list of db ids of extracted features
+    """
+    cache.clear()
+    stims = _load_stim_models(dataset_name, task_name)
+
+    results = _extract(extractors, stims)
+
+    _to_csv(results, dataset_name, task_name)
+
+    ext_feats = _create_efs(results)
+
+    return create_predictors([ef for ef in ext_feats.values() if ef.active],
+                             dataset_name, task_name)
+
+
+def extract_tokenized_features(dataset_name, task_name, extractors):
+
+    pass

@@ -12,16 +12,10 @@
         "converters": [
         ],
         "extractors": [
-          ["PredefinedDictionaryExtractor", {"variables":
-            {"massiveauditorylexicaldecision":
-                ["StressPattern", "NumSylls", "NumPhones", "Duration",
-                  "OrthUP", "PhonND", "OrthND", "POS", "AllPOS", "FreqSUBTLEX",
-                  "FreqCOCA", "FreqCOCAspok", "FreqGoogle", "PhonUP", "StressCat",
-                  "PhonLev", "NumMorphs", "OrthLev"],
-               "calgarysemanticdecision": ["Concrete_rating"]
-              },
-            "missing": "n/a"} ]
           ],
+        "tokenized_extractors": [
+          ["VADERSentimentExtractor", {}, "complete"]
+        ],
         "transformations":[
         ]
       }
