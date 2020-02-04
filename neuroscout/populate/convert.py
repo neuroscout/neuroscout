@@ -181,7 +181,7 @@ def ingest_text_stimuli(filename, dataset_name, task_name, parent_ids=None,
         stem = Path(filename).stem
         parent_ids = Stimulus.query.filter_by(
             dataset_id=dataset_id).filter(
-                Stimulus.path.contains(stem)).order_by(
+                Stimulus.path.contains(stem + ".")).order_by(
                     Stimulus.id.asc()).first().id
 
     parent_ids = listify(parent_ids)
