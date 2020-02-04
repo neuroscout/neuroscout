@@ -210,6 +210,25 @@ def _load_complex_text_stim_models(dataset_name, task_name):
     return stims
 
 
+def _window_stim(cts, n):
+    """ Return windowed slices from a ComplexTextStim
+        Args:
+            cts - _load_complex_text_stim_models
+            n - size of window prior to current stimulus
+        Output:
+            list of ComplexTextStim with n elements
+    """
+    ix_high = n
+    ix_low = 0
+    slices = []
+    while ix_high <= len(cts.elements):
+        subset_stim = ComplexTextStim(elements=cts.elements[ix_low:ix_high])
+        slices.append(subset_stim)
+        ix_high += 1
+        ix_low = ix_high - n
+    return slices
+
+
 def extract_tokenized_features(dataset_name, task_name, extractors):
     stims = _load_complex_text_stim_models(dataset_name, task_name)
 
@@ -220,13 +239,15 @@ def extract_tokenized_features(dataset_name, task_name, extractors):
         ext = get_transformer(name, **ext_params)
 
         window = cts_params.get("window", "run")
-        if window == "run":
-            for sm, s in progressbar(stims):
-                for res in ext.transform(s):
+        for sm, s in progressbar(stims):
+            if window == "run":
+                # In complte run window, save all results
+                results += [(sm, res) for res in ext.transform(s)]
+            elif window == "pre":
+                # In pre-window, only take last value
+                for slice in _window_stim(s, cts_params.get("n", 10)):
+                    res = ext.transform(slice)[-1]
                     results.append((sm, res))
-        elif window == "pre":
-            n = cts_params.get("n")
-            pass
 
     # These results may not be fully recoverable
     # _to_csv(results, dataset_name, task_name)
