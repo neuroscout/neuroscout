@@ -109,15 +109,19 @@ def _create_efs(results):
 
 
 def create_predictors(features, dataset_name, task_name, run_ids=None,
-                      percentage_include=.9):
+                      percentage_include=.9, clear_cache=True):
     """ Create Predictors from Extracted Features.
         Args:
             features (object) - ExtractedFeature objects
             dataset_name (str) - Dataset name
             run_ids (list of ints) - Optional list of run_ids for which to
                                      create PredictorRun for.
+            clear_cache (bool) - Clear API cache
     """
     print("Creating predictors")
+
+    if clear_cache:
+        cache.clear()
 
     dataset = Dataset.query.filter_by(name=dataset_name).one()
     task = Task.query.filter_by(name=task_name, dataset_id=dataset.id).one()
@@ -165,7 +169,6 @@ def extract_features(dataset_name, task_name, extractors):
         Output:
             list of db ids of extracted features
     """
-    cache.clear()
     stims = _load_stim_models(dataset_name, task_name)
 
     results = _extract(extractors, stims)
@@ -179,8 +182,6 @@ def extract_features(dataset_name, task_name, extractors):
 
 
 def extract_tokenized_features(dataset_name, task_name, extractors):
-    cache.clear()
-
     stim_models = Stimulus.query.filter_by(
         active=True, mimetype='text/csv').join(
             RunStimulus).join(Run).join(Task).filter_by(name=task_name).join(
@@ -203,6 +204,21 @@ def extract_tokenized_features(dataset_name, task_name, extractors):
                         text=w.content, onset=w_rs.onset-rs_transcript.onset,
                         duration=w_rs.duration)
                     )
+        word_stims = sorted(word_stims, key=lambda x: x.onset)
         stims.append((stim_model, ComplexTextStim(elements=word_stims)))
 
-    return stims
+    results = []
+    # For every extractor, extract from complex stims
+    for name, ext_params, cts_params in extractors:
+        print("Extractor: {}".format(name))
+        ext = get_transformer(name, **ext_params)
+
+        # Windowing would go here.
+        results += [(sm, ext.transform(s)) for sm, s in progressbar(stims)]
+
+    _to_csv(results, dataset_name, task_name)
+
+    ext_feats = _create_efs(results)
+
+    return create_predictors([ef for ef in ext_feats.values() if ef.active],
+                             dataset_name, task_name)

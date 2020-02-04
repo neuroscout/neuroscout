@@ -14,7 +14,7 @@
         "extractors": [
           ],
         "tokenized_extractors": [
-          ["VADERSentimentExtractor", {}, "complete"]
+          ["WordCounterExtractor", {}, {}]
         ],
         "transformations":[
         ]
