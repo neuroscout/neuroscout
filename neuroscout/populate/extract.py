@@ -49,6 +49,7 @@ def _load_stim_models(dataset_name, task_name):
 
 
 def _extract(extractors, stims):
+    """ Apply list of extractors to complete list of stimuli in dataset """
     results = []
     # For every extractor, extract from matching stims
     for name, parameters in extractors:
@@ -80,6 +81,14 @@ def _to_csv(results, dataset_name, task_name):
 
 
 def _create_efs(results):
+    """ Create ExtractedFeature models from Pliers results.
+        Only creates one object per unique feature
+    Args:
+        results - list of zipped pairs of Stimulus objects and ExtractedResult
+                  objects
+    Returns:
+        ext_feats - dictionary of hash of ExtractedFeatures to EF objects
+    """
     ext_feats = {}
     print("Creating ExtractedFeatures...")
     for stim_object, result in progressbar(results):
@@ -182,6 +191,8 @@ def extract_features(dataset_name, task_name, extractors):
 
 
 def _load_complex_text_stim_models(dataset_name, task_name):
+    """ Reconstruct ComplexTextStim object of complete run transcript
+    for each run in a task """
     stim_models = Stimulus.query.filter_by(
         active=True, mimetype='text/csv').join(
             RunStimulus).join(Run).join(Task).filter_by(name=task_name).join(
@@ -230,6 +241,8 @@ def _window_stim(cts, n):
 
 
 def extract_tokenized_features(dataset_name, task_name, extractors):
+    """ Extract features that require a ComplexTextStim to give context to
+    individual words within a run """
     stims = _load_complex_text_stim_models(dataset_name, task_name)
 
     results = []
