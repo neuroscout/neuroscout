@@ -11,8 +11,7 @@
         "converters": [
         ],
         "extractors": [
-          ["GoogleVisionAPISafeSearchExtractor", {}]
-          ],
+        ],
         "transformations": [
         ],
         "ingest_args": {

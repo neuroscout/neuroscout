@@ -11,7 +11,9 @@
         "converters": [
         ],
         "extractors": [
-["GoogleVisionAPISafeSearchExtractor", {}]
+        ],
+        "tokenized_extractors": [
+          ["WordCounterExtractor", {}, {"window": "run"}]
         ],
         "transformations": [
         ]
@@ -21,8 +23,9 @@
         "converters": [
         ],
         "extractors": [
-["GoogleVisionAPISafeSearchExtractor", {}]
-
+        ],
+        "tokenized_extractors": [
+          ["WordCounterExtractor", {}, {"window": "run"}]
         ],
         "transformations": [
         ]

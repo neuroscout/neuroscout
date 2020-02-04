@@ -24,9 +24,6 @@
         "converters": [
         ],
         "extractors": [
-          ["SpectralCentroidExtractor", {}],
-          ["RMSEExtractor", {"frame_length": 72000, "hop_length": 72000, "center": false}],
-          ["STFTAudioExtractor", {}]
         ],
         "transformations": [
         ],
@@ -40,9 +37,6 @@
         "converters": [
         ],
         "extractors": [
-          ["SpectralCentroidExtractor", {}],
-          ["RMSEExtractor", {"frame_length": 72000, "hop_length": 72000, "center": false}],
-          ["STFTAudioExtractor", {}]
         ],
         "transformations": [
         ],
@@ -56,9 +50,6 @@
         "converters": [
         ],
         "extractors": [
-          ["SpectralCentroidExtractor", {}],
-          ["RMSEExtractor", {"frame_length": 72000, "hop_length": 72000, "center": false}],
-          ["STFTAudioExtractor", {}]
         ],
         "transformations": [
         ],

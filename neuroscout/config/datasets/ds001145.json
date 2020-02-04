@@ -11,7 +11,7 @@
         "converters": [
         ],
         "extractors": [
-          ],
+        ],
         "transformations": [
         ],
         "ingest_args": {
