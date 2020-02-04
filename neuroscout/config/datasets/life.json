@@ -14,7 +14,7 @@
         "extractors": [
           ],
         "tokenized_extractors": [
-          ["WordCounterExtractor", {}, {}]
+          ["WordCounterExtractor", {}, {"window": "run"}]
         ],
         "transformations":[
         ]

@@ -181,7 +181,7 @@ def extract_features(dataset_name, task_name, extractors):
                              dataset_name, task_name)
 
 
-def extract_tokenized_features(dataset_name, task_name, extractors):
+def _load_complex_text_stim_models(dataset_name, task_name):
     stim_models = Stimulus.query.filter_by(
         active=True, mimetype='text/csv').join(
             RunStimulus).join(Run).join(Task).filter_by(name=task_name).join(
@@ -207,16 +207,26 @@ def extract_tokenized_features(dataset_name, task_name, extractors):
         word_stims = sorted(word_stims, key=lambda x: x.onset)
         stims.append((stim_model, ComplexTextStim(elements=word_stims)))
 
+    return stims
+
+
+def extract_tokenized_features(dataset_name, task_name, extractors):
+    stims = _load_complex_text_stim_models(dataset_name, task_name)
+
     results = []
     # For every extractor, extract from complex stims
     for name, ext_params, cts_params in extractors:
         print("Extractor: {}".format(name))
         ext = get_transformer(name, **ext_params)
 
-        # Windowing would go here.
-        for sm, s in progressbar(stims):
-            for res in ext.transform(s):
-                results.append((sm, res))
+        window = cts_params.get("window", "run")
+        if window == "run":
+            for sm, s in progressbar(stims):
+                for res in ext.transform(s):
+                    results.append((sm, res))
+        elif window == "pre":
+            n = cts_params.get("n")
+            pass
 
     # These results may not be fully recoverable
     # _to_csv(results, dataset_name, task_name)
