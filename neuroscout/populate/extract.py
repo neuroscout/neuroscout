@@ -216,6 +216,7 @@ def extract_tokenized_features(dataset_name, task_name, extractors):
         # Windowing would go here.
         results += [(sm, ext.transform(s)) for sm, s in progressbar(stims)]
 
+    # These results may not be fully recoverable
     _to_csv(results, dataset_name, task_name)
 
     ext_feats = _create_efs(results)
