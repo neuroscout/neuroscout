@@ -214,11 +214,14 @@ def extract_tokenized_features(dataset_name, task_name, extractors):
         ext = get_transformer(name, **ext_params)
 
         # Windowing would go here.
-        results += [(sm, ext.transform(s)) for sm, s in progressbar(stims)]
+        for sm, s in progressbar(stims):
+            for res in ext.transform(s):
+                results.append((sm, res))
 
     # These results may not be fully recoverable
-    _to_csv(results, dataset_name, task_name)
+    # _to_csv(results, dataset_name, task_name)
 
+    # Need to add parameter used to windowize (or not) here
     ext_feats = _create_efs(results)
 
     return create_predictors([ef for ef in ext_feats.values() if ef.active],

@@ -1,4 +1,13 @@
 {
+  "WordCounterExtractor": [
+    {
+      "features": {
+        "word_count$": {
+          "description": "Number of times word has been spoken."
+        }
+      }
+    }
+  ]
   "BrightnessExtractor": [
     {
       "features": {
