@@ -250,18 +250,20 @@ def extract_tokenized_features(dataset_name, task_name, extractors):
     for name, ext_params, cts_params in extractors:
         print("Extractor: {}".format(name))
         ext = get_transformer(name, **ext_params)
-
-        window = cts_params.get("window", "run")
+        window = cts_params.get("window", "transcript")
+        ext.window_method = window
         for sm, s in progressbar(stims):
-            if window == "run":
-                # In complte run window, save all results
+            if window == "transcript":
+                # In complete transcript window, save all results
                 results += [(sm, res) for res in ext.transform(s)]
             elif window == "pre":
+                n = cts_params.get("n", 10)
+                ext.window_n = n
                 # In pre-window, only take last value
-                for slice in _window_stim(s, cts_params.get("n", 10)):
+                for slice in _window_stim(s, n):
                     res = ext.transform(slice)[-1]
                     results.append((sm, res))
-
+                    # Add parametest to Predictor provenance
     # These results may not be fully recoverable
     # _to_csv(results, dataset_name, task_name)
 

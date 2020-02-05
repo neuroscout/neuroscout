@@ -1,9 +1,10 @@
 {
   "WordCounterExtractor": [
     {
+      "attributes": { "window_method": "transcript" },
       "features": {
         "word_count$": {
-          "description": "Number of times word has been spoken."
+          "description": "Number of times word has been spoken in a stimulus."
         }
       }
     }
