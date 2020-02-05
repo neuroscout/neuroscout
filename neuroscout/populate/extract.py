@@ -263,11 +263,10 @@ def extract_tokenized_features(dataset_name, task_name, extractors):
                 for slice in _window_stim(s, n):
                     res = ext.transform(slice)[-1]
                     results.append((sm, res))
-                    # Add parametest to Predictor provenance
+
     # These results may not be fully recoverable
     # _to_csv(results, dataset_name, task_name)
 
-    # Need to add parameter used to windowize (or not) here
     ext_feats = _create_efs(results)
 
     return create_predictors([ef for ef in ext_feats.values() if ef.active],
