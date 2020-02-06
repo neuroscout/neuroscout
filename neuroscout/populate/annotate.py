@@ -100,7 +100,17 @@ stim_map = {
 
 
 class FeatureSerializer(Serializer):
-    def __init__(self, add_all=True):
+    def __init__(self, add_all=True, object_id='all', splat=False):
+        """
+        Args:
+            add_all - Add all features including those with no match in
+                      feature_schema
+            object_id - How to select among object_id repetitions
+                        One of: max, all
+            splat - If value is a list, automatically create n features,
+        """
+        self.object_id = object_id
+        self.splat = splat
         super().__init__(current_app.config['FEATURE_SCHEMA'], add_all)
 
     def _annotate_feature(self, pattern, schema, feat, extractor, sub_df,
@@ -129,37 +139,48 @@ class FeatureSerializer(Serializer):
             description = None
 
         annotated = []
-        for i, v in sub_df[sub_df.value.notnull()].iterrows():
-            annotated.append(
-                (
-                    {
-                        'value': v['value'],
-                        'onset': v['onset']
-                        if not pd.isnull(v['onset']) else None,
-                        'duration': v['duration']
-                        if not pd.isnull(v['duration']) else None,
-                        'object_id': v['object_id']
-                        },
-                    {
-                        'sha1_hash': hash_data(
-                            str(extractor.__hash__()) + name),
-                        'feature_name': name,
-                        'original_name': feat,
-                        'description': description,
-                        'active': schema.get('active', default_active),
-                        }
-                    )
-                )
+        for _, val in sub_df[sub_df.value.notnull()].iterrows():
+            if not isinstance(val.values[0], list):
+                val = [val]
+            else:
+                if not self.splat:
+                    raise ValueError(
+                        "Value is an array and splatting is not True")
 
+            for ix, v in enumerate(val):
+                ee = {
+                    'value': v['value'],
+                    'onset': v['onset']
+                    if not pd.isnull(v['onset']) else None,
+                    'duration': v['duration']
+                    if not pd.isnull(v['duration']) else None,
+                    'object_id': v['object_id']
+                    }
+                ef = {
+                    'sha1_hash': hash_data(str(extractor.__hash__()) + name),
+                    'feature_name': name,
+                    'original_name': feat,
+                    'description': description,
+                    'active': schema.get('active', default_active),
+                    }
+
+                # If value is list, splat out into n features
+                if len(val) > 1:
+                    ef['feature_name'] = f"{ef['feature_name']}_{ix+1}"
+
+                annotated.append((ee, ef))
         return annotated
 
     def load(self, res):
         """" Load and annotate features in an extractor result object.
         Args:
             res - Pliers ExtractorResult object
+
         Returns a dictionary of annotated features
         """
         res_df = res.to_df(format='long')
+        if self.object_id == 'max':
+            res_df = res_df[res_df.object_id == res_df.object_id.max()]
         features = res_df['feature'].unique().tolist()
 
         # Find matching extractor schema + attribute combination

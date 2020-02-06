@@ -80,20 +80,23 @@ def _to_csv(results, dataset_name, task_name):
         results_df.to_csv(outfile)
 
 
-def _create_efs(results):
+def _create_efs(results, object_id='max'):
     """ Create ExtractedFeature models from Pliers results.
         Only creates one object per unique feature
     Args:
         results - list of zipped pairs of Stimulus objects and ExtractedResult
                   objects
+        object_id - Selection function to use for object_id
     Returns:
         ext_feats - dictionary of hash of ExtractedFeatures to EF objects
     """
     ext_feats = {}
+    serializer = FeatureSerializer()
+
     print("Creating ExtractedFeatures...")
     for stim_object, result in progressbar(results):
         bulk_ees = []
-        for ee_props, ef_props in FeatureSerializer().load(result):
+        for ee_props, ef_props in serializer.load(result, object_id='max'):
             # Hash extractor name + feaFture name
             feat_hash = ef_props['sha1_hash']
 
@@ -266,8 +269,8 @@ def extract_tokenized_features(dataset_name, task_name, extractors):
 
     # These results may not be fully recoverable
     # _to_csv(results, dataset_name, task_name)
-
-    ext_feats = _create_efs(results)
+    object_id = 'max' if window == 'pre' else None
+    ext_feats = _create_efs(results, object_id=object_id, splat=True)
 
     return create_predictors([ef for ef in ext_feats.values() if ef.active],
                              dataset_name, task_name)
