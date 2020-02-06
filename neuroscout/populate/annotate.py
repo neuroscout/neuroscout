@@ -141,7 +141,7 @@ class FeatureSerializer(Serializer):
 
         annotated = []
         for _, val in sub_df[sub_df.value.notnull()].iterrows():
-            if isinstance(val['values'], list) and not self.splat:
+            if isinstance(val['value'], list) and not self.splat:
                 raise ValueError("Value is an array and splatting is not True")
             val = listify(val)
 
