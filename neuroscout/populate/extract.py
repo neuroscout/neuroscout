@@ -80,7 +80,7 @@ def _to_csv(results, dataset_name, task_name):
         results_df.to_csv(outfile)
 
 
-def _create_efs(results, object_id='max'):
+def _create_efs(results, **serializer_kwargs):
     """ Create ExtractedFeature models from Pliers results.
         Only creates one object per unique feature
     Args:
@@ -91,12 +91,12 @@ def _create_efs(results, object_id='max'):
         ext_feats - dictionary of hash of ExtractedFeatures to EF objects
     """
     ext_feats = {}
-    serializer = FeatureSerializer()
+    serializer = FeatureSerializer(**serializer_kwargs)
 
     print("Creating ExtractedFeatures...")
     for stim_object, result in progressbar(results):
         bulk_ees = []
-        for ee_props, ef_props in serializer.load(result, object_id='max'):
+        for ee_props, ef_props in serializer.load(result):
             # Hash extractor name + feaFture name
             feat_hash = ef_props['sha1_hash']
 
