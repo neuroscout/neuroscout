@@ -257,7 +257,7 @@ def extract_tokenized_features(dataset_name, task_name, extractors):
                 # In complete transcript window, save all results
                 results += [(sm, res) for res in ext.transform(s)]
             elif window == "pre":
-                n = cts_params.get("n", 10)
+                n = cts_params.get("n", 25)
                 ext.window_n = n
                 # In pre-window, only take last value
                 for sli in _window_stim(s, n):

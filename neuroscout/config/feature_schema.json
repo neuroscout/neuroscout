@@ -1,4 +1,14 @@
 {
+  "PretrainedBertEncodingExtractor": [
+    {
+      "features": {
+        "encoding_(.*)$": {
+          "description": "Encoding for {pretrained_model}, windowed with {window_n} letters {window_method} target."
+          "name": "{pretrained_model}_{window_method}_{window_n}_encoding_\\1",
+        }
+      }
+    }
+  ],
   "WordCounterExtractor": [
     {
       "attributes": { "window_method": "transcript" },

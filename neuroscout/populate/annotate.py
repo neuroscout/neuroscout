@@ -103,21 +103,30 @@ class FeatureSerializer(Serializer):
     def __init__(self, add_all=True):
         super().__init__(current_app.config['FEATURE_SCHEMA'], add_all)
 
-    def _annotate_feature(self, pattern, schema, feat, ext_hash, sub_df,
+    def _annotate_feature(self, pattern, schema, feat, extractor, sub_df,
                           default_active=True):
         """ Annotate a single pliers extracted result
         Args:
             pattern - regex pattern to match feature name
             schema - sub-schema that matches feature name
             feat - feature name from pliers
-            ext_hash - hash of the extractor
-            features - list of all features
+            extractor - pliers extractor object
+            sub_df - df with ef values
             default_active - set to active by default?
         """
-        name = re.sub(pattern, schema['name'], feat) \
-            if 'name' in schema else feat
-        description = re.sub(pattern, schema['description'], feat) \
-            if 'description' in schema else None
+        # If name is in schema, substitue regex patterns from schema pattern
+        # and fill in format strings from extractor_dict
+        if 'name' in schema:
+            name = re.sub(pattern, schema['name'], feat)
+            name = name.format(**extractor.__dict__)
+        else:
+            name = feat
+
+        if 'description' in schema:
+            description = re.sub(pattern, schema['description'], feat)
+            description = description.format(**extractor.__dict__)
+        else:
+            description = None
 
         annotated = []
         for i, v in sub_df[sub_df.value.notnull()].iterrows():
@@ -132,7 +141,8 @@ class FeatureSerializer(Serializer):
                         'object_id': v['object_id']
                         },
                     {
-                        'sha1_hash': hash_data(str(ext_hash) + name),
+                        'sha1_hash': hash_data(
+                            str(extractor.__hash__()) + name),
                         'feature_name': name,
                         'original_name': feat,
                         'description': description,
@@ -151,7 +161,6 @@ class FeatureSerializer(Serializer):
         """
         res_df = res.to_df(format='long')
         features = res_df['feature'].unique().tolist()
-        ext_hash = res.extractor.__hash__()
 
         # Find matching extractor schema + attribute combination
         # Entries with no attributes will match any
@@ -170,14 +179,14 @@ class FeatureSerializer(Serializer):
             features = set(features) - set(matching)
             for feat in matching:
                 annotated += self._annotate_feature(
-                    pattern, schema, feat, ext_hash,
+                    pattern, schema, feat, res.extractor,
                     res_df[res_df.feature == feat])
 
         # Add all remaining features
         if self.add_all is True:
             for feat in features:
                 annotated += self._annotate_feature(
-                    ".*", {}, feat, ext_hash,
+                    ".*", {}, feat, res.extractor,
                     res_df[res_df.feature == feat], default_active=False)
 
         # Add extractor constants
