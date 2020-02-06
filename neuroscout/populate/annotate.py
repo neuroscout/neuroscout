@@ -4,6 +4,7 @@ import json
 import re
 import pandas as pd
 from .utils import hash_data
+from ..utils.core import listify
 
 
 class Serializer(object):
@@ -140,12 +141,9 @@ class FeatureSerializer(Serializer):
 
         annotated = []
         for _, val in sub_df[sub_df.value.notnull()].iterrows():
-            if not isinstance(val.values[0], list):
-                val = [val]
-            else:
-                if not self.splat:
-                    raise ValueError(
-                        "Value is an array and splatting is not True")
+            if isinstance(val['values'], list) and not self.splat:
+                raise ValueError("Value is an array and splatting is not True")
+            val = listify(val)
 
             for ix, v in enumerate(val):
                 ee = {
