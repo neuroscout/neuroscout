@@ -140,18 +140,19 @@ class FeatureSerializer(Serializer):
             description = None
 
         annotated = []
-        for _, val in sub_df[sub_df.value.notnull()].iterrows():
-            if isinstance(val['value'], list) and not self.splat:
+        for _, row in sub_df[sub_df.value.notnull()].iterrows():
+            if isinstance(row['value'], list) and not self.splat:
                 raise ValueError("Value is an array and splatting is not True")
+            val = listify(row['value'])
 
-            for ix, v in enumerate(listify(val['value'])):
+            for ix, v in enumerate(val):
                 ee = {
-                    'value': v,
-                    'onset': val['onset']
-                    if not pd.isnull(val['onset']) else None,
-                    'duration': val['duration']
-                    if not pd.isnull(val['duration']) else None,
-                    'object_id': val['object_id']
+                    'value': val,
+                    'onset': row['onset']
+                    if not pd.isnull(row['onset']) else None,
+                    'duration': row['duration']
+                    if not pd.isnull(row['duration']) else None,
+                    'object_id': row['object_id']
                     }
                 ef = {
                     'sha1_hash': hash_data(str(extractor.__hash__()) + name),
