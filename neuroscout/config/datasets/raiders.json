@@ -13,7 +13,7 @@
         "extractors": [
         ],
         "tokenized_extractors": [
-          ["WordCounterExtractor", {}, {"window": "run"}]
+          ["PretrainedBertEncodingExtractor", {}, {"window": "pre", "n": 25}]
         ],
         "transformations":[
         ]
