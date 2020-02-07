@@ -2,9 +2,9 @@
   "PretrainedBertEncodingExtractor": [
     {
       "features": {
-        "encoding_(.*)$": {
+        "encoding$": {
           "description": "Encoding for {pretrained_model}, windowed with {window_n} letters {window_method} target.",
-          "name": "{pretrained_model}_{window_method}_{window_n}_encoding_\\1"
+          "name": "{pretrained_model}_{window_method}_{window_n}_encoding"
         }
       }
     }
