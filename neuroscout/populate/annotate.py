@@ -143,7 +143,7 @@ class FeatureSerializer(Serializer):
         for _, row in sub_df[sub_df.value.notnull()].iterrows():
             if isinstance(row['value'], list) and not self.splat:
                 raise ValueError("Value is an array and splatting is not True")
-            val = listify(row['value'])
+            val = listify(row['value'].values)
 
             for ix, v in enumerate(val):
                 ee = {
