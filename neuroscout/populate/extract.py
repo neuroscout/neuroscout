@@ -269,7 +269,8 @@ def extract_tokenized_features(dataset_name, task_name, extractors):
     # These results may not be fully recoverable
     # _to_csv(results, dataset_name, task_name)
     object_id = 'max' if window == 'pre' else None
-    ext_feats = _create_efs(results, object_id=object_id, splat=True)
+    ext_feats = _create_efs(
+        results, object_id=object_id, splat=True, add_all=False)
 
     return create_predictors([ef for ef in ext_feats.values() if ef.active],
                              dataset_name, task_name)
