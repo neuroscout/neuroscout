@@ -262,9 +262,8 @@ def extract_tokenized_features(dataset_name, task_name, extractors):
             elif window == "pre":
                 n = cts_params.get("n", 25)
                 ext.window_n = n
-                # In pre-window, only take last value
                 for sli in _window_stim(s, n):
-                    res = ext.transform(sli)[-1]
+                    res = ext.transform(sli)
                     results.append((sm, res))
 
     # These results may not be fully recoverable
