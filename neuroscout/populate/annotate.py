@@ -146,6 +146,8 @@ class FeatureSerializer(Serializer):
             val = listify(row['value'])
 
             for ix, v in enumerate(val):
+                feature_name = f"{name}_{ix+1}" if len(val) > 1 else name
+
                 ee = {
                     'value': v,
                     'onset': row['onset']
@@ -155,8 +157,9 @@ class FeatureSerializer(Serializer):
                     'object_id': row['object_id']
                     }
                 ef = {
-                    'sha1_hash': hash_data(str(extractor.__hash__()) + name),
-                    'feature_name': name,
+                    'sha1_hash': hash_data(
+                        str(extractor.__hash__()) + feature_name),
+                    'feature_name': feature_name,
                     'original_name': feat,
                     'description': description,
                     'active': schema.get('active', default_active),
