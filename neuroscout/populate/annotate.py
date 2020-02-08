@@ -165,10 +165,6 @@ class FeatureSerializer(Serializer):
                     'active': schema.get('active', default_active),
                     }
 
-                # If value is list, splat out into n features
-                if len(val) > 1:
-                    ef['feature_name'] = f"{ef['feature_name']}_{ix+1}"
-
                 annotated.append((ee, ef))
         return annotated
 
