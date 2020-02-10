@@ -101,7 +101,8 @@ stim_map = {
 
 
 class FeatureSerializer(Serializer):
-    def __init__(self, add_all=True, object_id='all', splat=False):
+    def __init__(self, add_all=True, object_id='all', splat=False,
+                 round_n=None):
         """
         Args:
             add_all - Add all features including those with no match in
@@ -109,9 +110,11 @@ class FeatureSerializer(Serializer):
             object_id - How to select among object_id repetitions
                         One of: max, all
             splat - If value is a list, automatically create n features,
+            round_n - Round float values to nth precision
         """
         self.object_id = object_id
         self.splat = splat
+        self.round_n = round_n
         super().__init__(current_app.config['FEATURE_SCHEMA'], add_all)
 
     def _annotate_feature(self, pattern, schema, feat, extractor, sub_df,
@@ -147,6 +150,8 @@ class FeatureSerializer(Serializer):
 
             for ix, v in enumerate(val):
                 feature_name = f"{name}_{ix+1}" if len(val) > 1 else name
+                if self.round_n is not None and isinstance(v, float):
+                    v = round(v, self.round_n)
 
                 ee = {
                     'value': v,
