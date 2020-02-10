@@ -111,7 +111,6 @@ def _create_efs(results, **serializer_kwargs):
             # Create ExtractedEvents
             bulk_ees.append(
                 ExtractedEvent(stimulus_id=stim_object.id,
-                               history=result.history.string,
                                ef_id=ext_feats[feat_hash].id,
                                **ee_props))
         db.session.bulk_save_objects(bulk_ees)

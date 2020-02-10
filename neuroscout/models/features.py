@@ -35,7 +35,6 @@ class ExtractedEvent(db.Model):
     onset = db.Column(db.Float)
     duration = db.Column(db.Float)
     value = db.Column(db.String, nullable=False)
-    history = db.Column(db.String)
     object_id = db.Column(db.Integer)
 
     stimulus_id = db.Column(
