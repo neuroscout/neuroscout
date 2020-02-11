@@ -22,3 +22,4 @@ Flask-Caching==1.3.3
 flask_jwt
 sentry-sdk==0.13.0
 -e git+https://github.com/bids-standard/pybids@f79cf7#egg=pybids
+Werkzeug==0.15.3
