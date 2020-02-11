@@ -109,6 +109,7 @@ def upload_collection(flask_app, filenames, runs, dataset_id, collection_id,
 
 MAP_TYPE_CHOICES = {
     't': 'T',
+    'F': 'F',
     'p': 'P',
     'effect': 'U',
     'variance': 'V',
