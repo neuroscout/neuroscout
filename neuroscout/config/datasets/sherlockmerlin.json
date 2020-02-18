@@ -11,7 +11,8 @@
         "converters": [
         ],
         "extractors": [
-["GoogleVisionAPISafeSearchExtractor", {}]
+        ],
+        "tokenized_extractors": [
         ],
         "transformations": [
         ]
@@ -21,8 +22,9 @@
         "converters": [
         ],
         "extractors": [
-["GoogleVisionAPISafeSearchExtractor", {}]
-
+        ],
+        "tokenized_extractors": [
+          ["PretrainedBertEncodingExtractor", {}, {"window": "pre", "n": 25}]
         ],
         "transformations": [
         ]

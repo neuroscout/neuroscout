@@ -1,4 +1,24 @@
 {
+  "PretrainedBertEncodingExtractor": [
+    {
+      "features": {
+        "encoding$": {
+          "description": "Encoding for {pretrained_model}, windowed with {window_n} letters {window_method} target.",
+          "name": "{pretrained_model}_{window_method}_{window_n}_encoding"
+        }
+      }
+    }
+  ],
+  "WordCounterExtractor": [
+    {
+      "attributes": { "window_method": "transcript" },
+      "features": {
+        "word_count$": {
+          "description": "Number of times word has been spoken in a stimulus."
+        }
+      }
+    }
+  ],
   "BrightnessExtractor": [
     {
       "features": {
@@ -195,7 +215,7 @@
           "active": false
         },
         "num_faces": {
-          "description": "Number of detected faces in scene",
+          "description": "Number of detected faces in scene"
         }
       }
     }

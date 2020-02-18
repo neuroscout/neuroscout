@@ -9,8 +9,6 @@
       "perception": {
         "summary": "Visual Image perception",
         "extractors": [
-          ["BrightnessExtractor", {}],
-          ["VibranceExtractor", {}]
         ],
         "filters": {
           "subject": "01"

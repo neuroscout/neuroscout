@@ -15,6 +15,7 @@ from .utils import hash_stim
 from .ingest import add_stimulus
 
 import pandas as pd
+from progressbar import progressbar
 
 
 def save_stim_filename(stimulus):
@@ -22,12 +23,13 @@ def save_stim_filename(stimulus):
         If type if TextStim or ComplexTextStim, return content rather than path
     """
     if isinstance(stimulus, TextStim):
-        stimulus = ComplexTextStim(text=stimulus.data)
+        stimulus = ComplexTextStim(text=stimulus.data, onset=stimulus.onset,
+                                   duration=stimulus.duration)
 
     stim_hash = hash_stim(stimulus)
 
     if isinstance(stimulus, ComplexTextStim):
-        return stim_hash, None, stimulus.data
+        return stim_hash, None, stimulus.data, stimulus.name
     else:
         basepath = Path(current_app.config['STIMULUS_DIR']).absolute()
 
@@ -48,18 +50,21 @@ def save_stim_filename(stimulus):
 def create_new_stimuli(dataset_id, task_name, parent_id, new_stims, rs_orig,
                        transformer=None, transformer_params=None):
     new_models = {}
-    for stim in new_stims:
-        stim_hash, path, content = save_stim_filename(stim)
+    print("Creating stimuli...")
+    for stim in progressbar(new_stims):
+        stim_hash, path, content, stim_name = save_stim_filename(stim)
 
         stim_model, stims = new_models.get(stim_hash, (None, []))
 
         if stim_model is None:
+            mimetype = 'text/csv' if stim_name == 'FULL_TRANSCRIPT' else None
             # Create stimulus model
             stim_model, new = add_stimulus(
                 stim_hash, path=path, content=content, parent_id=parent_id,
                 converter_name=transformer,
                 converter_params=transformer_params,
-                dataset_id=dataset_id)
+                dataset_id=dataset_id,
+                mimetype=mimetype)
 
             if not new:
                 # Delete previous RS associations with this derived stim
@@ -155,7 +160,7 @@ def convert_stimuli(dataset_name, task_name, converters):
 
 def ingest_text_stimuli(filename, dataset_name, task_name, parent_ids=None,
                         transformer='FAVEAlign', params=None, onsets=None,
-                        resample_ratio=1):
+                        resample_ratio=1, complete_only=False):
     """ Ingest converted text stimuli from file.
     Args:
         filename - aligned transcript, with onset, duration and text columns
@@ -167,6 +172,7 @@ def ingest_text_stimuli(filename, dataset_name, task_name, parent_ids=None,
         onsets - onset of the parent stimulus relative to the transcript.
         resample_ratio - Ratio to multiply onsets (after cropping) to adjust
                          for variable play speeds.
+        complete_only - Only add complete transcript ComplexTextStim
     """
     dataset_id = Dataset.query.filter_by(name=dataset_name).one().id
 
@@ -175,7 +181,8 @@ def ingest_text_stimuli(filename, dataset_name, task_name, parent_ids=None,
         stem = Path(filename).stem
         parent_ids = Stimulus.query.filter_by(
             dataset_id=dataset_id).filter(
-                Stimulus.path.contains(stem)).one().id
+                Stimulus.path.contains(stem + ".")).order_by(
+                    Stimulus.id.asc()).first().id
 
     parent_ids = listify(parent_ids)
     onsets = listify(onsets)
@@ -211,9 +218,19 @@ def ingest_text_stimuli(filename, dataset_name, task_name, parent_ids=None,
 
         # Create new stimuli
         new_stims = [
-            ComplexTextStim(text=row['text'], onset=row['onset'],
-                            duration=row.get('duration'))
+            TextStim(text=row['text'], onset=row['onset'],
+                     duration=row.get('duration'))
             for ix, row in sub.iterrows()]
+
+        # Complete transcript stimulus stand in
+        transcript_stim = ComplexTextStim(
+            elements=new_stims)
+        transcript_stim.name = 'FULL_TRANSCRIPT'
+
+        if complete_only:
+            new_stims = [transcript_stim]
+        else:
+            new_stims.append(transcript_stim)
 
         params['onset'] = onset
         params['duration'] = duration

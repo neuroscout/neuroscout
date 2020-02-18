@@ -1,7 +1,7 @@
 import json
 from flask import current_app
 from .ingest import add_task
-from .extract import extract_features
+from .extract import extract_features, extract_tokenized_features
 from .convert import convert_stimuli
 from .transform import Postprocessing
 from ..models import Dataset
@@ -114,10 +114,22 @@ def ingest_from_json(config_file, update_features=False, reingest=False):
 
             """ Extract features from applicable stimuli """
             extractors = params.get('extractors', None)
+            extract_args = params.get('extract_args', {})
             if extractors:
                 print("Extracting... {}".format(extractors))
-                extract_features(dataset_name, task_name,
-                                 extractors, **params.get('extract_args', {}))
+                extract_features(
+                    dataset_name, task_name, extractors, **extract_args)
+
+            """ Extract features that require pre-tokenization """
+            tokenized_extractors = params.get('tokenized_extractors', None)
+            if tokenized_extractors:
+                print("Tokenizing and extracting... {}".format(
+                    tokenized_extractors))
+                extract_tokenized_features(
+                    dataset_name, task_name, tokenized_extractors,
+                    **extract_args)
+
+            """ Apply transformations """
             transformations = params.get("transformations", [])
             post = Postprocessing(dataset_name, task_name)
             for args in transformations:

@@ -4,6 +4,7 @@ import json
 import re
 import pandas as pd
 from .utils import hash_data
+from ..utils.core import listify
 
 
 class Serializer(object):
@@ -100,58 +101,89 @@ stim_map = {
 
 
 class FeatureSerializer(Serializer):
-    def __init__(self, add_all=True):
+    def __init__(self, add_all=True, object_id='all', splat=False,
+                 round_n=None):
+        """
+        Args:
+            add_all - Add all features including those with no match in
+                      feature_schema
+            object_id - How to select among object_id repetitions
+                        One of: max, all
+            splat - If value is a list, automatically create n features,
+            round_n - Round float values to nth precision
+        """
+        self.object_id = object_id
+        self.splat = splat
+        self.round_n = round_n
         super().__init__(current_app.config['FEATURE_SCHEMA'], add_all)
 
-    def _annotate_feature(self, pattern, schema, feat, ext_hash, sub_df,
+    def _annotate_feature(self, pattern, schema, feat, extractor, sub_df,
                           default_active=True):
         """ Annotate a single pliers extracted result
         Args:
             pattern - regex pattern to match feature name
             schema - sub-schema that matches feature name
             feat - feature name from pliers
-            ext_hash - hash of the extractor
-            features - list of all features
+            extractor - pliers extractor object
+            sub_df - df with ef values
             default_active - set to active by default?
         """
-        name = re.sub(pattern, schema['name'], feat) \
-            if 'name' in schema else feat
-        description = re.sub(pattern, schema['description'], feat) \
-            if 'description' in schema else None
+        # If name is in schema, substitue regex patterns from schema pattern
+        # and fill in format strings from extractor_dict
+        if 'name' in schema:
+            name = re.sub(pattern, schema['name'], feat)
+            name = name.format(**extractor.__dict__)
+        else:
+            name = feat
+
+        if 'description' in schema:
+            description = re.sub(pattern, schema['description'], feat)
+            description = description.format(**extractor.__dict__)
+        else:
+            description = None
 
         annotated = []
-        for i, v in sub_df[sub_df.value.notnull()].iterrows():
-            annotated.append(
-                (
-                    {
-                        'value': v['value'],
-                        'onset': v['onset']
-                        if not pd.isnull(v['onset']) else None,
-                        'duration': v['duration']
-                        if not pd.isnull(v['duration']) else None,
-                        'object_id': v['object_id']
-                        },
-                    {
-                        'sha1_hash': hash_data(str(ext_hash) + name),
-                        'feature_name': name,
-                        'original_name': feat,
-                        'description': description,
-                        'active': schema.get('active', default_active),
-                        }
-                    )
-                )
+        for _, row in sub_df[sub_df.value.notnull()].iterrows():
+            if isinstance(row['value'], list) and not self.splat:
+                raise ValueError("Value is an array and splatting is not True")
+            val = listify(row['value'])
 
+            for ix, v in enumerate(val):
+                feature_name = f"{name}_{ix+1}" if len(val) > 1 else name
+                if self.round_n is not None and isinstance(v, float):
+                    v = round(v, self.round_n)
+
+                ee = {
+                    'value': v,
+                    'onset': row['onset']
+                    if not pd.isnull(row['onset']) else None,
+                    'duration': row['duration']
+                    if not pd.isnull(row['duration']) else None,
+                    'object_id': row['object_id']
+                    }
+                ef = {
+                    'sha1_hash': hash_data(
+                        str(extractor.__hash__()) + feature_name),
+                    'feature_name': feature_name,
+                    'original_name': feat,
+                    'description': description,
+                    'active': schema.get('active', default_active),
+                    }
+
+                annotated.append((ee, ef))
         return annotated
 
     def load(self, res):
         """" Load and annotate features in an extractor result object.
         Args:
             res - Pliers ExtractorResult object
+
         Returns a dictionary of annotated features
         """
         res_df = res.to_df(format='long')
+        if self.object_id == 'max':
+            res_df = res_df[res_df.object_id == res_df.object_id.max()]
         features = res_df['feature'].unique().tolist()
-        ext_hash = res.extractor.__hash__()
 
         # Find matching extractor schema + attribute combination
         # Entries with no attributes will match any
@@ -170,14 +202,14 @@ class FeatureSerializer(Serializer):
             features = set(features) - set(matching)
             for feat in matching:
                 annotated += self._annotate_feature(
-                    pattern, schema, feat, ext_hash,
+                    pattern, schema, feat, res.extractor,
                     res_df[res_df.feature == feat])
 
         # Add all remaining features
         if self.add_all is True:
             for feat in features:
                 annotated += self._annotate_feature(
-                    ".*", {}, feat, ext_hash,
+                    ".*", {}, feat, res.extractor,
                     res_df[res_df.feature == feat], default_active=False)
 
         # Add extractor constants

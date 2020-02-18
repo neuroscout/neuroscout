@@ -1,4 +1,4 @@
-FROM python:3.6
+FROM python:3.6-stretch
 ARG DEBIAN_FRONTEND=noninteractive
 ADD ./celery_worker/requirements.txt /requirements.txt
 RUN pip install -r /requirements.txt
