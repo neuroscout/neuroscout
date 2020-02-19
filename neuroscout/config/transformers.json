@@ -35,11 +35,12 @@
       "aoa": ["AoA_Kup"],
       "concreteness": ["Conc.M"]},
       "missing": "n/a"} ],
-      ["PredefinedDictionaryExtractor", {"variables":
+    ["PredefinedDictionaryExtractor", {"variables":
         {
           "lancastersensorimotornorms": ["Auditory.mean", "Gustatory.mean", "Haptic.mean", "Interoceptive.mean", "Olfactory.mean", "Visual.mean", "Foot_leg.mean", "Hand_arm.mean", "Head.mean", "Mouth.mean", "Torso.mean"]
         }
-      ],
+      "missing": "n/a"}
+    ],
     ["LengthExtractor", {}]
   ],
   "transformations":[
