@@ -11,6 +11,11 @@
         "converters": [
         ],
         "extractors": [
+          ["PredefinedDictionaryExtractor", {"variables":
+            {
+              "lancastersensorimotornorms": ["Auditory.mean", "Gustatory.mean", "Haptic.mean", "Interoceptive.mean", "Olfactory.mean", "Visual.mean", "Foot_leg.mean", "Hand_arm.mean", "Head.mean", "Mouth.mean", "Torso.mean"]
+            }
+          ]
         ],
         "tokenized_extractors": [
         ],
@@ -22,9 +27,13 @@
         "converters": [
         ],
         "extractors": [
+          ["PredefinedDictionaryExtractor", {"variables":
+            {
+              "lancastersensorimotornorms": ["Auditory.mean", "Gustatory.mean", "Haptic.mean", "Interoceptive.mean", "Olfactory.mean", "Visual.mean", "Foot_leg.mean", "Hand_arm.mean", "Head.mean", "Mouth.mean", "Torso.mean"]
+            }
+          ]
         ],
         "tokenized_extractors": [
-          ["PretrainedBertEncodingExtractor", {}, {"window": "pre", "n": 25}]
         ],
         "transformations": [
         ]
