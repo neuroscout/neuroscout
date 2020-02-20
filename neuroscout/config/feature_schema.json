@@ -425,6 +425,39 @@
         },
         "calgarysemanticdecision_Concrete_rating": {
           "description": "Concreteness (calgarysemanticdecision)."
+        },
+        "lancastersensorimotornorms_Auditory.mean": {
+            "description": "how strongly the speoken word is experienced by hearing"
+        },
+        "lancastersensorimotornorms_Gustatory.mean": {
+            "description": "how strongly the speoken word is experienced by tasting"
+        },
+        "lancastersensorimotornorms_Haptic.mean": {
+            "description": "how strongly the speoken word is experienced by feeling through touch"
+        },
+        "lancastersensorimotornorms_Interoceptive.mean": {
+            "description": "how strongly the speoken word is experienced by sensations inside the body"
+        },
+        "lancastersensorimotornorms_Olfactory.mean": {
+            "description": "how strongly the speoken word is experienced by smelling"
+        },
+        "lancastersensorimotornorms_Visual.mean": {
+            "description": "how strongly the speoken word is experienced by seeing"
+        },
+        "lancastersensorimotornorms_Foot_leg.mean": {
+            "description": "how strongly the speoken word is experienced by performing an action with the foot / leg"
+        },
+        "lancastersensorimotornorms_Hand_arm.mean": {
+            "description": "how strongly the speoken word is experienced by performing an action with the hand / arm"
+        },
+        "lancastersensorimotornorms_Head.mean": {
+            "description": "how strongly the speoken word is experienced by performing an action with the head excluding mouth"
+        },
+        "lancastersensorimotornorms_Mouth.mean": {
+            "description": "how strongly the speoken word is experienced by performing an action with the mouth / throat"
+        },
+        "lancastersensorimotornorms_Torso.mean": {
+            "description": "how strongly the speoken word is experienced by performing an action with the torso"
         }
       }
     }

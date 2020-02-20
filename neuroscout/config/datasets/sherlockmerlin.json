@@ -7,10 +7,16 @@
     "url": "https://openneuro.org/datasets/ds001110",
     "tasks": {
       "SherlockMovie": {
-	"summary": "AV Presentation: Sherlock Episode",
+	    "summary": "AV Presentation: Sherlock Episode",
         "converters": [
         ],
         "extractors": [
+          ["PredefinedDictionaryExtractor", {"variables":
+              {
+                "lancastersensorimotornorms": ["Auditory.mean", "Gustatory.mean", "Haptic.mean", "Interoceptive.mean", "Olfactory.mean", "Visual.mean", "Foot_leg.mean", "Hand_arm.mean", "Head.mean", "Mouth.mean", "Torso.mean"]
+              },
+            "missing": "n/a"}
+          ]
         ],
         "tokenized_extractors": [
         ],
@@ -22,9 +28,14 @@
         "converters": [
         ],
         "extractors": [
+          ["PredefinedDictionaryExtractor", {"variables":
+              {
+                "lancastersensorimotornorms": ["Auditory.mean", "Gustatory.mean", "Haptic.mean", "Interoceptive.mean", "Olfactory.mean", "Visual.mean", "Foot_leg.mean", "Hand_arm.mean", "Head.mean", "Mouth.mean", "Torso.mean"]
+              },
+            "missing": "n/a"}
+          ]
         ],
         "tokenized_extractors": [
-          ["PretrainedBertEncodingExtractor", {}, {"window": "pre", "n": 25}]
         ],
         "transformations": [
         ]
