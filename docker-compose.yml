@@ -68,7 +68,20 @@ services:
     env_file:
       - .env
 
+  monitor:
+    build:
+      context: ./
+      dockerfile: celery_worker/Dockerfile
+    ports:
+     - "5555:5555"
+    entrypoint: celery -A tasks flower
+    volumes:
+      - ./celery_worker:/celery_worker
+    depends_on:
+      - redis
+    env_file:
+       - .env
+
 volumes:
-  postgres-data:
   certs:
   certs-data:
