@@ -126,14 +126,17 @@ def upload_neurovault(flask_app, file_id, n_subjects=None):
     file_object = NeurovaultFileUpload.query.filter_by(id=file_id).one()
     path = Path(file_object.path)
 
-    new_p = Path(str(path).replace('space-MNI152NLin2009cAsym_', ''))
-    path.rename(new_p)
-
-    basename = new_p.parts[-1]
-
+    basename = path.parts[-1]
     contrast_name = re.findall('contrast-(.*)_', str(basename))[0]
     map_type = re.findall('stat-(.*)_', str(basename))[0]
     map_type = MAP_TYPE_CHOICES[map_type]
+
+    # Truncate filename
+    new_p = Path(str(path).replace('space-MNI152NLin2009cAsym_', ''))
+    parts = list(new_p.parts)
+    parts[-1] = parts[-1][:86]
+    new_p = Path(*parts)
+    path.rename(new_p)
 
     if file_object.level == 'GROUP':
         analysis_level = 'G'
