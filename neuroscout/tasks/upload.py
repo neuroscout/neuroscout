@@ -127,16 +127,10 @@ def upload_neurovault(flask_app, file_id, n_subjects=None):
     path = Path(file_object.path)
 
     basename = path.parts[-1]
-    contrast_name = re.findall('contrast-(.*)_', str(basename))[0]
-    map_type = re.findall('stat-(.*)_', str(basename))[0]
-    map_type = MAP_TYPE_CHOICES[map_type]
 
-    # Truncate filename
-    new_p = Path(str(path).replace('space-MNI152NLin2009cAsym_', ''))
-    parts = list(new_p.parts)
-    parts[-1] = parts[-1][:86]
-    new_p = Path(*parts)
-    path.rename(new_p)
+    contrast_name = re.findall('contrast-(.*?)_', str(basename))[0]
+    map_type = re.findall('stat-(.*?)_', str(basename))[0]
+    map_type = MAP_TYPE_CHOICES[map_type]
 
     if file_object.level == 'GROUP':
         analysis_level = 'G'
@@ -146,7 +140,7 @@ def upload_neurovault(flask_app, file_id, n_subjects=None):
 
     try:
         api.add_image(
-            file_object.collection.collection_id, str(new_p),
+            file_object.collection.collection_id, str(path),
             name=contrast_name,
             modality="fMRI-BOLD", map_type=map_type,
             analysis_level=analysis_level, cognitive_paradigm_cogatlas='None',
