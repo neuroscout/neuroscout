@@ -10,9 +10,14 @@
         "converters": [
         ],
         "extractors": [
+          ["AudiosetLabelExtractor", {"label_subset": ["Human sounds", "Animal", "Music", "Natural sounds", "Sounds of things", "Source-ambiguous sounds", "Channel, environment and background",
+            "Human voice", "Whistling", "Respiratory sounds", "Human locomotion", "Digestive", "Hands", "Heart sounds, heartbeat", "Otoacoustic emission", "Human group actions",
+            "Domestic animals, pets", "Livestock, farm animals, working animals", "Wild animals", "Musical instrument", "Music genre", "Musical concepts", "Music role",
+            "Music mood", "Wind", "Thunderstorm", "Water", "Fire", "Vehicle", "Engine", "Domestic sounds, home sounds", "Alarm", "Mechanisms", "Tools", "Explosion", "Wood", "Glass", "Liquid",
+            "Miscellaneous sources", "Specific impact sounds", "Generic impact sounds", "Surface contact", "Deformable shell", "Onomatopoeia", "Silence", "Other sourceless", "Acoustic environment",
+            "Noise", "Sound reproduction"]}]
         ],
         "tokenized_extractors": [
-          ["WordCounterExtractor", {}, {"window": "run"}]
         ],
         "transformations":[
         ],
