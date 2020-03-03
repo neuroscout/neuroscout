@@ -2,11 +2,11 @@
   "AudiosetLabelExtractor":[
     {
       "features": {
-        "(Human sounds|Animal|Music|Natural sounds|Sounds of things|Source-ambiguous sounds|Channel, environment and background)$": {
+        "(Animal|Music|Sounds of things|Channel, environment and background)$": {
           "description": "AudioSet Level 1 label:\\1",
           "name": "as-\\1"
         },
-        "(Human voice|Whistling|Respiratory sounds|Human locomotion|Digestive|Hands|Heart sounds, heartbeat|Otoacoustic emission|Human group actions|Domestic animals, pets|Livestock, farm animals, working animals|Wild animals|Musical instrument|Music genre|Musical concepts|Music role|Music mood|Wind|Thunderstorm|Water|Fire|Vehicle|Engine|Domestic sounds, home sounds|Alarm|Mechanisms|Tools|Explosion|Wood|Glass|Liquid|Miscellaneous sources|Specific impact sounds|Generic impact sounds|Surface contact|Deformable shell|Onomatopoeia|Silence|Other sourceless|Acoustic environment|Noise|Sound reproduction)$": {
+        "(Whistling|Human locomotion|Hands|Heart sounds, heartbeat|Human group actions|Domestic animals, pets|Livestock, farm animals, working animals|Wild animals|Musical instrument|Musical concepts|Music mood|Wind|Thunderstorm|Water|Fire|Vehicle|Engine|Alarm|Mechanisms|Tools|Explosion|Wood|Glass|Liquid|Specific impact sounds|Surface contact|Onomatopoeia|Silence|Acoustic environment|Noise)$": {
           "description": "AudioSet Level 2 label:\\1",
           "name": "as-\\1"
         }
