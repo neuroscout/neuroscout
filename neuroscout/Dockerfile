@@ -32,8 +32,7 @@ COPY . /usr/src/app
 RUN git config --global user.name "Neuroscout"
 RUN git config --global  user.email "delavega@utexas.edu"
 
-RUN cd /tmp && git clone --depth 1 -b master https://github.com/tensorflow/models
-RUN cd /tmp/models/research/audioset/yamnet && curl -O https://storage.googleapis.com/audioset/yamnet.h5 && cp * /usr/local/lib/python3.6/site-packages
+RUN python -m pliers.support.setup_yamnet
 
 RUN crontab /usr/src/app/update.txt
 RUN service cron start
