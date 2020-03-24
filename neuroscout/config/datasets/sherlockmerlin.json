@@ -11,12 +11,9 @@
         "converters": [
         ],
         "extractors": [
-          ["PredefinedDictionaryExtractor", {"variables":
-              {
-                "lancastersensorimotornorms": ["Auditory.mean", "Gustatory.mean", "Haptic.mean", "Interoceptive.mean", "Olfactory.mean", "Visual.mean", "Foot_leg.mean", "Hand_arm.mean", "Head.mean", "Mouth.mean", "Torso.mean"]
-              },
-            "missing": "n/a"}
-          ]
+          ["AudiosetLabelExtractor", {"labels": ["Whistling", "Heart sounds, heartbeat", "Wild animals", "Vehicle", "Fire",
+           "Silence", "Domestic animals, pets", "Livestock, farm animals, working animals", "Alarm", "Tools", "Explosion", "Thunderstorm",
+           "Engine", "Noise", "Water", "Wind", "Glass", "Animal", "Liquid", "Wood", "Mechanisms", "Musical instrument", "Hands", "Music"]}]
         ],
         "tokenized_extractors": [
         ],
@@ -28,12 +25,9 @@
         "converters": [
         ],
         "extractors": [
-          ["PredefinedDictionaryExtractor", {"variables":
-              {
-                "lancastersensorimotornorms": ["Auditory.mean", "Gustatory.mean", "Haptic.mean", "Interoceptive.mean", "Olfactory.mean", "Visual.mean", "Foot_leg.mean", "Hand_arm.mean", "Head.mean", "Mouth.mean", "Torso.mean"]
-              },
-            "missing": "n/a"}
-          ]
+          ["AudiosetLabelExtractor", {"labels": ["Whistling", "Heart sounds, heartbeat", "Wild animals", "Vehicle", "Fire",
+           "Silence", "Domestic animals, pets", "Livestock, farm animals, working animals", "Alarm", "Tools", "Explosion", "Thunderstorm",
+           "Engine", "Noise", "Water", "Wind", "Glass", "Animal", "Liquid", "Wood", "Mechanisms", "Musical instrument", "Hands", "Music"]}]
         ],
         "tokenized_extractors": [
         ],

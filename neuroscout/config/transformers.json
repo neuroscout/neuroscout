@@ -41,7 +41,10 @@
         },
       "missing": "n/a"}
     ],
-    ["LengthExtractor", {}]
+    ["LengthExtractor", {}],
+    ["AudiosetLabelExtractor", {"labels": ["Whistling", "Heart sounds, heartbeat", "Wild animals", "Vehicle", "Fire",
+     "Silence", "Domestic animals, pets", "Livestock, farm animals, working animals", "Alarm", "Tools", "Explosion", "Thunderstorm",
+     "Engine", "Noise", "Water", "Wind", "Glass", "Animal", "Liquid", "Wood", "Mechanisms", "Musical instrument", "Hands", "Music"]}]
   ],
   "transformations":[
     {

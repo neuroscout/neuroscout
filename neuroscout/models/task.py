@@ -39,8 +39,11 @@ class Task(db.Model):
     @hybrid_property
     def avg_run_duration(self):
         """ Average run duration (seconds) """
-        return round(db.session.query(func.avg(Run.duration)).filter_by(
-            task_id=self.id).all()[0][0], 2)
+        avg_run = db.session.query(func.avg(Run.duration)).filter_by(
+            task_id=self.id).all()[0][0]
+        if avg_run:
+            avg_run = round(avg_run, 2)
+        return avg_run
 
     def __repr__(self):
         return '<models.Task[name={}]>'.format(self.name)

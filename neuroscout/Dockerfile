@@ -9,6 +9,7 @@ RUN apt-get install -yq ffmpeg tesseract-ocr
 RUN pip install -e git+https://github.com/tyarkoni/pliers.git#egg=pliers
 RUN pip install clarifai duecredit google-api-python-client IndicoIo librosa>=0.6.3 pysrt pytesseract spacy rev_ai
 RUN python -m pliers.support.download
+RUN python -m pliers.support.setup_yamnet
 RUN apt-get install apt-transport-https
 
 RUN wget -O- http://neuro.debian.net/lists/stretch.us-nh.full | tee /etc/apt/sources.list.d/neurodebian.sources.list
@@ -26,6 +27,7 @@ RUN npm install -g yarn
 
 COPY requirements.txt /usr/src/app/
 RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install --no-cache-dir -r optional_requirements.txt
 
 COPY . /usr/src/app
 

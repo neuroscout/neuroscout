@@ -130,6 +130,7 @@ class FeatureSerializer(Serializer):
         """
         # If name is in schema, substitue regex patterns from schema pattern
         # and fill in format strings from extractor_dict
+        feat = feat.replace(',', '')  # Remove commas
         if 'name' in schema:
             name = re.sub(pattern, schema['name'], feat)
             name = name.format(**extractor.__dict__)

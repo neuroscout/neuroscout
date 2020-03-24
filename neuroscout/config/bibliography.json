@@ -1,4 +1,201 @@
 {
+    "PretrainedBertEncodingExtractor": {
+      ".*": [
+            	{
+            		"id": "http://zotero.org/users/local/JXz6ijqB/items/AG67MFBG",
+            		"type": "article-journal",
+            		"title": "HuggingFace's Transformers: State-of-the-art Natural Language Processing",
+            		"container-title": "arXiv:1910.03771 [cs]",
+            		"source": "arXiv.org",
+            		"URL": "http://arxiv.org/abs/1910.03771",
+            		"note": "arXiv: 1910.03771",
+            		"shortTitle": "HuggingFace's Transformers",
+            		"language": "en",
+            		"author": [
+            			{
+            				"family": "Wolf",
+            				"given": "Thomas"
+            			},
+            			{
+            				"family": "Debut",
+            				"given": "Lysandre"
+            			},
+            			{
+            				"family": "Sanh",
+            				"given": "Victor"
+            			},
+            			{
+            				"family": "Chaumond",
+            				"given": "Julien"
+            			},
+            			{
+            				"family": "Delangue",
+            				"given": "Clement"
+            			},
+            			{
+            				"family": "Moi",
+            				"given": "Anthony"
+            			},
+            			{
+            				"family": "Cistac",
+            				"given": "Pierric"
+            			},
+            			{
+            				"family": "Rault",
+            				"given": "Tim"
+            			},
+            			{
+            				"family": "Louf",
+            				"given": "Rémi"
+            			},
+            			{
+            				"family": "Funtowicz",
+            				"given": "Morgan"
+            			},
+            			{
+            				"family": "Brew",
+            				"given": "Jamie"
+            			}
+            		],
+            		"issued": {
+            			"date-parts": [
+            				[
+            					"2020",
+            					2,
+            					11
+            				]
+            			]
+            		},
+            		"accessed": {
+            			"date-parts": [
+            				[
+            					"2020",
+            					3,
+            					5
+            				]
+            			]
+            		}
+            	},
+            	{
+            		"id": "http://zotero.org/users/local/JXz6ijqB/items/D5AHDFA4",
+            		"type": "article-journal",
+            		"title": "BERT: Pre-training of Deep Bidirectional Transformers for Language Understanding",
+            		"container-title": "arXiv:1810.04805 [cs]",
+            		"source": "arXiv.org",
+            		"URL": "http://arxiv.org/abs/1810.04805",
+            		"note": "arXiv: 1810.04805",
+            		"shortTitle": "BERT",
+            		"language": "en",
+            		"author": [
+            			{
+            				"family": "Devlin",
+            				"given": "Jacob"
+            			},
+            			{
+            				"family": "Chang",
+            				"given": "Ming-Wei"
+            			},
+            			{
+            				"family": "Lee",
+            				"given": "Kenton"
+            			},
+            			{
+            				"family": "Toutanova",
+            				"given": "Kristina"
+            			}
+            		],
+            		"issued": {
+            			"date-parts": [
+            				[
+            					"2019",
+            					5,
+            					24
+            				]
+            			]
+            		},
+            		"accessed": {
+            			"date-parts": [
+            				[
+            					"2020",
+            					3,
+            					5
+            				]
+            			]
+            		}
+            	}
+            ]
+    },
+    "AudiosetLabelExtractor": {
+      ".*":[
+        {
+      		"id": "http://zotero.org/users/local/JXz6ijqB/items/ESZ6EBBZ",
+      		"type": "paper-conference",
+      		"title": "Audio Set: An ontology and human-labeled dataset for audio events",
+      		"container-title": "2017 IEEE International Conference on Acoustics, Speech and Signal Processing (ICASSP)",
+      		"publisher": "IEEE",
+      		"publisher-place": "New Orleans, LA",
+      		"page": "776-780",
+      		"source": "DOI.org (Crossref)",
+      		"event": "2017 IEEE International Conference on Acoustics, Speech and Signal Processing (ICASSP)",
+      		"event-place": "New Orleans, LA",
+      		"DOI": "10.1109/ICASSP.2017.7952261",
+      		"ISBN": "978-1-5090-4117-6",
+      		"shortTitle": "Audio Set",
+      		"language": "en",
+      		"author": [
+      			{
+      				"family": "Gemmeke",
+      				"given": "Jort F."
+      			},
+      			{
+      				"family": "Ellis",
+      				"given": "Daniel P. W."
+      			},
+      			{
+      				"family": "Freedman",
+      				"given": "Dylan"
+      			},
+      			{
+      				"family": "Jansen",
+      				"given": "Aren"
+      			},
+      			{
+      				"family": "Lawrence",
+      				"given": "Wade"
+      			},
+      			{
+      				"family": "Moore",
+      				"given": "R. Channing"
+      			},
+      			{
+      				"family": "Plakal",
+      				"given": "Manoj"
+      			},
+      			{
+      				"family": "Ritter",
+      				"given": "Marvin"
+      			}
+      		],
+      		"issued": {
+      			"date-parts": [
+      				[
+      					"2017",
+      					3
+      				]
+      			]
+      		},
+      		"accessed": {
+      			"date-parts": [
+      				[
+      					"2020",
+      					3,
+      					5
+      				]
+      			]
+      		}
+        }
+      ]
+    },
     "ClarifaiAPIImageExtractor": {
         ".*": [
             {
