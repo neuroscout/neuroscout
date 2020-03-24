@@ -6,7 +6,7 @@
           "description": "AudioSet Level 1 label: \\1",
           "name": "as-\\1"
         },
-        "(Explosion|Whistling|Heart sounds, heartbeat|Wild animals|Vehicle|Thunderstorm|Engine|Noise|Fire|Water|Wind|Glass|Liquid|Wood|Silence|Domestic animals, pets|Mechanisms|Livestock, farm animals, working animals|Alarm|Musical instrument|Hands|Tools)$": {
+        "(Explosion|Whistling|Heart sounds heartbeat|Wild animals|Vehicle|Thunderstorm|Engine|Noise|Fire|Water|Wind|Glass|Liquid|Wood|Silence|Domestic animals pets|Mechanisms|Livestock farm animals working animals|Alarm|Musical instrument|Hands|Tools)$": {
           "description": "AudioSet Level 2 label: \\1",
           "name": "as-\\1"
         }
