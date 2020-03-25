@@ -11,9 +11,9 @@
         "converters": [
         ],
         "extractors": [
-          ["AudiosetLabelExtractor", {"labels": ["Whistling", "Heart sounds, heartbeat", "Wild animals", "Vehicle", "Fire",
-           "Silence", "Domestic animals, pets", "Livestock, farm animals, working animals", "Alarm", "Tools", "Explosion", "Thunderstorm",
-           "Engine", "Noise", "Water", "Wind", "Glass", "Animal", "Liquid", "Wood", "Mechanisms", "Musical instrument", "Hands", "Music"]}]
+          ["ClarifaiAPIImageExtractor", { "model": "general-v1.3",
+            "select_concepts": ["tool"]
+            }]
         ],
         "tokenized_extractors": [
         ],
@@ -25,9 +25,9 @@
         "converters": [
         ],
         "extractors": [
-          ["AudiosetLabelExtractor", {"labels": ["Whistling", "Heart sounds, heartbeat", "Wild animals", "Vehicle", "Fire",
-           "Silence", "Domestic animals, pets", "Livestock, farm animals, working animals", "Alarm", "Tools", "Explosion", "Thunderstorm",
-           "Engine", "Noise", "Water", "Wind", "Glass", "Animal", "Liquid", "Wood", "Mechanisms", "Musical instrument", "Hands", "Music"]}]
+          ["ClarifaiAPIImageExtractor", { "model": "general-v1.3",
+            "select_concepts": ["tool"]
+            }]
         ],
         "tokenized_extractors": [
         ],

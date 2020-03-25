@@ -10,9 +10,10 @@
         "summary": "Movie watching, six clips each run",
         "converters": [
         ],
-        ["AudiosetLabelExtractor", {"labels": ["Whistling", "Heart sounds, heartbeat", "Wild animals", "Vehicle", "Fire",
-         "Silence", "Domestic animals, pets", "Livestock, farm animals, working animals", "Alarm", "Tools", "Explosion", "Thunderstorm",
-         "Engine", "Noise", "Water", "Wind", "Glass", "Animal", "Liquid", "Wood", "Mechanisms", "Musical instrument", "Hands", "Music"]}]
+        "extractors": [
+          ["ClarifaiAPIImageExtractor", { "model": "general-v1.3",
+            "select_concepts": ["tool"]
+            }]
         ],
         "tokenized_extractors": [
         ],

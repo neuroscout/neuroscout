@@ -11,6 +11,9 @@
         "converters": [
         ],
         "extractors": [
+          ["ClarifaiAPIImageExtractor", { "model": "general-v1.3",
+            "select_concepts": ["tool"]
+            }]
         ],
         "transformations": [
         ],
