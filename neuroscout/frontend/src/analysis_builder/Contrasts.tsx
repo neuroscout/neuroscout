@@ -40,7 +40,7 @@ const ContrastDisplay = (props: ContrastDisplayProps) => {
         </Button>
       </div>
       <div>
-        <b>{`${contrast.Name}`} </b>{`${contrast.ContrastType} test`}<br/>
+        <b>{`${contrast.Name}`} </b>{`${contrast.Type} test`}<br/>
         {/*contrast.ConditionList && contrast.ConditionList.map((predictor, i) => {
           return(predictor + ': ' + contrast.Weights[i] + ' ');
         })*/}

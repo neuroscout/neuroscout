@@ -163,7 +163,7 @@ export interface Contrast {
   Name: string;
   ConditionList: string[];
   Weights: number[];
-  ContrastType: ContrastTypeEnum;
+  Type: ContrastTypeEnum;
 }
 
 export interface Store {
@@ -259,7 +259,7 @@ export interface ModelContrast {
   Name: string;
   Predictors: string[];
   Weights: number[];
-  ContrastType: 't' | 'F';
+  Type: 't' | 'F';
 }
 
 export interface PredictorCollection {
