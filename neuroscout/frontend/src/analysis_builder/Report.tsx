@@ -358,6 +358,10 @@ export class Report extends React.Component<ReportProps, ReportState> {
       </>
     );
 
+    // tslint:disable-next-line:no-console
+    console.log(this.props.runs);
+    // tslint:disable-next-line:no-console
+    console.log(this.state.selectedRunIds);
     return (
       <div>
         <Card
