@@ -815,13 +815,10 @@ export default class AnalysisBuilder extends Reflux.Component<any, BuilderProps 
     keys.map(key => {
       if (!input[key]) {return; }
       runIds = runIds.filter((x) => {
-        if ((key !== 'Run' && !x[key]) || (key === 'Run' && !x.number)) {
-          return true;
-        }
         if (key === 'Run') {
           return input[key]!.indexOf(parseInt(x.number, 10)) > -1;
         }
-        return input[key].indexOf(x[key]) > -1;
+        return input[key].indexOf(x[key.toLowerCase()]) > -1;
       });
     });
     return runIds.map(x => x.id);
