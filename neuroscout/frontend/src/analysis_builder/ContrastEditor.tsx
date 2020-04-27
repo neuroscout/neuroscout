@@ -16,7 +16,7 @@ export function emptyContrast() {
         ConditionList: [] as string[],
         Name: '',
         Weights:  [] as number[],
-        ContrastType: 't' as ContrastTypeEnum
+        Type: 't' as ContrastTypeEnum
     };
 }
 
@@ -128,7 +128,7 @@ export class ContrastEditor extends React.Component<
 
   render() {
     const { selectedPredictors } = this.state;
-    let { Name, ConditionList, Weights, ContrastType } = this.props.activeContrast;
+    let { Name, ConditionList, Weights, Type } = this.props.activeContrast;
     const { availablePredictors } = this.props;
     return (
       <div>
@@ -177,11 +177,11 @@ export class ContrastEditor extends React.Component<
           )}
           <FormItem label={'Contrast type:'} >
             <RadioGroup
-              value={ContrastType}
+              value={Type}
               onChange={(event: any) =>
                 this.props.updateBuilderState('activeContrast')({
                   ...this.props.activeContrast,
-                  ContrastType: event.target.value as 't' | 'F' }
+                  Type: event.target.value as 't' | 'F' }
                 )}
             >
               {CONTRAST_TYPE_OPTIONS.map(x =>
