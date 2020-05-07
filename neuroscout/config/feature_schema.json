@@ -23,6 +23,16 @@
       }
     }
   ],
+  "MetricExtractor": [
+    {
+      "features": {
+        "entropy$": {
+          "description": "Entrop of BERT LM encoding vectors.",
+          "name": "BERTLM_{window_method}_{window_n}_entropy"
+        }
+      }
+    }
+  ],
   "WordCounterExtractor": [
     {
       "attributes": { "window_method": "transcript" },
