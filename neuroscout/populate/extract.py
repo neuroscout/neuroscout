@@ -259,15 +259,14 @@ def extract_tokenized_features(dataset_name, task_name, extractors):
             setattr(node.transformer, "window_method", window)
             if window_n:
                 setattr(node.transformer, "window_n", window_n)
-
         for sm, s in progressbar(stims):
             if window == "transcript":
                 # In complete transcript window, save all results
                 results += [(sm, res) for res in g.transform(s, merge=False)]
             elif window == "pre":
                 for sli in _window_stim(s, window_n):
-                    res = g.transform(sli, merge=False)
-                    results.append((sm, res))
+                    for r in g.transform(sli, merge=False):
+                        results.append((sm, r))
 
     # These results may not be fully recoverable
     # _to_csv(results, dataset_name, task_name)
