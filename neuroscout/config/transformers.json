@@ -33,7 +33,9 @@
     ["PredefinedDictionaryExtractor", {"variables":
       {"affect":["V.Mean.Sum", "A.Mean.Sum", "D.Mean.Sum"],
       "aoa": ["AoA_Kup"],
-      "concreteness": ["Conc.M"]},
+      "concreteness": ["Conc.M"],
+      "massiveauditorylexicaldecision": ["FreqCOCAspok", "NumSylls", "NumPhones", "Duration", "PhonLev"]
+      },
       "missing": "n/a"} ],
     ["PredefinedDictionaryExtractor", {"variables":
         {
