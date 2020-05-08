@@ -148,7 +148,7 @@ def _create_collection(analysis, force=False):
             description=analysis.description,
             full_dataset_url=url)
     except Exception:
-        abort(422, "Error creating collection named: f{collection_name}, "
+        abort(422, f"Error creating collection named: f{collection_name}, "
                    "perhaps one with that name already exists?")
 
     # Create new NV collection
