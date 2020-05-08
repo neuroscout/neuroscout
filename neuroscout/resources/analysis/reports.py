@@ -130,12 +130,14 @@ def _truncate_string(si, max_char):
 
 
 def _create_collection(analysis, force=False):
-    analysis_name = _truncate_string(analysis.name, 180)
-    collection_name = f"{analysis_name} - {analysis.hash_id}"
+    collection_name = f"{analysis.name} - {analysis.hash_id}"
     if force is True:
         timestamp = datetime.datetime.utcnow().strftime(
             '%Y-%m-%d_%H:%M')
         collection_name += f"_{timestamp}"
+
+    collection_name = _truncate_string(collection_name, 199)
+
     url = f"https://{current_app.config['SERVER_NAME']}"\
           f"/builder/{analysis.hash_id}"
     try:
@@ -146,7 +148,7 @@ def _create_collection(analysis, force=False):
             description=analysis.description,
             full_dataset_url=url)
     except Exception:
-        abort(422, "Error creating collection, "
+        abort(422, "Error creating collection named: f{collection_name}, "
                    "perhaps one with that name already exists?")
 
     # Create new NV collection
