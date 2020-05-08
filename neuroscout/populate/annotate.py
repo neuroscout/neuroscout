@@ -221,7 +221,7 @@ class FeatureSerializer(Serializer):
             "extractor_parameters": str(dict(
                 zip(res.extractor._log_attributes, tr_attrs))),
             "extractor_version": res.extractor.VERSION,
-            "modality": stim_map[res.extractor._input_type.__name__]
+            "modality": stim_map.get(res.extractor._input_type.__name__, '')
         }
 
         for ee, ef in annotated:
