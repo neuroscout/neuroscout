@@ -10,6 +10,12 @@
         "summary": "Visual Image perception",
         "extractors": [
         ],
+        "tokenized_extractors":[
+          [
+            [{"transformer": "BertLMExtractor", "parameters": {"mask": 10, "top_n": 100}, "children": [{"transformer": "MetricExtractor", "parameters": {"functions": "scipy.stats.entropy"}}]}],
+            {"window": "pre", "n": 10}
+          ]
+        ]
         "filters": {
           "subject": "01"
         }

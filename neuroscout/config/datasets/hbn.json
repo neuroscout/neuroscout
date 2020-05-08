@@ -10,11 +10,12 @@
         "converters": [
         ],
         "extractors": [
-          ["AudiosetLabelExtractor", {"labels": ["Whistling", "Heart sounds, heartbeat", "Wild animals", "Vehicle", "Fire",
-           "Silence", "Domestic animals, pets", "Livestock, farm animals, working animals", "Alarm", "Tools", "Explosion", "Thunderstorm",
-           "Engine", "Noise", "Water", "Wind", "Glass", "Animal", "Liquid", "Wood", "Mechanisms", "Musical instrument", "Hands", "Music"]}]
         ],
         "tokenized_extractors": [
+          [
+            [{"transformer": "BertLMExtractor", "parameters": {"mask": 10, "top_n": 100}, "children": [{"transformer": "MetricExtractor", "parameters": {"functions": "scipy.stats.entropy"}}]}],
+            {"window": "pre", "n": 10}
+          ]
         ],
         "transformations":[
         ],

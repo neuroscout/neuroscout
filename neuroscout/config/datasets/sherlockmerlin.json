@@ -13,6 +13,10 @@
         "extractors": [
         ],
         "tokenized_extractors": [
+          [
+            [{"transformer": "BertLMExtractor", "parameters": {"mask": 10, "top_n": 100}, "children": [{"transformer": "MetricExtractor", "parameters": {"functions": "scipy.stats.entropy"}}]}],
+            {"window": "pre", "n": 10}
+          ]
         ],
         "transformations": [
         ]
@@ -26,7 +30,7 @@
         "tokenized_extractors": [
           [
             [{"transformer": "BertLMExtractor", "parameters": {"mask": 10, "top_n": 100}, "children": [{"transformer": "MetricExtractor", "parameters": {"functions": "scipy.stats.entropy"}}]}],
-            {"window": "pre", "n": 25}
+            {"window": "pre", "n": 10}
           ]
         ],
         "transformations": [
