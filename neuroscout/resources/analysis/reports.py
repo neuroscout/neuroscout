@@ -136,7 +136,7 @@ def _create_collection(analysis, force=False):
             '%Y-%m-%d_%H:%M')
         collection_name += f"_{timestamp}"
 
-    collection_name = _truncate_string(collection_name, 199)
+    collection_name = _truncate_string(collection_name, 195)
 
     url = f"https://{current_app.config['SERVER_NAME']}"\
           f"/builder/{analysis.hash_id}"
