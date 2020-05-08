@@ -120,8 +120,18 @@ def _save_file(file, collection_id):
     return str(path)
 
 
+def _truncate_string(si, max_char):
+    if len(si) > max_char:
+        middle_point = int(len(si) / 2)
+        diff = int((len(si) - max_char) / 2)
+        end = middle_point - diff
+        si = si[:end]+"..."+si[-end:]
+    return si
+
+
 def _create_collection(analysis, force=False):
-    collection_name = f"{analysis.name} - {analysis.hash_id}"
+    analysis_name = _truncate_string(analysis.name, 180)
+    collection_name = f"{analysis_name} - {analysis.hash_id}"
     if force is True:
         timestamp = datetime.datetime.utcnow().strftime(
             '%Y-%m-%d_%H:%M')
