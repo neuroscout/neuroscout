@@ -183,7 +183,6 @@ class FeatureSerializer(Serializer):
         """
         res_df = res.to_df(format='long')
         if self.object_id == 'max':
-            assert 0
             res_df = res_df[res_df.object_id == res_df.object_id.max()]
         features = res_df['feature'].unique().tolist()
 
