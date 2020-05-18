@@ -43,14 +43,23 @@ export default class Routes extends React.Component<AppState, {}> {
         />
         <Route
           path="/builder/:id"
-          render={props =>
-            <AnalysisBuilder
+          render={props => {
+            let id = props.match.params.id;
+            if (
+              !this.props.publicAnalyses.some(elem => elem.id === id)
+              && !this.props.analyses.some(elem => elem.id === id)
+            ) {
+              message.warning('Analyses is currently private');
+              return <Redirect to="/" />;
+            }
+            return <AnalysisBuilder
               id={props.match.params.id}
               updatedAnalysis={() => this.props.loadAnalyses()}
               userOwns={this.props.analyses.filter((x) => x.id === props.match.params.id).length > 0}
               datasets={this.props.datasets}
               doTooltip={true}
-            />}
+            />;
+          }}
         />
         <Route
           exact={true}
