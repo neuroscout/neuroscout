@@ -244,6 +244,9 @@ export default class AnalysisBuilder extends Reflux.Component<any, BuilderProps 
       })
       .then((data: ApiAnalysis) => {
         if (this.state.analysis404) { return; }
+        if (!this.props.userOwns && editableStatus.includes(data.status)) {
+          editableStatus = [];
+        }
         if (editableStatus.includes(data.status)) {
           this.setState({model: this.buildModel()});
         } else if (data.model !== undefined) {
@@ -251,9 +254,6 @@ export default class AnalysisBuilder extends Reflux.Component<any, BuilderProps 
         }
         if (data.status === 'FAILED') {
           this.setState({activeTab: 'submit'});
-        }
-        if (!this.props.userOwns && editableStatus.includes(data.status)) {
-          editableStatus = [];
         }
       })
       .catch(displayError);
