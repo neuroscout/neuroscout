@@ -55,7 +55,7 @@ const history = createBrowserHistory();
 // const logo = require('./logo.svg');
 const domainRoot = config.server_url;
 const DEFAULT_SMOOTHING = 5;
-const editableStatus = ['DRAFT', 'FAILED'];
+let editableStatus = ['DRAFT', 'FAILED'];
 
 const defaultConfig: AnalysisConfig = { smoothing: DEFAULT_SMOOTHING, predictorConfigs: {} };
 
@@ -226,6 +226,7 @@ type BuilderProps = {
 export default class AnalysisBuilder extends Reflux.Component<any, BuilderProps & RouteComponentProps<{}>, Store> {
   constructor(props: BuilderProps) {
     super(props);
+    editableStatus = ['DRAFT', 'FAILED'];
     this.state = initializeStore();
     this.store = AuthStore;
     // Load analysis from server if an analysis id is specified in the props
@@ -250,6 +251,9 @@ export default class AnalysisBuilder extends Reflux.Component<any, BuilderProps 
         }
         if (data.status === 'FAILED') {
           this.setState({activeTab: 'submit'});
+        }
+        if (!this.props.userOwns && editableStatus.includes(data.status)) {
+          editableStatus = [];
         }
       })
       .catch(displayError);
