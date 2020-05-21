@@ -266,6 +266,7 @@ def extract_tokenized_features(dataset_name, task_name, extractors):
             elif window == "pre":
                 for sli in _window_stim(s, window_n):
                     for r in g.transform(sli, merge=False):
+                        assert 0
                         results.append((sm, r))
 
     # These results may not be fully recoverable
