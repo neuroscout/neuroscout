@@ -266,14 +266,14 @@ def extract_tokenized_features(dataset_name, task_name, extractors):
             elif window == "pre":
                 for sli in _window_stim(s, window_n):
                     for r in g.transform(sli, merge=False):
-                        assert 0
                         results.append((sm, r))
 
     # These results may not be fully recoverable
     # _to_csv(results, dataset_name, task_name)
     object_id = 'max' if window == 'pre' else None
     ext_feats = _create_efs(
-        results, object_id=object_id, splat=True, add_all=False, round_n=3)
+        results, object_id=object_id, splat=True, add_all=False, round_n=4)
+    assert 0
 
     return create_predictors([ef for ef in ext_feats.values() if ef.active],
                              dataset_name, task_name)
