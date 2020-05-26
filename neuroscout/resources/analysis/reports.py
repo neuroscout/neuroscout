@@ -120,12 +120,24 @@ def _save_file(file, collection_id):
     return str(path)
 
 
+def _truncate_string(si, max_char):
+    if len(si) > max_char:
+        middle_point = int(len(si) / 2)
+        diff = int((len(si) - max_char) / 2)
+        end = middle_point - diff
+        si = si[:end]+"..."+si[-end:]
+    return si
+
+
 def _create_collection(analysis, force=False):
     collection_name = f"{analysis.name} - {analysis.hash_id}"
     if force is True:
         timestamp = datetime.datetime.utcnow().strftime(
             '%Y-%m-%d_%H:%M')
         collection_name += f"_{timestamp}"
+
+    collection_name = _truncate_string(collection_name, 195)
+
     url = f"https://{current_app.config['SERVER_NAME']}"\
           f"/builder/{analysis.hash_id}"
     try:
@@ -136,7 +148,7 @@ def _create_collection(analysis, force=False):
             description=analysis.description,
             full_dataset_url=url)
     except Exception:
-        abort(422, "Error creating collection, "
+        abort(422, f"Error creating collection named: {collection_name}, "
                    "perhaps one with that name already exists?")
 
     # Create new NV collection
