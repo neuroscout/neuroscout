@@ -14,8 +14,8 @@
         ],
         "tokenized_extractors": [
           [
-            [{"transformer": "BertLMExtractor", "parameters": {"mask": 10, "top_n": 100}, "children": [{"transformer": "MetricExtractor", "parameters": {"functions": "scipy.stats.entropy"}}]}],
-            {"window": "pre", "n": 10}
+            [{"transformer": "BertLMExtractor", "parameters": {"mask": 24, "top_n": 100, "return_softmax": true}, "children": [{"transformer": "MetricExtractor", "parameters": {"functions": "scipy.stats.entropy"}}]}],
+            {"window": "pre", "n": 25}
           ]
         ],
         "transformations":[
