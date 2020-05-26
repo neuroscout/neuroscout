@@ -148,3 +148,7 @@ class NeurovaultFileUpload(db.Model):
         db.CheckConstraint(status.in_(['OK', 'FAILED', 'PENDING'])),
         db.CheckConstraint(level.in_(['GROUP', 'SUBJECT'])),
         )
+
+    @hybrid_property
+    def basename(self):
+        return self.path.split('/')[-1]

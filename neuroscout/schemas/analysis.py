@@ -116,6 +116,7 @@ class NeurovaultFileUploadSchema(Schema):
     status = fields.Str(description='Upload status')
     traceback = fields.Str(
         description='Traceback of upload error.')
+    basename = fields.Str(description='Basename of file')
 
 
 class NeurovaultCollectionSchema(Schema):
