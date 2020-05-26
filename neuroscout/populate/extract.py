@@ -268,6 +268,8 @@ def extract_tokenized_features(dataset_name, task_name, extractors):
                     for r in g.transform(sli, merge=False):
                         results.append((sm, r))
 
+    assert 0
+
     # These results may not be fully recoverable
     # _to_csv(results, dataset_name, task_name)
     object_id = 'max' if window == 'pre' else None
