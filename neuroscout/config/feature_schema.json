@@ -31,7 +31,8 @@
           "name": "BERTLM_{window_method}_{window_n}_entropy"
         },
         "surprisal$": {
-          "description": "BERT LM Surprisal (-log(masked_prediction))"
+          "description": "BERTLM_{window_method}_{window_n} surprisal (-log(masked_prediction))"
+          "name": "BERTLM_{window_method}_{window_n}_surprisal"
         }
       }
     }
