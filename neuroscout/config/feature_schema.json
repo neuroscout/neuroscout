@@ -27,8 +27,11 @@
     {
       "features": {
         "entropy$": {
-          "description": "Entrop of BERT LM encoding vectors.",
+          "description": "Entropy of BERT LM encoding vectors.",
           "name": "BERTLM_{window_method}_{window_n}_entropy"
+        },
+        "surprisal$": {
+          "description": "BERT LM Surprisal (-log(masked_prediction))"
         }
       }
     }
