@@ -10,6 +10,8 @@
         "summary": "Visual Image perception",
         "extractors": [
         ],
+        "tokenized_extractors":[
+        ]
         "filters": {
           "subject": "01"
         }

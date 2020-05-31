@@ -15,7 +15,7 @@ from ..utils.db import get_or_create
 from pliers.stimuli import load_stims, ComplexTextStim, TextStim
 from pliers.transformers import get_transformer
 from pliers.extractors import merge_results
-
+from pliers.graph import Graph
 from ..models import (
     Dataset, Task, Predictor, PredictorRun, Run, Stimulus,
     RunStimulus, ExtractedFeature, ExtractedEvent)
@@ -249,27 +249,30 @@ def extract_tokenized_features(dataset_name, task_name, extractors):
 
     results = []
     # For every extractor, extract from complex stims
-    for name, ext_params, cts_params in extractors:
-        print("Extractor: {}".format(name))
-        ext = get_transformer(name, **ext_params)
+    for graph, cts_params in extractors:
+        print("Graph: {}".format(graph))
+        g = Graph(nodes=graph)
         window = cts_params.get("window", "transcript")
-        ext.window_method = window
+        window_n = cts_params.get("n", 25) if window == "pre" else None
+
+        for node in g.nodes.values():
+            setattr(node.transformer, "window_method", window)
+            if window_n:
+                setattr(node.transformer, "window_n", window_n)
         for sm, s in progressbar(stims):
             if window == "transcript":
                 # In complete transcript window, save all results
-                results += [(sm, res) for res in ext.transform(s)]
+                results += [(sm, res) for res in g.transform(s, merge=False)]
             elif window == "pre":
-                n = cts_params.get("n", 25)
-                ext.window_n = n
-                for sli in _window_stim(s, n):
-                    res = ext.transform(sli)
-                    results.append((sm, res))
+                for sli in _window_stim(s, window_n):
+                    for r in g.transform(sli, merge=False):
+                        results.append((sm, r))
 
     # These results may not be fully recoverable
     # _to_csv(results, dataset_name, task_name)
     object_id = 'max' if window == 'pre' else None
     ext_feats = _create_efs(
-        results, object_id=object_id, splat=True, add_all=False, round_n=3)
+        results, object_id=object_id, splat=True, add_all=False, round_n=4)
 
     return create_predictors([ef for ef in ext_feats.values() if ef.active],
                              dataset_name, task_name)
