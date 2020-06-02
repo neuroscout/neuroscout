@@ -15,8 +15,9 @@ PATHS = ['sub-{subject}_[ses-{session}_]task-{task}_[acq-{acquisition}_]'
 
 def writeout_events(analysis, pes, outdir, run_ids=None):
     """ Writeout predictor_events into BIDS event files """
-    if run_ids is None:
-        run_ids = []
+    analysis_runs = analysis.get('runs', [])
+    if run_ids is not None:
+        analysis_runs = [r for r in analysis_runs if r in run_ids]
 
     desc = {
         'Name': analysis['hash_id'],
@@ -37,36 +38,35 @@ def writeout_events(analysis, pes, outdir, run_ids=None):
     pes.predictor_id = pes.predictor_id.map(predictor_names)
 
     # Write out event files
-    for run in analysis.get('runs'):
-        if run['id'] in run_ids:
-            # Write out event files for each run_id
-            run_events = pes[pes.run_id == run['id']].drop('run_id', axis=1)
-            entities = _get_entities(run)
-            entities['task'] = analysis['task_name']
+    for run in analysis_runs:
+        # Write out event files for each run_id
+        run_events = pes[pes.run_id == run['id']].drop('run_id', axis=1)
+        entities = _get_entities(run)
+        entities['task'] = analysis['task_name']
 
-            out_cols = {}
-            if run_events.empty is False:
-                for name, df in run_events.groupby('predictor_id'):
-                    df_col = df.groupby(['onset', 'duration'])['value'].max()
-                    df_col = df_col.reset_index().rename(
-                        columns={'value': name})
-                    out_cols[name] = df_col
-
-            # For any columns that don't have events, output n/a file
-            for name in set(predictor_names.values()) - out_cols.keys():
-                df_col = pd.DataFrame([[0, 0, 'n/a']],
-                                      columns=['onset', 'duration', name])
+        out_cols = {}
+        if run_events.empty is False:
+            for name, df in run_events.groupby('predictor_id'):
+                df_col = df.groupby(['onset', 'duration'])['value'].max()
+                df_col = df_col.reset_index().rename(
+                    columns={'value': name})
                 out_cols[name] = df_col
 
-            # Write out files
-            for name, df_col in out_cols.items():
-                # Write out BIDS path
-                fname = outdir / name / build_path(
-                    entities, path_patterns=PATHS)
-                fname.parent.mkdir(exist_ok=True)
-                paths.append(
-                    (str(fname), 'events/{}/{}'.format(name, fname.name)))
-                df_col.to_csv(fname, sep='\t', index=False)
+        # For any columns that don't have events, output n/a file
+        for name in set(predictor_names.values()) - out_cols.keys():
+            df_col = pd.DataFrame([[0, 0, 'n/a']],
+                                  columns=['onset', 'duration', name])
+            out_cols[name] = df_col
+
+        # Write out files
+        for name, df_col in out_cols.items():
+            # Write out BIDS path
+            fname = outdir / name / build_path(
+                entities, path_patterns=PATHS)
+            fname.parent.mkdir(exist_ok=True)
+            paths.append(
+                (str(fname), 'events/{}/{}'.format(name, fname.name)))
+            df_col.to_csv(fname, sep='\t', index=False)
 
     return paths
 
@@ -91,7 +91,7 @@ def build_analysis(analysis, predictor_events, bids_dir,
     entities['task'] = analysis['task_name']
 
     # Write out all events
-    paths = writeout_events(analysis, predictor_events, tmp_dir)
+    paths = writeout_events(analysis, predictor_events, tmp_dir, run_ids)
 
     if build is False:
         bids_analysis = None
