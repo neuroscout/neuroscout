@@ -13,8 +13,12 @@ PATHS = ['sub-{subject}_[ses-{session}_]task-{task}_[acq-{acquisition}_]'
          '[run-{run}_]events.tsv']
 
 
-def writeout_events(analysis, pes, outdir):
+def writeout_events(analysis, pes, outdir, run_ids=None):
     """ Writeout predictor_events into BIDS event files """
+    analysis_runs = analysis.get('runs', [])
+    if run_ids is not None:
+        analysis_runs = [r for r in analysis_runs if r['id'] in run_ids]
+
     desc = {
         'Name': analysis['hash_id'],
         'BIDSVersion': '1.1.1',
@@ -34,7 +38,7 @@ def writeout_events(analysis, pes, outdir):
     pes.predictor_id = pes.predictor_id.map(predictor_names)
 
     # Write out event files
-    for run in analysis.get('runs'):
+    for run in analysis_runs:
         # Write out event files for each run_id
         run_events = pes[pes.run_id == run['id']].drop('run_id', axis=1)
         entities = _get_entities(run)
@@ -44,12 +48,13 @@ def writeout_events(analysis, pes, outdir):
         if run_events.empty is False:
             for name, df in run_events.groupby('predictor_id'):
                 df_col = df.groupby(['onset', 'duration'])['value'].max()
-                df_col = df_col.reset_index().rename(columns={'value': name})
+                df_col = df_col.reset_index().rename(
+                    columns={'value': name})
                 out_cols[name] = df_col
 
         # For any columns that don't have events, output n/a file
         for name in set(predictor_names.values()) - out_cols.keys():
-            df_col = pd.DataFrame([[0, 0, 'n/a']],
+            df_col = pd.DataFrame([[0, 1, 'n/a']],
                                   columns=['onset', 'duration', name])
             out_cols[name] = df_col
 
@@ -67,15 +72,15 @@ def writeout_events(analysis, pes, outdir):
 
 
 def build_analysis(analysis, predictor_events, bids_dir,
-                   run_id=None, build=True):
+                   run_ids=None, build=True):
     """ Write out and build analysis object """
     tmp_dir = Path(mkdtemp())
 
     # Get set of entities across analysis
     entities = [{}]
-    if run_id is not None:
+    if run_ids is not None:
         # Get entities of runs, and add to kwargs
-        for rid in run_id:
+        for rid in run_ids:
             for run in analysis['runs']:
                 if rid == run['id']:
                     entities.append(_get_entities(run))
@@ -86,7 +91,7 @@ def build_analysis(analysis, predictor_events, bids_dir,
     entities['task'] = analysis['task_name']
 
     # Write out all events
-    paths = writeout_events(analysis, predictor_events, tmp_dir)
+    paths = writeout_events(analysis, predictor_events, tmp_dir, run_ids)
 
     if build is False:
         bids_analysis = None
