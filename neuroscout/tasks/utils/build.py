@@ -17,7 +17,7 @@ def writeout_events(analysis, pes, outdir, run_ids=None):
     """ Writeout predictor_events into BIDS event files """
     analysis_runs = analysis.get('runs', [])
     if run_ids is not None:
-        analysis_runs = [r for r in analysis_runs if r in run_ids]
+        analysis_runs = [r for r in analysis_runs if r['id'] in run_ids]
 
     desc = {
         'Name': analysis['hash_id'],
@@ -54,7 +54,7 @@ def writeout_events(analysis, pes, outdir, run_ids=None):
 
         # For any columns that don't have events, output n/a file
         for name in set(predictor_names.values()) - out_cols.keys():
-            df_col = pd.DataFrame([[0, 0, 'n/a']],
+            df_col = pd.DataFrame([[0, 1, 'n/a']],
                                   columns=['onset', 'duration', name])
             out_cols[name] = df_col
 
