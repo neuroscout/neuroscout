@@ -3,6 +3,7 @@ altair
 grabbit
 docopt
 -e git+https://github.com/neurolearn/pynv#egg=pynv
+email_validator
 matplotlib
 nistats
 nilearn

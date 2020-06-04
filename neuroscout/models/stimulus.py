@@ -43,6 +43,7 @@ class RunStimulus(db.Model):
     """ Run Stimulus association table """
     __table_args__ = (
         db.UniqueConstraint('stimulus_id', 'run_id', 'onset'),
+        db.Index('stim_run', "stimulus_id", "run_id")
     )
     id = db.Column(db.Integer, primary_key=True)
     stimulus_id = db.Column(db.Integer, db.ForeignKey('stimulus.id'))
