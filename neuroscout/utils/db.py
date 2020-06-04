@@ -32,11 +32,11 @@ def create_pes(predictors, run_ids=None):
 
         for onset, dur, val, o_id, s_id, run_id, rs_onset, rs_dur in query:
             if dur is None:
-                duration = rs_dur
+                dur = rs_dur
             all_pes.append(
                 dict(
                     onset=(onset or 0) + rs_onset,
-                    duration=duration,
+                    duration=dur,
                     value=val,
                     run_id=run_id,
                     predictor_id=pred.id,
