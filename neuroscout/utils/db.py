@@ -3,7 +3,8 @@
 """
 from flask import abort, current_app
 from sqlalchemy.exc import SQLAlchemyError
-from ..models import Analysis, RunStimulus, Predictor, PredictorEvent
+from ..models import (Analysis, RunStimulus, Predictor, PredictorEvent,
+                      ExtractedEvent, Stimulus)
 from ..database import db
 from sqlalchemy.event import listens_for
 from sqlalchemy.dialects import postgresql
@@ -16,25 +17,33 @@ def create_pes(predictors, run_ids=None):
     for pred in predictors:
         ef = pred.extracted_feature
         # For all instances for stimuli in this task's runs
-        for ee in ef.extracted_events:
-            query = RunStimulus.query.filter_by(stimulus_id=ee.stimulus_id)
-            if run_ids is not None:
-                query = query.filter(RunStimulus.run_id.in_(run_ids))
-            for rs in query:
-                duration = ee.duration
-                if duration is None:
-                    duration = rs.duration
-                all_pes.append(
-                    dict(
-                        onset=(ee.onset or 0) + rs.onset,
-                        duration=duration,
-                        value=ee.value,
-                        run_id=rs.run_id,
-                        predictor_id=pred.id,
-                        object_id=ee.object_id,
-                        stimulus_id=ee.stimulus_id
-                    )
+        query = ExtractedEvent.query.filter_by(
+            ef_id=ef.id).join(Stimulus).join(
+                RunStimulus)
+
+        if run_ids is not None:
+            query = query.filter(RunStimulus.run_id.in_(run_ids))
+
+        query = query.with_entities(
+            'extracted_event.onset', 'extracted_event.duration',
+            'extracted_event.value', 'extracted_event.object_id',
+            'extracted_event.stimulus_id', 'run_stimulus.run_id',
+            'run_stimulus.onset', 'run_stimulus.duration')
+
+        for onset, dur, val, o_id, s_id, run_id, rs_onset, rs_dur in query:
+            if dur is None:
+                dur = rs_dur
+            all_pes.append(
+                dict(
+                    onset=(onset or 0) + rs_onset,
+                    duration=dur,
+                    value=val,
+                    run_id=run_id,
+                    predictor_id=pred.id,
+                    object_id=o_id,
+                    stimulus_id=s_id
                 )
+            )
     return all_pes
 
 

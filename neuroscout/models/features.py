@@ -31,6 +31,10 @@ class ExtractedFeature(db.Model):
 
 class ExtractedEvent(db.Model):
     """ Events extracted from a Stimuli"""
+    __table_args__ = (
+        db.Index("idx_ef_id", "ef_id"),
+    )
+
     id = db.Column(db.Integer, primary_key=True)
     onset = db.Column(db.Float)
     duration = db.Column(db.Float)
