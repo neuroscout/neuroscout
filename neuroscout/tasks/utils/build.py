@@ -102,7 +102,11 @@ def build_analysis(analysis, predictor_events, bids_dir,
                                  validate=False, index_metadata=False)
 
         indexer = BIDSLayoutIndexer(bids_layout)
-        indexer.index_metadata(extension='nii.gz')
+        metadata_filter = {
+            'extension': ['nii.gz'],
+            'suffix': 'bold',
+        }
+        indexer.index_metadata(**metadata_filter)
 
         bids_analysis = BIDSAnalysis(
             bids_layout, deepcopy(analysis.get('model')))
