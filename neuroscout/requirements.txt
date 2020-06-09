@@ -39,7 +39,7 @@ marshmallow==2.19.1
 moviepy==0.2.3.5
 nibabel==2.1.0
 nltk==3.2.2
-numpy==1.12.0
+numpy==1.18.0
 olefile==0.44
 packaging==16.8
 pandas==0.23
