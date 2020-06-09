@@ -127,6 +127,8 @@ def _load_cached_layout(bids_dir, dataset_id, task_name):
         }
         indexer.index_metadata(**metadata_filter)
 
+    return bids_layout
+
 
 def _get_entities(run):
     """ Get BIDS-entities from run object """
