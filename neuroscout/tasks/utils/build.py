@@ -106,7 +106,7 @@ def build_analysis(analysis, predictor_events, bids_dir,
             bids_layout.add_derivatives(str(tmp_dir))
         else:
             # Load events and try applying transformations
-            bids_layout = BIDSLayout(bids_dir,
+            bids_layout = BIDSLayout(bids_dir, database_path=layout_path,
                                      validate=False, index_metadata=False)
 
             indexer = BIDSLayoutIndexer(bids_layout)
