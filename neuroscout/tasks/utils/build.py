@@ -1,6 +1,7 @@
 import json
 import numpy as np
 import pandas as pd
+from flask import current_app
 from collections import defaultdict
 from pathlib import Path
 from tempfile import mkdtemp
@@ -97,16 +98,25 @@ def build_analysis(analysis, predictor_events, bids_dir,
     if build is False:
         bids_analysis = None
     else:
-        # Load events and try applying transformations
-        bids_layout = BIDSLayout(bids_dir, derivatives=str(tmp_dir),
-                                 validate=False, index_metadata=False)
+        layout_path = current_app.config['FILE_DIR'] / 'layouts' / \
+            f"{analysis['dataset_id']}_analysis['task_name']"
 
-        indexer = BIDSLayoutIndexer(bids_layout)
-        metadata_filter = {
-            'extension': ['nii.gz'],
-            'suffix': 'bold',
-        }
-        indexer.index_metadata(**metadata_filter)
+        if layout_path.exists():
+            bids_layout = BIDSLayout.load(str(layout_path))
+            bids_layout.add_derivatives(str(tmp_dir))
+        else:
+            # Load events and try applying transformations
+            bids_layout = BIDSLayout(bids_dir,
+                                     validate=False, index_metadata=False)
+
+            indexer = BIDSLayoutIndexer(bids_layout)
+            metadata_filter = {
+                'extension': ['nii.gz'],
+                'suffix': 'bold',
+            }
+            indexer.index_metadata(**metadata_filter)
+
+        bids_layout.add_derivatives(str(tmp_dir))
 
         bids_analysis = BIDSAnalysis(
             bids_layout, deepcopy(analysis.get('model')))
