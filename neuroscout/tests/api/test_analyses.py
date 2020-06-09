@@ -380,6 +380,8 @@ def test_reports(session, auth_client, add_analysis):
     assert resp.status_code == 200
 
     if decode_json(resp)['status'] != 'OK':
+        print(resp['status'])
+        print(resp['exception'])
         assert 0
 
     result = decode_json(resp)['result']
