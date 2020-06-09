@@ -5,6 +5,7 @@ from collections import defaultdict
 from pathlib import Path
 from tempfile import mkdtemp
 from bids.analysis import Analysis as BIDSAnalysis
+from bids.layout.index import BIDSLayoutIndexer
 from bids.layout import BIDSLayout
 from copy import deepcopy
 from grabbit.extensions.writable import build_path
@@ -87,8 +88,8 @@ def build_analysis(analysis, predictor_events, bids_dir,
                     break
 
     entities = _merge_dictionaries(*entities)
-    entities['scan_length'] = max([r['duration'] for r in analysis['runs']])
     entities['task'] = analysis['task_name']
+    entities['scan_length'] = max([r['duration'] for r in analysis['runs']])
 
     # Write out all events
     paths = writeout_events(analysis, predictor_events, tmp_dir, run_ids)
@@ -98,7 +99,15 @@ def build_analysis(analysis, predictor_events, bids_dir,
     else:
         # Load events and try applying transformations
         bids_layout = BIDSLayout(bids_dir, derivatives=str(tmp_dir),
-                                 validate=False)
+                                 validate=False, index_metadata=False)
+
+        indexer = BIDSLayoutIndexer(bids_layout)
+        metadata_filter = {
+            'extension': ['nii.gz'],
+            'suffix': 'bold',
+        }
+        indexer.index_metadata(**metadata_filter)
+
         bids_analysis = BIDSAnalysis(
             bids_layout, deepcopy(analysis.get('model')))
         bids_analysis.setup(**entities)

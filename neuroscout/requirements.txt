@@ -10,7 +10,7 @@ datalad==0.10.2
 decorator==4.0.11
 docopt==0.6.2
 duecredit==0.6.1
-pybids==0.10.0
+pybids==0.10.1
 -e git+https://github.com/neurolearn/pynv#egg=pynv
 Flask==1.1.1
 flask-apispec==0.8.0
@@ -39,7 +39,7 @@ marshmallow==2.19.1
 moviepy==0.2.3.5
 nibabel==2.1.0
 nltk==3.2.2
-numpy==1.12.0
+numpy==1.18.0
 olefile==0.44
 packaging==16.8
 pandas==0.23
