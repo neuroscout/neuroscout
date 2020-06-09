@@ -98,24 +98,8 @@ def build_analysis(analysis, predictor_events, bids_dir,
     if build is False:
         bids_analysis = None
     else:
-        layout_path = current_app.config['FILE_DIR'] / 'layouts' / \
-            f"{analysis['dataset_id']}_analysis['task_name']"
-
-        if layout_path.exists():
-            bids_layout = BIDSLayout.load(str(layout_path))
-            bids_layout.add_derivatives(str(tmp_dir))
-        else:
-            # Load events and try applying transformations
-            bids_layout = BIDSLayout(bids_dir, database_path=layout_path,
-                                     validate=False, index_metadata=False)
-
-            indexer = BIDSLayoutIndexer(bids_layout)
-            metadata_filter = {
-                'extension': ['nii.gz'],
-                'suffix': 'bold',
-            }
-            indexer.index_metadata(**metadata_filter)
-
+        bids_layout = _load_cached_layout(
+            bids_dir, analysis['dataset_id'], analysis['task_name'])
         bids_layout.add_derivatives(str(tmp_dir))
 
         bids_analysis = BIDSAnalysis(
@@ -123,6 +107,25 @@ def build_analysis(analysis, predictor_events, bids_dir,
         bids_analysis.setup(**entities)
 
     return tmp_dir, paths, bids_analysis
+
+
+def _load_cached_layout(bids_dir, dataset_id, task_name):
+    layout_path = current_app.config['FILE_DIR'] / 'layouts' / \
+        f"{dataset_id}_{task_name}"
+
+    if layout_path.exists():
+        bids_layout = BIDSLayout.load(str(layout_path))
+    else:
+        # Load events and try applying transformations
+        bids_layout = BIDSLayout(bids_dir, database_path=layout_path,
+                                 validate=False, index_metadata=False)
+
+        indexer = BIDSLayoutIndexer(bids_layout)
+        metadata_filter = {
+            'extension': ['nii.gz'],
+            'suffix': 'bold',
+        }
+        indexer.index_metadata(**metadata_filter)
 
 
 def _get_entities(run):
