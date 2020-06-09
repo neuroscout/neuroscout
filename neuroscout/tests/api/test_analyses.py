@@ -381,7 +381,7 @@ def test_reports(session, auth_client, add_analysis):
 
     if decode_json(resp)['status'] != 'OK':
         print(decode_json(resp)['status'])
-        print(decode_json(resp)['exception'])
+        print(decode_json(resp)['traceback'])
         assert 0
 
     result = decode_json(resp)['result']
