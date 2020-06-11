@@ -58,4 +58,4 @@ class PredictorEventSchema(Schema):
     stimulus_id = fields.Int(description='Stimulus id')
     stimulus_onset = fields.Number(description='Stimulus onset')
     stimulus_duration = fields.Number(description='Stimulus duration')
-    stimulus_path = fields.Number(description='Stimulus path')
+    stimulus_path = fields.Str(description='Stimulus path')
