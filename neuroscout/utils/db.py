@@ -95,7 +95,7 @@ def dump_predictor_events(predictor_ids, run_ids=None, stimulus_timing=False):
     pes = dump_pe(pes)
 
     # Create & dump Extracted PEs
-    pes += create_pes(ext_preds, run_ids)
+    pes += create_pes(ext_preds, run_ids, stimulus_timing=stimulus_timing)
     return pes
 
 
