@@ -11,7 +11,7 @@ from sqlalchemy.dialects import postgresql
 from hashids import Hashids
 
 
-def create_pes(predictors, run_ids=None):
+def create_pes(predictors, run_ids=None, stimulus_timing=False):
     """ Create PredictorEvents from EFs """
     all_pes = []
     for pred in predictors:
@@ -37,20 +37,25 @@ def create_pes(predictors, run_ids=None):
                 dur = rs_dur
             s_path = s_path.split('/')[-1] if s_path else None
 
-            all_pes.append(
-                dict(
+            res = dict(
                     onset=(onset or 0) + rs_onset,
                     duration=dur,
                     value=val,
                     run_id=run_id,
                     predictor_id=pred.id,
                     object_id=o_id,
+                )
+
+            if stimulus_timing:
+                res.update(dict(
                     stimulus_id=s_id,
                     stimulus_onset=rs_onset,
                     stimulus_duration=rs_dur,
                     stimulus_path=s_path
+                    )
                 )
-            )
+
+            all_pes.append(res)
     return all_pes
 
 
@@ -68,7 +73,7 @@ def dump_pe(pes):
         ]
 
 
-def dump_predictor_events(predictor_ids, run_ids=None):
+def dump_predictor_events(predictor_ids, run_ids=None, stimulus_timing=False):
     """ Query & serialize PredictorEvents, for both Raw and Extracted
     Predictors (which require creating PEs from EEs)
     """

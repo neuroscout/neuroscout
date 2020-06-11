@@ -166,6 +166,7 @@ class PredictorCollectionResource(MethodResource):
 
 class PredictorEventListResource(MethodResource):
     @doc(tags=['predictors'], summary='Get events for predictor(s)',)
+    @marshal_with(PredictorEventSchema(many=True))
     @use_kwargs({
         'run_id': wa.fields.DelimitedList(
             wa.fields.Int(),
@@ -179,10 +180,6 @@ class PredictorEventListResource(MethodResource):
             description="Return stimulus timing and information")
         }, locations=['query'])
     @cache.cached(60 * 60 * 24 * 300, query_string=True)
-    def get(self, predictor_id, run_id=None, stimulus_timing=None):
-        res = dump_predictor_events(predictor_id, run_id)
-
-        only = ['onset', 'duration', 'value', 'run_id', 'predictor_id'] \
-            if not stimulus_timing else None
-
-        return PredictorEventSchema(many=True, only=only).dump(res)[0]
+    def get(self, predictor_id, run_id=None, stimulus_timing=False):
+        return dump_predictor_events(
+            predictor_id, run_id, stimulus_timing=stimulus_timing)
