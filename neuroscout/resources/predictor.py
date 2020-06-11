@@ -185,4 +185,4 @@ class PredictorEventListResource(MethodResource):
         only = ['onset', 'duration', 'value', 'run_id', 'predictor_id'] \
             if not stimulus_timing else None
 
-        return PredictorEventSchema(many=True, only=only).dump(res)
+        return PredictorEventSchema(many=True, only=only).dump(res)[0]
