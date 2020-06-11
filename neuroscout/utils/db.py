@@ -28,11 +28,15 @@ def create_pes(predictors, run_ids=None):
             'extracted_event.onset', 'extracted_event.duration',
             'extracted_event.value', 'extracted_event.object_id',
             'extracted_event.stimulus_id', 'run_stimulus.run_id',
-            'run_stimulus.onset', 'run_stimulus.duration')
+            'run_stimulus.onset', 'run_stimulus.duration',
+            'stimulus.path')
 
-        for onset, dur, val, o_id, s_id, run_id, rs_onset, rs_dur in query:
+        for (onset, dur, val, o_id, s_id, run_id, rs_onset, rs_dur, s_path) \
+                in query:
             if dur is None:
                 dur = rs_dur
+            s_path = s_path.split('/')[-1] if s_path else None
+
             all_pes.append(
                 dict(
                     onset=(onset or 0) + rs_onset,
@@ -41,7 +45,10 @@ def create_pes(predictors, run_ids=None):
                     run_id=run_id,
                     predictor_id=pred.id,
                     object_id=o_id,
-                    stimulus_id=s_id
+                    stimulus_id=s_id,
+                    stimulus_onset=rs_onset,
+                    stimulus_duration=rs_dur,
+                    stimulus_path=s_path
                 )
             )
     return all_pes
