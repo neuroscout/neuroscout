@@ -7,7 +7,7 @@ import { Redirect } from 'react-router-dom';
 import { createBrowserHistory } from 'history';
 import * as React from 'react';
 import {
-  Tag, Tabs, Row, Button, Modal, Icon, message, Tooltip, Form, Input, Collapse
+  Alert, Tag, Tabs, Row, Button, Modal, Icon, message, Tooltip, Form, Input, Collapse
 } from 'antd';
 import { Prompt } from 'react-router-dom';
 import Reflux from 'reflux';
@@ -1108,6 +1108,13 @@ export default class AnalysisBuilder extends Reflux.Component<any, BuilderProps 
                 className="builderTabs"
                 tabPosition="left"
               >
+                {!this.props.userOwns && isDraft &&
+                  <Alert
+                    message="Read Only"
+                    type="info"
+                    showIcon={true}
+                  />
+                }
                 {isEditable && <TabPane tab="Overview" key="overview" disabled={!isEditable}>
                   <h2>Overview</h2>
                   <OverviewTab
