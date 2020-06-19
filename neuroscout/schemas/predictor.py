@@ -55,3 +55,7 @@ class PredictorEventSchema(Schema):
     value = fields.Str(description="Value, or amplitude.")
     run_id = fields.Int()
     predictor_id = fields.Int()
+    stimulus_id = fields.Int(description='Stimulus id')
+    stimulus_onset = fields.Number(description='Stimulus onset')
+    stimulus_duration = fields.Number(description='Stimulus duration')
+    stimulus_path = fields.Str(description='Stimulus path')

@@ -11,7 +11,7 @@ from sqlalchemy.dialects import postgresql
 from hashids import Hashids
 
 
-def create_pes(predictors, run_ids=None):
+def create_pes(predictors, run_ids=None, stimulus_timing=False):
     """ Create PredictorEvents from EFs """
     all_pes = []
     for pred in predictors:
@@ -28,22 +28,34 @@ def create_pes(predictors, run_ids=None):
             'extracted_event.onset', 'extracted_event.duration',
             'extracted_event.value', 'extracted_event.object_id',
             'extracted_event.stimulus_id', 'run_stimulus.run_id',
-            'run_stimulus.onset', 'run_stimulus.duration')
+            'run_stimulus.onset', 'run_stimulus.duration',
+            'stimulus.path')
 
-        for onset, dur, val, o_id, s_id, run_id, rs_onset, rs_dur in query:
+        for (onset, dur, val, o_id, s_id, run_id, rs_onset, rs_dur, s_path) \
+                in query:
             if dur is None:
                 dur = rs_dur
-            all_pes.append(
-                dict(
+            s_path = s_path.split('/')[-1] if s_path else None
+
+            res = dict(
                     onset=(onset or 0) + rs_onset,
                     duration=dur,
                     value=val,
                     run_id=run_id,
                     predictor_id=pred.id,
                     object_id=o_id,
-                    stimulus_id=s_id
                 )
-            )
+
+            if stimulus_timing:
+                res.update(dict(
+                    stimulus_id=s_id,
+                    stimulus_onset=rs_onset,
+                    stimulus_duration=rs_dur,
+                    stimulus_path=s_path
+                    )
+                )
+
+            all_pes.append(res)
     return all_pes
 
 
@@ -61,7 +73,7 @@ def dump_pe(pes):
         ]
 
 
-def dump_predictor_events(predictor_ids, run_ids=None):
+def dump_predictor_events(predictor_ids, run_ids=None, stimulus_timing=False):
     """ Query & serialize PredictorEvents, for both Raw and Extracted
     Predictors (which require creating PEs from EEs)
     """
@@ -83,7 +95,7 @@ def dump_predictor_events(predictor_ids, run_ids=None):
     pes = dump_pe(pes)
 
     # Create & dump Extracted PEs
-    pes += create_pes(ext_preds, run_ids)
+    pes += create_pes(ext_preds, run_ids, stimulus_timing=stimulus_timing)
     return pes
 
 

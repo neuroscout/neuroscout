@@ -175,7 +175,11 @@ class PredictorEventListResource(MethodResource):
             wa.fields.Int(),
             description="Predictor id(s)",
             required=True),
-    }, locations=['query'])
+        'stimulus_timing': wa.fields.Boolean(
+            missing=False,
+            description="Return stimulus timing and information")
+        }, locations=['query'])
     @cache.cached(60 * 60 * 24 * 300, query_string=True)
-    def get(self, predictor_id, run_id=None):
-        return dump_predictor_events(predictor_id, run_id)
+    def get(self, predictor_id, run_id=None, stimulus_timing=False):
+        return dump_predictor_events(
+            predictor_id, run_id, stimulus_timing=stimulus_timing)
