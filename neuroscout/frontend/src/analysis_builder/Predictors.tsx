@@ -7,6 +7,8 @@ import * as React from 'react';
 import { Table, Input, Row, Col, Tag } from 'antd';
 import { TableRowSelection } from 'antd/lib/table';
 
+import isEqual from 'lodash.isequal';
+import memoize from 'memoize-one';
 import Reflux from 'reflux';
 
 import { Predictor } from '../coretypes';
@@ -52,19 +54,7 @@ export class PredictorSelector extends React.Component<
   }
 
   onInputChange = e => {
-    const { availablePredictors } = this.props;
-    const searchText: string = e.target.value;
-    const searchRegex = new RegExp(searchText.trim(), 'i');
-    const newState = { searchText, filteredPredictors: availablePredictors };
-    if (searchText.length > 2) {
-      newState.filteredPredictors = availablePredictors.filter(p => {
-        let targetText = p.name + (p.description || '');
-        targetText += ' ' + p.source;
-        return searchRegex.test(targetText);
-        }
-      );
-    }
-    this.setState(newState);
+    this.setState({ searchText: e.target.value });
   };
 
   // only for use with sidebar showing selected predictors
@@ -73,12 +63,23 @@ export class PredictorSelector extends React.Component<
     this.props.updateSelection(newSelection, this.props.selectedPredictors);
   };
 
-  // Refactor. What this wants to do is when a new predictor is added it sets the correct description and source
-  // text used by filteredPredictors? memoize
-  componentWillReceiveProps(nextProps: PredictorSelectorProps) {
-    if (this.props.availablePredictors.length !== nextProps.availablePredictors.length) {
-      let filteredPredictors = nextProps.availablePredictors;
-      filteredPredictors.map(
+  searchFilter = memoize((searchText, filteredPredictors) => {
+    const searchRegex = new RegExp(searchText.trim(), 'i');
+    // const newState = { searchText, filteredPredictors: availablePredictors };
+    if (searchText.length > 2) {
+      return filteredPredictors.filter(p => {
+        let targetText = p.name + (p.description || '');
+        targetText += ' ' + p.source;
+        return searchRegex.test(targetText);
+        }
+      );
+    }
+    return filteredPredictors;
+  });
+
+  setSource = memoize(
+    (availablePredictors) => {
+      availablePredictors.map(
         (x) => {
           if (!x.description && x.extracted_feature && x.extracted_feature.description) {
             x.description = x.extracted_feature.description;
@@ -88,9 +89,11 @@ export class PredictorSelector extends React.Component<
           }
         }
       );
-      this.setState({ filteredPredictors: filteredPredictors, searchText: '' });
-    }
-  }
+      this.setState({ searchText: '' });
+      return availablePredictors;
+    },
+    isEqual
+  );
 
   sourceCmp = (a, b) => {
     let x = a.source + a.name;
@@ -99,8 +102,9 @@ export class PredictorSelector extends React.Component<
   }
 
   render() {
-    const { availablePredictors, selectedPredictors, updateSelection } = this.props;
-    let { filteredPredictors } = this.state;
+    let { availablePredictors, selectedPredictors, updateSelection } = this.props;
+    let filteredPredictors = this.setSource(availablePredictors);
+    filteredPredictors = this.searchFilter(this.state.searchText, filteredPredictors);
     const columns = [
       {
         title: 'Name',
@@ -154,7 +158,7 @@ export class PredictorSelector extends React.Component<
         <div>
           <Row type="flex">
             <Col span={24}>
-              {this.state.filteredPredictors && this.state.filteredPredictors.length > 20 &&
+              {filteredPredictors && filteredPredictors.length > 20 &&
                 <div>
                   <Input
                     placeholder="Search predictor name or description..."
@@ -173,7 +177,7 @@ export class PredictorSelector extends React.Component<
                   pagination={false}
                   scroll={{y: 465}}
                   size="small"
-                  dataSource={this.state.filteredPredictors}
+                  dataSource={filteredPredictors}
                   rowSelection={rowSelection}
                   bordered={true}
                   loading={this.props.predictorsLoad}
@@ -206,7 +210,7 @@ export class PredictorSelector extends React.Component<
                 pagination={{defaultPageSize: 100}}
                 scroll={{y: 465}}
                 size="small"
-                dataSource={this.state.filteredPredictors}
+                dataSource={filteredPredictors}
                 rowSelection={rowSelection}
                 bordered={true}
                 loading={this.props.predictorsLoad}

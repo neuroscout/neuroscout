@@ -562,8 +562,8 @@ export default class AnalysisBuilder extends Reflux.Component<any, BuilderProps 
     if (analysis.runIds.length > 0) {
       jwtFetch(`${domainRoot}/api/runs/${analysis.runIds[0]}`)
         .then(fetch_data => {
-          this.setState({ selectedTaskId: fetch_data.task.id });
           this.updateState('analysis', true)(analysis);
+          this.setState({ selectedTaskId: fetch_data.task });
          })
         .catch(displayError);
     } else {
@@ -862,7 +862,7 @@ export default class AnalysisBuilder extends Reflux.Component<any, BuilderProps 
                 selectedTaskId: availTasks[0].id,
                 predictorsLoad: true,
               };
-            } else {
+            } else if (!this.state.selectedTaskId) {
               stateUpdate = {
                 ...stateUpdate,
                 selectedTaskId: null
@@ -901,7 +901,8 @@ export default class AnalysisBuilder extends Reflux.Component<any, BuilderProps 
       // When a different task is selected, autoselect all its associated run IDs
       this.updateState('analysis')({
         ...analysis,
-        runIds: availableRuns.filter(r => r.task === value).map(r => r.id)
+        runIds: availableRuns.filter(r => r.task === value).map(r => r.id),
+        predictorsLoad: true
       });
     }
 
@@ -1056,6 +1057,7 @@ export default class AnalysisBuilder extends Reflux.Component<any, BuilderProps 
   }
 
   render() {
+
     if (this.state.analysis404) {
       return <Redirect to="/builder/" />;
     }
