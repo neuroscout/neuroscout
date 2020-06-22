@@ -1110,9 +1110,10 @@ export default class AnalysisBuilder extends Reflux.Component<any, BuilderProps 
               >
                 {!this.props.userOwns && isDraft &&
                   <Alert
-                    message="Read Only"
+                    message="This analysis is a draft and is currently read only. Only the owner of this draft can edit it."
                     type="info"
                     showIcon={true}
+                    style={{ marginBottom: '.5em' }}
                   />
                 }
                 {isEditable && <TabPane tab="Overview" key="overview" disabled={!isEditable}>
