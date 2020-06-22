@@ -7,7 +7,7 @@ import { Redirect } from 'react-router-dom';
 import { createBrowserHistory } from 'history';
 import * as React from 'react';
 import {
-  Tag, Tabs, Row, Button, Modal, Icon, message, Tooltip, Form, Input, Collapse
+  Alert, Tag, Tabs, Row, Button, Modal, Icon, message, Tooltip, Form, Input, Collapse
 } from 'antd';
 import { Prompt } from 'react-router-dom';
 import Reflux from 'reflux';
@@ -55,7 +55,7 @@ const history = createBrowserHistory();
 // const logo = require('./logo.svg');
 const domainRoot = config.server_url;
 const DEFAULT_SMOOTHING = 5;
-const editableStatus = ['DRAFT', 'FAILED'];
+let editableStatus = ['DRAFT', 'FAILED'];
 
 const defaultConfig: AnalysisConfig = { smoothing: DEFAULT_SMOOTHING, predictorConfigs: {} };
 
@@ -226,6 +226,7 @@ type BuilderProps = {
 export default class AnalysisBuilder extends Reflux.Component<any, BuilderProps & RouteComponentProps<{}>, Store> {
   constructor(props: BuilderProps) {
     super(props);
+    editableStatus = ['DRAFT', 'FAILED'];
     this.state = initializeStore();
     this.store = AuthStore;
     // Load analysis from server if an analysis id is specified in the props
@@ -243,6 +244,9 @@ export default class AnalysisBuilder extends Reflux.Component<any, BuilderProps 
       })
       .then((data: ApiAnalysis) => {
         if (this.state.analysis404) { return; }
+        if (!this.props.userOwns && editableStatus.includes(data.status)) {
+          editableStatus = [];
+        }
         if (editableStatus.includes(data.status)) {
           this.setState({model: this.buildModel()});
         } else if (data.model !== undefined) {
@@ -1106,6 +1110,14 @@ export default class AnalysisBuilder extends Reflux.Component<any, BuilderProps 
                 className="builderTabs"
                 tabPosition="left"
               >
+                {!this.props.userOwns && isDraft &&
+                  <Alert
+                    message="This analysis is a draft and is currently read only. Only the owner of this draft can edit it."
+                    type="info"
+                    showIcon={true}
+                    style={{ marginBottom: '.5em' }}
+                  />
+                }
                 {isEditable && <TabPane tab="Overview" key="overview" disabled={!isEditable}>
                   <h2>Overview</h2>
                   <OverviewTab

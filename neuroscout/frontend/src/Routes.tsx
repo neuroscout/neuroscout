@@ -43,14 +43,15 @@ export default class Routes extends React.Component<AppState, {}> {
         />
         <Route
           path="/builder/:id"
-          render={props =>
-            <AnalysisBuilder
+          render={props => {
+            return <AnalysisBuilder
               id={props.match.params.id}
               updatedAnalysis={() => this.props.loadAnalyses()}
               userOwns={this.props.analyses.filter((x) => x.id === props.match.params.id).length > 0}
               datasets={this.props.datasets}
               doTooltip={true}
-            />}
+            />;
+          }}
         />
         <Route
           exact={true}
