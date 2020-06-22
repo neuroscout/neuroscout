@@ -69,8 +69,8 @@ class App extends Reflux.Component<any, {}, AppState> {
           this.setState({ analyses });
         });
       },
-      analyses: [],
-      publicAnalyses: [],
+      analyses: null,
+      publicAnalyses: null,
       auth: authActions.getInitialState(),
       datasets: [],
       onDelete: this.onDelete,
@@ -95,28 +95,30 @@ class App extends Reflux.Component<any, {}, AppState> {
       if (key < checkCount) { return; }
       if (!(this.state.auth.loggedIn)) { return; }
       let changeFlag = false;
-      let updatedAnalyses = this.state.analyses.map(async (analysis) => {
-        if (['DRAFT', 'PASSED'].indexOf(analysis.status) > -1) {
-          return analysis;
-        }
-        let id = analysis.id;
-        return jwtFetch(`${DOMAINROOT}/api/analyses/${id}`, { method: 'get' })
-          .then((data: ApiAnalysis) => {
-            if ((data.status !== analysis.status)
-                && (['SUBMITTING', 'PENDING'].indexOf(data.status) === -1)) {
-              changeFlag = true;
-              message.info(`analysis ${id} updated from ${analysis.status} to ${data.status}`);
-              analysis.status = data.status;
-            }
+      if (this.state.analyses !== null) {
+        let updatedAnalyses = this.state.analyses.map(async (analysis) => {
+          if (['DRAFT', 'PASSED'].indexOf(analysis.status) > -1) {
             return analysis;
-        })
-        .catch(() => { return analysis; });
-      });
-      Promise.all(updatedAnalyses).then((values) => {
-        if (changeFlag) {
-          this.setState({ analyses: values});
-        }
-      });
+          }
+          let id = analysis.id;
+          return jwtFetch(`${DOMAINROOT}/api/analyses/${id}`, { method: 'get' })
+            .then((data: ApiAnalysis) => {
+              if ((data.status !== analysis.status)
+                  && (['SUBMITTING', 'PENDING'].indexOf(data.status) === -1)) {
+                changeFlag = true;
+                message.info(`analysis ${id} updated from ${analysis.status} to ${data.status}`);
+                analysis.status = data.status;
+              }
+              return analysis;
+          })
+          .catch(() => { return analysis; });
+        });
+        Promise.all(updatedAnalyses).then((values) => {
+          if (changeFlag) {
+            this.setState({ analyses: values});
+          }
+        });
+      }
       await timeout(12000);
     }
   };
@@ -124,7 +126,7 @@ class App extends Reflux.Component<any, {}, AppState> {
   // Actually delete existing analysis given its hash ID, called from onDelete()
   deleteAnalysis = (id): void => {
     api.deleteAnalysis(id).then((response) => {
-      if (response === true) {
+      if (response === true && this.state.analyses !== null) {
         this.setState({ analyses: this.state.analyses.filter(a => a.id !== id) });
       }
     });
@@ -151,7 +153,11 @@ class App extends Reflux.Component<any, {}, AppState> {
   cloneAnalysis = (id: string): void => {
     api.cloneAnalysis(id).then((analysis) => {
       if (analysis !== null) {
-        this.setState({ analyses: this.state.analyses.concat([analysis]) });
+        if (this.state.analyses === null) {
+          this.setState({ analyses: [analysis] });
+        } else {
+          this.setState({ analyses: this.state.analyses.concat([analysis]) });
+        }
       }
     });
   };

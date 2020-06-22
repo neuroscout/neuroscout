@@ -47,7 +47,10 @@ export default class Routes extends React.Component<AppState, {}> {
             <AnalysisBuilder
               id={props.match.params.id}
               updatedAnalysis={() => this.props.loadAnalyses()}
-              userOwns={this.props.analyses.filter((x) => x.id === props.match.params.id).length > 0}
+              userOwns={
+                (this.props.analyses === null ? false
+                  : this.props.analyses.filter((x) => x.id === props.match.params.id).length > 0)
+              }
               datasets={this.props.datasets}
               doTooltip={true}
             />}
@@ -59,7 +62,10 @@ export default class Routes extends React.Component<AppState, {}> {
             <AnalysisBuilder
               id={props.match.params.id}
               updatedAnalysis={() => this.props.loadAnalyses()}
-              userOwns={this.props.analyses.filter((x) => x.id === props.match.params.id).length > 0}
+              userOwns={
+                (this.props.analyses === null ? false
+                  : this.props.analyses.filter((x) => x.id === props.match.params.id).length > 0)
+              }
               datasets={this.props.datasets}
               doTooltip={true}
             />

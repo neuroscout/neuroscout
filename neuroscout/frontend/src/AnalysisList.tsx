@@ -11,7 +11,7 @@ import { Link } from 'react-router-dom';
 export interface AnalysisListProps {
   loggedIn?: boolean;
   publicList?: boolean;
-  analyses: AppAnalysis[];
+  analyses: (AppAnalysis[] | null);
   cloneAnalysis: (id: string) => void;
   onDelete?: (analysis: AppAnalysis) => void;
   children?: React.ReactNode;
@@ -97,12 +97,13 @@ class AnalysisListTable extends React.Component<AnalysisListProps> {
           columns={analysisTableColumns}
           rowKey="id"
           size="small"
-          dataSource={analyses}
+          dataSource={(analyses === null ? [] : analyses)}
+          loading={analyses === null}
           expandedRowRender={record =>
             <p>
               {record.description}
             </p>}
-          pagination={(analyses.length > 20) ? {'position': 'bottom'} : false}
+          pagination={(analyses !== null && analyses.length > 20) ? {'position': 'bottom'} : false}
         />
       </div>
     );
