@@ -317,8 +317,8 @@ export interface AuthStoreState {
 
 export interface AppState {
   loadAnalyses: () => void;
-  analyses: AppAnalysis[]; // List of analyses belonging to the user
-  publicAnalyses: AppAnalysis[]; // List of public analyses
+  analyses: (AppAnalysis[] | null); // List of analyses belonging to the user
+  publicAnalyses: (AppAnalysis[] | null); // List of public analyses
   auth: AuthStoreState;
   datasets: Dataset[];
   cloneAnalysis: (number) => void;
