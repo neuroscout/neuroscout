@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Alert, Button, Tabs, Collapse, Card, Tooltip, Icon, Select, Spin, Popconfirm } from 'antd';
+import { Alert, Button, Checkbox, Tabs, Collapse, Card, Tooltip, Icon, Select, Spin, Popconfirm } from 'antd';
 import vegaEmbed from 'vega-embed';
 
 import { OptionProps } from 'antd/lib/select';
@@ -55,7 +55,16 @@ class Warnings extends React.Component<{warnings: string[]}> {
   }
 }
 
-class Plots extends React.Component<{matrices: string[], plots: any[], corr_plots: any[], runTitles: string[]}, {}> {
+interface PlotsProps {
+  matrices: string[];
+  plots: any[];
+  corr_plots: any[];
+  runTitles: string[];
+  scale?: boolean;
+  updateScale: () => void;
+}
+
+class Plots extends React.Component<PlotsProps, {}> {
     plotContainer;
     constructor(props) {
       super(props);
@@ -70,6 +79,9 @@ class Plots extends React.Component<{matrices: string[], plots: any[], corr_plot
           <TabPane tab={this.props.runTitles[i]} key={'' + i}>
             <Collapse bordered={false} defaultActiveKey={['dm']}>
              <Panel header="Design Matrix" key="dm">
+              <div style={{'float': 'right' }}>
+                Scale Design Matrix: <Checkbox onChange={this.props.updateScale} checked={this.props.scale} />
+              </div>
               <VegaPlot spec={this.props.plots[i]}/>
               <br/>
               <a href={this.props.matrices[i]}>Download Design Matrix</a>
@@ -126,18 +138,19 @@ interface ReportProps {
 }
 
 interface ReportState {
+  compileLoaded: boolean;
+  corr_plots: string[];
   matrices: string[];
   plots: string[];
-  corr_plots: string[];
-  warnings: string[];
   reportTimestamp: string;
   reportTraceback: string;
   reportsLoaded: boolean;
   reportsPosted: boolean;
-  compileLoaded: boolean;
-  status?: string;
-  selectedRunIds: string[];
   runTitles: string[];
+  scale?: boolean;
+  selectedRunIds: string[];
+  status?: string;
+  warnings: string[];
   warnVisible: boolean;
 }
 
@@ -166,7 +179,8 @@ export class Report extends React.Component<ReportProps, ReportState> {
 
   generateReport = (): void => {
     let id = this.props.analysisId;
-    let url = `${domainRoot}/api/analyses/${id}/report?run_id=${this.state.selectedRunIds}`;
+    let scale_param = this.state.scale === undefined ? '' : `&scale=${this.state.scale}`;
+    let url = `${domainRoot}/api/analyses/${id}/report?run_id=${this.state.selectedRunIds}${scale_param}`;
     jwtFetch(url, { method: 'POST' })
     .then((res) => {
     });
@@ -211,6 +225,13 @@ export class Report extends React.Component<ReportProps, ReportState> {
         if (res.result === undefined) {
           return;
         }
+        let scale = true;
+        if (res.result.scale === undefined && this.state.scale !== undefined) {
+          scale = this.state.scale;
+        } else if (res.result.scale !== undefined) {
+          scale = res.result.scale;
+        }
+        state.scale = scale;
         state.matrices = res.result.design_matrix;
         state.plots = res.result.design_matrix_plot;
         state.corr_plots = res.result.design_matrix_corrplot;
@@ -338,6 +359,11 @@ export class Report extends React.Component<ReportProps, ReportState> {
     this.setState({ warnVisible: false });
   };
 
+  updateScale = () => {
+    this.setState({ scale: !this.state.scale });
+    this.updateReports();
+  };
+
   render() {
     const runIdsOptions: JSX.Element[] = [];
     this.props.runs.map(x => runIdsOptions.push(<Option key={'' + x.id}>{this.formatRun(x)}</Option>));
@@ -400,6 +426,8 @@ export class Report extends React.Component<ReportProps, ReportState> {
               plots={this.state.plots}
               corr_plots={this.state.corr_plots}
               runTitles={this.state.runTitles}
+              scale={this.state.scale}
+              updateScale={this.updateScale}
             />
 
             {(this.state.warnings.length > 0) && <Warnings warnings={this.state.warnings} />}
