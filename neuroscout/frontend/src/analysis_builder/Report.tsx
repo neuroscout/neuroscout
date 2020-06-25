@@ -80,7 +80,11 @@ class Plots extends React.Component<PlotsProps, {}> {
             <Collapse bordered={false} defaultActiveKey={['dm']}>
              <Panel header="Design Matrix" key="dm">
               <div style={{'float': 'right' }}>
-                Scale Design Matrix: <Switch onChange={this.props.updateScale} checked={this.props.scale} />
+                <Tooltip
+                  title={'Scale variables in the design matrix plot (only for visual purposes)'}
+                >
+                  Scale Design Matrix: <Switch onChange={this.props.updateScale} checked={this.props.scale} />
+                </Tooltip>
               </div>
               <VegaPlot spec={this.props.plots[i]}/>
               <br/>
