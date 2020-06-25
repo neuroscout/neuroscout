@@ -226,10 +226,10 @@ export class Report extends React.Component<ReportProps, ReportState> {
           return;
         }
         let scale = true;
-        if (res.result.scale === undefined && this.state.scale !== undefined) {
+        if (res.scale === null && this.state.scale !== undefined) {
           scale = this.state.scale;
-        } else if (res.result.scale !== undefined) {
-          scale = res.result.scale;
+        } else if (res.scale !== null) {
+          scale = res.scale;
         }
         state.scale = scale;
         state.matrices = res.result.design_matrix;
