@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Alert, Button, Checkbox, Tabs, Collapse, Card, Tooltip, Icon, Select, Spin, Popconfirm } from 'antd';
+import { Alert, Button, Tabs, Collapse, Card, Tooltip, Icon, Select, Spin, Switch, Popconfirm } from 'antd';
 import vegaEmbed from 'vega-embed';
 
 import { OptionProps } from 'antd/lib/select';
@@ -80,7 +80,7 @@ class Plots extends React.Component<PlotsProps, {}> {
             <Collapse bordered={false} defaultActiveKey={['dm']}>
              <Panel header="Design Matrix" key="dm">
               <div style={{'float': 'right' }}>
-                Scale Design Matrix: <Checkbox onChange={this.props.updateScale} checked={this.props.scale} />
+                Scale Design Matrix: <Switch onChange={this.props.updateScale} checked={this.props.scale} />
               </div>
               <VegaPlot spec={this.props.plots[i]}/>
               <br/>
