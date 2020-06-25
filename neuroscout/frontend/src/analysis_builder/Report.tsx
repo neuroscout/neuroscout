@@ -78,7 +78,7 @@ class Plots extends React.Component<PlotsProps, {}> {
         let spec = x;
         display.push(
           <TabPane tab={this.props.runTitles[i]} key={'' + i}>
-            <Collapse bordered={false} defaultActiveKey={['dm']}>
+            <Collapse bordered={true} defaultActiveKey={['dm']}>
              <Panel header="Design Matrix" key="dm">
               <div style={{'float': 'right' }}>
                 <Tooltip
