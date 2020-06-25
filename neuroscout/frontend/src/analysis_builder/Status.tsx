@@ -1,11 +1,14 @@
 import * as React from 'react';
 import { Alert, Button, Card, Checkbox, Modal, Tooltip, Switch } from 'antd';
+import memoize from 'memoize-one';
+
 import { config } from '../config';
 import { jwtFetch } from '../utils';
 import { Analysis } from '../coretypes';
 import { StatusTag } from '../HelperComponents';
 import { api } from '../api';
 import { Tracebacks } from './Report';
+
 const domainRoot = config.server_url;
 
 export class DLLink extends React.Component<{status?: string, analysisId?: string}, {}> {
@@ -169,19 +172,22 @@ export class StatusTab extends React.Component<submitProps, statusTabState> {
       });
   }
 
-  componentWillReceiveProps(nextProps: submitProps) {
-    if ((nextProps.status !== this.props.status) && (nextProps.status === 'FAILED')) {
-      this.getTraceback(nextProps.analysisId);
+  newlyFailed = memoize((status) => {
+    if (status === 'FAILED') {
+      this.getTraceback(this.props.analysisId);
     }
-    if ((nextProps.analysisId !== this.props.analysisId && nextProps.analysisId !== undefined)) {
-      this.getTraceback(nextProps.analysisId);
-      api.getNVUploads(nextProps.analysisId).then(nvUploads => {
+  });
+
+  analysisIdChange = memoize((analysisId) => {
+    if (analysisId !== undefined) {
+      this.getTraceback(analysisId);
+      api.getNVUploads(analysisId).then(nvUploads => {
         if (nvUploads !== null) {
           this.setState({nvUploads: nvUploads});
         }
       });
     }
-  }
+  });
 
   nvLink(collection_id: any) {
     let url = `https://neurovault.org/collections/${collection_id}`;
@@ -240,6 +246,8 @@ export class StatusTab extends React.Component<submitProps, statusTabState> {
   }
 
   render() {
+    this.newlyFailed(this.props.status);
+    this.analysisIdChange(this.props.analysisId);
     return(
       <div>
       <div className="statusHeader">
