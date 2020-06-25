@@ -6,6 +6,7 @@ import { OptionProps } from 'antd/lib/select';
 
 import { config } from '../config';
 import { jwtFetch, timeout } from '../utils';
+import { Space } from '../HelperComponents';
 
 import { Run, TabName } from '../coretypes';
 const domainRoot = config.server_url;
@@ -83,7 +84,7 @@ class Plots extends React.Component<PlotsProps, {}> {
                 <Tooltip
                   title={'Scale variables in the design matrix plot (only for visual purposes)'}
                 >
-                  Scale Design Matrix <Icon type="info-circle" />
+                  Scale Design Matrix <Icon type="info-circle" /><Space />
                   <Switch onChange={this.props.updateScale} checked={this.props.scale} />
                 </Tooltip>
               </div>
