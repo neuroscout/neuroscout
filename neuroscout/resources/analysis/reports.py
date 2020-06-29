@@ -84,10 +84,8 @@ class ReportResource(MethodResource):
         task = celery_app.send_task(
             'workflow.generate_report',
             args=[analysis.hash_id,
-                  report.id,
-                  run_id,
-                  sampling_rate,
-                  scale])
+                  report.id
+                  ])
         report.task_id = task.id
         db.session.commit()
 
