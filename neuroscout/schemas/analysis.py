@@ -151,6 +151,9 @@ class ReportSchema(Schema):
     generated_at = fields.Time(description='Time report was generated')
     result = fields.Dict(description='Links to report resources')
     status = fields.Str(description='Report status')
+    scale = fields.Boolean(description='Is plot scaled for display purposes')
+    sampling_rate = fields.Float(
+        description='Sampling rate to resample design matrix to.')
     warnings = fields.List(
         fields.Str(), description='Report warnings')
     traceback = fields.Str(

@@ -271,7 +271,7 @@ export class OverviewTab extends React.Component<OverviewTabProps, OverviewTabSt
           <FormItem label="Description">
             <Input.TextArea
               value={analysis.description}
-              autosize={{ minRows: 1, maxRows: 10 }}
+              autoSize={{ minRows: 1, maxRows: 10 }}
               onChange={this.updateAnalysisFromEvent('description')}
             />
           </FormItem>

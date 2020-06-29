@@ -106,6 +106,9 @@ class Report(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     analysis_id = db.Column(db.Text, db.ForeignKey('analysis.hash_id'))
     runs = db.Column(JSONB, default=None)
+    scale = db.Column(db.Boolean)
+    sampling_rate = db.Column(db.Float)
+
     generated_at = db.Column(db.DateTime, default=datetime.datetime.utcnow)
     task_id = db.Column(db.Text)   # Celery task id
     result = db.Column(JSONB)  # JSON result from Celery (once finished)

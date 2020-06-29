@@ -79,8 +79,7 @@ def compile(flask_app, hash_id, run_ids=None, build=False):
     )
 
 
-def generate_report(flask_app, hash_id, report_id,
-                    run_ids=None, sampling_rate=None, scale=None):
+def generate_report(flask_app, hash_id, report_id):
     """ Generate report for analysis
     Args:
         hash_id (str): analysis hash_id
@@ -91,34 +90,34 @@ def generate_report(flask_app, hash_id, report_id,
     """
     FILE_DATA = Path(flask_app.config['FILE_DIR'])
     domain = flask_app.config['SERVER_NAME']
-    report_object = Report.query.filter_by(id=report_id).one()
+    report_obj = Report.query.filter_by(id=report_id).one()
 
     try:
         _, analysis, resources, pes, bids_dir = analysis_to_json(
-            hash_id, run_ids)
+            hash_id, report_obj.runs)
     except Exception as e:
         update_record(
-            report_object,
+            report_obj,
             exception=e,
             traceback='Error deserializing analysis'
         )
         raise
 
     try:
-        pre_warnings(analysis, pes, report_object)
+        pre_warnings(analysis, pes, report_obj)
     except Exception as e:
         update_record(
-            report_object,
+            report_obj,
             exception=e,
             traceback='Error generating warnings'
         )
 
     try:
         _, _, bids_analysis = build_analysis(
-            analysis, pes, bids_dir, run_ids)
+            analysis, pes, bids_dir, report_obj.runs)
     except Exception as e:
         update_record(
-            report_object,
+            report_obj,
             exception=e,
             traceback='Error validating analysis'
         )
@@ -139,6 +138,7 @@ def generate_report(flask_app, hash_id, report_id,
                analysis['model']['Steps'][0]['Transformations']
                if t['Name'] == 'Convolve']
 
+        sampling_rate = report_obj.sampling_rate
         if sampling_rate is None:
             sampling_rate = 'TR'
 
@@ -156,21 +156,21 @@ def generate_report(flask_app, hash_id, report_id,
             results['design_matrix'].append(url)
             dense.to_csv(out, index=False)
 
-            dm_plot = plot_design_matrix(dense, scale=scale)
+            dm_plot = plot_design_matrix(dense, scale=report_obj.scale)
             results['design_matrix_plot'].append(dm_plot)
 
             corr_plot = plot_corr_matrix(dense)
             results['design_matrix_corrplot'].append(corr_plot)
     except Exception as e:
         return update_record(
-            report_object,
+            report_obj,
             exception=e,
             traceback='Error generating report outputs'
         )
         raise
 
     return update_record(
-        report_object,
+        report_obj,
         result=results,
         status='OK'
         )

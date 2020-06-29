@@ -75,6 +75,8 @@ class ReportResource(MethodResource):
         report = Report(
             analysis_id=analysis.hash_id,
             runs=run_id,
+            scale=scale,
+            sampling_rate=sampling_rate
             )
         db.session.add(report)
         db.session.commit()
