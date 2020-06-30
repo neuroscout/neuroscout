@@ -1265,496 +1265,6 @@
     "nipype": {
         ".*": [
             {
-                "DOI": "10.5281/zenodo.2577511",
-                "author": [
-                    {
-                        "family": "Gorgolewski, Krzysztof J."
-                    },
-                    {
-                        "family": "Esteban, Oscar"
-                    },
-                    {
-                        "family": "Markiewicz, Christopher J."
-                    },
-                    {
-                        "family": "Ziegler, Erik"
-                    },
-                    {
-                        "family": "Ellis, David Gage"
-                    },
-                    {
-                        "family": "Jarecka, Dorota"
-                    },
-                    {
-                        "family": "Notter, Michael Philipp"
-                    },
-                    {
-                        "family": "Johnson, Hans"
-                    },
-                    {
-                        "family": "Burns, Christopher"
-                    },
-                    {
-                        "family": "Manh\u00e3es-Savio, Alexandre"
-                    },
-                    {
-                        "family": "Hamalainen, Carlo"
-                    },
-                    {
-                        "family": "Yvernault, Benjamin"
-                    },
-                    {
-                        "family": "Salo, Taylor"
-                    },
-                    {
-                        "family": "Goncalves, Mathias"
-                    },
-                    {
-                        "family": "Jordan, Kesshi"
-                    },
-                    {
-                        "family": "Waskom, Michael"
-                    },
-                    {
-                        "family": "Wong, Jason"
-                    },
-                    {
-                        "family": "Modat, Marc"
-                    },
-                    {
-                        "family": "Loney, Fred"
-                    },
-                    {
-                        "family": "Clark, Daniel"
-                    },
-                    {
-                        "family": "Nielson, Dylan M."
-                    },
-                    {
-                        "family": "Dewey, Blake E"
-                    },
-                    {
-                        "family": "Madison, Cindee"
-                    },
-                    {
-                        "family": "Bougacha, Salma"
-                    },
-                    {
-                        "family": "Clark, Michael G."
-                    },
-                    {
-                        "family": "Dayan, Michael"
-                    },
-                    {
-                        "family": "Visconti di Oleggio Castello, Matteo"
-                    },
-                    {
-                        "family": "Clark, Dav"
-                    },
-                    {
-                        "family": "Keshavan, Anisha"
-                    },
-                    {
-                        "family": "Pinsard, Basile"
-                    },
-                    {
-                        "family": "Gramfort, Alexandre"
-                    },
-                    {
-                        "family": "Berleant, Shoshana"
-                    },
-                    {
-                        "family": "Halchenko, Yaroslav O."
-                    },
-                    {
-                        "family": "Christian, Horea"
-                    },
-                    {
-                        "family": "Cipollini, Ben"
-                    },
-                    {
-                        "family": "Guillon, J\u00e9r\u00e9my"
-                    },
-                    {
-                        "family": "Markello, Ross"
-                    },
-                    {
-                        "family": "Rokem, Ariel"
-                    },
-                    {
-                        "family": "DuPre, Elizabeth"
-                    },
-                    {
-                        "family": "Kaczmarzyk, Jakub"
-                    },
-                    {
-                        "family": "Moloney, Brendan"
-                    },
-                    {
-                        "family": "Varoquaux, Gael"
-                    },
-                    {
-                        "family": "Wassermann, Demian"
-                    },
-                    {
-                        "family": "Hanke, Michael"
-                    },
-                    {
-                        "family": "de Hollander, Gilles"
-                    },
-                    {
-                        "family": "Mordom, David"
-                    },
-                    {
-                        "family": "Gillman, Ashley"
-                    },
-                    {
-                        "family": "Buchanan, Colin"
-                    },
-                    {
-                        "family": "Tabas, Alejandro"
-                    },
-                    {
-                        "family": "Tungaraza, Rosalia"
-                    },
-                    {
-                        "family": "Pauli, Wolfgang M."
-                    },
-                    {
-                        "family": "Sikka, Sharad"
-                    },
-                    {
-                        "family": "Mancini, Matteo"
-                    },
-                    {
-                        "family": "Forbes, Jessica"
-                    },
-                    {
-                        "family": "Iqbal, Shariq"
-                    },
-                    {
-                        "family": "Richie-Halford, Adam"
-                    },
-                    {
-                        "family": "Schwartz, Yannick"
-                    },
-                    {
-                        "family": "Malone, Ian B."
-                    },
-                    {
-                        "family": "Dubois, Mathieu"
-                    },
-                    {
-                        "family": "Heinsfeld, Anibal S\u00f3lon"
-                    },
-                    {
-                        "family": "Frohlich, Caroline"
-                    },
-                    {
-                        "family": "Welch, David"
-                    },
-                    {
-                        "family": "Bottenhorn, Katherine"
-                    },
-                    {
-                        "family": "Kent, James"
-                    },
-                    {
-                        "family": "De La Vega, Alejandro"
-                    },
-                    {
-                        "family": "Watanabe, Aimi"
-                    },
-                    {
-                        "family": "Huntenburg, Julia M."
-                    },
-                    {
-                        "family": "Cumba, Chad"
-                    },
-                    {
-                        "family": "Nichols, B. Nolan"
-                    },
-                    {
-                        "family": "Eshaghi, Arman"
-                    },
-                    {
-                        "family": "Ginsburg, Daniel"
-                    },
-                    {
-                        "family": "Schaefer, Alexander"
-                    },
-                    {
-                        "family": "Kastman, Erik"
-                    },
-                    {
-                        "family": "Acland, Benjamin"
-                    },
-                    {
-                        "family": "Liem, Franz"
-                    },
-                    {
-                        "family": "Kleesiek, Jens"
-                    },
-                    {
-                        "family": "Erickson, Drew"
-                    },
-                    {
-                        "family": "Giavasis, Steven"
-                    },
-                    {
-                        "family": "Correa, Carlos"
-                    },
-                    {
-                        "family": "Ghayoor, Ali"
-                    },
-                    {
-                        "family": "Contier, Oliver"
-                    },
-                    {
-                        "family": "K\u00fcttner, Ren\u00e9"
-                    },
-                    {
-                        "family": "Millman, Jarrod"
-                    },
-                    {
-                        "family": "Lai, Jeff"
-                    },
-                    {
-                        "family": "Zhou, Dale"
-                    },
-                    {
-                        "family": "Blair, Ross"
-                    },
-                    {
-                        "family": "Haselgrove, Christian"
-                    },
-                    {
-                        "family": "Glatard, Tristan"
-                    },
-                    {
-                        "family": "Renfro, Mandy"
-                    },
-                    {
-                        "family": "Liu, Siqi"
-                    },
-                    {
-                        "family": "Stadler, J\u00f6rg"
-                    },
-                    {
-                        "family": "Kahn, Ari E."
-                    },
-                    {
-                        "family": "P\u00e9rez-Garc\u00eda, Fernando"
-                    },
-                    {
-                        "family": "Triplett, William"
-                    },
-                    {
-                        "family": "Lampe, Leonie"
-                    },
-                    {
-                        "family": "Kong, Xiang-Zhen"
-                    },
-                    {
-                        "family": "Hallquist, Michael"
-                    },
-                    {
-                        "family": "Ma, Feilong"
-                    },
-                    {
-                        "family": "Leinweber, Katrin"
-                    },
-                    {
-                        "family": "Chetverikov, Andrey"
-                    },
-                    {
-                        "family": "Grignard, Martin"
-                    },
-                    {
-                        "family": "Chawla, Kshitij"
-                    },
-                    {
-                        "family": "Salvatore, John"
-                    },
-                    {
-                        "family": "Park, Anne"
-                    },
-                    {
-                        "family": "Poldrack, Russell"
-                    },
-                    {
-                        "family": "Craddock, R. Cameron"
-                    },
-                    {
-                        "family": "Hinds, Oliver"
-                    },
-                    {
-                        "family": "Cooper, Gavin"
-                    },
-                    {
-                        "family": "Weninger, Leon"
-                    },
-                    {
-                        "family": "Inati, Souheil"
-                    },
-                    {
-                        "family": "Perkins, L. Nathan"
-                    },
-                    {
-                        "family": "Lukas Snoek"
-                    },
-                    {
-                        "family": "Marina, Ana"
-                    },
-                    {
-                        "family": "Mattfeld, Aaron"
-                    },
-                    {
-                        "family": "Matsubara, K"
-                    },
-                    {
-                        "family": "Noel, Maxime"
-                    },
-                    {
-                        "family": "Cheung, Brian"
-                    },
-                    {
-                        "family": "Urchs, Sebastian"
-                    },
-                    {
-                        "family": "Durnez, Joke"
-                    },
-                    {
-                        "family": "Condamine, Eric"
-                    },
-                    {
-                        "family": "Geisler, Daniel"
-                    },
-                    {
-                        "family": "Floren, Andrew"
-                    },
-                    {
-                        "family": "Gerhard, Stephan"
-                    },
-                    {
-                        "family": "Sharp, Paul"
-                    },
-                    {
-                        "family": "Molina-Romero, Miguel"
-                    },
-                    {
-                        "family": "Haehn, Daniel"
-                    },
-                    {
-                        "family": "Weinstein, Alejandro"
-                    },
-                    {
-                        "family": "Tambini, Arielle"
-                    },
-                    {
-                        "family": "Broderick, William"
-                    },
-                    {
-                        "family": "Saase, Victor"
-                    },
-                    {
-                        "family": "Rothmei, Simon"
-                    },
-                    {
-                        "family": "Andberg, Sami Kristian"
-                    },
-                    {
-                        "family": "Harms, Robbert"
-                    },
-                    {
-                        "family": "Khanuja, Ranjeet"
-                    },
-                    {
-                        "family": "Schlamp, Kai"
-                    },
-                    {
-                        "family": "Arias, Jaime"
-                    },
-                    {
-                        "family": "Papadopoulos Orfanos, Dimitri"
-                    },
-                    {
-                        "family": "Tarbert, Claire"
-                    },
-                    {
-                        "family": "Nickson, Thomas"
-                    },
-                    {
-                        "family": "Brett, Matthew"
-                    },
-                    {
-                        "family": "Falkiewicz, Marcel"
-                    },
-                    {
-                        "family": "Podranski, Kornelius"
-                    },
-                    {
-                        "family": "Linkersd\u00f6rfer, Janosch"
-                    },
-                    {
-                        "family": "Flandin, Guillaume"
-                    },
-                    {
-                        "family": "Ort, Eduard"
-                    },
-                    {
-                        "family": "Shachnev, Dmitry"
-                    },
-                    {
-                        "family": "McNamee, Daniel"
-                    },
-                    {
-                        "family": "Davison, Andrew"
-                    },
-                    {
-                        "family": "Varada, Jan"
-                    },
-                    {
-                        "family": "Schwabacher, Isaac"
-                    },
-                    {
-                        "family": "Pellman, John"
-                    },
-                    {
-                        "family": "Perez-Guevara, Martin"
-                    },
-                    {
-                        "family": "Khanuja, Ranjeet"
-                    },
-                    {
-                        "family": "Pannetier, Nicolas"
-                    },
-                    {
-                        "family": "McDermottroe, Conor"
-                    },
-                    {
-                        "family": "Mihai, Paul Glad"
-                    },
-                    {
-                        "family": "Ghosh, Satrajit"
-                    }
-                ],
-                "id": "2577511",
-                "issued": {
-                    "date-parts": [
-                        [
-                            2019,
-                            2,
-                            25
-                        ]
-                    ]
-                },
-                "publisher": "Zenodo",
-                "title": "nipy/nipype: 1.1.9",
-                "type": "article",
-                "version": "1.1.9"
-            },
-            {
                 "DOI": "10.3389/fninf.2011.00013",
                 "ISSN": "1662-5196",
                 "URL": "http://journal.frontiersin.org/article/10.3389/fninf.2011.00013/abstract",
@@ -1813,6 +1323,330 @@
                 "volume": "5"
             }
         ]
+    },
+    "fmriprep": [
+      '.*': [
+      	{
+      		"id": "http://zotero.org/users/local/JXz6ijqB/items/MB27YTQQ",
+      		"type": "article-journal",
+      		"title": "fMRIPrep: a robust preprocessing pipeline for functional MRI",
+      		"container-title": "Nature Methods",
+      		"page": "111",
+      		"volume": "16",
+      		"issue": "1",
+      		"source": "www.nature.com",
+      		"abstract": "fMRIPrep is a robust and easy-to-use pipeline for preprocessing of diverse fMRI data. The transparent workflow dispenses of manual intervention, thereby ensuring the reproducibility of the results.",
+      		"URL": "https://www.nature.com/articles/s41592-018-0235-4",
+      		"DOI": "10.1038/s41592-018-0235-4",
+      		"ISSN": "1548-7105",
+      		"shortTitle": "fMRIPrep",
+      		"language": "En",
+      		"author": [
+      			{
+      				"family": "Esteban",
+      				"given": "Oscar"
+      			},
+      			{
+      				"family": "Markiewicz",
+      				"given": "Christopher J."
+      			},
+      			{
+      				"family": "Blair",
+      				"given": "Ross W."
+      			},
+      			{
+      				"family": "Moodie",
+      				"given": "Craig A."
+      			},
+      			{
+      				"family": "Isik",
+      				"given": "A. Ilkay"
+      			},
+      			{
+      				"family": "Erramuzpe",
+      				"given": "Asier"
+      			},
+      			{
+      				"family": "Kent",
+      				"given": "James D."
+      			},
+      			{
+      				"family": "Goncalves",
+      				"given": "Mathias"
+      			},
+      			{
+      				"family": "DuPre",
+      				"given": "Elizabeth"
+      			},
+      			{
+      				"family": "Snyder",
+      				"given": "Madeleine"
+      			},
+      			{
+      				"family": "Oya",
+      				"given": "Hiroyuki"
+      			},
+      			{
+      				"family": "Ghosh",
+      				"given": "Satrajit S."
+      			},
+      			{
+      				"family": "Wright",
+      				"given": "Jessey"
+      			},
+      			{
+      				"family": "Durnez",
+      				"given": "Joke"
+      			},
+      			{
+      				"family": "Poldrack",
+      				"given": "Russell A."
+      			},
+      			{
+      				"family": "Gorgolewski",
+      				"given": "Krzysztof J."
+      			}
+      		],
+      		"issued": {
+      			"date-parts": [
+      				[
+      					"2019",
+      					1
+      				]
+      			]
+      		},
+      		"accessed": {
+      			"date-parts": [
+      				[
+      					"2019",
+      					4,
+      					26
+      				]
+      			]
+      		}
+      	}
+      ]
+    ]
+    "fitlins": {
+      ".*": [
+        {
+          "publisher": "Zenodo",
+          "DOI": "10.5281/zenodo.3575117",
+          "title": "poldracklab/fitlins: 0.6.2",
+          "issued": {
+            "date-parts": [
+              [
+                2019,
+                12,
+                13
+              ]
+            ]
+          },
+          "abstract": "Release Notes\n<p>Hotfix release</p>\nCHANGES\n<ul>\n<li>FIX: FEMA input index should filter on rows, not columns. (#207) @adelavega</li>\n</ul>",
+          "author": [
+            {
+              "family": "Markiewicz, Christopher J."
+            },
+            {
+              "family": "De La Vega, Alejandro"
+            },
+            {
+              "family": "Wagner, Adina"
+            },
+            {
+              "family": "Halchenko, Yaroslav O."
+            },
+            {
+              "family": "Finc, Karolina"
+            },
+            {
+              "family": "Ciric, Rastko"
+            },
+            {
+              "family": "Goncalves, Mathias"
+            },
+            {
+              "family": "Nielson, Dylan M."
+            },
+            {
+              "family": "Poldrack, Russell A."
+            },
+            {
+              "family": "Gorgolewski, Krzysztof J."
+            }
+          ],
+          "version": "0.6.2",
+          "type": "article",
+          "id": "3575117"
+        }
+      ]
+    }
+    "pybids": {
+        ".*": [
+          	{
+          		"id": "http://zotero.org/users/local/JXz6ijqB/items/SZ8F7GDC",
+          		"type": "article-journal",
+          		"title": "PyBIDS: Python tools for BIDS datasets",
+          		"container-title": "Journal of Open Source Software",
+          		"page": "1294",
+          		"volume": "4",
+          		"issue": "40",
+          		"source": "DOI.org (Crossref)",
+          		"abstract": "Brain imaging researchers regularly work with large, heterogeneous, high-dimensional datasets. Historically, researchers have dealt with this complexity idiosyncratically, with every lab or individual implementing their own preprocessing and analysis procedures. The resulting lack of field-wide standards has severely limited reproducibility and data sharing and reuse.",
+          		"URL": "https://joss.theoj.org/papers/10.21105/joss.01294",
+          		"DOI": "10.21105/joss.01294",
+          		"ISSN": "2475-9066",
+          		"shortTitle": "PyBIDS",
+          		"journalAbbreviation": "JOSS",
+          		"language": "en",
+          		"author": [
+          			{
+          				"family": "Yarkoni",
+          				"given": "Tal"
+          			},
+          			{
+          				"family": "Markiewicz",
+          				"given": "Christopher"
+          			},
+          			{
+          				"family": "Vega",
+          				"given": "Alejandro",
+          				"non-dropping-particle": "de la"
+          			},
+          			{
+          				"family": "Gorgolewski",
+          				"given": "Krzysztof"
+          			},
+          			{
+          				"family": "Salo",
+          				"given": "Taylor"
+          			},
+          			{
+          				"family": "Halchenko",
+          				"given": "Yaroslav"
+          			},
+          			{
+          				"family": "McNamara",
+          				"given": "Quinten"
+          			},
+          			{
+          				"family": "DeStasio",
+          				"given": "Krista"
+          			},
+          			{
+          				"family": "Poline",
+          				"given": "Jean-Baptiste"
+          			},
+          			{
+          				"family": "Petrov",
+          				"given": "Dmitry"
+          			},
+          			{
+          				"family": "Hayot-Sasson",
+          				"given": "Valérie"
+          			},
+          			{
+          				"family": "Nielson",
+          				"given": "Dylan"
+          			},
+          			{
+          				"family": "Carlin",
+          				"given": "Johan"
+          			},
+          			{
+          				"family": "Kiar",
+          				"given": "Gregory"
+          			},
+          			{
+          				"family": "Whitaker",
+          				"given": "Kirstie"
+          			},
+          			{
+          				"family": "DuPre",
+          				"given": "Elizabeth"
+          			},
+          			{
+          				"family": "Wagner",
+          				"given": "Adina"
+          			},
+          			{
+          				"family": "Tirrell",
+          				"given": "Lee"
+          			},
+          			{
+          				"family": "Jas",
+          				"given": "Mainak"
+          			},
+          			{
+          				"family": "Hanke",
+          				"given": "Michael"
+          			},
+          			{
+          				"family": "Poldrack",
+          				"given": "Russell"
+          			},
+          			{
+          				"family": "Esteban",
+          				"given": "Oscar"
+          			},
+          			{
+          				"family": "Appelhoff",
+          				"given": "Stefan"
+          			},
+          			{
+          				"family": "Holdgraf",
+          				"given": "Chris"
+          			},
+          			{
+          				"family": "Staden",
+          				"given": "Isla"
+          			},
+          			{
+          				"family": "Thirion",
+          				"given": "Bertrand"
+          			},
+          			{
+          				"family": "Kleinschmidt",
+          				"given": "Dave"
+          			},
+          			{
+          				"family": "Lee",
+          				"given": "John"
+          			},
+          			{
+          				"family": "Castello",
+          				"given": "Matteo",
+          				"non-dropping-particle": "di"
+          			},
+          			{
+          				"family": "Notter",
+          				"given": "Michael"
+          			},
+          			{
+          				"family": "Blair",
+          				"given": "Ross"
+          			}
+          		],
+          		"issued": {
+          			"date-parts": [
+          				[
+          					"2019",
+          					8,
+          					12
+          				]
+          			]
+          		},
+          		"accessed": {
+          			"date-parts": [
+          				[
+          					"2020",
+          					6,
+          					30
+          				]
+          			]
+          		}
+          	}
+          ]
     },
     "pliers": {
         ".*": [
