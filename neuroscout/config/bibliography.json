@@ -236,6 +236,66 @@
             }
         ]
     },
+    "SherlockMerlin":{
+      ".*":[
+      	{
+      		"id": "http://zotero.org/users/local/JXz6ijqB/items/ZPMGQRAV",
+      		"type": "article-journal",
+      		"title": "How We Transmit Memories to Other Brains: Constructing Shared Neural Representations Via Communication",
+      		"container-title": "Cerebral Cortex",
+      		"page": "4988-5000",
+      		"volume": "27",
+      		"issue": "10",
+      		"source": "DOI.org (Crossref)",
+      		"abstract": "Humans are able to mentally construct an episode when listening to another person’s recollection, even though they themselves did not experience the events. However, it is unknown how strongly the neural patterns elicited by mental construction resemble those found in the brain of the individual who experienced the original events. Using fMRI and a verbal communication task, we traced how neural patterns associated with viewing speciﬁc scenes in a movie are encoded, recalled, and then transferred to a group of naïve listeners. By comparing neural patterns across the 3 conditions, we report, for the ﬁrst time, that event-speciﬁc neural patterns observed in the default mode network are shared across the encoding, recall, and construction of the same reallife episode. This study uncovers the intimate correspondences between memory encoding and event construction, and highlights the essential role our common language plays in the process of transmitting one’s memories to other brains.",
+      		"URL": "https://academic.oup.com/cercor/article/27/10/4988/4080827",
+      		"DOI": "10.1093/cercor/bhx202",
+      		"ISSN": "1047-3211, 1460-2199",
+      		"shortTitle": "How We Transmit Memories to Other Brains",
+      		"language": "en",
+      		"author": [
+      			{
+      				"family": "Zadbood",
+      				"given": "A."
+      			},
+      			{
+      				"family": "Chen",
+      				"given": "J."
+      			},
+      			{
+      				"family": "Leong",
+      				"given": "Y.C."
+      			},
+      			{
+      				"family": "Norman",
+      				"given": "K.A."
+      			},
+      			{
+      				"family": "Hasson",
+      				"given": "U."
+      			}
+      		],
+      		"issued": {
+      			"date-parts": [
+      				[
+      					"2017",
+      					10,
+      					1
+      				]
+      			]
+      		},
+      		"accessed": {
+      			"date-parts": [
+      				[
+      					"2020",
+      					6,
+      					30
+      				]
+      			]
+      		}
+      	}
+      ]
+      },
     "Sherlock": {
       ".*": [
         	{
