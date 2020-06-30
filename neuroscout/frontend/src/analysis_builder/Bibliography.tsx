@@ -12,9 +12,10 @@ type bibProps = {
 };
 
 interface BibState {
-  tools: any[];
+  supporting: any[];
   data: any[];
-  extractors: any[];
+  extraction: any[];
+  neuroscout: any[];
   csl_json: any[];
   bibLoaded: boolean;
 }
@@ -50,9 +51,10 @@ export class BibliographyTab extends React.Component<bibProps, BibState> {
   constructor(props) {
     super(props);
     let state: BibState = {
-      tools: [],
+      supporting: [],
+      neuroscout: [],
       data: [],
-      extractors: [],
+      extraction: [],
       csl_json: [],
       bibLoaded: false,
     };
@@ -65,9 +67,10 @@ export class BibliographyTab extends React.Component<bibProps, BibState> {
     let state = {...this.state};
     jwtFetch(url, { method: 'GET' })
     .then((res) => {
-      state.tools = res.tools;
+      state.supporting = res.supporting;
       state.data = res.data;
-      state.extractors = res.extractors;
+      state.extraction = res.extraction;
+      state.neuroscout = res.neuroscout;
       state.csl_json = res.csl_json;
       state.bibLoaded = true;
       this.setState({...state});
@@ -81,28 +84,35 @@ export class BibliographyTab extends React.Component<bibProps, BibState> {
   }
 
   render() {
-    let merged = this.state.data.concat(this.state.tools, this.state.extractors);
+    let merged = this.state.data.concat(this.state.neuroscout.concat(
+      this.state.supporting.concat(this.state.extraction)));
     return(
       <div>
           <p>
             Below are the references for the tools, data, and extractors used in this analysis.
             Be sure to cite these references if you publish any results stemming from this analysis.
           </p>
+          <Card title="Neuroscout">
+          <Skeleton loading={this.state.bibLoaded === false}>
+            {this.state.neuroscout && <RefList refs={this.state.neuroscout}/>}
+          </Skeleton>
+          </Card>
+          <br/>
+          <Card title="Supporting packages">
+          <Skeleton loading={this.state.bibLoaded === false}>
+            {this.state.supporting && <RefList refs={this.state.supporting}/>}
+          </Skeleton>
+          </Card>
+          <br/>
           <Card title="Dataset">
           <Skeleton loading={this.state.bibLoaded === false}>
             {this.state.data && <RefList refs={this.state.data}/>}
           </Skeleton>
           </Card>
           <br/>
-          <Card title="Scientific Software">
+          <Card title="Extraction">
           <Skeleton loading={this.state.bibLoaded === false}>
-            {this.state.tools && <RefList refs={this.state.tools}/>}
-          </Skeleton>
-          </Card>
-          <br/>
-          <Card title="Feature Extractors">
-          <Skeleton loading={this.state.bibLoaded === false}>
-            {this.state.extractors && <RefList refs={this.state.extractors}/>}
+            {this.state.extraction && <RefList refs={this.state.extraction}/>}
           </Skeleton>
 
           </Card>
