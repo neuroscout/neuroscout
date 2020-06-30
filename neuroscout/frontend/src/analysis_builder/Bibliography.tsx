@@ -84,8 +84,8 @@ export class BibliographyTab extends React.Component<bibProps, BibState> {
   }
 
   render() {
-    let merged = this.state.data.concat(this.state.neuroscout,
-      this.state.supporting, this.state.data, this.state.extraction);
+    let merged = this.state.data.concat(this.state.neuroscout.concat(
+      this.state.supporting.concat(this.state.extraction)));
     return(
       <div>
           <p>
