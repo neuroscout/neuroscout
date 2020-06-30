@@ -1325,7 +1325,7 @@
         ]
     },
     "fmriprep": [
-      '.*': [
+      ".*": [
       	{
       		"id": "http://zotero.org/users/local/JXz6ijqB/items/MB27YTQQ",
       		"type": "article-journal",
