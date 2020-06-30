@@ -1037,196 +1037,6 @@
             }
         ]
     },
-    "fmriprep": {
-        ".*": [
-            {
-                "DOI": "10.5281/zenodo.2597526",
-                "author": [
-                    {
-                        "family": "Esteban, Oscar"
-                    },
-                    {
-                        "family": "Blair, Ross"
-                    },
-                    {
-                        "family": "Markiewicz, Christopher J."
-                    },
-                    {
-                        "family": "Berleant, Shoshana L."
-                    },
-                    {
-                        "family": "Moodie, Craig"
-                    },
-                    {
-                        "family": "Ma, Feilong"
-                    },
-                    {
-                        "family": "Isik, Ayse Ilkay"
-                    },
-                    {
-                        "family": "Erramuzpe, Asier"
-                    },
-                    {
-                        "family": "Kent, James D."
-                    },
-                    {
-                        "family": "Goncalves, Mathias"
-                    },
-                    {
-                        "family": "DuPre, Elizabeth"
-                    },
-                    {
-                        "family": "Sitek, Kevin R."
-                    },
-                    {
-                        "family": "Gomez, Daniel E. P."
-                    },
-                    {
-                        "family": "Lurie, Daniel J."
-                    },
-                    {
-                        "family": "Ye, Zhifang"
-                    },
-                    {
-                        "family": "Salo, Taylor"
-                    },
-                    {
-                        "family": "Valabregue, Romain"
-                    },
-                    {
-                        "family": "Amlien, Inge K."
-                    },
-                    {
-                        "family": "Liem, Franz"
-                    },
-                    {
-                        "family": "Jacoby, Nir"
-                    },
-                    {
-                        "family": "Stojic, Hrvoje"
-                    },
-                    {
-                        "family": "Poldrack, Russell A."
-                    },
-                    {
-                        "family": "Gorgolewski, Krzysztof J."
-                    }
-                ],
-                "id": "2597526",
-                "issued": {
-                    "date-parts": [
-                        [
-                            2019,
-                            3,
-                            18
-                        ]
-                    ]
-                },
-                "publisher": "Zenodo",
-                "title": "fMRIPrep: a robust preprocessing pipeline for functional MRI",
-                "type": "article",
-                "version": "1.3.2"
-            },
-            {
-                "DOI": "10.1038/s41592-018-0235-4",
-                "ISSN": "1548-7105",
-                "URL": "https://www.nature.com/articles/s41592-018-0235-4",
-                "accessed": {
-                    "date-parts": [
-                        [
-                            "2019",
-                            4,
-                            26
-                        ]
-                    ]
-                },
-                "author": [
-                    {
-                        "family": "Esteban",
-                        "given": "Oscar"
-                    },
-                    {
-                        "family": "Markiewicz",
-                        "given": "Christopher J."
-                    },
-                    {
-                        "family": "Blair",
-                        "given": "Ross W."
-                    },
-                    {
-                        "family": "Moodie",
-                        "given": "Craig A."
-                    },
-                    {
-                        "family": "Isik",
-                        "given": "A. Ilkay"
-                    },
-                    {
-                        "family": "Erramuzpe",
-                        "given": "Asier"
-                    },
-                    {
-                        "family": "Kent",
-                        "given": "James D."
-                    },
-                    {
-                        "family": "Goncalves",
-                        "given": "Mathias"
-                    },
-                    {
-                        "family": "DuPre",
-                        "given": "Elizabeth"
-                    },
-                    {
-                        "family": "Snyder",
-                        "given": "Madeleine"
-                    },
-                    {
-                        "family": "Oya",
-                        "given": "Hiroyuki"
-                    },
-                    {
-                        "family": "Ghosh",
-                        "given": "Satrajit S."
-                    },
-                    {
-                        "family": "Wright",
-                        "given": "Jessey"
-                    },
-                    {
-                        "family": "Durnez",
-                        "given": "Joke"
-                    },
-                    {
-                        "family": "Poldrack",
-                        "given": "Russell A."
-                    },
-                    {
-                        "family": "Gorgolewski",
-                        "given": "Krzysztof J."
-                    }
-                ],
-                "container-title": "Nature Methods",
-                "id": "http://zotero.org/users/local/JXz6ijqB/items/MB27YTQQ",
-                "issue": "1",
-                "issued": {
-                    "date-parts": [
-                        [
-                            "2019",
-                            1
-                        ]
-                    ]
-                },
-                "language": "En",
-                "page": "111",
-                "source": "www.nature.com",
-                "title": "fMRIPrep: a robust preprocessing pipeline for functional MRI",
-                "title-short": "fMRIPrep",
-                "type": "article-journal",
-                "volume": "16"
-            }
-        ]
-    },
     "neuroscout": {
         ".*": [
             {
@@ -1324,7 +1134,7 @@
             }
         ]
     },
-    "fmriprep": [
+    "fmriprep": {
       ".*": [
       	{
       		"id": "http://zotero.org/users/local/JXz6ijqB/items/MB27YTQQ",
@@ -1426,7 +1236,7 @@
       		}
       	}
       ]
-    ],
+    },
     "fitlins": {
       ".*": [
         {
