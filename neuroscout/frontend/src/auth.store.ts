@@ -7,16 +7,21 @@ import { api } from './api';
 import { authActions } from './auth.actions';
 import { config } from './config';
 import { ApiUser, AuthStoreState } from './coretypes';
-import { displayError } from './utils';
+import { displayError, jwtFetch } from './utils';
 
-const DOMAINROOT = config.server_url;
+const domainRoot = config.server_url;
 
 export class AuthStore extends Reflux.Store {
 
+  // jwt might not be set in state by the time getProfile is needed.
+  // setState in this constructor doesn't take a callback...
   constructor() {
     super();
     this.listenToMany(authActions);
-    this.setState(this.getInitialState());
+    this.state = this.getInitialState();
+    if (!!this.state.auth.jwt) {
+      this.getProfile();
+    }
   }
 
   getInitialState() {
@@ -101,12 +106,21 @@ export class AuthStore extends Reflux.Store {
     }
   }
 
+  // jwtFetch response has already had .json() called on it compared to fetch call in authenticate 
+  getProfile() {
+    jwtFetch(`${domainRoot}/api/user`).then(response => {
+      if (response.statusCode === 200) {
+        this.update({institution: response.institution, name: response.name});
+      }
+    });
+  }
+
   // Authenticate the user with the server. This function is called from login()
   authenticate(): Promise<string> {
     return new Promise((resolve, reject) => {
       let { email, password, avatar, isGAuth } = this.state.auth;
       let { accountconfirmError } = this;
-      fetch(DOMAINROOT + '/api/auth', {
+      fetch(domainRoot + '/api/auth', {
         method: 'post',
         body: JSON.stringify({ email: isGAuth === true ? 'GOOGLE' : email, password: password }),
         headers: {
@@ -120,7 +134,7 @@ export class AuthStore extends Reflux.Store {
             reject('Authentication failed');
           } else if (data.access_token) {
             let token = data.access_token;
-            fetch(DOMAINROOT + '/api/user', {
+            fetch(domainRoot + '/api/user', {
               method: 'get',
               headers: {
                 'Content-type': 'application/json',
@@ -203,7 +217,7 @@ export class AuthStore extends Reflux.Store {
   // Sign up for a new account
   signup() {
     const { name, email, password } = this.state.auth;
-    fetch(DOMAINROOT + '/api/user', {
+    fetch(domainRoot + '/api/user', {
       method: 'post',
       body: JSON.stringify({ email: email, password: password, name: name }),
       headers: {
@@ -276,7 +290,7 @@ export class AuthStore extends Reflux.Store {
       okText: 'Resend confirmation',
       cancelText: 'Close',
       onOk() {
-        fetch(DOMAINROOT + '/api/user/resend_confirmation', {
+        fetch(domainRoot + '/api/user/resend_confirmation', {
           method: 'post',
           headers: {
             'Content-type': 'application/json',
@@ -291,7 +305,7 @@ export class AuthStore extends Reflux.Store {
   // Reset password function
   resetPassword = (): void => {
     const { email } = this.state;
-    fetch(DOMAINROOT + '/api/user/reset_password', {
+    fetch(domainRoot + '/api/user/reset_password', {
       method: 'post',
       body: JSON.stringify({ email: email}),
       headers: {
@@ -308,7 +322,7 @@ export class AuthStore extends Reflux.Store {
   submitToken = (): void => {
     const { token, password } = this.state;
     const that = this;
-    fetch(DOMAINROOT + '/api/user/submit_token', {
+    fetch(domainRoot + '/api/user/submit_token', {
       method: 'post',
       body: JSON.stringify({ token: token, password: password}),
       headers: {

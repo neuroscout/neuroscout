@@ -9,13 +9,14 @@ import { BrowserRouter as Router, Route, Redirect } from 'react-router-dom';
 import Reflux from 'reflux';
 import { Layout, Modal, message } from 'antd';
 import ReactGA from 'react-ga';
+import memoize from 'memoize-one';
 
 import './css/App.css';
 import { api } from './api';
 import { AuthStore } from './auth.store';
 import { authActions } from './auth.actions';
 import { config } from './config';
-import { ApiAnalysis, AppAnalysis, AppState } from './coretypes';
+import { ApiAnalysis, AppAnalysis, AppState, ProfileState } from './coretypes';
 import { LoginModal, ResetPasswordModal, SignupModal } from './Modals';
 import Routes from './Routes';
 import { jwtFetch, timeout } from './utils';
@@ -74,7 +75,14 @@ class App extends Reflux.Component<any, {}, AppState> {
       auth: authActions.getInitialState(),
       datasets: [],
       onDelete: this.onDelete,
-      cloneAnalysis: this.cloneAnalysis
+      cloneAnalysis: this.cloneAnalysis,
+      profileState: {
+        name: '',
+        institution: '',
+        update: (updates: Partial<ProfileState>) => {
+          this.setState({profileState: {...this.state.profileState, ...updates}});
+        }
+      }
     };
     this.store = AuthStore;
     api.getPublicAnalyses().then((publicAnalyses) => {
@@ -162,6 +170,10 @@ class App extends Reflux.Component<any, {}, AppState> {
     });
   };
 
+  nameUpdateFromApi = memoize((name) => {
+    this.state.profileState.update({'name': this.state.auth.name, 'institution': this.state.auth.institution});
+  });
+
   AnalyticIndex = withTracker(Routes);
 
   render() {
@@ -172,6 +184,7 @@ class App extends Reflux.Component<any, {}, AppState> {
         </Router>
       );
     }
+    this.nameUpdateFromApi(this.state.auth.name);
 
     return (
       <Router>

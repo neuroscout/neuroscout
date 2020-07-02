@@ -317,6 +317,12 @@ export interface AuthStoreState {
   institution: string;
 }
 
+export interface ProfileState {
+  name: string;
+  institution: string;
+  update: (updates: Partial<ProfileState>) => void;
+}
+
 export interface AppState {
   loadAnalyses: () => void;
   analyses: (AppAnalysis[] | null); // List of analyses belonging to the user
@@ -325,6 +331,7 @@ export interface AppState {
   datasets: Dataset[];
   cloneAnalysis: (number) => void;
   onDelete:  (analysis: AppAnalysis) => void;
+  profileState: ProfileState;
 }
 
 export interface RunFilters {

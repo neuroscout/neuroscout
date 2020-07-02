@@ -107,7 +107,7 @@ export default class Routes extends React.Component<AppState, {}> {
       <Route
         path="/profile"
         render={props =>
-          <Profile auth={this.props.auth} />
+          <Profile auth={this.props.auth} draftProfile={this.props.profileState} />
         }
       />
       <Route component={NotFound} />

@@ -2,7 +2,9 @@ import * as React from 'react';
 import { Divider, Row, Col, Button, Card, Form, Input } from 'antd';
 import { MainCol } from '../HelperComponents';
 
-import { AuthStoreState } from '../coretypes';
+import memoize from 'memoize-one';
+
+import { AuthStoreState, ProfileState } from '../coretypes';
 import { api } from '../api';
 
 /*
@@ -27,13 +29,9 @@ import { api } from '../api';
   predictorCollections: PredictorCollection[];
 */
 
-interface ProfileState {
-  name: string | undefined;
-  institution: string | undefined;
-}
-
 interface ProfileProps {
   auth: AuthStoreState;
+  draftProfile: ProfileState;
 }
 
 const formItemLayout = {
@@ -43,30 +41,11 @@ const formItemLayout = {
   }
 };
 
-class Profile extends React.Component<ProfileProps, ProfileState> {
-  constructor(props: ProfileProps) {
-    super(props);
-    this.state = {
-      name: props.auth.name,
-      institution: props.auth.institution
-    };
-  }
-
-  update() {
-    // Post changes to api.
-    // Handle invalid username etc
-    // If all good reload profile? or just kick changes up to top level state?
-    let updates = {email: '', name: '', institution: '', ...this.state};
-    let res = api.updateProfile(updates);
-    // tslint:disable-next-line:no-console
-    console.log(res);
-    return;
-  }
-
+class Profile extends React.Component<ProfileProps, {}> {
   render() {
     let auth = this.props.auth;
-    // tslint:disable-next-line:no-console
-    console.log(this.props);
+    let draftProfile = this.props.draftProfile;
+
     return (
     <div>
       <Row type="flex" justify="center" style={{ background: '#fff', padding: 0 }}>
@@ -77,21 +56,28 @@ class Profile extends React.Component<ProfileProps, ProfileState> {
             <Form {...formItemLayout} layout="vertical">
               <Form.Item label="Name" required={true}>
                 <Input
-                  placeholder="Display Name"
-                  value={this.state.name}
-                  onChange={(e) => this.setState({name: e.currentTarget.value})}
+                  defaultValue={'wat'}
+                  value={!!draftProfile.name ? draftProfile.name : undefined}
                   required={true}
                   min={1}
+                  onChange={(e) => draftProfile.update({name: e.currentTarget.value})}
                 />
               </Form.Item>
               <Form.Item label="Institution">
                 <Input
-                  value={this.state.institution}
-                  onChange={(e) => this.setState({institution: e.currentTarget.value})}
+                  defaultValue={auth.institution}
+                  value={draftProfile.institution}
+                  onChange={(e) => draftProfile.update({institution: e.currentTarget.value})}
                 />
               </Form.Item>
             </Form>
-          <Button type="primary" onClick={() => {this.update(); }} size={'small'}>
+          <Button
+            type="primary"
+            onClick={() => {
+              api.updateProfile({name: draftProfile.name, institution: draftProfile.institution });
+            }}
+            size={'small'}
+          >
             Update Profile
           </Button>
           </div>
