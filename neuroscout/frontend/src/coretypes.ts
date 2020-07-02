@@ -280,6 +280,7 @@ export interface ApiUser {
   analyses: ApiAnalysis[];
   predictor_collections: PredictorCollection[];
   first_login: boolean;
+  institution: string;
 }
 
 // The more condensed version of analysis object as returned by the user route
