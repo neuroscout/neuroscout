@@ -9,6 +9,7 @@ import { AppState } from './coretypes';
 import { NotFound } from './HelperComponents';
 import Home from './Home';
 import { PredictorCollectionList } from './predictor_collection/CollectionList';
+import Profile from './profile/Profile';
 
 export default class Routes extends React.Component<AppState, {}> {
   render() {
@@ -102,6 +103,12 @@ export default class Routes extends React.Component<AppState, {}> {
             datasets={this.props.datasets}
             collections={this.props.auth.predictorCollections}
           />}
+      />
+      <Route
+        path="/profile"
+        render={props =>
+          <Profile auth={this.props.auth} />
+        }
       />
       <Route component={NotFound} />
       </Switch>

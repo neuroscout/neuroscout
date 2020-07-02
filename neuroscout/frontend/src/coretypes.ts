@@ -313,6 +313,7 @@ export interface AuthStoreState {
   gAuth: any;
   avatar: string;
   predictorCollections: PredictorCollection[];
+  institution: string;
 }
 
 export interface AppState {

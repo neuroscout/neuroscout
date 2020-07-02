@@ -190,5 +190,16 @@ export const api = {
       displayError(error);
       return null;
     });
+  },
+
+  updateProfile: (updates: {name?: string, institution?: string}): Promise<null> => {
+    return jwtFetch(
+      `${domainRoot}/api/user`,
+      {
+        headers: {'accept': 'application/json'},
+        method: 'put',
+        body: JSON.stringify(updates)
+      }
+    );
   }
 };

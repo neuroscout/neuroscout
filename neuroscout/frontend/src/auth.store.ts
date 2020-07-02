@@ -56,6 +56,7 @@ export class AuthStore extends Reflux.Store {
       token: null,
       gAuth: null, 
       isGAuth: isGAuth,
+      institution: '',
       predictorCollections: jwt ? this.loadPredictorCollections() : []
     }};
   }
@@ -247,7 +248,8 @@ export class AuthStore extends Reflux.Store {
       jwt: null,
       analyses: [],
       loggingOut: true,
-      gAuth: null
+      gAuth: null,
+      institution: ''
     });
   };
 

@@ -19,6 +19,7 @@ class UserSchema(Schema):
         description='Predictor collections contributed by this user.',
         many=True, dump_only=True)
     first_login = fields.Bool(description='First time logging in.')
+    institution = fields.Str(allow_none=True)
 
     @validates('password')
     def validate_pass(self, value):

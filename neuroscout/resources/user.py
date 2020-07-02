@@ -1,3 +1,5 @@
+import sys
+
 from flask_jwt import current_identity, jwt_required
 from flask_security.recoverable import reset_password_token_status
 import webargs as wa
@@ -24,12 +26,14 @@ class UserRootResource(MethodResource):
     def post(self, **kwargs):
         return register_user(**kwargs)
 
-    @use_kwargs(UserSchema)
+    @use_kwargs(UserSchema(only=['name', 'institution']))
     @auth_required
     def put(self, **kwargs):
+        '''
         if User.query.filter((User.email == kwargs['email'])
                              & (User.id != current_identity.id)).all():
             abort(422, 'Email already in use.')
+        '''
         return put_record(kwargs, current_identity)
 
 
