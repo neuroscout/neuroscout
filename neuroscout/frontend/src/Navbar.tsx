@@ -37,6 +37,10 @@ class Navbar extends React.Component<AuthStoreState, {}> {
                      <Link to="/mycollections"> My Predictors </Link>
                    </Menu.Item>
 
+                   <Menu.Item key="profile">
+                     <Link to="/profile"> Profile </Link>
+                   </Menu.Item>
+
                    <Menu.Item
                     key="signout"
                     onClick={(e) => {return authActions.confirmLogout(); }}
