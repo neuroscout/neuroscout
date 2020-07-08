@@ -11,6 +11,25 @@ import { displayError, jwtFetch } from './utils';
 
 const domainRoot = config.server_url;
 
+const localItems = ['email', 'avatar', 'isGAuth', 'name', 'institution'];
+
+export const setLocal = (auth: AuthStoreState) => {
+  localItems.map((x) => { localStorage.setItem(x, auth[x]); });
+};
+
+export const removeLocal = () => {
+  [...localItems, 'jwt'].map((x) => { localStorage.removeItem(x); });
+};
+
+export const getLocal = () => {
+  let ret = {};
+  localItems.map((x) => { 
+    let item = localStorage.getItem(x);
+    item === null ? ret[x] = '' : ret[x] = item;
+  });
+  return ret;
+};
+
 export class AuthStore extends Reflux.Store {
 
   // jwt might not be set in state by the time getProfile is needed.
@@ -36,12 +55,11 @@ export class AuthStore extends Reflux.Store {
       jwt = '';
     }
 
-    let _email = localStorage.getItem('email');
-    let email = _email == null ? undefined : _email;
-    let isGAuth = localStorage.getItem('isGAuth');
-    let avatar = localStorage.getItem('avatar');
+    let local: Partial<AuthStoreState> = getLocal();
+    local.email === '' ? local.email = undefined : null;
 
     return { auth: {
+      ...local,
       jwt: jwt ? jwt : '',
       loggedIn: jwt ? true : false,
       openTour: false,
@@ -49,9 +67,6 @@ export class AuthStore extends Reflux.Store {
       loginError: '',
       signupError: '',
       resetError: '',
-      avatar: avatar ? avatar : '',
-      email: email,
-      name: undefined,
       password: '',
       openLogin: false,
       openSignup: false,
@@ -60,8 +75,6 @@ export class AuthStore extends Reflux.Store {
       loggingOut: false,
       token: null,
       gAuth: null, 
-      isGAuth: isGAuth,
-      institution: '',
       predictorCollections: jwt ? this.loadPredictorCollections() : []
     }};
   }
@@ -118,7 +131,7 @@ export class AuthStore extends Reflux.Store {
   // Authenticate the user with the server. This function is called from login()
   authenticate(): Promise<string> {
     return new Promise((resolve, reject) => {
-      let { email, password, avatar, isGAuth } = this.state.auth;
+      let { email, password, avatar, isGAuth, name } = this.state.auth;
       let { accountconfirmError } = this;
       fetch(domainRoot + '/api/auth', {
         method: 'post',
@@ -154,9 +167,8 @@ export class AuthStore extends Reflux.Store {
                 message.success('Logged in.');
 
                 localStorage.setItem('jwt', token);
-                localStorage.setItem('email', email!);
-                localStorage.setItem('avatar', avatar);
-                localStorage.setItem('isGAuth', isGAuth);
+                setLocal(this.state.auth);
+
                 response.json().then((user_data: ApiUser) => {
                   this.update({ openTour: user_data.first_login });
                   this.loadPredictorCollections(user_data);
@@ -250,10 +262,8 @@ export class AuthStore extends Reflux.Store {
 
   // Log user out
   logout = () => {
-    localStorage.removeItem('jwt');
-    localStorage.removeItem('email');
-    localStorage.removeItem('isGAuth');
-    localStorage.removeItem('avatar');
+    removeLocal();
+
     this.update({
       loggedIn: false,
       name: undefined,
