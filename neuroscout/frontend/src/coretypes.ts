@@ -294,7 +294,7 @@ export interface AppAnalysis {
   modifiedAt?: string;
 }
 
-export interface AuthStoreState {
+export interface AuthStoreState extends Omit<ProfileState, 'update' | 'name'> {
   jwt: string;
   loggedIn: boolean;
   openLogin: boolean;
@@ -314,12 +314,19 @@ export interface AuthStoreState {
   gAuth: any;
   avatar: string;
   predictorCollections: PredictorCollection[];
-  institution: string;
 }
+
+export const profileEditItems = ['name', 'institution', 'orcid', 'bio', 'twitter_handle', 'personal_site',
+                                 'public_email'];
 
 export interface ProfileState {
   name: string;
   institution: string;
+  orcid: string;
+  bio: string;
+  twitter_handle: string;
+  personal_site: string;
+  public_email: string;
   update: (updates: Partial<ProfileState>) => void;
 }
 

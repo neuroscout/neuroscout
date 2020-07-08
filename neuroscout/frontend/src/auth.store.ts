@@ -6,12 +6,12 @@ var jwtDecode = require('jwt-decode');
 import { api } from './api';
 import { authActions } from './auth.actions';
 import { config } from './config';
-import { ApiUser, AuthStoreState } from './coretypes';
+import { ApiUser, AuthStoreState, profileEditItems } from './coretypes';
 import { displayError, jwtFetch } from './utils';
 
 const domainRoot = config.server_url;
 
-const localItems = ['email', 'avatar', 'isGAuth', 'name', 'institution'];
+const localItems = ['email', 'avatar', 'isGAuth', ...profileEditItems];
 
 export const setLocal = (auth: Partial<AuthStoreState>) => {
   localItems.map((x) => { localStorage.setItem(x, auth[x]); });
@@ -353,9 +353,9 @@ export class AuthStore extends Reflux.Store {
             errorMessage += data.message[key];
           });
           that.update({resetError: errorMessage});
-      });
-    }
-  })
+        });
+      }
+    })
     .catch(displayError);
   };
 }

@@ -16,7 +16,7 @@ import { api } from './api';
 import { AuthStore } from './auth.store';
 import { authActions } from './auth.actions';
 import { config } from './config';
-import { ApiAnalysis, AppAnalysis, AppState, ProfileState } from './coretypes';
+import { ApiAnalysis, AppAnalysis, AppState, profileEditItems, ProfileState } from './coretypes';
 import { LoginModal, ResetPasswordModal, SignupModal } from './Modals';
 import Routes from './Routes';
 import { jwtFetch, timeout } from './utils';
@@ -64,6 +64,7 @@ class JWTChange extends React.Component<JWTChangeProps, {}> {
 class App extends Reflux.Component<any, {}, AppState> {
   constructor(props) {
     super(props);
+    
     this.state = {
       loadAnalyses: () => {
         api.getAnalyses().then(analyses => {
@@ -79,6 +80,11 @@ class App extends Reflux.Component<any, {}, AppState> {
       profileState: {
         name: '',
         institution: '',
+        orcid: '',
+        bio: '',
+        twitter_handle: '',
+        personal_site: '',
+        public_email: '',
         update: (updates: Partial<ProfileState>) => {
           this.setState({profileState: {...this.state.profileState, ...updates}});
         }

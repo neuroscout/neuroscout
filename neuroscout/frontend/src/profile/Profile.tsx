@@ -1,11 +1,12 @@
 import * as React from 'react';
-import { Divider, Row, Col, Button, Card, Form, Input } from 'antd';
+import { Divider, Row, Col, Button, Card, Form, Input, Switch } from 'antd';
 import { MainCol } from '../HelperComponents';
 
 import memoize from 'memoize-one';
 
-import { AuthStoreState, ProfileState } from '../coretypes';
+import { AuthStoreState, profileEditItems, ProfileState } from '../coretypes';
 import { api } from '../api';
+import { Space } from '../HelperComponents';
 
 /*
   jwt: string;
@@ -51,7 +52,16 @@ class Profile extends React.Component<ProfileProps, {}> {
       <Row type="flex" justify="center" style={{ background: '#fff', padding: 0 }}>
         <MainCol>
           <div>
-            Email: {auth.email}<br/>
+            Email:<Space />
+            {auth.email}
+            <Space />
+            <Switch
+              checked={('' + draftProfile.public_email) === 'true'}
+              checkedChildren="Public"
+              unCheckedChildren="Private"
+              onChange={checked => draftProfile.update({'public_email': '' + checked})}
+            />
+            <br/>
             Avatar: {auth.avatar}<br/>
             <Form {...formItemLayout} layout="vertical">
               <Form.Item label="Name" required={true}>
@@ -69,11 +79,43 @@ class Profile extends React.Component<ProfileProps, {}> {
                   onChange={(e) => draftProfile.update({institution: e.currentTarget.value})}
                 />
               </Form.Item>
+              <Form.Item label="ORCID iD">
+                <Input
+                  defaultValue={auth.orcid}
+                  value={draftProfile.orcid}
+                  onChange={(e) => draftProfile.update({orcid: e.currentTarget.value})}
+                />
+              </Form.Item>
+              <Form.Item label="Bio">
+                <Input.TextArea
+                  defaultValue={auth.bio}
+                  value={draftProfile.bio}
+                  rows={4}
+                  onChange={(e) => draftProfile.update({bio: e.currentTarget.value})}
+                />
+              </Form.Item>
+              <Form.Item label="Twitter Handle">
+                <Input
+                  defaultValue={auth.twitter_handle}
+                  value={draftProfile.twitter_handle}
+                  onChange={(e) => draftProfile.update({twitter_handle: e.currentTarget.value})}
+                />
+              </Form.Item>
+              <Form.Item label="Personal Site">
+                <Input
+                  defaultValue={auth.personal_site}
+                  value={draftProfile.personal_site}
+                  onChange={(e) => draftProfile.update({personal_site: e.currentTarget.value})}
+                />
+              </Form.Item>
             </Form>
           <Button
             type="primary"
             onClick={() => {
-              api.updateProfile({name: draftProfile.name, institution: draftProfile.institution });
+              api.updateProfile(profileEditItems.reduce(
+                (acc, curr) => {acc[curr] = draftProfile[curr]; return acc; },
+                {}
+              ));
             }}
             size={'small'}
           >
