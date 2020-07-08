@@ -13,7 +13,7 @@ const domainRoot = config.server_url;
 
 const localItems = ['email', 'avatar', 'isGAuth', 'name', 'institution'];
 
-export const setLocal = (auth: AuthStoreState) => {
+export const setLocal = (auth: Partial<AuthStoreState>) => {
   localItems.map((x) => { localStorage.setItem(x, auth[x]); });
 };
 
@@ -167,10 +167,12 @@ export class AuthStore extends Reflux.Store {
                 message.success('Logged in.');
 
                 localStorage.setItem('jwt', token);
-                setLocal(this.state.auth);
 
                 response.json().then((user_data: ApiUser) => {
-                  this.update({ openTour: user_data.first_login });
+                  setLocal(user_data);
+                  let profileItems: Partial<AuthStoreState> = {};
+                  localItems.map((x) => profileItems[x] = user_data[x]);
+                  this.update({ ...profileItems, openTour: user_data.first_login });
                   this.loadPredictorCollections(user_data);
                 });
                 return resolve(token);

@@ -56,7 +56,6 @@ class Profile extends React.Component<ProfileProps, {}> {
             <Form {...formItemLayout} layout="vertical">
               <Form.Item label="Name" required={true}>
                 <Input
-                  defaultValue={'wat'}
                   value={!!draftProfile.name ? draftProfile.name : undefined}
                   required={true}
                   min={1}
