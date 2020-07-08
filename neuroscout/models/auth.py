@@ -14,10 +14,15 @@ class User(db.Model, UserMixin):
     google_id = db.Column(db.Text)
     email = db.Column(db.String(100), unique=True)
     password = db.Column(db.String(255))
+
+    name = db.Column(db.Text)
     picture = db.Column(db.Text)
     institution = db.Column(db.Text)
+    personal_site = db.Column(db.Text)
+    twitter_handle = db.Column(db.Text)
+    orcid = db.Column(db.Text)
+    public_email = db.Column(db.Boolean(), default=True)
 
-    name = db.Column(db.String(40))
     active = db.Column(db.Boolean())  # If set to disabled, cannot access.
     confirmed_at = db.Column(db.DateTime())
     roles = db.relationship('Role', secondary=roles_users,

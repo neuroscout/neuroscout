@@ -8,7 +8,16 @@ class UserSchema(Schema):
     name = fields.Str(required=True, description='User full name')
     password = fields.Str(load_only=True,
                           description='Password. Minimum 6 characters.')
-    picture = fields.Str(allow_none=True)
+    picture = fields.Str(allow_none=True,
+                         description='Links to avatar.')
+    personal_site = fields.Str(allow_none=True,
+                               description='Site URL.')
+    twitter_handle = fields.Str(allow_none=True,
+                                description='Twitter handle.')
+    orcid = fields.Str(allow_none=True,
+                       description='ORCID')
+    public_email = fields.Bool(description='Display email in public profile.')
+
     analyses = fields.Nested(
         'AnalysisSchema',  many=True, dump_only=True,
         only=['hash_id', 'name', 'status', 'description',
