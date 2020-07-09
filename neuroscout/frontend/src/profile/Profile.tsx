@@ -119,7 +119,7 @@ class Profile extends React.Component<ProfileProps, {}> {
               )).then((ret) => {
                 if (!!ret && ret.statusCode === 200) {
                   message.success('Profile updated.');
-                  authActions.update(...ret);
+                  authActions.update(ret);
                 }
               });
             }}
