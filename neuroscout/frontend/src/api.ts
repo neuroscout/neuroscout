@@ -45,7 +45,7 @@ export const ApiToAppAnalysis = (data: ApiAnalysis): AppAnalysis => ({
 });
 
 export const api = {
-  getUser: (): Promise<ApiUser> => {
+  getUser: (): Promise<ApiUser & {statusCode: number}> => {
     return jwtFetch(`${domainRoot}/api/user`);
   },
 
@@ -192,7 +192,7 @@ export const api = {
     });
   },
 
-  updateProfile: (updates: {name?: string, institution?: string}): Promise<null> => {
+  updateProfile: (updates): Promise<ApiUser & {statusCode: number}> => {
     return jwtFetch(
       `${domainRoot}/api/user`,
       {
