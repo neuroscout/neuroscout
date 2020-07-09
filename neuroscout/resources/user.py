@@ -26,7 +26,9 @@ class UserRootResource(MethodResource):
     def post(self, **kwargs):
         return register_user(**kwargs)
 
-    @use_kwargs(UserSchema(only=['name', 'institution']))
+    put_kwargs = ['name', 'picture', 'institution', 'personal_site',
+                  'twitter_handle', 'orcid']
+    @use_kwargs(UserSchema(only=put_kwargs))
     @auth_required
     def put(self, **kwargs):
         '''

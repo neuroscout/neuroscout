@@ -1,11 +1,12 @@
 import * as React from 'react';
-import { Divider, Row, Col, Button, Card, Form, Input, Switch } from 'antd';
+import { message, Divider, Row, Col, Button, Card, Form, Input, Switch } from 'antd';
 import { MainCol } from '../HelperComponents';
 
 import memoize from 'memoize-one';
 
 import { AuthStoreState, profileEditItems, ProfileState } from '../coretypes';
 import { api } from '../api';
+import { authActions } from '../auth.actions';
 import { Space } from '../HelperComponents';
 
 /*
@@ -112,10 +113,15 @@ class Profile extends React.Component<ProfileProps, {}> {
           <Button
             type="primary"
             onClick={() => {
-              api.updateProfile(profileEditItems.reduce(
+              return api.updateProfile(profileEditItems.reduce(
                 (acc, curr) => {acc[curr] = draftProfile[curr]; return acc; },
                 {}
-              ));
+              )).then((ret) => {
+                if (!!ret && ret.statusCode === 200) {
+                  message.success('Profile updated.');
+                  authActions.update(...ret);
+                }
+              });
             }}
             size={'small'}
           >
