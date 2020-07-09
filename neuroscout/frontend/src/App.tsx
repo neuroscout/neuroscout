@@ -94,6 +94,14 @@ class App extends Reflux.Component<any, {}, AppState> {
     api.getPublicAnalyses().then((publicAnalyses) => {
       this.setState({ publicAnalyses });
     });
+    api.getUser().then((response) => {
+      if (response.statusCode !== 200) {
+        return;
+      }
+      let updates = profileEditItems.reduce((acc, curr) => {acc[curr] = response[curr]; return acc; }, {});
+      this.state.profileState.update(updates);
+      authActions.update(updates, true);
+    });
     api.getDatasets(false).then((datasets) => {
       if (datasets.length !== 0) {
         this.setState({ datasets });
