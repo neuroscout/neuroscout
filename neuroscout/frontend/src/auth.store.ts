@@ -32,15 +32,10 @@ export const getLocal = () => {
 
 export class AuthStore extends Reflux.Store {
 
-  // jwt might not be set in state by the time getProfile is needed.
-  // setState in this constructor doesn't take a callback...
   constructor() {
     super();
     this.listenToMany(authActions);
     this.state = this.getInitialState();
-    if (!!this.state.auth.jwt) {
-      this.getProfile();
-    }
   }
 
   getInitialState() {
@@ -79,7 +74,7 @@ export class AuthStore extends Reflux.Store {
     }};
   }
 
-  update(data: any) {
+  update(data: any, updateLocal: boolean = false) {
     let newAuth = this.state.auth;
     if (data) {
       for (let prop in data) {
@@ -88,6 +83,9 @@ export class AuthStore extends Reflux.Store {
         }
       }
       this.setState({auth: newAuth});
+      if (updateLocal) {
+        setLocal(newAuth);
+      }
     }
   }
 
@@ -117,15 +115,6 @@ export class AuthStore extends Reflux.Store {
         this.update({jwt: '', loggedIn: false, openLogin: true});
         return false;
     }
-  }
-
-  // jwtFetch response has already had .json() called on it compared to fetch call in authenticate 
-  getProfile() {
-    jwtFetch(`${domainRoot}/api/user`).then(response => {
-      if (response.statusCode === 200) {
-        this.update({institution: response.institution, name: response.name});
-      }
-    });
   }
 
   // Authenticate the user with the server. This function is called from login()
