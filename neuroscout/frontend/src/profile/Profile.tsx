@@ -4,37 +4,9 @@ import { MainCol } from '../HelperComponents';
 
 import memoize from 'memoize-one';
 
-import { AuthStoreState, profileEditItems, ProfileState } from '../coretypes';
+import { profileEditItems, ProfileState } from '../coretypes';
 import { api } from '../api';
-import { authActions } from '../auth.actions';
 import { Space } from '../HelperComponents';
-
-/*
-  jwt: string;
-  loggedIn: boolean;
-  openLogin: boolean;
-  openSignup: boolean;
-  openReset: boolean;
-  openEnterResetToken: boolean;
-  openTour: boolean;
-  loginError: string;
-  signupError: string;
-  resetError: string;
-  email: string | undefined;
-  name: string | undefined;
-  password: string | undefined;
-  token: string | null;
-  loggingOut: boolean; // flag set on logout to know to redirect after logout
-  nextURL: string | null; // will probably remove this and find a better solution to login redirects
-  gAuth: any;
-  avatar: string;
-  predictorCollections: PredictorCollection[];
-*/
-
-interface ProfileProps {
-  auth: AuthStoreState;
-  draftProfile: ProfileState;
-}
 
 const formItemLayout = {
   wrapperCol: {
@@ -43,70 +15,75 @@ const formItemLayout = {
   }
 };
 
-class Profile extends React.Component<ProfileProps, {}> {
-  render() {
-    let auth = this.props.auth;
-    let draftProfile = this.props.draftProfile;
+class Profile extends React.Component<ProfileState, ProfileState> {
+  constructor(props) {
+    super(props);
+    this.state = {...props};
+  }
 
+  profileLoaded = memoize((...args) => { this.setState({...this.props}); });
+
+  render() {
+    this.profileLoaded(...profileEditItems.map(x => this.props[x]));
     return (
     <div>
       <Row type="flex" justify="center" style={{ background: '#fff', padding: 0 }}>
         <MainCol>
           <div>
             Email:<Space />
-            {auth.email}
+            {this.state.email}
             <Space />
             <Switch
-              checked={('' + draftProfile.public_email) === 'true'}
+              checked={('' + this.state.public_email) === 'true'}
               checkedChildren="Public"
               unCheckedChildren="Private"
-              onChange={checked => draftProfile.update({'public_email': '' + checked})}
+              onChange={checked => this.setState({'public_email': '' + checked})}
             />
             <br/>
-            Avatar: {auth.avatar}<br/>
+            Avatar: {this.state.avatar}<br/>
             <Form {...formItemLayout} layout="vertical">
               <Form.Item label="Name" required={true}>
                 <Input
-                  value={!!draftProfile.name ? draftProfile.name : undefined}
+                  value={!!this.state.name ? this.state.name : undefined}
                   required={true}
                   min={1}
-                  onChange={(e) => draftProfile.update({name: e.currentTarget.value})}
+                  onChange={(e) => this.setState({name: e.currentTarget.value})}
                 />
               </Form.Item>
               <Form.Item label="Institution">
                 <Input
-                  defaultValue={auth.institution}
-                  value={draftProfile.institution}
-                  onChange={(e) => draftProfile.update({institution: e.currentTarget.value})}
+                  defaultValue={this.state.institution}
+                  value={this.state.institution}
+                  onChange={(e) => this.setState({institution: e.currentTarget.value})}
                 />
               </Form.Item>
               <Form.Item label="ORCID iD">
                 <Input
-                  defaultValue={auth.orcid}
-                  value={draftProfile.orcid}
-                  onChange={(e) => draftProfile.update({orcid: e.currentTarget.value})}
+                  defaultValue={this.state.orcid}
+                  value={this.state.orcid}
+                  onChange={(e) => this.setState({orcid: e.currentTarget.value})}
                 />
               </Form.Item>
               <Form.Item label="Bio">
                 <Input.TextArea
-                  defaultValue={auth.bio}
-                  value={draftProfile.bio}
+                  defaultValue={this.state.bio}
+                  value={this.state.bio}
                   rows={4}
-                  onChange={(e) => draftProfile.update({bio: e.currentTarget.value})}
+                  onChange={(e) => this.setState({bio: e.currentTarget.value})}
                 />
               </Form.Item>
               <Form.Item label="Twitter Handle">
                 <Input
-                  defaultValue={auth.twitter_handle}
-                  value={draftProfile.twitter_handle}
-                  onChange={(e) => draftProfile.update({twitter_handle: e.currentTarget.value})}
+                  defaultValue={this.state.twitter_handle}
+                  value={this.state.twitter_handle}
+                  onChange={(e) => this.setState({twitter_handle: e.currentTarget.value})}
                 />
               </Form.Item>
               <Form.Item label="Personal Site">
                 <Input
-                  defaultValue={auth.personal_site}
-                  value={draftProfile.personal_site}
-                  onChange={(e) => draftProfile.update({personal_site: e.currentTarget.value})}
+                  defaultValue={this.state.personal_site}
+                  value={this.state.personal_site}
+                  onChange={(e) => this.setState({personal_site: e.currentTarget.value})}
                 />
               </Form.Item>
             </Form>
@@ -114,13 +91,13 @@ class Profile extends React.Component<ProfileProps, {}> {
             type="primary"
             onClick={() => {
               return api.updateProfile(profileEditItems.reduce(
-                (acc, curr) => {acc[curr] = draftProfile[curr]; return acc; },
+                (acc, curr) => {acc[curr] = this.state[curr]; return acc; },
                 {}
               )).then((ret) => {
                 if (!!ret && ret.statusCode === 200) {
                   message.success('Profile updated.');
-                  authActions.update(ret);
                 }
+                this.props.update(this.state);
               });
             }}
             size={'small'}

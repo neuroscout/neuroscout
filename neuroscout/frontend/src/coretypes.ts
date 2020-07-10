@@ -3,6 +3,7 @@
  The data models below are largely UI agonstic. This module is a good starting point to understand the
  shape of the data in the frontend app. All resusable type definitions should go into this module.
 */
+import { UserStore } from './user';
 
 export type AnalysisStatus = 'DRAFT' | 'PENDING' | 'PASSED' | 'FAILED' | 'SUBMITTING';
 
@@ -200,7 +201,7 @@ export interface Store {
   fillAnalysis: boolean;
   analysis404: boolean;
   doTooltip: boolean;
-  auth?: AuthStoreState;
+  user?: UserStore;
 }
 
 export interface ApiRun {
@@ -294,51 +295,30 @@ export interface AppAnalysis {
   modifiedAt?: string;
 }
 
-export interface AuthStoreState extends Omit<ProfileState, 'update' | 'name'> {
-  jwt: string;
-  loggedIn: boolean;
-  openLogin: boolean;
-  openSignup: boolean;
-  openReset: boolean;
-  openEnterResetToken: boolean;
-  openTour: boolean;
-  loginError: string;
-  signupError: string;
-  resetError: string;
-  email: string | undefined;
-  name: string | undefined;
-  password: string | undefined;
-  token: string | null;
-  loggingOut: boolean; // flag set on logout to know to redirect after logout
-  nextURL: string | null; // will probably remove this and find a better solution to login redirects
-  gAuth: any;
-  avatar: string;
-  predictorCollections: PredictorCollection[];
-}
-
 export const profileEditItems = ['name', 'institution', 'orcid', 'bio', 'twitter_handle', 'personal_site',
-                                 'public_email'];
+                                 'public_email', 'avatar'];
 
 export interface ProfileState {
   name: string;
+  email: string;
   institution: string;
   orcid: string;
   bio: string;
   twitter_handle: string;
   personal_site: string;
   public_email: string;
-  update: (updates: Partial<ProfileState>) => void;
+  avatar: string;
+  update: (updates: Partial<ProfileState>, updateLocal?: boolean) => void;
 }
 
 export interface AppState {
   loadAnalyses: () => void;
   analyses: (AppAnalysis[] | null); // List of analyses belonging to the user
   publicAnalyses: (AppAnalysis[] | null); // List of public analyses
-  auth: AuthStoreState;
+  user: UserStore;
   datasets: Dataset[];
   cloneAnalysis: (number) => void;
   onDelete:  (analysis: AppAnalysis) => void;
-  profileState: ProfileState;
 }
 
 export interface RunFilters {

@@ -9,7 +9,6 @@ import { TableRowSelection } from 'antd/lib/table';
 
 import isEqual from 'lodash.isequal';
 import memoize from 'memoize-one';
-import Reflux from 'reflux';
 
 import { Predictor } from '../coretypes';
 

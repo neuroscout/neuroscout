@@ -590,13 +590,6 @@
     "@types/prop-types" "*"
     csstype "^2.2.0"
 
-"@types/reflux@^6.4.1":
-  version "6.4.2"
-  resolved "https://registry.yarnpkg.com/@types/reflux/-/reflux-6.4.2.tgz#08eda3c4bee7d2044a9b2eb89c87010aa0208fb6"
-  integrity sha512-4FcJCO7fThmdFAd6+ThuLeBZ9wD5WymsNfVVUoFFZAlE56YPgwCO2EMnTJjcvfUW+/0+vlWCl59gpABuNz/3ZA==
-  dependencies:
-    "@types/react" "*"
-
 "@types/stack-utils@^1.0.1":
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/@types/stack-utils/-/stack-utils-1.0.1.tgz#0a851d3bd96498fa25c33ab7278ed3bd65f06c3e"
@@ -4012,11 +4005,6 @@ event-emitter@~0.3.5:
   dependencies:
     d "1"
     es5-ext "~0.10.14"
-
-eventemitter3@^1.1.1:
-  version "1.2.0"
-  resolved "https://registry.yarnpkg.com/eventemitter3/-/eventemitter3-1.2.0.tgz#1c86991d816ad1e504750e73874224ecf3bec508"
-  integrity sha1-HIaZHYFq0eUEdQ5zh0Ik7PO+xQg=
 
 eventemitter3@^4.0.0:
   version "4.0.0"
@@ -9742,21 +9730,6 @@ reflect.ownkeys@^0.2.0:
   version "0.2.0"
   resolved "https://registry.yarnpkg.com/reflect.ownkeys/-/reflect.ownkeys-0.2.0.tgz#749aceec7f3fdf8b63f927a04809e90c5c0b3460"
   integrity sha1-dJrO7H8/34tj+SegSAnpDFwLNGA=
-
-reflux-core@^1.0.0:
-  version "1.0.0"
-  resolved "https://registry.yarnpkg.com/reflux-core/-/reflux-core-1.0.0.tgz#eb9baae2d50871324adb9312583c12e070cd61d3"
-  integrity sha1-65uq4tUIcTJK25MSWDwS4HDNYdM=
-  dependencies:
-    eventemitter3 "^1.1.1"
-
-reflux@^6.4.1:
-  version "6.4.1"
-  resolved "https://registry.yarnpkg.com/reflux/-/reflux-6.4.1.tgz#8bbbabaff54cf1b82233d67dd2542fdad2a8d678"
-  integrity sha1-i7urr/VM8bgiM9Z90lQv2tKo1ng=
-  dependencies:
-    eventemitter3 "^1.1.1"
-    reflux-core "^1.0.0"
 
 regenerate@^1.2.1:
   version "1.4.0"

@@ -2,11 +2,10 @@ import * as React from 'react';
 import { Avatar, Row, Button, Menu, Icon } from 'antd';
 import { Link } from 'react-router-dom';
 
-import { authActions } from './auth.actions';
-import { AuthStoreState } from './coretypes';
 import { MainCol } from './HelperComponents';
+import { UserStore } from './user';
 
-class Navbar extends React.Component<AuthStoreState, {}> {
+class Navbar extends React.Component<UserStore, {}> {
   render() {
     return (
       <Row type="flex" justify="center" style={{padding: 0 }}>
@@ -26,12 +25,12 @@ class Navbar extends React.Component<AuthStoreState, {}> {
                   <Avatar
                     shape="circle"
                     icon="user"
-                    src={this.props.avatar}
+                    src={this.props.profile.avatar}
                     className="headerAvatar"
                   />
                 }
               >
-                 <Menu.ItemGroup title={`${this.props.gAuth ? this.props.gAuth.profileObj.email : this.props.email}`}>
+                 <Menu.ItemGroup title={`${this.props.gAuth ? this.props.gAuth.profileObj.email : this.props.profile.email}`}>
                    <Menu.Divider/>
                    <Menu.Item key="predictorCollections">
                      <Link to="/mycollections"> My Predictors </Link>
@@ -43,7 +42,7 @@ class Navbar extends React.Component<AuthStoreState, {}> {
 
                    <Menu.Item
                     key="signout"
-                    onClick={(e) => {return authActions.confirmLogout(); }}
+                    onClick={(e) => {return this.props.confirmLogout(); }}
                    >
                     Sign Out
                    </Menu.Item>
@@ -51,12 +50,12 @@ class Navbar extends React.Component<AuthStoreState, {}> {
               </Menu.SubMenu>
              :
               <Menu.Item key="signup" style={{float: 'right'}}>
-              <Button size="large" type="primary" onClick={e => authActions.update({ openSignup: true })}>
+              <Button size="large" type="primary" onClick={e => this.props.update({ openSignup: true })}>
                 Sign up</Button></Menu.Item>
              }
              {this.props.loggedIn === false &&
                  <Menu.Item
-                  onClick={e => authActions.update({ openLogin: true })}
+                  onClick={e => this.props.update({ openLogin: true })}
                   key="signin"
                   style={{float: 'right'}}
                  >

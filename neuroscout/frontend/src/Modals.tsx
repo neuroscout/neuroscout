@@ -2,14 +2,13 @@ import * as React from 'react';
 import { Button, Divider, Form, Icon, Input, Modal } from 'antd';
 import { GoogleLogin } from 'react-google-login';
 
-import { authActions } from './auth.actions';
 import { config } from './config';
-import { AuthStoreState } from './coretypes';
+import { UserStore } from './user';
 
 const FormItem = Form.Item;
 const GOOGLECLIENTID = config.google_client_id;
 
-class GoogleLoginBtn extends React.Component<{}, {}> {
+class GoogleLoginBtn extends React.Component<UserStore, {}> {
   render() {
     return (
       <GoogleLogin
@@ -28,16 +27,18 @@ class GoogleLoginBtn extends React.Component<{}, {}> {
         buttonText="Log in"
         onSuccess={(e) => {
           if (e.hasOwnProperty('accessToken')) {
-            authActions.update({
-              email: (e as any).profileObj.email,
+            this.props.update({
               password: (e as any).tokenId,
               gAuth: e,
               isGAuth: true,
               openSignup: false,
               openLogin: false,
+            });
+            this.props.profile.update({
+              email: (e as any).profileObj.email,
               avatar: (e as any).profileObj.imageUrl
             });
-            authActions.login();
+            this.props.login();
           }
           return '';
         }}
@@ -49,7 +50,7 @@ class GoogleLoginBtn extends React.Component<{}, {}> {
   }
 }
 
-export class ResetPasswordModal extends React.Component<AuthStoreState, {}> {
+export class ResetPasswordModal extends React.Component<UserStore, {}> {
   render() {
     return (
       <Modal
@@ -58,7 +59,7 @@ export class ResetPasswordModal extends React.Component<AuthStoreState, {}> {
         footer={null}
         maskClosable={true}
         onCancel={e => {
-          authActions.update({openReset: false});
+          this.props.update({openReset: false});
         }}
       >
         <p>
@@ -67,7 +68,7 @@ export class ResetPasswordModal extends React.Component<AuthStoreState, {}> {
         <Form
           onSubmit={e => {
             e.preventDefault();
-            authActions.resetPassword();
+            this.props.resetPassword();
           }}
         >
           <FormItem>
@@ -76,8 +77,8 @@ export class ResetPasswordModal extends React.Component<AuthStoreState, {}> {
               placeholder="Email"
               type="email"
               size="large"
-              value={this.props.email}
-              onChange={authActions.updateFromInput('email')}
+              value={this.props.profile.email}
+              onChange={(e) => this.props.updateFromInput('email', e, true)}
             />
           </FormItem>
           <FormItem>
@@ -91,7 +92,7 @@ export class ResetPasswordModal extends React.Component<AuthStoreState, {}> {
   }
 }
 
-export class EnterResetTokenModal extends React.Component<AuthStoreState, {}> {
+export class EnterResetTokenModal extends React.Component<UserStore, {}> {
   render () {
     return (
       <Modal
@@ -100,17 +101,17 @@ export class EnterResetTokenModal extends React.Component<AuthStoreState, {}> {
         footer={null}
         maskClosable={true}
         onCancel={e => {
-          authActions.update({ openEnterResetToken: false });
+          this.props.update({ openEnterResetToken: false });
         }}
       >
         <p>
-         We have sent a reset token to {this.props.email} <br/>
+         We have sent a reset token to {this.props.profile.email} <br/>
          Please enter the token below, along with a new password for the account.
        </p>
         <Form
           onSubmit={e => {
             e.preventDefault();
-            authActions.submitToken();
+            this.props.submitToken();
           }}
         >
           <FormItem>
@@ -119,7 +120,7 @@ export class EnterResetTokenModal extends React.Component<AuthStoreState, {}> {
               placeholder="Token"
               type="token"
               size="large"
-              onChange={authActions.updateFromInput('token')}
+              onChange={(e) => this.props.updateFromInput('token', e)}
 
             />
           </FormItem>
@@ -129,7 +130,7 @@ export class EnterResetTokenModal extends React.Component<AuthStoreState, {}> {
               placeholder="Password"
               type="password"
               size="large"
-              onChange={authActions.updateFromInput('password')}
+              onChange={(e) => this.props.updateFromInput('password', e)}
             />
           </FormItem>
           <FormItem>
@@ -147,7 +148,7 @@ export class EnterResetTokenModal extends React.Component<AuthStoreState, {}> {
   }
 }
 
-export class LoginModal extends React.Component<AuthStoreState, {}> {
+export class LoginModal extends React.Component<UserStore, {}> {
   render () {
     return (
       <Modal
@@ -156,8 +157,8 @@ export class LoginModal extends React.Component<AuthStoreState, {}> {
         footer={null}
         maskClosable={true}
         onCancel={e => {
-          authActions.logout();
-          authActions.update({ openLogin: false });
+          this.props.logout();
+          this.props.update({ openLogin: false });
         }}
       >
         <p>
@@ -167,7 +168,7 @@ export class LoginModal extends React.Component<AuthStoreState, {}> {
         <Form
           onSubmit={e => {
             e.preventDefault();
-            authActions.login();
+            this.props.login();
           }}
         >
           <FormItem>
@@ -176,9 +177,9 @@ export class LoginModal extends React.Component<AuthStoreState, {}> {
               placeholder="Email"
               type="email"
               size="large"
-              value={this.props.email}
+              value={this.props.profile.email}
               onChange={(e) => {
-                authActions.updateFromInput('email', e);
+                this.props.updateFromInput('email', e, true);
               }}
             />
           </FormItem>
@@ -188,24 +189,24 @@ export class LoginModal extends React.Component<AuthStoreState, {}> {
               placeholder="Password"
               type="password"
               value={this.props.password}
-              onChange={(e) => authActions.updateFromInput('password', e)}
+              onChange={(e) => this.props.updateFromInput('password', e)}
             />
           </FormItem>
           <FormItem>
-           <a onClick={e => {authActions.update( { openLogin: false, openReset: true}); }}>Forgot password</a><br/>
+           <a onClick={e => {this.props.update( { openLogin: false, openReset: true}); }}>Forgot password</a><br/>
             <Button style={{ width: '100%' }} htmlType="submit" type="primary">
               Log in
             </Button>
           </FormItem>
         </Form>
         <Divider> Or log in with Google </Divider>
-        <GoogleLoginBtn />
+        <GoogleLoginBtn {...this.props} />
       </Modal>
     );
   }
 }
 
-export class SignupModal extends React.Component<AuthStoreState, {}> {
+export class SignupModal extends React.Component<UserStore, {}> {
   render() {
     return (
       <Modal
@@ -213,7 +214,7 @@ export class SignupModal extends React.Component<AuthStoreState, {}> {
         visible={this.props.openSignup}
         footer={null}
         maskClosable={true}
-        onCancel={e => authActions.update({ openSignup: false }, e)}
+        onCancel={e => this.props.update({ openSignup: false })}
       >
         <p>
           {this.props.signupError}
@@ -222,15 +223,15 @@ export class SignupModal extends React.Component<AuthStoreState, {}> {
         <Form
           onSubmit={e => {
             e.preventDefault();
-            authActions.signup();
+            this.props.signup();
           }}
         >
           <FormItem>
             <Input
               placeholder="Full name"
               size="large"
-              value={this.props.name}
-              onChange={(e) => authActions.updateFromInput('name', e)}
+              value={this.props.profile.name}
+              onChange={(e) => this.props.updateFromInput('name', e, true)}
             />
           </FormItem>
           <FormItem>
@@ -238,8 +239,8 @@ export class SignupModal extends React.Component<AuthStoreState, {}> {
               placeholder="Email"
               type="email"
               size="large"
-              value={this.props.email}
-              onChange={(e) => authActions.updateFromInput('email', e)}
+              value={this.props.profile.email}
+              onChange={(e) => this.props.updateFromInput('email', e, true)}
             />
           </FormItem>
           <FormItem>
@@ -247,7 +248,7 @@ export class SignupModal extends React.Component<AuthStoreState, {}> {
               placeholder="Password"
               type="password"
               value={this.props.password}
-              onChange={(e) => authActions.updateFromInput('password', e)}
+              onChange={(e) => this.props.updateFromInput('password', e)}
             />
           </FormItem>
           <FormItem>
@@ -257,7 +258,7 @@ export class SignupModal extends React.Component<AuthStoreState, {}> {
           </FormItem>
         </Form>
         <Divider> Or sign up using a Google account </Divider>
-        <GoogleLoginBtn />
+        <GoogleLoginBtn {...this.props} />
       </Modal>
     );
   }

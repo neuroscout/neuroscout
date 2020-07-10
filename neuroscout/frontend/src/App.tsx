@@ -6,15 +6,13 @@ Top-level App component containing AppState. The App component is currently resp
 */
 import * as React from 'react';
 import { BrowserRouter as Router, Route, Redirect } from 'react-router-dom';
-import Reflux from 'reflux';
 import { Layout, Modal, message } from 'antd';
 import ReactGA from 'react-ga';
 import memoize from 'memoize-one';
 
 import './css/App.css';
 import { api } from './api';
-import { AuthStore } from './auth.store';
-import { authActions } from './auth.actions';
+import { UserStore } from './user';
 import { config } from './config';
 import { ApiAnalysis, AppAnalysis, AppState, profileEditItems, ProfileState } from './coretypes';
 import { LoginModal, ResetPasswordModal, SignupModal } from './Modals';
@@ -61,7 +59,7 @@ class JWTChange extends React.Component<JWTChangeProps, {}> {
 }
 
 // Top-level App component
-class App extends Reflux.Component<any, {}, AppState> {
+class App extends React.Component<{}, AppState> {
   constructor(props) {
     super(props);
     
@@ -73,24 +71,11 @@ class App extends Reflux.Component<any, {}, AppState> {
       },
       analyses: null,
       publicAnalyses: null,
-      auth: authActions.getInitialState(),
+      user: new UserStore(this.setState.bind(this)),
       datasets: [],
       onDelete: this.onDelete,
       cloneAnalysis: this.cloneAnalysis,
-      profileState: {
-        name: '',
-        institution: '',
-        orcid: '',
-        bio: '',
-        twitter_handle: '',
-        personal_site: '',
-        public_email: '',
-        update: (updates: Partial<ProfileState>) => {
-          this.setState({profileState: {...this.state.profileState, ...updates}});
-        }
-      }
     };
-    this.store = AuthStore;
     api.getPublicAnalyses().then((publicAnalyses) => {
       this.setState({ publicAnalyses });
     });
@@ -99,8 +84,7 @@ class App extends Reflux.Component<any, {}, AppState> {
         return;
       }
       let updates = profileEditItems.reduce((acc, curr) => {acc[curr] = response[curr]; return acc; }, {});
-      this.state.profileState.update(updates);
-      authActions.update(updates, true);
+      this.state.user.profile.update(updates, true);
     });
     api.getDatasets(false).then((datasets) => {
       if (datasets.length !== 0) {
@@ -115,7 +99,7 @@ class App extends Reflux.Component<any, {}, AppState> {
   checkAnalysesStatus = async (key: number) => {
     while (true) {
       if (key < checkCount) { return; }
-      if (!(this.state.auth.loggedIn)) { return; }
+      if (!(this.state.user.loggedIn)) { return; }
       let changeFlag = false;
       if (this.state.analyses !== null) {
         let updatedAnalyses = this.state.analyses.map(async (analysis) => {
@@ -184,21 +168,16 @@ class App extends Reflux.Component<any, {}, AppState> {
     });
   };
 
-  nameUpdateFromApi = memoize((name) => {
-    this.state.profileState.update({'name': this.state.auth.name, 'institution': this.state.auth.institution});
-  });
-
   AnalyticIndex = withTracker(Routes);
 
   render() {
-    if (this.state.auth.loggingOut) {
+    if (this.state.user.loggingOut) {
       return (
         <Router>
           <Redirect to="/" />
         </Router>
       );
     }
-    this.nameUpdateFromApi(this.state.auth.name);
 
     return (
       <Router>
@@ -206,18 +185,18 @@ class App extends Reflux.Component<any, {}, AppState> {
           <JWTChange
             loadAnalyses={this.state.loadAnalyses}
             checkAnalysesStatus={this.checkAnalysesStatus}
-            jwt={this.state.auth.jwt}
+            jwt={this.state.user.jwt}
           />
-          {this.state.auth.openLogin && <LoginModal {...this.state.auth} />}
-          {this.state.auth.openReset && <ResetPasswordModal {...this.state.auth} />}
-          {this.state.auth.openSignup && <SignupModal {...this.state.auth} />}
+          {this.state.user.openLogin && <LoginModal {...this.state.user} />}
+          {this.state.user.openReset && <ResetPasswordModal {...this.state.user} />}
+          {this.state.user.openSignup && <SignupModal {...this.state.user} />}
           <Tour
-            isOpen={this.state.auth.openTour}
-            closeTour={authActions.closeTour}
+            isOpen={this.state.user.openTour}
+            closeTour={this.state.user.closeTour}
           />
           <Layout>
             <Content style={{ background: '#fff' }}>
-              <Navbar {...this.state.auth} />
+              <Navbar {...this.state.user} />
               <br />
               <Route 
                 render={(routeProps) => 
@@ -233,8 +212,8 @@ class App extends Reflux.Component<any, {}, AppState> {
 
   componentDidUpdate(prevProps, prevState) {
     // Need to do this so logout redirect only happens once, otherwise it'd be an infinite loop
-    if (this.state.auth.loggingOut) {
-      authActions.update({ loggingOut: false });
+    if (this.state.user.loggingOut) {
+      this.state.user.update({ loggingOut: false });
       this.setState({analyses: []});
     }
   }

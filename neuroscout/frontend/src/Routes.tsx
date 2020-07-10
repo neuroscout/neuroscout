@@ -30,12 +30,12 @@ export default class Routes extends React.Component<AppState, {}> {
             // Longer term to automatically redirect the user to the target URL after login we
             // need to implement something like the auth workflow example here:
             // https://reacttraining.com/react-router/web/example/auth-workflow
-            if (this.props.auth.loggedIn || this.props.auth.openLogin) {
+            if (this.props.user.loggedIn || this.props.user.openLogin) {
               return <AnalysisBuilder
                         updatedAnalysis={() => this.props.loadAnalyses()}
                         key={props.location.key}
                         datasets={this.props.datasets}
-                        doTour={this.props.auth.openTour}
+                        doTour={this.props.user.openTour}
               />;
             }
             message.warning('Please log in first and try again');
@@ -101,13 +101,14 @@ export default class Routes extends React.Component<AppState, {}> {
         render={props =>
           <PredictorCollectionList
             datasets={this.props.datasets}
-            collections={this.props.auth.predictorCollections}
+            collections={this.props.user.predictorCollections}
+            updateUser={this.props.user.update}
           />}
       />
       <Route
         path="/profile"
         render={props =>
-          <Profile auth={this.props.auth} draftProfile={this.props.profileState} />
+          <Profile {...this.props.user.profile} />
         }
       />
       <Route component={NotFound} />

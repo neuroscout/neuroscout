@@ -10,10 +10,7 @@ import {
   Alert, Tag, Tabs, Row, Button, Modal, Icon, message, Tooltip, Form, Input, Collapse
 } from 'antd';
 import { Prompt } from 'react-router-dom';
-import Reflux from 'reflux';
 
-import { authActions } from '../auth.actions';
-import { AuthStore } from '../auth.store';
 import { api } from '../api';
 import { OverviewTab } from './Overview';
 import { PredictorSelector } from './Predictors';
@@ -223,12 +220,11 @@ type BuilderProps = {
   datasets: Dataset[];
 };
 
-export default class AnalysisBuilder extends Reflux.Component<any, BuilderProps & RouteComponentProps<{}>, Store> {
+export default class AnalysisBuilder extends React.Component<BuilderProps & RouteComponentProps<{}>, Store> {
   constructor(props: BuilderProps) {
     super(props);
     editableStatus = ['DRAFT', 'FAILED'];
     this.state = initializeStore();
-    this.store = AuthStore;
     // Load analysis from server if an analysis id is specified in the props
     if (!!props.id) {
       jwtFetch(`${domainRoot}/api/analyses/${props.id}`)
@@ -953,8 +949,8 @@ export default class AnalysisBuilder extends Reflux.Component<any, BuilderProps 
       }
 
       // merge predictor collection predictors into available predictors
-      if (this.state.auth && this.state.auth.predictorCollections) {
-        let userPredictors = this.state.auth.predictorCollections.filter(x => {
+      if (this.state.user && this.state.user.predictorCollections) {
+        let userPredictors = this.state.user.predictorCollections.filter(x => {
           return x.predictors !== undefined &&
           x.predictors.length > 0 &&
           x.predictors[0].dataset_id + '' === this.state.analysis.datasetId;
@@ -1036,7 +1032,7 @@ export default class AnalysisBuilder extends Reflux.Component<any, BuilderProps 
   componentDidUpdate(prevProps, prevState) {
     // we really only need a valid JWT when creating the analysis
     if (editableStatus.includes(this.state.analysis.status)) {
-      authActions.checkJWT();
+      this.props.checkJWT();
     }
 
     if (this.state.saveFromUpdate) {
