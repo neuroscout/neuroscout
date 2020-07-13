@@ -219,9 +219,11 @@ class BibliographyResource(MethodResource):
         for all other matches, .* is used to denote that all entries match. """
         bib = json.load(open(current_app.config['BIBLIOGRAPHY']))
 
+        neuroscout = [bib['neuroscout']['.*']]
+
         tools = [b['.*'] for k, b in bib.items()
                  if k in [
-                     'nipype', 'neuroscout', 'fitlins', 'nipype', 'pliers']]
+                     'nipype', 'fitlins', 'fmriprep', 'pybids', 'pliers']]
         all_csl_json = tools.copy()
 
         dataset_entry = bib.get(analysis.dataset.name, [])
@@ -230,15 +232,17 @@ class BibliographyResource(MethodResource):
             data = [dataset_entry['.*']]
             all_csl_json += data
 
+        extraction = [bib['pliers']['.*']]
         # Search for Predictor citations
-        extractors = [find_predictor_citation(p, bib)
-                      for p in analysis.predictors]
-        all_csl_json += extractors
+        extraction += [find_predictor_citation(p, bib)
+                       for p in analysis.predictors]
+        all_csl_json += extraction
 
         resp = {
-            'tools': format_bibliography(tools),
+            'neuroscout': format_bibliography(neuroscout),
+            'supporting': format_bibliography(tools),
             'data': format_bibliography(data),
-            'extractors': format_bibliography(extractors),
+            'extraction': format_bibliography(extraction),
             'csl_json': _flatten(all_csl_json)
         }
 
