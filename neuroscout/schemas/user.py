@@ -18,11 +18,6 @@ class UserSchema(Schema):
                        description='ORCID')
     public_email = fields.Bool(description='Display email in public profile.')
 
-    analyses = fields.Nested(
-        'AnalysisSchema',  many=True, dump_only=True,
-        only=['hash_id', 'name', 'status', 'description',
-              'modified_at', 'dataset_id']
-        )
     predictor_collections = fields.Nested(
         'PredictorCollectionSchema', only=['id', 'collection_name'],
         description='Predictor collections contributed by this user.',

@@ -1,17 +1,16 @@
-import sys
-
 from flask_jwt import current_identity, jwt_required
 from flask_security.recoverable import reset_password_token_status
 import webargs as wa
 
 from flask_apispec import MethodResource, marshal_with, use_kwargs, doc
-from ..models.auth import User
+from ..models import User, Analysis
 from ..database import db
 from ..auth import register_user, reset_password, send_confirmation
 from .utils import abort, auth_required, first_or_404
 from ..utils.db import put_record
 from ..schemas.user import UserSchema, UserCreationSchema, UserResetSchema
 from ..schemas.predictor import PredictorSchema
+from ..schemas.analysis import AnalysisSchema
 from .predictor import get_predictors
 
 
@@ -28,6 +27,7 @@ class UserRootResource(MethodResource):
 
     put_kwargs = ['name', 'picture', 'institution', 'personal_site',
                   'twitter_handle', 'orcid']
+
     @use_kwargs(UserSchema(only=put_kwargs))
     @auth_required
     def put(self, **kwargs):
@@ -38,11 +38,25 @@ class UserRootResource(MethodResource):
         '''
         return put_record(kwargs, current_identity)
 
+
 @marshal_with(UserSchema)
 class UserDetailResource(MethodResource):
     @doc(tags=['user'], summary='Get a given users information.')
     def get(self, user_id):
         return first_or_404(User.query.filter_by(id=user_id))
+
+
+@marshal_with(AnalysisSchema(many=True))
+class UserAnalysisListResource(MethodResource):
+    @doc(tags=['user'], summary='Get a list of analyses created by a user.')
+    def get(self, user_id):
+        kwargs = {'user_id': user_id}
+        if user_id != current_identity.id:
+            kwargs['private'] = False
+            kwargs['status'] = 'PASSED'
+
+        return Analysis.query.filter_by(**kwargs)
+
 
 class UserResendConfirm(MethodResource):
     @jwt_required()

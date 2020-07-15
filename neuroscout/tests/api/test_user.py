@@ -21,7 +21,8 @@ def test_auth(auth_client):
 
     resp = auth_client.get('/api/{}'.format('user'))
     assert resp.status_code == 401
-    assert decode_json(resp)['description'] == 'Request does not contain an access token'
+    assert decode_json(resp)['description'] == \
+        'Request does not contain an access token'
 
 
 def test_get(auth_client):
@@ -60,8 +61,10 @@ def test_put(auth_client):
 
 def test_create_new(auth_client, session):
     # Make a new user and authorize
-    resp = auth_client.post('/api/user',
-        data={'name': 'me', 'email': 'fake@gmail.com', 'password': 'something'})
+    resp = auth_client.post(
+        '/api/user',
+        data={
+            'name': 'me', 'email': 'fake@gmail.com', 'password': 'something'})
 
     auth_client.authorize(email="fake@gmail.com", password="something")
     # Try getting route without confirming, should fail
@@ -94,5 +97,15 @@ def test_post(auth_client):
     # Valid email
     resp = auth_client.post(
         '/api/user',
-        data={'name': 'me', 'email': 'fake@gmail.com', 'password': 'something'})
+        data={
+            'name': 'me', 'email': 'fake@gmail.com', 'password': 'something'})
     assert resp.status_code == 200
+
+
+def test_get_analysis_list(auth_client):
+    resp = auth_client.get('/api/user')
+
+    user = User.query.filter_by(email=decode_json(resp)['email']).one()
+
+    resp = auth_client.get(f'/api/user/{user.id}/analyses')
+    assert len(resp) == 0

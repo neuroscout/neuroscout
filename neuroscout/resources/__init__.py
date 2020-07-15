@@ -13,7 +13,8 @@ from .predictor import (PredictorListResource, PredictorResource,
 from .run import RunResource, RunListResource
 from .user import (UserRootResource, UserTriggerResetResource,
                    UserResetSubmitResource, UserResendConfirm,
-                   UserPredictorListResource, UserDetailResource)
+                   UserPredictorListResource, UserDetailResource,
+                   UserAnalysisListResource)
 from .task import TaskResource, TaskListResource
 
 __all__ = [
@@ -42,6 +43,7 @@ __all__ = [
     'UserResetSubmitResource',
     'UserResendConfirm',
     'UserPredictorListResource',
+    'UserAnalysisListResource',
     'TaskResource',
     'TaskListResource',
     'prepare_upload'
