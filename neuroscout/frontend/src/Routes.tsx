@@ -10,6 +10,7 @@ import { NotFound } from './HelperComponents';
 import Home from './Home';
 import { PredictorCollectionList } from './predictor_collection/CollectionList';
 import Profile from './profile/Profile';
+import PublicProfile from './profile/PublicProfile';
 
 export default class Routes extends React.Component<AppState, {}> {
   render() {
@@ -83,6 +84,7 @@ export default class Routes extends React.Component<AppState, {}> {
             cloneAnalysis={this.props.cloneAnalysis}
             datasets={this.props.datasets}
             publicList={true}
+            loggedIn={this.props.user.loggedIn}
           />}
       />
       <Route
@@ -95,6 +97,7 @@ export default class Routes extends React.Component<AppState, {}> {
             onDelete={this.props.onDelete}
             datasets={this.props.datasets}
             publicList={false}
+            loggedIn={this.props.user.loggedIn}
           />}
       />
       <Route
@@ -105,6 +108,17 @@ export default class Routes extends React.Component<AppState, {}> {
             collections={this.props.user.predictorCollections}
             updateUser={this.props.user.update}
           />}
+      />
+      <Route
+        path="/profile/:id"
+        render={props =>
+          <PublicProfile 
+            id={props.match.params.id}
+            datasets={this.props.datasets}
+            cloneAnalysis={this.props.cloneAnalysis}
+            loggedIn={this.props.user.loggedIn}
+          />
+        }
       />
       <Route
         path="/profile"

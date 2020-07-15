@@ -36,7 +36,7 @@ class GoogleLoginBtn extends React.Component<UserStore, {}> {
             });
             this.props.profile.update({
               email: (e as any).profileObj.email,
-              avatar: (e as any).profileObj.imageUrl
+              picture: (e as any).profileObj.imageUrl
             });
             this.props.login();
           }

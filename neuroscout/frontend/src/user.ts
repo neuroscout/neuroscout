@@ -11,10 +11,10 @@ import { displayError, jwtFetch } from './utils';
 
 const domainRoot = config.server_url;
 
-const profileInit = () => {
+export const profileInit = () => {
   return {
     name: '',
-    avatar: '',
+    picture: '',
     email: '',
     institution: '',
     orcid: '',
@@ -167,7 +167,7 @@ export class UserStore {
   authenticate = (): Promise<string> => {
     return new Promise((resolve, reject) => {
       let { password, isGAuth, accountconfirmError } = this;
-      let { email, name, avatar } = this.profile;
+      let { email, name, picture } = this.profile;
       fetch(domainRoot + '/api/auth', {
         method: 'post',
         body: JSON.stringify({ email: isGAuth === true ? 'GOOGLE' : email, password: password }),

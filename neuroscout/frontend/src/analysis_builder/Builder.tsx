@@ -1,4 +1,4 @@
- /*
+/*
  Top-level AnalysisBuilder component which contains all of the necessary state for editing
  an analysis.
 */
@@ -477,7 +477,7 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
             ...analysis,
             analysisId: analysisId,
             status: data.status,
-            modifiedAt: data.modified_at
+            modified_at: data.modified_at
           },
           postReports: analysis.contrasts.length > 0,
           unsavedChanges: false,

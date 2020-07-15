@@ -18,7 +18,7 @@ export interface AnalysisListProps {
   datasets: Dataset[];
 }
 
-class AnalysisListTable extends React.Component<AnalysisListProps> {
+export class AnalysisListTable extends React.Component<AnalysisListProps> {
   render() {
     const { analyses, datasets, publicList, cloneAnalysis, onDelete } = this.props;
 
@@ -26,7 +26,7 @@ class AnalysisListTable extends React.Component<AnalysisListProps> {
     // Open link: always (opens analysis in Builder)
     // Delete button: only if not a public list and analysis is in draft mode
     // Clone button: any analysis
-    const analysisTableColumns = [
+    let analysisTableColumns: any[] = [
       {
         title: 'ID',
         dataIndex: 'id',
@@ -49,13 +49,13 @@ class AnalysisListTable extends React.Component<AnalysisListProps> {
       },
       {
         title: 'Modified at',
-        dataIndex: 'modifiedAt',
+        dataIndex: 'modified_at',
         defaultSortOrder: 'descend' as 'descend',
-        sorter: (a, b) => a.modifiedAt.localeCompare(b.modifiedAt)
+        sorter: (a, b) => a.modified_at.localeCompare(b.modifiedAt)
       },
       {
         title: 'Dataset',
-        dataIndex: 'datasetName',
+        dataIndex: 'dataset_id',
         render: (text, record) => {
           let dataset: any = datasets.filter((x) => {return x.id === text.toString(); } );
           let name = ' ';
@@ -65,32 +65,38 @@ class AnalysisListTable extends React.Component<AnalysisListProps> {
           return (<>{name}</>);
         },
         sorter: (a, b) => {
-          let dataset: (Dataset | undefined) = datasets.find((x) => {return x.id === a.datasetName.toString(); } );
+          let dataset: (Dataset | undefined) = datasets.find((x) => {return x.id === a.name.toString(); } );
           a = (!!dataset && !!dataset.name) ? dataset.name : '';
-          dataset = datasets.find((x) => {return x.id === b.datasetName.toString(); } );
+          dataset = datasets.find((x) => {return x.id === b.name.toString(); } );
           b = (!!dataset && !!dataset.name) ? dataset.name : '';
           return a.localeCompare(b);
         }
-      },
-      {
-        title: 'Actions',
-        render: (text, record: AppAnalysis) => (
-          <span>
-            {record.status === 'PASSED' && 
-              <>
-              <Button type="primary" ghost={true} onClick={() => cloneAnalysis(record.id)}>
-                Clone
-              </Button>
-              <Space /></>}
-            {!publicList &&
-              ['DRAFT', 'FAILED'].includes(record.status) &&
-              <Button type="danger" ghost={true} onClick={() => onDelete!(record)}>
-                Delete
-              </Button>}
-          </span>
-        )
       }
     ];
+
+    if (this.props.loggedIn) {
+      analysisTableColumns.push(
+        {
+          title: 'Actions',
+          render: (text, record: AppAnalysis) => (
+            <span>
+              {record.status === 'PASSED' &&
+                <>
+                <Button type="primary" ghost={true} onClick={() => cloneAnalysis(record.id)}>
+                  Clone
+                </Button>
+                <Space /></>}
+              {!publicList &&
+                ['DRAFT', 'FAILED'].includes(record.status) &&
+                <Button type="danger" ghost={true} onClick={() => onDelete!(record)}>
+                  Delete
+                </Button>}
+            </span>
+          )
+        }
+      );
+    }
+
     return (
       <div>
         <Table

@@ -40,8 +40,8 @@ export const ApiToAppAnalysis = (data: ApiAnalysis): AppAnalysis => ({
   name: data.name,
   description: data.description,
   status: data.status,
-  datasetName: !!data.dataset_id ? '' + data.dataset_id : '',
-  modifiedAt: data.modified_at
+  dataset_id: !!data.dataset_id ? '' + data.dataset_id : '',
+  modified_at: data.modified_at
 });
 
 export const api = {
@@ -201,5 +201,8 @@ export const api = {
         body: JSON.stringify(updates)
       }
     );
+  },
+  getPublicProfile: (user_id): Promise<ApiUser & {statusCode: number}> => {
+    return jwtFetch(`${domainRoot}/api/user/${user_id}`);
   }
 };

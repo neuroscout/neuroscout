@@ -25,7 +25,7 @@ class Navbar extends React.Component<UserStore, {}> {
                   <Avatar
                     shape="circle"
                     icon="user"
-                    src={this.props.profile.avatar}
+                    src={this.props.profile.picture}
                     className="headerAvatar"
                   />
                 }

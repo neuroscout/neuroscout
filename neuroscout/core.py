@@ -51,6 +51,7 @@ route_factory(
         ('PredictorCollectionResource', 'predictors/collection'),
         ('PredictorEventListResource', 'predictor-events'),
         ('UserRootResource', 'user'),
+        ('UserDetailResource', 'user/<int:user_id>'),
         ('UserTriggerResetResource', 'user/reset_password'),
         ('UserResetSubmitResource', 'user/submit_token'),
         ('UserResendConfirm', 'user/resend_confirmation'),

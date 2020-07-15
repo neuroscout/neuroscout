@@ -19,7 +19,7 @@ export interface Analysis {
   hrfPredictorIds: string[];
   status: AnalysisStatus;
   private?: boolean;
-  modifiedAt?: string;
+  modified_at?: string;
   config: AnalysisConfig;
   transformations: Transformation[];
   contrasts: Contrast[];
@@ -273,17 +273,6 @@ export interface PredictorCollection {
   predictors?: Predictor[];
 }
 
-// Shape of User object as consumed/produced by the backend API
-export interface ApiUser {
-  email: string;
-  name: string;
-  picture: string;
-  analyses: ApiAnalysis[];
-  predictor_collections: PredictorCollection[];
-  first_login: boolean;
-  institution: string;
-}
-
 // The more condensed version of analysis object as returned by the user route
 // and displayed as list of analyses on the homepage
 export interface AppAnalysis {
@@ -291,14 +280,14 @@ export interface AppAnalysis {
   name: string;
   description: string;
   status: AnalysisStatus;
-  datasetName?: string;
-  modifiedAt?: string;
+  dataset_id?: string;
+  modified_at?: string;
 }
 
 export const profileEditItems = ['name', 'institution', 'orcid', 'bio', 'twitter_handle', 'personal_site',
-                                 'public_email', 'avatar'];
+                                 'public_email', 'picture'];
 
-export interface ProfileState {
+export interface User {
   name: string;
   email: string;
   institution: string;
@@ -307,10 +296,20 @@ export interface ProfileState {
   twitter_handle: string;
   personal_site: string;
   public_email: string;
-  avatar: string;
+  picture: string;
+ 
+}
+
+export interface ProfileState extends User {
   update: (updates: Partial<ProfileState>, updateLocal?: boolean) => void;
 }
 
+// Shape of User object as consumed/produced by the backend API
+export interface ApiUser extends User {
+  analyses: AppAnalysis[];
+  predictor_collections: PredictorCollection[];
+  first_login: boolean;
+}
 export interface AppState {
   loadAnalyses: () => void;
   analyses: (AppAnalysis[] | null); // List of analyses belonging to the user

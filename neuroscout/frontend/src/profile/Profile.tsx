@@ -1,12 +1,11 @@
 import * as React from 'react';
 import { message, Divider, Row, Col, Button, Card, Form, Input, Switch } from 'antd';
-import { MainCol } from '../HelperComponents';
+import { MainCol, Space } from '../HelperComponents';
 
 import memoize from 'memoize-one';
 
 import { profileEditItems, ProfileState } from '../coretypes';
 import { api } from '../api';
-import { Space } from '../HelperComponents';
 
 const formItemLayout = {
   wrapperCol: {
@@ -40,7 +39,7 @@ class Profile extends React.Component<ProfileState, ProfileState> {
               onChange={checked => this.setState({'public_email': '' + checked})}
             />
             <br/>
-            Avatar: {this.state.avatar}<br/>
+            Avatar: {this.state.picture}<br/>
             <Form {...formItemLayout} layout="vertical">
               <Form.Item label="Name" required={true}>
                 <Input
