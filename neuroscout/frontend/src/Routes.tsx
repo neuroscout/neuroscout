@@ -36,6 +36,7 @@ export default class Routes extends React.Component<AppState, {}> {
                         key={props.location.key}
                         datasets={this.props.datasets}
                         doTour={this.props.user.openTour}
+                        userOwns={true}
               />;
             }
             message.warning('Please log in first and try again');
