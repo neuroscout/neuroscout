@@ -10,9 +10,9 @@ def compile(hash_id, run_ids, build):
 
 
 @celery_app.task(name='workflow.generate_report')
-def generate_report(hash_id, report_id, run_ids, sampling_rate, scale):
+def generate_report(hash_id, report_id):
     return report.generate_report(
-        flask_app, hash_id, report_id, run_ids, sampling_rate, scale)
+        flask_app, hash_id, report_id)
 
 
 @celery_app.task(name='neurovault.upload')

@@ -458,8 +458,8 @@ def test_bibliography(auth_client, add_analysis, add_task, session):
         auth_client.get('/api/analyses/{}/bibliography'.format(
             analysis.hash_id)))
 
-    assert 'tools' in bib_json
+    assert 'supporting' in bib_json
     assert "https://test.test.com/" in bib_json['data'][0]
-    assert "Google Cloud Computing Services" in bib_json['extractors'][0]
+    assert "Google Cloud Computing Services" in bib_json['extraction'][1]
 
     assert len([j['id'] for j in bib_json['csl_json']]) == 4
