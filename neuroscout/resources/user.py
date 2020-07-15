@@ -8,7 +8,7 @@ from flask_apispec import MethodResource, marshal_with, use_kwargs, doc
 from ..models.auth import User
 from ..database import db
 from ..auth import register_user, reset_password, send_confirmation
-from .utils import abort, auth_required
+from .utils import abort, auth_required, first_or_404
 from ..utils.db import put_record
 from ..schemas.user import UserSchema, UserCreationSchema, UserResetSchema
 from ..schemas.predictor import PredictorSchema
@@ -38,6 +38,11 @@ class UserRootResource(MethodResource):
         '''
         return put_record(kwargs, current_identity)
 
+@marshal_with(UserSchema)
+class UserDetailResource(MethodResource):
+    @doc(tags=['user'], summary='Get a given users information.')
+    def get(self, user_id):
+        return first_or_404(User.query.filter_by(id=user_id))
 
 class UserResendConfirm(MethodResource):
     @jwt_required()
