@@ -13,6 +13,7 @@ const domainRoot = config.server_url;
 
 export const profileInit = () => {
   return {
+    id: 0,
     name: '',
     picture: '',
     email: '',

@@ -34,28 +34,25 @@ type JWTChangeProps = {
   loadAnalyses:  () => any;
   checkAnalysesStatus: (key: number) => any;
   jwt: string;
+  id: number;
 };
 
 // This global var lets the dumb polling loops know when to exit.
 let checkCount = 0;
 
 class JWTChange extends React.Component<JWTChangeProps, {}> {
-  constructor(props) {
-    super(props);
-    if (this.props.jwt !== '' && this.props.jwt !== null) {
-      props.loadAnalyses();
-      checkCount += 1;
-      props.checkAnalysesStatus(checkCount);
-    }
-  }
-
-  componentDidUpdate(prevProps, prevState) {
-    if (!!this.props.jwt && this.props.jwt !== prevProps.jwt) {
+  jwtChanged = memoize((jwt, id) => {
+    if (!!jwt && id > 0) {
       this.props.loadAnalyses();
+      checkCount += 1;
+      this.props.checkAnalysesStatus(checkCount);
     }
-  }
+  });
 
-  render() { return null; }
+  render() { 
+    this.jwtChanged(this.props.jwt, this.props.id);
+    return null;
+  }
 }
 
 // Top-level App component
@@ -98,6 +95,7 @@ class App extends React.Component<{}, AppState> {
    */
   checkAnalysesStatus = async (key: number) => {
     while (true) {
+      /*
       if (key < checkCount) { return; }
       if (!(this.state.user.loggedIn)) { return; }
       let changeFlag = false;
@@ -125,6 +123,7 @@ class App extends React.Component<{}, AppState> {
           }
         });
       }
+      */
       await timeout(12000);
     }
   };
@@ -186,6 +185,7 @@ class App extends React.Component<{}, AppState> {
             loadAnalyses={this.state.loadAnalyses}
             checkAnalysesStatus={this.checkAnalysesStatus}
             jwt={this.state.user.jwt}
+            id={this.state.user.profile.id}
           />
           {this.state.user.openLogin && <LoginModal {...this.state.user} />}
           {this.state.user.openReset && <ResetPasswordModal {...this.state.user} />}

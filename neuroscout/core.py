@@ -53,6 +53,7 @@ route_factory(
         ('UserRootResource', 'user'),
         ('UserDetailResource', 'user/<int:user_id>'),
         ('UserAnalysisListResource', 'user/<int:user_id>/analyses'),
+        ('UserPrivateAnalysisListResource', 'user/myanalyses'),
         ('UserTriggerResetResource', 'user/reset_password'),
         ('UserResetSubmitResource', 'user/submit_token'),
         ('UserResendConfirm', 'user/resend_confirmation'),

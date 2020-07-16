@@ -102,8 +102,12 @@ export const api = {
   },
 
   // Gets a logged in users own analyses
-  getAnalyses: (): Promise<AppAnalysis[]> => {
-    return jwtFetch(`${domainRoot}/api/user`)
+  getAnalyses: (id?: number): Promise<AppAnalysis[]> => {
+    let url = `${domainRoot}/api/user/myanalyses`;
+    if (!!id) {
+      url = `${domainRoot}/api/user/${id}/analyses`;
+    }
+    return jwtFetch(url)
       .then(data => {
         return (data.analyses || []).filter(x => !!x.status).map((x) => ApiToAppAnalysis(x));
       })

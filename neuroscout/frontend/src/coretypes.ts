@@ -288,6 +288,7 @@ export const profileEditItems = ['name', 'institution', 'orcid', 'bio', 'twitter
                                  'public_email', 'picture'];
 
 export interface User {
+  id: number;
   name: string;
   email: string;
   institution: string;
@@ -297,7 +298,6 @@ export interface User {
   personal_site: string;
   public_email: string;
   picture: string;
- 
 }
 
 export interface ProfileState extends User {
