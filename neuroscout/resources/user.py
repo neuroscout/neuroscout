@@ -45,16 +45,20 @@ class UserDetailResource(MethodResource):
     def get(self, user_id):
         return first_or_404(User.query.filter_by(id=user_id))
 
+@marshal_with(AnalysisSchema(many=True))
+class UserPrivateAnalysisListResource(MethodResource):
+    @doc(tags=['user'], summary='Get a list of analyses created by a user.')
+    @auth_required
+    def get(self):
+        kwargs = {'user_id': current_identity.id}
+        return Analysis.query.filter_by(**kwargs)
+
 
 @marshal_with(AnalysisSchema(many=True))
 class UserAnalysisListResource(MethodResource):
     @doc(tags=['user'], summary='Get a list of analyses created by a user.')
     def get(self, user_id):
-        kwargs = {'user_id': user_id}
-        if user_id != current_identity.id:
-            kwargs['private'] = False
-            kwargs['status'] = 'PASSED'
-
+        kwargs = {'user_id': user_id, 'private': False, 'status': PASSED}
         return Analysis.query.filter_by(**kwargs)
 
 

@@ -76,12 +76,12 @@ class App extends React.Component<{}, AppState> {
     api.getPublicAnalyses().then((publicAnalyses) => {
       this.setState({ publicAnalyses });
     });
+    // We can avoid this api call and catch sometimes by testing if the jwt is present and valid
     api.getUser().then((response) => {
-      if (response.statusCode !== 200) {
-        return;
-      }
       let updates = profileEditItems.reduce((acc, curr) => {acc[curr] = response[curr]; return acc; }, {});
       this.state.user.profile.update(updates, true);
+    }).catch(error => {
+      return;
     });
     api.getDatasets(false).then((datasets) => {
       if (datasets.length !== 0) {
