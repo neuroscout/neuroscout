@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { message, Divider, Row, Col, Button, Card, Form, Input, Switch } from 'antd';
 import { MainCol, Space } from '../HelperComponents';
+import { withRouter } from 'react-router-dom';
 
 import memoize from 'memoize-one';
 
@@ -14,7 +15,7 @@ const formItemLayout = {
   }
 };
 
-class Profile extends React.Component<ProfileState, ProfileState> {
+class EditProfile extends React.Component<ProfileState & { history: any }, ProfileState> {
   constructor(props) {
     super(props);
     this.state = {...props};
@@ -95,6 +96,7 @@ class Profile extends React.Component<ProfileState, ProfileState> {
               )).then((ret) => {
                 if (!!ret && ret.statusCode === 200) {
                   message.success('Profile updated.');
+                  this.props.history.push(`/profile/${this.props.id}`);
                 }
                 this.props.update(this.state);
               });
@@ -111,4 +113,4 @@ class Profile extends React.Component<ProfileState, ProfileState> {
   }
 }
 
-export default Profile;
+export default withRouter(EditProfile);

@@ -306,7 +306,7 @@ export interface ProfileState extends User {
 
 // Shape of User object as consumed/produced by the backend API
 export interface ApiUser extends User {
-  analyses: AppAnalysis[];
+  analyses?: AppAnalysis[];
   predictor_collections: PredictorCollection[];
   first_login: boolean;
 }

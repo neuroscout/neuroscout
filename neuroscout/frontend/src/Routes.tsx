@@ -9,7 +9,7 @@ import { AppState } from './coretypes';
 import { NotFound } from './HelperComponents';
 import Home from './Home';
 import { PredictorCollectionList } from './predictor_collection/CollectionList';
-import Profile from './profile/Profile';
+import EditProfile from './profile/EditProfile';
 import PublicProfile from './profile/PublicProfile';
 
 export default class Routes extends React.Component<AppState, {}> {
@@ -110,6 +110,12 @@ export default class Routes extends React.Component<AppState, {}> {
           />}
       />
       <Route
+        path="/profile/edit"
+        render={props =>
+          <EditProfile {...this.props.user.profile} />
+        }
+      />
+      <Route
         path="/profile/:id"
         render={props =>
           <PublicProfile 
@@ -117,13 +123,8 @@ export default class Routes extends React.Component<AppState, {}> {
             datasets={this.props.datasets}
             cloneAnalysis={this.props.cloneAnalysis}
             loggedIn={this.props.user.loggedIn}
+            isUser={props.match.params.id === this.props.user.profile.id}
           />
-        }
-      />
-      <Route
-        path="/profile"
-        render={props =>
-          <Profile {...this.props.user.profile} />
         }
       />
       <Route component={NotFound} />

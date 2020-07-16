@@ -58,7 +58,7 @@ class UserPrivateAnalysisListResource(MethodResource):
 class UserAnalysisListResource(MethodResource):
     @doc(tags=['user'], summary='Get a list of analyses created by a user.')
     def get(self, user_id):
-        kwargs = {'user_id': user_id, 'private': False, 'status': PASSED}
+        kwargs = {'user_id': user_id, 'private': False, 'status': 'PASSED'}
         return Analysis.query.filter_by(**kwargs)
 
 

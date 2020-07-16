@@ -1,6 +1,7 @@
 import * as React from 'react';
 
-import { Avatar, Descriptions, Row, Spin } from 'antd';
+import { Avatar, List, Row, Spin } from 'antd';
+import { Link } from 'react-router-dom';
 
 import { AnalysisListTable } from '../AnalysisList';
 import { MainCol, Space } from '../HelperComponents';
@@ -13,12 +14,15 @@ interface PublicProfileProps {
   datasets: Dataset[];
   cloneAnalysis: (id: string) => void;
   loggedIn: boolean;
+  isUser: boolean;
 }
 
 interface PublicProfileState {
   profile: ApiUser;
   loaded: boolean;
   error: boolean;
+  analysesLoaded: boolean;
+  analyses: AppAnalysis[];
 }
 
 class PublicProfile extends React.Component<PublicProfileProps, PublicProfileState> {
@@ -28,10 +32,11 @@ class PublicProfile extends React.Component<PublicProfileProps, PublicProfileSta
     this.state = {
       profile: {
         ...profInit,
-        analyses: [] as AppAnalysis[],
         predictor_collections: [] as PredictorCollection[],
         first_login: false
       },
+      analysesLoaded: false,
+      analyses: [] as AppAnalysis[],
       loaded: false,
       error: false
     };
@@ -41,27 +46,30 @@ class PublicProfile extends React.Component<PublicProfileProps, PublicProfileSta
     if (this.state.loaded) {
       return;
     }
-    api.getPublicProfile(this.props.id).then(response => {
-      let newProfile = {...this.state.profile};
-      let error = response.statusCode === 200;
-      Object.keys(response).map(key => {
-        if (newProfile.hasOwnProperty(key)) {
-          newProfile[key] = response[key];
-        }
+    api.getPublicProfile(this.props.id)
+      .then(response => {
+        let newProfile = {...this.state.profile};
+        let error = response.statusCode === 200;
+        Object.keys(response).map(key => {
+          if (newProfile.hasOwnProperty(key)) {
+            newProfile[key] = response[key];
+          }
+        });
+        this.setState({profile: newProfile, loaded: true, error: error});
       });
-      this.setState({profile: newProfile, loaded: true, error: error});
-    });
+    let id = this.props.isUser ? this.props.id : undefined;
+    api.getAnalyses(id).then(analyses => this.setState({analyses: analyses, analysesLoaded: true}));
   }
 
   render() {
     let profile = this.state.profile;
     let descItems: any[] = [
-      ['name', (<Descriptions.Item label="Name">{profile.name}</Descriptions.Item>)],
-      ['institution', (<Descriptions.Item label="Institution">{profile.institution}</Descriptions.Item>)],
-      ['orcid', (<Descriptions.Item label="ORCID iD">{profile.orcid}</Descriptions.Item>)],
-      ['bio', (<Descriptions.Item label="Biography">{profile.bio}</Descriptions.Item>)],
-      ['twitter_handle', (<Descriptions.Item label="Twitter">{profile.twitter_handle}</Descriptions.Item>)],
-      ['personal_site', (<Descriptions.Item label="Personal Site">{profile.personal_site}</Descriptions.Item>)]
+      ['name', {title: 'Name', desc: profile.name}],
+      ['institution', {title: 'Institution', desc: profile.institution}],
+      ['orcid', {title: 'ORCID iD', desc: profile.orcid}],
+      ['bio', {title: 'Biography', desc: profile.bio}],
+      ['twitter_handle', {title: 'Twitter', desc: profile.twitter_handle}],
+      ['personal_site', {title: 'Personal Site', desc: profile.personal_site}]
     ];
     descItems = descItems.filter(x => !!profile[x[0]]).map(x => x[1]);
 
@@ -79,17 +87,28 @@ class PublicProfile extends React.Component<PublicProfileProps, PublicProfileSta
                 src={profile.picture}
                 className="headerAvatar"
               />
-              <Descriptions column={1}>
-                {descItems}
-              </Descriptions>
+              <List
+                dataSource={descItems}
+                itemLayout="vertical"
+                renderItem={item => (
+                  <List.Item>
+                    <List.Item.Meta
+                      title={item.title}
+                    />
+                    {item.desc}
+                  </List.Item>
+                )}
+                footer={editProfileList(this.props.isUser)}
+              />
               <br />
               <h3>Analyses by {profile.name}:</h3>
               <AnalysisListTable
-                analyses={this.state.profile.analyses}
+                analyses={this.state.analyses}
                 datasets={this.props.datasets}
                 cloneAnalysis={this.props.cloneAnalysis}
                 publicList={true}
                 loggedIn={this.props.loggedIn}
+                loading={!this.state.analysesLoaded}
               />
             </>
           }
@@ -97,6 +116,13 @@ class PublicProfile extends React.Component<PublicProfileProps, PublicProfileSta
       </Row>
     );
   }
+}
+
+function editProfileList(isUser: Boolean) {
+  if (isUser) {
+    return <Link to="/profile/edit">Edit Profile</Link>;
+  }
+  return '';
 }
 
 export default PublicProfile;

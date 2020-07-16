@@ -8,6 +8,12 @@ import { MainCol, Space, StatusTag } from './HelperComponents';
 import { AppAnalysis, Dataset } from './coretypes';
 import { Link } from 'react-router-dom';
 
+const tableLocale = {
+  filterConfirm: 'Ok',
+  filterReset: 'Reset',
+  emptyText: 'No Analyses'
+};
+
 export interface AnalysisListProps {
   loggedIn?: boolean;
   publicList?: boolean;
@@ -16,6 +22,7 @@ export interface AnalysisListProps {
   onDelete?: (analysis: AppAnalysis) => void;
   children?: React.ReactNode;
   datasets: Dataset[];
+  loading?: boolean;
 }
 
 export class AnalysisListTable extends React.Component<AnalysisListProps> {
@@ -104,12 +111,13 @@ export class AnalysisListTable extends React.Component<AnalysisListProps> {
           rowKey="id"
           size="small"
           dataSource={(analyses === null ? [] : analyses)}
-          loading={analyses === null}
+          loading={analyses === null || !!this.props.loading}
           expandedRowRender={record =>
             <p>
               {record.description}
             </p>}
           pagination={(analyses !== null && analyses.length > 20) ? {'position': 'bottom'} : false}
+          locale={tableLocale}
         />
       </div>
     );

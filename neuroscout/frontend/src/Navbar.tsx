@@ -37,7 +37,7 @@ class Navbar extends React.Component<UserStore, {}> {
                    </Menu.Item>
 
                    <Menu.Item key="profile">
-                     <Link to="/profile"> Profile </Link>
+                     <Link to={`/profile/${this.props.profile.id}`}> Profile </Link>
                    </Menu.Item>
 
                    <Menu.Item
