@@ -109,7 +109,7 @@ export const api = {
     }
     return jwtFetch(url)
       .then(data => {
-        return (data.analyses || []).filter(x => !!x.status).map((x) => ApiToAppAnalysis(x));
+        return (data || []).filter(x => !!x.status).map((x) => ApiToAppAnalysis(x));
       })
       .catch((error) => {
         displayError(error);
