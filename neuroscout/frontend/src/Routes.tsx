@@ -38,6 +38,7 @@ export default class Routes extends React.Component<AppState, {}> {
                         datasets={this.props.datasets}
                         doTour={this.props.user.openTour}
                         userOwns={true}
+                        checkJWT={() => this.props.user.checkJWT(undefined)}
               />;
             }
             message.warning('Please log in first and try again');
@@ -56,6 +57,7 @@ export default class Routes extends React.Component<AppState, {}> {
               }
               datasets={this.props.datasets}
               doTooltip={true}
+              checkJWT={() => this.props.user.checkJWT(undefined)}
             />;
           }}
         />
@@ -72,6 +74,7 @@ export default class Routes extends React.Component<AppState, {}> {
               }
               datasets={this.props.datasets}
               doTooltip={true}
+              checkJWT={() => this.props.user.checkJWT(undefined)}
             />
           }
         />

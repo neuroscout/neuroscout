@@ -218,6 +218,7 @@ type BuilderProps = {
   userOwns?: boolean;
   doTour?: boolean;
   datasets: Dataset[];
+  checkJWT: () => void;
 };
 
 export default class AnalysisBuilder extends React.Component<BuilderProps & RouteComponentProps<{}>, Store> {
