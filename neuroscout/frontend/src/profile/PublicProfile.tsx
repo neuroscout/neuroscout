@@ -1,6 +1,6 @@
 import * as React from 'react';
 
-import { Avatar, List, Row, Spin } from 'antd';
+import { Avatar, Card, Col, List, Row, Spin } from 'antd';
 import { Link } from 'react-router-dom';
 
 import { AnalysisListTable } from '../AnalysisList';
@@ -57,14 +57,13 @@ class PublicProfile extends React.Component<PublicProfileProps, PublicProfileSta
         });
         this.setState({profile: newProfile, loaded: true, error: error});
       });
-    let id = this.props.isUser ? this.props.id : undefined;
+    let id = !this.props.isUser ? this.props.id : undefined;
     api.getAnalyses(id).then(analyses => this.setState({analyses: analyses, analysesLoaded: true}));
   }
 
   render() {
     let profile = this.state.profile;
     let descItems: any[] = [
-      ['name', {title: 'Name', desc: profile.name}],
       ['institution', {title: 'Institution', desc: profile.institution}],
       ['orcid', {title: 'ORCID iD', desc: profile.orcid}],
       ['bio', {title: 'Biography', desc: profile.bio}],
@@ -81,35 +80,39 @@ class PublicProfile extends React.Component<PublicProfileProps, PublicProfileSta
           }
           {this.state.loaded &&
             <>
-              <Avatar
-                shape="circle"
-                icon="user"
-                src={profile.picture}
-                className="headerAvatar"
-              />
+              <Col lg={{ span: 4 }}>
+              <h3>
+                <Avatar
+                  shape="circle"
+                  icon="user"
+                  src={profile.picture}
+                  className="headerAvatar"
+                />
+                <Space />
+                {profile.name}
+              </h3>
+              <br />
+              {editProfileList(this.props.isUser)}
               <List
                 dataSource={descItems}
                 itemLayout="vertical"
                 renderItem={item => (
                   <List.Item>
-                    <List.Item.Meta
-                      title={item.title}
-                    />
-                    {item.desc}
+                    {item.title}: {item.desc}
                   </List.Item>
                 )}
-                footer={editProfileList(this.props.isUser)}
               />
-              <br />
-              <h3>Analyses by {profile.name}:</h3>
+              </Col>
+              <Col lg={{ span: 20 }}>
               <AnalysisListTable
                 analyses={this.state.analyses}
                 datasets={this.props.datasets}
                 cloneAnalysis={this.props.cloneAnalysis}
-                publicList={true}
+                publicList={!this.props.isUser}
                 loggedIn={this.props.loggedIn}
                 loading={!this.state.analysesLoaded}
               />
+              </Col>
             </>
           }
         </MainCol>

@@ -32,12 +32,12 @@ class Navbar extends React.Component<UserStore, {}> {
               >
                  <Menu.ItemGroup title={`${this.props.gAuth ? this.props.gAuth.profileObj.email : this.props.profile.email}`}>
                    <Menu.Divider/>
-                   <Menu.Item key="predictorCollections">
-                     <Link to="/mycollections"> My Predictors </Link>
+                   <Menu.Item key="profile">
+                     <Link to={`/profile/${this.props.profile.id}`}> My Profile </Link>
                    </Menu.Item>
 
-                   <Menu.Item key="profile">
-                     <Link to={`/profile/${this.props.profile.id}`}> Profile </Link>
+                   <Menu.Item key="predictorCollections">
+                     <Link to="/mycollections"> My Predictors </Link>
                    </Menu.Item>
 
                    <Menu.Item
