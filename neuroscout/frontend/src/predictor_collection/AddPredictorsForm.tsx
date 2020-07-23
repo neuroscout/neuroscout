@@ -174,7 +174,7 @@ export class AddPredictorsForm extends React.Component<AddPredictorsFormProps, A
         </Tabs.TabPane>
         <Tabs.TabPane tab="Predictor Descriptions" key={'' + 3}>
         {this.state.filesAndRuns[0].file !== undefined &&
-         this.state.collectionName !== undefined &&
+         this.state.collectionName !== '' &&
           <>
             <PredictorDescriptionForm
               predictors={this.state.predictors}
@@ -184,7 +184,7 @@ export class AddPredictorsForm extends React.Component<AddPredictorsFormProps, A
             <Button onClick={this.upload} type="primary">Upload</Button>
           </>
         }
-        {this.state.collectionName === undefined &&
+        {this.state.collectionName === '' &&
           <div>
             Please specify a descriptive name for your collection on the <a onClick={this.prevTab}>previous tab</a>
           </div>
