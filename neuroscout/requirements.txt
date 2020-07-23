@@ -58,6 +58,7 @@ python-magic==0.4.13
 pytz==2017.2
 redis
 requests==2.21.0
+setuptools==45
 scipy
 sentry-sdk[flask]==0.13
 soundfile
