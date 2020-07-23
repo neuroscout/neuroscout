@@ -186,7 +186,7 @@ export class AddPredictorsForm extends React.Component<AddPredictorsFormProps, A
         }
         {this.state.collectionName === undefined &&
           <div>
-            Please specify a unique, descripive name for your collection on the <a onClick={this.prevTab}>previous tab</a>
+            Please specify a descriptive name for your collection on the <a onClick={this.prevTab}>previous tab</a>
           </div>
         }
         {this.state.filesAndRuns[0].file === undefined &&
