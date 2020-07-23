@@ -115,7 +115,7 @@ export class FilesAndRunsForm extends React.Component<FilesAndRunsFormProps, Fil
   render() {
     let formList: any[] = [];
     this.props.filesAndRuns.forEach((x, i) => {
-      let fileName = 'No File'; 
+      let fileName = 'No File';
       if (x.file && x.file.name) {
         fileName = x.file.name;
       }
@@ -171,7 +171,7 @@ export class FilesAndRunsForm extends React.Component<FilesAndRunsFormProps, Fil
     return (
       <div>
         <Form>
-          <Form.Item label="Collection Name">
+          <Form.Item label="Collection Name" required={true}>
             <Input
               onChange={(e) => this.props.updateState({collectionName: e.target.value})}
               value={this.props.collectionName}
