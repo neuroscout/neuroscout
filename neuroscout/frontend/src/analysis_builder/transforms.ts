@@ -25,17 +25,7 @@ const transformDefinitions: Transformation[] = [
     Above: true,
     Binarize: false,
     Signed: true
-  },
-  {
-    Name: 'Or'
-  },
-  {
-    Name: 'And'
-  },
-  {
-    Name: 'Not'
   }
-
 ];
 
 export default transformDefinitions;
