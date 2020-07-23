@@ -14,7 +14,8 @@ from .run import RunResource, RunListResource
 from .user import (UserRootResource, UserTriggerResetResource,
                    UserResetSubmitResource, UserResendConfirm,
                    UserPredictorListResource, UserDetailResource,
-                   UserAnalysisListResource, UserPrivateAnalysisListResource)
+                   UserAnalysisListResource, UserPrivateAnalysisListResource,
+                   UserListResource)
 from .task import TaskResource, TaskListResource
 
 __all__ = [
@@ -45,6 +46,7 @@ __all__ = [
     'UserPredictorListResource',
     'UserAnalysisListResource',
     'UserPrivateAnalysisListResource',
+    'UserListResource',
     'TaskResource',
     'TaskListResource',
     'prepare_upload'

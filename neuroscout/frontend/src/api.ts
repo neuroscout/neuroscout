@@ -10,7 +10,8 @@ import {
   AppAnalysis,
   Dataset,
   Predictor,
-  Run
+  Run,
+  User
 } from './coretypes';
 //  PredictorCollection
 import { config } from './config';
@@ -47,6 +48,10 @@ export const ApiToAppAnalysis = (data: ApiAnalysis): AppAnalysis => ({
 export const api = {
   getUser: (): Promise<ApiUser & {statusCode: number}> => {
     return jwtFetch(`${domainRoot}/api/user`);
+  },
+
+  getUsers: (): Promise<User[] & {statusCode: number}> => {
+    return jwtFetch(`${domainRoot}/api/users`);
   },
 
   getDatasets:  (active_only = true): Promise<Dataset[]> => {

@@ -81,6 +81,10 @@ export class AnalysisListTable extends React.Component<AnalysisListProps> {
       }
     ];
 
+    if (publicList) {
+      analysisTableColumns.splice(2, 1);
+    }
+
     if (this.props.loggedIn) {
       analysisTableColumns.push(
         {

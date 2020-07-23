@@ -11,6 +11,7 @@ import Home from './Home';
 import { PredictorCollectionList } from './predictor_collection/CollectionList';
 import EditProfile from './profile/EditProfile';
 import PublicProfile from './profile/PublicProfile';
+import UserList from './profile/UserList';
 
 export default class Routes extends React.Component<AppState, {}> {
   render() {
@@ -129,6 +130,20 @@ export default class Routes extends React.Component<AppState, {}> {
             isUser={props.match.params.id === this.props.user.profile.id}
           />
         }
+      />
+      <Route
+        path="/profiles"
+        render={props => <UserList />}
+      />
+    
+      <Route
+        path="/profile"
+        render={props => {
+          if (this.props.user.profile.id > 0) {
+            return <Redirect to={'/profile/' + this.props.user.profile.id} />;
+          }
+          return <Redirect to="/profiles" />;
+        }}
       />
       <Route component={NotFound} />
       </Switch>

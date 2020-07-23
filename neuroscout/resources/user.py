@@ -31,11 +31,9 @@ class UserRootResource(MethodResource):
     @use_kwargs(UserSchema(only=put_kwargs))
     @auth_required
     def put(self, **kwargs):
-        '''
         if User.query.filter((User.email == kwargs['email'])
                              & (User.id != current_identity.id)).all():
             abort(422, 'Email already in use.')
-        '''
         return put_record(kwargs, current_identity)
 
 
@@ -53,6 +51,13 @@ class UserPrivateAnalysisListResource(MethodResource):
         kwargs = {'user_id': current_identity.id}
         return Analysis.query.filter_by(**kwargs)
 
+@marshal_with(UserSchema(many=True, exclude=['predictor_collections',
+                                             'first_login']))
+class UserListResource(MethodResource):
+    @doc(tags=['user'], summary='Get a list of public users.')
+    def get(self):
+        return User.query.all()
+    
 
 @marshal_with(AnalysisSchema(many=True))
 class UserAnalysisListResource(MethodResource):

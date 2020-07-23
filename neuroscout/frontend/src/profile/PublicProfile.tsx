@@ -80,35 +80,38 @@ class PublicProfile extends React.Component<PublicProfileProps, PublicProfileSta
           }
           {this.state.loaded &&
             <>
-              <Col lg={{ span: 4 }}>
-              <h3>
+              <div className="profileHeader">
                 <Avatar
                   shape="circle"
                   icon="user"
                   src={profile.picture}
-                  className="headerAvatar"
                 />
                 <Space />
-                {profile.name}
-              </h3>
+                <span className="profileName">
+                  {profile.name}
+                </span>
+              </div>
               <br />
+              <Col lg={{ span: 6 }}>
               {editProfileList(this.props.isUser)}
-              <List
-                dataSource={descItems}
-                itemLayout="vertical"
-                renderItem={item => (
-                  <List.Item>
-                    {item.title}: {item.desc}
-                  </List.Item>
-                )}
-              />
+              {descItems.length > 0 &&
+                <List
+                  dataSource={descItems}
+                  itemLayout="vertical"
+                  renderItem={item => (
+                    <List.Item>
+                      {item.title}: {item.desc}
+                    </List.Item>
+                  )}
+                />
+              }
               </Col>
-              <Col lg={{ span: 20 }}>
+              <Col lg={{ span: 18 }}>
               <AnalysisListTable
                 analyses={this.state.analyses}
                 datasets={this.props.datasets}
                 cloneAnalysis={this.props.cloneAnalysis}
-                publicList={!this.props.isUser}
+                publicList={true}
                 loggedIn={this.props.loggedIn}
                 loading={!this.state.analysesLoaded}
               />
