@@ -67,7 +67,7 @@ export class AddPredictorsForm extends React.Component<AddPredictorsFormProps, A
       if (!filter[filterKey]) {
         continue;
       }
-      let runKey = filterKey.slice(0, -1); 
+      let runKey = filterKey.slice(0, -1);
       runs.forEach((run) => {
         if (filter[filterKey].indexOf(run[runKey]) !== -1 && runIds.indexOf(run.id) === -1) {
           runIds.push(run.id);
@@ -98,10 +98,10 @@ export class AddPredictorsForm extends React.Component<AddPredictorsFormProps, A
         this.props.closeModal();
       }
     });
-    
+
     return;
   };
-  
+
   updateState = (value: PartialState) => {
     if ('predictors' in value) {
       value.predictors = [...this.state.predictors, ...value.predictors];
@@ -174,6 +174,7 @@ export class AddPredictorsForm extends React.Component<AddPredictorsFormProps, A
         </Tabs.TabPane>
         <Tabs.TabPane tab="Predictor Descriptions" key={'' + 3}>
         {this.state.filesAndRuns[0].file !== undefined &&
+         this.state.collectionName !== undefined &&
           <>
             <PredictorDescriptionForm
               predictors={this.state.predictors}
@@ -182,6 +183,11 @@ export class AddPredictorsForm extends React.Component<AddPredictorsFormProps, A
             />
             <Button onClick={this.upload} type="primary">Upload</Button>
           </>
+        }
+        {this.state.collectionName === undefined &&
+          <div>
+            Please specify a unique, descripive name for your collection on the <a onClick={this.prevTab}>previous tab</a>
+          </div>
         }
         {this.state.filesAndRuns[0].file === undefined &&
           <div>
