@@ -9,8 +9,6 @@
   <meta name="author" content="Alejandro de la Vega">
   <link rel="shortcut icon" href="../img/favicon.ico">
   <title>FAQ - Neuroscout Docs</title>
-  <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
-
   <link rel="stylesheet" href="../css/theme.css" type="text/css" />
   <link rel="stylesheet" href="../css/theme_extra.css" type="text/css" />
   <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css">
@@ -147,6 +145,8 @@
         
             <li><a class="toctree-l3" href="#am-i-restricted-to-mass-univariate-glms-or-can-i-use-neuroscout-to-specify-other-kinds-of-analyses">Am I restricted to mass univariate GLMs, or can I use Neuroscout to specify other kinds of analyses?</a></li>
         
+            <li><a class="toctree-l3" href="#can-i-contribute-my-own-predictors-to-neuroscout">Can I contribute my own predictors to Neuroscout?</a></li>
+        
         </ul>
     
 
@@ -236,6 +236,15 @@ Discovery and Data Mining (pp. 1567-1574). ACM.</p>
 <h3 id="am-i-restricted-to-mass-univariate-glms-or-can-i-use-neuroscout-to-specify-other-kinds-of-analyses">Am I restricted to mass univariate GLMs, or can I use Neuroscout to specify other kinds of analyses?</h3>
 <p>Currently, that is the case. However,the underlying BIDS-StatsModel is designed with more complex
 models in mind, such as predictive and linear-mixed effect models</p>
+<h3 id="can-i-contribute-my-own-predictors-to-neuroscout">Can I contribute my own predictors to Neuroscout?</h3>
+<p>Yes! Using the "My Predictors" function, you can create custom collections of predictors to add to your analyses.
+Simply navigate to <a href="https://neuroscout.org/mycollections">My Predictors</a>, and click on "Add New Predictors".</p>
+<p>Features should be in BIDS-compliant events format. Two columns are mandatory: "onset" and "duration" (both in seconds).
+You can then include any number of novel predictors as additional columns. Missing values can be annotated using the value "n/a" (no quotes).</p>
+<p>For each events file that you upload, you will be asked to associate it with runs in the respective dataset. Typically, there will be a different event file for each run in a naturalistic dataset.
+You must then associate each file with subjects. For example, in most cases, all subjects will have seen the same stimulus, but this will vary across datasets.</p>
+<p>After uploading, a new collection of predictors will be created. By default, predictors in this collection will be private, and only visible to you in the Analysis Builder.
+If you wish to share these predictors with other Neuroscout users, please contact us, and we can make your predictors public.</p>
               
             </div>
           </div>
