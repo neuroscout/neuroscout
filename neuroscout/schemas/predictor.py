@@ -44,7 +44,8 @@ class PredictorCollectionSchema(Schema):
     # predictor_id = fields.Dict(description='NeuroVault collection id')
     status = fields.Str(description='Upload status')
     traceback = fields.Str(description='Traceback of error.')
-    collection_name = fields.Str(description='Name of collection')
+    collection_name = fields.Str(description='Name of collection',
+                                 required=True)
     predictors = fields.Nested(
         'PredictorSchema', many=True)
 
