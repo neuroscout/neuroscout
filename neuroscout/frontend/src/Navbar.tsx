@@ -63,7 +63,7 @@ class Navbar extends React.Component<AuthStoreState, {}> {
               style={{float: 'right'}}
               key="help"
              >
-               <a href="https://neuroscout.github.io/neuroscout/"><span>
+               <a href="https://neuroscout.github.io/neuroscout/" target="_blank"><span>
                <Icon type="question-circle"/>Help</span></a>
              </Menu.Item>
 
