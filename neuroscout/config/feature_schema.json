@@ -112,43 +112,6 @@
       }
     }
   ],
-  "IndicoAPIImageExtractor": [
-    {
-      "features": {
-        "fer_(.*)$": {
-          "description": "Probability of emotion \\1 in face"
-        },
-        "content_filtering$": {
-          "description": "Determines whether or not an image contains mature content"
-        },
-        "image_recognition_(.*)$": {
-          "description": "Image recognition label: \\1"
-        }
-      }
-    },
-    {
-      "features": {
-        "sentiment$": {
-          "description": "Sentiment (valence)"
-        },
-        "sentiment_hq$": {
-          "description": "Sentiment (valence)"
-        },
-        "text_tags_(.*)$": {
-          "description": "Text topic: \\1"
-        },
-        "personality_(.*)$": {
-          "description": "Probability of speakers personality trait: \\1"
-        },
-        "persona_(.*)$": {
-          "description": "Probability of Myers-Briggs persona: \\1"
-        },
-        "emotion_(.*)$": {
-          "description": "Emotion of speaker: \\1"
-        }
-      }
-    }
-  ],
   "STFTAudioExtractor": [
     {
       "features": {
