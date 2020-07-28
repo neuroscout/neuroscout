@@ -6,7 +6,7 @@
   ],
   "extractors": [
     ["FarnebackOpticalFlowExtractor", {}],
-    ["WordEmbeddingExtractor", {"embedding_file": "/datasets/glove.6B.300d.txt.word2vec", "binary": false}],
+    ["WordEmbeddingExtractor", {"embedding_file": "/datasets/other/glove.6B.300d.txt.word2vec", "binary": false}],
     ["BrightnessExtractor", {}],
     ["VibranceExtractor", {}],
     ["SharpnessExtractor", {}],
