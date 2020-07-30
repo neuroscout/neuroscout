@@ -36,7 +36,7 @@ export const setLocal = (user: Partial<UserStore>) => {
 };
 
 export const removeLocal = () => {
-  [...localItems, ...localProfileItems, 'jwt'].map((x) => { localStorage.removeItem(x); });
+  localStorage.clear();
 };
 
 export const getLocal = () => {
@@ -83,6 +83,7 @@ export class UserStore {
     this.loggingOut = false;
     this.token = null;
     this.gAuth = null;
+    this.isGAuth = false;
     this.predictorCollections = [];
     this.profile = {
       ...profileInit(),
@@ -311,6 +312,7 @@ export class UserStore {
       analyses: [],
       loggingOut: true,
       gAuth: null,
+      isGAuth: false
     });
     this.profile.update(profileInit());
   };

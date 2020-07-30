@@ -73,6 +73,9 @@ class App extends React.Component<{}, AppState> {
       onDelete: this.onDelete,
       cloneAnalysis: this.cloneAnalysis,
     };
+  }
+
+  componentDidMount() {
     api.getPublicAnalyses().then((publicAnalyses) => {
       this.setState({ publicAnalyses });
     });
