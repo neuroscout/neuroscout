@@ -121,15 +121,15 @@ export default class Routes extends React.Component<AppState, {}> {
       />
       <Route
         path="/profile/:id"
-        render={props =>
-          <PublicProfile 
+        render={props => {
+          return (<PublicProfile 
             id={props.match.params.id}
             datasets={this.props.datasets}
             cloneAnalysis={this.props.cloneAnalysis}
             loggedIn={this.props.user.loggedIn}
-            isUser={props.match.params.id === this.props.user.profile.id}
-          />
-        }
+            isUser={props.match.params.id === '' + this.props.user.profile.id}
+          />);
+        }}
       />
       <Route
         path="/profiles"
