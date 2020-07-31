@@ -93,7 +93,8 @@ def build_analysis(analysis, predictor_events, bids_dir, task_name,
     entities['scan_length'] = max([r['duration'] for r in analysis['runs']])
 
     # Write out all events
-    paths = writeout_events(analysis, predictor_events, tmp_dir, task_name, run_ids)
+    paths = writeout_events(
+        analysis, predictor_events, tmp_dir, task_name, run_ids)
 
     if build is False:
         bids_analysis = None
