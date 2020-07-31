@@ -17,8 +17,6 @@ class AnalysisSchema(Schema):
     predictions = fields.Str(description='User apriori predictions.')
 
     dataset_id = fields.Int(required=True)
-    task_name = fields.Str(description='Task name', dump_only=True)
-    TR = fields.Float(description='Time repetition (s)', dump_only=True)
 
     model = fields.Dict(description='BIDS model.')
 

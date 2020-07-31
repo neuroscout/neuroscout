@@ -15,7 +15,7 @@ PATHS = ['sub-{subject}_[ses-{session}_]task-{task}_[acq-{acquisition}_]'
          '[run-{run}_]events.tsv']
 
 
-def writeout_events(analysis, pes, outdir, run_ids=None):
+def writeout_events(analysis, pes, outdir, task_name, run_ids=None):
     """ Writeout predictor_events into BIDS event files """
     analysis_runs = analysis.get('runs', [])
     if run_ids is not None:
@@ -44,7 +44,7 @@ def writeout_events(analysis, pes, outdir, run_ids=None):
         # Write out event files for each run_id
         run_events = pes[pes.run_id == run['id']].drop('run_id', axis=1)
         entities = _get_entities(run)
-        entities['task'] = analysis['task_name']
+        entities['task'] = task_name
 
         out_cols = {}
         if run_events.empty is False:
@@ -73,7 +73,7 @@ def writeout_events(analysis, pes, outdir, run_ids=None):
     return paths
 
 
-def build_analysis(analysis, predictor_events, bids_dir,
+def build_analysis(analysis, predictor_events, bids_dir, task_name,
                    run_ids=None, build=True):
     """ Write out and build analysis object """
     tmp_dir = Path(mkdtemp())
@@ -89,17 +89,17 @@ def build_analysis(analysis, predictor_events, bids_dir,
                     break
 
     entities = _merge_dictionaries(*entities)
-    entities['task'] = analysis['task_name']
+    entities['task'] = task_name
     entities['scan_length'] = max([r['duration'] for r in analysis['runs']])
 
     # Write out all events
-    paths = writeout_events(analysis, predictor_events, tmp_dir, run_ids)
+    paths = writeout_events(analysis, predictor_events, tmp_dir, task_name, run_ids)
 
     if build is False:
         bids_analysis = None
     else:
         bids_layout = _load_cached_layout(
-            bids_dir, analysis['dataset_id'], analysis['task_name'])
+            bids_dir, analysis['dataset_id'], task_name)
         bids_layout.add_derivatives(str(tmp_dir))
 
         bids_analysis = BIDSAnalysis(
