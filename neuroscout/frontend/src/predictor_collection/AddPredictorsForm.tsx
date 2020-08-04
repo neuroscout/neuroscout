@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Anchor, Button, Card, Checkbox, Collapse, Form, Icon, Input, List, Row, Tabs, Table, Upload } from 'antd';
+import { Anchor, Button, Card, Checkbox, Collapse, Form, Icon, Input, List, Row, Tabs, Table, Upload, Alert } from 'antd';
 import { TableRowSelection } from 'antd/lib/table';
 
 import { api } from '../api';
@@ -67,7 +67,7 @@ export class AddPredictorsForm extends React.Component<AddPredictorsFormProps, A
       if (!filter[filterKey]) {
         continue;
       }
-      let runKey = filterKey.slice(0, -1); 
+      let runKey = filterKey.slice(0, -1);
       runs.forEach((run) => {
         if (filter[filterKey].indexOf(run[runKey]) !== -1 && runIds.indexOf(run.id) === -1) {
           runIds.push(run.id);
@@ -98,10 +98,10 @@ export class AddPredictorsForm extends React.Component<AddPredictorsFormProps, A
         this.props.closeModal();
       }
     });
-    
+
     return;
   };
-  
+
   updateState = (value: PartialState) => {
     if ('predictors' in value) {
       value.predictors = [...this.state.predictors, ...value.predictors];
@@ -142,6 +142,11 @@ export class AddPredictorsForm extends React.Component<AddPredictorsFormProps, A
         onTabClick={newTab => this.onTabClick(newTab)}
       >
         <Tabs.TabPane tab="Select Dataset" key={'' + 1}>
+          <Alert
+            message="Select a dataset for which you want to upload custom predictors."
+            type="info"
+            showIcon={true}
+          />
           <Table
             className="selectDataset"
             columns={datasetColumns}
@@ -151,8 +156,22 @@ export class AddPredictorsForm extends React.Component<AddPredictorsFormProps, A
             rowSelection={rowSelection}
             pagination={(this.props.datasets.length > 10) ? {'position': 'bottom'} : false}
           />
+          <a
+           href="https://neuroscout.github.io/neuroscout/faq/#can-i-contribute-my-own-predictors-to-neuroscout"
+           target="_blank"
+          >
+          <Button icon="question">Help</Button>
+          </a>
         </Tabs.TabPane>
         <Tabs.TabPane tab="Select Files and Runs" key={'' + 2}>
+        {this.state.datasetId &&
+          <Alert
+            message="For each set of runs with the same events (i.e. with same stimuli),
+             upload a BIDS compliant TSV events file (e.g. onset, duration, event_1, event_2, etc...)"
+            type="info"
+            showIcon={true}
+          />
+        }
         {this.state.datasetId &&
           <>
             <div className="runSelectorContainer">
@@ -167,13 +186,31 @@ export class AddPredictorsForm extends React.Component<AddPredictorsFormProps, A
           </>
         }
         {!this.state.datasetId &&
-          <div>
-          Please select a dataset from the <a onClick={this.prevTab}>previous tab</a>
-          </div>
+          <Alert
+            message="Please select a dataset from the previous tab"
+            type="error"
+            showIcon={true}
+          />
         }
+        <br/>
+        <a
+         href="https://neuroscout.github.io/neuroscout/faq/#can-i-contribute-my-own-predictors-to-neuroscout"
+         target="_blank"
+        >
+        <Button icon="question">Help</Button>
+        </a>
         </Tabs.TabPane>
         <Tabs.TabPane tab="Predictor Descriptions" key={'' + 3}>
         {this.state.filesAndRuns[0].file !== undefined &&
+         this.state.collectionName !== '' &&
+           <Alert
+             message="Please specify a description for each event column."
+             type="info"
+             showIcon={true}
+           />
+        }
+        {this.state.filesAndRuns[0].file !== undefined &&
+         this.state.collectionName !== '' &&
           <>
             <PredictorDescriptionForm
               predictors={this.state.predictors}
@@ -183,10 +220,19 @@ export class AddPredictorsForm extends React.Component<AddPredictorsFormProps, A
             <Button onClick={this.upload} type="primary">Upload</Button>
           </>
         }
+        {this.state.collectionName === '' &&
+          <Alert
+            message="Please specify a descriptive name for your collection on the previous tab"
+            type="error"
+            showIcon={true}
+          />
+        }
         {this.state.filesAndRuns[0].file === undefined &&
-          <div>
-            Please select at least one file to upload from the <a onClick={this.prevTab}>previous tab</a>
-          </div>
+          <Alert
+            message="Please select at least one file to upload from the <a onClick={this.prevTab}>previous tab</a>"
+            type="error"
+            showIcon={true}
+          />
         }
         </Tabs.TabPane>
       </Tabs>

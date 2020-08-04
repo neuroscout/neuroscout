@@ -66,3 +66,18 @@ paper:
 
 Currently, that is the case. However,the underlying BIDS-StatsModel is designed with more complex
 models in mind, such as predictive and linear-mixed effect models
+
+
+### Can I contribute my own predictors to Neuroscout?
+
+Yes! Using the "My Predictors" function, you can create custom collections of predictors to add to your analyses.
+Simply navigate to [My Predictors](https://neuroscout.org/mycollections), and click on "Add New Predictors".
+
+Features should be in BIDS-compliant events format. Two columns are mandatory: "onset" and "duration" (both in seconds).
+You can then include any number of novel predictors as additional columns. Missing values can be annotated using the value "n/a" (no quotes).
+
+For each events file that you upload, you will be asked to associate it with runs in the respective dataset. Typically, there will be a different event file for each run in a naturalistic dataset.
+You must then associate each file with subjects. For example, in most cases, all subjects will have seen the same stimulus, but this will vary across datasets.
+
+After uploading, a new collection of predictors will be created. By default, predictors in this collection will be private, and only visible to you in the Analysis Builder.
+If you wish to share these predictors with other Neuroscout users, please contact us, and we can make your predictors public.

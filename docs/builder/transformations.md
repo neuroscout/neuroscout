@@ -12,7 +12,6 @@ The transformations currently supported by Neuroscout are a subset of the comple
 |---------------------|--------------------------------------------------------------------------------------------------------------------------------------------|
 | Scale               | Standardize the value of one or more variables. Can independently choose to denmean and/or rescale.                                        |
 | Orthogonalize       | Orthogonalizes one or more input columns with respect to one or more other columns.                                                        |
-| And/Or/Not          | Each of these transformations takes one or more columns, and performs a logical operation on the input column and a provided operand.      |
 
 ## Select input
 
