@@ -1,4 +1,5 @@
 import * as React from 'react';
+import memoize from 'memoize-one';
 
 import { Avatar, Card, Col, List, Row, Spin } from 'antd';
 import { Link } from 'react-router-dom';
@@ -41,27 +42,24 @@ class PublicProfile extends React.Component<PublicProfileProps, PublicProfileSta
       error: false
     };
   }
-
-  componentDidMount() {
-    if (this.state.loaded) {
-      return;
-    }
-    api.getPublicProfile(this.props.id)
-      .then(response => {
-        let newProfile = {...this.state.profile};
-        let error = response.statusCode === 200;
-        Object.keys(response).map(key => {
-          if (newProfile.hasOwnProperty(key)) {
-            newProfile[key] = response[key];
-          }
-        });
-        this.setState({profile: newProfile, loaded: true, error: error});
+  
+  memoizeId = memoize((id) => {
+    api.getPublicProfile(id).then(response => {
+      let newProfile = {...this.state.profile};
+      let error = response.statusCode === 200;
+      Object.keys(response).map(key => {
+        if (newProfile.hasOwnProperty(key)) {
+          newProfile[key] = response[key];
+        }
       });
-    let id = !this.props.isUser ? this.props.id : undefined;
-    api.getAnalyses(id).then(analyses => this.setState({analyses: analyses, analysesLoaded: true}));
-  }
+      this.setState({profile: newProfile, loaded: true, error: error});
+    });
+    id = !this.props.isUser ? this.props.id : undefined;
+    api.getAnalyses(id).then(analyses => this.setState({analyses: analyses, analysesLoaded: true}));   
+  });
 
   render() {
+    this.memoizeId(this.props.id);
     let profile = this.state.profile;
     let descItems: any[] = [
       ['institution', {title: 'Institution', desc: profile.institution}],

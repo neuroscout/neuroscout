@@ -68,6 +68,9 @@ export const _fetch = (path: string, options?: object) => {
 // - Decoding JSON response and adding the response status code to decoded JSON object
 export const jwtFetch = (path: string, options?: any, noCT?: boolean) => {
   const jwt = window.localStorage.getItem('jwt');
+  if (!jwt) {
+    return _fetch(path, options);
+  }
 
   if (!options) { options = {}; }
   if (!options.headers) { options.headers = {}; }
