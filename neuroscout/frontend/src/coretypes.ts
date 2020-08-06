@@ -122,7 +122,7 @@ interface PredictorsParam {
 export type Parameter = BooleanParam | PredictorsParam;
 
 export type TransformName = 'Scale' | 'Orthogonalize' | 'Threshold'
-  | 'Or' | 'And' | 'Not' | 'Convolve';
+  | 'Convolve';
 
 export type StepLevel = 'Run' | 'Session' | 'Subject' | 'Dataset';
 
