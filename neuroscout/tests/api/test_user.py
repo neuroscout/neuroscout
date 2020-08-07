@@ -48,8 +48,7 @@ def test_put(auth_client):
 
     # Testing incomplete put request
     resp = auth_client.put('/api/user', data={'name': 'new_name'})
-    assert resp.status_code == 422
-    assert 'email' in decode_json(resp)['message']
+    assert resp.status_code == 200
 
     # Testing changing name to same email
     values = decode_json(auth_client.get('/api/user'))
