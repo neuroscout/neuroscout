@@ -34,9 +34,9 @@ def load_update_config(config_file, update=False):
     datastore = Path(current_app.config['FEATURE_DATASTORE'])
     datastore.parents[0].mkdir(exist_ok=True)
     print("Checking for updates...")
-    updated = check_updates(tfs, datastore=datastore.as_posix())
 
     if update:
+        updated = check_updates(tfs, datastore=datastore.as_posix())
         # Filter configs to only include updated transformers
         filt_config = {}
         for dname, dataset in config_dict.items():
