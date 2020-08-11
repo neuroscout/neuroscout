@@ -48,7 +48,7 @@ def register_user(**kwargs):
     base_name = kwargs['name'].lower().replace(' ', '.')
     user_name = base_name
     i = 1
-    while User.query.filter_by(username=user_name).count() > 0:
+    while User.query.filter_by(user_name=user_name).count() > 0:
         user_name = base_name + f'.{i}'
     kwargs['user_name'] = user_name
 
