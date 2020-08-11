@@ -50,13 +50,6 @@ def test_put(auth_client):
     resp = auth_client.put('/api/user', data={'name': 'new_name'})
     assert resp.status_code == 200
 
-    # Testing changing name to same email
-    values = decode_json(auth_client.get('/api/user'))
-    values['email'] = 'test2@gmail.com'
-    resp = auth_client.put('/api/user', data=values)
-    assert resp.status_code == 422
-    assert 'Email already in use' in decode_json(resp)['message']
-
 
 def test_create_new(auth_client, session):
     # Make a new user and authorize

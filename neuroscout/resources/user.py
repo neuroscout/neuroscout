@@ -31,10 +31,6 @@ class UserRootResource(MethodResource):
     @use_kwargs(UserSchema(only=put_kwargs))
     @auth_required
     def put(self, **kwargs):
-        if 'email' in kwargs:
-            if User.query.filter((User.email == kwargs['email'])
-                                 & (User.id != current_identity.id)).all():
-                abort(422, 'Email already in use.')
         return put_record(kwargs, current_identity)
 
 
