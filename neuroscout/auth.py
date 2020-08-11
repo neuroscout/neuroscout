@@ -43,6 +43,15 @@ def send_confirmation(user):
 
 def register_user(**kwargs):
     """ Register new user and password """
+
+    # Create unique user name
+    base_name = kwargs['name'].lower().replace(' ', '.')
+    user_name = base_name
+    i = 1
+    while User.query.filter_by(username=user_name).count() > 0:
+        user_name = base_name + f'.{i}'
+    kwargs['user_name'] = user_name
+
     user = user_datastore.create_user(**kwargs)
     user_datastore.commit()
     send_confirmation(user)

@@ -14,6 +14,7 @@ class User(db.Model, UserMixin):
     google_id = db.Column(db.Text)
     email = db.Column(db.String(100), unique=True)
     password = db.Column(db.String(255))
+    user_name = db.Column(db.Text, unique=True)
 
     name = db.Column(db.Text)
     picture = db.Column(db.Text)

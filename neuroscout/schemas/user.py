@@ -7,6 +7,7 @@ class UserSchema(Schema):
     id = fields.Integer()
     email = fields.Email(required=True)
     name = fields.Str(required=True, description='User full name')
+    user_name = fields.Str(description='User name')
     password = fields.Str(load_only=True,
                           description='Password. Minimum 6 characters.')
     picture = fields.Str(allow_none=True,
