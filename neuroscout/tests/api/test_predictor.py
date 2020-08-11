@@ -80,7 +80,7 @@ def test_get_rextracted(auth_client, reextract):
             '/api/runs', params={'number': '1', 'subject': '01'}))[0]['id']
     resp = auth_client.get('/api/predictors', params={
         'run_id': run_id, 'newest': 'false'})
-    assert len(decode_json(resp)) == 5
+    assert len(decode_json(resp)) == 8
 
 
 def test_predictor_create(session,

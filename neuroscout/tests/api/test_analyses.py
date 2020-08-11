@@ -404,7 +404,7 @@ def test_compile(auth_client, add_analysis, add_analysis_fail):
         analysis_bad.hash_id))
 
     new_analysis = decode_json(resp)
-    if new_analysis['status'] != 'FAILED':
+    if new_analysis['status'] == 'PASSED':
         assert 0
 
     # Test getting bundle prior to compiling

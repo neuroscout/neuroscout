@@ -2,6 +2,7 @@ import json
 import datetime
 from flask_security.confirmable import confirm_user
 from ...models.auth import User
+from ..request_utils import decode_json
 
 
 def decode_json(resp):
@@ -100,4 +101,4 @@ def test_get_analysis_list(auth_client):
     user = User.query.filter_by(email=decode_json(resp)['email']).one()
 
     resp = auth_client.get(f'/api/user/{user.id}/analyses')
-    assert len(resp) == 0
+    assert len(decode_json(resp)) == 0
