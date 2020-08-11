@@ -107,11 +107,21 @@ export const api = {
   },
 
   // Gets a logged in users own analyses
-  getAnalyses: (id?: number): Promise<AppAnalysis[]> => {
+  getMyAnalyses: (): Promise<AppAnalysis[]> => {
     let url = `${domainRoot}/api/user/myanalyses`;
-    if (!!id) {
-      url = `${domainRoot}/api/user/${id}/analyses`;
-    }
+    return jwtFetch(url)
+      .then(data => {
+        return (data || []).filter(x => !!x.status).map((x) => ApiToAppAnalysis(x));
+      })
+      .catch((error) => {
+        displayError(error);
+        return [] as AppAnalysis[];
+      });
+  },
+
+  // Gets a logged in users own analyses
+  getAnalyses: (id: number): Promise<AppAnalysis[]> => {
+    let url = `${domainRoot}/api/user/${id}/analyses`;
     return jwtFetch(url)
       .then(data => {
         return (data || []).filter(x => !!x.status).map((x) => ApiToAppAnalysis(x));

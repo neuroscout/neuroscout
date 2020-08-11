@@ -54,8 +54,7 @@ class PublicProfile extends React.Component<PublicProfileProps, PublicProfileSta
       });
       this.setState({profile: newProfile, loaded: true, error: error});
     });
-    id = !this.props.isUser ? this.props.id : undefined;
-    api.getAnalyses(id).then(analyses => this.setState({analyses: analyses, analysesLoaded: true}));   
+    api.getAnalyses(this.props.id).then(analyses => this.setState({analyses: analyses, analysesLoaded: true}));
   });
 
   render() {

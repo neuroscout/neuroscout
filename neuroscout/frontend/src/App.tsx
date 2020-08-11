@@ -62,7 +62,7 @@ class App extends React.Component<{}, AppState> {
     
     this.state = {
       loadAnalyses: () => {
-        api.getAnalyses().then(analyses => {
+        api.getMyAnalyses().then(analyses => {
           this.setState({ analyses });
         });
       },
