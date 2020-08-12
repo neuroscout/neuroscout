@@ -15,6 +15,7 @@ export const profileInit = () => {
   return {
     id: 0,
     name: '',
+    user_name: '',
     picture: '',
     email: '',
     institution: '',

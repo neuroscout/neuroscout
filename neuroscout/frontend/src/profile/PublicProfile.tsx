@@ -11,7 +11,7 @@ import { api } from '../api';
 import { profileInit } from '../user';
 
 interface PublicProfileProps {
-  id: number;
+  user_name: string;
   datasets: Dataset[];
   cloneAnalysis: (id: string) => void;
   loggedIn: boolean;
@@ -43,8 +43,8 @@ class PublicProfile extends React.Component<PublicProfileProps, PublicProfileSta
     };
   }
   
-  memoizeId = memoize((id) => {
-    api.getPublicProfile(id).then(response => {
+  memoizeId = memoize((user_name) => {
+    api.getPublicProfile(user_name).then(response => {
       let newProfile = {...this.state.profile};
       let error = response.statusCode === 200;
       Object.keys(response).map(key => {
@@ -54,11 +54,11 @@ class PublicProfile extends React.Component<PublicProfileProps, PublicProfileSta
       });
       this.setState({profile: newProfile, loaded: true, error: error});
     });
-    api.getAnalyses(this.props.id).then(analyses => this.setState({analyses: analyses, analysesLoaded: true}));
+    api.getAnalyses(this.props.user_name).then(analyses => this.setState({analyses: analyses, analysesLoaded: true}));
   });
 
   render() {
-    this.memoizeId(this.props.id);
+    this.memoizeId(this.props.user_name);
     let profile = this.state.profile;
     let descItems: any[] = [
       ['institution', {title: 'Institution', desc: profile.institution}],

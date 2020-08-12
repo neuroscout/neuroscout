@@ -25,7 +25,7 @@ export class UserList extends React.Component<{}, {users: User[]}> {
           title: 'Name',
           dataIndex: 'name',
           render: (text, record) => (
-            <Link to={'/profile/' + record.id}>{record.name}</Link>
+            <Link to={'/profile/' + record.user_name}>{record.name}</Link>
           )
         }
     ];
@@ -35,7 +35,7 @@ export class UserList extends React.Component<{}, {users: User[]}> {
           <Table
             columns={userTableColumns}
             dataSource={this.state.users}
-            rowKey="id"
+            rowKey="user_name"
           />
         </MainCol>
       </Row>

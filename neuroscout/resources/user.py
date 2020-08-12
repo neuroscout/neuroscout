@@ -37,8 +37,8 @@ class UserRootResource(MethodResource):
 @marshal_with(UserSchema)
 class UserDetailResource(MethodResource):
     @doc(tags=['user'], summary='Get a given users information.')
-    def get(self, user_id):
-        return first_or_404(User.query.filter_by(id=user_id))
+    def get(self, user_name):
+        return first_or_404(User.query.filter_by(user_name=user_name))
 
 @marshal_with(AnalysisSchema(many=True))
 class UserPrivateAnalysisListResource(MethodResource):
@@ -59,9 +59,9 @@ class UserListResource(MethodResource):
 @marshal_with(AnalysisSchema(many=True))
 class UserAnalysisListResource(MethodResource):
     @doc(tags=['user'], summary='Get a list of analyses created by a user.')
-    def get(self, user_id):
-        kwargs = {'user_id': user_id, 'private': False, 'status': 'PASSED'}
-        return Analysis.query.filter_by(**kwargs)
+    def get(self, user_name):
+        kwargs = {'private': False, 'status': 'PASSED'}
+        return Analysis.query.filter_by(**kwargs).join(User).filter(User.user_name == user_name)
 
 
 class UserResendConfirm(MethodResource):

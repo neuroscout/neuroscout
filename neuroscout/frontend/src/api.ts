@@ -120,8 +120,8 @@ export const api = {
   },
 
   // Gets a logged in users own analyses
-  getAnalyses: (id: number): Promise<AppAnalysis[]> => {
-    let url = `${domainRoot}/api/user/${id}/analyses`;
+  getAnalyses: (user_name: string): Promise<AppAnalysis[]> => {
+    let url = `${domainRoot}/api/user/${user_name}/analyses`;
     return jwtFetch(url)
       .then(data => {
         return (data || []).filter(x => !!x.status).map((x) => ApiToAppAnalysis(x));
@@ -221,7 +221,7 @@ export const api = {
       }
     );
   },
-  getPublicProfile: (user_id): Promise<ApiUser & {statusCode: number}> => {
-    return jwtFetch(`${domainRoot}/api/user/${user_id}`);
+  getPublicProfile: (user_name: string): Promise<ApiUser & {statusCode: number}> => {
+    return jwtFetch(`${domainRoot}/api/user/${user_name}`);
   }
 };

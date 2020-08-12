@@ -34,15 +34,15 @@ type JWTChangeProps = {
   loadAnalyses:  () => any;
   checkAnalysesStatus: (key: number) => any;
   jwt: string;
-  id: number;
+  user_name: string;
 };
 
 // This global var lets the dumb polling loops know when to exit.
 let checkCount = 0;
 
 class JWTChange extends React.Component<JWTChangeProps, {}> {
-  jwtChanged = memoize((jwt, id) => {
-    if (!!jwt && id > 0) {
+  jwtChanged = memoize((jwt, user_name) => {
+    if (!!jwt && user_name > 0) {
       this.props.loadAnalyses();
       checkCount += 1;
       this.props.checkAnalysesStatus(checkCount);
@@ -50,7 +50,7 @@ class JWTChange extends React.Component<JWTChangeProps, {}> {
   });
 
   render() { 
-    this.jwtChanged(this.props.jwt, this.props.id);
+    this.jwtChanged(this.props.jwt, this.props.user_name);
     return null;
   }
 }
@@ -189,7 +189,7 @@ class App extends React.Component<{}, AppState> {
             loadAnalyses={this.state.loadAnalyses}
             checkAnalysesStatus={this.checkAnalysesStatus}
             jwt={this.state.user.jwt}
-            id={this.state.user.profile.id}
+            user_name={this.state.user.profile.user_name}
           />
           {this.state.user.openLogin && <LoginModal {...this.state.user} />}
           {this.state.user.openReset && <ResetPasswordModal {...this.state.user} />}

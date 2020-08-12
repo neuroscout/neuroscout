@@ -120,14 +120,14 @@ export default class Routes extends React.Component<AppState, {}> {
         }
       />
       <Route
-        path="/profile/:id"
+        path="/profile/:user_name"
         render={props => {
           return (<PublicProfile 
-            id={props.match.params.id}
+            user_name={props.match.params.user_name}
             datasets={this.props.datasets}
             cloneAnalysis={this.props.cloneAnalysis}
             loggedIn={this.props.user.loggedIn}
-            isUser={props.match.params.id === '' + this.props.user.profile.id}
+            isUser={props.match.params.user_name === '' + this.props.user.profile.user_name}
           />);
         }}
       />
@@ -139,8 +139,8 @@ export default class Routes extends React.Component<AppState, {}> {
       <Route
         path="/profile"
         render={props => {
-          if (this.props.user.profile.id > 0) {
-            return <Redirect to={'/profile/' + this.props.user.profile.id} />;
+          if (this.props.user.profile.user_name !== '') {
+            return <Redirect to={'/profile/' + this.props.user.profile.user_name} />;
           }
           return <Redirect to="/profiles" />;
         }}
