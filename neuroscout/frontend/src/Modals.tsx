@@ -217,9 +217,7 @@ export class SignupModal extends React.Component<UserStore, {}> {
         onCancel={e => this.props.update({ openSignup: false })}
       >
         {this.props.signupError &&
-          <p>
             <Alert message={this.props.signupError} type="error" />
-          </p>
         }
         <br />
         <Form
