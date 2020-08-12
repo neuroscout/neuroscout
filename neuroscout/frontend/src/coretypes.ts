@@ -25,6 +25,7 @@ export interface Analysis {
   contrasts: Contrast[];
   model?: BidsModel;
   dummyContrast: boolean;
+  user_name?: string;
 }
 
 // Normalized dataset object in Analysis Builder
@@ -286,7 +287,7 @@ export interface AppAnalysis {
   user_name?: string;
 }
 
-export const profileEditItems = ['name', 'institution', 'orcid', 'bio', 'twitter_handle', 'personal_site',
+export const profileEditItems = ['name', 'user_name', 'institution', 'orcid', 'bio', 'twitter_handle', 'personal_site',
                                  'public_email', 'picture'];
 
 export interface User {

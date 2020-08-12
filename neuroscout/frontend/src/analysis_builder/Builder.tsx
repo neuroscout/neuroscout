@@ -74,6 +74,7 @@ let initializeStore = (): Store => ({
   submitActive: false,
   reviewActive: false,
   analysis: {
+    user_name: '',
     analysisId: undefined,
     name: '',
     description: '',
@@ -557,7 +558,8 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
       contrasts: data.contrasts || [],
       model: data.model,
       dummyContrast: dummyContrast,
-      private: data.private
+      private: data.private,
+      user_name: data.user
     };
 
     if (analysis.runIds.length > 0) {
@@ -1261,6 +1263,7 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
                         unsavedChanges={this.state.unsavedChanges}
                         availablePredictors={this.state.availablePredictors}
                         dataset={this.props.datasets.find((x => x.id === this.state.analysis.datasetId))}
+                        user_name={this.state.analysis.user_name}
                       />
                       <br/>
                       {isEditable && this.navButtons(false, isEditable)}

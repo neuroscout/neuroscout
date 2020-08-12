@@ -50,6 +50,14 @@ class EditProfile extends React.Component<ProfileState & { history: any }, Profi
                   onChange={(e) => this.setState({name: e.currentTarget.value})}
                 />
               </Form.Item>
+              <Form.Item label="Username" required={true}>
+                <Input
+                  value={!!this.state.user_name ? this.state.user_name : undefined}
+                  required={true}
+                  min={1}
+                  onChange={(e) => this.setState({user_name: e.currentTarget.value})}
+                />
+              </Form.Item>
               <Form.Item label="Institution">
                 <Input
                   defaultValue={this.state.institution}
@@ -72,7 +80,7 @@ class EditProfile extends React.Component<ProfileState & { history: any }, Profi
                   onChange={(e) => this.setState({bio: e.currentTarget.value})}
                 />
               </Form.Item>
-              <Form.Item label="Twitter Handle">
+              <Form.Item label="Twitter URL">
                 <Input
                   defaultValue={this.state.twitter_handle}
                   value={this.state.twitter_handle}
@@ -96,7 +104,7 @@ class EditProfile extends React.Component<ProfileState & { history: any }, Profi
               )).then((ret) => {
                 if (!!ret && ret.statusCode === 200) {
                   message.success('Profile updated.');
-                  this.props.history.push(`/profile/${this.props.id}`);
+                  this.props.history.push(`/profile/${this.state.user_name}`);
                 }
                 this.props.update(this.state);
               });

@@ -64,8 +64,14 @@ class PublicProfile extends React.Component<PublicProfileProps, PublicProfileSta
       ['institution', {title: 'Institution', desc: profile.institution}],
       ['orcid', {title: 'ORCID iD', desc: profile.orcid}],
       ['bio', {title: 'Biography', desc: profile.bio}],
-      ['twitter_handle', {title: 'Twitter', desc: profile.twitter_handle}],
-      ['personal_site', {title: 'Personal Site', desc: profile.personal_site}]
+      ['twitter_handle', {
+        title: 'Twitter',
+        desc: (<a target="_blank" href={profile.twitter_handle}>{profile.twitter_handle}</a>)
+      }],
+      ['personal_site', {
+        title: 'Personal Site',
+        desc: (<a target="_blank" href={profile.personal_site}>{profile.personal_site}</a>)
+      }]
     ];
     descItems = descItems.filter(x => !!profile[x[0]]).map(x => x[1]);
 

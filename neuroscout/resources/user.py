@@ -26,7 +26,7 @@ class UserRootResource(MethodResource):
         return register_user(**kwargs)
 
     put_kwargs = ['name', 'picture', 'institution', 'personal_site',
-                  'twitter_handle', 'orcid', 'public_email']
+                  'twitter_handle', 'orcid', 'public_email', 'user_name']
 
     @use_kwargs(UserSchema(only=put_kwargs))
     @auth_required

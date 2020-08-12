@@ -133,11 +133,6 @@ export default class Routes extends React.Component<AppState, {}> {
         }}
       />
       <Route
-        path="/profiles"
-        render={props => <UserList />}
-      />
-    
-      <Route
         path="/profile"
         render={props => {
           if (this.props.user.profile.user_name !== '') {

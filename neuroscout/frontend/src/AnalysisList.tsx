@@ -85,7 +85,7 @@ export class AnalysisListTable extends React.Component<AnalysisListProps> {
     if (showOwner) {
       analysisTableColumns.push(
         {
-          title: 'Owner',
+          title: 'Author',
           dataIndex: 'user_name',
           sorter: (a, b) => a.user_name.localeCompare(b.user_name),
           render: (text, record) => <Link to={`/profile/${record.user_name}`}> {record.user_name} </Link>
