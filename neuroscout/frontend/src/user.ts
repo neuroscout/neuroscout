@@ -288,7 +288,10 @@ export class UserStore {
           this.update({
             signupError: errorMessage
           });
-          throw new Error('Signup failed!');
+          if (Object.keys(data.message).length === 0) {
+            throw new Error('Signup failed!');
+          }
+          return;
         }
         this.update({ openSignup: false, signupError: '' });
         this.profile.update({ name: name, email: email, user_name: data.user_name });

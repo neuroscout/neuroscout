@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Button, Divider, Form, Icon, Input, Modal } from 'antd';
+import { Alert, Button, Divider, Form, Icon, Input, Modal } from 'antd';
 import { GoogleLogin } from 'react-google-login';
 
 import { config } from './config';
@@ -216,9 +216,11 @@ export class SignupModal extends React.Component<UserStore, {}> {
         maskClosable={true}
         onCancel={e => this.props.update({ openSignup: false })}
       >
-        <p>
-          {this.props.signupError}
-        </p>
+        {this.props.signupError &&
+          <p>
+            <Alert message={this.props.signupError} type="error" />
+          </p>
+        }
         <br />
         <Form
           onSubmit={e => {
