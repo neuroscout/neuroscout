@@ -291,7 +291,7 @@ export class UserStore {
           throw new Error('Signup failed!');
         }
         this.update({ openSignup: false, signupError: '' });
-        this.profile.update({ name: name, email: email });
+        this.profile.update({ name: name, email: email, user_name: data.user_name });
         Modal.success({
           title: 'Account created!',
           content: 'Your account has been sucessfully created. \
