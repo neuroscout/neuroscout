@@ -227,6 +227,7 @@ export interface ApiAnalysis {
   config: AnalysisConfig;
   modified_at?: string;
   model?: BidsModel;
+  user?: string;
 }
 
 export interface BidsModel {
@@ -282,6 +283,7 @@ export interface AppAnalysis {
   status: AnalysisStatus;
   dataset_id?: string;
   modified_at?: string;
+  user_name?: string;
 }
 
 export const profileEditItems = ['name', 'institution', 'orcid', 'bio', 'twitter_handle', 'personal_site',

@@ -42,7 +42,8 @@ export const ApiToAppAnalysis = (data: ApiAnalysis): AppAnalysis => ({
   description: data.description,
   status: data.status,
   dataset_id: !!data.dataset_id ? '' + data.dataset_id : '',
-  modified_at: data.modified_at
+  modified_at: data.modified_at,
+  user_name: data.user
 });
 
 export const api = {

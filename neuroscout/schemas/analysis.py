@@ -4,6 +4,7 @@ from ..models import Dataset, Run, Predictor
 from .dataset import DatasetSchema
 from .run import RunSchema
 from .predictor import PredictorSchema
+from .user import UserSchema
 
 
 class AnalysisSchema(Schema):
@@ -43,6 +44,9 @@ class AnalysisSchema(Schema):
     runs = fields.Nested(
         RunSchema, many=True, only='id',
         description='Runs associated with analysis')
+
+    user = fields.Nested(UserSchema, many=False, only='user_name')
+
 
     @validates('dataset_id')
     def validate_dsid(self, value):

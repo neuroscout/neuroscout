@@ -89,6 +89,7 @@ export default class Routes extends React.Component<AppState, {}> {
             datasets={this.props.datasets}
             publicList={true}
             loggedIn={this.props.user.loggedIn}
+            showOwner={true}
           />}
       />
       <Route

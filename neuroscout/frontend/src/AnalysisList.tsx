@@ -23,11 +23,12 @@ export interface AnalysisListProps {
   children?: React.ReactNode;
   datasets: Dataset[];
   loading?: boolean;
+  showOwner?: boolean;
 }
 
 export class AnalysisListTable extends React.Component<AnalysisListProps> {
   render() {
-    const { analyses, datasets, publicList, cloneAnalysis, onDelete } = this.props;
+    const { analyses, datasets, publicList, cloneAnalysis, onDelete, showOwner } = this.props;
 
     // Define columns of the analysis table
     // Open link: always (opens analysis in Builder)
@@ -78,8 +79,19 @@ export class AnalysisListTable extends React.Component<AnalysisListProps> {
           b = (!!dataset && !!dataset.name) ? dataset.name : '';
           return a.localeCompare(b);
         }
-      }
+      },
     ];
+
+    if (showOwner) {
+      analysisTableColumns.push(
+        {
+          title: 'Owner',
+          dataIndex: 'user_name',
+          sorter: (a, b) => a.user_name.localeCompare(b.user_name),
+          render: (text, record) => <Link to={`/profile/${record.user_name}`}> {record.user_name} </Link>
+        }
+      );
+    }
 
     if (publicList) {
       analysisTableColumns.splice(2, 1);
