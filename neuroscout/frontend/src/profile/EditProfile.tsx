@@ -120,7 +120,7 @@ class EditProfile extends React.Component<ProfileState & { history: any }, Profi
                 } else if (!!ret && ret.statusCode === 422) {
                   if (ret.message) {
                     Object.keys(ret.message).forEach(key => {
-                      errorMessage += ret.message[key];
+                      errorMessage += ret.message[key] + '; ';
                     });
                   }
                   this.setState({user_name: this.props.user_name});
