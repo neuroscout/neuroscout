@@ -29,10 +29,16 @@ class UserRootResource(MethodResource):
     put_kwargs = ['name', 'picture', 'institution', 'personal_site',
                   'twitter_handle', 'orcid', 'public_email', 'user_name']
 
-    @use_kwargs(UserSchema(only=put_kwargs), validate=False)
+    @use_kwargs(UserSchema(only=put_kwargs))
     @auth_required
     def put(self, **kwargs):
-        kwargs = UserSchema().dump(kwargs)
+        if 'user_name' in kwargs:
+            value = kwargs['user_name']
+            if value != current_identity.user_name:
+                if User.query.filter_by(user_name=value):
+                    abort(
+                        422, {"message":{
+                            "user_name": {"User name is already in use"})
         return put_record(kwargs, current_identity)
 
 
