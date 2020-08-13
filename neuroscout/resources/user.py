@@ -36,9 +36,10 @@ class UserRootResource(MethodResource):
             value = kwargs['user_name']
             if value != current_identity.user_name:
                 if User.query.filter_by(user_name=value):
-                    abort(
-                        422, {"message":{
-                            "user_name": {"User name is already in use"})
+                    abort(422,
+                          {"message": {
+                            "user_name": {"User name is already in use"}}})
+
         return put_record(kwargs, current_identity)
 
 
