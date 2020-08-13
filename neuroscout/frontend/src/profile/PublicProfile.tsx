@@ -2,13 +2,14 @@ import * as React from 'react';
 import memoize from 'memoize-one';
 
 import { Avatar, Card, Col, List, Row, Spin } from 'antd';
-import { Link } from 'react-router-dom';
+import { Link, withRouter } from 'react-router-dom';
 
 import { AnalysisListTable } from '../AnalysisList';
 import { MainCol, Space } from '../HelperComponents';
 import { profileEditItems, ApiUser, AppAnalysis, PredictorCollection, Dataset } from '../coretypes';
 import { api } from '../api';
 import { profileInit } from '../user';
+import { NotFound } from '../HelperComponents';
 
 interface PublicProfileProps {
   user_name: string;
@@ -21,12 +22,12 @@ interface PublicProfileProps {
 interface PublicProfileState {
   profile: ApiUser;
   loaded: boolean;
-  error: boolean;
+  error: number;
   analysesLoaded: boolean;
   analyses: AppAnalysis[];
 }
 
-class PublicProfile extends React.Component<PublicProfileProps, PublicProfileState> {
+class PublicProfile extends React.Component<PublicProfileProps & { history: any }, PublicProfileState> {
   constructor(props) {
     super(props);
     let profInit = profileInit();
@@ -39,14 +40,14 @@ class PublicProfile extends React.Component<PublicProfileProps, PublicProfileSta
       analysesLoaded: false,
       analyses: [] as AppAnalysis[],
       loaded: false,
-      error: false
+      error: 0 
     };
   }
   
   memoizeId = memoize((user_name) => {
     api.getPublicProfile(user_name).then(response => {
       let newProfile = {...this.state.profile};
-      let error = response.statusCode === 200;
+      let error = response.statusCode;
       Object.keys(response).map(key => {
         if (newProfile.hasOwnProperty(key)) {
           newProfile[key] = response[key];
@@ -59,6 +60,9 @@ class PublicProfile extends React.Component<PublicProfileProps, PublicProfileSta
 
   render() {
     this.memoizeId(this.props.user_name);
+    if (this.state.error === 404) {
+      return (<NotFound />);
+    }
     let profile = this.state.profile;
     let descItems: any[] = [
       ['institution', {title: 'Institution', desc: profile.institution}],
@@ -134,4 +138,4 @@ function editProfileList(isUser: Boolean) {
   return '';
 }
 
-export default PublicProfile;
+export default withRouter(PublicProfile);
