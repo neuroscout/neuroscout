@@ -21,7 +21,7 @@ def compile(flask_app, hash_id, run_ids=None, build=False):
         build (bool): Validate in pybids?
     """
     FILE_DATA = Path(flask_app.config['FILE_DIR'])
-    analysis_object = Analysis.query.filter_by(hash_id=hash_id).one
+    analysis_object = Analysis.query.filter_by(hash_id=hash_id).one()
 
     try:
         a_id, analysis, resources, pes, bids_dir,\
