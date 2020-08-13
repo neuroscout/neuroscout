@@ -13,6 +13,7 @@ from ..schemas.user import (UserSchema, UserCreationSchema, UserResetSchema,
 from ..schemas.predictor import PredictorSchema
 from ..schemas.analysis import AnalysisSchema
 from .predictor import get_predictors
+from flask import jsonify
 
 
 @marshal_with(UserSchema)
@@ -37,8 +38,8 @@ class UserRootResource(MethodResource):
             if value != current_identity.user_name:
                 if User.query.filter_by(user_name=value):
                     abort(422,
-                          {"message": {
-                            "user_name": {"User name is already in use"}}})
+                          jsonify({"message": {
+                            "user_name": {"User name is already in use"}}}))
 
         return put_record(kwargs, current_identity)
 
