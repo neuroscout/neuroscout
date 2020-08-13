@@ -70,7 +70,11 @@ class PublicProfile extends React.Component<PublicProfileProps & { history: any 
       ['bio', {title: 'Biography', desc: profile.bio}],
       ['twitter_handle', {
         title: 'Twitter',
-        desc: (<a target="_blank" href={profile.twitter_handle}>{profile.twitter_handle}</a>)
+        desc: (
+          <a target="_blank" href={'https://twitter.com/' + profile.twitter_handle}>
+            {'@' + profile.twitter_handle}
+          </a>
+        )
       }],
       ['personal_site', {
         title: 'Personal Site',

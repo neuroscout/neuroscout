@@ -30,7 +30,12 @@ class EditProfile extends React.Component<ProfileState & { history: any }, Profi
       <Row type="flex" justify="center" style={{ background: '#fff', padding: 0 }}>
         <MainCol>
           {!!this.state.errors &&
-              <Alert message={this.state.errors} type="error" />
+              <Row>
+                <Col {...formItemLayout.wrapperCol}>
+                  <Alert message={this.state.errors} type="error" />
+                  <br />
+                </Col>
+              </Row>
           }
           <div>
             Email:<Space />
@@ -85,9 +90,9 @@ class EditProfile extends React.Component<ProfileState & { history: any }, Profi
                   onChange={(e) => this.setState({bio: e.currentTarget.value})}
                 />
               </Form.Item>
-              <Form.Item label="Twitter URL">
+              <Form.Item label="Twitter Handle">
                 <Input
-                  defaultValue={this.state.twitter_handle}
+                  addonBefore="@"
                   value={this.state.twitter_handle}
                   onChange={(e) => this.setState({twitter_handle: e.currentTarget.value})}
                 />
@@ -113,8 +118,6 @@ class EditProfile extends React.Component<ProfileState & { history: any }, Profi
                   this.props.history.push(`/profile/${this.state.user_name}`);
                   this.props.update(this.state);
                 } else if (!!ret && ret.statusCode === 422) {
-                  // tslint:disable-next-line:no-console
-                  console.log(ret);
                   if (ret.message) {
                     Object.keys(ret.message).forEach(key => {
                       errorMessage += ret.message[key];
