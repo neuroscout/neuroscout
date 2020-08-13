@@ -45,8 +45,8 @@ class AnalysisSchema(Schema):
         RunSchema, many=True, only='id',
         description='Runs associated with analysis')
 
-    user = fields.Nested(UserSchema, many=False, only='user_name')
-
+    user = fields.Nested(UserSchema, many=False, only='user_name',
+                         dump_only=True)
 
     @validates('dataset_id')
     def validate_dsid(self, value):
