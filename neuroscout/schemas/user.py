@@ -32,6 +32,11 @@ class UserSchema(Schema):
         if len(value) < 6:
             raise ValidationError('Password must be at least 6 characters.')
 
+    @validates('user_name')
+    def validate_user(self, value):
+        if User.query.filter_by(user_name=value).first():
+            raise ValidationError('User name already in use.')
+
     @post_load
     def encrypt_password(self, in_data):
         if 'password' in in_data:
