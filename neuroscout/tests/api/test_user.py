@@ -1,12 +1,7 @@
-import json
 import datetime
 from flask_security.confirmable import confirm_user
 from ...models.auth import User
 from ..request_utils import decode_json
-
-
-def decode_json(resp):
-    return json.loads(resp.data.decode())
 
 
 def test_auth(auth_client):
