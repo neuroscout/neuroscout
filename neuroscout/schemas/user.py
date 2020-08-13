@@ -1,4 +1,5 @@
 from flask_security.utils import encrypt_password
+from flask_jwt import current_identity
 from marshmallow import (
     Schema, fields, validates, ValidationError, post_load, post_dump)
 from ..models import User
@@ -35,9 +36,9 @@ class UserSchema(Schema):
 
     @validates('user_name')
     def validate_user(self, value):
-        matches = User.query.filter_by(user_name=value)
-        if matches.filter(User.id != self.id).count():
-            raise ValidationError('User name already in use.')
+        if value != current_identity.user_name:
+            if User.query.filter_by(user_name=value):
+                raise ValidationError('User name already in use.')
 
     @post_load
     def encrypt_password(self, in_data):
