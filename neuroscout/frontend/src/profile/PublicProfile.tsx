@@ -78,6 +78,9 @@ class PublicProfile extends React.Component<PublicProfileProps & { history: any 
       }]
     ];
     descItems = descItems.filter(x => !!profile[x[0]]).map(x => x[1]);
+    if (profile.public_email) {
+      descItems = [{title: 'Email', desc: profile.email}, ...descItems];
+    }
 
     return (
       <Row type="flex" justify="center" style={{ background: '#fff', padding: 0 }}>
