@@ -113,7 +113,13 @@ class EditProfile extends React.Component<ProfileState & { history: any }, Profi
                   this.props.history.push(`/profile/${this.state.user_name}`);
                   this.props.update(this.state);
                 } else if (!!ret && ret.statusCode === 422) {
-                  errorMessage = 'Username already in use.';
+                  // tslint:disable-next-line:no-console
+                  console.log(ret);
+                  if (ret.message) {
+                    Object.keys(ret.message).forEach(key => {
+                      errorMessage += ret.message[key];
+                    });
+                  }
                   this.setState({user_name: this.props.user_name});
                 }
                 this.setState({errors: errorMessage});
