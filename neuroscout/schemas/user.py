@@ -1,5 +1,6 @@
 from flask_security.utils import encrypt_password
-from marshmallow import Schema, fields, validates, ValidationError, post_load
+from marshmallow import (
+    Schema, fields, validates, ValidationError, post_load, post_dump)
 from ..models import User
 
 
@@ -7,6 +8,8 @@ class UserSchema(Schema):
     email = fields.Email(required=True)
     name = fields.Str(required=True, description='User full name')
     user_name = fields.Str(description='User name')
+    password = fields.Str(load_only=True,
+                          description='Password. Minimum 6 characters.')
     picture = fields.Str(allow_none=True,
                          description='Links to avatar.')
     personal_site = fields.Str(allow_none=True,
