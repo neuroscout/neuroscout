@@ -4,12 +4,9 @@ from ..models import User
 
 
 class UserSchema(Schema):
-    id = fields.Integer()
     email = fields.Email(required=True)
     name = fields.Str(required=True, description='User full name')
     user_name = fields.Str(description='User name')
-    password = fields.Str(load_only=True,
-                          description='Password. Minimum 6 characters.')
     picture = fields.Str(allow_none=True,
                          description='Links to avatar.')
     personal_site = fields.Str(allow_none=True,
@@ -40,6 +37,14 @@ class UserSchema(Schema):
 
     class Meta:
         strict = True
+
+
+class UserPublicSchema(UserSchema):
+    @post_load
+    def redact_email(self, out_data):
+        if not out_data['public_email']:
+            out_data['email'] = 'HIDDEN'
+        return out_data
 
 
 class UserCreationSchema(UserSchema):

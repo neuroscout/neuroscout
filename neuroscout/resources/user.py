@@ -8,7 +8,8 @@ from ..database import db
 from ..auth import register_user, reset_password, send_confirmation
 from .utils import abort, auth_required, first_or_404
 from ..utils.db import put_record
-from ..schemas.user import UserSchema, UserCreationSchema, UserResetSchema
+from ..schemas.user import (UserSchema, UserCreationSchema, UserResetSchema,
+                            UserPublicSchema)
 from ..schemas.predictor import PredictorSchema
 from ..schemas.analysis import AnalysisSchema
 from .predictor import get_predictors
@@ -34,11 +35,12 @@ class UserRootResource(MethodResource):
         return put_record(kwargs, current_identity)
 
 
-@marshal_with(UserSchema)
+@marshal_with(UserPublicSchema)
 class UserDetailResource(MethodResource):
     @doc(tags=['user'], summary='Get a given users information.')
     def get(self, user_name):
         return first_or_404(User.query.filter_by(user_name=user_name))
+
 
 @marshal_with(AnalysisSchema(many=True))
 class UserPrivateAnalysisListResource(MethodResource):
@@ -48,8 +50,9 @@ class UserPrivateAnalysisListResource(MethodResource):
         kwargs = {'user_id': current_identity.id}
         return Analysis.query.filter_by(**kwargs)
 
-@marshal_with(UserSchema(many=True, exclude=['predictor_collections',
-                                             'first_login']))
+
+@marshal_with(UserPublicSchema(
+    many=True,  exclude=['predictor_collections', 'first_login']))
 class UserListResource(MethodResource):
     @doc(tags=['user'], summary='Get a list of public users.')
     def get(self):
@@ -61,7 +64,8 @@ class UserAnalysisListResource(MethodResource):
     @doc(tags=['user'], summary='Get a list of analyses created by a user.')
     def get(self, user_name):
         kwargs = {'private': False, 'status': 'PASSED'}
-        return Analysis.query.filter_by(**kwargs).join(User).filter(User.user_name == user_name)
+        return Analysis.query.filter_by(**kwargs).join(
+            User).filter(User.user_name == user_name)
 
 
 class UserResendConfirm(MethodResource):
