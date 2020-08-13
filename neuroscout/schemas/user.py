@@ -5,6 +5,7 @@ from ..models import User
 
 
 class UserSchema(Schema):
+    id = fields.Int(load_only=True)
     email = fields.Email(required=True)
     name = fields.Str(required=True, description='User full name')
     user_name = fields.Str(description='User name')
@@ -34,7 +35,8 @@ class UserSchema(Schema):
 
     @validates('user_name')
     def validate_user(self, value):
-        if User.query.filter_by(user_name=value).first():
+        matches = User.query.filter_by(user_name=value)
+        if matches.filter(User.id != self.id).count():
             raise ValidationError('User name already in use.')
 
     @post_load
