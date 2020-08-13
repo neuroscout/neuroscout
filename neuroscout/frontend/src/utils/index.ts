@@ -42,7 +42,7 @@ export const _fetch = (path: string, options?: object) => {
         throw new Error('Please Login Again');
       }
       if (response.status >= 400) {
-        pres(response);
+        // pres(response);
         return { statusCode: response.status };
       } else {
         return response.json().then(json => {

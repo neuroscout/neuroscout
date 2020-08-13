@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { message, Divider, Row, Col, Button, Card, Form, Input, Switch } from 'antd';
+import { Alert, message, Divider, Row, Col, Button, Card, Form, Input, Switch } from 'antd';
 import { MainCol, Space } from '../HelperComponents';
 import { withRouter } from 'react-router-dom';
 
@@ -15,13 +15,13 @@ const formItemLayout = {
   }
 };
 
-class EditProfile extends React.Component<ProfileState & { history: any }, ProfileState> {
+class EditProfile extends React.Component<ProfileState & { history: any }, ProfileState & {errors: string}> {
   constructor(props) {
     super(props);
-    this.state = {...props};
+    this.state = {...props, errors: ''};
   }
 
-  profileLoaded = memoize((...args) => { this.setState({...this.props}); });
+  profileLoaded = memoize((...args) => { this.setState({...this.props, errors: this.state.errors}); });
 
   render() {
     this.profileLoaded(...profileEditItems.map(x => this.props[x]));
@@ -29,6 +29,9 @@ class EditProfile extends React.Component<ProfileState & { history: any }, Profi
     <div>
       <Row type="flex" justify="center" style={{ background: '#fff', padding: 0 }}>
         <MainCol>
+          {!!this.state.errors &&
+              <Alert message={this.state.errors} type="error" />
+          }
           <div>
             Email:<Space />
             {this.state.email}
@@ -40,7 +43,9 @@ class EditProfile extends React.Component<ProfileState & { history: any }, Profi
               onChange={checked => this.setState({'public_email': '' + checked})}
             />
             <br/>
-            Avatar: {this.state.picture}<br/>
+            {!!this.state.picture &&
+              <>Avatar: {this.state.picture}<br/></>
+            }
             <Form {...formItemLayout} layout="vertical">
               <Form.Item label="Name" required={true}>
                 <Input
@@ -101,12 +106,17 @@ class EditProfile extends React.Component<ProfileState & { history: any }, Profi
               return api.updateProfile(profileEditItems.reduce(
                 (acc, curr) => {acc[curr] = this.state[curr]; return acc; },
                 {}
-              )).then((ret) => {
+              )).then((ret: any) => {
+                let errorMessage = '';
                 if (!!ret && ret.statusCode === 200) {
                   message.success('Profile updated.');
                   this.props.history.push(`/profile/${this.state.user_name}`);
+                  this.props.update(this.state);
+                } else if (!!ret && ret.statusCode === 422) {
+                  errorMessage = 'Username already in use.';
+                  this.setState({user_name: this.props.user_name});
                 }
-                this.props.update(this.state);
+                this.setState({errors: errorMessage});
               });
             }}
             size={'small'}
