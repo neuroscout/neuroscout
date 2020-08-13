@@ -78,7 +78,7 @@ class PublicProfile extends React.Component<PublicProfileProps & { history: any 
       }],
       ['personal_site', {
         title: 'Personal Site',
-        desc: (<a target="_blank" href={profile.personal_site}>{profile.personal_site}</a>)
+        desc: (<a target="_blank" href={'https://' + profile.personal_site}>{profile.personal_site}</a>)
       }]
     ];
     descItems = descItems.filter(x => !!profile[x[0]]).map(x => x[1]);

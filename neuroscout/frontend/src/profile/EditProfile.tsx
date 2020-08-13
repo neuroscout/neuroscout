@@ -99,6 +99,7 @@ class EditProfile extends React.Component<ProfileState & { history: any }, Profi
               </Form.Item>
               <Form.Item label="Personal Site">
                 <Input
+                  addonBefore="https://" 
                   defaultValue={this.state.personal_site}
                   value={this.state.personal_site}
                   onChange={(e) => this.setState({personal_site: e.currentTarget.value})}
