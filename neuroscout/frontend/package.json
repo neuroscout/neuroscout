@@ -25,7 +25,7 @@
     "react-router": "^4",
     "react-router-dom": "^4",
     "reactour": "^1.15.0",
-    "serialize-javascript": "^2.1.1",
+    "serialize-javascript": "^3.1.0",
     "styled-components": "^4.0.0",
     "vega": "^5.9.0",
     "vega-embed": "^4.0.0",
