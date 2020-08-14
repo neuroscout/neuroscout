@@ -2,7 +2,7 @@
     Misc utils related to database functions.
 """
 from flask import abort, current_app
-from sqlalchemy.exc import SQLAlchemyError
+from sqlalchemy.exc import SQLAlchemyError, IntegrityError
 from ..models import (Analysis, RunStimulus, Predictor, PredictorEvent,
                       ExtractedEvent, Stimulus)
 from ..database import db
@@ -118,7 +118,10 @@ def put_record(updated_values, instance, commit=True):
             if commit is True:
                 db.session.commit()
         return instance
-
+    except IntegrityError as e:
+        current_app.logger.error(e)
+        db.session.rollback()
+        abort(422, "Error updating field")
     except SQLAlchemyError as e:
         current_app.logger.error(e)
         db.session.rollback()

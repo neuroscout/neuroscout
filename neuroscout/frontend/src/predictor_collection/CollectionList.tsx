@@ -4,24 +4,24 @@ import { Button, Card, Checkbox, Collapse, Form, Icon, Input, List, Modal, Row, 
 import { TableRowSelection } from 'antd/lib/table';
 
 import { api } from '../api';
-import { authActions } from '../auth.actions';
 import { ApiUser, Dataset, PredictorCollection, Run, RunFilters } from '../coretypes';
 import { datasetColumns, MainCol } from '../HelperComponents';
 import { AddPredictorsForm } from './AddPredictorsForm';
 
 const { Text } = Typography;
 
-type CollectionListProps = {
-  datasets: Dataset[],
-  collections: PredictorCollection[]
-};
+export interface CollectionListProps {
+  datasets: Dataset[];
+  collections: PredictorCollection[];
+  updateUser: (data: any, updateLocal?: boolean) => void;
+}
 
-type CollectionListState = {
-  formModal: boolean,
-  user?: ApiUser,
-  collections?: PredictorCollection[],
-  loading: boolean
-};
+export interface CollectionListState {
+  formModal: boolean;
+  user?: ApiUser;
+  collections?: PredictorCollection[];
+  loading: boolean;
+}
 
 export class PredictorCollectionList extends React.Component<CollectionListProps, CollectionListState> {
   constructor(props) {
@@ -46,7 +46,7 @@ export class PredictorCollectionList extends React.Component<CollectionListProps
     }).then((collections) => {
       // collections.sort((a, b) => { return b.id - a.id; });
       this.setState({loading: false});
-      authActions.update({predictorCollections: collections});
+      this.props.updateUser({predictorCollections: collections});
     });
   };
  

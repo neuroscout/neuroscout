@@ -3,6 +3,7 @@
  The data models below are largely UI agonstic. This module is a good starting point to understand the
  shape of the data in the frontend app. All resusable type definitions should go into this module.
 */
+import { UserStore } from './user';
 
 export type AnalysisStatus = 'DRAFT' | 'PENDING' | 'PASSED' | 'FAILED' | 'SUBMITTING';
 
@@ -18,12 +19,13 @@ export interface Analysis {
   hrfPredictorIds: string[];
   status: AnalysisStatus;
   private?: boolean;
-  modifiedAt?: string;
+  modified_at?: string;
   config: AnalysisConfig;
   transformations: Transformation[];
   contrasts: Contrast[];
   model?: BidsModel;
   dummyContrast: boolean;
+  user_name?: string;
 }
 
 // Normalized dataset object in Analysis Builder
@@ -200,7 +202,7 @@ export interface Store {
   fillAnalysis: boolean;
   analysis404: boolean;
   doTooltip: boolean;
-  auth?: AuthStoreState;
+  user?: UserStore;
 }
 
 export interface ApiRun {
@@ -226,6 +228,7 @@ export interface ApiAnalysis {
   config: AnalysisConfig;
   modified_at?: string;
   model?: BidsModel;
+  user?: string;
 }
 
 export interface BidsModel {
@@ -272,16 +275,6 @@ export interface PredictorCollection {
   predictors?: Predictor[];
 }
 
-// Shape of User object as consumed/produced by the backend API
-export interface ApiUser {
-  email: string;
-  name: string;
-  picture: string;
-  analyses: ApiAnalysis[];
-  predictor_collections: PredictorCollection[];
-  first_login: boolean;
-}
-
 // The more condensed version of analysis object as returned by the user route
 // and displayed as list of analyses on the homepage
 export interface AppAnalysis {
@@ -289,37 +282,43 @@ export interface AppAnalysis {
   name: string;
   description: string;
   status: AnalysisStatus;
-  datasetName?: string;
-  modifiedAt?: string;
+  dataset_id?: string;
+  modified_at?: string;
+  user_name?: string;
 }
 
-export interface AuthStoreState {
-  jwt: string;
-  loggedIn: boolean;
-  openLogin: boolean;
-  openSignup: boolean;
-  openReset: boolean;
-  openEnterResetToken: boolean;
-  openTour: boolean;
-  loginError: string;
-  signupError: string;
-  resetError: string;
-  email: string | undefined;
-  name: string | undefined;
-  password: string | undefined;
-  token: string | null;
-  loggingOut: boolean; // flag set on logout to know to redirect after logout
-  nextURL: string | null; // will probably remove this and find a better solution to login redirects
-  gAuth: any;
-  avatar: string;
-  predictorCollections: PredictorCollection[];
+export const profileEditItems = ['name', 'user_name', 'institution', 'orcid', 'bio', 'twitter_handle', 'personal_site',
+                                 'public_email', 'picture'];
+
+export interface User {
+  id: number;
+  name: string;
+  user_name: string;
+  email: string;
+  institution: string;
+  orcid: string;
+  bio: string;
+  twitter_handle: string;
+  personal_site: string;
+  public_email: string;
+  picture: string;
 }
 
+export interface ProfileState extends User {
+  update: (updates: Partial<ProfileState>, updateLocal?: boolean) => void;
+}
+
+// Shape of User object as consumed/produced by the backend API
+export interface ApiUser extends User {
+  analyses?: AppAnalysis[];
+  predictor_collections: PredictorCollection[];
+  first_login: boolean;
+}
 export interface AppState {
   loadAnalyses: () => void;
   analyses: (AppAnalysis[] | null); // List of analyses belonging to the user
   publicAnalyses: (AppAnalysis[] | null); // List of public analyses
-  auth: AuthStoreState;
+  user: UserStore;
   datasets: Dataset[];
   cloneAnalysis: (number) => void;
   onDelete:  (analysis: AppAnalysis) => void;

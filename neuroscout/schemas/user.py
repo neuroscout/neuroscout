@@ -1,24 +1,33 @@
 from flask_security.utils import encrypt_password
-from marshmallow import Schema, fields, validates, ValidationError, post_load
+from flask_jwt import current_identity
+from marshmallow import (
+    Schema, fields, validates, ValidationError, post_load, post_dump)
 from ..models import User
 
 
 class UserSchema(Schema):
+    id = fields.Int(load_only=True)
     email = fields.Email(required=True)
     name = fields.Str(required=True, description='User full name')
+    user_name = fields.Str(description='User name')
     password = fields.Str(load_only=True,
                           description='Password. Minimum 6 characters.')
-    picture = fields.Str(allow_none=True)
-    analyses = fields.Nested(
-        'AnalysisSchema',  many=True, dump_only=True,
-        only=['hash_id', 'name', 'status', 'description',
-              'modified_at', 'dataset_id']
-        )
+    picture = fields.Str(allow_none=True,
+                         description='Links to avatar.')
+    personal_site = fields.Str(allow_none=True,
+                               description='Site URL.')
+    twitter_handle = fields.Str(allow_none=True,
+                                description='Twitter handle.')
+    orcid = fields.Str(allow_none=True,
+                       description='ORCID')
+    public_email = fields.Bool(description='Display email in public profile.')
+
     predictor_collections = fields.Nested(
         'PredictorCollectionSchema', only=['id', 'collection_name'],
         description='Predictor collections contributed by this user.',
         many=True, dump_only=True)
     first_login = fields.Bool(description='First time logging in.')
+    institution = fields.Str(allow_none=True)
 
     @validates('password')
     def validate_pass(self, value):
@@ -33,6 +42,14 @@ class UserSchema(Schema):
 
     class Meta:
         strict = True
+
+
+class UserPublicSchema(UserSchema):
+    @post_dump
+    def redact_email(self, out_data):
+        if not out_data['public_email']:
+            out_data['email'] = 'HIDDEN'
+        return out_data
 
 
 class UserCreationSchema(UserSchema):

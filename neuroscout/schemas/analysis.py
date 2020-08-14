@@ -4,6 +4,7 @@ from ..models import Dataset, Run, Predictor
 from .dataset import DatasetSchema
 from .run import RunSchema
 from .predictor import PredictorSchema
+from .user import UserSchema
 
 
 class AnalysisSchema(Schema):
@@ -17,8 +18,6 @@ class AnalysisSchema(Schema):
     predictions = fields.Str(description='User apriori predictions.')
 
     dataset_id = fields.Int(required=True)
-    task_name = fields.Str(description='Task name', dump_only=True)
-    TR = fields.Float(description='Time repetition (s)', dump_only=True)
 
     model = fields.Dict(description='BIDS model.')
 
@@ -45,6 +44,9 @@ class AnalysisSchema(Schema):
     runs = fields.Nested(
         RunSchema, many=True, only='id',
         description='Runs associated with analysis')
+
+    user = fields.Nested(UserSchema, many=False, only='user_name',
+                         dump_only=True)
 
     @validates('dataset_id')
     def validate_dsid(self, value):

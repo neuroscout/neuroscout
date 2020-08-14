@@ -1,6 +1,4 @@
 import { message } from 'antd';
-import { authActions } from '../auth.actions';
-
 // Display error to user as a UI notification and log it to console
 export const displayError = (error: Error) => {
   try {
@@ -40,18 +38,11 @@ async function pres(res) {
 
 export const _fetch = (path: string, options?: object) => {
   return fetch(path, options).then(response => {
-      // Need to figure this response out. openLogin triggers modal to popup,
-      // but in next cycle. Keep track of request, and after submit on modal
-      // run jwt fetch again?
       if (response.status === 401) {
-        authActions.update({
-          openLogin: true,
-          loggedIn: false,
-        });
         throw new Error('Please Login Again');
       }
-      if (response.status >= 400) {
-        pres(response);
+      if (response.status !== 200 && response.status !== 422) {
+        // pres(response);
         return { statusCode: response.status };
       } else {
         return response.json().then(json => {
@@ -77,6 +68,9 @@ export const _fetch = (path: string, options?: object) => {
 // - Decoding JSON response and adding the response status code to decoded JSON object
 export const jwtFetch = (path: string, options?: any, noCT?: boolean) => {
   const jwt = window.localStorage.getItem('jwt');
+  if (!jwt) {
+    return _fetch(path, options);
+  }
 
   if (!options) { options = {}; }
   if (!options.headers) { options.headers = {}; }

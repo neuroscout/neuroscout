@@ -1,6 +1,7 @@
 
 import * as React from 'react';
 import { Collapse, Card, Table } from 'antd';
+import { Link } from 'react-router-dom';
 
 import {
   Dataset,
@@ -18,6 +19,7 @@ interface ReviewProps {
   unsavedChanges: boolean;
   availablePredictors: Predictor[];
   dataset?: Dataset;
+  user_name?: string;
 }
 
 class DatasetInfo extends React.Component<{dataset: Dataset}, {}> {
@@ -160,6 +162,7 @@ export class Review extends React.Component<ReviewProps, {}> {
       <Card
         title={'Overview of ' + (Name ? Name : 'No Name')}
       >
+        Author: <Link to={`/profile/${this.props.user_name}`}> {this.props.user_name} </Link>
         <p>{Description ? Description : 'No description.'}</p>
         <Collapse bordered={false}>
         {dataset && <Panel header={`Dataset - ${dataset.name}`} key="dataset"><DatasetInfo dataset={dataset}/></Panel>}

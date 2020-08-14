@@ -10,7 +10,8 @@ import {
   AppAnalysis,
   Dataset,
   Predictor,
-  Run
+  Run,
+  User
 } from './coretypes';
 //  PredictorCollection
 import { config } from './config';
@@ -40,13 +41,18 @@ export const ApiToAppAnalysis = (data: ApiAnalysis): AppAnalysis => ({
   name: data.name,
   description: data.description,
   status: data.status,
-  datasetName: !!data.dataset_id ? '' + data.dataset_id : '',
-  modifiedAt: data.modified_at
+  dataset_id: !!data.dataset_id ? '' + data.dataset_id : '',
+  modified_at: data.modified_at,
+  user_name: data.user
 });
 
 export const api = {
-  getUser: (): Promise<ApiUser> => {
+  getUser: (): Promise<ApiUser & {statusCode: number}> => {
     return jwtFetch(`${domainRoot}/api/user`);
+  },
+
+  getUsers: (): Promise<User[] & {statusCode: number}> => {
+    return jwtFetch(`${domainRoot}/api/users`);
   },
 
   getDatasets:  (active_only = true): Promise<Dataset[]> => {
@@ -102,10 +108,24 @@ export const api = {
   },
 
   // Gets a logged in users own analyses
-  getAnalyses: (): Promise<AppAnalysis[]> => {
-    return jwtFetch(`${domainRoot}/api/user`)
+  getMyAnalyses: (): Promise<AppAnalysis[]> => {
+    let url = `${domainRoot}/api/user/myanalyses`;
+    return jwtFetch(url)
       .then(data => {
-        return (data.analyses || []).filter(x => !!x.status).map((x) => ApiToAppAnalysis(x));
+        return (data || []).filter(x => !!x.status).map((x) => ApiToAppAnalysis(x));
+      })
+      .catch((error) => {
+        displayError(error);
+        return [] as AppAnalysis[];
+      });
+  },
+
+  // Gets a logged in users own analyses
+  getAnalyses: (user_name: string): Promise<AppAnalysis[]> => {
+    let url = `${domainRoot}/api/user/${user_name}/analyses`;
+    return jwtFetch(url)
+      .then(data => {
+        return (data || []).filter(x => !!x.status).map((x) => ApiToAppAnalysis(x));
       })
       .catch((error) => {
         displayError(error);
@@ -190,5 +210,19 @@ export const api = {
       displayError(error);
       return null;
     });
+  },
+
+  updateProfile: (updates): Promise<ApiUser & {statusCode: number}> => {
+    return jwtFetch(
+      `${domainRoot}/api/user`,
+      {
+        headers: {'accept': 'application/json'},
+        method: 'put',
+        body: JSON.stringify(updates)
+      }
+    );
+  },
+  getPublicProfile: (user_name: string): Promise<ApiUser & {statusCode: number}> => {
+    return jwtFetch(`${domainRoot}/api/user/${user_name}`);
   }
 };
