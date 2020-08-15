@@ -9,6 +9,9 @@ import { AppState } from './coretypes';
 import { NotFound } from './HelperComponents';
 import Home from './Home';
 import { PredictorCollectionList } from './predictor_collection/CollectionList';
+import EditProfile from './profile/EditProfile';
+import PublicProfile from './profile/PublicProfile';
+import UserList from './profile/UserList';
 
 export default class Routes extends React.Component<AppState, {}> {
   render() {
@@ -29,13 +32,14 @@ export default class Routes extends React.Component<AppState, {}> {
             // Longer term to automatically redirect the user to the target URL after login we
             // need to implement something like the auth workflow example here:
             // https://reacttraining.com/react-router/web/example/auth-workflow
-            if (this.props.auth.loggedIn || this.props.auth.openLogin) {
+            if (this.props.user.loggedIn || this.props.user.openLogin) {
               return <AnalysisBuilder
                         updatedAnalysis={() => this.props.loadAnalyses()}
                         key={props.location.key}
                         datasets={this.props.datasets}
-                        doTour={this.props.auth.openTour}
+                        doTour={this.props.user.openTour}
                         userOwns={true}
+                        checkJWT={() => this.props.user.checkJWT(undefined)}
               />;
             }
             message.warning('Please log in first and try again');
@@ -54,6 +58,7 @@ export default class Routes extends React.Component<AppState, {}> {
               }
               datasets={this.props.datasets}
               doTooltip={true}
+              checkJWT={() => this.props.user.checkJWT(undefined)}
             />;
           }}
         />
@@ -70,6 +75,7 @@ export default class Routes extends React.Component<AppState, {}> {
               }
               datasets={this.props.datasets}
               doTooltip={true}
+              checkJWT={() => this.props.user.checkJWT(undefined)}
             />
           }
         />
@@ -82,6 +88,8 @@ export default class Routes extends React.Component<AppState, {}> {
             cloneAnalysis={this.props.cloneAnalysis}
             datasets={this.props.datasets}
             publicList={true}
+            loggedIn={this.props.user.loggedIn}
+            showOwner={true}
           />}
       />
       <Route
@@ -94,6 +102,7 @@ export default class Routes extends React.Component<AppState, {}> {
             onDelete={this.props.onDelete}
             datasets={this.props.datasets}
             publicList={false}
+            loggedIn={this.props.user.loggedIn}
           />}
       />
       <Route
@@ -101,8 +110,36 @@ export default class Routes extends React.Component<AppState, {}> {
         render={props =>
           <PredictorCollectionList
             datasets={this.props.datasets}
-            collections={this.props.auth.predictorCollections}
+            collections={this.props.user.predictorCollections}
+            updateUser={this.props.user.update}
           />}
+      />
+      <Route
+        path="/profile/edit"
+        render={props =>
+          <EditProfile {...this.props.user.profile} />
+        }
+      />
+      <Route
+        path="/profile/:user_name"
+        render={props => {
+          return (<PublicProfile 
+            user_name={props.match.params.user_name}
+            datasets={this.props.datasets}
+            cloneAnalysis={this.props.cloneAnalysis}
+            loggedIn={this.props.user.loggedIn}
+            isUser={props.match.params.user_name === '' + this.props.user.profile.user_name}
+          />);
+        }}
+      />
+      <Route
+        path="/profile"
+        render={props => {
+          if (this.props.user.profile.user_name !== '') {
+            return <Redirect to={'/profile/' + this.props.user.profile.user_name} />;
+          }
+          return <Redirect to="/profiles" />;
+        }}
       />
       <Route component={NotFound} />
       </Switch>

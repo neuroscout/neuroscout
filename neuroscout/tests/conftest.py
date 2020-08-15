@@ -123,11 +123,13 @@ def add_users(app, db, session):
     pass2 = 'test2'
 
     user_datastore.create_user(email=user1, password=encrypt_password(pass1),
+                               user_name='testuser',
                                confirmed_at=datetime.datetime.now())
     session.commit()
     id_1 = user_datastore.find_user(email=user1).id
 
     user_datastore.create_user(email=user2, password=encrypt_password(pass2),
+                               user_name='testuser2',
                                confirmed_at=datetime.datetime.now())
     session.commit()
     id_2 = user_datastore.find_user(email=user2).id

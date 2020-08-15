@@ -6,16 +6,15 @@ Top-level App component containing AppState. The App component is currently resp
 */
 import * as React from 'react';
 import { BrowserRouter as Router, Route, Redirect } from 'react-router-dom';
-import Reflux from 'reflux';
 import { Layout, Modal, message } from 'antd';
 import ReactGA from 'react-ga';
+import memoize from 'memoize-one';
 
 import './css/App.css';
 import { api } from './api';
-import { AuthStore } from './auth.store';
-import { authActions } from './auth.actions';
+import { UserStore } from './user';
 import { config } from './config';
-import { ApiAnalysis, AppAnalysis, AppState } from './coretypes';
+import { ApiAnalysis, AppAnalysis, AppState, profileEditItems, ProfileState } from './coretypes';
 import { LoginModal, ResetPasswordModal, SignupModal } from './Modals';
 import Routes from './Routes';
 import { jwtFetch, timeout } from './utils';
@@ -35,51 +34,59 @@ type JWTChangeProps = {
   loadAnalyses:  () => any;
   checkAnalysesStatus: (key: number) => any;
   jwt: string;
+  user_name: string;
 };
 
 // This global var lets the dumb polling loops know when to exit.
 let checkCount = 0;
 
 class JWTChange extends React.Component<JWTChangeProps, {}> {
-  constructor(props) {
-    super(props);
-    if (this.props.jwt !== '' && this.props.jwt !== null) {
-      props.loadAnalyses();
-      checkCount += 1;
-      props.checkAnalysesStatus(checkCount);
-    }
-  }
-
-  componentDidUpdate(prevProps, prevState) {
-    if (!!this.props.jwt && this.props.jwt !== prevProps.jwt) {
+  jwtChanged = memoize((jwt, user_name) => {
+    if (!!jwt && user_name > 0) {
       this.props.loadAnalyses();
+      checkCount += 1;
+      this.props.checkAnalysesStatus(checkCount);
     }
-  }
+  });
 
-  render() { return null; }
+  render() { 
+    this.jwtChanged(this.props.jwt, this.props.user_name);
+    return null;
+  }
 }
 
 // Top-level App component
-class App extends Reflux.Component<any, {}, AppState> {
+class App extends React.Component<{}, AppState> {
   constructor(props) {
     super(props);
+    
     this.state = {
       loadAnalyses: () => {
-        api.getAnalyses().then(analyses => {
+        api.getMyAnalyses().then(analyses => {
           this.setState({ analyses });
         });
       },
       analyses: null,
       publicAnalyses: null,
-      auth: authActions.getInitialState(),
+      user: new UserStore(this.setState.bind(this)),
       datasets: [],
       onDelete: this.onDelete,
-      cloneAnalysis: this.cloneAnalysis
+      cloneAnalysis: this.cloneAnalysis,
     };
-    this.store = AuthStore;
+  }
+
+  componentDidMount() {
     api.getPublicAnalyses().then((publicAnalyses) => {
       this.setState({ publicAnalyses });
     });
+    if (!!window.localStorage.getItem('jwt')) {
+      api.getUser().then((response) => {
+        let updates = profileEditItems.reduce((acc, curr) => {acc[curr] = response[curr]; return acc; }, {});
+        this.state.user.profile.update(updates, true);
+      }).catch(error => {
+        return;
+      });
+    }
     api.getDatasets(false).then((datasets) => {
       if (datasets.length !== 0) {
         this.setState({ datasets });
@@ -92,8 +99,9 @@ class App extends Reflux.Component<any, {}, AppState> {
    */
   checkAnalysesStatus = async (key: number) => {
     while (true) {
+      /*
       if (key < checkCount) { return; }
-      if (!(this.state.auth.loggedIn)) { return; }
+      if (!(this.state.user.loggedIn)) { return; }
       let changeFlag = false;
       if (this.state.analyses !== null) {
         let updatedAnalyses = this.state.analyses.map(async (analysis) => {
@@ -119,6 +127,7 @@ class App extends Reflux.Component<any, {}, AppState> {
           }
         });
       }
+      */
       await timeout(12000);
     }
   };
@@ -165,7 +174,7 @@ class App extends Reflux.Component<any, {}, AppState> {
   AnalyticIndex = withTracker(Routes);
 
   render() {
-    if (this.state.auth.loggingOut) {
+    if (this.state.user.loggingOut) {
       return (
         <Router>
           <Redirect to="/" />
@@ -179,18 +188,19 @@ class App extends Reflux.Component<any, {}, AppState> {
           <JWTChange
             loadAnalyses={this.state.loadAnalyses}
             checkAnalysesStatus={this.checkAnalysesStatus}
-            jwt={this.state.auth.jwt}
+            jwt={this.state.user.jwt}
+            user_name={this.state.user.profile.user_name}
           />
-          {this.state.auth.openLogin && <LoginModal {...this.state.auth} />}
-          {this.state.auth.openReset && <ResetPasswordModal {...this.state.auth} />}
-          {this.state.auth.openSignup && <SignupModal {...this.state.auth} />}
+          {this.state.user.openLogin && <LoginModal {...this.state.user} />}
+          {this.state.user.openReset && <ResetPasswordModal {...this.state.user} />}
+          {this.state.user.openSignup && <SignupModal {...this.state.user} />}
           <Tour
-            isOpen={this.state.auth.openTour}
-            closeTour={authActions.closeTour}
+            isOpen={this.state.user.openTour}
+            closeTour={this.state.user.closeTour}
           />
           <Layout>
             <Content style={{ background: '#fff' }}>
-              <Navbar {...this.state.auth} />
+              <Navbar {...this.state.user} />
               <br />
               <Route 
                 render={(routeProps) => 
@@ -206,8 +216,8 @@ class App extends Reflux.Component<any, {}, AppState> {
 
   componentDidUpdate(prevProps, prevState) {
     // Need to do this so logout redirect only happens once, otherwise it'd be an infinite loop
-    if (this.state.auth.loggingOut) {
-      authActions.update({ loggingOut: false });
+    if (this.state.user.loggingOut) {
+      this.state.user.update({ loggingOut: false });
       this.setState({analyses: []});
     }
   }
