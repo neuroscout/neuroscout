@@ -10,6 +10,8 @@
         "summary": "Movie watching",
         "converters": [
         ],
+        "extractors": [
+        ],
         "tokenized_extractors": [
         ],
         "transformations": [
