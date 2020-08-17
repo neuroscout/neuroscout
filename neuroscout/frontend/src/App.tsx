@@ -42,7 +42,7 @@ let checkCount = 0;
 
 class JWTChange extends React.Component<JWTChangeProps, {}> {
   jwtChanged = memoize((jwt, user_name) => {
-    if (!!jwt && user_name > 0) {
+    if (!!jwt && !!user_name) {
       this.props.loadAnalyses();
       checkCount += 1;
       this.props.checkAnalysesStatus(checkCount);

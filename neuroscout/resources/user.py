@@ -48,15 +48,6 @@ class UserDetailResource(MethodResource):
         return first_or_404(User.query.filter_by(user_name=user_name))
 
 
-@marshal_with(AnalysisSchema(many=True))
-class UserPrivateAnalysisListResource(MethodResource):
-    @doc(tags=['user'], summary='Get a list of analyses created by a user.')
-    @auth_required
-    def get(self):
-        kwargs = {'user_id': current_identity.id}
-        return Analysis.query.filter_by(**kwargs)
-
-
 @marshal_with(UserPublicSchema(
     many=True,  exclude=['predictor_collections', 'first_login']))
 class UserListResource(MethodResource):
@@ -65,7 +56,20 @@ class UserListResource(MethodResource):
         return User.query.all()
 
 
-@marshal_with(AnalysisSchema(many=True))
+@marshal_with(AnalysisSchema(many=True,
+                             only=['hash_id', 'name', 'description', 'status',
+                                   'dataset_id', 'modified_at', 'user']))
+class UserPrivateAnalysisListResource(MethodResource):
+    @doc(tags=['user'], summary='Get a list of analyses created by a user.')
+    @auth_required
+    def get(self):
+        kwargs = {'user_id': current_identity.id}
+        return Analysis.query.filter_by(**kwargs)
+
+
+@marshal_with(AnalysisSchema(many=True,
+                             only=['hash_id', 'name', 'description', 'status',
+                                   'dataset_id', 'modified_at', 'user']))
 class UserAnalysisListResource(MethodResource):
     @doc(tags=['user'], summary='Get a list of analyses created by a user.')
     def get(self, user_name):

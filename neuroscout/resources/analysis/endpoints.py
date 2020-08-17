@@ -25,7 +25,9 @@ class AnalysisMethodResource(MethodResource):
 
 class AnalysisRootResource(AnalysisMethodResource):
     """" Resource for root address """
-    @marshal_with(AnalysisSchema(many=True))
+    @marshal_with(AnalysisSchema(many=True,
+                                 only=['hash_id', 'name', 'description', 'status',
+                                       'dataset_id', 'modified_at', 'user']))
     @doc(summary='Returns list of public analyses.')
     @use_kwargs({
         'name': wa.fields.DelimitedList(
