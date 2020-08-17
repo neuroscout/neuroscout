@@ -57,7 +57,7 @@ class UserListResource(MethodResource):
 
 
 @marshal_with(AnalysisSchema(many=True,
-                             only=['id', 'name', 'description', 'status',
+                             only=['hash_id', 'name', 'description', 'status',
                                    'dataset_id', 'modified_at', 'user']))
 class UserPrivateAnalysisListResource(MethodResource):
     @doc(tags=['user'], summary='Get a list of analyses created by a user.')
@@ -68,7 +68,7 @@ class UserPrivateAnalysisListResource(MethodResource):
 
 
 @marshal_with(AnalysisSchema(many=True,
-                             only=['id', 'name', 'description', 'status',
+                             only=['hash_id', 'name', 'description', 'status',
                                    'dataset_id', 'modified_at', 'user']))
 class UserAnalysisListResource(MethodResource):
     @doc(tags=['user'], summary='Get a list of analyses created by a user.')
