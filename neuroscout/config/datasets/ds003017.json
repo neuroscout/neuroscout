@@ -9,6 +9,8 @@
       "movie": {
         "summary": "Movie watching",
         "converters": [
+          ["FrameSamplingFilter", { "hertz": 1 }],
+          ["VideoToAudioConverter", {}]
         ],
         "extractors": [
         ],
