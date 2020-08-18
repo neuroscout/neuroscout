@@ -9,9 +9,11 @@
       "movie": {
         "summary": "Movie watching",
         "converters": [
-          ["VideoToAudioConverter", {}]
         ],
         "extractors": [
+          ["BrightnessExtractor", {}],
+          ["VibranceExtractor", {}],
+          ["SharpnessExtractor", {}]
         ],
         "tokenized_extractors": [
         ],
