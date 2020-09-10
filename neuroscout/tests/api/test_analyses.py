@@ -161,7 +161,7 @@ def test_post(auth_client, add_task, add_predictor):
 
     resp = auth_client.post('/api/analyses', data=bad_post)
     assert resp.status_code == 422
-    assert decode_json(resp)['message']['dataset_id'][0] == \
+    assert decode_json(resp)['message']['json']['dataset_id'][0] == \
         'Invalid dataset id.'
 
     bad_post_2 = {
@@ -171,7 +171,7 @@ def test_post(auth_client, add_task, add_predictor):
 
     resp = auth_client.post('/api/analyses', data=bad_post_2)
     assert resp.status_code == 422
-    assert decode_json(resp)['message']['name'][0] == \
+    assert decode_json(resp)['message']['json']['name'][0] == \
         'Missing data for required field.'
 
 
@@ -226,7 +226,7 @@ def test_put(auth_client, add_analysis, add_task, session):
     resp = auth_client.put('/api/analyses/{}'.format(analysis.hash_id),
                            data=analysis_json)
     assert resp.status_code == 422
-    assert 'runs' in decode_json(resp)['message']
+    assert 'runs' in decode_json(resp)['message']['json']
 
     # Add and delete analysis
     # Add analysis

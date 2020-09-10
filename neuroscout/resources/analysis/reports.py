@@ -29,7 +29,7 @@ class CompileAnalysisResource(MethodResource):
     @use_kwargs({
         'build': wa.fields.Boolean(
             description='Build Analysis object')
-        }, locations=['query'])
+        }, location='query')
     @doc(summary='Compile and lock analysis.')
     @owner_required
     def post(self, analysis, build=False):
@@ -63,7 +63,7 @@ class CompileAnalysisResource(MethodResource):
                                       description='Run id(s).'),
     'sampling_rate': wa.fields.Number(description='Sampling rate in Hz'),
     'scale': wa.fields.Boolean(description='Scale columns for plotting'),
-}, locations=['query'])
+}, location='query')
 @doc(tags=['analysis'])
 class ReportResource(MethodResource):
     @doc(summary='Generate analysis reports.')
@@ -173,12 +173,14 @@ class AnalysisUploadResource(MethodResource):
     @marshal_with(NeurovaultCollectionSchemaStatus)
     @use_kwargs({
         "validation_hash": wa.fields.Str(required=True),
-        "image_file": FileField(required=False),
         "collection_id": wa.fields.Int(required=False),
         "force": wa.fields.Bool(),
         "level": wa.fields.Str(),
         "n_subjects": wa.fields.Number(description='Number of subjects'),
-        }, locations=["files", "form"])
+        }, location="files")
+    @use_kwargs({
+        "image_file": FileField(required=False),
+        }, location="form")
     @fetch_analysis
     def post(self, analysis, validation_hash, collection_id=None,
              image_file=None, level=None, n_subjects=None, force=False):

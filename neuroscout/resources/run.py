@@ -24,7 +24,7 @@ class RunListResource(MethodResource):
         'subject': wa.fields.DelimitedList(
             wa.fields.Str(), description='Subject id(s).'),
         'dataset_id': wa.fields.Int(description='Dataset id.'),
-    }, locations=['query'])
+    }, location='query')
     @marshal_with(RunSchema(many=True))
     def get(self, **kwargs):
         try:

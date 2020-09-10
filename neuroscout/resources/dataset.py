@@ -20,7 +20,7 @@ class DatasetListResource(MethodResource):
         'active_only': wa.fields.Boolean(
             missing=True, description="Return only active Datasets")
         },
-        locations=['query'])
+        location='query')
     @cache.cached(60 * 60 * 24 * 300, query_string=True)
     @marshal_with(DatasetSchema(
         many=True, exclude=['dataset_address', 'preproc_address']))

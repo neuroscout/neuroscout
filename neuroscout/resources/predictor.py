@@ -70,7 +70,7 @@ class PredictorListResource(MethodResource):
             missing=True,
             description="Return only newest Predictor by name")
         },
-        locations=['query'])
+        location='query')
     @cache.cached(60 * 60 * 24 * 300, query_string=True)
     @marshal_with(PredictorSchema(many=True))
     def get(self, **kwargs):
@@ -131,7 +131,7 @@ class PredictorCollectionResource(MethodResource):
             ),
         "dataset_id": wa.fields.Int(required=True, description="Dataset id."),
         "descriptions": wa.fields.Str(description="Column descriptions")
-        }, locations=["files", "form"])
+        }, location="form")
     @auth_required
     def post(self, collection_name, event_files, runs, dataset_id,
              descriptions=None):
@@ -157,7 +157,7 @@ class PredictorCollectionResource(MethodResource):
     @use_kwargs(
         {'collection_id': wa.fields.Int(description="Predictor Collection id.",
                                         required=True)},
-        locations=['query'])
+        location='query')
     @marshal_with(PredictorCollectionSchema)
     def get(self, collection_id):
         return first_or_404(
@@ -178,7 +178,7 @@ class PredictorEventListResource(MethodResource):
         'stimulus_timing': wa.fields.Boolean(
             missing=False,
             description="Return stimulus timing and information")
-        }, locations=['query'])
+        }, location='query')
     @cache.cached(60 * 60 * 24 * 300, query_string=True)
     def get(self, predictor_id, run_id=None, stimulus_timing=False):
         return dump_predictor_events(

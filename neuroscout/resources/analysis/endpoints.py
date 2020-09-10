@@ -34,7 +34,7 @@ class AnalysisRootResource(AnalysisMethodResource):
             wa.fields.Str(), description="Analysis name(s)"),
         'dataset_id': wa.fields.DelimitedList(
             wa.fields.Number(), description="Dataset id(s)")
-        }, locations=['query'])
+        }, location='query')
     def get(self, **kwargs):
         query = Analysis.query.filter_by(private=False, status='PASSED')
         for param in kwargs:
@@ -97,7 +97,7 @@ class AnalysisFillResource(AnalysisMethodResource):
             missing=True),
         'dryrun': wa.fields.Boolean(
             description="Don't commit autofill results to database")
-        }, locations=['query'])
+        }, location='query')
     @doc(summary='Auto fill fields from model.')
     @owner_required
     def post(self, analysis, partial=True, dryrun=False):

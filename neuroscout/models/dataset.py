@@ -47,6 +47,7 @@ class Dataset(db.Model):
         else:
             return None
 
+    @hybrid_property
     def percent_female(self):
         values = GroupPredictorValue.query.join(GroupPredictor).filter_by(
             dataset_id=self.id).filter(

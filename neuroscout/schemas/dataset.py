@@ -20,10 +20,10 @@ class DatasetSchema(Schema):
         descrption='Mean age in years of subjects')
     percent_female = fields.Float(
         descrption='Percent female subjects')
-    runs = fields.Nested(
-        'RunSchema', many=True, only='id')
+    runs = fields.Pluck(
+        'RunSchema', 'id', many=True)
     tasks = fields.Nested(
-        'TaskSchema', many=True,
+        'TaskSchema',
         only=['id', 'name', 'summary', 'n_subjects', 'n_runs_subject',
               'avg_run_duration', 'TR'])
     dataset_address = fields.Str(

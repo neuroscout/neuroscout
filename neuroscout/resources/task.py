@@ -16,7 +16,7 @@ class TaskListResource(MethodResource):
     @doc(tags=['run'], summary='Returns list of tasks.')
     @use_kwargs({
         'dataset_id': wa.fields.Int(description='Dataset id(s).'),
-    }, locations=['query'])
+    }, location='query')
     @marshal_with(TaskSchema(many=True))
     def get(self, **kwargs):
         query = Task.query

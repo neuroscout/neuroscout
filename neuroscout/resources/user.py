@@ -120,7 +120,7 @@ class UserPredictorListResource(MethodResource):
             missing=True,
             description="Return only newest Predictor by name")
         },
-        locations=['query'])
+        location='query')
     @auth_required
     @marshal_with(PredictorSchema(many=True))
     def get(self, **kwargs):

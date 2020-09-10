@@ -37,16 +37,16 @@ class AnalysisSchema(Schema):
 
     private = fields.Bool(description='Analysis private or discoverable?')
 
-    predictors = fields.Nested(
-        PredictorSchema, many=True, only='id',
+    predictors = fields.Pluck(
+        PredictorSchema, "id", many=True,
         description='Predictor id(s) associated with analysis')
 
-    runs = fields.Nested(
-        RunSchema, many=True, only='id',
+    runs = fields.Pluck(
+        RunSchema, "id", many=True,
         description='Runs associated with analysis')
 
-    user = fields.Nested(UserSchema, many=False, only='user_name',
-                         dump_only=True)
+    user = fields.Pluck(
+        UserSchema, "user_name", many=False, dump_only=True)
 
     @validates('dataset_id')
     def validate_dsid(self, value):
@@ -68,7 +68,7 @@ class AnalysisSchema(Schema):
             raise ValidationError('Invalid predictor id.')
 
     @pre_load
-    def unflatten(self, in_data):
+    def unflatten(self, in_data, **kwargs):
         if 'runs' in in_data:
             in_data['runs'] = [{"id": r} for r in in_data['runs']]
         if 'predictors' in in_data:
@@ -77,7 +77,7 @@ class AnalysisSchema(Schema):
         return in_data
 
     @post_load
-    def nested_object(self, args):
+    def nested_object(self, args, **kwargs):
         if 'runs' in args:
             args['runs'] = [
                 Run.query.filter_by(**r).one() for r in args['runs']]
@@ -89,18 +89,15 @@ class AnalysisSchema(Schema):
 
         return args
 
-    class Meta:
-        strict = True
-
 
 class AnalysisResourcesSchema(Schema):
     """ Schema for Analysis resources. """
-    preproc_address = fields.Nested(
-        DatasetSchema, only='preproc_address', attribute='dataset')
-    dataset_address = fields.Nested(
-        DatasetSchema, only='dataset_address', attribute='dataset')
-    dataset_name = fields.Nested(
-        DatasetSchema, only='name', attribute='dataset')
+    preproc_address = fields.Pluck(
+        DatasetSchema, 'preproc_address', attribute='dataset', dump_only=True)
+    dataset_address = fields.Pluck(
+        DatasetSchema, 'dataset_address', attribute='dataset', dump_only=True)
+    dataset_name = fields.Pluck(
+        DatasetSchema, 'name', attribute='dataset', dump_only=True)
 
 
 class AnalysisCompiledSchema(Schema):
@@ -129,21 +126,21 @@ class NeurovaultCollectionSchema(Schema):
 
 class NeurovaultCollectionSchemaStatus(NeurovaultCollectionSchema):
     files = fields.Nested(
-        NeurovaultFileUploadSchema, many=True)
+        NeurovaultFileUploadSchema)
 
 
 class AnalysisFullSchema(AnalysisSchema):
     """ Analysis schema, with additional nested fields """
     runs = fields.Nested(
-        RunSchema, many=True, description='Runs associated with analysis',
+        RunSchema, description='Runs associated with analysis',
         exclude=['dataset_id', 'task'], dump_only=True)
 
     predictors = fields.Nested(
-        PredictorSchema, many=True, only=['id', 'name'],
+        PredictorSchema, only=['id', 'name'],
         description='Predictor id(s) associated with analysis', dump_only=True)
 
     neurovault_collections = fields.Nested(
-        NeurovaultCollectionSchema, many=True,
+        NeurovaultCollectionSchema,
         description="Neurovault Collections of analysis results"
     )
 
