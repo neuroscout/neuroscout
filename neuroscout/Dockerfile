@@ -1,4 +1,4 @@
-FROM python:3.6-stretch
+FROM python:3.6-buster
 ARG DEBIAN_FRONTEND=noninteractive
 
 RUN mkdir -p /usr/src/app
@@ -21,6 +21,7 @@ RUN npm install -g yarn
 
 COPY requirements.txt /usr/src/app/
 COPY optional_requirements.txt /usr/src/app
+RUN pip install setuptools==45
 RUN pip install --no-cache-dir -r requirements.txt
 RUN pip install --no-cache-dir -r optional_requirements.txt
 RUN python -m pliers.support.download
