@@ -73,8 +73,8 @@ def analysis_to_json(analysis_id, run_id=None):
     analysis = Analysis.query.filter_by(hash_id=analysis_id).one()
 
     # Dump analysis JSON
-    analysis_json = AnalysisFullSchema().dump(analysis)[0]
-    resources_json = AnalysisResourcesSchema().dump(analysis)[0]
+    analysis_json = AnalysisFullSchema().dump(analysis)
+    resources_json = AnalysisResourcesSchema().dump(analysis)
 
     # Get run IDs
     all_runs = [r['id'] for r in analysis_json['runs']]

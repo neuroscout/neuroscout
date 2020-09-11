@@ -23,7 +23,7 @@ class DatasetSchema(Schema):
     runs = fields.Pluck(
         'RunSchema', 'id', many=True)
     tasks = fields.Nested(
-        'TaskSchema',
+        'TaskSchema', many=True,
         only=['id', 'name', 'summary', 'n_subjects', 'n_runs_subject',
               'avg_run_duration', 'TR'])
     dataset_address = fields.Str(

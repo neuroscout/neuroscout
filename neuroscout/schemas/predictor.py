@@ -46,7 +46,7 @@ class PredictorCollectionSchema(Schema):
     traceback = fields.Str(description='Traceback of error.')
     collection_name = fields.Str(description='Name of collection',
                                  required=True)
-    predictors = fields.Nested('PredictorSchema')
+    predictors = fields.Nested('PredictorSchema', many=True)
 
 
 class PredictorEventSchema(Schema):

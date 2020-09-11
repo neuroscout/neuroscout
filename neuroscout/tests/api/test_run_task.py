@@ -1,4 +1,6 @@
 from ..request_utils import decode_json
+from neuroscout.models import Task
+
 
 def test_get_run(auth_client, add_task):
 	# List of runs
@@ -36,18 +38,7 @@ def test_get_run(auth_client, add_task):
 	assert resp.status_code == 200
 	assert len(decode_json(resp)) == 0
 
-	# Test getting all fields
-	resp = auth_client.get('/api/runs', params={'dataset_id' : add_task,
-											'all_fields' : 'True'})
-	assert 'task' in decode_json(resp)[0]
-	task_id = decode_json(resp)[0]['task']
-
-	# Test filtering by multiple parameters
-	resp = auth_client.get('/api/runs', params={'number': '1,2',
-											'task': 'bidstest'})
-	assert resp.status_code == 200
-	run_p = decode_json(resp)
-	assert len(run_p) == 4
+	task_id = Task.query.first().id
 
 	# Test task route
 	resp = auth_client.get('/api/tasks/{}'.format(task_id))

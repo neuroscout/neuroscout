@@ -61,8 +61,8 @@ class PredictorListResource(MethodResource):
     @use_kwargs({
         'run_id': fields.DelimitedList(
             fields.Int(), description="Run id(s). Warning, slow query."),
-        'name': fields.DelimitedList(fields.Str(),
-                                        description="Predictor name(s)"),
+        'name': fields.DelimitedList(
+            fields.Str(), description="Predictor name(s)"),
         'active_only': fields.Boolean(
             missing=True,
             description="Return only active Predictors"),

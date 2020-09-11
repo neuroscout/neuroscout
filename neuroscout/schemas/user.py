@@ -1,6 +1,6 @@
 from flask_security.utils import encrypt_password
 from marshmallow import (
-    Schema, fields, validates, ValidationError, post_load, post_dump)
+    Schema, fields, validates, ValidationError, post_load, post_dump, EXCLUDE)
 from ..models import User
 
 
@@ -34,10 +34,13 @@ class UserSchema(Schema):
             raise ValidationError('Password must be at least 6 characters.')
 
     @post_load
-    def encrypt_password(self, in_data):
+    def encrypt_password(self, in_data, **kwargs):
         if 'password' in in_data:
             in_data['password'] = encrypt_password(in_data['password'])
         return in_data
+
+    class Meta:
+        unknown = EXCLUDE
 
 
 class UserPublicSchema(UserSchema):

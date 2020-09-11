@@ -1,5 +1,5 @@
 from marshmallow import (Schema, fields, validates, ValidationError,
-                         post_load, pre_load)
+                         post_load, EXCLUDE)
 from ..models import Dataset, Run, Predictor
 from .dataset import DatasetSchema
 from .run import RunSchema
@@ -58,7 +58,7 @@ class AnalysisSchema(Schema):
         try:
             [Run.query.filter_by(**r).one() for r in value]
         except Exception:
-            raise ValidationError('Invalid run id!')
+            raise ValidationError(f'Invalid run id: {value}')
 
     @validates('predictors')
     def validate_preds(self, value):
@@ -66,15 +66,6 @@ class AnalysisSchema(Schema):
             [Predictor.query.filter_by(**r).one() for r in value]
         except Exception:
             raise ValidationError('Invalid predictor id.')
-
-    @pre_load
-    def unflatten(self, in_data, **kwargs):
-        if 'runs' in in_data:
-            in_data['runs'] = [{"id": r} for r in in_data['runs']]
-        if 'predictors' in in_data:
-            in_data['predictors'] = [{"id": r} for r in in_data['predictors']]
-
-        return in_data
 
     @post_load
     def nested_object(self, args, **kwargs):
@@ -88,6 +79,9 @@ class AnalysisSchema(Schema):
                 for r in args['predictors']]
 
         return args
+
+    class Meta:
+        unknown = EXCLUDE
 
 
 class AnalysisResourcesSchema(Schema):
@@ -133,14 +127,14 @@ class AnalysisFullSchema(AnalysisSchema):
     """ Analysis schema, with additional nested fields """
     runs = fields.Nested(
         RunSchema, description='Runs associated with analysis',
-        exclude=['dataset_id', 'task'], dump_only=True)
+        exclude=('dataset_id', 'task',), dump_only=True, many=True)
 
     predictors = fields.Nested(
-        PredictorSchema, only=['id', 'name'],
+        PredictorSchema, only=('id', 'name'), many=True,
         description='Predictor id(s) associated with analysis', dump_only=True)
 
     neurovault_collections = fields.Nested(
-        NeurovaultCollectionSchema,
+        NeurovaultCollectionSchema, many=True,
         description="Neurovault Collections of analysis results"
     )
 

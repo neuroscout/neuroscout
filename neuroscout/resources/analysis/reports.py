@@ -59,8 +59,8 @@ class CompileAnalysisResource(MethodResource):
 
 @marshal_with(ReportSchema)
 @use_kwargs({
-    'run_id': fields.DelimitedList(fields.Int(),
-                                      description='Run id(s).'),
+    'run_id': fields.DelimitedList(
+        fields.Int(), description='Run id(s).'),
     'sampling_rate': fields.Number(description='Sampling rate in Hz'),
     'scale': fields.Boolean(description='Scale columns for plotting'),
 }, location='query')
