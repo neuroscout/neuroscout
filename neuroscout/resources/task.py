@@ -1,6 +1,6 @@
 from flask_apispec import MethodResource, marshal_with, doc, use_kwargs
 from ..models import Task
-import webargs as wa
+from webargs import fields
 from .utils import first_or_404
 from ..schemas.task import TaskSchema
 
@@ -15,7 +15,7 @@ class TaskResource(MethodResource):
 class TaskListResource(MethodResource):
     @doc(tags=['run'], summary='Returns list of tasks.')
     @use_kwargs({
-        'dataset_id': wa.fields.Int(description='Dataset id(s).'),
+        'dataset_id': fields.Int(description='Dataset id(s).'),
     }, location='query')
     @marshal_with(TaskSchema(many=True))
     def get(self, **kwargs):

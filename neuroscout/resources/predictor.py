@@ -1,4 +1,4 @@
-import webargs as wa
+from webargs import fields
 import tempfile
 import json
 from sqlalchemy import func
@@ -59,14 +59,14 @@ def get_predictors(newest=True, active=True, user=None, **kwargs):
 class PredictorListResource(MethodResource):
     @doc(tags=['predictors'], summary='Get list of predictors.',)
     @use_kwargs({
-        'run_id': wa.fields.DelimitedList(
-            wa.fields.Int(), description="Run id(s). Warning, slow query."),
-        'name': wa.fields.DelimitedList(wa.fields.Str(),
+        'run_id': fields.DelimitedList(
+            fields.Int(), description="Run id(s). Warning, slow query."),
+        'name': fields.DelimitedList(fields.Str(),
                                         description="Predictor name(s)"),
-        'active_only': wa.fields.Boolean(
+        'active_only': fields.Boolean(
             missing=True,
             description="Return only active Predictors"),
-        'newest': wa.fields.Boolean(
+        'newest': fields.Boolean(
             missing=True,
             description="Return only newest Predictor by name")
         },
@@ -116,21 +116,21 @@ class PredictorCollectionResource(MethodResource):
          consumes=['multipart/form-data', 'application/x-www-form-urlencoded'])
     @marshal_with(PredictorCollectionSchema)
     @use_kwargs({
-        "collection_name": wa.fields.Str(
+        "collection_name": fields.Str(
             required=True,
             description="Name of collection"
         ),
-        "event_files": wa.fields.List(
+        "event_files": fields.List(
             FileField(), required=True,
             description="TSV files with additional Predictors to be created.\
             Required columns: onset, duration, any number of columns\
             with values for new Predictors."),
-        "runs": wa.fields.List(
-            wa.fields.DelimitedList(wa.fields.Int()),
+        "runs": fields.List(
+            fields.DelimitedList(fields.Int()),
             required=True
             ),
-        "dataset_id": wa.fields.Int(required=True, description="Dataset id."),
-        "descriptions": wa.fields.Str(description="Column descriptions")
+        "dataset_id": fields.Int(required=True, description="Dataset id."),
+        "descriptions": fields.Str(description="Column descriptions")
         }, location="form")
     @auth_required
     def post(self, collection_name, event_files, runs, dataset_id,
@@ -155,7 +155,7 @@ class PredictorCollectionResource(MethodResource):
 
     @doc(summary='Get predictor collection by id.')
     @use_kwargs(
-        {'collection_id': wa.fields.Int(description="Predictor Collection id.",
+        {'collection_id': fields.Int(description="Predictor Collection id.",
                                         required=True)},
         location='query')
     @marshal_with(PredictorCollectionSchema)
@@ -168,14 +168,14 @@ class PredictorEventListResource(MethodResource):
     @doc(tags=['predictors'], summary='Get events for predictor(s)',)
     @marshal_with(PredictorEventSchema(many=True))
     @use_kwargs({
-        'run_id': wa.fields.DelimitedList(
-            wa.fields.Int(),
+        'run_id': fields.DelimitedList(
+            fields.Int(),
             description="Run id(s)"),
-        'predictor_id': wa.fields.DelimitedList(
-            wa.fields.Int(),
+        'predictor_id': fields.DelimitedList(
+            fields.Int(),
             description="Predictor id(s)",
             required=True),
-        'stimulus_timing': wa.fields.Boolean(
+        'stimulus_timing': fields.Boolean(
             missing=False,
             description="Return stimulus timing and information")
         }, location='query')

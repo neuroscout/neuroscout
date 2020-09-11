@@ -5,7 +5,7 @@ from ...models import Analysis, Report
 from ...database import db
 from os.path import exists
 import datetime
-import webargs as wa
+from webargs import fields
 import json
 
 from ...utils.db import put_record
@@ -25,15 +25,16 @@ class AnalysisMethodResource(MethodResource):
 
 class AnalysisRootResource(AnalysisMethodResource):
     """" Resource for root address """
-    @marshal_with(AnalysisSchema(many=True,
-                                 only=['hash_id', 'name', 'description', 'status',
-                                       'dataset_id', 'modified_at', 'user']))
+    @marshal_with(AnalysisSchema(
+        many=True,
+        only=['hash_id', 'name', 'description', 'status',
+              'dataset_id', 'modified_at', 'user']))
     @doc(summary='Returns list of public analyses.')
     @use_kwargs({
-        'name': wa.fields.DelimitedList(
-            wa.fields.Str(), description="Analysis name(s)"),
-        'dataset_id': wa.fields.DelimitedList(
-            wa.fields.Number(), description="Dataset id(s)")
+        'name': fields.DelimitedList(
+            fields.Str(), description="Analysis name(s)"),
+        'dataset_id': fields.DelimitedList(
+            fields.Number(), description="Dataset id(s)")
         }, location='query')
     def get(self, **kwargs):
         query = Analysis.query.filter_by(private=False, status='PASSED')
@@ -92,10 +93,10 @@ class AnalysisResource(AnalysisMethodResource):
 
 class AnalysisFillResource(AnalysisMethodResource):
     @use_kwargs({
-        'partial': wa.fields.Boolean(
+        'partial': fields.Boolean(
             description='Attempt partial fill if complete is not possible.',
             missing=True),
-        'dryrun': wa.fields.Boolean(
+        'dryrun': fields.Boolean(
             description="Don't commit autofill results to database")
         }, location='query')
     @doc(summary='Auto fill fields from model.')

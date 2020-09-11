@@ -1,6 +1,6 @@
 import datetime
 from hashids import Hashids
-import webargs as wa
+from webargs import fields
 from flask_apispec import doc, use_kwargs, MethodResource, marshal_with
 from flask import current_app
 from pathlib import Path
@@ -27,7 +27,7 @@ def _validation_hash(analysis_id):
 @marshal_with(AnalysisCompiledSchema)
 class CompileAnalysisResource(MethodResource):
     @use_kwargs({
-        'build': wa.fields.Boolean(
+        'build': fields.Boolean(
             description='Build Analysis object')
         }, location='query')
     @doc(summary='Compile and lock analysis.')
@@ -59,10 +59,10 @@ class CompileAnalysisResource(MethodResource):
 
 @marshal_with(ReportSchema)
 @use_kwargs({
-    'run_id': wa.fields.DelimitedList(wa.fields.Int(),
+    'run_id': fields.DelimitedList(fields.Int(),
                                       description='Run id(s).'),
-    'sampling_rate': wa.fields.Number(description='Sampling rate in Hz'),
-    'scale': wa.fields.Boolean(description='Scale columns for plotting'),
+    'sampling_rate': fields.Number(description='Sampling rate in Hz'),
+    'scale': fields.Boolean(description='Scale columns for plotting'),
 }, location='query')
 @doc(tags=['analysis'])
 class ReportResource(MethodResource):
@@ -172,11 +172,11 @@ class AnalysisUploadResource(MethodResource):
          consumes=['multipart/form-data', 'application/x-www-form-urlencoded'])
     @marshal_with(NeurovaultCollectionSchemaStatus)
     @use_kwargs({
-        "validation_hash": wa.fields.Str(required=True),
-        "collection_id": wa.fields.Int(required=False),
-        "force": wa.fields.Bool(),
-        "level": wa.fields.Str(),
-        "n_subjects": wa.fields.Number(description='Number of subjects'),
+        "validation_hash": fields.Str(required=True),
+        "collection_id": fields.Int(required=False),
+        "force": fields.Bool(),
+        "level": fields.Str(),
+        "n_subjects": fields.Number(description='Number of subjects'),
         }, location="files")
     @use_kwargs({
         "image_file": FileField(required=False),
