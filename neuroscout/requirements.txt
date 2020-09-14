@@ -1,19 +1,20 @@
 altair
 alembic==1.3.1
-apispec==1.1.0
+apispec==3.3.2
 appdirs==1.4.3
 blinker==1.4
 celery
 citeproc-py==0.4.0
 citeproc-py-styles==0.1.1
 datalad==0.10.2
+dataclasses==0.7
 decorator==4.0.11
 docopt==0.6.2
 duecredit==0.6.1
 pybids==0.10.1
--e git+https://github.com/neurolearn/pynv#egg=pynv
+pynv==0.2
 Flask==1.1.1
-flask-apispec==0.8.0
+flask-apispec==0.10.0
 Flask-Caching==1.3.3
 Flask-cors==3.0.2
 Flask-JWT==0.3.2
@@ -35,7 +36,7 @@ ipython==6.2.1
 itsdangerous==0.24
 Jinja2==2.10.1
 MarkupSafe==1.0
-marshmallow==2.19.1
+marshmallow==3.7.1
 moviepy==0.2.3.5
 nibabel==2.1.0
 nltk==3.2.2
@@ -64,7 +65,7 @@ soundfile
 pytesseract
 SQLAlchemy==1.3.0
 tqdm==4.11.2
-webargs>=0.18.0,<6.0.0
+webargs==6.1.1
 Werkzeug==0.15.3
 WTForms==2.1
 xlrd

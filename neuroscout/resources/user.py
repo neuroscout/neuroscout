@@ -1,6 +1,6 @@
 from flask_jwt import current_identity, jwt_required
 from flask_security.recoverable import reset_password_token_status
-import webargs as wa
+from webargs import fields
 
 from flask_apispec import MethodResource, marshal_with, use_kwargs, doc
 from ..models import User, Analysis
@@ -112,15 +112,15 @@ class UserResetSubmitResource(MethodResource):
 class UserPredictorListResource(MethodResource):
     @doc(tags=['user'], summary='Get list of user predictors.',)
     @use_kwargs({
-        'run_id': wa.fields.DelimitedList(
-            wa.fields.Int(), description="Run id(s). Warning, slow query."),
-        'name': wa.fields.DelimitedList(wa.fields.Str(),
+        'run_id': fields.DelimitedList(
+            fields.Int(), description="Run id(s). Warning, slow query."),
+        'name': fields.DelimitedList(fields.Str(),
                                         description="Predictor name(s)"),
-        'newest': wa.fields.Boolean(
+        'newest': fields.Boolean(
             missing=True,
             description="Return only newest Predictor by name")
         },
-        locations=['query'])
+        location='query')
     @auth_required
     @marshal_with(PredictorSchema(many=True))
     def get(self, **kwargs):
