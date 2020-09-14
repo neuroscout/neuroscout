@@ -1,6 +1,7 @@
 import datetime
 from hashids import Hashids
 from webargs import fields
+from marshmallow import INCLUDE
 from flask_apispec import doc, use_kwargs, MethodResource, marshal_with
 from flask import current_app
 from pathlib import Path
@@ -177,10 +178,10 @@ class AnalysisUploadResource(MethodResource):
         "force": fields.Bool(),
         "level": fields.Str(),
         "n_subjects": fields.Number(description='Number of subjects'),
-        }, location="files")
+        }, location="form", unknown=INCLUDE)
     @use_kwargs({
         "image_file": FileField(required=False),
-        }, location="form")
+        }, location="files")
     @fetch_analysis
     def post(self, analysis, validation_hash, collection_id=None,
              image_file=None, level=None, n_subjects=None, force=False):
