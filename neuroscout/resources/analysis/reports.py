@@ -1,7 +1,7 @@
 import datetime
 from hashids import Hashids
 from webargs import fields
-from marshmallow import INCLUDE
+from marshmallow import INCLUDE, Schema
 from flask_apispec import doc, use_kwargs, MethodResource, marshal_with
 from flask import current_app
 from pathlib import Path
@@ -174,13 +174,19 @@ class AnalysisUploadResource(MethodResource):
     @marshal_with(NeurovaultCollectionSchemaStatus)
     @use_kwargs({
         "validation_hash": fields.Str(required=True),
-        "collection_id": fields.Int(required=False),
+        "collection_id": fields.Int(),
         "force": fields.Bool(),
         "level": fields.Str(),
-        "n_subjects": fields.Number(description='Number of subjects'),
-        }, location="form", unknown=INCLUDE)
+        "n_subjects": fields.Number(),
+        "image_file": FileField(),
+        }, location="form")
     @use_kwargs({
-        "image_file": FileField(required=False),
+        "validation_hash": fields.Str(),
+        "collection_id": fields.Int(),
+        "force": fields.Bool(),
+        "level": fields.Str(),
+        "n_subjects": fields.Number(),
+        "image_file": FileField(required=True),
         }, location="files")
     @fetch_analysis
     def post(self, analysis, validation_hash, collection_id=None,
