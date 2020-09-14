@@ -173,7 +173,6 @@ class FormSchema(Schema):
     force = fields.Bool()
     level = fields.Str()
     n_subjects = fields.Number()
-    image_file = FileField()
 
     class Meta:
         unknown = INCLUDE
