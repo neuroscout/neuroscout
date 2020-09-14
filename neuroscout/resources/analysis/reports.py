@@ -167,27 +167,32 @@ def _create_collection(analysis, force=False):
     return upload
 
 
+class FormSchema(Schema):
+    validation_hash = fields.Str(required=True)
+    collection_id = fields.Int()
+    force = fields.Bool()
+    level = fields.Str()
+    n_subjects = fields.Number()
+    image_file = FileField()
+
+    class Meta:
+        unknown = INCLUDE
+
+
+class FileSchema(Schema):
+    image_file = FileField(required=True)
+
+    class Meta:
+        unknown = INCLUDE
+
+
 @doc(tags=['analysis'])
 class AnalysisUploadResource(MethodResource):
     @doc(summary='Upload fitlins analysis results. ',
          consumes=['multipart/form-data', 'application/x-www-form-urlencoded'])
     @marshal_with(NeurovaultCollectionSchemaStatus)
-    @use_kwargs({
-        "validation_hash": fields.Str(required=True),
-        "collection_id": fields.Int(),
-        "force": fields.Bool(),
-        "level": fields.Str(),
-        "n_subjects": fields.Number(),
-        "image_file": FileField(),
-        }, location="form")
-    @use_kwargs({
-        "validation_hash": fields.Str(),
-        "collection_id": fields.Int(),
-        "force": fields.Bool(),
-        "level": fields.Str(),
-        "n_subjects": fields.Number(),
-        "image_file": FileField(required=True),
-        }, location="files")
+    @use_kwargs(FormSchema, location="form")
+    @use_kwargs(FileSchema, location="files")
     @fetch_analysis
     def post(self, analysis, validation_hash, collection_id=None,
              image_file=None, level=None, n_subjects=None, force=False):
