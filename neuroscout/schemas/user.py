@@ -1,7 +1,6 @@
 from flask_security.utils import encrypt_password
-from flask_jwt import current_identity
 from marshmallow import (
-    Schema, fields, validates, ValidationError, post_load, post_dump)
+    Schema, fields, validates, ValidationError, post_load, post_dump, EXCLUDE)
 from ..models import User
 
 
@@ -25,7 +24,7 @@ class UserSchema(Schema):
     predictor_collections = fields.Nested(
         'PredictorCollectionSchema', only=['id', 'collection_name'],
         description='Predictor collections contributed by this user.',
-        many=True, dump_only=True)
+        dump_only=True)
     first_login = fields.Bool(description='First time logging in.')
     institution = fields.Str(allow_none=True)
 
@@ -35,13 +34,13 @@ class UserSchema(Schema):
             raise ValidationError('Password must be at least 6 characters.')
 
     @post_load
-    def encrypt_password(self, in_data):
+    def encrypt_password(self, in_data, **kwargs):
         if 'password' in in_data:
             in_data['password'] = encrypt_password(in_data['password'])
         return in_data
 
     class Meta:
-        strict = True
+        unknown = EXCLUDE
 
 
 class UserPublicSchema(UserSchema):

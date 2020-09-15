@@ -45,14 +45,6 @@ def test_get_predictor(auth_client, extract_features):
     assert resp.status_code == 200
     assert len(decode_json(resp)) == 0
 
-    # Test filtering by dataset
-    resp = auth_client.get(
-        '/api/predictors', params={'dataset_id': dataset_id})
-    assert resp.status_code == 200
-    pred_select = decode_json(resp)
-    assert type(pred_select) == list
-    assert len(pred_select) == 4
-
     # Test filtering by multiple parameters
     resp = auth_client.get(
         '/api/predictors', params={'name': 'rt', 'run_id': run_id})
