@@ -1,6 +1,7 @@
 import datetime
 from hashids import Hashids
-import webargs as wa
+from webargs import fields
+from marshmallow import INCLUDE, Schema
 from flask_apispec import doc, use_kwargs, MethodResource, marshal_with
 from flask import current_app
 from pathlib import Path
@@ -27,9 +28,9 @@ def _validation_hash(analysis_id):
 @marshal_with(AnalysisCompiledSchema)
 class CompileAnalysisResource(MethodResource):
     @use_kwargs({
-        'build': wa.fields.Boolean(
+        'build': fields.Boolean(
             description='Build Analysis object')
-        }, locations=['query'])
+        }, location='query')
     @doc(summary='Compile and lock analysis.')
     @owner_required
     def post(self, analysis, build=False):
@@ -59,11 +60,11 @@ class CompileAnalysisResource(MethodResource):
 
 @marshal_with(ReportSchema)
 @use_kwargs({
-    'run_id': wa.fields.DelimitedList(wa.fields.Int(),
-                                      description='Run id(s).'),
-    'sampling_rate': wa.fields.Number(description='Sampling rate in Hz'),
-    'scale': wa.fields.Boolean(description='Scale columns for plotting'),
-}, locations=['query'])
+    'run_id': fields.DelimitedList(
+        fields.Int(), description='Run id(s).'),
+    'sampling_rate': fields.Number(description='Sampling rate in Hz'),
+    'scale': fields.Boolean(description='Scale columns for plotting'),
+}, location='query')
 @doc(tags=['analysis'])
 class ReportResource(MethodResource):
     @doc(summary='Generate analysis reports.')
@@ -166,19 +167,31 @@ def _create_collection(analysis, force=False):
     return upload
 
 
+class FormSchema(Schema):
+    validation_hash = fields.Str(required=True)
+    collection_id = fields.Int()
+    force = fields.Bool()
+    level = fields.Str()
+    n_subjects = fields.Number()
+
+    class Meta:
+        unknown = INCLUDE
+
+
+class FileSchema(Schema):
+    image_file = FileField(required=True)
+
+    class Meta:
+        unknown = INCLUDE
+
+
 @doc(tags=['analysis'])
 class AnalysisUploadResource(MethodResource):
     @doc(summary='Upload fitlins analysis results. ',
          consumes=['multipart/form-data', 'application/x-www-form-urlencoded'])
     @marshal_with(NeurovaultCollectionSchemaStatus)
-    @use_kwargs({
-        "validation_hash": wa.fields.Str(required=True),
-        "image_file": FileField(required=False),
-        "collection_id": wa.fields.Int(required=False),
-        "force": wa.fields.Bool(),
-        "level": wa.fields.Str(),
-        "n_subjects": wa.fields.Number(description='Number of subjects'),
-        }, locations=["files", "form"])
+    @use_kwargs(FormSchema, location="form")
+    @use_kwargs(FileSchema, location="files")
     @fetch_analysis
     def post(self, analysis, validation_hash, collection_id=None,
              image_file=None, level=None, n_subjects=None, force=False):

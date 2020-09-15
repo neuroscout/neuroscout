@@ -25,7 +25,7 @@ class PredictorSchema(Schema):
     dataset_id = fields.Int()
 
     @post_dump
-    def remove_null_values(self, data):
+    def remove_null_values(self, data, **kwargs):
         if data.get('extracted_feature', True) is None:
             data.pop('extracted_feature')
         return data
@@ -46,8 +46,7 @@ class PredictorCollectionSchema(Schema):
     traceback = fields.Str(description='Traceback of error.')
     collection_name = fields.Str(description='Name of collection',
                                  required=True)
-    predictors = fields.Nested(
-        'PredictorSchema', many=True)
+    predictors = fields.Nested('PredictorSchema', many=True)
 
 
 class PredictorEventSchema(Schema):

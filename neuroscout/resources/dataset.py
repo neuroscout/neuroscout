@@ -1,5 +1,5 @@
 from flask_apispec import MethodResource, marshal_with, doc, use_kwargs
-import webargs as wa
+from webargs import fields
 from ..models import Dataset
 from ..core import cache
 from .utils import first_or_404
@@ -17,10 +17,10 @@ class DatasetResource(MethodResource):
 class DatasetListResource(MethodResource):
     @doc(tags=['dataset'], summary='Returns list of datasets.')
     @use_kwargs({
-        'active_only': wa.fields.Boolean(
+        'active_only': fields.Boolean(
             missing=True, description="Return only active Datasets")
         },
-        locations=['query'])
+        location='query')
     @cache.cached(60 * 60 * 24 * 300, query_string=True)
     @marshal_with(DatasetSchema(
         many=True, exclude=['dataset_address', 'preproc_address']))

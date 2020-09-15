@@ -3,7 +3,7 @@ from .core import app
 from .auth import add_auth_to_swagger
 from apispec import APISpec
 from flask_apispec.extension import FlaskApiSpec
-import webargs as wa
+from webargs import fields
 from apispec.ext.marshmallow import MarshmallowPlugin
 
 file_plugin = MarshmallowPlugin()
@@ -21,5 +21,5 @@ docs = FlaskApiSpec(app)
 
 
 @file_plugin.map_to_openapi_type('file', None)
-class FileField(wa.fields.Raw):
+class FileField(fields.Raw):
     pass

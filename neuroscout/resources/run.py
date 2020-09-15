@@ -1,5 +1,5 @@
 from flask_apispec import MethodResource, marshal_with, use_kwargs, doc
-import webargs as wa
+from webargs import fields
 from ..models import Run
 from .utils import first_or_404
 from ..schemas.run import RunSchema
@@ -15,16 +15,16 @@ class RunResource(MethodResource):
 class RunListResource(MethodResource):
     @doc(tags=['run'], summary='Returns list of runs.')
     @use_kwargs({
-        'session': wa.fields.DelimitedList(
-            wa.fields.Str(), description='Session number(s).'),
-        'number': wa.fields.DelimitedList(
-            wa.fields.Int(), description='Run number(s).'),
-        'task_id': wa.fields.DelimitedList(
-            wa.fields.Int(), description='Task id(s).'),
-        'subject': wa.fields.DelimitedList(
-            wa.fields.Str(), description='Subject id(s).'),
-        'dataset_id': wa.fields.Int(description='Dataset id.'),
-    }, locations=['query'])
+        'session': fields.DelimitedList(
+            fields.Str(), description='Session number(s).'),
+        'number': fields.DelimitedList(
+            fields.Int(), description='Run number(s).'),
+        'task_id': fields.DelimitedList(
+            fields.Int(), description='Task id(s).'),
+        'subject': fields.DelimitedList(
+            fields.Str(), description='Subject id(s).'),
+        'dataset_id': fields.Int(description='Dataset id.'),
+    }, location='query')
     @marshal_with(RunSchema(many=True))
     def get(self, **kwargs):
         try:
