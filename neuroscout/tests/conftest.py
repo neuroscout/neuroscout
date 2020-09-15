@@ -156,22 +156,6 @@ def add_local_task_json(session):
 
 
 @pytest.fixture(scope="function")
-def update_local_json(session, add_local_task_json):
-    """ Add a dataset with two subjects. """
-    # Edit datastore file
-    datastore_file = current_app.config['FEATURE_DATASTORE']
-
-    # Change value in datastore
-    ds = pd.read_csv(datastore_file)
-    select_cols = [c for c in ds.columns if c != "time_extracted"]
-    ds.loc[ds.time_extracted.max() == ds.time_extracted, select_cols] = 1
-    ds.to_csv(datastore_file, index=False)
-
-    # Update
-    return populate.ingest_from_json(LOCAL_JSON_PATH, update_features=True)[0]
-
-
-@pytest.fixture(scope="function")
 def extract_features(session, add_task):
     return populate.extract_features('Test Dataset', 'bidstest', EXTRACTORS)
 
