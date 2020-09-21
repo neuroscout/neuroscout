@@ -34,7 +34,7 @@ export class PredictorCollectionList extends React.Component<CollectionListProps
   loadCollections = () => {
     this.setState({loading: true});
     api.getUser().then((user: ApiUser): any => {
-      if (user && user.predictor_collections) {
+      if (user && Object.values(user.predictor_collections).length > 0) {
         let collections = user.predictor_collections.map((x) => {
           return api.getPredictorCollection(x.id);
         });

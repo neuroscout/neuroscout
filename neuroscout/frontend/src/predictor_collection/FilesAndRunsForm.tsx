@@ -136,7 +136,8 @@ export class FilesAndRunsForm extends React.Component<FilesAndRunsFormProps, Fil
                 />
               </div>
             )}
-            extra={<Icon type="close" onClick={this.remove(i)} />}
+            extra={this.props.filesAndRuns.length > 1 && 
+                   <Icon type="close" onClick={this.remove(i)} />}
           >
             {this.props.filesAndRuns[i].display &&
               <>
