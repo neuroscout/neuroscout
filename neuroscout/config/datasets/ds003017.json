@@ -11,11 +11,16 @@
         "converters": [
         ],
         "extractors": [
-            ["GoogleVideoAPIShotDetectionExtractor", {"timeout": 100000}]
         ],
         "tokenized_extractors": [
         ],
         "transformations": [
+          {
+            "function": "dummy_value",
+            "new_name": "shot_change",
+            "extractor_name": "GoogleVideoAPIShotDetectionExtractor",
+            "feature_name": "shot_id"
+          }
         ],
         "ingest_args": {
         }
