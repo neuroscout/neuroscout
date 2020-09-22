@@ -191,6 +191,9 @@ export const api = {
           id: 0,
           tracebacks: [] as (string | null)[]
         };
+        if (Object.values(collection.files).length === 0) {
+          return;
+        }
         let tracebacks = [...new Set(
           collection.files.filter(x => x.status === 'FAILED').filter(x => x.traceback !== null).map(x => x.traceback)
         )];
@@ -203,6 +206,7 @@ export const api = {
         upload.pending = collection.files.filter(x => x.status === 'PENDING').length;
         upload.id = collection.collection_id;
         uploads.push(upload);
+        return;
       });
       return uploads;
     })
