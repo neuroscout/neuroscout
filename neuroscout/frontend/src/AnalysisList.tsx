@@ -59,7 +59,11 @@ export class AnalysisListTable extends React.Component<AnalysisListProps> {
         title: 'Modified at',
         dataIndex: 'modified_at',
         defaultSortOrder: 'descend' as 'descend',
-        sorter: (a, b) => a.modified_at.localeCompare(b.modifiedAt)
+        sorter: (a, b) => a.modified_at.localeCompare(b.modified_at),
+        render: (text) => {
+          let date = text.split('-');
+          return ( <>{date[1]}-{date[0].slice(2, 4)}</> );
+        }
       },
       {
         title: 'Dataset',

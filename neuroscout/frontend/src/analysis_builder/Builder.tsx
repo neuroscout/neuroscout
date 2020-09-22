@@ -559,7 +559,8 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
       model: data.model,
       dummyContrast: dummyContrast,
       private: data.private,
-      user_name: data.user
+      user_name: data.user,
+      modified_at: data.modified_at
     };
 
     if (analysis.runIds.length > 0) {
@@ -1060,6 +1061,8 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
   }
 
   render() {
+    // tslint:disable-next-line:no-console
+    console.log(this.state.availableRuns);
 
     if (this.state.analysis404) {
       return <Redirect to="/builder/" />;
@@ -1257,6 +1260,7 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
                         postReports={activeTab === ('review' as TabName)}
                         defaultVisible={this.state.doTooltip && this.state.activeTab === ('review' as TabName)}
                         activeTab={activeTab}
+                        modified_at={analysis.modified_at}
                       />
                       <Review
                         model={this.state.model}

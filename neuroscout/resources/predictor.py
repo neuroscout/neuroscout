@@ -1,6 +1,7 @@
 from webargs import fields
 import tempfile
 import json
+from marshmallow import INCLUDE, Schema
 from sqlalchemy import func
 from flask_apispec import MethodResource, marshal_with, use_kwargs, doc
 from flask_jwt import current_identity
@@ -110,28 +111,39 @@ def prepare_upload(collection_name, event_files, runs, dataset_id):
     return pc, filenames
 
 
+class FormSchema(Schema):
+    collection_name = fields.Str(
+        required=True, description="Name of collection")
+    runs = fields.List(
+        fields.DelimitedList(fields.Int()),
+        required=True
+        )
+    dataset_id = fields.Int(required=True)
+    descriptions = fields.Str(description='Column descriptions')
+
+    class Meta:
+        unknown = INCLUDE
+
+
+class FileSchema(Schema):
+    image_file = fields.List(
+        FileField(), required=True,
+        description="TSV files with additional Predictors to be created.\
+        Required columns: onset, duration, any number of columns\
+        with values for new Predictors."
+        )
+
+    class Meta:
+        unknown = INCLUDE
+
+
 @doc(tags=['predictors'])
 class PredictorCollectionResource(MethodResource):
     @doc(summary='Create a custom Predictor using uploaded annotations.',
          consumes=['multipart/form-data', 'application/x-www-form-urlencoded'])
     @marshal_with(PredictorCollectionSchema)
-    @use_kwargs({
-        "collection_name": fields.Str(
-            required=True,
-            description="Name of collection"
-        ),
-        "event_files": fields.List(
-            FileField(), required=True,
-            description="TSV files with additional Predictors to be created.\
-            Required columns: onset, duration, any number of columns\
-            with values for new Predictors."),
-        "runs": fields.List(
-            fields.DelimitedList(fields.Int()),
-            required=True
-            ),
-        "dataset_id": fields.Int(required=True, description="Dataset id."),
-        "descriptions": fields.Str(description="Column descriptions")
-        }, location="form")
+    @use_kwargs(FormSchema, location="form")
+    @use_kwargs(FileSchema, location="files")
     @auth_required
     def post(self, collection_name, event_files, runs, dataset_id,
              descriptions=None):
@@ -155,8 +167,9 @@ class PredictorCollectionResource(MethodResource):
 
     @doc(summary='Get predictor collection by id.')
     @use_kwargs(
-        {'collection_id': fields.Int(description="Predictor Collection id.",
-                                        required=True)},
+        {'collection_id': fields.Int(
+            description="Predictor Collection id.",
+            required=True)},
         location='query')
     @marshal_with(PredictorCollectionSchema)
     def get(self, collection_id):
