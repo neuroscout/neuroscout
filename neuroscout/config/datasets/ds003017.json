@@ -11,6 +11,7 @@
         "converters": [
         ],
         "extractors": [
+          ["ComplexTextExtractor", {}]
         ],
         "tokenized_extractors": [
         ],
