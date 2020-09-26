@@ -44,7 +44,7 @@ def save_stim_filename(stimulus):
         path.parents[0].mkdir(exist_ok=True)
         stimulus.save(path.as_posix())
 
-        return stim_hash, path, None
+        return stim_hash, path, None, None
 
 
 def create_new_stimuli(dataset_id, task_name, parent_id, new_stims, rs_orig,

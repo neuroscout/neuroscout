@@ -91,6 +91,9 @@ export class AddPredictorsForm extends React.Component<AddPredictorsFormProps, A
       return api.postPredictorCollection(formData);
     }).then(ret => {
       if (ret.statusCode && ret.statusCode > 400) {
+        if (ret.statusCode === 422) {
+          // form issues?
+        }
         // need to figure out how to encode actual error message
         // tslint:disable-next-line:no-console
         console.log(ret);
@@ -201,7 +204,7 @@ export class AddPredictorsForm extends React.Component<AddPredictorsFormProps, A
         </a>
         </Tabs.TabPane>
         <Tabs.TabPane tab="Predictor Descriptions" key={'' + 3}>
-        {this.state.filesAndRuns[0].file !== undefined &&
+        {this.state.filesAndRuns.length > 0 && this.state.filesAndRuns[0].file !== undefined &&
          this.state.collectionName !== '' &&
            <Alert
              message="Please specify a description for each event column."

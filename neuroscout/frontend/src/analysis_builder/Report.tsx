@@ -137,6 +137,7 @@ export class Tracebacks extends React.Component<{traceback: string, message: str
 
 interface ReportProps {
   analysisId?: string;
+  modified_at?: string;
   runs: Run[];
   postReports: boolean;
   defaultVisible: boolean;
@@ -240,7 +241,6 @@ export class Report extends React.Component<ReportProps, ReportState> {
         state.scale = scale;
         state.matrices = res.result.design_matrix;
         state.plots = res.result.design_matrix_plot;
-        state.corr_plots = res.result.design_matrix_corrplot;
         state.reportTimestamp = res.generated_at;
         if (res.traceback) {
           state.reportTraceback = res.traceback;
@@ -260,7 +260,7 @@ export class Report extends React.Component<ReportProps, ReportState> {
       state.reportsLoaded = true;
       this.setState({...state});
     });
-  }
+  };
 
   updateSelectedRunIds = (values: string[]) => {
     this.setState({
@@ -378,8 +378,19 @@ export class Report extends React.Component<ReportProps, ReportState> {
           Design Reports
       </>
     );
+    
+    let date = [''];
+    if (!!this.props.modified_at) {
+      date = this.props.modified_at.split('-');
+    }
     const cardExtra = (
       <>
+        {!!date[0] && date.length === 3 &&
+          <>
+            last modified<Space />{date[2].slice(0, 2)}-{date[1]}-{date[0].slice(2, 4)}
+            <Space />
+          </>
+        }
         <Tooltip
           title={'Here you can preview the final design and correlation matrices. \
           \nClick on the design matrix columns to view the timecourse in detail.'}
