@@ -49,7 +49,7 @@ class UserDetailResource(MethodResource):
 
 
 @marshal_with(UserPublicSchema(
-    many=True,  exclude=['predictor_collections', 'first_login']))
+    many=True,  exclude=['first_login']))
 class UserListResource(MethodResource):
     @doc(tags=['user'], summary='Get a list of public users.')
     def get(self):
