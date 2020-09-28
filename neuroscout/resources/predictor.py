@@ -126,7 +126,7 @@ class FormSchema(Schema):
 
 
 class FileSchema(Schema):
-    image_file = fields.List(
+    event_files = fields.List(
         FileField(), required=True,
         description="TSV files with additional Predictors to be created.\
         Required columns: onset, duration, any number of columns\
