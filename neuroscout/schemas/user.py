@@ -21,10 +21,6 @@ class UserSchema(Schema):
                        description='ORCID')
     public_email = fields.Bool(description='Display email in public profile.')
 
-    predictor_collections = fields.Nested(
-        'PredictorCollectionSchema', only=['id', 'collection_name'],
-        description='Predictor collections contributed by this user.',
-        dump_only=True)
     first_login = fields.Bool(description='First time logging in.')
     institution = fields.Str(allow_none=True)
 
