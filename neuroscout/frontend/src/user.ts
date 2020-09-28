@@ -224,7 +224,7 @@ export class UserStore {
 
   loadPredictorCollections = (user?: ApiUser) => {
     (user ? Promise.resolve(user) : api.getUser()).then((_user: ApiUser): any => {
-      if (_user && _user.predictor_collections) {
+      if (_user && _user.predictor_collections && Array.isArray(_user.predictor_collections)) {
         let collections = _user.predictor_collections.map((x) => {
           return api.getPredictorCollection(x.id);
         });
