@@ -1061,9 +1061,6 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
   }
 
   render() {
-    // tslint:disable-next-line:no-console
-    console.log(this.state.availableRuns);
-
     if (this.state.analysis404) {
       return <Redirect to="/builder/" />;
     }
@@ -1103,6 +1100,7 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
             when={unsavedChanges}
             message={'You have unsaved changes. Are you sure you want leave this page?'}
           />
+          <div style={{ overflow: 'scroll' }}>
           <Row type="flex" justify="center" style={{ background: '#fff', padding: 0 }}>
             <MainCol>
               <Tabs
@@ -1288,6 +1286,7 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
                     private={analysis.private || false}
                     updateAnalysis={this.updateAnalysis}
                     userOwns={this.props.userOwns}
+                    modified_at={analysis.modified_at}
                   >
                   {this.props.userOwns && !isDraft &&
                       <EditDetails
@@ -1310,6 +1309,7 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
               </Tabs>
             </MainCol>
           </Row>
+          </div>
         </div>
     );
   }
