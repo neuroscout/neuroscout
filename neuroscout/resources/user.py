@@ -3,14 +3,14 @@ from flask_security.recoverable import reset_password_token_status
 from webargs import fields
 
 from flask_apispec import MethodResource, marshal_with, use_kwargs, doc
-from ..models import User, Analysis
+from ..models import User, Analysis, PredictorCollection
 from ..database import db
 from ..auth import register_user, reset_password, send_confirmation
 from .utils import abort, auth_required, first_or_404
 from ..utils.db import put_record
 from ..schemas.user import (UserSchema, UserCreationSchema, UserResetSchema,
                             UserPublicSchema)
-from ..schemas.predictor import PredictorSchema
+from ..schemas.predictor import PredictorSchema, PredictorCollectionSchema
 from ..schemas.analysis import AnalysisSchema
 from .predictor import get_predictors
 
@@ -78,6 +78,14 @@ class UserAnalysisListResource(MethodResource):
             User).filter(User.user_name == user_name)
 
 
+class UserPredictorCollectionResource(MethodResource):
+    @doc(tags=['predictors'], summary='Get list of user collections.')
+    @marshal_with(PredictorCollectionSchema)
+    @auth_required
+    def get(self,  **kwargs):
+        return current_identity.predictor_collections
+
+
 class UserResendConfirm(MethodResource):
     @jwt_required()
     def post(self):
@@ -114,8 +122,8 @@ class UserPredictorListResource(MethodResource):
     @use_kwargs({
         'run_id': fields.DelimitedList(
             fields.Int(), description="Run id(s). Warning, slow query."),
-        'name': fields.DelimitedList(fields.Str(),
-                                        description="Predictor name(s)"),
+        'name': fields.DelimitedList(
+            fields.Str(), description="Predictor name(s)"),
         'newest': fields.Boolean(
             missing=True,
             description="Return only newest Predictor by name")

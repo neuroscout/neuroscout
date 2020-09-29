@@ -138,7 +138,7 @@ class FileSchema(Schema):
 
 
 @doc(tags=['predictors'])
-class PredictorCollectionResource(MethodResource):
+class PredictorCollectionCreateResource(MethodResource):
     @doc(summary='Create a custom Predictor using uploaded annotations.',
          consumes=['multipart/form-data', 'application/x-www-form-urlencoded'])
     @marshal_with(PredictorCollectionSchema)
@@ -165,16 +165,14 @@ class PredictorCollectionResource(MethodResource):
         db.session.commit()
         return pc
 
+
+@doc(tags=['predictors'])
+class PredictorCollectionResource(MethodResource):
     @doc(summary='Get predictor collection by id.')
-    @use_kwargs(
-        {'collection_id': fields.Int(
-            description="Predictor Collection id.",
-            required=True)},
-        location='query')
     @marshal_with(PredictorCollectionSchema)
-    def get(self, collection_id):
+    def get(self, pc_id, **kwargs):
         return first_or_404(
-            PredictorCollection.query.filter_by(id=collection_id))
+            PredictorCollection.query.filter_by(id=pc_id))
 
 
 class PredictorEventListResource(MethodResource):
