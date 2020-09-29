@@ -60,6 +60,7 @@ route_factory(
         ('UserResetSubmitResource', 'user/submit_token'),
         ('UserResendConfirm', 'user/resend_confirmation'),
         ('UserPredictorListResource', 'user/predictors'),
+        ('UserPredictorCollectionResource', 'user/collections'),
         ('TaskResource', 'tasks/<int:task_id>'),
         ('TaskListResource', 'tasks')
     ])

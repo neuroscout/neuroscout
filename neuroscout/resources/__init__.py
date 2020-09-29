@@ -16,7 +16,7 @@ from .user import (UserRootResource, UserTriggerResetResource,
                    UserResetSubmitResource, UserResendConfirm,
                    UserPredictorListResource, UserDetailResource,
                    UserAnalysisListResource, UserPrivateAnalysisListResource,
-                   UserListResource)
+                   UserListResource, UserPredictorCollectionResource)
 from .task import TaskResource, TaskListResource
 
 __all__ = [
@@ -48,6 +48,7 @@ __all__ = [
     'UserPredictorListResource',
     'UserAnalysisListResource',
     'UserPrivateAnalysisListResource',
+    'UserPredictorCollectionResource',
     'UserListResource',
     'TaskResource',
     'TaskListResource',
