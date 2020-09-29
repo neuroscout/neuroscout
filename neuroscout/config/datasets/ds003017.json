@@ -1,0 +1,34 @@
+{
+  "Budapest": {
+    "preproc_address": "https://github.com/neuroscout-datasets/ds003017.git",
+    "path": "/datasets/raw/ds003017/",
+    "summary": "The Grand Budapest Hotel: an fMRI dataset in response to a socially-rich, naturalistic movie",
+    "long_description": "Twenty-five subjects watched the second half of the movie 'The Grand Budapest Hotel'.",
+    "url": "https://openneuro.org/datasets/ds0030175",
+    "tasks": {
+      "movie": {
+        "summary": "Movie watching",
+        "converters": [
+        ],
+        "extractors": [
+          ["LengthExtractor", {}]
+        ],
+        "tokenized_extractors": [
+          [
+            [{"transformer": "BertLMExtractor", "parameters": {"mask": 24, "top_n": 100, "return_softmax": true}, "children": [{"transformer": "MetricExtractor", "parameters": {"functions": "scipy.stats.entropy"}}]}],
+            {"window": "pre", "n": 25}
+          ],
+          [
+            [{"transformer": "BertLMExtractor", "parameters": {"mask": 24, "top_n": 100, "return_softmax": true, "return_masked_word": true}, "children": [
+              {"transformer": "MetricExtractor", "parameters": {"subset_idx": ["true_word_score"], "functions": "lambda x: -np.log(x.values.astype(float))[0] if not x.isna()[0] else 'n/a'", "var_names": ["surprisal"]}}]}],
+            {"window": "pre", "n": 25}
+          ]
+        ],
+        "transformations": [
+        ],
+        "ingest_args": {
+        }
+      }
+    }
+  }
+}

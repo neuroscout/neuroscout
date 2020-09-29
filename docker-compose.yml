@@ -33,6 +33,7 @@ services:
   postgres:
     restart: always
     build: ./postgres
+    shm_size: 1g
     volumes:
       - /media/neuroscout-data/neuroscout/db_data:/var/lib/postgresql/data
     expose:
