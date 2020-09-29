@@ -79,7 +79,7 @@ class UserAnalysisListResource(MethodResource):
 
 
 class UserPredictorCollectionResource(MethodResource):
-    @doc(tags=['predictors'], summary='Get list of user collections.')
+    @doc(tags=['user'], summary='Get list of user collections.')
     @marshal_with(PredictorCollectionSchema(many=True))
     @auth_required
     def get(self,  **kwargs):
