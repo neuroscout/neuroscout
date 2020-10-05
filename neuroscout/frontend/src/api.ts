@@ -96,6 +96,15 @@ export const api = {
     });
   },
 
+  getUserPredictors: (ids?: (number[] | string[])): Promise<Predictor[] | null> => {
+    return jwtFetch(`${domainRoot}/api/user/predictors?run_id=${ids}`).then((data) => {
+      if (data.statusCode && data.statusCode === 422) {
+        return [] as Predictor[];
+      }
+      return data;
+    });
+  },
+
   getDataset: (datasetId: (number | string)): Promise<(Dataset | null)> => {
   return jwtFetch(`${domainRoot}/api/datasets/${datasetId}`)
     .then(data => {
