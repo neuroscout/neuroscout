@@ -67,8 +67,8 @@ export const api = {
     });
   },
 
-  getPredictorCollection: (id: string): any => {
-    return jwtFetch(`${domainRoot}/api/predictors/collection?collection_id=${id}`);
+  getPredictorCollections: (): any => {
+    return jwtFetch(`${domainRoot}/api/user/collections`);
   },
 
   postPredictorCollection: (formData: FormData): any => {
@@ -191,14 +191,13 @@ export const api = {
           id: 0,
           tracebacks: [] as (string | null)[]
         };
-        if (Object.values(collection.files).length === 0) {
-          return;
-        }
-        let tracebacks = [...new Set(
-          collection.files.filter(x => x.status === 'FAILED').filter(x => x.traceback !== null).map(x => x.traceback)
-        )];
-        if (tracebacks !== null && tracebacks.length > 0) {
-          upload.tracebacks = tracebacks;
+        if (Object.values(collection.files).length > 0) {
+          let tracebacks = [...new Set(
+            collection.files.filter(x => x.status === 'FAILED').filter(x => x.traceback !== null).map(x => x.traceback)
+          )];
+          if (tracebacks !== null && tracebacks.length > 0) {
+            upload.tracebacks = tracebacks;
+          }
         }
         upload.total = collection.files.length;
         upload.failed = collection.files.filter(x => x.status  === 'FAILED').length;
