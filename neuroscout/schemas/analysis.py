@@ -120,7 +120,7 @@ class NeurovaultCollectionSchema(Schema):
 
 class NeurovaultCollectionSchemaStatus(NeurovaultCollectionSchema):
     files = fields.Nested(
-        NeurovaultFileUploadSchema)
+        NeurovaultFileUploadSchema, many=True)
 
 
 class AnalysisFullSchema(AnalysisSchema):
