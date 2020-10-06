@@ -110,8 +110,7 @@ def test_predictor_create(session,
                                 descriptions)
     assert results['status'] == 'OK'
 
-    resp = auth_client.get('/api/predictors/collection',
-                           params={'collection_id': pc.id})
+    resp = auth_client.get(f'/api/predictors/collection/{pc.id}')
     assert resp.status_code == 200
     resp = decode_json(resp)
 
