@@ -5,7 +5,7 @@ import memoize from 'memoize-one';
 import { config } from '../config';
 import { jwtFetch } from '../utils';
 import { Analysis } from '../coretypes';
-import { StatusTag } from '../HelperComponents';
+import { DateTag, StatusTag } from '../HelperComponents';
 import { api } from '../api';
 import { Tracebacks } from './Report';
 
@@ -53,6 +53,7 @@ class PubAccess extends React.Component<PubAccessProps, {}> {
 type submitProps = {
   status?: string,
   analysisId?: string,
+  modified_at?: string;
   confirmSubmission: (build: boolean) => void,
   private: boolean,
   updateAnalysis?: (value: Partial<Analysis>) => void,
@@ -256,6 +257,7 @@ export class StatusTab extends React.Component<submitProps, statusTabState> {
           <PubAccess private={this.props.private} updateAnalysis={this.props.updateAnalysis!} />
           <span>{' '}</span>
           </>}
+        <DateTag modified_at={this.props.modified_at} />
         <StatusTag status={this.props.status} analysisId={this.props.analysisId} />
       </div>
       {(this.props.status === 'PASSED') &&

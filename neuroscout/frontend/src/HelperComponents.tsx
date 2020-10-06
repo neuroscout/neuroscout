@@ -102,3 +102,15 @@ export const datasetColumns = [
     }
   }
 ];
+
+export function DateTag(props) {
+    let date = [''];
+    if (!!props.modified_at) {
+      date = props.modified_at.split('-');
+    }
+    return (
+      <>{!!date[0] && date.length === 3 &&
+          <Tag>last modified <Space />{date[2].slice(0, 2)}-{date[1]}-{date[0].slice(2, 4)}</Tag>
+        }</>
+    );
+}

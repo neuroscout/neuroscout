@@ -253,6 +253,10 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
         if (data.status === 'FAILED') {
           this.setState({activeTab: 'submit'});
         }
+        if (!editableStatus.includes(data.status)) {
+          this.setState({activeTab: 'review'});
+          this.postTabChange('review');
+        }
       })
       .catch(displayError);
     }
@@ -941,7 +945,7 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
     api.getPredictors(runIds)
     .then((data: (Predictor[] | null)) => {
       if (data === null) {
-        return;
+        data = [] as Predictor[];
       }
 
       // If there is a statusCode we do not have a list of predictors
@@ -952,19 +956,18 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
         return;
       }
 
-      // merge predictor collection predictors into available predictors
-      if (this.state.user && this.state.user.predictorCollections) {
-        let userPredictors = this.state.user.predictorCollections.filter(x => {
-          return x.predictors !== undefined &&
-          x.predictors.length > 0 &&
-          x.predictors[0].dataset_id + '' === this.state.analysis.datasetId;
-        }).map(x => x.predictors).filter(isDefined).flat().map(predictor => {
-          if (!data.some((elem => elem.id === predictor.id))) {
-            data.push(predictor);
+      if (!!localStorage.getItem('jwt')) {
+        return api.getUserPredictors(runIds).then((user_preds: (Predictor[] | null)) => {
+          if (user_preds !== null && Array.isArray(user_preds)) {
+            // @ts-ignore: Object is possibly 'null'
+            return data.concat(user_preds);
           }
+          return data;
         });
+      } else {
+        return data;
       }
-
+    }).then((data: Predictor[]) => {
       const selectedPredictors = data.filter(
         p => analysis.predictorIds.indexOf(p.id) > -1
       );
@@ -1061,9 +1064,6 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
   }
 
   render() {
-    // tslint:disable-next-line:no-console
-    console.log(this.state.availableRuns);
-
     if (this.state.analysis404) {
       return <Redirect to="/builder/" />;
     }
@@ -1103,6 +1103,7 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
             when={unsavedChanges}
             message={'You have unsaved changes. Are you sure you want leave this page?'}
           />
+          <div style={{ overflow: 'scroll' }}>
           <Row type="flex" justify="center" style={{ background: '#fff', padding: 0 }}>
             <MainCol>
               <Tabs
@@ -1288,6 +1289,7 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
                     private={analysis.private || false}
                     updateAnalysis={this.updateAnalysis}
                     userOwns={this.props.userOwns}
+                    modified_at={analysis.modified_at}
                   >
                   {this.props.userOwns && !isDraft &&
                       <EditDetails
@@ -1310,6 +1312,7 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
               </Tabs>
             </MainCol>
           </Row>
+          </div>
         </div>
     );
   }

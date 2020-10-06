@@ -1,12 +1,12 @@
 import * as React from 'react';
-import { Alert, Button, Tabs, Collapse, Card, Tooltip, Icon, Select, Spin, Switch, Popconfirm } from 'antd';
+import { Alert, Button, Tabs, Collapse, Card, Tooltip, Icon, Select, Spin, Switch, Popconfirm, Tag } from 'antd';
 import vegaEmbed from 'vega-embed';
 
 import { OptionProps } from 'antd/lib/select';
 
 import { config } from '../config';
 import { jwtFetch, timeout } from '../utils';
-import { Space } from '../HelperComponents';
+import { DateTag, Space } from '../HelperComponents';
 
 import { Run, TabName } from '../coretypes';
 const domainRoot = config.server_url;
@@ -379,18 +379,9 @@ export class Report extends React.Component<ReportProps, ReportState> {
       </>
     );
     
-    let date = [''];
-    if (!!this.props.modified_at) {
-      date = this.props.modified_at.split('-');
-    }
     const cardExtra = (
       <>
-        {!!date[0] && date.length === 3 &&
-          <>
-            last modified<Space />{date[2].slice(0, 2)}-{date[1]}-{date[0].slice(2, 4)}
-            <Space />
-          </>
-        }
+        <DateTag modified_at={this.props.modified_at} />
         <Tooltip
           title={'Here you can preview the final design and correlation matrices. \
           \nClick on the design matrix columns to view the timecourse in detail.'}

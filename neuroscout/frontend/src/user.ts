@@ -223,19 +223,8 @@ export class UserStore {
   }
 
   loadPredictorCollections = (user?: ApiUser) => {
-    (user ? Promise.resolve(user) : api.getUser()).then((_user: ApiUser): any => {
-      if (_user && _user.predictor_collections) {
-        let collections = _user.predictor_collections.map((x) => {
-          return api.getPredictorCollection(x.id);
-        });
-        return Promise.all(collections);
-      } else {
-        return [];
-      }
-    }).then((collections) => {
-      /* need to get dataset id from first predictor in each collection */
-      collections.sort((a, b) => { return b.id - a.id; });
-      this.update({ predictorCollections: collections });
+    api.getPredictorCollections().then(colls => {
+      this.update({predictorCollections: colls});
     });
   };
 

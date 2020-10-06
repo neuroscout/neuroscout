@@ -62,7 +62,7 @@ export class AnalysisListTable extends React.Component<AnalysisListProps> {
         sorter: (a, b) => a.modified_at.localeCompare(b.modified_at),
         render: (text) => {
           let date = text.split('-');
-          return ( <>{date[1]}-{date[0].slice(2, 4)}</> );
+          return ( <>{date[2].slice(0, 2)}-{date[1]}-{date[0].slice(2, 4)}</>);
         }
       },
       {

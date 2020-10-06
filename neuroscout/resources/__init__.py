@@ -8,6 +8,7 @@ from .analysis import (AnalysisResource, AnalysisRootResource,
                        BibliographyResource)
 from .dataset import DatasetResource, DatasetListResource
 from .predictor import (PredictorListResource, PredictorResource,
+                        PredictorCollectionCreateResource,
                         PredictorCollectionResource, prepare_upload,
                         PredictorEventListResource)
 from .run import RunResource, RunListResource
@@ -15,7 +16,7 @@ from .user import (UserRootResource, UserTriggerResetResource,
                    UserResetSubmitResource, UserResendConfirm,
                    UserPredictorListResource, UserDetailResource,
                    UserAnalysisListResource, UserPrivateAnalysisListResource,
-                   UserListResource)
+                   UserListResource, UserPredictorCollectionResource)
 from .task import TaskResource, TaskListResource
 
 __all__ = [
@@ -36,6 +37,7 @@ __all__ = [
     'PredictorListResource',
     'PredictorEventListResource',
     'PredictorCollectionResource',
+    'PredictorCollectionCreateResource',
     'RunResource',
     'RunListResource',
     'UserDetailResource',
@@ -46,6 +48,7 @@ __all__ = [
     'UserPredictorListResource',
     'UserAnalysisListResource',
     'UserPrivateAnalysisListResource',
+    'UserPredictorCollectionResource',
     'UserListResource',
     'TaskResource',
     'TaskListResource',
