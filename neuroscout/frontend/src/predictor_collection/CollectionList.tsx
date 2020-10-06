@@ -33,20 +33,9 @@ export class PredictorCollectionList extends React.Component<CollectionListProps
   // loading state local
   loadCollections = () => {
     this.setState({loading: true});
-    api.getUser().then((user: ApiUser): any => {
-      if (user && Object.values(user.predictor_collections).length > 0) {
-        let collections = user.predictor_collections.map((x) => {
-          return api.getPredictorCollection(x.id);
-        });
-        return Promise.all(collections);
-      } else {
-        this.setState({loading: false});
-        return [];
-      }
-    }).then((collections) => {
-      // collections.sort((a, b) => { return b.id - a.id; });
+    api.getPredictorCollections().then(colls => {
       this.setState({loading: false});
-      this.props.updateUser({predictorCollections: collections});
+      this.props.updateUser({predictorCollections: colls});
     });
   };
  
