@@ -262,7 +262,6 @@ export class OverviewTab extends React.Component<OverviewTabProps, OverviewTabSt
                   placeholder="You can change this later"
                   value={analysis.name}
                   onChange={this.updateAnalysisFromEvent('name')}
-                  required={true}
                   min={1}
                 />
               </Col>
