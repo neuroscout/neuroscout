@@ -20,14 +20,14 @@ class Home extends React.Component<{}, {}> {
       <Row type="flex" justify="center" style={{ background: '#fff', padding: 0 }}>
         <MainCol>
         <div>
+          <Alert
+            message="Outage alert"
+            description="Our dataset host (TACC's Corral) is currently down for maintenance, and should be back shortly. "
+            type="warning"
+            showIcon
+          />
          <img className="splashLogo" src="/static/Neuroscout_Simple_Wide.svg"/><br/>
          <div className="splashText">A platform for fast and flexible re-analysis of (naturalistic) fMRI studies</div>
-        <Alert
-          message="Informational Notes"
-          description="Our dataset host (TACC's Corral) is currently down for maintenance, and should be back shortly. "
-          type="info"
-          showIcon
-        />
          <br/><br/>
          <div className="splashButtonParent">
          <Button size="large" className="splashButton" type="primary" href="/public">
