@@ -13,7 +13,7 @@ class AnalysisSchema(Schema):
     parent_id = fields.Str(dump_only=True,
                            description="Parent analysis, if cloned.")
 
-    name = fields.Str(required=True, description='Analysis name.')
+    name = fields.Str(description='Analysis name.')
     description = fields.Str()
     predictions = fields.Str(description='User apriori predictions.')
 

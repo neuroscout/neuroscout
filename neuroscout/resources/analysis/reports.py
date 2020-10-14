@@ -34,6 +34,8 @@ class CompileAnalysisResource(MethodResource):
     @doc(summary='Compile and lock analysis.')
     @owner_required
     def post(self, analysis, build=False):
+        if analysis.name is None:
+            abort(404, "Analysis must be given a name before compilation.")
         try:
             task = celery_app.send_task(
                 'workflow.compile',
