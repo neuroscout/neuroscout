@@ -22,14 +22,28 @@ def _check_scale_variance(pes_df, transformations):
         for (n, id), grp in in_scale_df.groupby(['predictor_name', 'run_id']):
             if grp.value.astype('float').var() == 0:
                 no_var.append(n)
-
+    messages = []
     if no_var:
-        return [
+        messages.append([
             f"The following variables have no variance in at least one run: "
             f"{', '.join(set(no_var))}. "
-            "Scale transformation cannot be applied."]
-    else:
-        return []
+            "Scale transformation cannot be applied."])
+    return messages
+
+
+def _check_na(pes_df):
+    messages = []
+    nas = pes_df[pes_df.value == 'n/a']
+    if not nas.empty:
+        na_vars = nas.predictor_name.unique().tolist()
+        messages.append([
+            f"The following variables at least one n/a value: "
+            f"{', '.join(set(na_vars))}. "
+            "You must remove n/as using the Scale transformation"
+            "to apply the HRF convolution."]
+                        )
+
+    return messages
 
 
 def pre_warnings(analysis, pes, report_object):
