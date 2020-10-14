@@ -22,7 +22,6 @@ class Home extends React.Component<{}, {}> {
         <div>
          <img className="splashLogo" src="/static/Neuroscout_Simple_Wide.svg"/><br/>
          <div className="splashText">A platform for fast and flexible re-analysis of (naturalistic) fMRI studies</div>
-         />
         <Alert
           message="Informational Notes"
           description="Our dataset host (TACC's Corral) is currently down for maintenance, and should be back shortly. "
