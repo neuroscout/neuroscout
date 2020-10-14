@@ -102,14 +102,15 @@ def dump_predictor_events(predictor_ids, run_ids=None, stimulus_timing=False):
 @listens_for(Analysis, "after_insert")
 def update_hash(mapper, connection, target):
     analysis_table = mapper.local_table
-    new_hash = shortuuid.ShortUUID().random(length=5)
+    shortuuid.set_alphabet('23456789abcdefghijkmnopqrstuvwxyz')
+    new_hash = shortuuid.random(length=5)
     res = connection.execute(
         f"select id from analysis where hash_id='{new_hash}'")
 
     # Check for clashes and generate new if there is one
     while res.rowcount > 0:
         print('trying again')
-        new_hash = shortuuid.ShortUUID().random(length=5)
+        new_hash = shortuuid.ShortUUID().random(length=6)
         res = connection.execute(
             f"select id from analysis where hash_id='{new_hash}'")
 
