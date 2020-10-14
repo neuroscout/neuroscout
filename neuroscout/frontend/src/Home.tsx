@@ -2,7 +2,7 @@
  Home component for the homepage
 */
 import * as React from 'react';
-import { Divider, Row, Col, Button, Card } from 'antd';
+import { Divider, Row, Col, Button, Card, Alert } from 'antd';
 import { MainCol } from './HelperComponents';
 
 const titleStyle: any = {
@@ -22,6 +22,13 @@ class Home extends React.Component<{}, {}> {
         <div>
          <img className="splashLogo" src="/static/Neuroscout_Simple_Wide.svg"/><br/>
          <div className="splashText">A platform for fast and flexible re-analysis of (naturalistic) fMRI studies</div>
+         />
+        <Alert
+          message="Informational Notes"
+          description="Our dataset host (TACC's Corral) is currently down for maintenance, and should be back shortly. "
+          type="info"
+          showIcon
+        />
          <br/><br/>
          <div className="splashButtonParent">
          <Button size="large" className="splashButton" type="primary" href="/public">
