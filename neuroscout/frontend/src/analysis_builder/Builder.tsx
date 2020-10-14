@@ -410,11 +410,6 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
       return new Promise(() => {return false; });
     }
 
-    if (!analysis.name) {
-      displayError(Error('Analysis cannot be saved without a name'));
-      return new Promise(() => {return false; });
-    }
-
     const apiAnalysis: ApiAnalysis = {
       name: analysis.name,
       description: analysis.description,
@@ -616,9 +611,6 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
       update[nextTab + 'Active' ] = true;
       if (this.state.activeTab === 'overview') {
         // need name and runids
-        if (this.state.analysis.name.length < 1) {
-          // how
-        }
         if (this.state.analysis.runIds.length < 1) {
         }
       } else if (!this.preTabChange(nextTab as TabName)) {
@@ -1133,7 +1125,7 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
                     updateSelectedTaskId={this.updateState('selectedTaskId')}
                   />
                   {this.navButtons(
-                    !(!!this.state.analysis.name && this.state.analysis.runIds.length > 0 && selectedTaskId !== null),
+                    !(this.state.analysis.runIds.length > 0 && selectedTaskId !== null),
                     false
                   )}
                   <br/>
