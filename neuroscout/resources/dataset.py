@@ -23,7 +23,7 @@ class DatasetListResource(MethodResource):
         location='query')
     @cache.cached(60 * 60 * 24 * 300, query_string=True)
     @marshal_with(DatasetSchema(
-        many=True, exclude=['dataset_address', 'preproc_address']))
+        many=True, exclude=['dataset_address', 'preproc_address', 'runs']))
     def get(self, **kwargs):
         query = {}
         if kwargs.pop('active_only'):
