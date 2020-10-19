@@ -1280,6 +1280,7 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
                   <h2>Finalize and Run</h2>
                   <StatusTab
                     status={analysis.status}
+                    name={analysis.name}
                     analysisId={analysis.analysisId}
                     confirmSubmission={this.confirmSubmission}
                     private={analysis.private || false}
