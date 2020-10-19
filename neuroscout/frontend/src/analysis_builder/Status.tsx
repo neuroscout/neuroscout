@@ -260,6 +260,7 @@ export class StatusTab extends React.Component<submitProps, statusTabState> {
         <DateTag modified_at={this.props.modified_at} />
         <StatusTag status={this.props.status} analysisId={this.props.analysisId} />
       </div>
+      {this.props.children}
       {(this.props.status === 'PASSED') &&
         <div>
           <h3>Analysis Passed</h3>
@@ -308,7 +309,6 @@ export class StatusTab extends React.Component<submitProps, statusTabState> {
         </div>
       }
       {this.state.nvUploads && this.nvStatus(this.state.nvUploads)}
-      {this.props.children}
       </div>
     );
   }

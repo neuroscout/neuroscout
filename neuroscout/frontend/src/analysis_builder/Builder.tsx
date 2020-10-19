@@ -149,7 +149,11 @@ class EditDetails extends React.Component<editDetailsProps, editDetailsState> {
   }
 
   init(props: editDetailsProps) {
-    return {newName: props.name, newDescription: props.description, visible: []};
+    return {
+      newName: props.name,
+      newDescription: props.description,
+      visible: props.name ? [] : ['1']
+    };
   }
 
   update() {
@@ -162,11 +166,11 @@ class EditDetails extends React.Component<editDetailsProps, editDetailsState> {
 
   render() {
     return (
-      <div>
+      <div className="editDetails">
       <Collapse bordered={false} activeKey={this.state.visible} onChange={this.onChange}>
         <Panel header="Edit Analysis Details" key="1">
           <Form layout="vertical">
-            <FormItem label="Name" required={true}>
+            <FormItem label="Name">
               <Input
                 placeholder="Name your analysis"
                 value={this.state.newName}
@@ -1283,7 +1287,7 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
                     userOwns={this.props.userOwns}
                     modified_at={analysis.modified_at}
                   >
-                  {this.props.userOwns && !isDraft &&
+                  {this.props.userOwns &&
                       <EditDetails
                         name={analysis.name}
                         description={analysis.description}
