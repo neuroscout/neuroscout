@@ -164,6 +164,14 @@ def test_post(auth_client, add_task, add_predictor):
     assert decode_json(resp)['message']['json']['dataset_id'][0] == \
         'Invalid dataset id.'
 
+    no_name_OK = {
+        "dataset_id": dataset_id,
+        "description": "pretty damn innovative"
+        }
+
+    resp = auth_client.post('/api/analyses', data=no_name_OK)
+    assert resp.status_code == 200
+
 
 def test_clone(session, auth_client, add_task, add_analysis, add_users):
     (id1, id2), _ = add_users
