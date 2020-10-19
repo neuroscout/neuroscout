@@ -164,16 +164,6 @@ def test_post(auth_client, add_task, add_predictor):
     assert decode_json(resp)['message']['json']['dataset_id'][0] == \
         'Invalid dataset id.'
 
-    bad_post_2 = {
-        "dataset_id": dataset_id,
-        "description": "pretty damn innovative"
-        }
-
-    resp = auth_client.post('/api/analyses', data=bad_post_2)
-    assert resp.status_code == 422
-    assert decode_json(resp)['message']['json']['name'][0] == \
-        'Missing data for required field.'
-
 
 def test_clone(session, auth_client, add_task, add_analysis, add_users):
     (id1, id2), _ = add_users
