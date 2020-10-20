@@ -79,18 +79,18 @@ def build_analysis(analysis, predictor_events, bids_dir, task_name,
     tmp_dir = Path(mkdtemp())
 
     # Get set of entities across analysis
-    entities = [{}]
+    run_entities = []
     if run_ids is not None:
         # Get entities of runs, and add to kwargs
         for rid in run_ids:
             for run in analysis['runs']:
                 if rid == run['id']:
-                    entities.append(_get_entities(run))
+                    ents = _get_entities(run)
+                    ents['task'] = task_name
+                    run_entities.append()
                     break
 
-    entities = _merge_dictionaries(*entities)
-    entities['task'] = task_name
-    entities['scan_length'] = max([r['duration'] for r in analysis['runs']])
+    scan_length = max([r['duration'] for r in analysis['runs']])
 
     # Write out all events
     paths = writeout_events(
@@ -105,7 +105,11 @@ def build_analysis(analysis, predictor_events, bids_dir, task_name,
 
         bids_analysis = BIDSAnalysis(
             bids_layout, deepcopy(analysis.get('model')))
-        bids_analysis.setup(**entities)
+
+        for ents in run_entities:
+            bids_analysis.setup(
+                **ents, scan_length=scan_length, finalize=False)
+        bids_analysis.finalize()
 
     return tmp_dir, paths, bids_analysis
 
@@ -143,17 +147,6 @@ def _get_entities(run):
     if 'number' in entities:
         entities['run'] = entities.pop('number')
     return entities
-
-
-def _merge_dictionaries(*arg):
-    """ Set merge dictionaries """
-    dd = defaultdict(set)
-
-    for d in arg:  # you can list as many input dicts as you want here
-        for key, value in d.items():
-            dd[key].add(value)
-    return dict(((k, list(v)) if len(v) > 1 else (k, list(v)[0])
-                 for k, v in dd.items()))
 
 
 def impute_confounds(dense):

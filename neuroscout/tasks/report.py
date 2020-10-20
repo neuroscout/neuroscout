@@ -85,9 +85,6 @@ def generate_report(flask_app, hash_id, report_id):
     Args:
         hash_id (str): analysis hash_id
         report_id (int): Report object id
-        run_ids (list): List of run ids
-        sampling_rate (float): Rate to re-sample design matrix in Hz
-        scale (bool): Scale columns in dm plot
     """
     FILE_DATA = Path(flask_app.config['FILE_DIR'])
     domain = flask_app.config['SERVER_NAME']
