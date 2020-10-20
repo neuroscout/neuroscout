@@ -2,6 +2,7 @@ import json
 import numpy as np
 import pandas as pd
 from flask import current_app
+from collections import defaultdict
 from pathlib import Path
 from tempfile import mkdtemp
 from bids.analysis import Analysis as BIDSAnalysis
@@ -86,7 +87,7 @@ def build_analysis(analysis, predictor_events, bids_dir, task_name,
                 if rid == run['id']:
                     ents = _get_entities(run)
                     ents['task'] = task_name
-                    run_entities.append(ents)
+                    run_entities.append()
                     break
 
     scan_length = max([r['duration'] for r in analysis['runs']])
@@ -105,10 +106,9 @@ def build_analysis(analysis, predictor_events, bids_dir, task_name,
         bids_analysis = BIDSAnalysis(
             bids_layout, deepcopy(analysis.get('model')))
 
-        for ents in run_entities:
-            bids_analysis.setup(
-                **ents, scan_length=scan_length, finalize=False)
-        bids_analysis.finalize()
+
+        for ents in run_ent
+        bids_analysis.setup(**entities)
 
     return tmp_dir, paths, bids_analysis
 
@@ -121,15 +121,15 @@ def _load_cached_layout(bids_dir, dataset_id, task_name):
         bids_layout = BIDSLayout.load(str(layout_path))
     else:
         # Load events and try applying transformations
-        bids_layout = BIDSLayout(bids_dir, database_path=layout_path,
-                                 validate=False, index_metadata=False)
-
         metadata_filter = {
             'extension': ['nii.gz'],
             'suffix': 'bold',
         }
-        indexer = BIDSLayoutIndexer(bids_layout, **metadata_filter)
-        
+        indexer = BIDSLayoutIndexer(bids_layout, extension=**metadata_filter)
+        bids_layout = BIDSLayout(bids_dir, database_path=layout_path,
+                                 validate=False, index_metadata=False,
+                                 indexer=indexer)
+
     return bids_layout
 
 
