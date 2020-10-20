@@ -53,6 +53,7 @@ class PubAccess extends React.Component<PubAccessProps, {}> {
 type submitProps = {
   status?: string,
   analysisId?: string,
+  name?: string,
   modified_at?: string;
   confirmSubmission: (build: boolean) => void,
   private: boolean,
@@ -127,11 +128,14 @@ export class Submit extends React.Component<submitProps, {tosAgree: boolean, val
           I have read and agree to Neuroscout's terms of service
         </Checkbox>
         <br/>
+        {!this.props.name &&
+          <Alert message="Analysis needs name to be generated" type="warning" showIcon={true} closable={true} />
+        }
         <Button
           hidden={!this.props.analysisId}
           onClick={this.props.confirmSubmission.bind(this, this.state.validate)}
           type={'primary'}
-          disabled={!this.state.tosAgree || !['DRAFT', 'FAILED'].includes(status)}
+          disabled={!this.state.tosAgree || !['DRAFT', 'FAILED'].includes(status) || !this.props.name}
         >
           Generate
         </Button>
@@ -260,6 +264,7 @@ export class StatusTab extends React.Component<submitProps, statusTabState> {
         <DateTag modified_at={this.props.modified_at} />
         <StatusTag status={this.props.status} analysisId={this.props.analysisId} />
       </div>
+      {this.props.children}
       {(this.props.status === 'PASSED') &&
         <div>
           <h3>Analysis Passed</h3>
@@ -286,6 +291,7 @@ export class StatusTab extends React.Component<submitProps, statusTabState> {
       {(this.props.status === 'DRAFT' || this.props.status === 'FAILED') &&
         <Submit
           status={this.props.status}
+          name={this.props.name}
           analysisId={this.props.analysisId}
           confirmSubmission={this.props.confirmSubmission}
           private={this.props.private}
@@ -308,7 +314,6 @@ export class StatusTab extends React.Component<submitProps, statusTabState> {
         </div>
       }
       {this.state.nvUploads && this.nvStatus(this.state.nvUploads)}
-      {this.props.children}
       </div>
     );
   }
