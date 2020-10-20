@@ -87,7 +87,7 @@ def build_analysis(analysis, predictor_events, bids_dir, task_name,
                 if rid == run['id']:
                     ents = _get_entities(run)
                     ents['task'] = task_name
-                    run_entities.append()
+                    run_entities.append(ents)
                     break
 
     scan_length = max([r['duration'] for r in analysis['runs']])
