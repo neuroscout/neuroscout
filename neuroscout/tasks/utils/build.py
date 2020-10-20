@@ -2,7 +2,6 @@ import json
 import numpy as np
 import pandas as pd
 from flask import current_app
-from collections import defaultdict
 from pathlib import Path
 from tempfile import mkdtemp
 from bids.analysis import Analysis as BIDSAnalysis
@@ -125,13 +124,12 @@ def _load_cached_layout(bids_dir, dataset_id, task_name):
         bids_layout = BIDSLayout(bids_dir, database_path=layout_path,
                                  validate=False, index_metadata=False)
 
-        indexer = BIDSLayoutIndexer(bids_layout)
         metadata_filter = {
             'extension': ['nii.gz'],
             'suffix': 'bold',
         }
-        indexer.index_metadata(**metadata_filter)
-
+        indexer = BIDSLayoutIndexer(bids_layout, **metadata_filter)
+        
     return bids_layout
 
 
