@@ -3,6 +3,7 @@ from flask_apispec import MethodResource, marshal_with, use_kwargs, doc
 from flask_jwt import current_identity
 from ...models import Analysis, Report
 from ...database import db
+from ..core import cache
 from os.path import exists
 import datetime
 from webargs import fields
@@ -252,10 +253,14 @@ class BibliographyResource(MethodResource):
 
         return resp
 
+
 class ImageVersionResource(MethodResource):
-    @doc(tags=['analysis'], summary='Get latest version of neuroscout cli docker image')
+    @doc(tags=['analysis'],
+         summary='Get latest version of neuroscout cli docker image')
+    @cache.cached(60 * 60 * 24)
     def get(self):
-        url = "https://hub.docker.com/v2/repositories/neuroscout/neuroscout-cli/tags"
+        url = "https://hub.docker.com/v2/repositories/neuroscout/\
+            neuroscout-cli/tags"
         req = requests.get(url)
         try:
             req = req.json()
@@ -268,4 +273,3 @@ class ImageVersionResource(MethodResource):
                     return {'version': res['name']}
 
         return {}
-
