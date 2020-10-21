@@ -28,14 +28,16 @@ class Home extends React.Component<UserStore, {}> {
          <Button size="large" className="splashButton" type="default" href="/public">
             Browse public analyses
          </Button> <br/>
-         <Button
-              size="large"
-              className="splashButton"
-              type="primary"
-              onClick={e => this.props.update({ openSignup: true })}
-         >
-            Sign up to get started!
-         </Button>
+         {this.props.loggedIn === false &&
+           <Button
+                size="large"
+                className="splashButton"
+                type="primary"
+                onClick={e => this.props.update({ openSignup: true })}
+           >
+              Sign up to get started!
+           </Button>
+         }
          </div>
          </div>
          <br/>
