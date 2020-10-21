@@ -13,7 +13,7 @@ const transformDefinitions: Transformation[] = [
     Name: 'Scale',
     Demean: true,
     Rescale: true,
-    ReplaceNA: 'None' as ReplaceNA
+    ReplaceNA: 'after' as ReplaceNA
   },
   {
     Name: 'Orthogonalize',
