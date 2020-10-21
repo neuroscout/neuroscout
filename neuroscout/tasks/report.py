@@ -140,15 +140,25 @@ def generate_report(flask_app, hash_id, report_id):
         if sampling_rate is None:
             sampling_rate = 'TR'
 
-        for dm in first.get_design_matrix(
-          mode='dense', force=True, entities=False,
-          sampling_rate=sampling_rate):
-            dense = impute_confounds(dm.dense)
+        out_entities = ['subject', 'session', 'task', 'acquisition', 'run',
+                        'type', 'extension']
+        for coll in first.get_collections():
+            dense = coll.to_df(
+                include_dense=True, include_sparse=True,
+                sampling_rate=sampling_rate,
+                entities=True, format='wide')
+
+            X = analysis['model']['Steps'][0]['Model']['X']
+
+            dense = dense[X]
+            dense = impute_confounds(dense)
             if hrf:
                 dense = sort_dm(dense, interest=hrf[0]['Input'])
 
+            row = dense.iloc[0]
+            entities = {d: v for d, v in row.items() if d in out_entities}
             builder = PathBuilder(
-                outdir, domain, analysis['hash_id'], dm.entities)
+                outdir, domain, analysis['hash_id'], entities)
             # Writeout design matrix
             out, url = builder.build('design_matrix', 'tsv')
             results['design_matrix'].append(url)
