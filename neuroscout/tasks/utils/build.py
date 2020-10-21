@@ -2,7 +2,6 @@ import json
 import numpy as np
 import pandas as pd
 from flask import current_app
-from collections import defaultdict
 from pathlib import Path
 from tempfile import mkdtemp
 from bids.analysis import Analysis as BIDSAnalysis

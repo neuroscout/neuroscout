@@ -147,6 +147,7 @@ def generate_report(flask_app, hash_id, report_id):
                 include_dense=True, include_sparse=True,
                 sampling_rate=sampling_rate,
                 entities=True, format='wide')
+            row = dense.iloc[0]
 
             X = analysis['model']['Steps'][0]['Model']['X']
 
@@ -155,7 +156,6 @@ def generate_report(flask_app, hash_id, report_id):
             if hrf:
                 dense = sort_dm(dense, interest=hrf[0]['Input'])
 
-            row = dense.iloc[0]
             entities = {d: v for d, v in row.items() if d in out_entities}
             builder = PathBuilder(
                 outdir, domain, analysis['hash_id'], entities)
