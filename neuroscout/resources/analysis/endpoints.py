@@ -3,7 +3,7 @@ from flask_apispec import MethodResource, marshal_with, use_kwargs, doc
 from flask_jwt import current_identity
 from ...models import Analysis, Report
 from ...database import db
-from ..core import cache
+from ...core import cache
 from os.path import exists
 import datetime
 from webargs import fields
