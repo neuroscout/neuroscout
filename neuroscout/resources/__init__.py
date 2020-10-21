@@ -5,7 +5,7 @@ from .analysis import (AnalysisResource, AnalysisRootResource,
                        AnalysisBundleResource, AnalysisFullResource,
                        AnalysisResourcesResource, ReportResource,
                        AnalysisFillResource, AnalysisUploadResource,
-                       BibliographyResource)
+                       BibliographyResource, ImageVersionResource)
 from .dataset import DatasetResource, DatasetListResource
 from .predictor import (PredictorListResource, PredictorResource,
                         PredictorCollectionCreateResource,
@@ -54,5 +54,6 @@ __all__ = [
     'TaskResource',
     'TaskPredictorsResource',
     'TaskListResource',
+    'ImageVersionResource',
     'prepare_upload'
 ]

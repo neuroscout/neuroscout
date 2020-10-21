@@ -146,7 +146,8 @@ export class Submit extends React.Component<submitProps, {tosAgree: boolean, val
 
 type statusTabState = {
   compileTraceback: string,
-  nvUploads?: any
+  nvUploads?: any,
+  imageVersion: string
 };
 
 export class StatusTab extends React.Component<submitProps, statusTabState> {
@@ -154,7 +155,11 @@ export class StatusTab extends React.Component<submitProps, statusTabState> {
     super(props);
     this.state = {
       compileTraceback: '',
+      imageVersion: ''
     };
+  }
+
+  componentDidMount() {
     if ((this.props.analysisId !== undefined)) {
       this.getTraceback(this.props.analysisId);
       api.getNVUploads(this.props.analysisId).then(nvUploads => {
@@ -163,6 +168,11 @@ export class StatusTab extends React.Component<submitProps, statusTabState> {
         }
      });
     }
+    api.getImageVersion().then((version) => {
+      if (!!version) {
+        this.setState({imageVersion: `:${version}`});
+      }
+    });
   }
 
   getTraceback(id) {
@@ -277,7 +287,7 @@ export class StatusTab extends React.Component<submitProps, statusTabState> {
           <pre>
             <code>
               docker run --rm -it -v /local/outputdirectory:/out
-              neuroscout/neuroscout-cli run /out {this.props.analysisId}
+              {` neuroscout/neuroscout-cli${this.state.imageVersion}`} run /out {this.props.analysisId}
             </code>
           </pre>
           <Card size="small" title="System Requirements" style={{ width: 400 }}>

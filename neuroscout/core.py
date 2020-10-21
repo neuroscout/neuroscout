@@ -63,7 +63,8 @@ route_factory(
         ('UserPredictorCollectionResource', 'user/collections'),
         ('TaskResource', 'tasks/<int:task_id>'),
         ('TaskPredictorsResource', 'tasks/<int:task_id>/predictors'),
-        ('TaskListResource', 'tasks')
+        ('TaskListResource', 'tasks'),
+        ('ImageVersionResource', 'image_version')
     ])
 
 

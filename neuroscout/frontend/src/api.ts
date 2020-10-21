@@ -236,5 +236,13 @@ export const api = {
   },
   getPublicProfile: (user_name: string): Promise<ApiUser & {statusCode: number}> => {
     return jwtFetch(`${domainRoot}/api/user/${user_name}`);
+  },
+  getImageVersion: (): Promise<string> => {
+    return jwtFetch(`${domainRoot}/api/image_version`).then((res) => {
+      if (res.version) {
+        return res.version;
+      }
+      return '';
+    });
   }
 };
