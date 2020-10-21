@@ -35,7 +35,8 @@ def test_get_predictor(auth_client, extract_features):
         auth_client.get('/api/datasets'))
     dataset_id = ds[0]['id']
 
-    run_id = auth_client.get('/api/runs', params={'dataset_id': dataset_id})
+    run_id = decode_json(
+        auth_client.get('/api/runs', params={'dataset_id': dataset_id}))
     run_id = [r['id'] for r in run_id]
 
     resp = auth_client.get('/api/predictors', params={'run_id': run_id})
