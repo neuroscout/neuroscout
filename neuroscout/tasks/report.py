@@ -85,9 +85,6 @@ def generate_report(flask_app, hash_id, report_id):
     Args:
         hash_id (str): analysis hash_id
         report_id (int): Report object id
-        run_ids (list): List of run ids
-        sampling_rate (float): Rate to re-sample design matrix in Hz
-        scale (bool): Scale columns in dm plot
     """
     FILE_DATA = Path(flask_app.config['FILE_DIR'])
     domain = flask_app.config['SERVER_NAME']
@@ -143,15 +140,25 @@ def generate_report(flask_app, hash_id, report_id):
         if sampling_rate is None:
             sampling_rate = 'TR'
 
-        for dm in first.get_design_matrix(
-          mode='dense', force=True, entities=False,
-          sampling_rate=sampling_rate):
-            dense = impute_confounds(dm.dense)
+        out_entities = ['subject', 'session', 'task', 'acquisition', 'run',
+                        'type', 'extension']
+        for coll in first.get_collections():
+            dense = coll.to_df(
+                include_dense=True, include_sparse=True,
+                sampling_rate=sampling_rate,
+                entities=True, format='wide')
+            row = dense.iloc[0]
+
+            X = analysis['model']['Steps'][0]['Model']['X']
+
+            dense = dense[X]
+            dense = impute_confounds(dense)
             if hrf:
                 dense = sort_dm(dense, interest=hrf[0]['Input'])
 
+            entities = {d: v for d, v in row.items() if d in out_entities}
             builder = PathBuilder(
-                outdir, domain, analysis['hash_id'], dm.entities)
+                outdir, domain, analysis['hash_id'], entities)
             # Writeout design matrix
             out, url = builder.build('design_matrix', 'tsv')
             results['design_matrix'].append(url)
