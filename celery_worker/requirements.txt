@@ -11,7 +11,7 @@ sklearn
 networkx==1.9
 celery
 hashids==1.2.0
-marshmallow==2.19.1
+marshmallow==3.7.1
 psycopg2==2.8.3
 redis
 pandas==0.23
@@ -22,6 +22,7 @@ duecredit==0.6.1
 SQLAlchemy==1.3.0
 Flask-Caching==1.3.3
 flask_jwt
+shortuuid==1.0.1
 sentry-sdk==0.13.0
--e git+https://github.com/bids-standard/pybids@incremental-setup#egg=pybids
+-e git+https://github.com/bids-standard/pybids#egg=pybids
 Werkzeug==0.15.3
