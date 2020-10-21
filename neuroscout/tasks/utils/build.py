@@ -124,7 +124,7 @@ def _load_cached_layout(bids_dir, dataset_id, task_name):
             'extension': ['nii.gz'],
             'suffix': 'bold',
         }
-        indexer = BIDSLayoutIndexer(bids_layout, *metadata_filter)
+        indexer = BIDSLayoutIndexer(**metadata_filter)
         bids_layout = BIDSLayout(bids_dir, database_path=layout_path,
                                  validate=False, index_metadata=False,
                                  indexer=indexer)
