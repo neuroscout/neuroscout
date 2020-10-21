@@ -21,7 +21,7 @@ export default class Routes extends React.Component<AppState, {}> {
           exact={true}
           path="/"
           render={props =>
-            <Home />
+            <Home {...this.props.user} />
            }
         />
         <Route
@@ -123,7 +123,7 @@ export default class Routes extends React.Component<AppState, {}> {
       <Route
         path="/profile/:user_name"
         render={props => {
-          return (<PublicProfile 
+          return (<PublicProfile
             user_name={props.match.params.user_name}
             datasets={this.props.datasets}
             cloneAnalysis={this.props.cloneAnalysis}
