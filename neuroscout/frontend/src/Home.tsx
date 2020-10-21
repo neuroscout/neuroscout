@@ -29,7 +29,9 @@ class Home extends React.Component<UserStore, {}> {
             Browse public analyses
          </Button> <br/>
          <Button
-              size="large" className="splashButton" type="primary"
+              size="large"
+              className="splashButton"
+              type="primary"
               onClick={e => this.props.update({ openSignup: true })}
          >
             Sign up to get started!
