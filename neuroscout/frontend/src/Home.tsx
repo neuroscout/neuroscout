@@ -25,10 +25,13 @@ class Home extends React.Component<UserStore, {}> {
          <div className="splashText">A platform for fast and flexible re-analysis of (naturalistic) fMRI studies</div>
          <br/><br/>
          <div className="splashButtonParent">
-         <Button size="large" className="splashButton" type="primary" href="/public">
+         <Button size="large" className="splashButton" type="default" href="/public">
             Browse public analyses
          </Button> <br/>
-         <Button size="large" className="splashButton" type="primary" onClick={e => this.props.update({ openSignup: true })}>
+         <Button
+              size="large" className="splashButton" type="primary"
+              onClick={e => this.props.update({ openSignup: true })}
+         >
             Sign up to get started!
          </Button>
          </div>
