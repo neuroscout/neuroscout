@@ -102,9 +102,10 @@ export class Submit extends React.Component<submitProps, {tosAgree: boolean, val
       <div>
         {!this.props.name &&
           <span>
-           <Alert message="Analysis needs name to be generated" type="warning" showIcon={true} closable={true} /><br/>
+           <br/><Alert message="Analysis needs name to be generated" type="warning" showIcon={true} closable={true} />
           </span>
         }
+        <br/>
         <h3>Terms for analysis generation:</h3>
         <ul>
           <li>I agree that once I submit my analysis, I will not be able to delete or edit it.</li>
