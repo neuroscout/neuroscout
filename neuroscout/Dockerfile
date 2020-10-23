@@ -22,6 +22,7 @@ RUN npm install -g yarn
 COPY requirements.txt /usr/src/app/
 COPY optional_requirements.txt /usr/src/app
 RUN pip install setuptools==45
+RUN pip uninstall -y enum34
 RUN pip install --no-cache-dir -r requirements.txt
 RUN pip install --no-cache-dir -r optional_requirements.txt
 RUN python -m pliers.support.download
