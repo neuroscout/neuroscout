@@ -101,7 +101,9 @@ export class Submit extends React.Component<submitProps, {tosAgree: boolean, val
     return(
       <div>
         {!this.props.name &&
-          <span><Alert message="Analysis needs name to be generated" type="warning" showIcon={true} closable={true} /><br/></span>
+          <span>
+           <Alert message="Analysis needs name to be generated" type="warning" showIcon={true} closable={true} /><br/>
+          </span>
         }
         <h3>Terms for analysis generation:</h3>
         <ul>
