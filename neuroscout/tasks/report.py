@@ -9,7 +9,7 @@ from .utils.io import (
     update_record, PathBuilder, write_jsons, write_tarball, analysis_to_json)
 from .utils.warnings import pre_warnings
 
-MIN_CLI_VERSION = '0.3.3'
+MIN_CLI_VERSION = '0.4.1'
 
 
 def compile(flask_app, hash_id, run_ids=None, build=False):
