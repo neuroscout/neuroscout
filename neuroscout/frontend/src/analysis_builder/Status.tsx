@@ -100,6 +100,9 @@ export class Submit extends React.Component<submitProps, {tosAgree: boolean, val
     let validateChange = this.validateChange.bind(this);
     return(
       <div>
+        {!this.props.name &&
+          <span><Alert message="Analysis needs name to be generated" type="warning" showIcon={true} closable={true} /><br/></span>
+        }
         <h3>Terms for analysis generation:</h3>
         <ul>
           <li>I agree that once I submit my analysis, I will not be able to delete or edit it.</li>
@@ -128,9 +131,6 @@ export class Submit extends React.Component<submitProps, {tosAgree: boolean, val
           I have read and agree to Neuroscout's terms of service
         </Checkbox>
         <br/>
-        {!this.props.name &&
-          <Alert message="Analysis needs name to be generated" type="warning" showIcon={true} closable={true} />
-        }
         <Button
           hidden={!this.props.analysisId}
           onClick={this.props.confirmSubmission.bind(this, this.state.validate)}
