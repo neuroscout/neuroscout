@@ -281,7 +281,7 @@ export class StatusTab extends React.Component<submitProps, statusTabState> {
           <p>
             {this.props.userOwns && 'Congratulations, your analysis has been compiled!'}
             Run the analysis with this this command, replacing '/local/outputdirectory' with a local directory.
-            See the <a href="https://github.com/neuroscout/neuroscout-cli">neuroscout-cli documentation </a>
+            See the <a href="https://neuroscout.github.io/neuroscout/cli/">neuroscout-cli documentation </a>
              for more information.
           </p>
           <pre>
