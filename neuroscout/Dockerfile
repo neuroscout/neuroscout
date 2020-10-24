@@ -6,7 +6,7 @@ WORKDIR /usr/src/app
 
 RUN apt-get -qq update
 RUN apt-get install -yq ffmpeg tesseract-ocr apt-transport-https
-RUN pip install -e git+https://github.com/tyarkoni/pliers.git#egg=pliers
+RUN pip install -e git+https://github.com/PsychoinformaticsLab/pliers.git#egg=pliers
 RUN pip install clarifai duecredit google-api-python-client IndicoIo librosa>=0.6.3 pysrt pytesseract spacy rev_ai
 
 RUN wget -O- http://neuro.debian.net/lists/stretch.us-nh.full | tee /etc/apt/sources.list.d/neurodebian.sources.list && apt-key adv --recv-keys --keyserver hkp://pool.sks-keyservers.net 0xA5D32F012649A5A9
