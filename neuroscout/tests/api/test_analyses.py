@@ -164,15 +164,13 @@ def test_post(auth_client, add_task, add_predictor):
     assert decode_json(resp)['message']['json']['dataset_id'][0] == \
         'Invalid dataset id.'
 
-    bad_post_2 = {
+    no_name_OK = {
         "dataset_id": dataset_id,
         "description": "pretty damn innovative"
         }
 
-    resp = auth_client.post('/api/analyses', data=bad_post_2)
-    assert resp.status_code == 422
-    assert decode_json(resp)['message']['json']['name'][0] == \
-        'Missing data for required field.'
+    resp = auth_client.post('/api/analyses', data=no_name_OK)
+    assert resp.status_code == 200
 
 
 def test_clone(session, auth_client, add_task, add_analysis, add_users):
@@ -367,7 +365,8 @@ def test_reports(session, auth_client, add_analysis):
 
     # Create new Report
     r = Report(
-        analysis_id=analysis.hash_id
+        analysis_id=analysis.hash_id,
+        runs=[analysis.runs[0].id]
         )
     session.add(r)
     session.commit()
@@ -389,7 +388,7 @@ def test_reports(session, auth_client, add_analysis):
     for f in ['design_matrix', 'design_matrix_corrplot', 'design_matrix_plot']:
         assert f in result
 
-    assert len(result['design_matrix']) == 4
+    assert len(result['design_matrix']) == 1
 
 
 def test_compile(auth_client, add_analysis, add_analysis_fail):

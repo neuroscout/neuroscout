@@ -160,7 +160,7 @@ export class Review extends React.Component<ReviewProps, {}> {
 
     return (
       <Card
-        title={'Overview of ' + (Name ? Name : 'No Name')}
+        title={'Overview of ' + (Name ? Name : 'Untitled')}
       >
         Author: <Link to={`/profile/${this.props.user_name}`}> {this.props.user_name} </Link>
         <p>{Description ? Description : 'No description.'}</p>

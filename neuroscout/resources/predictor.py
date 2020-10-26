@@ -9,7 +9,7 @@ from flask import current_app
 from pathlib import Path
 from .utils import abort, auth_required, first_or_404
 from ..models import (
-    Predictor, PredictorRun, PredictorCollection)
+    Predictor, PredictorRun, PredictorCollection, Task)
 from ..database import db
 from ..core import cache
 from ..schemas.predictor import (
@@ -109,6 +109,28 @@ def prepare_upload(collection_name, event_files, runs, dataset_id):
     db.session.commit()
 
     return pc, filenames
+
+
+class TaskPredictorsResource(MethodResource):
+    @doc(tags=['predictors'], summary='Get list of predictors.',)
+    @use_kwargs({
+        'active_only': fields.Boolean(
+            missing=True,
+            description="Return only active Predictors"),
+        'newest': fields.Boolean(
+            missing=True,
+            description="Return only newest Predictor by name")
+        },
+        location='query')
+    @cache.cached(60 * 60 * 24 * 300, query_string=True)
+    @marshal_with(PredictorSchema(many=True))
+    def get(self, task_id, **kwargs):
+        newest = kwargs.pop('newest')
+        active = kwargs.pop('active_only')
+        task = first_or_404(Task.query.filter_by(id=task_id))
+        run_id = [r.id for r in task.runs]
+        return get_predictors(newest=newest, active=active,
+                              run_id=run_id, **kwargs)
 
 
 class FormSchema(Schema):

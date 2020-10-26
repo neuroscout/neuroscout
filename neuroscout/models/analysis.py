@@ -18,7 +18,7 @@ class Analysis(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     hash_id = db.Column(db.Text, unique=True)
 
-    name = db.Column(db.Text, nullable=False)
+    name = db.Column(db.Text)
     description = db.Column(db.Text)
     predictions = db.Column(db.Text, default='')
     private = db.Column(db.Boolean, default=True)

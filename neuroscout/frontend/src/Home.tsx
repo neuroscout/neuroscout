@@ -2,8 +2,9 @@
  Home component for the homepage
 */
 import * as React from 'react';
-import { Divider, Row, Col, Button, Card, Alert } from 'antd';
+import { Divider, Row, Col, Button, Card } from 'antd';
 import { MainCol } from './HelperComponents';
+import { UserStore } from './user';
 
 const titleStyle: any = {
   textAlign: ('center' as React.CSSProperties),
@@ -11,7 +12,7 @@ const titleStyle: any = {
   padding: '0px 0px 0px 0px'
 };
 
-class Home extends React.Component<{}, {}> {
+class Home extends React.Component<UserStore, {}> {
   render() {
     return (
 
@@ -24,9 +25,19 @@ class Home extends React.Component<{}, {}> {
          <div className="splashText">A platform for fast and flexible re-analysis of (naturalistic) fMRI studies</div>
          <br/><br/>
          <div className="splashButtonParent">
-         <Button size="large" className="splashButton" type="primary" href="/public">
+         <Button size="large" className="splashButton" type="default" href="/public">
             Browse public analyses
-         </Button>
+         </Button> <br/>
+         {this.props.loggedIn === false &&
+           <Button
+                size="large"
+                className="splashButton"
+                type="primary"
+                onClick={e => this.props.update({ openSignup: true })}
+           >
+              Sign up to get started!
+           </Button>
+         }
          </div>
          </div>
          <br/>

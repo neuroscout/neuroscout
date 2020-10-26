@@ -53,6 +53,7 @@ class PubAccess extends React.Component<PubAccessProps, {}> {
 type submitProps = {
   status?: string,
   analysisId?: string,
+  name?: string,
   modified_at?: string;
   confirmSubmission: (build: boolean) => void,
   private: boolean,
@@ -99,6 +100,12 @@ export class Submit extends React.Component<submitProps, {tosAgree: boolean, val
     let validateChange = this.validateChange.bind(this);
     return(
       <div>
+        {!this.props.name &&
+          <span>
+           <br/><Alert message="Analysis needs name to be generated" type="warning" showIcon={true} closable={true} />
+          </span>
+        }
+        <br/>
         <h3>Terms for analysis generation:</h3>
         <ul>
           <li>I agree that once I submit my analysis, I will not be able to delete or edit it.</li>
@@ -131,7 +138,7 @@ export class Submit extends React.Component<submitProps, {tosAgree: boolean, val
           hidden={!this.props.analysisId}
           onClick={this.props.confirmSubmission.bind(this, this.state.validate)}
           type={'primary'}
-          disabled={!this.state.tosAgree || !['DRAFT', 'FAILED'].includes(status)}
+          disabled={!this.state.tosAgree || !['DRAFT', 'FAILED'].includes(status) || !this.props.name}
         >
           Generate
         </Button>
@@ -142,7 +149,8 @@ export class Submit extends React.Component<submitProps, {tosAgree: boolean, val
 
 type statusTabState = {
   compileTraceback: string,
-  nvUploads?: any
+  nvUploads?: any,
+  imageVersion: string
 };
 
 export class StatusTab extends React.Component<submitProps, statusTabState> {
@@ -150,7 +158,11 @@ export class StatusTab extends React.Component<submitProps, statusTabState> {
     super(props);
     this.state = {
       compileTraceback: '',
+      imageVersion: ''
     };
+  }
+
+  componentDidMount() {
     if ((this.props.analysisId !== undefined)) {
       this.getTraceback(this.props.analysisId);
       api.getNVUploads(this.props.analysisId).then(nvUploads => {
@@ -159,6 +171,11 @@ export class StatusTab extends React.Component<submitProps, statusTabState> {
         }
      });
     }
+    api.getImageVersion().then((version) => {
+      if (!!version) {
+        this.setState({imageVersion: `:${version}`});
+      }
+    });
   }
 
   getTraceback(id) {
@@ -260,19 +277,20 @@ export class StatusTab extends React.Component<submitProps, statusTabState> {
         <DateTag modified_at={this.props.modified_at} />
         <StatusTag status={this.props.status} analysisId={this.props.analysisId} />
       </div>
+      {this.props.children}
       {(this.props.status === 'PASSED') &&
         <div>
           <h3>Analysis Passed</h3>
           <p>
             {this.props.userOwns && 'Congratulations, your analysis has been compiled!'}
             Run the analysis with this this command, replacing '/local/outputdirectory' with a local directory.
-            See the <a href="https://github.com/neuroscout/neuroscout-cli">neuroscout-cli documentation </a>
+            See the <a href="https://neuroscout.github.io/neuroscout/cli/">neuroscout-cli documentation </a>
              for more information.
           </p>
           <pre>
             <code>
               docker run --rm -it -v /local/outputdirectory:/out
-              neuroscout/neuroscout-cli run /out {this.props.analysisId}
+              {` neuroscout/neuroscout-cli${this.state.imageVersion}`} run /out {this.props.analysisId}
             </code>
           </pre>
           <Card size="small" title="System Requirements" style={{ width: 400 }}>
@@ -286,6 +304,7 @@ export class StatusTab extends React.Component<submitProps, statusTabState> {
       {(this.props.status === 'DRAFT' || this.props.status === 'FAILED') &&
         <Submit
           status={this.props.status}
+          name={this.props.name}
           analysisId={this.props.analysisId}
           confirmSubmission={this.props.confirmSubmission}
           private={this.props.private}
@@ -308,7 +327,6 @@ export class StatusTab extends React.Component<submitProps, statusTabState> {
         </div>
       }
       {this.state.nvUploads && this.nvStatus(this.state.nvUploads)}
-      {this.props.children}
       </div>
     );
   }
