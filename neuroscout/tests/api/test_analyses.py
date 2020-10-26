@@ -365,7 +365,8 @@ def test_reports(session, auth_client, add_analysis):
 
     # Create new Report
     r = Report(
-        analysis_id=analysis.hash_id
+        analysis_id=analysis.hash_id,
+        runs=[analysis.runs[0].id]
         )
     session.add(r)
     session.commit()
@@ -387,7 +388,7 @@ def test_reports(session, auth_client, add_analysis):
     for f in ['design_matrix', 'design_matrix_corrplot', 'design_matrix_plot']:
         assert f in result
 
-    assert len(result['design_matrix']) == 4
+    assert len(result['design_matrix']) == 1
 
 
 def test_compile(auth_client, add_analysis, add_analysis_fail):

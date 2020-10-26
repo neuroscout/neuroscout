@@ -80,13 +80,10 @@ def build_analysis(analysis, predictor_events, bids_dir, task_name,
     # Get set of entities across analysis
     run_entities = []
     if run_ids is not None:
-        # Get entities of runs, and add to kwargs
         for rid in run_ids:
             for run in analysis['runs']:
                 if rid == run['id']:
-                    ents = _get_entities(run)
-                    ents['task'] = task_name
-                    run_entities.append(ents)
+                    run_entities.append(_get_entities(run, task=task_name))
                     break
 
     scan_length = max([r['duration'] for r in analysis['runs']])
@@ -105,8 +102,11 @@ def build_analysis(analysis, predictor_events, bids_dir, task_name,
         bids_analysis = BIDSAnalysis(
             bids_layout, deepcopy(analysis.get('model')))
 
-        for ents in run_entities:
-            bids_analysis.setup(**ents, scan_length=scan_length)
+        if run_entities:
+            for ents in run_entities:
+                bids_analysis.setup(**ents, scan_length=scan_length)
+        else:
+            bids_analysis.setup(scan_length=scan_length)
 
     return tmp_dir, paths, bids_analysis
 
@@ -130,7 +130,7 @@ def _load_cached_layout(bids_dir, dataset_id, task_name):
     return bids_layout
 
 
-def _get_entities(run):
+def _get_entities(run, **kwargs):
     """ Get BIDS-entities from run object """
     valid = ['number', 'session', 'subject', 'acquisition']
     entities = {
@@ -141,6 +141,9 @@ def _get_entities(run):
 
     if 'number' in entities:
         entities['run'] = entities.pop('number')
+
+    entities = {**entities, **kwargs}
+
     return entities
 
 
