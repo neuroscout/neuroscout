@@ -99,6 +99,9 @@ class NeurovaultCollection(db.Model):
 
     files = db.relationship('NeurovaultFileUpload', backref='collection')
 
+    cli_version = db.Column(db.Text)  # neuroscout-cli version
+    fmriprep_version = db.Column(db.Text)
+
 
 class NeurovaultFileUpload(db.Model):
     """ NV file upload """
