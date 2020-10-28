@@ -1,5 +1,6 @@
 import * as React from 'react';
 import { Alert, Button, Divider, Form, Icon, Input, Modal } from 'antd';
+import { FormComponentProps } from 'antd/es/form';
 import { GoogleLogin } from 'react-google-login';
 
 import { config } from './config';
@@ -206,7 +207,112 @@ export class LoginModal extends React.Component<UserStore, {}> {
   }
 }
 
-export class SignupModal extends React.Component<UserStore, {}> {
+interface RegistrationFormProps extends FormComponentProps {
+  signup: (any) => void;
+}
+
+class RegistrationForm extends React.Component<RegistrationFormProps, {}> {
+  handleSubmit = e => {
+    e.preventDefault();
+    this.props.form.validateFieldsAndScroll((err, values) => {
+      console.log(values);
+      if (!err) {
+        this.props.signup(values); 
+      }
+    });
+  };
+
+  compareToFirstPassword = (rule, value, callback) => {
+    const { form } = this.props;
+    if (value && value !== form.getFieldValue('password')) {
+      callback('Password do not match.');
+    } else {
+      callback();
+    }
+  };
+
+  validateToNextPassword = (rule, value, callback) => {
+    const { form } = this.props;
+    if (value) {
+      form.validateFields(['confirm'], { force: true });
+    }
+    callback();
+  };
+
+  render() {
+    const { getFieldDecorator } = this.props.form;
+
+    return (
+        <Form
+          onSubmit={this.handleSubmit}
+        >
+          <FormItem label="Name">
+            {getFieldDecorator('name', {
+              rules: [
+                {
+                  type: 'string'
+                },
+                {
+                  required: true,
+                  message: 'Please input your name!',
+                },
+              ],
+            })(<Input />)}
+          </FormItem>
+          <FormItem label="Email">
+            {getFieldDecorator('email', {
+              rules: [
+                {
+                  type: 'email',
+                  message: 'Invalid email address.'
+                },
+                {
+                  required: true,
+                  message: 'Please input your email address.',
+                },
+              ],
+            })(<Input />)}
+          </FormItem>
+          <Form.Item label="Password" hasFeedback={true}>
+            {getFieldDecorator('password', {
+              rules: [
+                {
+                  required: true,
+                  message: 'Please input your password.',
+                },
+                {
+                  validator: this.validateToNextPassword,
+                },
+              ],
+            })(<Input.Password />)}
+          </Form.Item>
+          <Form.Item label="Confirm Password" hasFeedback={true}>
+            {getFieldDecorator('confirm', {
+              rules: [
+                {
+                  required: true,
+                  message: 'Please confirm your password.',
+                },
+                {
+                  validator: this.compareToFirstPassword,
+                },
+              ],
+            })(<Input.Password />)}
+          </Form.Item>
+          <FormItem>
+            <Button style={{ width: '100%' }} type="primary" htmlType="submit">
+              Sign up
+            </Button>
+          </FormItem>
+        </Form>
+    );
+ 
+  }
+}
+
+const WrappedRegistrationForm = Form.create<RegistrationFormProps>({ name: 'register' })(RegistrationForm);
+
+export class SignupModal extends React.Component<UserStore, {secPassword: string}> {
   render() {
     return (
       <Modal
@@ -220,43 +326,7 @@ export class SignupModal extends React.Component<UserStore, {}> {
             <Alert message={this.props.signupError} type="error" />
         }
         <br />
-        <Form
-          onSubmit={e => {
-            e.preventDefault();
-            this.props.signup();
-          }}
-        >
-          <FormItem>
-            <Input
-              placeholder="Full name"
-              size="large"
-              value={this.props.profile.name}
-              onChange={(e) => this.props.updateFromInput('name', e, true)}
-            />
-          </FormItem>
-          <FormItem>
-            <Input
-              placeholder="Email"
-              type="email"
-              size="large"
-              value={this.props.profile.email}
-              onChange={(e) => this.props.updateFromInput('email', e, true)}
-            />
-          </FormItem>
-          <FormItem>
-            <Input
-              placeholder="Password"
-              type="password"
-              value={this.props.password}
-              onChange={(e) => this.props.updateFromInput('password', e)}
-            />
-          </FormItem>
-          <FormItem>
-            <Button style={{ width: '100%' }} type="primary" htmlType="submit">
-              Sign up
-            </Button>
-          </FormItem>
-        </Form>
+        <WrappedRegistrationForm signup={this.props.signup}/>
         <Divider> Or sign up using a Google account </Divider>
         <GoogleLoginBtn {...this.props} />
       </Modal>
