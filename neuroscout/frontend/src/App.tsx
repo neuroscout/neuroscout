@@ -9,7 +9,6 @@ import { BrowserRouter as Router, Route, Redirect, withRouter } from 'react-rout
 import { Layout, Modal, message } from 'antd';
 import ReactGA from 'react-ga';
 import memoize from 'memoize-one';
-import { createBrowserHistory } from 'history';
 
 import './css/App.css';
 import { api } from './api';
