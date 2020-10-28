@@ -576,18 +576,18 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
     } else {
       this.updateState('analysis', true)(analysis);
     }
-
     this.setActiveTabs(analysis);
+
     return Promise.resolve(analysis);
   };
 
   setActiveTabs = (analysis: Analysis) => {
-    if (analysis.contrasts.length) {
+    if (analysis.predictorIds) {
       this.setState({
         transformationsActive: true,
         contrastsActive: true,
         hrfActive: true,
-        reviewActive: true
+        reviewActive: analysis.contrasts.length > 0
       });
     }
   }
@@ -632,6 +632,9 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
     if (!this.preTabChange(newTab)) {
       return;
     }
+    let id = this.state.analysis.analysisId ? this.state.analysis.analysisId : '';
+    localStorage.setItem('analysisId', id);
+    localStorage.setItem('tab', newTab);
     this.setState({ activeTab: newTab });
   }
 
@@ -1048,10 +1051,18 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
       this.setState({loadInitialPredictors: false});
     }
   }
-//
+
   componentDidMount() {
     if (this.props.doTour) {
       this.setState({doTooltip: true});
+    }
+    let curId = this.props.id ? this.props.id : '';
+    if (localStorage.getItem('analysisId') === this.props.id) {
+      let tab = localStorage.getItem('tab');
+      if (!!tab && tabOrder.includes(tab)) {
+        this.setState({'activeTab': tab as TabName});
+        this.postTabChange(tab as TabName);
+      }
     }
   }
 
