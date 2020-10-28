@@ -41,7 +41,7 @@ class UserSchema(Schema):
 
 class UserPublicSchema(UserSchema):
     @post_dump
-    def redact_email(self, out_data):
+    def redact_email(self, out_data, **kwargs):
         if not out_data['public_email']:
             out_data['email'] = 'HIDDEN'
         return out_data
