@@ -1057,7 +1057,7 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
       this.setState({doTooltip: true});
     }
     let curId = this.props.id ? this.props.id : '';
-    if (localStorage.getItem('analysisId') === this.props.id) {
+    if (curId !== '' && localStorage.getItem('analysisId') === curId) {
       let tab = localStorage.getItem('tab');
       if (!!tab && tabOrder.includes(tab)) {
         this.setState({'activeTab': tab as TabName});
