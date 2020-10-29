@@ -231,39 +231,6 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
     super(props);
     editableStatus = ['DRAFT', 'FAILED'];
     this.state = initializeStore();
-    // Load analysis from server if an analysis id is specified in the props
-    if (!!props.id) {
-      jwtFetch(`${domainRoot}/api/analyses/${props.id}`)
-      // .then(response => response.json() as Promise<ApiAnalysis>)
-      .then((data: ApiAnalysis) => {
-        if ((data as any).statusCode === 404) {
-          this.setState({analysis404: true});
-          return;
-        } else {
-          this.loadAnalysis(data);
-          return data;
-        }
-      })
-      .then((data: ApiAnalysis) => {
-        if (this.state.analysis404) { return; }
-        if (!this.props.userOwns && editableStatus.includes(data.status)) {
-          editableStatus = [];
-        }
-        if (editableStatus.includes(data.status)) {
-          this.setState({model: this.buildModel()});
-        } else if (data.model !== undefined) {
-          this.setState({model: data.model!});
-        }
-        if (data.status === 'FAILED') {
-          this.setState({activeTab: 'submit'});
-        }
-        if (!editableStatus.includes(data.status) && data.status !== 'DRAFT') {
-          this.setState({activeTab: 'review'});
-          this.postTabChange('review');
-        }
-      })
-      .catch(displayError);
-    }
   }
 
   saveEnabled = (): boolean => this.state.unsavedChanges && editableStatus.includes(this.state.analysis.status);
@@ -582,7 +549,7 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
   };
 
   setActiveTabs = (analysis: Analysis) => {
-    if (analysis.predictorIds) {
+    if (analysis.predictorIds && analysis.predictorIds.length > 0) {
       this.setState({
         transformationsActive: true,
         contrastsActive: true,
@@ -1056,13 +1023,45 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
     if (this.props.doTour) {
       this.setState({doTooltip: true});
     }
-    let curId = this.props.id ? this.props.id : '';
-    if (curId !== '' && localStorage.getItem('analysisId') === curId) {
-      let tab = localStorage.getItem('tab');
-      if (!!tab && tabOrder.includes(tab)) {
-        this.setState({'activeTab': tab as TabName});
-        this.postTabChange(tab as TabName);
-      }
+    // Load analysis from server if an analysis id is specified in the props
+    if (!!this.props.id) {
+      jwtFetch(`${domainRoot}/api/analyses/${this.props.id}`)
+      // .then(response => response.json() as Promise<ApiAnalysis>)
+      .then((data: ApiAnalysis) => {
+        if ((data as any).statusCode === 404) {
+          this.setState({analysis404: true});
+          return;
+        } else {
+          this.loadAnalysis(data);
+          return data;
+        }
+      })
+      .then((data: ApiAnalysis) => {
+        if (this.state.analysis404) { return; }
+        if (!this.props.userOwns && editableStatus.includes(data.status)) {
+          editableStatus = [];
+        }
+        if (editableStatus.includes(data.status)) {
+          this.setState({model: this.buildModel()});
+        } else if (data.model !== undefined) {
+          this.setState({model: data.model!});
+        }
+        if (data.status === 'FAILED') {
+          this.setState({activeTab: 'submit'});
+        }
+        if (!editableStatus.includes(data.status) && data.status !== 'DRAFT') {
+          this.setState({activeTab: 'review'});
+          this.postTabChange('review');
+        }
+        if (this.props.id !== '' && localStorage.getItem('analysisId') === this.props.id) {
+          let tab = localStorage.getItem('tab');
+          if (!!tab && tabOrder.includes(tab)) {
+            this.setState({'activeTab': tab as TabName});
+            this.postTabChange(tab as TabName);
+          }
+        }
+      })
+      .catch(displayError);
     }
   }
 
