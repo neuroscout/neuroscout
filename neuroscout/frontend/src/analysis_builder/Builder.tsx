@@ -257,7 +257,7 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
         if (data.status === 'FAILED') {
           this.setState({activeTab: 'submit'});
         }
-        if (!editableStatus.includes(data.status)) {
+        if (!editableStatus.includes(data.status) && data.status !== 'DRAFT') {
           this.setState({activeTab: 'review'});
           this.postTabChange('review');
         }
