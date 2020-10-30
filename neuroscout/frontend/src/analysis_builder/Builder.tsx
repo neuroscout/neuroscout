@@ -1053,7 +1053,7 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
           this.setState({activeTab: 'review'});
           this.postTabChange('review');
         }
-        if (this.props.id !== '' && localStorage.getItem('analysisId') === this.props.id) {
+        if (!!this.props.id && localStorage.getItem('analysisId') === this.props.id) {
           let tab = localStorage.getItem('tab');
           if (!!tab && tabOrder.includes(tab)) {
             this.setState({'activeTab': tab as TabName});
