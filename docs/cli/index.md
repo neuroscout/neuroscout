@@ -6,7 +6,7 @@ _neuroscout-cli_ makes it easy to run your analysis with no configuration by fet
 
 ## Installation
 
-The recommended way to use the _neuroscout-cli_ is using a Docker Container. Docker Containers greatly facilitate the management of software dependencies, and increase reproducibility of results.
+The recommended way to use the _neuroscout-cli_ is using a Docker or Singularity Container. Containers greatly facilitate the management of software dependencies, and increase reproducibility of results.
 
 ### Docker Container
 
@@ -15,6 +15,19 @@ In order to run _neuroscout-cli_ in a Docker Container, you must first install [
 Once Docker is is installed, pull down the latest _neuroscout-cli_ Docker image:
 
     docker pull neuroscout/neuroscout-cli
+
+### Singularity Container (>= 2.5)
+
+If you are using a high performance computing (HPC) cluster, you will likely not have access
+to Docker.
+However, Singularity is installed as an alternative on many HPC clusters.
+Unlike docker, you control where your images are built.
+To build a _neuroscout-cli_ singularity image on your own, modify
+the template command below:
+
+    singularity build /my_images/ceuroscout-cli-<version>.simg docker://neuroscout/neuroscout-cli:<version>
+
+where `<version>` should be replaced with the desired version of neuroscout-cli that you want to download.
 
 ### Manual installation
 
