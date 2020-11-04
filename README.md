@@ -147,3 +147,8 @@ or run them interactively:
 To run frontend tests run:
 
     docker-compose run --rm -w /neuroscout/neuroscout/frontend neuroscout npm test
+
+## Renewing HTTPS certs
+Ideally, this is take care of by a cronjob
+
+    docker run -it --rm -v /home/alejandro/www/neuroscout/nginx/certs/:/etc/letsencrypt -v /home/alejandro/www/neuroscout/nginx/certs-data/:/data/letsencrypt deliverous/certbot certonly --webroot --webroot-path=/data/letsencrypt -d neuroscout.org -d alpha.neuroscout.org -d www.neuroscout.org
