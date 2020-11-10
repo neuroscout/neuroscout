@@ -13,6 +13,7 @@ from flask_security.utils import encrypt_password
 from neuroscout import populate
 from neuroscout.core import app, db
 from neuroscout.models import user_datastore
+from neuroscout import models
 
 app.config.from_object(os.environ['APP_SETTINGS'])
 migrate = Migrate(app, db, directory=app.config['MIGRATIONS_DIR'])
@@ -20,7 +21,6 @@ manager = Manager(app)
 
 
 def _make_context():
-    from neuroscout import models
     from neuroscout.tests.request_utils import Client
     from neuroscout import resources
 
@@ -68,15 +68,23 @@ def add_task(local_path, task, include_predictors=None,
 
 
 @manager.command
-def extract_features(local_path, task, graph_spec, filters='{}'):
+def extract_features(extractor_graphs, dataset_name=None, task_name=None):
     """ Extract features from a BIDS dataset.
-    local_path - Path to bids directory
+    extractor_graphs - List of Graphs to apply to relevant stimuli
+    dataset_name - Dataset name - By default applies to all active datasets
     task - Task name
-    graph_spec - Path to JSON pliers graph spec
-    filters - string JSON object with optional run filters
     """
-    populate.extract_features(
-        local_path, task, graph_spec, **json.loads(filters))
+
+    if dataset_name is None:
+        for dataset in models.Dataset.query.filter_by(active=True).all():
+            dataset_name = dataset.name
+            for task in dataset.tasks:
+                task_name = task.name
+                populate.extract_features(
+                    dataset_name, task_name, extractor_graphs)
+
+    else:
+        populate.extract_features(dataset_name, task_name, extractor_graphs)
 
 
 @manager.command
