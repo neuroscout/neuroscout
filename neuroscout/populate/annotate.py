@@ -3,6 +3,7 @@ import numpy as np
 import json
 import re
 import pandas as pd
+from pliers.utils import resample
 from .utils import hash_data
 from ..utils.core import listify
 
@@ -102,7 +103,7 @@ stim_map = {
 
 class FeatureSerializer(Serializer):
     def __init__(self, add_all=True, object_id='all', splat=False,
-                 round_n=None):
+                 round_n=None, resample_frequency=None):
         """
         Args:
             add_all - Add all features including those with no match in
@@ -111,10 +112,14 @@ class FeatureSerializer(Serializer):
                         One of: max, all
             splat - If value is a list, automatically create n features,
             round_n - Round float values to nth precision
+            resample_frequency - Frequency to resample events to in Hz.
+                If None, will defer to value for that extractor if
+                predictor_schema.json. If none specified, will default to 3hz.
         """
         self.object_id = object_id
         self.splat = splat
         self.round_n = round_n
+        self.resample_frequency = resample_frequency
         super().__init__(current_app.config['FEATURE_SCHEMA'], add_all)
 
     def _annotate_feature(self, pattern, schema, feat, extractor, sub_df,
@@ -195,6 +200,15 @@ class FeatureSerializer(Serializer):
                     break
             else:
                 ext_schema = candidate
+
+        # Determine resample frequency
+        resample_frequency = self.resample_frequency
+        if resample_frequency is None:
+            resample_frequency = ext_schema.get('resample_frequency', 3)
+
+        # Resample events
+        if resample_frequency is not None:
+            res_df = resample(res_df, resample_frequency)
 
         annotated = []
         # Add all features in schema, popping features that match

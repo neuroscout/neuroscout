@@ -13,7 +13,6 @@ from progressbar import progressbar
 from ..utils.db import get_or_create
 
 from pliers.stimuli import load_stims, ComplexTextStim, TextStim
-from pliers.transformers import get_transformer
 from pliers.extractors import merge_results
 from pliers.graph import Graph
 from ..models import (
@@ -86,7 +85,7 @@ def _create_efs(results, **serializer_kwargs):
     Args:
         results - list of zipped pairs of Stimulus objects and ExtractedResult
                   objects
-        object_id - Selection function to use for object_id
+        serializer_kwargs - kwargs for Feature serialization
     Returns:
         ext_feats - dictionary of hash of ExtractedFeatures to EF objects
     """
@@ -171,12 +170,14 @@ def create_predictors(features, dataset_name, task_name, run_ids=None,
     return [p.id for p in all_preds]
 
 
-def extract_features(dataset_name, task_name, extractor_graphs):
+def extract_features(dataset_name, task_name, extractor_graphs,
+                     **serializer_kwargs):
     """ Extract features using pliers for a dataset/task
         Args:
             dataset_name - dataset name
             task_name - task name
             extractor_graphs - List of Graphs to apply to stimuli
+            serializer_kwargs - Arguments to pass to FeatureSerializer
         Output:
             list of db ids of extracted features
     """
@@ -186,7 +187,7 @@ def extract_features(dataset_name, task_name, extractor_graphs):
 
     _to_csv(results, dataset_name, task_name)
 
-    ext_feats = _create_efs(results)
+    ext_feats = _create_efs(results, **serializer_kwargs)
 
     return create_predictors([ef for ef in ext_feats.values() if ef.active],
                              dataset_name, task_name)
