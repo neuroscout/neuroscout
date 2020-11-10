@@ -48,11 +48,11 @@ def _load_stim_models(dataset_name, task_name):
     return stims
 
 
-def _extract(extractors, stims):
-    """ Apply list of extractors to complete list of stimuli in dataset """
+def _extract(graphs, stims):
+    """ Apply list of graphs to complete list of stimuli in dataset """
     results = []
     # For every extractor, extract from matching stims
-    for graph in extractors:
+    for graph in graphs:
         ext = graph.roots[0].transformer
         print("Extractor: {}".format(ext.name))
         valid_stims = []
@@ -62,7 +62,7 @@ def _extract(extractors, stims):
                 if 'GoogleVideoAPIShotDetectionExtractor' in str(ext.__class__):
                     s.filename = str(Path(s.filename).with_suffix('.avi'))
                 valid_stims.append((sm, s))
-        results += [(sm, graph.transform(s))
+        results += [(sm, graph.transform(s, merge=False))
                     for sm, s in progressbar(valid_stims)]
     return results
 
@@ -171,18 +171,18 @@ def create_predictors(features, dataset_name, task_name, run_ids=None,
     return [p.id for p in all_preds]
 
 
-def extract_features(dataset_name, task_name, extractors):
+def extract_features(dataset_name, task_name, extractor_graphs):
     """ Extract features using pliers for a dataset/task
         Args:
             dataset_name - dataset name
             task_name - task name
-            extractors - dictionary of extractor names to parameters
+            extractor_graphs - List of Graphs to apply to stimuli
         Output:
             list of db ids of extracted features
     """
     stims = _load_stim_models(dataset_name, task_name)
 
-    results = _extract(extractors, stims)
+    results = _extract(extractor_graphs, stims)
 
     _to_csv(results, dataset_name, task_name)
 

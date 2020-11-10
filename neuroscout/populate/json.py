@@ -113,12 +113,12 @@ def ingest_from_json(config_file, update_features=False, reingest=False):
                 convert_stimuli(dataset_name, task_name, converters)
 
             """ Extract features from applicable stimuli """
-            extractors = params.get('extractors', None)
+            extractor_graphs = params.get('extractors', None)
             extract_args = params.get('extract_args', {})
-            if extractors:
-                print("Extracting... {}".format(extractors))
+            if extractor_graphs:
+                print("Extracting...")
                 extract_features(
-                    dataset_name, task_name, extractors, **extract_args)
+                    dataset_name, task_name, extractor_graphs, **extract_args)
 
             """ Extract features that require pre-tokenization """
             tokenized_extractors = params.get('tokenized_extractors', None)
