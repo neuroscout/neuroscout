@@ -114,7 +114,8 @@ class FeatureSerializer(Serializer):
             round_n - Round float values to nth precision
             resample_frequency - Frequency to resample events to in Hz.
                 If None, will defer to value for that extractor if
-                predictor_schema.json. If none specified, will default to 3hz.
+                predictor_schema.json. If not specified, will default to 3hz.
+                If False, will skip resampling, regardless of value in schema.
         """
         self.object_id = object_id
         self.splat = splat
@@ -201,13 +202,13 @@ class FeatureSerializer(Serializer):
             else:
                 ext_schema = candidate
 
-        # Determine resample frequency
+        # Determine resample frequency. False value will skip
         resample_frequency = self.resample_frequency
         if resample_frequency is None:
             resample_frequency = ext_schema.get('resample_frequency', 3)
 
-        # Resample events
-        if resample_frequency is not None:
+        # Resample events if
+        if resample_frequency:
             res_df = resample(res_df, resample_frequency)
 
         annotated = []
