@@ -68,11 +68,13 @@ def add_task(local_path, task, include_predictors=None,
 
 
 @manager.command
-def extract_features(extractor_graphs, dataset_name=None, task_name=None):
+def extract_features(extractor_graphs, dataset_name=None, task_name=None,
+                     resample_frequency=None):
     """ Extract features from a BIDS dataset.
     extractor_graphs - List of Graphs to apply to relevant stimuli
     dataset_name - Dataset name - By default applies to all active datasets
     task - Task name
+    resample_frequency - None
     """
 
     if dataset_name is None:
@@ -84,7 +86,9 @@ def extract_features(extractor_graphs, dataset_name=None, task_name=None):
                     dataset_name, task_name, extractor_graphs)
 
     else:
-        populate.extract_features(dataset_name, task_name, extractor_graphs)
+        populate.extract_features(
+            dataset_name, task_name, extractor_graphs,
+            resample_frequency=resample_frequency)
 
 
 @manager.command
