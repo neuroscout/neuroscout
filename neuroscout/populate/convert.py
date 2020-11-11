@@ -7,7 +7,7 @@ from pathlib import Path
 
 from pliers.stimuli import (TextStim, ImageStim, VideoFrameStim,
                             ComplexTextStim, VideoStim, AudioStim, load_stims)
-from pliers.transformers import get_transformer
+from pliers.graph import Graph
 
 from ..models import Dataset, Task, Run, Stimulus, RunStimulus
 from ..utils.core import listify
@@ -108,7 +108,7 @@ def convert_stimuli(dataset_name, task_name, converters):
 
     dataset_id = Dataset.query.filter_by(name=dataset_name).one().id
 
-    converters = [get_transformer(n, **p) for n, p in converters]
+    converters = [Graph(n) for n in converters]
 
     # Load all active original stimuli for task
     stim_objects = Stimulus.query.filter_by(active=True, parent_id=None).join(
@@ -125,11 +125,16 @@ def convert_stimuli(dataset_name, task_name, converters):
         loaded_stim = load_stims(stim.path)
 
         # Extract for each converter
-        for conv in converters:
+        for graph in converters:
             results = []
             # Extract and flatten results (to a single unit)
+            conv = graph.roots[0].transformer
             if conv._stim_matches_input_types(loaded_stim):
-                cstim = conv.transform(loaded_stim)
+                cstim = graph.transform(loaded_stim, merge=False)
+                if len(cstim) == 1:
+                    cstim = cstim[0]
+                params = cstim.history.transformer_params
+                name = cstim.history.transformer_class
                 try:  # Add iterable
                     results += cstim
                 except TypeError:
@@ -142,8 +147,8 @@ def convert_stimuli(dataset_name, task_name, converters):
                            if hasattr(res, 'data') and res.data != '']
                 new_stims += create_new_stimuli(
                     dataset_id, task_name, stim.id, results, rs_orig,
-                    transformer=cstim.history.transformer_class,
-                    transformer_params=cstim.history.transformer_params)
+                    transformer=name,
+                    transformer_params=params)
 
         # De-activate previously generated stimuli from these converters.
         update = Stimulus.query.filter_by(parent_id=stim.id).filter(

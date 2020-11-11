@@ -51,7 +51,8 @@ def _extract(graphs, stims):
     """ Apply list of graphs to complete list of stimuli in dataset """
     results = []
     # For every extractor, extract from matching stims
-    for graph in graphs:
+    for g in graphs:
+        graph = Graph(g)
         ext = graph.roots[0].transformer
         print("Extractor: {}".format(ext.name))
         valid_stims = []
@@ -61,7 +62,7 @@ def _extract(graphs, stims):
                 if 'GoogleVideoAPIShotDetectionExtractor' in str(ext.__class__):
                     s.filename = str(Path(s.filename).with_suffix('.avi'))
                 valid_stims.append((sm, s))
-        results += [(sm, graph.transform(s, merge=False))
+        results += [(sm, graph.transform(s, merge=False)[0])
                     for sm, s in progressbar(valid_stims)]
     return results
 

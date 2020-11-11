@@ -205,7 +205,7 @@ class FeatureSerializer(Serializer):
         # Determine resample frequency. False value will skip
         resample_frequency = self.resample_frequency
         if resample_frequency is None:
-            resample_frequency = ext_schema.get('resample_frequency', 3)
+            resample_frequency = ext_schema.get('resample_frequency', False)
 
         # Resample events if
         if resample_frequency:

@@ -6,11 +6,11 @@
     "tasks": {
       "bidstest": {
         "extractors": [
-          ["BrightnessExtractor", {}],
-          ["FaceRecognitionFaceLandmarksExtractor", {}]
+          [{"transformer": "BrightnessExtractor"}],
+          [{"transformer": "VibranceExtractor"}]
         ],
         "converters": [
-          ["TesseractConverter", {}]
+          [{"transformer": "TesseractConverter"}]
         ],
         "filters": {
           "run": 1,
