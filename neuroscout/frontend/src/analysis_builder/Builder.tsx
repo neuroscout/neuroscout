@@ -587,6 +587,8 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
       } else if (!this.preTabChange(nextTab as TabName)) {
         return;
       }
+
+      localStorage.setItem('tab', nextTab);
       this.setState(update);
       this.postTabChange(nextTab);
     };
