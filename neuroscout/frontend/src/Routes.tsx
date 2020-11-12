@@ -68,7 +68,6 @@ export default class Routes extends React.Component<AppState, {}> {
           exact={true}
           path="/public/:id"
           render={props =>
-            document.title = `Neuroscout ${props.match.params.id}`;
             <AnalysisBuilder
               id={props.match.params.id}
               updatedAnalysis={() => this.props.loadAnalyses()}
