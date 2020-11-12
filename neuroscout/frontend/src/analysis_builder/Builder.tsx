@@ -1032,6 +1032,7 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
     }
     // Load analysis from server if an analysis id is specified in the props
     if (!!this.props.id) {
+      document.title = `Neuroscout ${this.props.id}`;
       jwtFetch(`${domainRoot}/api/analyses/${this.props.id}`)
       // .then(response => response.json() as Promise<ApiAnalysis>)
       .then((data: ApiAnalysis) => {

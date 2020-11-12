@@ -14,6 +14,7 @@ const titleStyle: any = {
 
 class Home extends React.Component<UserStore, {}> {
   render() {
+    document.title = 'Neuroscout';
     return (
 
       <div>
