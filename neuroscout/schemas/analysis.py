@@ -116,6 +116,8 @@ class NeurovaultCollectionSchema(Schema):
     """ Schema for report results """
     uploaded_at = fields.Time(description='Time collections was created')
     collection_id = fields.Dict(description='NeuroVault collection id')
+    cli_version = fields.Str(description='neuroscout-cli version at runtime')
+    fmriprep_version = fields.Str(description='fmriprep version at runtime')
 
 
 class NeurovaultCollectionSchemaStatus(NeurovaultCollectionSchema):
