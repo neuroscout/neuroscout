@@ -171,7 +171,7 @@ def create_predictors(features, dataset_name, task_name, run_ids=None,
     return [p.id for p in all_preds]
 
 
-def extract_features(dataset_name, task_name, extractor_graphs,
+def extract_features(extractor_graphs, dataset_name=None, task_name=None,
                      **serializer_kwargs):
     """ Extract features using pliers for a dataset/task
         Args:
@@ -182,6 +182,16 @@ def extract_features(dataset_name, task_name, extractor_graphs,
         Output:
             list of db ids of extracted features
     """
+
+    if dataset_name is None:
+        for dataset in Dataset.query.filter_by(active=True).all():
+            dataset_name = dataset.name
+            for task in dataset.tasks:
+                task_name = task.name
+                extract_features(
+                    extractor_graphs,
+                    dataset_name, task_name, **serializer_kwargs)
+
     stims = _load_stim_models(dataset_name, task_name)
 
     results = _extract(extractor_graphs, stims)

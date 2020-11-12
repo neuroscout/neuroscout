@@ -76,19 +76,9 @@ def extract_features(extractor_graphs, dataset_name=None, task_name=None,
     task - Task name
     resample_frequency - None
     """
-
-    if dataset_name is None:
-        for dataset in models.Dataset.query.filter_by(active=True).all():
-            dataset_name = dataset.name
-            for task in dataset.tasks:
-                task_name = task.name
-                populate.extract_features(
-                    dataset_name, task_name, extractor_graphs)
-
-    else:
-        populate.extract_features(
-            dataset_name, task_name, extractor_graphs,
-            resample_frequency=resample_frequency)
+    populate.extract_features(
+        extractor_graphs, dataset_name, task_name,
+        resample_frequency=resample_frequency)
 
 
 @manager.command

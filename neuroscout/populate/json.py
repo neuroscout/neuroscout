@@ -117,7 +117,7 @@ def ingest_from_json(config_file, update_features=False, reingest=False):
             if extractor_graphs:
                 print("Extracting...")
                 extract_features(
-                    dataset_name, task_name, extractor_graphs)
+                    extractor_graphs, dataset_name, task_name)
 
             """ Extract features that require pre-tokenization """
             tokenized_extractors = params.get('tokenized_extractors', None)

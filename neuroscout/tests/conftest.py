@@ -157,12 +157,12 @@ def add_local_task_json(session):
 
 @pytest.fixture(scope="function")
 def extract_features(session, add_task):
-    return populate.extract_features('Test Dataset', 'bidstest', EXTRACTORS)
+    return populate.extract_features(EXTRACTORS, 'Test Dataset', 'bidstest')
 
 
 @pytest.fixture(scope="function")
 def reextract(session, extract_features):
-    return populate.extract_features('Test Dataset', 'bidstest', EXTRACTORS)
+    return populate.extract_features(EXTRACTORS, 'Test Dataset', 'bidstest')
 
 
 @pytest.fixture(scope="function")
