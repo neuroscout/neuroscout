@@ -159,7 +159,6 @@ export class AnalysisListTable extends React.Component<AnalysisListProps, {redir
 
 // wrap table in components for use by itself as route
 const AnalysisList = (props: AnalysisListProps) => {
-  document.title = 'Neuroscout';
   return (
     <div>
       <Row type="flex" justify="center">
