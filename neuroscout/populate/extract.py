@@ -194,6 +194,7 @@ def extract_features(graphs, dataset_name=None, task_name=None,
 
     elif task_name is None:
         dataset = Dataset.query.filter_by(name=dataset_name).one()
+        print(f"Extracting: {dataset_name} {task_name}")
         return [extract_features(
             graphs, dataset.name, task.name, **serializer_kwargs)
                  for task in dataset.tasks]
