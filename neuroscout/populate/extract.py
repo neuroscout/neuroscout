@@ -125,6 +125,7 @@ def create_predictors(features, dataset_name, task_name, run_ids=None,
         Args:
             features (object) - ExtractedFeature objects
             dataset_name (str) - Dataset name
+            task_name (str) - Task name
             run_ids (list of ints) - Optional list of run_ids for which to
                                      create PredictorRun for.
             clear_cache (bool) - Clear API cache
@@ -135,7 +136,11 @@ def create_predictors(features, dataset_name, task_name, run_ids=None,
         cache.clear()
 
     dataset = Dataset.query.filter_by(name=dataset_name).one()
-    task = Task.query.filter_by(name=task_name, dataset_id=dataset.id).one()
+    task = Task.query.filter_by(dataset_id=dataset.id)
+    if task_name is not None:
+        task.filter_by(name=task_name)
+
+    task = task.one()
 
     # Create/Get Predictors
     all_preds = []
@@ -171,37 +176,40 @@ def create_predictors(features, dataset_name, task_name, run_ids=None,
     return [p.id for p in all_preds]
 
 
-def extract_features(extractor_graphs, dataset_name=None, task_name=None,
+def extract_features(graphs, dataset_name=None, task_name=None,
                      **serializer_kwargs):
     """ Extract features using pliers for a dataset/task
         Args:
             dataset_name - dataset name
             task_name - task name
-            extractor_graphs - List of Graphs to apply to stimuli
+            graphs - List of Graphs to apply to stimuli
             serializer_kwargs - Arguments to pass to FeatureSerializer
         Output:
             list of db ids of extracted features
     """
-
     if dataset_name is None:
-        for dataset in Dataset.query.filter_by(active=True).all():
-            dataset_name = dataset.name
-            for task in dataset.tasks:
-                task_name = task.name
-                extract_features(
-                    extractor_graphs,
-                    dataset_name, task_name, **serializer_kwargs)
+        return [extract_features(
+            graphs, dataset.name, None, **serializer_kwargs)
+                for dataset in Dataset.query.filter_by(active=True)]
 
-    stims = _load_stim_models(dataset_name, task_name)
+    elif task_name is None:
+        dataset = Dataset.query.filter_by(name=dataset_name).one()
+        return [extract_features(
+            graphs, dataset.name, task.name, **serializer_kwargs)
+                 for task in dataset.tasks]
 
-    results = _extract(extractor_graphs, stims)
+    else:
+        stims = _load_stim_models(dataset_name, task_name)
 
-    _to_csv(results, dataset_name, task_name)
+        results = _extract(graphs, stims)
 
-    ext_feats = _create_efs(results, **serializer_kwargs)
+        _to_csv(results, dataset_name, task_name)
 
-    return create_predictors([ef for ef in ext_feats.values() if ef.active],
-                             dataset_name, task_name)
+        ext_feats = _create_efs(results, **serializer_kwargs)
+
+        return create_predictors(
+            [ef for ef in ext_feats.values() if ef.active],
+            dataset_name, task_name)
 
 
 def _load_complex_text_stim_models(dataset_name, task_name):
