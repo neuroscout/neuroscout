@@ -132,7 +132,8 @@ def _truncate_string(si, max_char):
     return si
 
 
-def _create_collection(analysis, force=False):
+def _create_collection(
+      analysis, cli_version=None, fmriprep_version=None, force=False):
     collection_name = f"{analysis.name} - {analysis.hash_id}"
     if force is True:
         timestamp = datetime.datetime.utcnow().strftime(
@@ -158,6 +159,8 @@ def _create_collection(analysis, force=False):
     upload = NeurovaultCollection(
         analysis_id=analysis.hash_id,
         collection_id=collection['id'],
+        cli_version=cli_version,
+        fmriprep_version=fmriprep_version
         )
     db.session.add(upload)
     db.session.commit()
@@ -169,18 +172,20 @@ def _create_collection(analysis, force=False):
     return upload
 
 
-class FormSchema(Schema):
+class NVUploadFormSchema(Schema):
     validation_hash = fields.Str(required=True)
     collection_id = fields.Int()
     force = fields.Bool()
     level = fields.Str()
     n_subjects = fields.Number()
+    cli_version = fields.Str()
+    fmriprep_version = fields.Str()
 
     class Meta:
         unknown = INCLUDE
 
 
-class FileSchema(Schema):
+class NVUploadFileSchema(Schema):
     image_file = FileField(required=True)
 
     class Meta:
@@ -192,17 +197,19 @@ class AnalysisUploadResource(MethodResource):
     @doc(summary='Upload fitlins analysis results. ',
          consumes=['multipart/form-data', 'application/x-www-form-urlencoded'])
     @marshal_with(NeurovaultCollectionSchemaStatus)
-    @use_kwargs(FormSchema, location="form")
-    @use_kwargs(FileSchema, location="files")
+    @use_kwargs(NVUploadFormSchema, location="form")
+    @use_kwargs(NVUploadFileSchema, location="files")
     @fetch_analysis
     def post(self, analysis, validation_hash, collection_id=None,
+             cli_version=None, fmriprep_version=None,
              image_file=None, level=None, n_subjects=None, force=False):
         if validation_hash != _validation_hash(analysis.id):
             abort(422, "Invalid validation hash.")
 
         # Create or fetch NeurovaultCollection
         if collection_id is None:
-            upload = _create_collection(analysis, force)
+            upload = _create_collection(
+                analysis, cli_version, fmriprep_version, force)
             collection_id = upload.collection_id
         else:
             upload = NeurovaultCollection.query.filter_by(
