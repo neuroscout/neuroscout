@@ -1072,12 +1072,14 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
 
   componentWillUnmount() {
     this.setState({doTooltip: false});
+    document.title = 'Neuroscout';
   }
 
   render() {
     if (this.state.analysis404) {
       return <Redirect to="/builder/" />;
     }
+
     let {
       predictorsActive,
       transformationsActive,
@@ -1095,6 +1097,10 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
       selectedHRFPredictors,
       unsavedChanges
     } = this.state;
+
+    if (analysis.analysisId && !unsavedChanges) {
+      document.title = `Neuroscout ${analysis.analysisId} ${analysis.name}`;
+    }
 
     let reportRuns = this.state.availableRuns.filter(
       x => this.state.analysis.runIds.find(runId => runId === x.id)

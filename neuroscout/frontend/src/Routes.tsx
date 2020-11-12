@@ -15,7 +15,6 @@ import UserList from './profile/UserList';
 
 export default class Routes extends React.Component<AppState, {}> {
   render() {
-    document.title = 'Neuroscout';
     return (
       <Switch>
         <Route
@@ -50,7 +49,6 @@ export default class Routes extends React.Component<AppState, {}> {
         <Route
           path="/builder/:id"
           render={props => {
-            document.title = `Neuroscout ${props.match.params.id}`;
             return <AnalysisBuilder
               id={props.match.params.id}
               updatedAnalysis={() => this.props.loadAnalyses()}
