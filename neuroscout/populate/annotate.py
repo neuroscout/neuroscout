@@ -124,7 +124,7 @@ class FeatureSerializer(Serializer):
         super().__init__(current_app.config['FEATURE_SCHEMA'], add_all)
 
     def _annotate_feature(self, pattern, schema, feat, extractor, sub_df,
-                          default_active=True):
+                          default_active=True, resample_frequency=None):
         """ Annotate a single pliers extracted result
         Args:
             pattern - regex pattern to match feature name
@@ -148,6 +148,9 @@ class FeatureSerializer(Serializer):
             description = description.format(**extractor.__dict__)
         else:
             description = None
+
+        if not resample_frequency:
+            resample_frequency = None
 
         annotated = []
         for _, row in sub_df[sub_df.value.notnull()].iterrows():
@@ -175,6 +178,7 @@ class FeatureSerializer(Serializer):
                     'original_name': feat,
                     'description': description,
                     'active': schema.get('active', default_active),
+                    'resample_frequency': resample_frequency
                     }
 
                 annotated.append((ee, ef))
@@ -219,14 +223,16 @@ class FeatureSerializer(Serializer):
             for feat in matching:
                 annotated += self._annotate_feature(
                     pattern, schema, feat, res.extractor,
-                    res_df[res_df.feature == feat])
+                    res_df[res_df.feature == feat],
+                    resample_frequency=resample_frequency)
 
         # Add all remaining features
         if self.add_all is True:
             for feat in features:
                 annotated += self._annotate_feature(
                     ".*", {}, feat, res.extractor,
-                    res_df[res_df.feature == feat], default_active=False)
+                    res_df[res_df.feature == feat], default_active=False,
+                    resample_frequency=resample_frequency)
 
         # Add extractor constants
         tr_attrs = [getattr(res.extractor, a)

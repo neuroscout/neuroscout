@@ -6,6 +6,8 @@ class ExtractedFeatureSchema(Schema):
     description = fields.Str(description="Feature description.")
     created_at = fields.Str(description="Extraction timestamp.")
     extractor_name = fields.Str(description="Extractor name.")
+    resample_frequency = fields.Float(
+        description="Frequency feature was resampled to prior to ingestion")
     modality = fields.Str()
 
 
