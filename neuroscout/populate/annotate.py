@@ -166,7 +166,7 @@ class FeatureSerializer(Serializer):
                     if not pd.isnull(row['onset']) else None,
                     'duration': row['duration']
                     if not pd.isnull(row['duration']) else None,
-                    'object_id': row['object_id']
+                    'object_id': row.get('object_id', None)
                     }
                 ef = {
                     'sha1_hash': hash_data(
