@@ -536,8 +536,8 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
     if (analysis.runIds.length > 0) {
       jwtFetch(`${domainRoot}/api/runs/${analysis.runIds[0]}`)
         .then(fetch_data => {
-          this.updateState('analysis', true)(analysis);
           this.setState({ selectedTaskId: fetch_data.task });
+          this.updateState('analysis', true)(analysis);
          })
         .catch(displayError);
     } else {
@@ -829,18 +829,25 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
               } else {
                 updatedAnalysis.runIds = this.runIdsFromModel(data, updatedAnalysis.model.Input);
               }
-            }
-            if (availTasks.length === 1) {
-              stateUpdate = {
-                ...stateUpdate,
-                selectedTaskId: availTasks[0].id,
-                predictorsLoad: true,
-              };
-            } else if (!this.state.selectedTaskId) {
-              stateUpdate = {
-                ...stateUpdate,
-                selectedTaskId: null
-              };
+            } 
+            if (
+              !(updatedAnalysis && updatedAnalysis.model && updatedAnalysis.model.Input &&
+                !!updatedAnalysis.model.Input.Task)
+            ) {
+              if (availTasks.length === 1) {
+                stateUpdate = {
+                  ...stateUpdate,
+                  selectedTaskId: availTasks[0].id,
+                  predictorsLoad: true,
+                };
+              } else if (!this.state.selectedTaskId) {
+                stateUpdate = {
+                  ...stateUpdate,
+                  selectedTaskId: null
+                };
+              }
+            } else {
+              stateUpdate.model = updatedAnalysis.model;
             }
 
             stateUpdate = {
@@ -875,7 +882,7 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
       // When a different task is selected, autoselect all its associated run IDs
       this.updateState('analysis')({
         ...analysis,
-        runIds: availableRuns.filter(r => r.task === value).map(r => r.id),
+        runids: availableRuns.filter(r => r.task === value).map(r => r.id),
         predictorsLoad: true
       });
     }
@@ -1043,8 +1050,6 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
         }
         if (editableStatus.includes(data.status)) {
           this.setState({model: this.buildModel()});
-        } else if (data.model !== undefined) {
-          this.setState({model: data.model!});
         }
         if (data.status === 'FAILED') {
           this.setState({activeTab: 'submit'});
