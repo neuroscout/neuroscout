@@ -10,6 +10,7 @@ import {
   Alert, Tag, Tabs, Row, Button, Modal, Icon, message, Tooltip, Form, Input, Collapse
 } from 'antd';
 import { Prompt } from 'react-router-dom';
+import memoize from 'memoize-one';
 
 import { api } from '../api';
 import { OverviewTab } from './Overview';
@@ -160,11 +161,21 @@ class EditDetails extends React.Component<editDetailsProps, editDetailsState> {
     this.props.updateAnalysis({name: this.state.newName, description: this.state.newDescription}, false, true);
   }
 
+  memoizeUpdates = memoize((value: string, key: keyof editDetailsState) => {
+    // tslint:disable-next-line:no-console
+    console.log('memoized');
+    let update: Partial<editDetailsState> = {};
+    update[key] = value;
+    this.setState({...this.state, ...update});
+  });
+
   onChange = (e: any) => {
     this.setState({visible: e});
   };
 
   render() {
+    this.memoizeUpdates(this.props.name, 'newName');
+    this.memoizeUpdates(this.props.description, 'newDescription');
     return (
       <div className="editDetails">
       <Collapse bordered={false} activeKey={this.state.visible} onChange={this.onChange}>
