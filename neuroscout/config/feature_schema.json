@@ -138,7 +138,8 @@
         "spectral_centroid": {
           "description": "Spectral centroids from audio"
         }
-      }
+      },
+      "resample_frequency": 3
     }
   ],
   "RMSExtractor": [
