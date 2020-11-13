@@ -138,7 +138,7 @@ def create_predictors(features, dataset_name, task_name, run_ids=None,
     dataset = Dataset.query.filter_by(name=dataset_name).one()
     task = Task.query.filter_by(dataset_id=dataset.id)
     if task_name is not None:
-        task.filter_by(name=task_name)
+        task = task.filter_by(name=task_name)
 
     task = task.one()
 
