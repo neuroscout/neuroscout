@@ -118,7 +118,8 @@
         "(.*)": {
           "description": "Audio power at frequency band \\1 Hz"
         }
-      }
+      },
+      "resample_frequency": 3
     }
   ],
   "MeanAmplitudeExtractor": [
@@ -127,7 +128,8 @@
         "mean_amplitude": {
           "description": "Mean audio amplitude during speech"
         }
-      }
+      },
+      "resample_frequency": 3
     }
   ],
   "SpectralCentroidExtractor": [
@@ -145,7 +147,8 @@
         "rms": {
           "description": "Root mean square (RMS) energy from audio"
         }
-      }
+      },
+      "resample_frequency": 3
     }
   ],
   "GoogleVisionAPIFaceExtractor": [
@@ -285,7 +288,8 @@
         "FarnebackOpticalFlowExtractor": {
           "description": "Total amount of dense optical flow between every pair of video frames"
         }
-      }
+      },
+      "resample_frequency": 3
     }
   ],
   "LengthExtractor": [
