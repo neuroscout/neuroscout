@@ -1100,6 +1100,8 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
       unsavedChanges
     } = this.state;
 
+    // tslint:disable-next-line:no-console
+    console.log(analysis.private);
     if (analysis.analysisId && !unsavedChanges) {
       document.title = `Neuroscout ${analysis.analysisId} ${analysis.name}`;
     }
