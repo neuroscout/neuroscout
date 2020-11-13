@@ -162,8 +162,6 @@ class EditDetails extends React.Component<editDetailsProps, editDetailsState> {
   }
 
   memoizeUpdates = memoize((value: string, key: keyof editDetailsState) => {
-    // tslint:disable-next-line:no-console
-    console.log('memoized');
     let update: Partial<editDetailsState> = {};
     update[key] = value;
     this.setState({...this.state, ...update});
@@ -1111,8 +1109,6 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
       unsavedChanges
     } = this.state;
 
-    // tslint:disable-next-line:no-console
-    console.log(analysis.private);
     if (analysis.analysisId && !unsavedChanges) {
       document.title = `Neuroscout ${analysis.analysisId} ${analysis.name}`;
     }
