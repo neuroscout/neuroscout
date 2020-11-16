@@ -10,6 +10,7 @@ import {
   Alert, Tag, Tabs, Row, Button, Modal, Icon, message, Tooltip, Form, Input, Collapse
 } from 'antd';
 import { Prompt } from 'react-router-dom';
+import memoize from 'memoize-one';
 
 import { api } from '../api';
 import { OverviewTab } from './Overview';
@@ -160,6 +161,15 @@ class EditDetails extends React.Component<editDetailsProps, editDetailsState> {
     this.props.updateAnalysis({name: this.state.newName, description: this.state.newDescription}, false, true);
   }
 
+  componentDidUpdate(prevProps, prevState) {
+    if (prevProps.name === '' && prevProps.name !== this.props.name) {
+      this.setState({newName: this.props.name});
+    }
+    if (prevProps.description === '' && prevProps.description !== this.props.description) {
+      this.setState({newDescription: this.props.description});
+    }
+  }
+
   onChange = (e: any) => {
     this.setState({visible: e});
   };
@@ -231,39 +241,6 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
     super(props);
     editableStatus = ['DRAFT', 'FAILED'];
     this.state = initializeStore();
-    // Load analysis from server if an analysis id is specified in the props
-    if (!!props.id) {
-      jwtFetch(`${domainRoot}/api/analyses/${props.id}`)
-      // .then(response => response.json() as Promise<ApiAnalysis>)
-      .then((data: ApiAnalysis) => {
-        if ((data as any).statusCode === 404) {
-          this.setState({analysis404: true});
-          return;
-        } else {
-          this.loadAnalysis(data);
-          return data;
-        }
-      })
-      .then((data: ApiAnalysis) => {
-        if (this.state.analysis404) { return; }
-        if (!this.props.userOwns && editableStatus.includes(data.status)) {
-          editableStatus = [];
-        }
-        if (editableStatus.includes(data.status)) {
-          this.setState({model: this.buildModel()});
-        } else if (data.model !== undefined) {
-          this.setState({model: data.model!});
-        }
-        if (data.status === 'FAILED') {
-          this.setState({activeTab: 'submit'});
-        }
-        if (!editableStatus.includes(data.status)) {
-          this.setState({activeTab: 'review'});
-          this.postTabChange('review');
-        }
-      })
-      .catch(displayError);
-    }
   }
 
   saveEnabled = (): boolean => this.state.unsavedChanges && editableStatus.includes(this.state.analysis.status);
@@ -475,6 +452,7 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
         let analysisId = this.state.analysis.analysisId;
         if (data.hash_id !== undefined) {
           analysisId = data.hash_id;
+          localStorage.setItem('analysisId', analysisId);
         }
 
         this.setState({
@@ -569,25 +547,25 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
     if (analysis.runIds.length > 0) {
       jwtFetch(`${domainRoot}/api/runs/${analysis.runIds[0]}`)
         .then(fetch_data => {
-          this.updateState('analysis', true)(analysis);
           this.setState({ selectedTaskId: fetch_data.task });
+          this.updateState('analysis', true)(analysis);
          })
         .catch(displayError);
     } else {
       this.updateState('analysis', true)(analysis);
     }
-
     this.setActiveTabs(analysis);
+
     return Promise.resolve(analysis);
   };
 
   setActiveTabs = (analysis: Analysis) => {
-    if (analysis.contrasts.length) {
+    if (analysis.predictorIds && analysis.predictorIds.length > 0) {
       this.setState({
         transformationsActive: true,
         contrastsActive: true,
         hrfActive: true,
-        reviewActive: true
+        reviewActive: analysis.contrasts.length > 0
       });
     }
   }
@@ -620,6 +598,10 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
       } else if (!this.preTabChange(nextTab as TabName)) {
         return;
       }
+
+      localStorage.setItem('tab', nextTab);
+      let id = this.state.analysis.analysisId ? this.state.analysis.analysisId : '';
+      localStorage.setItem('analysisId', id);
       this.setState(update);
       this.postTabChange(nextTab);
     };
@@ -632,6 +614,9 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
     if (!this.preTabChange(newTab)) {
       return;
     }
+    let id = this.state.analysis.analysisId ? this.state.analysis.analysisId : '';
+    localStorage.setItem('analysisId', id);
+    localStorage.setItem('tab', newTab);
     this.setState({ activeTab: newTab });
   }
 
@@ -859,18 +844,25 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
               } else {
                 updatedAnalysis.runIds = this.runIdsFromModel(data, updatedAnalysis.model.Input);
               }
-            }
-            if (availTasks.length === 1) {
-              stateUpdate = {
-                ...stateUpdate,
-                selectedTaskId: availTasks[0].id,
-                predictorsLoad: true,
-              };
-            } else if (!this.state.selectedTaskId) {
-              stateUpdate = {
-                ...stateUpdate,
-                selectedTaskId: null
-              };
+            } 
+            if (
+              !(updatedAnalysis && updatedAnalysis.model && updatedAnalysis.model.Input &&
+                !!updatedAnalysis.model.Input.Task)
+            ) {
+              if (availTasks.length === 1) {
+                stateUpdate = {
+                  ...stateUpdate,
+                  selectedTaskId: availTasks[0].id,
+                  predictorsLoad: true,
+                };
+              } else if (!this.state.selectedTaskId) {
+                stateUpdate = {
+                  ...stateUpdate,
+                  selectedTaskId: null
+                };
+              }
+            } else {
+              stateUpdate.model = updatedAnalysis.model;
             }
 
             stateUpdate = {
@@ -905,7 +897,7 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
       // When a different task is selected, autoselect all its associated run IDs
       this.updateState('analysis')({
         ...analysis,
-        runIds: availableRuns.filter(r => r.task === value).map(r => r.id),
+        runids: availableRuns.filter(r => r.task === value).map(r => r.id),
         predictorsLoad: true
       });
     }
@@ -1037,32 +1029,77 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
     if (editableStatus.includes(this.state.analysis.status)) {
       this.props.checkJWT();
     }
-
+    
     if (this.state.saveFromUpdate) {
       this.saveAnalysis({compile: false})();
       this.setState({saveFromUpdate: false});
     }
+
     if ((this.state.loadInitialPredictors === true)
       && (prevState.analysis.runIds.length !== this.state.analysis.runIds.length)) {
       this.loadPredictors();
       this.setState({loadInitialPredictors: false});
     }
   }
-//
+
   componentDidMount() {
     if (this.props.doTour) {
       this.setState({doTooltip: true});
+    }
+    // Load analysis from server if an analysis id is specified in the props
+    if (!!this.props.id) {
+      jwtFetch(`${domainRoot}/api/analyses/${this.props.id}`)
+      // .then(response => response.json() as Promise<ApiAnalysis>)
+      .then((data: ApiAnalysis) => {
+        if ((data as any).statusCode === 404) {
+          this.setState({analysis404: true});
+          return;
+        } else {
+          this.loadAnalysis(data);
+          return data;
+        }
+      })
+      .then((data: ApiAnalysis) => {
+        if (this.state.analysis404) { return; }
+        if (!this.props.userOwns && editableStatus.includes(data.status)) {
+          editableStatus = [];
+        }
+        if (editableStatus.includes(data.status)) {
+          this.setState({model: this.buildModel()});
+        }
+        if (data.status === 'FAILED') {
+          this.setState({activeTab: 'submit'});
+        }
+        if (!editableStatus.includes(data.status) && data.status !== 'DRAFT') {
+          this.setState({activeTab: 'review'});
+          this.postTabChange('review');
+        }
+        if (!!this.props.id && localStorage.getItem('analysisId') === this.props.id) {
+          let tab = localStorage.getItem('tab');
+          if (!!tab && tabOrder.includes(tab)) {
+            this.setState({'activeTab': tab as TabName});
+            this.postTabChange(tab as TabName);
+          }
+        }
+      })
+      .catch(displayError);
     }
   }
 
   componentWillUnmount() {
     this.setState({doTooltip: false});
+    document.title = 'Neuroscout';
   }
 
   render() {
     if (this.state.analysis404) {
       return <Redirect to="/builder/" />;
     }
+
+    if (this.props.userOwns) {
+      editableStatus = ['DRAFT', 'FAILED'];
+    }
+
     let {
       predictorsActive,
       transformationsActive,
@@ -1080,6 +1117,10 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
       selectedHRFPredictors,
       unsavedChanges
     } = this.state;
+
+    if (analysis.analysisId && !unsavedChanges) {
+      document.title = `Neuroscout ${analysis.analysisId} ${analysis.name}`;
+    }
 
     let reportRuns = this.state.availableRuns.filter(
       x => this.state.analysis.runIds.find(runId => runId === x.id)

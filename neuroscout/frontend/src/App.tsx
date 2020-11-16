@@ -5,7 +5,7 @@ Top-level App component containing AppState. The App component is currently resp
 - Managing user's saved analyses (list display, clone and delete)
 */
 import * as React from 'react';
-import { BrowserRouter as Router, Route, Redirect } from 'react-router-dom';
+import { BrowserRouter as Router, Route, Redirect, withRouter } from 'react-router-dom';
 import { Layout, Modal, message } from 'antd';
 import ReactGA from 'react-ga';
 import memoize from 'memoize-one';
@@ -99,7 +99,6 @@ class App extends React.Component<{}, AppState> {
    */
   checkAnalysesStatus = async (key: number) => {
     while (true) {
-      /*
       if (key < checkCount) { return; }
       if (!(this.state.user.loggedIn)) { return; }
       let changeFlag = false;
@@ -127,7 +126,6 @@ class App extends React.Component<{}, AppState> {
           }
         });
       }
-      */
       await timeout(12000);
     }
   };
@@ -159,15 +157,17 @@ class App extends React.Component<{}, AppState> {
       });
   }
 
-  cloneAnalysis = (id: string): void => {
-    api.cloneAnalysis(id).then((analysis) => {
+  cloneAnalysis = (id: string): Promise<string> => {
+    return api.cloneAnalysis(id).then((analysis) => {
       if (analysis !== null) {
         if (this.state.analyses === null) {
           this.setState({ analyses: [analysis] });
         } else {
           this.setState({ analyses: this.state.analyses.concat([analysis]) });
         }
+        return analysis.id;
       }
+      return '';
     });
   };
 

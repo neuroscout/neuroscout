@@ -320,7 +320,7 @@ export interface AppState {
   publicAnalyses: (AppAnalysis[] | null); // List of public analyses
   user: UserStore;
   datasets: Dataset[];
-  cloneAnalysis: (number) => void;
+  cloneAnalysis: (number) => Promise<string>;
   onDelete:  (analysis: AppAnalysis) => void;
 }
 
