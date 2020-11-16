@@ -142,6 +142,16 @@
       "resample_frequency": 3
     }
   ],
+  "TonnetzExtractor": [
+    {
+      "features": {
+        "tonal_centroid_(.*)": {
+          "description": "Tonal centroid \\1"
+        }
+      },
+      "resample_frequency": 3
+    }
+  ],
   "RMSExtractor": [
     {
       "features": {
