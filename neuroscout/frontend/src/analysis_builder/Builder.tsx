@@ -452,6 +452,7 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
         let analysisId = this.state.analysis.analysisId;
         if (data.hash_id !== undefined) {
           analysisId = data.hash_id;
+          localStorage.setItem('analysisId', analysisId);
         }
 
         this.setState({
@@ -599,6 +600,8 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
       }
 
       localStorage.setItem('tab', nextTab);
+      let id = this.state.analysis.analysisId ? this.state.analysis.analysisId : '';
+      localStorage.setItem('analysisId', id);
       this.setState(update);
       this.postTabChange(nextTab);
     };
@@ -1031,6 +1034,7 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
       this.saveAnalysis({compile: false})();
       this.setState({saveFromUpdate: false});
     }
+
     if ((this.state.loadInitialPredictors === true)
       && (prevState.analysis.runIds.length !== this.state.analysis.runIds.length)) {
       this.loadPredictors();
