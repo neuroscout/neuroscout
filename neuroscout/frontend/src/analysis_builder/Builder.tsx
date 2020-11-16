@@ -1029,7 +1029,7 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
     if (editableStatus.includes(this.state.analysis.status)) {
       this.props.checkJWT();
     }
-
+    
     if (this.state.saveFromUpdate) {
       this.saveAnalysis({compile: false})();
       this.setState({saveFromUpdate: false});
@@ -1094,6 +1094,10 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
   render() {
     if (this.state.analysis404) {
       return <Redirect to="/builder/" />;
+    }
+
+    if (this.props.userOwns) {
+      editableStatus = ['DRAFT', 'FAILED'];
     }
 
     let {
