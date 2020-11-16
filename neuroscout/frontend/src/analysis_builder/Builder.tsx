@@ -161,19 +161,20 @@ class EditDetails extends React.Component<editDetailsProps, editDetailsState> {
     this.props.updateAnalysis({name: this.state.newName, description: this.state.newDescription}, false, true);
   }
 
-  memoizeUpdates = memoize((value: string, key: keyof editDetailsState) => {
-    let update: Partial<editDetailsState> = {};
-    update[key] = value;
-    this.setState({...this.state, ...update});
-  });
+  componentDidUpdate(prevProps, prevState) {
+    if (prevProps.name === '' && prevProps.name !== this.props.name) {
+      this.setState({newName: this.props.name});
+    }
+    if (prevProps.description === '' && prevProps.description !== this.props.description) {
+      this.setState({newDescription: this.props.description});
+    }
+  }
 
   onChange = (e: any) => {
     this.setState({visible: e});
   };
 
   render() {
-    this.memoizeUpdates(this.props.name, 'newName');
-    this.memoizeUpdates(this.props.description, 'newDescription');
     return (
       <div className="editDetails">
       <Collapse bordered={false} activeKey={this.state.visible} onChange={this.onChange}>
