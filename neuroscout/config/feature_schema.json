@@ -152,6 +152,16 @@
       "resample_frequency": 3
     }
   ],
+  "ChromaSTFTExtractor": [
+    {
+      "features": {
+        "chroma_(.*)": {
+          "description": "Normalized energy for each chroma bin \\1"
+        }
+      },
+      "resample_frequency": 3
+    }
+  ],
   "RMSExtractor": [
     {
       "features": {
