@@ -162,6 +162,16 @@
       "resample_frequency": 3
     }
   ],
+  "ChromaCQTExtractor": [
+    {
+      "features": {
+        "chroma_cqt_(.*)": {
+          "description": "Constant-q chromogram bin \\1"
+        }
+      },
+      "resample_frequency": 3
+    }
+  ],
   "RMSExtractor": [
     {
       "features": {
