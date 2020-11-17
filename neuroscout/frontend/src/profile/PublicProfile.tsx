@@ -14,7 +14,7 @@ import { NotFound } from '../HelperComponents';
 interface PublicProfileProps {
   user_name: string;
   datasets: Dataset[];
-  cloneAnalysis: (id: string) => void;
+  cloneAnalysis: (id: string) => Promise<string>;
   loggedIn: boolean;
   isUser: boolean;
 }

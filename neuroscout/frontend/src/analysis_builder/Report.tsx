@@ -184,12 +184,18 @@ export class Report extends React.Component<ReportProps, ReportState> {
 
   _timer: any = null;
 
-  generateReport = (): void => {
+  generateReport = (scale?: boolean): void => {
     let id = this.props.analysisId;
-    let scale_param = this.state.scale === undefined ? '' : `&scale=${this.state.scale}`;
+    let scale_param = '';
+    if (scale === undefined) {
+      scale_param = this.state.scale === undefined ? '' : `&scale=${this.state.scale}`;
+    } else {
+      scale_param = `&scale=${scale}`;
+    }
     let url = `${domainRoot}/api/analyses/${id}/report?run_id=${this.state.selectedRunIds}${scale_param}`;
     jwtFetch(url, { method: 'POST' })
     .then((res) => {
+      // Not sure what we want to do on failure here.
     });
   };
 
@@ -233,7 +239,7 @@ export class Report extends React.Component<ReportProps, ReportState> {
           return;
         }
         let scale = true;
-        if (res.scale === null && this.state.scale !== undefined) {
+        if (this.state.scale !== undefined) {
           scale = this.state.scale;
         } else if (res.scale !== null) {
           scale = res.scale;
@@ -367,6 +373,7 @@ export class Report extends React.Component<ReportProps, ReportState> {
 
   updateScale = () => {
     this.setState({ scale: !this.state.scale });
+    this.generateReport(!this.state.scale);
     this.updateReports();
   };
 

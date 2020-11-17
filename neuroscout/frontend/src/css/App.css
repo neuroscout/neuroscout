@@ -57,7 +57,9 @@ pre {
 
 .statusHeader {
     float: right;
-    display: inline-block;
+    position: relative;
+    z-index: 10;
+       
 }
 
 .splashLogo {

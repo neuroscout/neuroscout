@@ -257,9 +257,10 @@ export class UserStore {
   };
 
   // Sign up for a new account
-  signup = () => {
-    const { password } = this;
-    const { name, email } = this.profile;
+  signup = (newUser: {password: string, name: string, email: string}) => {
+    const { name, email, password } = newUser;
+    this.update({password: password});  
+    this.profile.update({name: name, email: email});
     fetch(domainRoot + '/api/user', {
       method: 'post',
       body: JSON.stringify({ email: email, password: password, name: name }),

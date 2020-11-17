@@ -6,7 +6,7 @@ import * as React from 'react';
 import { Button, Row, Table } from 'antd';
 import { MainCol, Space, StatusTag } from './HelperComponents';
 import { AppAnalysis, Dataset } from './coretypes';
-import { Link } from 'react-router-dom';
+import { Link, Redirect } from 'react-router-dom';
 
 const tableLocale = {
   filterConfirm: 'Ok',
@@ -18,7 +18,7 @@ export interface AnalysisListProps {
   loggedIn?: boolean;
   publicList?: boolean;
   analyses: (AppAnalysis[] | null);
-  cloneAnalysis: (id: string) => void;
+  cloneAnalysis: (id: string) => Promise<string>;
   onDelete?: (analysis: AppAnalysis) => void;
   children?: React.ReactNode;
   datasets: Dataset[];
@@ -26,8 +26,13 @@ export interface AnalysisListProps {
   showOwner?: boolean;
 }
 
-export class AnalysisListTable extends React.Component<AnalysisListProps> {
+export class AnalysisListTable extends React.Component<AnalysisListProps, {redirectId: string}> {
+  state = {redirectId: ''};
+
   render() {
+    if (this.state.redirectId !== '') {
+      return (<Redirect to={'/builder/' + this.state.redirectId} />);
+    }
     const { analyses, datasets, publicList, cloneAnalysis, onDelete, showOwner } = this.props;
 
     // Define columns of the analysis table
@@ -109,7 +114,15 @@ export class AnalysisListTable extends React.Component<AnalysisListProps> {
             <span>
               {record.status === 'PASSED' &&
                 <>
-                <Button type="primary" ghost={true} onClick={() => cloneAnalysis(record.id)}>
+                <Button
+                  type="primary"
+                  ghost={true}
+                  onClick={() => {
+                    this.props.cloneAnalysis(record.id).then((id) => {
+                      this.setState({redirectId: id});
+                    });
+                  }}
+                >
                   Clone
                 </Button>
                 <Space /></>}
