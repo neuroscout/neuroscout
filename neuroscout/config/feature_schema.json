@@ -172,6 +172,16 @@
       "resample_frequency": 3
     }
   ],
+  "MelspectrogramExtractor": [
+    {
+      "features": {
+        "mel_(.*)": {
+          "description": "Melspectrogram bin \\1"
+        }
+      },
+      "resample_frequency": 3
+    }
+  ],
   "RMSExtractor": [
     {
       "features": {
