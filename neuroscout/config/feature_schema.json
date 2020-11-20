@@ -182,10 +182,10 @@
       "resample_frequency": 3
     }
   ],
-  "MFCCExtractor":
+  "MFCCExtractor": [
     {
       "features": {
-        "mgcc_(.*)": {
+        "mfcc_(.*)": {
           "description": "Mel Frequency Ceptral Coefficients, \\1"
         }
       },
