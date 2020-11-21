@@ -13,7 +13,6 @@ from progressbar import progressbar
 from ..utils.db import get_or_create
 
 from pliers.stimuli import load_stims, ComplexTextStim, TextStim
-from pliers.transformers import get_transformer
 from pliers.extractors import merge_results
 from pliers.graph import Graph
 from ..models import (
@@ -48,13 +47,14 @@ def _load_stim_models(dataset_name, task_name):
     return stims
 
 
-def _extract(extractors, stims):
-    """ Apply list of extractors to complete list of stimuli in dataset """
+def _extract(graphs, stims):
+    """ Apply list of graphs to complete list of stimuli in dataset """
     results = []
     # For every extractor, extract from matching stims
-    for name, parameters in extractors:
-        print("Extractor: {}".format(name))
-        ext = get_transformer(name, **parameters)
+    for g in graphs:
+        graph = Graph(g)
+        ext = graph.roots[0].transformer
+        print("Extractor: {}".format(ext.name))
         valid_stims = []
         for sm, s in stims:
             if ext._stim_matches_input_types(s):
@@ -62,7 +62,7 @@ def _extract(extractors, stims):
                 if 'GoogleVideoAPIShotDetectionExtractor' in str(ext.__class__):
                     s.filename = str(Path(s.filename).with_suffix('.avi'))
                 valid_stims.append((sm, s))
-        results += [(sm, ext.transform(s))
+        results += [(sm, graph.transform(s, merge=False)[0])
                     for sm, s in progressbar(valid_stims)]
     return results
 
@@ -86,7 +86,7 @@ def _create_efs(results, **serializer_kwargs):
     Args:
         results - list of zipped pairs of Stimulus objects and ExtractedResult
                   objects
-        object_id - Selection function to use for object_id
+        serializer_kwargs - kwargs for Feature serialization
     Returns:
         ext_feats - dictionary of hash of ExtractedFeatures to EF objects
     """
@@ -125,6 +125,7 @@ def create_predictors(features, dataset_name, task_name, run_ids=None,
         Args:
             features (object) - ExtractedFeature objects
             dataset_name (str) - Dataset name
+            task_name (str) - Task name
             run_ids (list of ints) - Optional list of run_ids for which to
                                      create PredictorRun for.
             clear_cache (bool) - Clear API cache
@@ -135,7 +136,11 @@ def create_predictors(features, dataset_name, task_name, run_ids=None,
         cache.clear()
 
     dataset = Dataset.query.filter_by(name=dataset_name).one()
-    task = Task.query.filter_by(name=task_name, dataset_id=dataset.id).one()
+    task = Task.query.filter_by(dataset_id=dataset.id)
+    if task_name is not None:
+        task = task.filter_by(name=task_name)
+
+    task = task.one()
 
     # Create/Get Predictors
     all_preds = []
@@ -171,25 +176,41 @@ def create_predictors(features, dataset_name, task_name, run_ids=None,
     return [p.id for p in all_preds]
 
 
-def extract_features(dataset_name, task_name, extractors):
+def extract_features(graphs, dataset_name=None, task_name=None,
+                     **serializer_kwargs):
     """ Extract features using pliers for a dataset/task
         Args:
             dataset_name - dataset name
             task_name - task name
-            extractors - dictionary of extractor names to parameters
+            graphs - List of Graphs to apply to stimuli
+            serializer_kwargs - Arguments to pass to FeatureSerializer
         Output:
             list of db ids of extracted features
     """
-    stims = _load_stim_models(dataset_name, task_name)
+    if dataset_name is None:
+        return [extract_features(
+            graphs, dataset.name, None, **serializer_kwargs)
+                for dataset in Dataset.query.filter_by(active=True)]
 
-    results = _extract(extractors, stims)
+    elif task_name is None:
+        dataset = Dataset.query.filter_by(name=dataset_name).one()
+        print(f"Extracting: {dataset_name} {task_name}")
+        return [extract_features(
+            graphs, dataset.name, task.name, **serializer_kwargs)
+                 for task in dataset.tasks]
 
-    _to_csv(results, dataset_name, task_name)
+    else:
+        stims = _load_stim_models(dataset_name, task_name)
 
-    ext_feats = _create_efs(results)
+        results = _extract(graphs, stims)
 
-    return create_predictors([ef for ef in ext_feats.values() if ef.active],
-                             dataset_name, task_name)
+        _to_csv(results, dataset_name, task_name)
+
+        ext_feats = _create_efs(results, **serializer_kwargs)
+
+        return create_predictors(
+            [ef for ef in ext_feats.values() if ef.active],
+            dataset_name, task_name)
 
 
 def _load_complex_text_stim_models(dataset_name, task_name):

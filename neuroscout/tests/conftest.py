@@ -99,8 +99,8 @@ DATASET_PATH = DATA_PATH / 'bids_test'
 LOCAL_JSON_PATH = (DATA_PATH / 'test_local.json').as_posix()
 REMOTE_JSON_PATH = (DATA_PATH / 'test_remote.json').as_posix()
 EXTRACTORS = [
-    ("BrightnessExtractor", {}),
-    ("VibranceExtractor", {})
+    [{"transformer": "BrightnessExtractor"}],
+    [{"transformer": "VibranceExtractor"}]
     ]
 
 
@@ -157,12 +157,12 @@ def add_local_task_json(session):
 
 @pytest.fixture(scope="function")
 def extract_features(session, add_task):
-    return populate.extract_features('Test Dataset', 'bidstest', EXTRACTORS)
+    return populate.extract_features(EXTRACTORS, 'Test Dataset', 'bidstest')
 
 
 @pytest.fixture(scope="function")
 def reextract(session, extract_features):
-    return populate.extract_features('Test Dataset', 'bidstest', EXTRACTORS)
+    return populate.extract_features(EXTRACTORS, 'Test Dataset', 'bidstest')
 
 
 @pytest.fixture(scope="function")
