@@ -5,7 +5,7 @@ RUN mkdir -p /usr/src/app
 WORKDIR /usr/src/app
 
 RUN apt-get -qq update
-RUN apt-get install -yq ffmpeg tesseract-ocr apt-transport-https
+RUN apt-get install -yq ffmpeg tesseract-ocr apt-transport-https libnss3 xvfb
 RUN pip install -e git+https://github.com/PsychoinformaticsLab/pliers.git#egg=pliers
 RUN pip install clarifai duecredit google-api-python-client IndicoIo librosa>=0.6.3 pysrt pytesseract spacy rev_ai
 
