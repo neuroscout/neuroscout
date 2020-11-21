@@ -51,6 +51,7 @@
     "analyze": "source-map-explorer 'build/static/js/*.js'",
     "build": "react-scripts-ts build",
     "test": "react-scripts-ts test --env=jsdom",
-    "eject": "react-scripts-ts eject"
+    "eject": "react-scripts-ts eject".
+    "cypress:open": "cypress open"
   }
 }
