@@ -49,6 +49,7 @@ matrix:
       install:
         - cd ./neuroscout/frontend
         - yarn install
+        - npm install -g wait-on
       script:
         - mv ./src/config.ts.example ./src/config.ts
         - mv cypress-test.json cypress.json
