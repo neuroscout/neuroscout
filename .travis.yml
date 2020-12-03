@@ -53,5 +53,5 @@ matrix:
       script:
         - mv ./src/config.ts.example ./src/config.ts
         - mv cypress-test.json cypress.json
-        - yarn start & wait-on http://localhost:3000/
+        - yarn start & wait-on http://localhost:3000/ &
         - npm run cy:run
