@@ -1,5 +1,0 @@
-export const config =  {
-  'server_url': 'http://localhost',
-  'google_client_id': '66127382167-v83riq5etne59h7v9ghqqs5t6a3i0rta.apps.googleusercontent.com',
-  'ga_key': 'UA-143429930-1'
-};
