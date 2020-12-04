@@ -26,7 +26,8 @@
     "acceptance-tests",
     "webpack",
     "jest",
-    "src/tests/setupTests.ts"
+    "src/tests/setupTests.ts",
+    "cypress"
   ],
   "types": [
     "typePatches"
