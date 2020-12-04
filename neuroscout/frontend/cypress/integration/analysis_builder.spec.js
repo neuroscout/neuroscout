@@ -24,7 +24,7 @@ describe('Analysis Builder', () => {
     cy.get('.ant-collapse-item-active > .ant-collapse-content > .ant-collapse-content-box').find('tr').its('length').should('be.gte', 1)
     cy.contains('Next').click()
 
-    /* Predictor Tab */
+    /* Predictor Tab - select first 5 predictors */
     let count = 0
     cy.contains('Select Predictors').parent().within(() => {
       cy.contains('abstract')
@@ -38,7 +38,7 @@ describe('Analysis Builder', () => {
     cy.get('.ant-tag').its('length').should('be.gte', 5)
     cy.get('button:visible').contains('Next').parent().click()
 
-    /* Transformation Tab */
+    /* Transformation Tab - create a scale xform with all predictors */
     cy.get('button').contains('Add Transformation').parent().click()
     cy.get('.ant-select').click()
     cy.get('li').contains('Scale').click()
@@ -49,5 +49,15 @@ describe('Analysis Builder', () => {
     cy.get('button:visible').contains('Next').parent().click()
 
     /* HRF Tab */
+    cy.get('button').contains('Select All Non-Confound').parent().click()
+    cy.get('.ant-tag:visible').its('length').should('be.eq', 6)
+    cy.get('button:visible').contains('Next').parent().click()
+
+    /* Contrast Tab - generate dummy contrasts, then delete one of them */
+    cy.get('button').contains('Generate Dummy').parent().click()
+    cy.get('.ant-list:visible').find('.ant-btn-danger').its('length').should('be.eq', 5)
+    cy.get('.ant-list:visible').find('.ant-btn-danger').first().click()
+    cy.get('.ant-list:visible').find('.ant-btn-danger').its('length').should('be.eq', 4)
+    cy.get('button:visible').contains('Next').parent().click()
   });
 });

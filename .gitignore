@@ -122,4 +122,4 @@ nginx/certs-data
 
 neuroscout/frontend/src/config.ts
 
-cypress/videos
+cypress/videos/
