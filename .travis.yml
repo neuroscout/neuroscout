@@ -34,11 +34,24 @@ matrix:
     - language: node_js
       node_js:
         - "lts/*"
+      addons:
+      apt:
+        packages:
+        - libgconf-2-4
       cache:
         yarn: true
+        directories:
+          - ~/node_modules
+        override:
+          - npm ci
+          - npm run cy:verify
+          - npm run cy:info
       install:
         - cd ./neuroscout/frontend
         - yarn install
+        - npm install -g wait-on
       script:
         - mv ./src/config.ts.example ./src/config.ts
-        - yarn build
+        - mv cypress-test.json cypress.json
+        - yarn start & wait-on http://localhost:3000/ &
+        - cypress run --record

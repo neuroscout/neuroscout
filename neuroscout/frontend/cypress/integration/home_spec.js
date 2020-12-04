@@ -3,6 +3,7 @@ describe('The Home Page', () => {
     cy.visit('/')
   })
 
+
   it('navigation bar contents', () =>{
     cy.get('.ant-menu').contains('Neuroscout').should(
       'have.attr', 'href', '/'

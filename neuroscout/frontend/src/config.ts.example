@@ -1,5 +1,5 @@
 export const config =  {
-  'server_url': 'https://neuroscout.org',
+  'server_url': 'http://localhost:3000/',
   'google_client_id': 'GOOGLE_CLIENT_ID',
   'ga_key': 'GAKEY'
 };
