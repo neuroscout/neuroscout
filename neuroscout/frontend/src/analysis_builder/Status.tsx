@@ -99,7 +99,7 @@ export class Submit extends React.Component<submitProps, {tosAgree: boolean, val
     let onChange = this.onChange.bind(this);
     let validateChange = this.validateChange.bind(this);
     return(
-      <div>
+      <div className="statusTOS">
         {!this.props.name &&
           <span>
            <br/><Alert message="Analysis needs name to be generated" type="warning" showIcon={true} closable={true} />

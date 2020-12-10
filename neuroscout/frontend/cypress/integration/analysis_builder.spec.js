@@ -6,6 +6,7 @@ describe('Analysis Builder', () => {
   })
 
   let name = 'dataset_name';
+  let predCount = 5;
   it('analysis builder', () => {
     /* Overview Tab */
     cy.get('.builderAnalysisNameInput').type(name)
@@ -29,13 +30,13 @@ describe('Analysis Builder', () => {
     cy.contains('Select Predictors').parent().within(() => {
       cy.contains('abstract')
       cy.get('.ant-table-body').find('input[type=checkbox]').each(($el, index, $list) => {
-        if (count < 5) {
+        if (count < predCount) {
           $el.click()
           count++
         }
       })
     })
-    cy.get('.ant-tag').its('length').should('be.gte', 5)
+    cy.get('.ant-tag').its('length').should('be.gte', predCount)
     cy.get('button:visible').contains('Next').parent().click()
 
     /* Transformation Tab - create a scale xform with all predictors */
@@ -47,17 +48,30 @@ describe('Analysis Builder', () => {
     })
     cy.get('button:visible').contains('OK').parent().click()
     cy.get('button:visible').contains('Next').parent().click()
+    let xformCount = 1
 
     /* HRF Tab */
     cy.get('button').contains('Select All Non-Confound').parent().click()
-    cy.get('.ant-tag:visible').its('length').should('be.eq', 6)
+    cy.get('.ant-tag:visible').its('length').should('be.eq', predCount + 1)
     cy.get('button:visible').contains('Next').parent().click()
 
     /* Contrast Tab - generate dummy contrasts, then delete one of them */
     cy.get('button').contains('Generate Dummy').parent().click()
-    cy.get('.ant-list:visible').find('.ant-btn-danger').its('length').should('be.eq', 5)
+    cy.get('.ant-list:visible').find('.ant-btn-danger').its('length').should('be.eq', predCount)
     cy.get('.ant-list:visible').find('.ant-btn-danger').first().click()
-    cy.get('.ant-list:visible').find('.ant-btn-danger').its('length').should('be.eq', 4)
+    cy.get('.ant-list:visible').find('.ant-btn-danger').its('length').should('be.eq', predCount - 1)
     cy.get('button:visible').contains('Next').parent().click()
+
+    /* Review Tab */
+    cy.get('.ant-collapse-item').contains('Contrasts').click()
+    cy.get('.ant-collapse-item').contains('Contrasts').parent().find('.ant-collapse-content-box > div').children().should('have.length', predCount - 1)
+    cy.get('.ant-collapse-item').contains('Transformations').click()
+    cy.get('.ant-collapse-item').contains('Transformations').parent().find('.ant-collapse-content-box > div').children().should('have.length', xformCount)
+    cy.get('button:visible').contains('Next').parent().click()
+
+    /* Status Tab */
+    cy.get('.statusTOS').get('button:disabled')
+    cy.get('span').contains('terms of service').parent().find('input').check()
+    cy.get('.statusTOS').get('span:visible').contains('Generate').parent().click()
   });
 });
