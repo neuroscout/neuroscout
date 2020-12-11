@@ -9,6 +9,7 @@
       "12yearsaslave": {
         "summary": "12 Years a Slave",
         "converters": [
+          [{"transformer": "VideoToAudioConverter"}]
         ],
         "extractors": [
         ],
@@ -22,6 +23,7 @@
       "500daysofsummer": {
         "summary": "500 Days of Summer",
         "converters": [
+          [{"transformer": "VideoToAudioConverter"}]
         ],
         "extractors": [
         ],
@@ -35,6 +37,7 @@
       "backtothefuture": {
         "summary": "Back to the Future",
         "converters": [
+          [{"transformer": "VideoToAudioConverter"}]
         ],
         "extractors": [
         ],
@@ -48,6 +51,7 @@
       "citizenfour": {
         "summary": "Citizen Four",
         "converters": [
+          [{"transformer": "VideoToAudioConverter"}]
         ],
         "extractors": [
         ],
@@ -61,6 +65,7 @@
       "littlemisssunshine": {
         "summary": "Little Miss Sunshine",
         "converters": [
+          [{"transformer": "VideoToAudioConverter"}]
         ],
         "extractors": [
         ],
@@ -74,6 +79,7 @@
       "pulpfiction": {
         "summary": "Pulp Fiction",
         "converters": [
+          [{"transformer": "VideoToAudioConverter"}]
         ],
         "extractors": [
         ],
@@ -87,6 +93,7 @@
       "split": {
         "summary": "Split",
         "converters": [
+          [{"transformer": "VideoToAudioConverter"}]
         ],
         "extractors": [
         ],
@@ -100,6 +107,7 @@
       "theprestige": {
         "summary": "The Prestige",
         "converters": [
+          [{"transformer": "VideoToAudioConverter"}]
         ],
         "extractors": [
         ],
@@ -113,6 +121,7 @@
       "theshawshankredemption": {
         "summary": "The Shawshank Redemption",
         "converters": [
+          [{"transformer": "VideoToAudioConverter"}]
         ],
         "extractors": [
         ],
@@ -126,6 +135,7 @@
       "theusualsuspects": {
         "summary": "The Usual Suspects",
         "converters": [
+          [{"transformer": "VideoToAudioConverter"}]
         ],
         "extractors": [
         ],
