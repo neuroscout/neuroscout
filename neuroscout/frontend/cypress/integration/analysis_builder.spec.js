@@ -67,11 +67,18 @@ describe('Analysis Builder', () => {
     cy.get('.ant-collapse-item').contains('Contrasts').parent().find('.ant-collapse-content-box > div').children().should('have.length', predCount - 1)
     cy.get('.ant-collapse-item').contains('Transformations').click()
     cy.get('.ant-collapse-item').contains('Transformations').parent().find('.ant-collapse-content-box > div').children().should('have.length', xformCount)
-    cy.get('button:visible').contains('Next').parent().click()
+    cy.get('.ant-spin-spinning:visible')
+    cy.intercept('GET', '**/report**', 'fixture:design_matrix_response.json')
+    cy.fixture('design_matrix_response.json').then(dmResponse => {
+    })
+
+    //cy.get('button:visible').contains('Next').parent().click()
 
     /* Status Tab */
+    /*
     cy.get('.statusTOS').get('button:disabled')
     cy.get('span').contains('terms of service').parent().find('input').check()
     cy.get('.statusTOS').get('span:visible').contains('Generate').parent().click()
+    */
   });
 });
