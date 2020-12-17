@@ -10,4 +10,6 @@ class RunSchema(Schema):
     duration = fields.Number(description='Total run duration in seconds.')
     dataset_id = fields.Int(description='Dataset run belongs to.')
     task = fields.Pluck(
-        'TaskSchema', 'id', description="Task id and name")
+        'TaskSchema', 'id', description="Task id")
+    task_name = fields.Pluck(
+        'TaskSchema', 'name', description="Task name")

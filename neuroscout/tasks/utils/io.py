@@ -98,8 +98,7 @@ def analysis_to_json(analysis_id, run_id=None):
         if preproc_path.exists():
             dataset_path = preproc_path
 
-    task_name = analysis.runs[0].task.name if analysis.runs else None
     TR = analysis.runs[0].task.TR if analysis.runs else None
 
     return (analysis.id, analysis_json, resources_json, pes,
-            str(dataset_path), task_name, TR)
+            str(dataset_path), TR)
