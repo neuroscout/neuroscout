@@ -2,18 +2,15 @@
 Set of methods to extract features from stimuli in a dataset and generate
 the associated predictors
 """
-from flask import current_app
 from ..core import cache
 from ..database import db
 import socket
 
 from pathlib import Path
-import datetime
 from progressbar import progressbar
 from ..utils.db import get_or_create
 
 from pliers.stimuli import load_stims, ComplexTextStim, TextStim
-from pliers.extractors import merge_results
 from pliers.graph import Graph
 from ..models import (
     Dataset, Task, Predictor, PredictorRun, Run, Stimulus,
@@ -23,13 +20,17 @@ from .annotate import FeatureSerializer
 socket.setdefaulttimeout(10000)
 
 
-def _load_stim_models(dataset_name, task_name):
+def _load_stim_models(dataset_name, task_name=None):
     """ Given a dataset and task, load all available stimuli as Pliers
     stimuli, and pair them with original database stim object. """
     stim_models = Stimulus.query.filter_by(active=True).filter(
         Stimulus.mimetype != 'text/csv').join(
-        RunStimulus).join(Run).join(Task).filter_by(name=task_name).join(
-            Dataset).filter_by(name=dataset_name)
+        RunStimulus).join(Run).join(Task)
+
+    if task_name is not None:
+        stim_models = stim_models.filter_by(name=task_name)
+
+    stim_models = stim_models.join(Dataset).filter_by(name=dataset_name)
 
     stims = []
     print("Loading stim models...")
@@ -65,19 +66,6 @@ def _extract(graphs, stims):
         results += [(sm, graph.transform(s, merge=False)[0])
                     for sm, s in progressbar(valid_stims)]
     return results
-
-
-def _to_csv(results, dataset_name, task_name):
-    """ Save extracted Pliers results to file. """
-    if results != [] and 'EXTRACTION_DIR' in current_app.config:
-        results_df = merge_results(list(zip(*results))[1])
-        outfile = Path(
-            current_app.config['EXTRACTION_DIR']) / '{}_{}_{}.csv'.format(
-                dataset_name, task_name,
-                datetime.datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
-            )
-        outfile.parents[0].mkdir(exist_ok=True)
-        results_df.to_csv(outfile)
 
 
 def _create_efs(results, **serializer_kwargs):
@@ -119,7 +107,7 @@ def _create_efs(results, **serializer_kwargs):
     return ext_feats
 
 
-def create_predictors(features, dataset_name, task_name, run_ids=None,
+def create_predictors(features, dataset_name, task_name=None, run_ids=None,
                       percentage_include=.9, clear_cache=True):
     """ Create Predictors from Extracted Features.
         Args:
@@ -136,11 +124,13 @@ def create_predictors(features, dataset_name, task_name, run_ids=None,
         cache.clear()
 
     dataset = Dataset.query.filter_by(name=dataset_name).one()
-    task = Task.query.filter_by(dataset_id=dataset.id)
-    if task_name is not None:
-        task = task.filter_by(name=task_name)
 
-    task = task.one()
+    if task_name is not None:
+        task = Task.query.filter_by(
+            dataset_id=dataset.id).filter_by(name=task_name).one()
+        n_runs = len(task.runs)
+    else:
+        n_runs = len(dataset.runs)
 
     # Create/Get Predictors
     all_preds = []
@@ -151,7 +141,7 @@ def create_predictors(features, dataset_name, task_name, run_ids=None,
                 set([ee.stimulus_id for ee in ef.extracted_events]))).\
                 distinct('run_id')
 
-        if unique_runs.count() / len(task.runs) > percentage_include:
+        if unique_runs.count() / len(n_runs) > percentage_include:
             all_preds.append(get_or_create(
                 Predictor, name=ef.feature_name, description=ef.description,
                 dataset_id=dataset.id,
@@ -161,7 +151,7 @@ def create_predictors(features, dataset_name, task_name, run_ids=None,
     for ix, predictor in enumerate(progressbar(all_preds)):
         ef = features[ix]
         all_rs = []
-        # For all instances for stimuli in this task's runs
+        # For all instances for stimuli in this set of runs
         for ee in ef.extracted_events:
             query = RunStimulus.query.filter_by(stimulus_id=ee.stimulus_id)
             if run_ids is not None:
@@ -180,9 +170,9 @@ def extract_features(graphs, dataset_name=None, task_name=None,
                      **serializer_kwargs):
     """ Extract features using pliers for a dataset/task
         Args:
-            dataset_name - dataset name
-            task_name - task name
             graphs - List of Graphs to apply to stimuli
+            dataset_name - dataset name
+            task_name - task name (optional)
             serializer_kwargs - Arguments to pass to FeatureSerializer
         Output:
             list of db ids of extracted features
@@ -191,20 +181,10 @@ def extract_features(graphs, dataset_name=None, task_name=None,
         return [extract_features(
             graphs, dataset.name, None, **serializer_kwargs)
                 for dataset in Dataset.query.filter_by(active=True)]
-
-    elif task_name is None:
-        dataset = Dataset.query.filter_by(name=dataset_name).one()
-        print(f"Extracting: {dataset_name} {task_name}")
-        return [extract_features(
-            graphs, dataset.name, task.name, **serializer_kwargs)
-                 for task in dataset.tasks]
-
     else:
         stims = _load_stim_models(dataset_name, task_name)
 
         results = _extract(graphs, stims)
-
-        _to_csv(results, dataset_name, task_name)
 
         ext_feats = _create_efs(results, **serializer_kwargs)
 
