@@ -11,5 +11,4 @@ class RunSchema(Schema):
     dataset_id = fields.Int(description='Dataset run belongs to.')
     task = fields.Pluck(
         'TaskSchema', 'id', description="Task id")
-    task_name = fields.Pluck(
-        'TaskSchema', 'name', description="Task name")
+    task_name = fields.String(attribute='task.name')
