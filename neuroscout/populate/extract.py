@@ -141,7 +141,7 @@ def create_predictors(features, dataset_name, task_name=None, run_ids=None,
                 set([ee.stimulus_id for ee in ef.extracted_events]))).\
                 distinct('run_id')
 
-        if unique_runs.count() / len(n_runs) > percentage_include:
+        if unique_runs.count() / n_runs > percentage_include:
             all_preds.append(get_or_create(
                 Predictor, name=ef.feature_name, description=ef.description,
                 dataset_id=dataset.id,
