@@ -204,7 +204,7 @@ class AnalysisUploadResource(MethodResource):
     @use_kwargs(NVUploadFileSchema, location="files")
     @fetch_analysis
     def post(self, analysis, validation_hash, collection_id=None,
-             cli_version=None, fmriprep_version=None, estimator=estimator,
+             cli_version=None, fmriprep_version=None, estimator=None,
              image_file=None, level=None, n_subjects=None, force=False):
         if validation_hash != _validation_hash(analysis.id):
             abort(422, "Invalid validation hash.")
