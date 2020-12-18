@@ -101,6 +101,7 @@ class NeurovaultCollection(db.Model):
 
     cli_version = db.Column(db.Text)  # neuroscout-cli version
     fmriprep_version = db.Column(db.Text)
+    estimator = db.Column(db.Text)
 
 
 class NeurovaultFileUpload(db.Model):
