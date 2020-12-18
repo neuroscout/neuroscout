@@ -133,7 +133,7 @@ def _truncate_string(si, max_char):
 
 
 def _create_collection(
-      analysis, cli_version=None, fmriprep_version=None, estimator=estimator,
+      analysis, cli_version=None, fmriprep_version=None, estimator=None,
       force=False):
     collection_name = f"{analysis.name} - {analysis.hash_id}"
     if force is True:
