@@ -27,7 +27,7 @@
     "reactour": "^1.15.0",
     "serialize-javascript": "^3.1.0",
     "styled-components": "^4.0.0",
-    "vega": "^5.9.0",
+    "vega": "^5.17.3",
     "vega-embed": "^4.0.0",
     "vega-lite": "^4.0.0",
     "webpack-dev-server": "^3.1.11"
