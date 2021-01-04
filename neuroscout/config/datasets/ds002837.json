@@ -1,0 +1,151 @@
+{
+  "NaturalisticNeuroimagingDatabase": {
+    "preproc_address": "https://github.com/neuroscout-datasets/NaturalisticNeuroimagingDatabase.git",
+    "path": "/datasets/raw/ds002837/",
+    "summary": "Movie watching of 10 full-length movies",
+    "long_description": "The Naturalistic Neuroimaging Database (NNDb v1.0) contains datasets from 86 human participants watching 10 full-length movies during fMRI. Each participant watched a distinct movie. Movies were stopped in 40-50 minute intervals or when participants asked for a break. However, the run files were concatenated into a single image during preprocessing. ",
+    "url": "https://openneuro.org/datasets/ds002837",
+    "tasks": {
+      "12yearsaslave": {
+        "summary": "12 Years a Slave",
+        "converters": [
+          [{"transformer": "VideoToAudioConverter"}]
+        ],
+        "extractors": [
+        ],
+        "tokenized_extractors": [
+        ],
+        "transformations": [
+        ],
+        "ingest_args": {
+        }
+      },
+      "500daysofsummer": {
+        "summary": "500 Days of Summer",
+        "converters": [
+          [{"transformer": "VideoToAudioConverter"}]
+        ],
+        "extractors": [
+        ],
+        "tokenized_extractors": [
+        ],
+        "transformations": [
+        ],
+        "ingest_args": {
+        }
+      },
+      "backtothefuture": {
+        "summary": "Back to the Future",
+        "converters": [
+          [{"transformer": "VideoToAudioConverter"}]
+        ],
+        "extractors": [
+        ],
+        "tokenized_extractors": [
+        ],
+        "transformations": [
+        ],
+        "ingest_args": {
+        }
+      },
+      "citizenfour": {
+        "summary": "Citizen Four",
+        "converters": [
+          [{"transformer": "VideoToAudioConverter"}]
+        ],
+        "extractors": [
+        ],
+        "tokenized_extractors": [
+        ],
+        "transformations": [
+        ],
+        "ingest_args": {
+        }
+      },
+      "littlemisssunshine": {
+        "summary": "Little Miss Sunshine",
+        "converters": [
+          [{"transformer": "VideoToAudioConverter"}]
+        ],
+        "extractors": [
+        ],
+        "tokenized_extractors": [
+        ],
+        "transformations": [
+        ],
+        "ingest_args": {
+        }
+      },
+      "pulpfiction": {
+        "summary": "Pulp Fiction",
+        "converters": [
+          [{"transformer": "VideoToAudioConverter"}]
+        ],
+        "extractors": [
+        ],
+        "tokenized_extractors": [
+        ],
+        "transformations": [
+        ],
+        "ingest_args": {
+        }
+      },
+      "split": {
+        "summary": "Split",
+        "converters": [
+          [{"transformer": "VideoToAudioConverter"}]
+        ],
+        "extractors": [
+        ],
+        "tokenized_extractors": [
+        ],
+        "transformations": [
+        ],
+        "ingest_args": {
+        }
+      },
+      "theprestige": {
+        "summary": "The Prestige",
+        "converters": [
+          [{"transformer": "VideoToAudioConverter"}]
+        ],
+        "extractors": [
+        ],
+        "tokenized_extractors": [
+        ],
+        "transformations": [
+        ],
+        "ingest_args": {
+        }
+      },
+      "theshawshankredemption": {
+        "summary": "The Shawshank Redemption",
+        "converters": [
+          [{"transformer": "VideoToAudioConverter"}]
+        ],
+        "extractors": [
+        ],
+        "tokenized_extractors": [
+        ],
+        "transformations": [
+        ],
+        "ingest_args": {
+        }
+      },
+      "theusualsuspects": {
+        "summary": "The Usual Suspects",
+        "converters": [
+          [{"transformer": "VideoToAudioConverter"}]
+        ],
+        "extractors": [
+        ],
+        "tokenized_extractors": [
+        ],
+        "transformations": [
+        ],
+        "ingest_args": {
+        }
+      }
+    }
+  }
+}
