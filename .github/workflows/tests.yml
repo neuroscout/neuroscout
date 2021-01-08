@@ -3,19 +3,21 @@ name: Neuroscout tests
 on: [push, pull_request]
 
 jobs:
-  build:
+  test:
     name: pytest
     runs-on: ubuntu-latest
     env:
       APP_SETTINGS: neuroscout.config.app.GHIConfig
       PYTHONHASHSEED: 0
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_USER: postgres
     services:
-      postgresql:
+      postgres:
         image: postgres:12
+        env:
+          POSTGRES_PASSWORD: password
+          POSTGRES_DB: travis_ci_test
         ports:
-        - 5432:5432
+          - 5432:5432
+        options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
     steps:
     - uses: actions/checkout@v2
     - name: Set up Python
@@ -27,6 +29,8 @@ jobs:
         bash <(wget -q -O- http://neuro.debian.net/_files/neurodebian-travis.sh)
         sudo apt-get -qq update
         sudo apt-get install -yq git-annex-standalone tesseract-ocr libavformat-dev libavfilter-dev libavdevice-dev ffmpeg
+        cp neuroscout/config/example_app.py neuroscout/config/app.py
+        cp neuroscout/frontend/src/config.ts.example neuroscout/frontend/src/config.ts
     - uses: actions/cache@v2
       with:
         path: ~/.cache/pip
@@ -37,11 +41,6 @@ jobs:
         python -m pip install -U setuptools==45 pytest-cov
         python -m pip install -r neuroscout/requirements.txt
         python -m pip install -e git+https://github.com/PsychoinformaticsLab/pliers.git#egg=pliers
-    - name: Setup test environment
-      run: |
-        cp neuroscout/config/example_app.py neuroscout/config/app.py
-        cp neuroscout/frontend/src/config.ts.example neuroscout/frontend/src/config.ts
-        psql -c 'create database travis_ci_test;' -U postgres
         python -m pliers.support.download
     - name: Test with pytest
       run: |
