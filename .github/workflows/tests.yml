@@ -10,10 +10,15 @@ jobs:
       postgresql:
         image: postgres:12
         ports:
-        - 5432/tcp
+        - 5432:5432
+                image: postgres:12.2
+        env:
+
     env:
-      APP_SETTINGS: neuroscout.config.app.TravisConfig
+      APP_SETTINGS: neuroscout.config.app.GHIConfig
       PYTHONHASHSEED: 0
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_USER: postgres
     steps:
     - uses: actions/checkout@v2
     - name: Set up Python
