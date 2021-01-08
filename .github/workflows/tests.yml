@@ -4,7 +4,7 @@ on: [push, pull_request]
 
 jobs:
   build:
-    name: pytest (${{ matrix.python-version }}, ${{ matrix.os }})
+    name: pytest
     runs-on: ubuntu-latest
     services:
       postgresql:
@@ -24,7 +24,7 @@ jobs:
       run: |
         bash <(wget -q -O- http://neuro.debian.net/_files/neurodebian-travis.sh)
         sudo apt-get -qq update
-        sdo apt-get install -yq git-annex-standalone tesseract-ocr libavformat-dev libavfilter-dev libavdevice-dev ffmpeg
+        sudo apt-get install -yq git-annex-standalone tesseract-ocr libavformat-dev libavfilter-dev libavdevice-dev ffmpeg
     - uses: actions/cache@v2
       with:
         path: ~/.cache/pip
