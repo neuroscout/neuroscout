@@ -1,0 +1,47 @@
+name: Neuroscout tests
+
+on: [push, pull_request]
+
+jobs:
+  build:
+    name: pytest (${{ matrix.python-version }}, ${{ matrix.os }})
+    runs-on: ubuntu-latest
+    services:
+      postgresql:
+        image: postgres:12
+        ports:
+        - 5432/tcp
+    env:
+      APP_SETTINGS:neuroscout.config.app.TravisConfig
+      PYTHONHASHSEED:0
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.6
+    - name: Set up system dependencies
+      run: |
+        bash <(wget -q -O- http://neuro.debian.net/_files/neurodebian-travis.sh)
+        sudo apt-get -qq update
+        sdo apt-get install -yq git-annex-standalone tesseract-ocr libavformat-dev libavfilter-dev libavdevice-dev ffmpeg
+    - uses: actions/cache@v2
+      with:
+        path: ~/.cache/pip
+        key: ${{ hashFiles('neuroscout/setup.py') }}-${{ hashFiles('neuroscout/requirements.txt') }}
+    - name: Install Python dependencies
+      run: |
+        python -m pip install --upgrade pip wheel
+        python -m pip install -U setuptools==45 pytest-cov
+        python -m pip install -r neuroscout/requirements.txt
+        python -m pip install -e git+https://github.com/PsychoinformaticsLab/pliers.git#egg=pliers
+    - name: Setup test environment
+      run: |
+        cp neuroscout/config/example_app.py neuroscout/config/app.py
+        cp neuroscout/frontend/src/config.ts.example neuroscout/frontend/src/config.ts
+        psql -c 'create database travis_ci_test;' -U postgres
+        python -m pliers.support.download
+    - name: Test with pytest
+      run: |
+        python -m pytest neuroscout/tests/ --cov=./neuroscout --cov-report xml
+    - uses: codecov/codecov-action@v1
