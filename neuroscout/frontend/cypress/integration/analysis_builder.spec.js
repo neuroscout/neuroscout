@@ -50,7 +50,7 @@ describe('Analysis Builder', () => {
     cy.get('button:visible').contains('Next').parent().click()
     let xformCount = 1
 
-    /* HRF Tab */
+    /* HRF Tab - select all non counfound predictors, check length is correct */
     cy.get('button').contains('Select All Non-Confound').parent().click()
     cy.get('.ant-tag:visible').its('length').should('be.eq', predCount + 1)
     cy.get('button:visible').contains('Next').parent().click()
@@ -62,23 +62,37 @@ describe('Analysis Builder', () => {
     cy.get('.ant-list:visible').find('.ant-btn-danger').its('length').should('be.eq', predCount - 1)
     cy.get('button:visible').contains('Next').parent().click()
 
-    /* Review Tab */
+    /* Review Tab 
+        - Ensure the number of contrasts in summary section matches what we expect.
+        - Intercept call to generate design matrix, reply with known good response.
+        - ensure that vega embed is displayed
+     */
     cy.get('.ant-collapse-item').contains('Contrasts').click()
     cy.get('.ant-collapse-item').contains('Contrasts').parent().find('.ant-collapse-content-box > div').children().should('have.length', predCount - 1)
     cy.get('.ant-collapse-item').contains('Transformations').click()
     cy.get('.ant-collapse-item').contains('Transformations').parent().find('.ant-collapse-content-box > div').children().should('have.length', xformCount)
     cy.get('.ant-spin-spinning:visible')
-    cy.intercept('GET', '**/report**', 'fixture:design_matrix_response.json')
-    cy.fixture('design_matrix_response.json').then(dmResponse => {
+    let dmResp;
+    cy.fixture('design_matrix_response.json').then(dmBody => {
+      dmResp = dmBody
+    });
+    cy.intercept('GET', '**/report**', (req) => {
+      req.reply(dmResp)
     })
+    cy.get('.vega-embed')
+    cy.get('button:visible').contains('Next').parent().click()
 
-    //cy.get('button:visible').contains('Next').parent().click()
-
-    /* Status Tab */
-    /*
+    /* Status Tab 
+        - ensure that generate button disabled
+        - toggle TOS checkbox
+        - generate button should now be enabled, hit it
+        - confirm in popup modal 
+        - ensure transition to pending status after we confirm submit
+     */
     cy.get('.statusTOS').get('button:disabled')
     cy.get('span').contains('terms of service').parent().find('input').check()
     cy.get('.statusTOS').get('span:visible').contains('Generate').parent().click()
-    */
+    cy.get('.ant-modal-body').contains('submit the analysis').get('button').contains('Yes').parent().click()
+    cy.contains('Analysis Pending Generation')
   });
 });
