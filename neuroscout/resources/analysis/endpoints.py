@@ -119,7 +119,8 @@ class AnalysisFillResource(AnalysisMethodResource):
                                  if getattr(r, k) is not None))
                      for k in ['subject', 'number', 'task', 'session']}
             input['run'] = input.pop('number')
-            input['task'] = [t.name for t in input['task']]
+            if 'task' in input:
+                input['task'] = [t.name for t in input['task']]
             fields['model']['Input'] = {
                 k.capitalize(): v for k, v in input.items() if v}
 

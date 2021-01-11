@@ -7,11 +7,11 @@
       "bidstest": {
         "summary": "AV Movie",
         "extractors": [
-          ["BrightnessExtractor", {}],
-          ["VibranceExtractor", {}]
+          [{"transformer": "BrightnessExtractor"}],
+          [{"transformer": "VibranceExtractor"}]
         ],
         "converters": [
-          ["TesseractConverter", {}]
+          [{"transformer": "TesseractConverter"}]
         ],
         "transformations":[
           {

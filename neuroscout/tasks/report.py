@@ -24,9 +24,9 @@ def compile(flask_app, hash_id, run_ids=None, build=False):
     analysis_object = Analysis.query.filter_by(hash_id=hash_id).one()
 
     try:
-        a_id, analysis, resources, pes, bids_dir,\
-         task_name, TR = analysis_to_json(
+        a_id, analysis, resources, pes, bids_dir, TR = analysis_to_json(
             hash_id, run_ids)
+        task_names = set([r['task_name'] for r in analysis['runs']])
     except Exception as e:
         update_record(
             analysis_object,
@@ -37,7 +37,7 @@ def compile(flask_app, hash_id, run_ids=None, build=False):
 
     try:
         tmp_dir, bundle_paths, _ = build_analysis(
-            analysis, pes, bids_dir, task_name, run_ids, build=build)
+            analysis, pes, bids_dir, run_ids, build=build)
     except Exception as e:
         update_record(
             analysis_object,
@@ -47,7 +47,15 @@ def compile(flask_app, hash_id, run_ids=None, build=False):
         raise
 
     try:
-        sidecar = {'RepetitionTime': TR}
+        # Writeout sidecars - Assumption same TR for each task!
+        sidecars = [
+            ({'RepetitionTime': TR}, f'task-{task_name}_bold')
+            for task_name in task_names
+            ]
+
+        # Write out JSON sidecarfs to tmp_dir
+        bundle_paths += write_jsons(sidecars, tmp_dir)
+
         resources['validation_hash'] = Hashids(
             flask_app.config['SECONDARY_HASH_SALT'],
             min_length=10).encode(a_id)
@@ -58,7 +66,6 @@ def compile(flask_app, hash_id, run_ids=None, build=False):
                 (analysis, 'analysis'),
                 (resources, 'resources'),
                 (analysis.get('model'), 'model'),
-                (sidecar, f'task-{task_name}_bold')
                 ], tmp_dir)
 
         # Save bundle as tarball
@@ -91,7 +98,7 @@ def generate_report(flask_app, hash_id, report_id):
     report_obj = Report.query.filter_by(id=report_id).one()
 
     try:
-        _, analysis, resources, pes, bids_dir, task_name, _ = analysis_to_json(
+        _, analysis, resources, pes, bids_dir, _ = analysis_to_json(
             hash_id, report_obj.runs)
     except Exception as e:
         update_record(
@@ -112,7 +119,7 @@ def generate_report(flask_app, hash_id, report_id):
 
     try:
         _, _, bids_analysis = build_analysis(
-            analysis, pes, bids_dir, task_name, report_obj.runs)
+            analysis, pes, bids_dir, report_obj.runs)
     except Exception as e:
         update_record(
             report_obj,

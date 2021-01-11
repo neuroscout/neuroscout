@@ -16,6 +16,7 @@ class ExtractedFeature(db.Model):
     active = db.Column(db.Boolean)
     modality = db.Column(db.String)
     transformed = db.Column(db.Boolean, default=False)
+    resample_frequency = db.Column(db.Float)  # If resampled, frequency
 
     created_at = db.Column(db.DateTime, default=datetime.datetime.utcnow)
     extractor_version = db.Column(db.Float, default=0.1)
