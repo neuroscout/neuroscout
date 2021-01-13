@@ -114,16 +114,19 @@ def setup_test_db():
         db.session.commit()
 
     id_1 = user_datastore.find_user(email=users[0][0]).id
-    add_user = [[id_1]]
 
-    add_task = conftest.add_task(db.session)
+    dataset_id = populate.add_task(
+        'bidstest', local_path=conftest.DATASET_PATH)
 
-    extract_features = conftest.extract_features(db.session, add_task)
+    predictor_id = populate.extract_features(
+        conftest.EXTRACTORS, 'Test Dataset', 'bidstest')
 
-    add_analysis = conftest.add_analysis(
-        db.session, add_user, add_task, extract_features)
+    analysis_id = conftest.add_analysis_abstract(id_1, dataset_id)
 
-    add_predictor = conftest.add_predictor(db.session, add_task)
+    pred = models.Predictor(dataset_id=dataset_id, name="RT")
+
+    db.session.add(pred)
+    db.session.commit()
 
 
 @manager.command
