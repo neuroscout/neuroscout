@@ -7,6 +7,7 @@ from pathlib import Path
 
 
 class Config(object):
+    # SERVER_NAME = localhost
     GOOGLE_CLIENT_ID = 'clientid'  # Must set this for frontend to build
     SECRET_KEY = 'A_SECRET!'
     HASH_SALT = 'dfdfdf'
@@ -48,6 +49,7 @@ class ProductionConfig(Config):
 
 
 class DevelopmentConfig(Config):
+    SERVER_NAME = 'localhost'
     ENV = 'development'
 
 
