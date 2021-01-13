@@ -121,7 +121,7 @@ def setup_test_db():
     predictor_id = populate.extract_features(
         conftest.EXTRACTORS, 'Test Dataset', 'bidstest')
 
-    analysis_id = conftest.add_analysis_abstract(id_1, dataset_id)
+    analysis_id = conftest.add_analysis_abstract(db.session, id_1, dataset_id)
 
     pred = models.Predictor(dataset_id=dataset_id, name="RT")
 

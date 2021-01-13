@@ -163,7 +163,7 @@ def reextract(session, extract_features):
     return populate.extract_features(EXTRACTORS, 'Test Dataset', 'bidstest')
 
 
-def add_analysis_abstract(user_id, dataset_id):
+def add_analysis_abstract(session, user_id, dataset_id):
     dataset = Dataset.query.filter_by(id=dataset_id).first()
 
     analysis = Analysis(
@@ -239,7 +239,7 @@ def add_analysis_abstract(user_id, dataset_id):
 @pytest.fixture(scope="function")
 def add_analysis(session, add_users, add_task, extract_features):
     user_id = add_users[0][0]
-    return add_analysis_abstract(user_id, add_task)
+    return add_analysis_abstract(session, user_id, add_task)
 
 
 @pytest.fixture(scope="function")
