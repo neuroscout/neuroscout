@@ -87,7 +87,7 @@ jobs:
         python -m pip install -r neuroscout/requirements.txt
         python -m pip install -e git+https://github.com/PsychoinformaticsLab/pliers.git#egg=pliers
         python -m pliers.support.download
-      uses: actions/setup-node@v2
+    - uses: actions/setup-node@v2
     - name: Install frontend dependencies
       run: |
          yarn install
