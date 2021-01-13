@@ -6,8 +6,6 @@ from ..core import app as _app
 from ..database import db as _db
 import datetime
 import sqlalchemy as sa
-import pandas as pd
-from flask import current_app
 from ..models import (Analysis, Predictor,
                       PredictorRun, User, Role, Dataset)
 from .. import populate

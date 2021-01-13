@@ -3,8 +3,8 @@ name: Neuroscout tests
 on: [push, pull_request]
 
 jobs:
-  test:
-    name: pytest
+  backend:
+    name: neuroscout tests
     runs-on: ubuntu-latest
     env:
       APP_SETTINGS: neuroscout.config.app.GHIConfig
@@ -46,3 +46,59 @@ jobs:
       run: |
         python -m pytest neuroscout/tests/ --cov=./neuroscout --cov-report xml
     - uses: codecov/codecov-action@v1
+
+
+  frontend:
+    name: frontend tests
+    runs-on: ubuntu-latest
+    env:
+      APP_SETTINGS: neuroscout.config.app.GHIConfig
+      PYTHONHASHSEED: 0
+    services:
+      postgres:
+        image: postgres:12
+        env:
+          POSTGRES_PASSWORD: password
+          POSTGRES_DB: travis_ci_test
+        ports:
+          - 5432:5432
+        options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.6
+    - name: Set up system dependencies
+      run: |
+        bash <(wget -q -O- http://neuro.debian.net/_files/neurodebian-travis.sh)
+        sudo apt-get -qq update
+        sudo apt-get install -yq git-annex-standalone tesseract-ocr libavformat-dev libavfilter-dev libavdevice-dev ffmpeg libgconf-2-4
+        cp neuroscout/config/example_app.py neuroscout/config/app.py
+        cp neuroscout/frontend/src/config.ts.example neuroscout/frontend/src/config.ts
+    - uses: actions/cache@v2
+      with:
+        path: ~/.cache/pip
+        key: ${{ hashFiles('neuroscout/setup.py') }}-${{ hashFiles('neuroscout/requirements.txt') }}
+    - name: Install Python dependencies
+      run: |
+        python -m pip install --upgrade pip wheel
+        python -m pip install -U setuptools==45 pytest-cov
+        python -m pip install -r neuroscout/requirements.txt
+        python -m pip install -e git+https://github.com/PsychoinformaticsLab/pliers.git#egg=pliers
+        python -m pliers.support.download
+      uses: actions/setup-node@v2
+    - name: Install frontend dependencies
+      run: |
+         yarn install
+         npm install -g wait-on
+         mv ./src/config.ts.example ./src/config.ts
+         mv cypress-test.json cypress.json
+    - name: Populate db
+      run: |
+        python manage.py setup_test_db
+    - name: Run backend and tests
+      run: |
+       APP_SETTINGS=neuroscout.config.app.DockerTestConfig /usr/local/bin/gunicorn -w 2 -b :3000 neuroscout.core:app --log-level debug --timeout 120 &
+       yarn start & wait-on http://localhost:3000/ &
+       cypress run --record
