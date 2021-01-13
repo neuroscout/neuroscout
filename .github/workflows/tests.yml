@@ -95,7 +95,7 @@ jobs:
     - name: Install frontend dependencies
       run: |
          cd neuroscout/frontend
-         yarn add cypress
+         yarn add cypress --dev
          yarn install
          sudo npm install -g wait-on
          mv cypress-test.json cypress.json
