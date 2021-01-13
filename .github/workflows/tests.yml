@@ -88,6 +88,10 @@ jobs:
         python -m pip install -e git+https://github.com/PsychoinformaticsLab/pliers.git#egg=pliers
         python -m pliers.support.download
     - uses: actions/setup-node@v2
+    - uses: actions/cache@v2
+      with:
+        path: 'neuroscout/frontend/node_modules'
+        key: modules-${{ hashFiles('**/yarn.lock') }}
     - name: Install frontend dependencies
       run: |
          cd neuroscout/frontend
