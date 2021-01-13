@@ -90,8 +90,9 @@ jobs:
     - uses: actions/setup-node@v2
     - name: Install frontend dependencies
       run: |
+         cd neuroscout/frontend
          yarn install
-         npm install wait-on
+         sudo npm install -g wait-on
          mv cypress-test.json cypress.json
     - name: Populate db
       run: |
@@ -99,5 +100,6 @@ jobs:
     - name: Run backend and tests
       run: |
        APP_SETTINGS=neuroscout.config.app.DockerTestConfig /usr/local/bin/gunicorn -w 2 -b :3000 neuroscout.core:app --log-level debug --timeout 120 &
+       cd neuroscout/frontend
        yarn start & wait-on http://localhost:3000/ &
        cypress run --record
