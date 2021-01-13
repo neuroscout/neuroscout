@@ -107,5 +107,6 @@ jobs:
        APP_SETTINGS=neuroscout.config.app.GHIConfig gunicorn -w 2 -b :8000 neuroscout.core:app --log-level debug --timeout 120 &
        wait-on http://0.0.0.0:8000/api/datasets
        cd neuroscout/frontend
-       yarn start & wait-on http://localhost:3000/ &
+       yarn start &
+       wait-on http://localhost:3000/
        ./node_modules/.bin/cypress run --record --key ${{ secrets.CYPRESS_RECORD_KEY }}
