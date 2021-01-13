@@ -104,7 +104,7 @@ jobs:
         python manage.py setup_test_db
     - name: Run backend and tests
       run: |
-       APP_SETTINGS=neuroscout.config.app.GHIConfig gunicorn -w 2 -b :8000 neuroscout.core:app --log-level debug --timeout 120 & wait-on &
+       APP_SETTINGS=neuroscout.config.app.GHIConfig gunicorn -w 2 -b :8000 neuroscout.core:app --log-level debug --timeout 120 & wait-on http://localhost:8000/ &
        curl http://localhost:8000/api/datasets
        cd neuroscout/frontend
        yarn start & wait-on http://localhost:3000/ &
