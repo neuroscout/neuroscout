@@ -108,5 +108,5 @@ jobs:
        wait-on http://0.0.0.0:8000/api/datasets
        cd neuroscout/frontend
        yarn start &
-       wait-on http://localhost:3000/
+       wait-on https://localhost:3000/builder && echo "Yarn ready"
        ./node_modules/.bin/cypress run --record --key ${{ secrets.CYPRESS_RECORD_KEY }}
