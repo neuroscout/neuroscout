@@ -7,7 +7,7 @@ jobs:
     name: neuroscout tests
     runs-on: ubuntu-latest
     env:
-      APP_SETTINGS: neuroscout.config.app.GHIConfig
+      APP_SETTINGS: neuroscout.config.app.GHIConfigBackend
       PYTHONHASHSEED: 0
     services:
       postgres:
