@@ -64,7 +64,7 @@ class DockerTestConfig(TestingConfig):
 
 
 class GHIConfig(TestingConfig):
-    SQLALCHEMY_DATABASE_URI = "postgresql://postgres:password@localhost/travis_ci_test"
+    SQLALCHEMY_DATABASE_URI = "postgresql://postgres:password@localhost/ci_test"
     FILE_DIR = Path('./tmp/file-data').absolute()
 
 
