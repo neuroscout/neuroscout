@@ -108,5 +108,5 @@ jobs:
        wait-on http://0.0.0.0:8000/api/datasets
        cd neuroscout/frontend
        yarn start &
-       sleep 10
+       sleep 20
        ./node_modules/.bin/cypress run --record --key ${{ secrets.CYPRESS_RECORD_KEY }}
