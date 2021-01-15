@@ -93,6 +93,14 @@ describe('Analysis Builder', () => {
     cy.get('span').contains('terms of service').parent().find('input').check()
     cy.get('.statusTOS').get('span:visible').contains('Generate').parent().click()
     cy.get('.ant-modal-body').contains('submit the analysis').get('button').contains('Yes').parent().click()
+    cy.intercept('GET', '**/report**', (req) => {
+      req.reply(dmResp)
+    })
+    cy.intercept('POST', '**/compile', {
+      statusCode: 200,
+      body: 'it worked!'
+    })
+
     cy.contains('Analysis Pending Generation')
   });
 });
