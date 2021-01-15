@@ -6,7 +6,7 @@ describe('Analysis Builder', () => {
   })
 
   let name = 'dataset_name';
-  let predCount = 4;
+  let predCount = 3;
   it('analysis builder', () => {
     /* Overview Tab */
     cy.get('.builderAnalysisNameInput').type(name)
@@ -25,7 +25,7 @@ describe('Analysis Builder', () => {
     cy.get('.ant-collapse-item-active > .ant-collapse-content > .ant-collapse-content-box').find('tr').its('length').should('be.gte', 1)
     cy.contains('Next').click()
 
-    /* Predictor Tab - select first 5 predictors */
+    /* Predictor Tab - select first 3 predictors */
     let count = 0
     cy.contains('Select Predictors').parent().within(() => {
       cy.contains('Brightness')
