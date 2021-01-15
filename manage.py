@@ -104,7 +104,7 @@ def setup_test_db():
     db.create_all()
 
     # Create test users
-    users = [('test1@gmail.com', 'test1', 'testuser'),
+    users = [('user@example.com', 'string', 'testuser'),
              ('test2@gmail.com', 'test2', 'testuser2')]
 
     for email, password, name in users:
