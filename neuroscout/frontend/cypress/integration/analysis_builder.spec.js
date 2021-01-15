@@ -6,7 +6,7 @@ describe('Analysis Builder', () => {
   })
 
   let name = 'dataset_name';
-  let predCount = 5;
+  let predCount = 4;
   it('analysis builder', () => {
     /* Overview Tab */
     cy.get('.builderAnalysisNameInput').type(name)
@@ -28,7 +28,7 @@ describe('Analysis Builder', () => {
     /* Predictor Tab - select first 5 predictors */
     let count = 0
     cy.contains('Select Predictors').parent().within(() => {
-      cy.contains('abstract')
+      cy.contains('Brightness')
       cy.get('.ant-table-body').find('input[type=checkbox]').each(($el, index, $list) => {
         if (count < predCount) {
           $el.click()
