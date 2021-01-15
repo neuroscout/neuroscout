@@ -15,9 +15,9 @@ describe('Analysis Builder', () => {
     cy.get('.ant-form-item-children > .ant-input').contains(name)
 
     cy.get('.selectDataset')
-    cy.get('td').contains('Life').parent().within(() => {
+    cy.get('td').contains('Test Dataset').parent().within(() => {
       cy.get('input[type=radio]').click()
-      
+
     })
     cy.get('.builderAnalysisTaskSelect')
     cy.get('.ant-collapse-item > .ant-collapse-header').contains('Runs: All selected').click()
@@ -62,7 +62,7 @@ describe('Analysis Builder', () => {
     cy.get('.ant-list:visible').find('.ant-btn-danger').its('length').should('be.eq', predCount - 1)
     cy.get('button:visible').contains('Next').parent().click()
 
-    /* Review Tab 
+    /* Review Tab
         - Ensure the number of contrasts in summary section matches what we expect.
         - Intercept call to generate design matrix, reply with known good response.
         - ensure that vega embed is displayed
@@ -82,11 +82,11 @@ describe('Analysis Builder', () => {
     cy.get('.vega-embed')
     cy.get('button:visible').contains('Next').parent().click()
 
-    /* Status Tab 
+    /* Status Tab
         - ensure that generate button disabled
         - toggle TOS checkbox
         - generate button should now be enabled, hit it
-        - confirm in popup modal 
+        - confirm in popup modal
         - ensure transition to pending status after we confirm submit
      */
     cy.get('.statusTOS').get('button:disabled')
