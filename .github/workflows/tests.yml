@@ -9,9 +9,6 @@ jobs:
     strategy:
         matrix:
           type: ['frontend', 'backend']
-    env:
-      APP_SETTINGS: neuroscout.config.app.GHIConfigBackend
-      PYTHONHASHSEED: 0
     services:
       postgres:
         image: postgres:12
@@ -33,7 +30,6 @@ jobs:
         sudo apt-get -qq update
         sudo apt-get install -yq git-annex-standalone tesseract-ocr libavformat-dev libavfilter-dev libavdevice-dev ffmpeg libgconf-2-4
         cp neuroscout/config/example_app.py neuroscout/config/app.py
-        cp neuroscout/frontend/src/config.ts.example neuroscout/frontend/src/config.ts
     - uses: actions/cache@v2
       with:
         path: ~/.cache/pip
@@ -47,6 +43,9 @@ jobs:
         python -m pliers.support.download
 
     - name: Test with pytest
+      env:
+        APP_SETTINGS: neuroscout.config.app.GHIConfigBackend
+        PYTHONHASHSEED: 0
       run: |
         python -m pytest neuroscout/tests/ --cov=./neuroscout --cov-report xml
       if: matrix.type == 'backend'
@@ -67,16 +66,11 @@ jobs:
          sudo npm install -g wait-on
          mv cypress-test.json cypress.json
       if: matrix.type == 'frontend'
-    - name: Populate db
+    - name: Run frontend tests with backend
+      env:
+        APP_SETTINGS: neuroscout.config.app.GHIConfig
       run: |
-        python manage.py setup_test_db
-      if: matrix.type == 'frontend'
-    - name: Run backend and tests
-      run: |
-       APP_SETTINGS=neuroscout.config.app.GHIConfig gunicorn -w 2 -b :8000 neuroscout.core:app --log-level debug --timeout 120 &
-       wait-on http://0.0.0.0:8000/api/datasets
-       cd neuroscout/frontend
-       yarn start &
-       sleep 20
+       bash setup_frontend_tests.sh
+       sleep 15
        ./node_modules/.bin/cypress run --record --key ${{ secrets.CYPRESS_RECORD_KEY }}
       if: matrix.type == 'frontend'
