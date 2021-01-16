@@ -64,7 +64,6 @@ jobs:
          cd neuroscout/frontend
          yarn install
          sudo npm install -g wait-on
-         mv cypress-test.json cypress.json
       if: matrix.type == 'frontend'
     - name: Run frontend tests with backend
       env:
