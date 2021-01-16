@@ -71,5 +71,5 @@ jobs:
       run: |
        bash setup_frontend_tests.sh
        sleep 15
-       ./node_modules/.bin/cypress run --record --key ${{ secrets.CYPRESS_RECORD_KEY }}
+       cd neuroscout/frontend && ./node_modules/.bin/cypress run --record --key ${{ secrets.CYPRESS_RECORD_KEY }}
       if: matrix.type == 'frontend'
