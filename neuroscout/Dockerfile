@@ -27,7 +27,6 @@ RUN pip install --no-cache-dir -r requirements.txt
 RUN pip install --no-cache-dir -r optional_requirements.txt
 RUN python -m pliers.support.download
 RUN python -m pliers.support.setup_yamnet
-RUN npm install -g wait-on
 
 COPY . /usr/src/app
 

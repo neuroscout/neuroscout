@@ -63,7 +63,6 @@ jobs:
       run: |
          cd neuroscout/frontend
          yarn install
-         sudo npm install -g wait-on
       if: matrix.type == 'frontend'
     - name: Run frontend tests with backend
       env:
