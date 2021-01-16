@@ -48,7 +48,7 @@ describe('Analysis Builder', () => {
     })
     cy.get('button:visible').contains('OK').parent().click()
     cy.get('button:visible').contains('Next').parent().click()
-    let xformCount = 2
+    let xformCount = 1
 
     /* HRF Tab - select all non counfound predictors, check length is correct */
     cy.get('button').contains('Select All Non-Confound').parent().click()
