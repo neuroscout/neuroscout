@@ -96,11 +96,10 @@ describe('Analysis Builder', () => {
     cy.intercept('GET', '**/report**', (req) => {
       req.reply(dmResp)
     })
-    cy.intercept('POST', '**/compile', {
+    cy.intercept('POST', '**/compile**', {
       statusCode: 200,
       body: 'it worked!'
     })
-
     cy.contains('Analysis Pending Generation')
   });
 });
