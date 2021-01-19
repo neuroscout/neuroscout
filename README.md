@@ -150,14 +150,19 @@ To run frontend tests run:
 
 ## Running frontened tests
 To run frontend tests, have Cypress 6.0 or greater installed locally.
-First, to set up the test environment run this command:
+First, ensure neurscout is running:
 
-    docker-compose exec bash
+    docker-compose -f docker-compose.yml -f docker-compose.dev.yml up -d
+
+Next, set up the test environment:
+
+    docker-compose exec neuroscout bash
     export APP_SETTINGS=neuroscout.config.app.DockerTestConfig
     bash setup_frontend_tests.sh
 
 In a separate window, you can run cypress:
 
+   cd neuroscout/frontend
    cypress open
 
 Once done, kill the first command, and run the following to tear down the test db
