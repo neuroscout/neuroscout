@@ -48,7 +48,7 @@ describe('Analysis Builder', () => {
     })
     cy.get('button:visible').contains('OK').parent().click()
     cy.get('button:visible').contains('Next').parent().click()
-    let xformCount = 1
+    let xformCount = 2
 
     /* HRF Tab - select all non counfound predictors, check length is correct */
     cy.get('button').contains('Select All Non-Confound').parent().click()
@@ -103,7 +103,7 @@ describe('Analysis Builder', () => {
       statusCode: 200,
       body: {'status': 'PENDING', 'traceback': ''}
     })
-    
+
     cy.get('.ant-modal-body').contains('submit the analysis').get('button').contains('Yes').parent().click()
 
     cy.contains('Analysis Pending Generation')
