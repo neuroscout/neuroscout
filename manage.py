@@ -14,6 +14,7 @@ from neuroscout import populate
 from neuroscout.core import app, db
 from neuroscout.models import user_datastore
 from neuroscout import models
+from neuroscout.tests import conftest
 
 app.config.from_object(os.environ['APP_SETTINGS'])
 migrate = Migrate(app, db, directory=app.config['MIGRATIONS_DIR'])
@@ -90,6 +91,52 @@ def ingest_from_json(config_file, update_features=False, reingest=False):
     populate.ingest_from_json(
         config_file, update_features=update_features,
         reingest=reingest)
+
+
+@manager.command
+def setup_test_db():
+    # Only run if in setup mode
+    if not app.config['TESTING']:
+        raise Exception("This fixture can only be run in test mode")
+
+    # Init db
+    db.init_app(app)
+    db.create_all()
+
+    # Create test users
+    users = [('user@example.com', 'string', 'testuser'),
+             ('test2@gmail.com', 'test2', 'testuser2')]
+
+    for email, password, name in users:
+        user_datastore.create_user(
+            email=email, password=encrypt_password(password),
+            user_name=name, confirmed_at=datetime.datetime.now())
+        db.session.commit()
+
+    id_1 = user_datastore.find_user(email=users[0][0]).id
+
+    dataset_id = populate.add_task(
+        'bidstest', local_path=conftest.DATASET_PATH)
+
+    predictor_id = populate.extract_features(
+        conftest.EXTRACTORS, 'Test Dataset', 'bidstest')
+
+    analysis_id = conftest.add_analysis_abstract(db.session, id_1, dataset_id)
+
+    pred = models.Predictor(dataset_id=dataset_id, name="RT")
+
+    db.session.add(pred)
+    db.session.commit()
+
+
+@manager.command
+def teardown_test_db():
+    # Only run if in setup mode
+    if not app.config['TESTING']:
+        raise Exception("This fixture can only be run in test mode")
+
+    db.session.remove()
+    db.drop_all()
 
 
 if __name__ == '__main__':

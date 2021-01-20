@@ -7,8 +7,7 @@ from pathlib import Path
 
 
 class Config(object):
-    SERVER_NAME = 'localhost'  # Set to external server name in production
-
+    # SERVER_NAME = localhost
     GOOGLE_CLIENT_ID = 'clientid'  # Must set this for frontend to build
     SECRET_KEY = 'A_SECRET!'
     HASH_SALT = 'dfdfdf'
@@ -50,6 +49,7 @@ class ProductionConfig(Config):
 
 
 class DevelopmentConfig(Config):
+    SERVER_NAME = 'localhost'
     ENV = 'development'
 
 
@@ -64,5 +64,9 @@ class DockerTestConfig(TestingConfig):
 
 
 class GHIConfig(TestingConfig):
-    SQLALCHEMY_DATABASE_URI = "postgresql://postgres:password@localhost/travis_ci_test"
+    SQLALCHEMY_DATABASE_URI = "postgresql://postgres:password@localhost/ci_test"
     FILE_DIR = Path('./tmp/file-data').absolute()
+
+
+class GHIConfigBackend(GHIConfig):
+    SERVER_NAME = 'localhost'

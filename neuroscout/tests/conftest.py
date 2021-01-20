@@ -6,8 +6,6 @@ from ..core import app as _app
 from ..database import db as _db
 import datetime
 import sqlalchemy as sa
-import pandas as pd
-from flask import current_app
 from ..models import (Analysis, Predictor,
                       PredictorRun, User, Role, Dataset)
 from .. import populate
@@ -165,12 +163,11 @@ def reextract(session, extract_features):
     return populate.extract_features(EXTRACTORS, 'Test Dataset', 'bidstest')
 
 
-@pytest.fixture(scope="function")
-def add_analysis(session, add_users, add_task, extract_features):
-    dataset = Dataset.query.filter_by(id=add_task).first()
+def add_analysis_abstract(session, user_id, dataset_id):
+    dataset = Dataset.query.filter_by(id=dataset_id).first()
 
     analysis = Analysis(
-        dataset_id=add_task, user_id=add_users[0][0],
+        dataset_id=dataset_id, user_id=user_id,
         name="My first fMRI analysis!", description="Ground breaking",
         runs=dataset.runs)
 
@@ -237,6 +234,12 @@ def add_analysis(session, add_users, add_task, extract_features):
     session.commit()
 
     return analysis.id
+
+
+@pytest.fixture(scope="function")
+def add_analysis(session, add_users, add_task, extract_features):
+    user_id = add_users[0][0]
+    return add_analysis_abstract(session, user_id, add_task)
 
 
 @pytest.fixture(scope="function")

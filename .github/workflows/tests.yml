@@ -3,18 +3,18 @@ name: Neuroscout tests
 on: [push, pull_request]
 
 jobs:
-  test:
-    name: pytest
+  tests:
+    name: neuroscout tests
     runs-on: ubuntu-latest
-    env:
-      APP_SETTINGS: neuroscout.config.app.GHIConfig
-      PYTHONHASHSEED: 0
+    strategy:
+        matrix:
+          type: ['frontend', 'backend']
     services:
       postgres:
         image: postgres:12
         env:
           POSTGRES_PASSWORD: password
-          POSTGRES_DB: travis_ci_test
+          POSTGRES_DB: ci_test
         ports:
           - 5432:5432
         options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
@@ -28,9 +28,8 @@ jobs:
       run: |
         bash <(wget -q -O- http://neuro.debian.net/_files/neurodebian-travis.sh)
         sudo apt-get -qq update
-        sudo apt-get install -yq git-annex-standalone tesseract-ocr libavformat-dev libavfilter-dev libavdevice-dev ffmpeg
+        sudo apt-get install -yq git-annex-standalone tesseract-ocr libavformat-dev libavfilter-dev libavdevice-dev ffmpeg libgconf-2-4
         cp neuroscout/config/example_app.py neuroscout/config/app.py
-        cp neuroscout/frontend/src/config.ts.example neuroscout/frontend/src/config.ts
     - uses: actions/cache@v2
       with:
         path: ~/.cache/pip
@@ -42,7 +41,34 @@ jobs:
         python -m pip install -r neuroscout/requirements.txt
         python -m pip install -e git+https://github.com/PsychoinformaticsLab/pliers.git#egg=pliers
         python -m pliers.support.download
+
     - name: Test with pytest
+      env:
+        APP_SETTINGS: neuroscout.config.app.GHIConfigBackend
+        PYTHONHASHSEED: 0
       run: |
         python -m pytest neuroscout/tests/ --cov=./neuroscout --cov-report xml
+      if: matrix.type == 'backend'
     - uses: codecov/codecov-action@v1
+      if: matrix.type == 'backend'
+
+    - uses: actions/setup-node@v2
+      if: matrix.type == 'frontend'
+    - uses: actions/cache@v2
+      with:
+        path: 'neuroscout/frontend/node_modules'
+        key: modules-${{ hashFiles('**/yarn.lock') }}
+      if: matrix.type == 'frontend'
+    - name: Install frontend dependencies
+      run: |
+         cd neuroscout/frontend
+         yarn install
+      if: matrix.type == 'frontend'
+    - name: Run frontend tests with backend
+      env:
+        APP_SETTINGS: neuroscout.config.app.GHIConfig
+      run: |
+       bash setup_frontend_tests.sh
+       sleep 15
+       cd neuroscout/frontend && ./node_modules/.bin/cypress run --record --key ${{ secrets.CYPRESS_RECORD_KEY }}
+      if: matrix.type == 'frontend'

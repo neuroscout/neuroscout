@@ -131,7 +131,7 @@ You can then insert this token into the header to authorize API requests:
 Note that in order to use any protected routes, you must confirm the email on your account. Confusingly, you can get a valid token without confirming your account, but protected routes will not function until confirmation.
 
 
-## Running tests
+## Running backend tests
 To run tests, after starting services, create a test database:
 
     docker-compose exec postgres psql -h postgres -U postgres -c "create database scout_test"
@@ -147,6 +147,27 @@ or run them interactively:
 To run frontend tests run:
 
     docker-compose run --rm -w /neuroscout/neuroscout/frontend neuroscout npm test
+
+## Running frontened tests
+To run frontend tests, have Cypress 6.0 or greater installed locally.
+First, ensure neurscout is running:
+
+    docker-compose -f docker-compose.yml -f docker-compose.dev.yml up -d
+
+Next, set up the test environment:
+
+    docker-compose exec neuroscout bash
+    export APP_SETTINGS=neuroscout.config.app.DockerTestConfig
+    bash setup_frontend_tests.sh
+
+In a separate window, you can run cypress:
+
+   cd neuroscout/frontend
+   cypress open
+
+Once done, kill the first command, and run the following to tear down the test db
+
+   docker-compose exec -e APP_SETTINGS=neuroscout.config.app.DockerTestConfig neuroscout python manage.py teardown_test_db
 
 ## Renewing HTTPS certs
 Ideally, this is take care of by a cronjob

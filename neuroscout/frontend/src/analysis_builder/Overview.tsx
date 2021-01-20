@@ -259,6 +259,7 @@ export class OverviewTab extends React.Component<OverviewTabProps, OverviewTabSt
             <Row type="flex" justify="space-between">
               <Col xs={24}>
                 <Input
+                  className="builderAnalysisNameInput"
                   placeholder="You can change this later"
                   value={analysis.name}
                   onChange={this.updateAnalysisFromEvent('name')}
@@ -269,6 +270,7 @@ export class OverviewTab extends React.Component<OverviewTabProps, OverviewTabSt
           </FormItem>
           <FormItem label="Description">
             <Input.TextArea
+              className="builderAnalysisDescriptionInput"
               value={analysis.description}
               autoSize={{ minRows: 1, maxRows: 10 }}
               onChange={this.updateAnalysisFromEvent('description')}
@@ -303,6 +305,7 @@ export class OverviewTab extends React.Component<OverviewTabProps, OverviewTabSt
             <Collapse accordion={true} bordered={false} defaultActiveKey={['task']}>
               <Panel header={`Task: ${taskMsg}`} key="task">
                   <Table
+                    className="builderAnalysisTaskSelect"
                     columns={this.taskColumns}
                     rowKey="id"
                     size="small"
@@ -313,6 +316,7 @@ export class OverviewTab extends React.Component<OverviewTabProps, OverviewTabSt
               </Panel>
               <Panel header={runMsg} key="runs">
                 <Table
+                  className="builderAnalysisRunsSelect"
                   columns={this.state.runColumns}
                   rowKey="id"
                   size="small"

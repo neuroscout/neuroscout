@@ -17,6 +17,7 @@
     "lodash": "^4.17.19",
     "mem": "^4.0.0",
     "memoize-one": "^5.1.1",
+    "n": "^6.7.0",
     "react": "^16.3.2",
     "react-beautiful-dnd": "^10.0.3",
     "react-dom": "^16.3.2",
@@ -25,16 +26,19 @@
     "react-router": "^4",
     "react-router-dom": "^4",
     "reactour": "^1.15.0",
+    "regexpu-core": "^4.7.1",
     "serialize-javascript": "^3.1.0",
     "styled-components": "^4.0.0",
     "vega": "^5.17.3",
     "vega-embed": "^4.0.0",
     "vega-lite": "^4.0.0",
+    "wait-on": "^5.2.0",
     "webpack-dev-server": "^3.1.11"
   },
   "devDependencies": {
     "@types/enzyme": "^3.1.10",
     "@types/jest": "^24.9.0",
+    "cypress": "^6.1.0",
     "enzyme": "^3.3.0",
     "enzyme-adapter-react-16": "^1.1.1",
     "jest": "^24.9.0",
@@ -50,6 +54,8 @@
     "analyze": "source-map-explorer 'build/static/js/*.js'",
     "build": "react-scripts-ts build",
     "test": "react-scripts-ts test --env=jsdom",
-    "eject": "react-scripts-ts eject"
+    "eject": "react-scripts-ts eject",
+    "cy:open": "cypress open",
+    "cy:run": "cypress run"
   }
 }
