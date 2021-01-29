@@ -9,7 +9,7 @@
       "12yearsaslave": {
         "summary": "12 Years a Slave",
         "converters": [
-          [{"transformer": "FrameSamplingFilter", "parameters": {"hertz": 3}}]
+          [{"transformer": "FrameSamplingFilter", "parameters": {"hertz": 1}}]
         ],
         "extractors": [
         ],
@@ -23,7 +23,7 @@
       "500daysofsummer": {
         "summary": "500 Days of Summer",
         "converters": [
-          [{"transformer": "FrameSamplingFilter", "parameters": {"hertz": 3}}]
+          [{"transformer": "FrameSamplingFilter", "parameters": {"hertz": 1}}]
         ],
         "extractors": [
         ],
@@ -37,7 +37,7 @@
       "backtothefuture": {
         "summary": "Back to the Future",
         "converters": [
-          [{"transformer": "FrameSamplingFilter", "parameters": {"hertz": 3}}]
+          [{"transformer": "FrameSamplingFilter", "parameters": {"hertz": 1}}]
         ],
         "extractors": [
         ],
@@ -51,7 +51,7 @@
       "citizenfour": {
         "summary": "Citizen Four",
         "converters": [
-          [{"transformer": "FrameSamplingFilter", "parameters": {"hertz": 3}}]
+          [{"transformer": "FrameSamplingFilter", "parameters": {"hertz": 1}}]
         ],
         "extractors": [
         ],
@@ -65,7 +65,7 @@
       "littlemisssunshine": {
         "summary": "Little Miss Sunshine",
         "converters": [
-          [{"transformer": "FrameSamplingFilter", "parameters": {"hertz": 3}}]
+          [{"transformer": "FrameSamplingFilter", "parameters": {"hertz": 1}}]
         ],
         "extractors": [
         ],
@@ -79,7 +79,7 @@
       "pulpfiction": {
         "summary": "Pulp Fiction",
         "converters": [
-          [{"transformer": "FrameSamplingFilter", "parameters": {"hertz": 3}}]
+          [{"transformer": "FrameSamplingFilter", "parameters": {"hertz": 1}}]
         ],
         "extractors": [
         ],
@@ -93,7 +93,7 @@
       "split": {
         "summary": "Split",
         "converters": [
-          [{"transformer": "FrameSamplingFilter", "parameters": {"hertz": 3}}]
+          [{"transformer": "FrameSamplingFilter", "parameters": {"hertz": 1}}]
         ],
         "extractors": [
         ],
@@ -107,7 +107,7 @@
       "theprestige": {
         "summary": "The Prestige",
         "converters": [
-          [{"transformer": "FrameSamplingFilter", "parameters": {"hertz": 3}}]
+          [{"transformer": "FrameSamplingFilter", "parameters": {"hertz": 1}}]
         ],
         "extractors": [
         ],
@@ -121,7 +121,7 @@
       "theshawshankredemption": {
         "summary": "The Shawshank Redemption",
         "converters": [
-          [{"transformer": "FrameSamplingFilter", "parameters": {"hertz": 3}}]
+          [{"transformer": "FrameSamplingFilter", "parameters": {"hertz": 1}}]
         ],
         "extractors": [
         ],
@@ -135,7 +135,7 @@
       "theusualsuspects": {
         "summary": "The Usual Suspects",
         "converters": [
-          [{"transformer": "FrameSamplingFilter", "parameters": {"hertz": 3}}]
+          [{"transformer": "FrameSamplingFilter", "parameters": {"hertz": 1}}]
         ],
         "extractors": [
         ],
