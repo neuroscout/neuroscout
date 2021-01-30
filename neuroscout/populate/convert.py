@@ -133,8 +133,8 @@ def convert_stimuli(dataset_name, task_name, converters):
                 cstim = graph.transform(loaded_stim, merge=False)
                 if len(cstim) == 1:
                     cstim = cstim[0]
-                params = cstim.history.transformer_params
-                name = cstim.history.transformer_class
+                params = conv.__dict__
+                name = conv.name
                 try:  # Add iterable
                     results += cstim
                 except TypeError:
