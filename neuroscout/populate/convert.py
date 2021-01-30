@@ -153,8 +153,8 @@ def convert_stimuli(dataset_name, task_name, converters):
         # De-activate previously generated stimuli from these converters.
         update = Stimulus.query.filter_by(parent_id=stim.id).filter(
             Stimulus.id.notin_(new_stims),
-            Stimulus.converter_name == cstim.history.transformer_class,
-            Stimulus.converter_parameters == cstim.history.transformer_params)
+            Stimulus.converter_name == conv.name,
+            Stimulus.converter_parameters == conv.__dict__)
         if update.count():
             update.update(dict(active=False), synchronize_session='fetch')
         db.session.commit()
