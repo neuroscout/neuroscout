@@ -113,8 +113,8 @@ export class PredictorSelector extends React.Component<
           <div style={{ wordWrap: 'break-word', wordBreak: 'break-word' }}>
             {text}
           </div>
-        ),
-        width: '35%'
+        )
+        // width: '35%'
       },
       {
         title: 'Source',
@@ -125,19 +125,9 @@ export class PredictorSelector extends React.Component<
           <div style={{ wordWrap: 'break-word', wordBreak: 'break-word' }}>
             {text}
           </div>
-        ),
-        width: '30%'
+        )
+        // width: '30%'
       },
-      {
-        title: 'Description',
-        dataIndex: 'description',
-        render: (text, record) => (
-          <div style={{ wordWrap: 'break-word', wordBreak: 'break-word' }}>
-            {text}
-          </div>
-        ),
-        width: '35%'
-      }
     ];
 
     const rowSelection: TableRowSelection<Predictor> = {
@@ -152,7 +142,7 @@ export class PredictorSelector extends React.Component<
 
     if (this.props.compact) {
       let compactCol = [columns[0]];
-      compactCol[0].width = '100%';
+      // compactCol[0].width = '100%';
       return (
         <div>
           <Row type="flex">
@@ -178,7 +168,7 @@ export class PredictorSelector extends React.Component<
                   size="small"
                   dataSource={filteredPredictors}
                   rowSelection={rowSelection}
-                  bordered={true}
+                  bordered={false}
                   loading={this.props.predictorsLoad}
                 />
               </div>
@@ -211,8 +201,9 @@ export class PredictorSelector extends React.Component<
                 size="small"
                 dataSource={filteredPredictors}
                 rowSelection={rowSelection}
-                bordered={true}
+                bordered={false}
                 loading={this.props.predictorsLoad}
+                expandedRowRender={record => <p>{record.description}</p>}
               />
             </div>
             <p style={{'float': 'right'}}>
