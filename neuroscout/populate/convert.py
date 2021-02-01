@@ -133,7 +133,7 @@ def convert_stimuli(dataset_name, task_name, converters):
                 cstim = graph.transform(loaded_stim, merge=False)
                 if len(cstim) == 1:
                     cstim = cstim[0]
-                params = conv.__dict__
+                params = str(conv.__dict__)
                 name = conv.name
                 try:  # Add iterable
                     results += cstim
@@ -154,7 +154,7 @@ def convert_stimuli(dataset_name, task_name, converters):
         update = Stimulus.query.filter_by(parent_id=stim.id).filter(
             Stimulus.id.notin_(new_stims),
             Stimulus.converter_name == conv.name,
-            Stimulus.converter_parameters == conv.__dict__)
+            Stimulus.converter_parameters == str(conv.__dict__))
         if update.count():
             update.update(dict(active=False), synchronize_session='fetch')
         db.session.commit()
