@@ -1,6 +1,22 @@
 import * as React from 'react';
-import { Anchor, Button, Card, Checkbox, Collapse, Form, Icon, Input, List, Row, Tabs, Table, Upload, Alert } from 'antd';
-import { TableRowSelection } from 'antd/lib/table';
+import { QuestionOutlined } from '@ant-design/icons';
+import { Form } from '@ant-design/compatible';
+import '@ant-design/compatible/assets/index.css';
+import {
+  Anchor,
+  Button,
+  Card,
+  Checkbox,
+  Collapse,
+  Input,
+  List,
+  Row,
+  Tabs,
+  Table,
+  Upload,
+  Alert,
+} from 'antd';
+import { TableRowSelection } from 'antd/lib/table/interface';
 
 import { api } from '../api';
 import { Dataset, Run, RunFilters } from '../coretypes';
@@ -157,13 +173,13 @@ export class AddPredictorsForm extends React.Component<AddPredictorsFormProps, A
             size="small"
             dataSource={this.props.datasets}
             rowSelection={rowSelection}
-            pagination={(this.props.datasets.length > 10) ? {'position': 'bottom'} : false}
+            pagination={(this.props.datasets.length > 10) ? {'position': ['bottomRight']} : false}
           />
           <a
            href="https://neuroscout.github.io/neuroscout/faq/#can-i-contribute-my-own-predictors-to-neuroscout"
            target="_blank"
           >
-          <Button icon="question">Help</Button>
+          <Button icon={<QuestionOutlined />}>Help</Button>
           </a>
         </Tabs.TabPane>
         <Tabs.TabPane tab="Select Files and Runs" key={'' + 2}>
@@ -200,7 +216,7 @@ export class AddPredictorsForm extends React.Component<AddPredictorsFormProps, A
          href="https://neuroscout.github.io/neuroscout/faq/#can-i-contribute-my-own-predictors-to-neuroscout"
          target="_blank"
         >
-        <Button icon="question">Help</Button>
+        <Button icon={<QuestionOutlined />}>Help</Button>
         </a>
         </Tabs.TabPane>
         <Tabs.TabPane tab="Predictor Descriptions" key={'' + 3}>

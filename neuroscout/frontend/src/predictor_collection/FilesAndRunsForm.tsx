@@ -1,6 +1,9 @@
 import * as React from 'react';
-import { Button, Card, Checkbox, Collapse, Form, Icon, Input, List, Row, Tabs, Table, Upload } from 'antd';
-import { TableRowSelection } from 'antd/lib/table';
+import { CloseOutlined, EditOutlined, PlusOutlined } from '@ant-design/icons';
+import { Form } from '@ant-design/compatible';
+import '@ant-design/compatible/assets/index.css';
+import { Button, Card, Checkbox, Collapse, Input, List, Row, Tabs, Table, Upload } from 'antd';
+import { TableRowSelection } from 'antd/lib/table/interface';
 
 import { api } from '../api';
 import { Dataset, Run, RunFilters } from '../coretypes';
@@ -137,7 +140,7 @@ export class FilesAndRunsForm extends React.Component<FilesAndRunsFormProps, Fil
               </div>
             )}
             extra={this.props.filesAndRuns.length > 1 && 
-                   <Icon type="close" onClick={this.remove(i)} />}
+                   <CloseOutlined onClick={this.remove(i)} />}
           >
             {this.props.filesAndRuns[i].display &&
               <>
@@ -161,7 +164,7 @@ export class FilesAndRunsForm extends React.Component<FilesAndRunsFormProps, Fil
             <>
               <span>{fileName}</span>
               <Button style={{margin: '0 0 0 10px'}} onClick={() => this.onChange(i)('display')(true)}>
-                <Icon type="edit" /> Edit
+                <EditOutlined /> Edit
               </Button>
             </>
           }
@@ -180,7 +183,7 @@ export class FilesAndRunsForm extends React.Component<FilesAndRunsFormProps, Fil
           </Form.Item>
         </Form>
         {formList}
-        <Button style={{margin: '10px 0 0 0'}} onClick={this.addMore}><Icon type="plus" /> Add Event File</Button>
+        <Button style={{margin: '10px 0 0 0'}} onClick={this.addMore}><PlusOutlined /> Add Event File</Button>
         {this.props.children}
       </div>
     );

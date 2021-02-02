@@ -30,7 +30,7 @@ export class UserList extends React.Component<{}, {users: User[]}> {
         }
     ];
     return (
-      <Row type="flex" justify="center" style={{ background: '#fff', padding: 0 }}>
+      <Row justify="center" style={{ background: '#fff', padding: 0 }}>
         <MainCol>
           <Table
             columns={userTableColumns}

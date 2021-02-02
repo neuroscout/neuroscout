@@ -1,5 +1,7 @@
 import * as React from 'react';
-import { Button, Checkbox, Form, List } from 'antd';
+import { Form } from '@ant-design/compatible';
+import '@ant-design/compatible/assets/index.css';
+import { Button, Checkbox, List } from 'antd';
 
 import { api } from '../api';
 import { RunFilters } from '../coretypes';

@@ -18,7 +18,7 @@ class Home extends React.Component<UserStore, {}> {
 
       <div>
         <br/>
-      <Row type="flex" justify="center" style={{ background: '#fff', padding: 0 }}>
+      <Row justify="center" style={{ background: '#fff', padding: 0 }}>
         <MainCol>
         <div>
          <img className="splashLogo" src="/static/Neuroscout_Simple_Wide.svg"/><br/>
@@ -45,7 +45,7 @@ class Home extends React.Component<UserStore, {}> {
         </MainCol>
       </Row>
 
-      <Row type="flex" justify="center" style={{ background: '#fff', padding: 0 }}>
+      <Row justify="center" style={{ background: '#fff', padding: 0 }}>
       <Col xxl={{span: 5}} xl={{span: 6}} lg={{span: 7}} xs={{span: 8}} >
       <Card title="Re-use public data" headStyle={titleStyle} bordered={false}>
       <img className="splashLogo" src="/static/browse.svg"/>
@@ -79,7 +79,7 @@ class Home extends React.Component<UserStore, {}> {
       </Col>
       </Row>
       <br/>
-      <Row type="flex" justify="center" style={{ background: '#fff', padding: 0 }}>
+      <Row justify="center" style={{ background: '#fff', padding: 0 }}>
       <MainCol>
       <div className="splashButtonParent">
       <Button size="large" className="splashButton" href="https://neuroscout.github.io/neuroscout/">
@@ -91,7 +91,7 @@ class Home extends React.Component<UserStore, {}> {
       <Divider />
       </MainCol>
       </Row>
-      <Row type="flex" justify="center" style={{ background: '#fff', padding: 0 }}>
+      <Row justify="center" style={{ background: '#fff', padding: 0 }}>
       <MainCol>
       <div className="footerText">
       <p>

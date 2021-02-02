@@ -1,7 +1,23 @@
 import * as React from 'react';
-import { Button, Card, Checkbox, Collapse, Form, Icon, Input, List, Modal, Row, Tabs, Table, Tag,
-         Typography, Upload } from 'antd';
-import { TableRowSelection } from 'antd/lib/table';
+import { PlusOutlined, ReloadOutlined } from '@ant-design/icons';
+import { Form } from '@ant-design/compatible';
+import '@ant-design/compatible/assets/index.css';
+import {
+  Button,
+  Card,
+  Checkbox,
+  Collapse,
+  Input,
+  List,
+  Modal,
+  Row,
+  Tabs,
+  Table,
+  Tag,
+  Typography,
+  Upload,
+} from 'antd';
+import { TableRowSelection } from 'antd/lib/table/interface';
 
 import { api } from '../api';
 import { ApiUser, Dataset, PredictorCollection, Run, RunFilters } from '../coretypes';
@@ -57,7 +73,7 @@ export class PredictorCollectionList extends React.Component<CollectionListProps
         sorter: (a, b) => a.collection_name.localeCompare(b.collection_name)
       },
       {
-        title: (<>Status <Icon type="reload" onClick={this.loadCollections} /></>),
+        title: (<>Status <ReloadOutlined onClick={this.loadCollections} /></>),
         dataIndex: 'status',
         sorter: (a, b) => a.status.localeCompare(b.status)
       },
@@ -68,7 +84,7 @@ export class PredictorCollectionList extends React.Component<CollectionListProps
           if (!record.traceback) {
             return (predictors.map(x => x.name).join(', '));
           }
-          return (<Text type="danger">{record.traceback}</Text>);
+          return (<Text type="danger" >{record.traceback}</Text>);
         }
       },
       {
@@ -90,7 +106,7 @@ export class PredictorCollectionList extends React.Component<CollectionListProps
     ];
 
     return (
-      <Row type="flex" justify="center" style={{ background: '#fff', padding: 0 }}>
+      <Row justify="center" style={{ background: '#fff', padding: 0 }}>
         <MainCol>
            <Row>
              <span className="viewTitle"> My Predictor Collections</span>
@@ -98,7 +114,7 @@ export class PredictorCollectionList extends React.Component<CollectionListProps
              <Button
                onClick={() => this.setState({formModal: true})}
              >
-               <Icon type="plus" /> Add New Predictors
+               <PlusOutlined /> Add New Predictors
              </Button>
              </span>
            </Row>

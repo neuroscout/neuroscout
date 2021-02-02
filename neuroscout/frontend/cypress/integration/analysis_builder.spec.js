@@ -12,7 +12,7 @@ describe('Analysis Builder', () => {
     cy.get('.builderAnalysisNameInput').type(name)
     cy.get(`.ant-col > .ant-input[value=${name}]`)
     cy.get('.builderAnalysisDescriptionInput').type(name)
-    cy.get('.ant-form-item-children > .ant-input').contains(name)
+    cy.get('.builderAnalysisDescriptionInput').contains(name)
 
     cy.get('.selectDataset')
     cy.get('td').contains('Test Dataset').parent().within(() => {

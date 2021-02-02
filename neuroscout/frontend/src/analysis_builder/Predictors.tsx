@@ -5,7 +5,7 @@ filter the table down to predictors whose name or description match the entered 
 */
 import * as React from 'react';
 import { Table, Input, Row, Col, Tag } from 'antd';
-import { TableRowSelection } from 'antd/lib/table';
+import { TableRowSelection } from 'antd/lib/table/interface';
 
 import isEqual from 'lodash.isequal';
 import memoize from 'memoize-one';
@@ -145,7 +145,7 @@ export class PredictorSelector extends React.Component<
       // compactCol[0].width = '100%';
       return (
         <div>
-          <Row type="flex">
+          <Row >
             <Col span={24}>
               {filteredPredictors && filteredPredictors.length > 20 &&
                 <div>
@@ -180,7 +180,7 @@ export class PredictorSelector extends React.Component<
 
     return (
       <div>
-        <Row type="flex">
+        <Row>
           <Col xl={{span: 18}} lg={{span: 24}}>
             <div>
               <Input
