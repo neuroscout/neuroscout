@@ -20,12 +20,18 @@ from .annotate import FeatureSerializer
 socket.setdefaulttimeout(10000)
 
 
-def _load_stim_models(dataset_name, task_name=None):
+def _load_stim_models(dataset_name, task_name=None, mimetypes=None):
     """ Given a dataset and task, load all available stimuli as Pliers
     stimuli, and pair them with original database stim object. """
+
     stim_models = Stimulus.query.filter_by(active=True).filter(
-        Stimulus.mimetype != 'text/csv').join(
-        RunStimulus).join(Run).join(Task)
+        Stimulus.mimetype != 'text/csv')
+
+    if mimetypes is not None:
+        stim_models = stim_models.filter(
+            Stimulus.mimetype.op('~')('|'.join(mimetypes)))
+
+    stim_models = stim_models.join(RunStimulus).join(Run).join(Task)
 
     if task_name is not None:
         stim_models = stim_models.filter_by(name=task_name)
@@ -52,8 +58,7 @@ def _extract(graphs, stims):
     """ Apply list of graphs to complete list of stimuli in dataset """
     results = []
     # For every extractor, extract from matching stims
-    for g in graphs:
-        graph = Graph(g)
+    for graph in graphs:
         ext = graph.roots[0].transformer
         print("Extractor: {}".format(ext.name))
         valid_stims = []
@@ -98,11 +103,10 @@ def _create_efs(results, **serializer_kwargs):
 
             # Create ExtractedEvents
             bulk_ees.append(
-                ExtractedEvent(stimulus_id=stim_object.id,
-                               ef_id=ext_feats[feat_hash].id,
-                               **ee_props))
-        db.session.bulk_save_objects(bulk_ees)
-        db.session.commit()
+                dict(stimulus_id=stim_object.id,
+                     ef_id=ext_feats[feat_hash].id,
+                     **ee_props))
+        db.session.execute(ExtractedEvent.__table__.insert(), bulk_ees)
 
     return ext_feats
 
@@ -158,12 +162,23 @@ def create_predictors(features, dataset_name, task_name=None, run_ids=None,
                 query = query.filter(RunStimulus.run_id.in_(run_ids))
             all_rs += [(predictor.id, rs.run_id) for rs in query]
 
-        all_rs = [PredictorRun(predictor_id=pred_id, run_id=run_id)
+        all_rs = [dict(predictor_id=pred_id, run_id=run_id)
                   for pred_id, run_id in set(all_rs)]
-        db.session.bulk_save_objects(all_rs)
-        db.session.commit()
+        db.session.execute(PredictorRun.__table__.insert(), all_rs)
 
     return [p.id for p in all_preds]
+
+
+def _determine_mimetypes(graphs):
+    mimetypes = []
+    for g in graphs:
+        it = g.roots[0].transformer._input_type
+        if not isinstance(list, it):
+            it = list([it])
+        for i in it:
+            mimetypes.append(str(i).split('.')[-2])
+
+    return mimetypes
 
 
 def extract_features(graphs, dataset_name=None, task_name=None,
@@ -182,7 +197,13 @@ def extract_features(graphs, dataset_name=None, task_name=None,
             graphs, dataset.name, None, **serializer_kwargs)
                 for dataset in Dataset.query.filter_by(active=True)]
     else:
-        stims = _load_stim_models(dataset_name, task_name)
+        # Load graphs
+        graphs = [Graph(g) for g in graphs]
+
+        # Determine the necessary stimuli
+        mimetypes = _determine_mimetypes(graphs)
+
+        stims = _load_stim_models(dataset_name, task_name, mimetypes=mimetypes)
 
         results = _extract(graphs, stims)
 
