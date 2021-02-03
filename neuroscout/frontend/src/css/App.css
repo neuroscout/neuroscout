@@ -159,3 +159,8 @@ pre {
     background-color: #fff;
     border: 0px;
 }
+
+.ant-table-expand-icon-col {
+    width: 32px;
+}
+
