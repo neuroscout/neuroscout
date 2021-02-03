@@ -4,7 +4,7 @@ predictors. The component includes a table of predictors as well as search box t
 filter the table down to predictors whose name or description match the entered search term
 */
 import * as React from 'react';
-import { Table, Input, Row, Col, Tag } from 'antd';
+import { Table, Input, Row, Col, Tag, Tooltip } from 'antd';
 import { TableRowSelection } from 'antd/lib/table/interface';
 
 import isEqual from 'lodash.isequal';
@@ -104,6 +104,15 @@ export class PredictorSelector extends React.Component<
     let { availablePredictors, selectedPredictors, updateSelection } = this.props;
     let filteredPredictors = this.setSource(availablePredictors);
     filteredPredictors = this.searchFilter(this.state.searchText, filteredPredictors);
+
+    const lorem = 'lorem ipsum';
+    const extractorDescriptions = {
+
+      'ClarifaiAPIImageExtractor': lorem,
+      'BrightnessExtractor': lorem,
+      'fmriprep': lorem
+    };
+
     const columns = [
       {
         title: 'Name',
@@ -122,9 +131,11 @@ export class PredictorSelector extends React.Component<
         sorter: this.sourceCmp,
         defaultSortOrder: 'ascend' as 'ascend',
         render: (text, record) => (
-          <div style={{ wordWrap: 'break-word', wordBreak: 'break-word' }}>
-            {text}
-          </div>
+          <Tooltip color="pink" title={extractorDescriptions[text]}>
+            <div style={{ wordWrap: 'break-word', wordBreak: 'break-word' }}>
+              {text}
+            </div>
+          </Tooltip> 
         )
         // width: '30%'
       },
