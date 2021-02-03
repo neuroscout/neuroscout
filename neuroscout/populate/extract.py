@@ -107,6 +107,7 @@ def _create_efs(results, **serializer_kwargs):
                      ef_id=ext_feats[feat_hash].id,
                      **ee_props))
         db.session.execute(ExtractedEvent.__table__.insert(), bulk_ees)
+        db.session.commit()
 
     return ext_feats
 
@@ -165,6 +166,7 @@ def create_predictors(features, dataset_name, task_name=None, run_ids=None,
         all_rs = [dict(predictor_id=pred_id, run_id=run_id)
                   for pred_id, run_id in set(all_rs)]
         db.session.execute(PredictorRun.__table__.insert(), all_rs)
+        db.session.commit()
 
     return [p.id for p in all_preds]
 
