@@ -8,6 +8,7 @@ import socket
 
 from pathlib import Path
 from progressbar import progressbar
+from joblib import Parallel, delayed
 from ..utils.db import get_or_create
 
 from pliers.stimuli import load_stims, ComplexTextStim, TextStim
@@ -20,14 +21,37 @@ from .annotate import FeatureSerializer
 socket.setdefaulttimeout(10000)
 
 
-def _load_stim_models(dataset_name, task_name=None, mimetypes=None):
-    """ Given a dataset and task, load all available stimuli as Pliers
-    stimuli, and pair them with original database stim object. """
+def _load_stim(stim_model):
+    stims = []
+    if stim_model.path is None:
+        stims.append(
+            (stim_model, ComplexTextStim(text=stim_model.content)))
+        stims.append(
+            (stim_model, TextStim(text=stims[-1][1].data)))
+
+    else:
+        stims.append(
+            (stim_model, load_stims(stim_model.path)))
+    return stims
+
+
+def _query_stim_models(dataset_name, task_name=None, graphs=None):
+    """ Given a dataset and task, query all matching stimuli.
+    Optionally a list of graphs can be provided which further restrict
+    the stimuli to only those necessary for those graphs """
 
     stim_models = Stimulus.query.filter_by(active=True).filter(
         Stimulus.mimetype != 'text/csv')
 
-    if mimetypes is not None:
+    # Determine the necessary stimuli to load
+    if graphs is not None:
+        mimetypes = []
+        for g in graphs:
+            it = g.roots[0].transformer._input_type
+            if not isinstance(list, it):
+                it = list([it])
+            for i in it:
+                mimetypes.append(str(i).split('.')[-2])
         stim_models = stim_models.filter(
             Stimulus.mimetype.op('~')('|'.join(mimetypes)))
 
@@ -38,38 +62,23 @@ def _load_stim_models(dataset_name, task_name=None, mimetypes=None):
 
     stim_models = stim_models.join(Dataset).filter_by(name=dataset_name)
 
-    stims = []
-    print("Loading stim models...")
-    for stim_model in progressbar(stim_models):
-        if stim_model.path is None:
-            stims.append(
-                (stim_model, ComplexTextStim(text=stim_model.content)))
-            stims.append(
-                (stim_model, TextStim(text=stims[-1][1].data)))
-
-        else:
-            stims.append(
-                (stim_model, load_stims(stim_model.path)))
-
-    return stims
+    return stim_models
 
 
-def _extract(graphs, stims):
-    """ Apply list of graphs to complete list of stimuli in dataset """
+def _extract(graphs, stim_object):
+    """ For a stim_object, load stim and apply graphs """
     results = []
-    # For every extractor, extract from matching stims
-    for graph in graphs:
-        ext = graph.roots[0].transformer
-        print("Extractor: {}".format(ext.name))
-        valid_stims = []
-        for sm, s in stims:
-            if ext._stim_matches_input_types(s):
+    for stim_obj, pliers_stim in _load_stim(stim_object):
+        # For each graph, check compatability, and then extract
+        for graph in graphs:
+            ext = graph.roots[0].transformer
+            if ext._stim_matches_input_types(pliers_stim):
                 # Hacky workaround. Look for compatible AVI
                 if 'GoogleVideoAPIShotDetectionExtractor' in str(ext.__class__):
-                    s.filename = str(Path(s.filename).with_suffix('.avi'))
-                valid_stims.append((sm, s))
-        results += [(sm, graph.transform(s, merge=False)[0])
-                    for sm, s in progressbar(valid_stims)]
+                    pliers_stim.filename = str(
+                        Path(pliers_stim.filename).with_suffix('.avi'))
+                res = graph.transform(pliers_stim, merge=False)[0]
+                results += (stim_obj.id, res)
     return results
 
 
@@ -85,10 +94,10 @@ def _create_efs(results, **serializer_kwargs):
     """
     ext_feats = {}
     serializer = FeatureSerializer(**serializer_kwargs)
+    bulk_ees = []
 
     print("Creating ExtractedFeatures...")
-    for stim_object, result in progressbar(results):
-        bulk_ees = []
+    for stim_id, result in progressbar(results):
         for ee_props, ef_props in serializer.load(result):
             # Hash extractor name + feaFture name
             feat_hash = ef_props['sha1_hash']
@@ -103,11 +112,11 @@ def _create_efs(results, **serializer_kwargs):
 
             # Create ExtractedEvents
             bulk_ees.append(
-                dict(stimulus_id=stim_object.id,
+                dict(stimulus_id=stim_id,
                      ef_id=ext_feats[feat_hash].id,
                      **ee_props))
-        db.session.execute(ExtractedEvent.__table__.insert(), bulk_ees)
-        db.session.commit()
+    db.session.execute(ExtractedEvent.__table__.insert(), bulk_ees)
+    db.session.commit()
 
     return ext_feats
 
@@ -171,19 +180,7 @@ def create_predictors(features, dataset_name, task_name=None, run_ids=None,
     return [p.id for p in all_preds]
 
 
-def _determine_mimetypes(graphs):
-    mimetypes = []
-    for g in graphs:
-        it = g.roots[0].transformer._input_type
-        if not isinstance(list, it):
-            it = list([it])
-        for i in it:
-            mimetypes.append(str(i).split('.')[-2])
-
-    return mimetypes
-
-
-def extract_features(graphs, dataset_name=None, task_name=None,
+def extract_features(graphs, dataset_name=None, task_name=None, n_jobs=1,
                      **serializer_kwargs):
     """ Extract features using pliers for a dataset/task
         Args:
@@ -194,20 +191,24 @@ def extract_features(graphs, dataset_name=None, task_name=None,
         Output:
             list of db ids of extracted features
     """
+    # If no dataset is specific extract for all datasets recursively
     if dataset_name is None:
         return [extract_features(
             graphs, dataset.name, None, **serializer_kwargs)
                 for dataset in Dataset.query.filter_by(active=True)]
     else:
-        # Load graphs
+        # Load Pliers Graph objects
         graphs = [Graph(g) for g in graphs]
 
-        # Determine the necessary stimuli
-        mimetypes = _determine_mimetypes(graphs)
+        stim_query = _query_stim_models(
+            dataset_name, task_name, graphs=graphs)
 
-        stims = _load_stim_models(dataset_name, task_name, mimetypes=mimetypes)
+        print("Extracting...")
+        # Apply graphs to each stim_objct
+        results = Parallel(
+            n_jobs=n_jobs)(delayed(_extract)(graphs, s) for s in stim_query)
 
-        results = _extract(graphs, stims)
+        assert 0
 
         ext_feats = _create_efs(results, **serializer_kwargs)
 
