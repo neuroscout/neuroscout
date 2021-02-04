@@ -12,6 +12,7 @@ from tqdm import tqdm
 from joblib import Parallel, delayed, parallel_backend
 from ..utils.db import get_or_create
 
+import pliers as pl
 from pliers.stimuli import load_stims, ComplexTextStim, TextStim
 from pliers.graph import Graph
 from ..models import (
@@ -19,7 +20,9 @@ from ..models import (
     RunStimulus, ExtractedFeature, ExtractedEvent)
 from .annotate import FeatureSerializer
 
+
 socket.setdefaulttimeout(10000)
+pl.set_options(cache_transformers=False)
 
 
 def _load_stim(stim_model):
