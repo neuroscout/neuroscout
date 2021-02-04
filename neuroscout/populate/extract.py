@@ -4,10 +4,11 @@ the associated predictors
 """
 from ..core import cache
 from ..database import db
+from .utils import tqdm_joblib
 import socket
 
 from pathlib import Path
-from progressbar import progressbar
+from tqdm import tqdm
 from joblib import Parallel, delayed, parallel_backend
 from ..utils.db import get_or_create
 
@@ -97,7 +98,7 @@ def _create_efs(results, **serializer_kwargs):
     bulk_ees = []
 
     print("Creating ExtractedFeatures...")
-    for stim_id, result in progressbar(results):
+    for stim_id, result in tqdm(results):
         for ee_props, ef_props in serializer.load(result):
             # Hash extractor name + feaFture name
             feat_hash = ef_props['sha1_hash']
@@ -162,7 +163,7 @@ def create_predictors(features, dataset_name, task_name=None, run_ids=None,
                 source='extracted', ef_id=ef.id)[0])
 
     # Create PredictorRuns
-    for ix, predictor in enumerate(progressbar(all_preds)):
+    for ix, predictor in enumerate(tqdm(all_preds)):
         ef = features[ix]
         all_rs = []
         # For all instances for stimuli in this set of runs
@@ -200,16 +201,14 @@ def extract_features(graphs, dataset_name=None, task_name=None, n_jobs=1,
         # Load Pliers Graph objects
         graphs = [Graph(g) for g in graphs]
 
-        stim_query = _query_stim_models(
+        stims = _query_stim_models(
             dataset_name, task_name, graphs=graphs)
 
-        print("Extracting...")
-        # Apply graphs to each stim_object
+        # Apply graphs to each stim_object in parallel
         with parallel_backend('multiprocessing'):
-            results = Parallel(
-                n_jobs=n_jobs)(delayed(_extract)(graphs, s) for s in stim_query)
-
-        assert 0
+            with tqdm_joblib(tqdm(desc="Extracting...", total=stims.count())):
+                results = Parallel(
+                    n_jobs=n_jobs)(delayed(_extract)(graphs, s) for s in stims)
 
         ext_feats = _create_efs(results, **serializer_kwargs)
 
@@ -228,7 +227,7 @@ def _load_complex_text_stim_models(dataset_name, task_name):
 
     stims = []
     print("Loading stim models...")
-    for stim_model in progressbar(stim_models):
+    for stim_model in tqdm(stim_models):
         # Reconstruct complete ComplexTextStim
         rs_transcript = stim_model.run_stimuli.first()
         run_words = Stimulus.query.filter_by(
@@ -285,7 +284,7 @@ def extract_tokenized_features(dataset_name, task_name, extractors):
             setattr(node.transformer, "window_method", window)
             if window_n:
                 setattr(node.transformer, "window_n", window_n)
-        for sm, s in progressbar(stims):
+        for sm, s in tqdm(stims):
             if window == "transcript":
                 # In complete transcript window, save all results
                 results += [(sm, res) for res in g.transform(s, merge=False)]

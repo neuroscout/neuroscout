@@ -48,7 +48,7 @@ pandas==0.23
 passlib==1.7.1
 patsy
 Pillow==7.1.0
-progressbar2
+tqdm
 psycopg2==2.8.3
 PyJWT==1.4.2
 pyld==0.7.3

@@ -15,7 +15,7 @@ from .utils import hash_stim
 from .ingest import add_stimulus
 
 import pandas as pd
-from progressbar import progressbar
+from tqdm import tqdm
 
 
 def save_stim_filename(stimulus):
@@ -51,7 +51,7 @@ def create_new_stimuli(dataset_id, task_name, parent_id, new_stims, rs_orig,
                        transformer=None, transformer_params=None):
     new_models = {}
     print("Creating stimuli...")
-    for stim in progressbar(new_stims):
+    for stim in tqdm(new_stims):
         stim_hash, path, content, stim_name = save_stim_filename(stim)
 
         stim_model, stims = new_models.get(stim_hash, (None, []))

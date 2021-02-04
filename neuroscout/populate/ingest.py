@@ -19,7 +19,7 @@ from ..models import (
     Dataset, Task, Run, Predictor, PredictorEvent, PredictorRun, Stimulus,
     RunStimulus, GroupPredictor, GroupPredictorValue)
 from ..database import db
-from progressbar import progressbar
+from tqdm import tqdm
 from .annotate import PredictorSerializer
 
 
@@ -197,7 +197,7 @@ def add_task(task_name, dataset_name=None, local_path=None,
     print("Parsing runs")
     all_runs = layout.get(task=task_name, suffix='bold', extension='nii.gz',
                           scope='raw', **kwargs)
-    for img in progressbar(all_runs):
+    for img in tqdm(all_runs):
         """ Extract Run information """
         # Get entities
         entities = {entity: getattr(img, entity)
