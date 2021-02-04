@@ -63,7 +63,7 @@ def _query_stim_models(dataset_name, task_name=None, graphs=None):
 
     stim_models = stim_models.join(Dataset).filter_by(name=dataset_name)
 
-    return stim_models
+    return stim_models.all()
 
 
 def _extract(graphs, stim_object):
@@ -206,7 +206,7 @@ def extract_features(graphs, dataset_name=None, task_name=None, n_jobs=1,
 
         # Apply graphs to each stim_object in parallel
         with parallel_backend('multiprocessing'):
-            with tqdm_joblib(tqdm(desc="Extracting...", total=stims.count())):
+            with tqdm_joblib(tqdm(desc="Extracting...", total=len(stims))):
                 results = Parallel(
                     n_jobs=n_jobs)(delayed(_extract)(graphs, s) for s in stims)
 
