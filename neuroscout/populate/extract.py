@@ -80,6 +80,7 @@ def _extract(graphs, stim_object):
                         Path(pliers_stim.filename).with_suffix('.avi'))
                 res = graph.transform(pliers_stim, merge=False)[0]
                 results += (stim_obj.id, res)
+    del pliers_stim
     return results
 
 
