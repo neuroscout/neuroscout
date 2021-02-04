@@ -54,6 +54,7 @@ PyJWT==1.4.2
 pyld==0.7.3
 pyparsing==2.2.0
 pytest>4.6
+joblib
 python-dateutil==2.6.0
 python-magic==0.4.13
 pytz==2017.2
