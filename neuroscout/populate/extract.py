@@ -8,7 +8,7 @@ import socket
 
 from pathlib import Path
 from progressbar import progressbar
-from joblib import Parallel, delayed
+from joblib import Parallel, delayed, parallel_backend
 from ..utils.db import get_or_create
 
 from pliers.stimuli import load_stims, ComplexTextStim, TextStim
@@ -204,9 +204,10 @@ def extract_features(graphs, dataset_name=None, task_name=None, n_jobs=1,
             dataset_name, task_name, graphs=graphs)
 
         print("Extracting...")
-        # Apply graphs to each stim_objct
-        results = Parallel(
-            n_jobs=n_jobs)(delayed(_extract)(graphs, s) for s in stim_query)
+        # Apply graphs to each stim_object
+        with parallel_backend('multiprocessing'):
+            results = Parallel(
+                n_jobs=n_jobs)(delayed(_extract)(graphs, s) for s in stim_query)
 
         assert 0
 
