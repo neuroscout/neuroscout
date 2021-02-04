@@ -79,7 +79,7 @@ def _extract(graphs, stim_object):
                     pliers_stim.filename = str(
                         Path(pliers_stim.filename).with_suffix('.avi'))
                 res = graph.transform(pliers_stim, merge=False)[0]
-                results += (stim_obj.id, res)
+                results.append((stim_obj.id, res))
     del pliers_stim
     return results
 
@@ -210,6 +210,9 @@ def extract_features(graphs, dataset_name=None, task_name=None, n_jobs=1,
             with tqdm_joblib(tqdm(desc="Extracting...", total=len(stims))):
                 results = Parallel(
                     n_jobs=n_jobs)(delayed(_extract)(graphs, s) for s in stims)
+
+        # Flatten
+        results = [item for sublist in results for item in sublist]
 
         ext_feats = _create_efs(results, **serializer_kwargs)
 
