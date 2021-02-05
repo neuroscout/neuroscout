@@ -4,12 +4,15 @@ the associated predictors
 """
 from ..core import cache
 from ..database import db
+from .utils import tqdm_joblib
 import socket
 
 from pathlib import Path
-from progressbar import progressbar
+from tqdm import tqdm
+from joblib import Parallel, delayed, parallel_backend
 from ..utils.db import get_or_create
 
+import pliers as pl
 from pliers.stimuli import load_stims, ComplexTextStim, TextStim
 from pliers.graph import Graph
 from ..models import (
@@ -17,54 +20,70 @@ from ..models import (
     RunStimulus, ExtractedFeature, ExtractedEvent)
 from .annotate import FeatureSerializer
 
+
 socket.setdefaulttimeout(10000)
+pl.set_options(cache_transformers=False)
 
 
-def _load_stim_models(dataset_name, task_name=None):
-    """ Given a dataset and task, load all available stimuli as Pliers
-    stimuli, and pair them with original database stim object. """
+def _load_stim(stim_model):
+    stims = []
+    if stim_model.path is None:
+        stims.append(
+            (stim_model, ComplexTextStim(text=stim_model.content)))
+        stims.append(
+            (stim_model, TextStim(text=stims[-1][1].data)))
+
+    else:
+        stims.append(
+            (stim_model, load_stims(stim_model.path)))
+    return stims
+
+
+def _query_stim_models(dataset_name, task_name=None, graphs=None):
+    """ Given a dataset and task, query all matching stimuli.
+    Optionally a list of graphs can be provided which further restrict
+    the stimuli to only those necessary for those graphs """
+
     stim_models = Stimulus.query.filter_by(active=True).filter(
-        Stimulus.mimetype != 'text/csv').join(
-        RunStimulus).join(Run).join(Task)
+        Stimulus.mimetype != 'text/csv')
+
+    # Determine the necessary stimuli to load
+    if graphs is not None:
+        mimetypes = []
+        for g in graphs:
+            it = g.roots[0].transformer._input_type
+            if not isinstance(list, it):
+                it = list([it])
+            for i in it:
+                mimetypes.append(str(i).split('.')[-2])
+        stim_models = stim_models.filter(
+            Stimulus.mimetype.op('~')('|'.join(mimetypes)))
+
+    stim_models = stim_models.join(RunStimulus).join(Run).join(Task)
 
     if task_name is not None:
         stim_models = stim_models.filter_by(name=task_name)
 
     stim_models = stim_models.join(Dataset).filter_by(name=dataset_name)
 
-    stims = []
-    print("Loading stim models...")
-    for stim_model in progressbar(stim_models):
-        if stim_model.path is None:
-            stims.append(
-                (stim_model, ComplexTextStim(text=stim_model.content)))
-            stims.append(
-                (stim_model, TextStim(text=stims[-1][1].data)))
-
-        else:
-            stims.append(
-                (stim_model, load_stims(stim_model.path)))
-
-    return stims
+    return stim_models.all()
 
 
-def _extract(graphs, stims):
-    """ Apply list of graphs to complete list of stimuli in dataset """
+def _extract(graphs, stim_object):
+    """ For a stim_object, load stim and apply graphs """
     results = []
-    # For every extractor, extract from matching stims
-    for g in graphs:
-        graph = Graph(g)
-        ext = graph.roots[0].transformer
-        print("Extractor: {}".format(ext.name))
-        valid_stims = []
-        for sm, s in stims:
-            if ext._stim_matches_input_types(s):
+    for stim_obj, pliers_stim in _load_stim(stim_object):
+        # For each graph, check compatability, and then extract
+        for graph in graphs:
+            ext = graph.roots[0].transformer
+            if ext._stim_matches_input_types(pliers_stim):
                 # Hacky workaround. Look for compatible AVI
                 if 'GoogleVideoAPIShotDetectionExtractor' in str(ext.__class__):
-                    s.filename = str(Path(s.filename).with_suffix('.avi'))
-                valid_stims.append((sm, s))
-        results += [(sm, graph.transform(s, merge=False)[0])
-                    for sm, s in progressbar(valid_stims)]
+                    pliers_stim.filename = str(
+                        Path(pliers_stim.filename).with_suffix('.avi'))
+                res = graph.transform(pliers_stim, merge=False)[0]
+                results.append((stim_obj.id, res))
+    del pliers_stim
     return results
 
 
@@ -80,10 +99,10 @@ def _create_efs(results, **serializer_kwargs):
     """
     ext_feats = {}
     serializer = FeatureSerializer(**serializer_kwargs)
+    bulk_ees = []
 
     print("Creating ExtractedFeatures...")
-    for stim_object, result in progressbar(results):
-        bulk_ees = []
+    for stim_id, result in tqdm(results):
         for ee_props, ef_props in serializer.load(result):
             # Hash extractor name + feaFture name
             feat_hash = ef_props['sha1_hash']
@@ -98,11 +117,11 @@ def _create_efs(results, **serializer_kwargs):
 
             # Create ExtractedEvents
             bulk_ees.append(
-                ExtractedEvent(stimulus_id=stim_object.id,
-                               ef_id=ext_feats[feat_hash].id,
-                               **ee_props))
-        db.session.bulk_save_objects(bulk_ees)
-        db.session.commit()
+                dict(stimulus_id=stim_id,
+                     ef_id=ext_feats[feat_hash].id,
+                     **ee_props))
+    db.session.execute(ExtractedEvent.__table__.insert(), bulk_ees)
+    db.session.commit()
 
     return ext_feats
 
@@ -148,7 +167,7 @@ def create_predictors(features, dataset_name, task_name=None, run_ids=None,
                 source='extracted', ef_id=ef.id)[0])
 
     # Create PredictorRuns
-    for ix, predictor in enumerate(progressbar(all_preds)):
+    for ix, predictor in enumerate(tqdm(all_preds)):
         ef = features[ix]
         all_rs = []
         # For all instances for stimuli in this set of runs
@@ -158,15 +177,15 @@ def create_predictors(features, dataset_name, task_name=None, run_ids=None,
                 query = query.filter(RunStimulus.run_id.in_(run_ids))
             all_rs += [(predictor.id, rs.run_id) for rs in query]
 
-        all_rs = [PredictorRun(predictor_id=pred_id, run_id=run_id)
+        all_rs = [dict(predictor_id=pred_id, run_id=run_id)
                   for pred_id, run_id in set(all_rs)]
-        db.session.bulk_save_objects(all_rs)
+        db.session.execute(PredictorRun.__table__.insert(), all_rs)
         db.session.commit()
 
     return [p.id for p in all_preds]
 
 
-def extract_features(graphs, dataset_name=None, task_name=None,
+def extract_features(graphs, dataset_name=None, task_name=None, n_jobs=1,
                      **serializer_kwargs):
     """ Extract features using pliers for a dataset/task
         Args:
@@ -177,14 +196,26 @@ def extract_features(graphs, dataset_name=None, task_name=None,
         Output:
             list of db ids of extracted features
     """
+    # If no dataset is specific extract for all datasets recursively
     if dataset_name is None:
         return [extract_features(
             graphs, dataset.name, None, **serializer_kwargs)
                 for dataset in Dataset.query.filter_by(active=True)]
     else:
-        stims = _load_stim_models(dataset_name, task_name)
+        # Load Pliers Graph objects
+        graphs = [Graph(g) for g in graphs]
 
-        results = _extract(graphs, stims)
+        stims = _query_stim_models(
+            dataset_name, task_name, graphs=graphs)
+
+        # Apply graphs to each stim_object in parallel
+        with parallel_backend('multiprocessing'):
+            with tqdm_joblib(tqdm(desc="Extracting...", total=len(stims))):
+                results = Parallel(
+                    n_jobs=n_jobs)(delayed(_extract)(graphs, s) for s in stims)
+
+        # Flatten
+        results = [item for sublist in results for item in sublist]
 
         ext_feats = _create_efs(results, **serializer_kwargs)
 
@@ -203,7 +234,7 @@ def _load_complex_text_stim_models(dataset_name, task_name):
 
     stims = []
     print("Loading stim models...")
-    for stim_model in progressbar(stim_models):
+    for stim_model in tqdm(stim_models):
         # Reconstruct complete ComplexTextStim
         rs_transcript = stim_model.run_stimuli.first()
         run_words = Stimulus.query.filter_by(
@@ -260,7 +291,7 @@ def extract_tokenized_features(dataset_name, task_name, extractors):
             setattr(node.transformer, "window_method", window)
             if window_n:
                 setattr(node.transformer, "window_n", window_n)
-        for sm, s in progressbar(stims):
+        for sm, s in tqdm(stims):
             if window == "transcript":
                 # In complete transcript window, save all results
                 results += [(sm, res) for res in g.transform(s, merge=False)]
