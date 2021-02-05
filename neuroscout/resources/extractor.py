@@ -17,14 +17,17 @@ class ExtractorListResource(MethodResource):
         result = []
         extractors = schema.keys()
         for ext in extractors:
-            docstring = getattr(piext, ext).__doc__
+            try:
+                docstring = getattr(piext, ext).__doc__
 
-            # Only return docstring prior to Args section
-            desc = docstring.split('Args')[0].replace('\n', '').strip(' ')
-            desc = re.sub('\\s+', ' ', desc)  # Replace multiple spaces
-            result.append({
-                'name': ext,
-                'description': desc
-                })
+                # Only return docstring prior to Args section
+                desc = docstring.split('Args')[0].replace('\n', '').strip(' ')
+                desc = re.sub('\\s+', ' ', desc)  # Replace multiple spaces
+                result.append({
+                    'name': ext,
+                    'description': desc
+                    })
+            except AttributeError:
+                pass
 
         return result
