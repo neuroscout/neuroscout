@@ -208,11 +208,15 @@ def extract_features(graphs, dataset_name=None, task_name=None, n_jobs=1,
         stims = _query_stim_models(
             dataset_name, task_name, graphs=graphs)
 
-        # Apply graphs to each stim_object in parallel
-        with parallel_backend('multiprocessing'):
-            with tqdm_joblib(tqdm(desc="Extracting...", total=len(stims))):
-                results = Parallel(
-                    n_jobs=n_jobs)(delayed(_extract)(graphs, s) for s in stims)
+        if n_jobs == 1:
+            for s in tqdm(stims, desc='Extracting...'):
+                results = [_extract(graphs, s) for s in stims]
+        else:
+            # Apply graphs to each stim_object in parallel
+            with parallel_backend('multiprocessing'):
+                with tqdm_joblib(tqdm(desc="Extracting...", total=len(stims))):
+                    results = Parallel( n_jobs=n_jobs)(
+                        delayed(_extract)(graphs, s) for s in stims)
 
         # Flatten
         results = [item for sublist in results for item in sublist]
