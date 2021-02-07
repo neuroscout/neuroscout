@@ -81,7 +81,11 @@ def _extract(graphs, stim_object):
                 if 'GoogleVideoAPIShotDetectionExtractor' in str(ext.__class__):
                     pliers_stim.filename = str(
                         Path(pliers_stim.filename).with_suffix('.avi'))
-                res = graph.transform(pliers_stim, merge=False)[0]
+                try:
+                    res = graph.transform(pliers_stim, merge=False)[0]
+                except Exception:
+                    # Try again (may be connection error)
+                    res = graph.transform(pliers_stim, merge=False)[0]
                 results.append((stim_obj.id, res))
     del pliers_stim
     return results
