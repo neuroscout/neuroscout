@@ -105,22 +105,23 @@ def _create_efs(results):
     bulk_ees = []
 
     print("Creating ExtractedFeatures...")
-    for stim_id, (ee_props, ef_props) in tqdm(results):
-        # Hash extractor name + feaFture name
-        feat_hash = ef_props['sha1_hash']
+    for stim_id, ser in tqdm(results):
+        for ee_props, ef_props in ser:
+            # Hash extractor name + feaFture name
+            feat_hash = ef_props['sha1_hash']
 
-        # If we haven't already added this feature
-        if feat_hash not in ext_feats:
-            # Create/get feature
-            ef_model = ExtractedFeature(**ef_props)
-            db.session.add(ef_model)
-            db.session.commit()
-            ext_feats[feat_hash] = ef_model
+            # If we haven't already added this feature
+            if feat_hash not in ext_feats:
+                # Create/get feature
+                ef_model = ExtractedFeature(**ef_props)
+                db.session.add(ef_model)
+                db.session.commit()
+                ext_feats[feat_hash] = ef_model
 
-        # Create ExtractedEvents
-        bulk_ees.append(
-            dict(stimulus_id=stim_id, ef_id=ext_feats[feat_hash].id, 
-                 **ee_props))
+            # Create ExtractedEvents
+            bulk_ees.append(
+                dict(stimulus_id=stim_id, ef_id=ext_feats[feat_hash].id, 
+                    **ee_props))
     db.session.execute(ExtractedEvent.__table__.insert(), bulk_ees)
     db.session.commit()
 
