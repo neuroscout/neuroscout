@@ -13,7 +13,7 @@
       }
     }
   ],
-  "PretrainedBertEncodingExtractor": [
+  "BertExtractor": [
     {
       "features": {
         "encoding$": {
