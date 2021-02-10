@@ -14,6 +14,6 @@ def test_extractor_desc(auth_client, add_local_task_json):
 
     assert len(ext_list) > 2
 
-    ext = [ext for ext in ext_list if ext['name'] == 'RMSExtractor'][0]
+    ext = [ext for ext in ext_list if ext['name'] == 'BrightnessExtractor'][0]
 
-    assert 'Extracts root mean square (RMS) from audio' in ext['description']
+    assert 'average luminosity of the pixels' in ext['description']
