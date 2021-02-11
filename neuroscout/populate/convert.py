@@ -15,7 +15,7 @@ from .utils import hash_stim
 from .ingest import add_stimulus
 
 import pandas as pd
-from progressbar import progressbar
+from tqdm import tqdm
 
 
 def save_stim_filename(stimulus):
@@ -51,7 +51,7 @@ def create_new_stimuli(dataset_id, task_name, parent_id, new_stims, rs_orig,
                        transformer=None, transformer_params=None):
     new_models = {}
     print("Creating stimuli...")
-    for stim in progressbar(new_stims):
+    for stim in tqdm(new_stims):
         stim_hash, path, content, stim_name = save_stim_filename(stim)
 
         stim_model, stims = new_models.get(stim_hash, (None, []))
@@ -133,8 +133,8 @@ def convert_stimuli(dataset_name, task_name, converters):
                 cstim = graph.transform(loaded_stim, merge=False)
                 if len(cstim) == 1:
                     cstim = cstim[0]
-                params = cstim.history.transformer_params
-                name = cstim.history.transformer_class
+                params = str(conv.__dict__)
+                name = conv.name
                 try:  # Add iterable
                     results += cstim
                 except TypeError:
@@ -153,8 +153,8 @@ def convert_stimuli(dataset_name, task_name, converters):
         # De-activate previously generated stimuli from these converters.
         update = Stimulus.query.filter_by(parent_id=stim.id).filter(
             Stimulus.id.notin_(new_stims),
-            Stimulus.converter_name == cstim.history.transformer_class,
-            Stimulus.converter_parameters == cstim.history.transformer_params)
+            Stimulus.converter_name == conv.name,
+            Stimulus.converter_parameters == str(conv.__dict__))
         if update.count():
             update.update(dict(active=False), synchronize_session='fetch')
         db.session.commit()
