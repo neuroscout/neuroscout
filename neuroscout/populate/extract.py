@@ -26,6 +26,7 @@ pl.set_options(cache_transformers=False)
 
 
 def _load_stim(stim_model):
+    """ Load Stimulus model to Pliers Stimulus object """
     stims = []
     if stim_model.path is None:
         stims.append(
@@ -69,8 +70,8 @@ def _query_stim_models(dataset_name, task_name=None, graphs=None):
     return stim_models.all()
 
 
-def _extract(graphs, stim_object):
-    """ For a stim_object, load stim and apply graphs """
+def _extract_to_serial(graphs, stim_object, serializer):
+    """ For a stim_object, load stim and apply graphs, and serialize """
     results = []
     for stim_obj, pliers_stim in _load_stim(stim_object):
         # For each graph, check compatability, and then extract
@@ -81,29 +82,31 @@ def _extract(graphs, stim_object):
                 if 'GoogleVideoAPIShotDetectionExtractor' in str(ext.__class__):
                     pliers_stim.filename = str(
                         Path(pliers_stim.filename).with_suffix('.avi'))
-                res = graph.transform(pliers_stim, merge=False)[0]
+                try:
+                    res = graph.transform(pliers_stim, merge=False)[0]
+                except Exception:
+                    # Try again (may be connection error)
+                    res = graph.transform(pliers_stim, merge=False)[0]
+                res = serializer.load(res)
                 results.append((stim_obj.id, res))
-    del pliers_stim
     return results
 
 
-def _create_efs(results, **serializer_kwargs):
+def _create_efs(results):
     """ Create ExtractedFeature models from Pliers results.
         Only creates one object per unique feature
     Args:
         results - list of zipped pairs of Stimulus objects and ExtractedResult
                   objects
-        serializer_kwargs - kwargs for Feature serialization
     Returns:
         ext_feats - dictionary of hash of ExtractedFeatures to EF objects
     """
     ext_feats = {}
-    serializer = FeatureSerializer(**serializer_kwargs)
     bulk_ees = []
 
     print("Creating ExtractedFeatures...")
-    for stim_id, result in tqdm(results):
-        for ee_props, ef_props in serializer.load(result):
+    for stim_id, ser in tqdm(results):
+        for ee_props, ef_props in ser:
             # Hash extractor name + feaFture name
             feat_hash = ef_props['sha1_hash']
 
@@ -117,9 +120,8 @@ def _create_efs(results, **serializer_kwargs):
 
             # Create ExtractedEvents
             bulk_ees.append(
-                dict(stimulus_id=stim_id,
-                     ef_id=ext_feats[feat_hash].id,
-                     **ee_props))
+                dict(stimulus_id=stim_id, ef_id=ext_feats[feat_hash].id, 
+                    **ee_props))
     db.session.execute(ExtractedEvent.__table__.insert(), bulk_ees)
     db.session.commit()
 
@@ -196,7 +198,9 @@ def extract_features(graphs, dataset_name=None, task_name=None, n_jobs=1,
         Output:
             list of db ids of extracted features
     """
-    # If no dataset is specific extract for all datasets recursively
+    serializer = FeatureSerializer(**serializer_kwargs)
+
+    # If no dataset is specified extract for all datasets recursively
     if dataset_name is None:
         return [extract_features(
             graphs, dataset.name, None, **serializer_kwargs)
@@ -205,20 +209,22 @@ def extract_features(graphs, dataset_name=None, task_name=None, n_jobs=1,
         # Load Pliers Graph objects
         graphs = [Graph(g) for g in graphs]
 
-        stims = _query_stim_models(
-            dataset_name, task_name, graphs=graphs)
+        stims = _query_stim_models(dataset_name, task_name, graphs=graphs)
 
         # Apply graphs to each stim_object in parallel
         with parallel_backend('multiprocessing'):
             with tqdm_joblib(tqdm(desc="Extracting...", total=len(stims))):
-                results = Parallel(
-                    n_jobs=n_jobs)(delayed(_extract)(graphs, s) for s in stims)
+                results = Parallel(n_jobs=n_jobs)(
+                    delayed(_extract_to_serial)(
+                        graphs, s, serializer) for s in stims)
 
         # Flatten
         results = [item for sublist in results for item in sublist]
 
-        ext_feats = _create_efs(results, **serializer_kwargs)
+        # Insert results to db as ExtractedFeatures
+        ext_feats = _create_efs(results)
 
+        # Create Predictors for ExtractedFeatures
         return create_predictors(
             [ef for ef in ext_feats.values() if ef.active],
             dataset_name, task_name)
@@ -278,6 +284,7 @@ def extract_tokenized_features(dataset_name, task_name, extractors):
     """ Extract features that require a ComplexTextStim to give context to
     individual words within a run """
     stims = _load_complex_text_stim_models(dataset_name, task_name)
+    serializer = FeatureSerializer()
 
     results = []
     # For every extractor, extract from complex stims
@@ -297,12 +304,16 @@ def extract_tokenized_features(dataset_name, task_name, extractors):
                 results += [(sm, res) for res in g.transform(s, merge=False)]
             elif window == "pre":
                 for sli in _window_stim(s, window_n):
-                    for r in g.transform(sli, merge=False):
-                        results.append((sm, r))
+                    for res in g.transform(sli, merge=False):
+                        res = serializer.load(res)
+                        results.append((sm.id, res))
 
     # These results may not be fully recoverable
     # _to_csv(results, dataset_name, task_name)
     object_id = 'max' if window == 'pre' else None
+
+    # Serialize result objects first
+    results = []
     ext_feats = _create_efs(
         results, object_id=object_id, splat=True, add_all=False, round_n=4)
 
