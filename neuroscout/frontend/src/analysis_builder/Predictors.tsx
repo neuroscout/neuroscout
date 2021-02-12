@@ -4,21 +4,19 @@ predictors. The component includes a table of predictors as well as search box t
 filter the table down to predictors whose name or description match the entered search term
 */
 import * as React from 'react';
-import { Table, Input, Row, Col, Tag, Tooltip } from 'antd';
+import { Checkbox, Col, Input, Row, Table, Tag, Tooltip } from 'antd';
 import { TableRowSelection } from 'antd/lib/table/interface';
 
-import isEqual from 'lodash.isequal';
 import memoize from 'memoize-one';
 
-import { Predictor } from '../coretypes';
+import { Predictor, ExtractorDescriptions } from '../coretypes';
 
-/*
-class PredictorTable extends React.Component<TableProps<any>, any> {
-  render() {
-    return <Table {...this.props} />;
-  }
+const filterFields = ['source', 'extractor_name', 'modality'];
+
+interface PredictorFilter {
+  title: string;
+  active: boolean;
 }
-*/
 
 interface PredictorSelectorProps {
   availablePredictors: Predictor[]; // All available predictors to select from
@@ -28,6 +26,7 @@ interface PredictorSelectorProps {
   predictorsLoad?: boolean;
   selectedText?: string;
   compact?: boolean;
+  extractorDescriptions?: ExtractorDescriptions;
 }
 
 interface PredictorsSelectorState {
@@ -35,6 +34,9 @@ interface PredictorsSelectorState {
   filteredPredictors: Predictor[]; // Subset of available preditors whose name or description match the search term
   selectedPredictors: Predictor[]; // List of selected predictors (when used as an uncontrolled component)
   selectedText?: string;
+  sourceFilters: PredictorFilter[];
+  modalityFilters: PredictorFilter[];
+  extractor_nameFilters: PredictorFilter[];
 }
 
 export class PredictorSelector extends React.Component<
@@ -44,11 +46,15 @@ export class PredictorSelector extends React.Component<
   constructor(props: PredictorSelectorProps) {
     super(props);
     const { availablePredictors, selectedPredictors, selectedText } = props;
+
     this.state = {
       searchText: '',
       filteredPredictors: availablePredictors,
       selectedPredictors,
-      selectedText: selectedText ? selectedText : ''
+      selectedText: selectedText ? selectedText : '',
+      sourceFilters: [],
+      modalityFilters: [],
+      extractor_nameFilters: []
     };
   }
 
@@ -62,9 +68,44 @@ export class PredictorSelector extends React.Component<
     this.props.updateSelection(newSelection, this.props.selectedPredictors);
   };
 
+  // Predictor members to make fields for and filter on
+  filterFields = ['source', 'extractor_name', 'modality'];
+
+  // initialize and update categorical predictors, intended to run when ever available predictors changes
+  updateFilters = (predictors) => {
+    let updatedState = this.state;
+    this.filterFields.map(field => {
+      let unique = new Set();
+      if (field === 'source') {
+        predictors.map(x => !!x[field] ? unique.add(x[field]) : null);
+      } else {
+        predictors.map(x =>
+          x.extracted_feature && !! x.extracted_feature[field] ? unique.add(x.extracted_feature[field]) : null
+        );
+      }
+      let stateField = field + 'Filters';
+      let updatedFilters = [...unique].map(x => {
+        return {title: x, active: !!this.state[stateField].active};
+      });
+      updatedState[stateField] = updatedFilters;
+    });
+    this.setState(updatedState);
+  };
+
+  toggleFilter = (field, title) => {
+    let stateUpdate = {};
+
+    field = (field + 'Filters') as keyof PredictorsSelectorState;
+    let updatedFilters = this.state[field];
+
+    let index = updatedFilters.findIndex((x) => x.title === title);
+    updatedFilters[index].active = !updatedFilters[index].active;
+    stateUpdate[field] = updatedFilters;
+    this.setState(stateUpdate, this.applyFilters);
+  }
+
   searchFilter = memoize((searchText, filteredPredictors) => {
     const searchRegex = new RegExp(searchText.trim(), 'i');
-    // const newState = { searchText, filteredPredictors: availablePredictors };
     if (searchText.length > 2) {
       return filteredPredictors.filter(p => {
         let targetText = p.name + (p.description || '');
@@ -76,23 +117,21 @@ export class PredictorSelector extends React.Component<
     return filteredPredictors;
   });
 
-  setSource = memoize(
-    (availablePredictors) => {
-      availablePredictors.map(
-        (x) => {
-          if (!x.description && x.extracted_feature && x.extracted_feature.description) {
-            x.description = x.extracted_feature.description;
+  applyFilters = () => {
+    let filteredPredictors = this.props.availablePredictors.filter(predictor => {
+      let keep = false;
+      this.filterFields.map(filterField => {
+        this.state[filterField + 'Filters'].map(filter => {
+          if (filter.active === true && predictor[filterField] === filter.title) {
+            keep = true;
+            return;
           }
-          if (x.extracted_feature && x.extracted_feature.extractor_name) {
-            x.source = x.extracted_feature.extractor_name;
-          }
-        }
-      );
-      this.setState({ searchText: '' });
-      return availablePredictors;
-    },
-    isEqual
-  );
+        });
+      });
+      return keep;
+    });
+    this.setState({filteredPredictors: filteredPredictors});
+  };
 
   sourceCmp = (a, b) => {
     let x = a.source + a.name;
@@ -100,18 +139,33 @@ export class PredictorSelector extends React.Component<
     return x.localeCompare(y);
   }
 
+  sourceRender = (text, record) => {
+    let inner = (
+      <div style={{ wordWrap: 'break-word', wordBreak: 'break-word' }}>
+        {text}
+      </div>
+    );
+    if (this.props.extractorDescriptions && this.props.extractorDescriptions[text]) {
+      return (
+        <Tooltip color="pink" title={this.props.extractorDescriptions[text]}>
+          {inner}
+        </Tooltip>
+      );
+    } else {
+      return inner;
+    }
+  }
+
+  componentDidUpdate(prevProps) {
+    if (prevProps.predictorsLoad && !this.props.predictorsLoad) {
+      this.updateFilters(this.props.availablePredictors);
+    }
+  }
+
   render() {
     let { availablePredictors, selectedPredictors, updateSelection } = this.props;
-    let filteredPredictors = this.setSource(availablePredictors);
+    let { filteredPredictors } = this.state;
     filteredPredictors = this.searchFilter(this.state.searchText, filteredPredictors);
-
-    const lorem = 'lorem ipsum';
-    const extractorDescriptions = {
-
-      'ClarifaiAPIImageExtractor': lorem,
-      'BrightnessExtractor': lorem,
-      'fmriprep': lorem
-    };
 
     const columns = [
       {
@@ -130,13 +184,7 @@ export class PredictorSelector extends React.Component<
         dataIndex: 'source',
         sorter: this.sourceCmp,
         defaultSortOrder: 'ascend' as 'ascend',
-        render: (text, record) => (
-          <Tooltip color="pink" title={extractorDescriptions[text]}>
-            <div style={{ wordWrap: 'break-word', wordBreak: 'break-word' }}>
-              {text}
-            </div>
-          </Tooltip> 
-        )
+        render: this.sourceRender
         // width: '30%'
       },
     ];
@@ -223,6 +271,26 @@ export class PredictorSelector extends React.Component<
           </Col>
           <Col xl={{span: 1}}/>
           <Col xl={{span: 5}}>
+            <h4>Predictor Source Filter:</h4>
+            {this.state.sourceFilters.map(filter => 
+              <Checkbox
+                onChange={() => this.toggleFilter('source', filter.title)}
+                checked={filter.active}
+                key={filter.title}
+              >
+                  {filter.title}
+              </Checkbox>
+            )}
+            {!!this.state.modalityFilters.length && <h4>Modality Filter:</h4>}
+            {this.state.modalityFilters.map(filter => 
+              <Checkbox
+                onChange={() => this.toggleFilter('modality', filter.title)}
+                checked={filter.active}
+                key={filter.title}
+              >
+                  {filter.title}
+              </Checkbox>
+            )}
             <h4>Selected Predictors:</h4>
             {selectedPredictors.map(p =>
               <Tag closable={true} onClose={ev => this.removePredictor(p.id)} key={p.id}>

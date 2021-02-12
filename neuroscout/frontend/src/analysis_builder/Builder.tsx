@@ -846,6 +846,11 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
                 updatedAnalysis.runIds = this.runIdsFromModel(data, updatedAnalysis.model.Input);
               }
             } 
+
+            /* If we haven't set a task when changing datasets, select default if only 1 task present.
+               Else we are going to fill the model from the api, so well keep the old model with its task 
+               selection in place.
+            */
             if (
               !(updatedAnalysis && updatedAnalysis.model && updatedAnalysis.model.Input &&
                 !!updatedAnalysis.model.Input.Task)
@@ -864,6 +869,7 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
               }
             } else {
               stateUpdate.model = updatedAnalysis.model;
+              stateUpdate.predictorsLoad = true;
             }
 
             stateUpdate = {

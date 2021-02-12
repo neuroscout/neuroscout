@@ -95,6 +95,7 @@ export interface Predictor {
 export interface ExtractedFeature {
   description: string;
   extractor_name: string;
+  modality: string;
 }
 
 export interface AnalysisConfig {
@@ -335,4 +336,13 @@ export interface ApiUpload {
   collection_id: number;
   uploaded_at: string;
   files: [{level: string, status: string, traceback: (null | string)}];
+}
+
+export interface ApiExtractorDescription {
+  description: string;
+  name: string;
+}
+
+export interface ExtractorDescriptions {
+  [key: string]: string;
 }

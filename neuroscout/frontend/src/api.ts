@@ -46,6 +46,18 @@ export const ApiToAppAnalysis = (data: ApiAnalysis): AppAnalysis => ({
   user_name: data.user
 });
 
+const setPredictorSource = (predictors: Predictor[]): Predictor[] => {
+  predictors.map((x) => {
+    if (!x.description && x.extracted_feature && x.extracted_feature.description) {
+      x.description = x.extracted_feature.description;
+    }
+    if (x.extracted_feature && x.extracted_feature.extractor_name) {
+      x.source = x.extracted_feature.extractor_name;
+    }
+  });
+  return predictors;
+};
+
 export const api = {
   getUser: (): Promise<ApiUser & {statusCode: number}> => {
     return jwtFetch(`${domainRoot}/api/user`);
@@ -92,7 +104,7 @@ export const api = {
       if (data.statusCode && data.statusCode === 422) {
         return [] as Predictor[];
       }
-      return data;
+      return setPredictorSource(data);
     });
   },
 
@@ -101,7 +113,7 @@ export const api = {
       if (data.statusCode && data.statusCode === 422) {
         return [] as Predictor[];
       }
-      return data;
+      return setPredictorSource(data);
     });
   },
 
@@ -236,6 +248,9 @@ export const api = {
   },
   getPublicProfile: (user_name: string): Promise<ApiUser & {statusCode: number}> => {
     return jwtFetch(`${domainRoot}/api/user/${user_name}`);
+  },
+  getExtractorDescriptions: (user_name: string): Promise<ApiUser & {statusCode: number}> => {
+    return jwtFetch(`${domainRoot}/api/extractors`);
   },
   getImageVersion: (): Promise<string> => {
     return jwtFetch(`${domainRoot}/api/image_version`).then((res) => {
