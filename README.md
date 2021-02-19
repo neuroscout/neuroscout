@@ -18,7 +18,7 @@ Optionally, set up pliers API keys for feature extraction in `.pliersenv` (see: 
 [More information on pliers API keys](http://tyarkoni.github.io/pliers/installation.html#api-keys)
 
 Next, set up the Flask server's environment variables by modifying `neuroscout/config/example_app.py`
-and saving as `neuroscout/config/app.py`.
+and saving as `neuroscout/c onfig/app.py`.
 
 Finally, set up the frontend's env variables by modifying `neuroscout/frontend/src/config.ts.example`
 and saving as `neuroscout/frontend/src/config.ts`.
