@@ -9,8 +9,7 @@
 This is the repository for the neuroscout server.
 
 Requirements: Docker and docker-compose.
-
-## Configuration
+ 
 First, set up the main environment variables in `.env` (see: `.env.example`).
 Set `DATASET_DIR`, `KEY_DIR`, and `FILE_DATA` to folders on the host machine.
 
