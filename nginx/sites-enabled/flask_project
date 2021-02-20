@@ -52,6 +52,10 @@ server {
            alias /file-data/analyses;
     }
 
+    location /stimuli {
+           alias /file-data/stimuli;
+    }
+
     location = /api/ {
         return 301 https://$host/api/swagger/;
     }
