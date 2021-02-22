@@ -1,4 +1,6 @@
+from sqlalchemy import cast, func, Float
 from ..database import db
+from .features import ExtractedEvent, ExtractedFeature
 import datetime
 
 
@@ -24,6 +26,12 @@ class Predictor(db.Model):
     predictor_run = db.relationship('PredictorRun')
     active = db.Column(db.Boolean, default=True)  # Actively display or not
     private = db.Column(db.Boolean, default=False)
+    
+    @property
+    def max(self):
+        return db.session.query(
+            func.max(cast(ExtractedEvent.value, Float))).filter(ExtractedEvent.ef_id==self.ef_id)
+
 
     def __repr__(self):
         return '<models.Predictor[name=%s]>' % self.name
