@@ -3,7 +3,6 @@ from ..database import db
 from .features import ExtractedEvent, ExtractedFeature
 import datetime
 
-
 class Predictor(db.Model):
     """ Instantiation of a predictor in a dataset.
     A collection of PredictorEvents. """
@@ -30,8 +29,12 @@ class Predictor(db.Model):
     @property
     def max(self):
         return db.session.query(
-            func.max(cast(ExtractedEvent.value, Float))).filter(ExtractedEvent.ef_id==self.ef_id)
+            func.max(cast(ExtractedEvent.value, Float))).filter(ExtractedEvent.ef_id==self.ef_id).scalar()
 
+    @property
+    def min(self):
+        return db.session.query(
+            func.max(cast(ExtractedEvent.value, Float))).filter(ExtractedEvent.ef_id==self.ef_id).scalar()
 
     def __repr__(self):
         return '<models.Predictor[name=%s]>' % self.name
