@@ -34,7 +34,7 @@ class Predictor(db.Model):
     @property
     def min(self):
         return db.session.query(
-            func.max(cast(ExtractedEvent.value, Float))).filter(ExtractedEvent.ef_id==self.ef_id).scalar()
+            func.min(cast(ExtractedEvent.value, Float))).filter(ExtractedEvent.ef_id==self.ef_id).scalar()
 
     def __repr__(self):
         return '<models.Predictor[name=%s]>' % self.name
