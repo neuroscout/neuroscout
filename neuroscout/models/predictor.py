@@ -1,6 +1,7 @@
-from sqlalchemy import cast, func, Float
+from sqlalchemy import cast, func, Float, desc
 from ..database import db
 from .features import ExtractedEvent, ExtractedFeature
+from .stimulus import Stimulus
 import datetime
 
 class Predictor(db.Model):
@@ -35,6 +36,13 @@ class Predictor(db.Model):
     def min(self):
         return db.session.query(
             func.min(cast(ExtractedEvent.value, Float))).filter(ExtractedEvent.ef_id==self.ef_id).scalar()
+        
+    def get_top_bottom(self, bottom=False, limit=None):
+        val = cast(ExtractedEvent.value, Float)
+        if bottom:
+            val = desc(val)
+
+        return Stimulus.query.join(ExtractedEvent).filter_by(ef_id=self.ef_id).order_by(val).limit(limit).all()
 
     def __repr__(self):
         return '<models.Predictor[name=%s]>' % self.name
