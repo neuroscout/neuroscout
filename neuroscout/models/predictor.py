@@ -31,29 +31,48 @@ class Predictor(db.Model):
     
     @property
     def max(self):
-        return db.session.query(
-            func.max(cast(ExtractedEvent.value, Float))).filter(ExtractedEvent.ef_id==self.ef_id).scalar()
+        try:
+            res = db.session.query(
+                func.max(cast(ExtractedEvent.value, Float))).filter(ExtractedEvent.ef_id==self.ef_id).scalar()
+        except:
+            res  = 'n/a'
+        return res
 
     @property
     def min(self):
-        return db.session.query(
-            func.min(cast(ExtractedEvent.value, Float))).filter(ExtractedEvent.ef_id==self.ef_id).scalar()
-        
+        try:
+            res =  db.session.query(
+                func.min(cast(ExtractedEvent.value, Float))).filter(ExtractedEvent.ef_id==self.ef_id).scalar()
+        except:
+            res  = 'n/a'
+        return res
+
     @property
     def num_na(self):
-        return len([ee for ee in self.extracted_feature.extracted_events if ee.value == 'n/a'])
-    
+        try:
+            res = len([ee for ee in self.extracted_feature.extracted_events if ee.value == 'n/a'])
+        except:
+            res  = 'n/a'
+        return res
     @property
     def mean(self):
-        return np.mean([float(ee.value) for ee in self.extracted_feature.extracted_events])
+        try:
+            res = np.mean([float(ee.value) for ee in self.extracted_feature.extracted_events])
+        except:
+            res  = 'n/a'
+        return res
 
     def get_top_bottom(self, bottom=False, limit=None):
         """ Get the Stimuli associated with the top or botton N values for this Predictor """
-        val = cast(ExtractedEvent.value, Float)
-        if bottom:
-            val = desc(val)
+        try:
+            val = cast(ExtractedEvent.value, Float)
+            if bottom:
+                val = desc(val)
 
-        return Stimulus.query.join(ExtractedEvent).filter_by(ef_id=self.ef_id).order_by(val).limit(limit).all()
+            res = Stimulus.query.join(ExtractedEvent).filter_by(ef_id=self.ef_id).order_by(val).limit(limit).all()
+        except:
+            res  = 'n/a'
+        return res
 
     def __repr__(self):
         return '<models.Predictor[name=%s]>' % self.name
