@@ -23,7 +23,7 @@ class PredictorSchema(Schema):
     max = fields.Float(description="Maximum value")
     min = fields.Float(description="Minimum value")
     mean = fields.Float(description="Mean value")
-    na_num = fields.Int(description="Numbers of n/a's)
+    na_num = fields.Int(description="Numbers of n/as")
     
     dataset_id = fields.Int()
 
