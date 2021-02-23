@@ -67,6 +67,10 @@ def test_get_predictor(auth_client, extract_features):
         'Brightness of an image.'
     assert pred_p[0]['source'] == 'extracted'
     assert pred_p[0]['extracted_feature']['modality'] == 'image'
+    
+    assert pres_[0]['mean'] > 0
+    assert pres_[0]['max'] > pres_[0]['min']
+    assert pres_[0]['num_na'] == 0
 
 
 def test_get_rextracted(auth_client, reextract):
