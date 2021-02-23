@@ -30,36 +30,42 @@ class Predictor(db.Model):
     private = db.Column(db.Boolean, default=False)
     
     @property
-    def max(self):
+    def float_values(self):
+        if self.extracted_feature:
+            key = self.extract_features.extracted_events
+        else:
+            key = self.predictor_events
+            
         try:
-            res = db.session.query(
-                func.max(cast(ExtractedEvent.value, Float))).filter(ExtractedEvent.ef_id==self.ef_id).scalar()
+            vals = [float(ee.value) for ee in key]
         except:
-            res  = 'n/a'
-        return res
+            vals = None
+        return vals
+    @property
+    def max(self):
+        vals = self.float_values
+        if vals:
+            vals =  max(vals)
+        return vals
 
     @property
     def min(self):
-        try:
-            res =  db.session.query(
-                func.min(cast(ExtractedEvent.value, Float))).filter(ExtractedEvent.ef_id==self.ef_id).scalar()
-        except:
-            res  = 'n/a'
-        return res
+        vals = self.float_values
+        if vals:
+            vals =  min(vals)
+        return vals
 
     @property
     def num_na(self):
-        try:
-            res = len([ee for ee in self.extracted_feature.extracted_events if ee.value == 'n/a'])
-        except:
-            res  = 'n/a'
-        return res
+        vals = self.float_values
+        if vals:
+            vals = len([v for v in vals if v == 'n/a'])
+        return vals
     @property
     def mean(self):
-        try:
-            res = np.mean([float(ee.value) for ee in self.extracted_feature.extracted_events])
-        except:
-            res  = 'n/a'
+        vals = self.float_values
+        if vals:
+            vals = np.mean(vals)
         return res
 
     def get_top_bottom(self, bottom=False, limit=None):
@@ -68,10 +74,9 @@ class Predictor(db.Model):
             val = cast(ExtractedEvent.value, Float)
             if bottom:
                 val = desc(val)
-
             res = Stimulus.query.join(ExtractedEvent).filter_by(ef_id=self.ef_id).order_by(val).limit(limit).all()
         except:
-            res  = 'n/a'
+            res = None
         return res
 
     def __repr__(self):
