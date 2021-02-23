@@ -40,7 +40,7 @@ class Predictor(db.Model):
             func.min(cast(ExtractedEvent.value, Float))).filter(ExtractedEvent.ef_id==self.ef_id).scalar()
         
     @property
-    def na_num(self):
+    def num_na(self):
         return len([ee for ee in self.extracted_feature.extracted_events if ee.value == 'n/a'])
     
     @property
