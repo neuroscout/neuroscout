@@ -65,3 +65,43 @@ def tqdm_joblib(tqdm_object):
     finally:
         joblib.parallel.Parallel.print_progress = original_print_progress
         tqdm_object.close()
+        
+        
+def compute_pred_stats(session, pred, commit=False):
+    """ Computes hard coded pre-computed metrics upon ingestion (or on demand)
+    for a Predictor """
+    def max(pred):
+        vals = pred.float_values
+        if vals:
+            vals =  max(vals)
+        return vals
+
+    def min(pred):
+        vals = pred.float_values
+        if vals:
+            vals =  min(vals)
+        return vals
+
+    def num_na(pred):
+        vals = pred.float_values
+        if vals:
+            vals = len([v for v in vals if v == 'n/a'])
+        return vals
+
+    def mean(pred):
+        vals = pred.float_values
+        if vals:
+            vals = np.mean(vals)
+        return vals
+    
+    pred.max = max(pred)
+    pred.min = min(pred)
+    pred.num_na = num_na(pred)
+    pred.mean = mean(pred)
+    
+    session.add(pred)
+    
+    if commit:
+        session.commit()
+        
+    return pred

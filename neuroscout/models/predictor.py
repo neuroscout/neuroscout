@@ -29,6 +29,14 @@ class Predictor(db.Model):
     active = db.Column(db.Boolean, default=True)  # Actively display or not
     private = db.Column(db.Boolean, default=False)
     
+
+    # Summary statistics computed upon ingeston (or ad hock)
+    # These are not updated on the fly
+    max = db.Column(db.Float)
+    max = db.Column(db.Float)
+    num_na = db.Column(db.Int)
+    mean = db.Column(db.Float)
+
     @property
     def float_values(self):
         if self.extracted_feature:
@@ -41,33 +49,7 @@ class Predictor(db.Model):
         except:
             vals = None
         return vals
-    @property
-    def max(self):
-        vals = self.float_values
-        if vals:
-            vals =  max(vals)
-        return vals
 
-    @property
-    def min(self):
-        vals = self.float_values
-        if vals:
-            vals =  min(vals)
-        return vals
-
-    @property
-    def num_na(self):
-        vals = self.float_values
-        if vals:
-            vals = len([v for v in vals if v == 'n/a'])
-        return vals
-
-    @property
-    def mean(self):
-        vals = self.float_values
-        if vals:
-            vals = np.mean(vals)
-        return vals
 
     def get_top_bottom(self, bottom=False, limit=None):
         """ Get the Stimuli associated with the top or botton N values for this Predictor """
