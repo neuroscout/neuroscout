@@ -45,7 +45,7 @@ class Predictor(db.Model):
     
     @property
     def mean(self):
-        return np.mean([float(ee.value) for ee in color.extracted_feature.extracted_events])
+        return np.mean([float(ee.value) for ee in self.extracted_feature.extracted_events])
 
     def get_top_bottom(self, bottom=False, limit=None):
         """ Get the Stimuli associated with the top or botton N values for this Predictor """
