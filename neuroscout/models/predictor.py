@@ -34,7 +34,7 @@ class Predictor(db.Model):
     # These are not updated on the fly
     max = db.Column(db.Float)
     max = db.Column(db.Float)
-    num_na = db.Column(db.Int)
+    num_na = db.Column(db.Integer)
     mean = db.Column(db.Float)
 
     @property
