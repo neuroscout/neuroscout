@@ -7,6 +7,7 @@ import warnings
 from pathlib import Path
 import contextlib
 import joblib
+import numpy as np
 
 def hash_stim(stim, blocksize=65536):
     """ Hash a pliers stimulus """

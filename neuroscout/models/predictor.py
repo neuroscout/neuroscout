@@ -3,7 +3,6 @@ from ..database import db
 from .features import ExtractedEvent, ExtractedFeature
 from .stimulus import Stimulus
 import datetime
-import numpy as np
 
 
 class Predictor(db.Model):
