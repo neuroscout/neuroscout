@@ -100,10 +100,9 @@ def compute_pred_stats(session, pred, commit=False):
     pred.min = get_min(values)
     pred.num_na = num_na(values)
     pred.mean = mean(values)
-    
-    session.add(pred)
-    
+        
     if commit:
+        session.add(pred)
         session.commit()
         
     return pred
