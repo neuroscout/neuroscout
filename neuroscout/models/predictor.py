@@ -39,7 +39,7 @@ class Predictor(db.Model):
     @property
     def float_values(self):
         if self.extracted_feature:
-            key = self.extract_features.extracted_events
+            key = self.extracted_feature.extracted_events
         else:
             key = self.predictor_events
             
