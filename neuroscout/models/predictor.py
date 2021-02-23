@@ -3,6 +3,8 @@ from ..database import db
 from .features import ExtractedEvent, ExtractedFeature
 from .stimulus import Stimulus
 import datetime
+import numpy as np
+
 
 class Predictor(db.Model):
     """ Instantiation of a predictor in a dataset.
@@ -37,7 +39,16 @@ class Predictor(db.Model):
         return db.session.query(
             func.min(cast(ExtractedEvent.value, Float))).filter(ExtractedEvent.ef_id==self.ef_id).scalar()
         
+    @property
+    def na_num(self):
+        return len([ee for ee in self.extracted_feature.extracted_events if ee.value == 'n/a'])
+    
+    @property
+    def mean(self):
+        return np.mean([float(ee.value) for ee in color.extracted_feature.extracted_events])
+
     def get_top_bottom(self, bottom=False, limit=None):
+        """ Get the Stimuli associated with the top or botton N values for this Predictor """
         val = cast(ExtractedEvent.value, Float)
         if bottom:
             val = desc(val)
