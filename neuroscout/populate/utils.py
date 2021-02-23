@@ -70,34 +70,35 @@ def tqdm_joblib(tqdm_object):
 def compute_pred_stats(session, pred, commit=False):
     """ Computes hard coded pre-computed metrics upon ingestion (or on demand)
     for a Predictor """
-    def max(pred):
-        vals = pred.float_values
+    def get_max(vals):
         if vals:
             vals =  max(vals)
         return vals
 
-    def min(pred):
-        vals = pred.float_values
+    def get_min(vals):
         if vals:
             vals =  min(vals)
         return vals
+    
+    def remove_nas(vals):
+        return [v for v in vals if v == 'n/a']
 
-    def num_na(pred):
-        vals = pred.float_values
+    def num_na(vals):
         if vals:
-            vals = len([v for v in vals if v == 'n/a'])
+            vals = len(remove_nas(vals))
         return vals
-
-    def mean(pred):
-        vals = pred.float_values
+    
+    def mean(vals):
         if vals:
             vals = np.mean(vals)
         return vals
     
-    pred.max = max(pred)
-    pred.min = min(pred)
-    pred.num_na = num_na(pred)
-    pred.mean = mean(pred)
+    values = pred.float_values
+    
+    pred.max = get_max(values)
+    pred.min = get_min(values)
+    pred.num_na = num_na(values)
+    pred.mean = mean(values)
     
     session.add(pred)
     
