@@ -61,12 +61,13 @@ class Predictor(db.Model):
         if vals:
             vals = len([v for v in vals if v == 'n/a'])
         return vals
+
     @property
     def mean(self):
         vals = self.float_values
         if vals:
             vals = np.mean(vals)
-        return res
+        return vals
 
     def get_top_bottom(self, bottom=False, limit=None):
         """ Get the Stimuli associated with the top or botton N values for this Predictor """
