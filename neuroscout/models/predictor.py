@@ -47,7 +47,7 @@ class Predictor(db.Model):
             vals = [float(ee.value) for ee in key]
         except:
             vals = None
-        return vals
+        return vals or None
 
 
     def get_top_bottom(self, bottom=False, limit=None):
