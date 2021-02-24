@@ -32,7 +32,7 @@ class Predictor(db.Model):
     # Summary statistics computed upon ingeston (or ad hock)
     # These are not updated on the fly
     max = db.Column(db.Float)
-    max = db.Column(db.Float)
+    min = db.Column(db.Float)
     num_na = db.Column(db.Integer)
     mean = db.Column(db.Float)
 
