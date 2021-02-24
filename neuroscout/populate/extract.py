@@ -186,8 +186,7 @@ def create_predictors(features, dataset_name, task_name=None, run_ids=None,
         
     # Compute metrics
     for pred in all_preds:
-        compute_pred_stats(db.session, preds)
-    db.session.commit()
+        compute_pred_stats(db.session, pred, commit=True)
 
     return [p.id for p in all_preds]
 
