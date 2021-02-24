@@ -4,20 +4,54 @@ predictors. The component includes a table of predictors as well as search box t
 filter the table down to predictors whose name or description match the entered search term
 */
 import * as React from 'react';
-import { Checkbox, Col, Input, Row, Table, Tag, Tooltip } from 'antd';
+import { Checkbox, Col, Input, Row, Table, Tabs, Tag, Tooltip } from 'antd';
 import { TableRowSelection } from 'antd/lib/table/interface';
 
 import memoize from 'memoize-one';
 
 import { Predictor, ExtractorDescriptions } from '../coretypes';
 
+const { TabPane } = Tabs;
 const filterFields = ['source', 'extractor_name', 'modality'];
 
 interface PredictorFilter {
   title: string;
   active: boolean;
+  count: number;
 }
 
+interface PredictorReviewProps {
+  selectedPredictors: Predictor[];
+  removePredictor: (string) => void;
+}
+
+export class PredictorReview extends React.Component<PredictorReviewProps, {} > {
+  render() {
+    const columns = [
+      {
+        title: 'Name',
+        dataIndex: 'name',
+      },
+      {
+        title: 'Source',
+        dataIndex: 'source',
+      },
+      {
+        title: 'Action',
+        dataIndex: 'id',
+        render: (text) => <a onClick={() => this.props.removePredictor(text)}>Remove</a>,
+      },
+    ];
+    return (
+      <Table
+        columns={columns}
+        rowKey="id"
+        size="small"
+        dataSource={this.props.selectedPredictors}
+      />
+    );
+  }
+}
 interface PredictorSelectorProps {
   availablePredictors: Predictor[]; // All available predictors to select from
   selectedPredictors: Predictor[]; // List of predicors selected by the user (when used as a controlled component)
@@ -85,7 +119,7 @@ export class PredictorSelector extends React.Component<
       }
       let stateField = field + 'Filters';
       let updatedFilters = [...unique].sort().map(x => {
-        return {title: x, active: !!this.state[stateField].active};
+        return {title: x, active: !!this.state[stateField].active, count: 0};
       });
       updatedState[stateField] = updatedFilters;
     });
@@ -118,27 +152,30 @@ export class PredictorSelector extends React.Component<
   });
 
   applyFilters = () => {
-    let filteredPredictors = this.props.availablePredictors;
 
     let anyActive = !!this.filterFields.find(filterField => {
         return !!this.state[filterField + 'Filters'].find(filter => filter.active === true);
     });
-
+    let filteredPredictors;
     if (anyActive) {
-      filteredPredictors = this.props.availablePredictors.filter(predictor => {
-        let keep = false;
-        this.filterFields.map(filterField => {
-          this.state[filterField + 'Filters'].map(filter => {
-            if (filter.active === true && predictor[filterField] === filter.title) {
-              keep = true;
-              return;
-            }
-          });
+      filteredPredictors = new Set();
+      this.filterFields.map(filterField => {
+        this.state[filterField + 'Filters'].map(filter => {
+          if (filter.active) {
+            filter.count = this.props.availablePredictors.filter(predictor => {
+              if (predictor[filterField] === filter.title) {
+                filteredPredictors.add(predictor);
+                return true;
+              }
+              return false;
+            }).length;
+          }
         });
-        return keep;
       });
+    } else {
+      filteredPredictors = this.props.availablePredictors;
     }
-    this.setState({filteredPredictors: filteredPredictors});
+    this.setState({filteredPredictors: [...filteredPredictors]});
   };
 
   sourceCmp = (a, b) => {
@@ -173,7 +210,10 @@ export class PredictorSelector extends React.Component<
   render() {
     let { availablePredictors, selectedPredictors, updateSelection } = this.props;
     let { filteredPredictors } = this.state;
+
     filteredPredictors = this.searchFilter(this.state.searchText, filteredPredictors);
+
+    let numSelected = selectedPredictors.length;
 
     const columns = [
       {
@@ -245,68 +285,74 @@ export class PredictorSelector extends React.Component<
       );
     }
 
+    let filterCheckboxes = this.state.sourceFilters.map(filter => {
+      let display = !!filter.count ? `${filter.title} (${filter.count})` : filter.title;
+      return (
+        <Checkbox
+          onChange={() => this.toggleFilter('source', filter.title)}
+          checked={filter.active}
+          key={filter.title}
+        >
+          {display}
+        </Checkbox>
+      );
+    });
+
     return (
       <div>
-        <Row>
-          <Col xl={{span: 18}} lg={{span: 24}}>
-            <div>
-              <Input
-                placeholder="Search predictor name or description..."
-                value={this.state.searchText}
-                onChange={this.onInputChange}
-              />
-              <br />
-              <br />
-            </div>
-            <div>
-              <Table
-                locale={{ emptyText: this.state.searchText ? 'No results found' : 'No data'}}
-                columns={columns}
-                rowKey="id"
-                pagination={{defaultPageSize: 100}}
-                scroll={{y: 465}}
-                size="small"
-                dataSource={filteredPredictors}
-                rowSelection={rowSelection}
-                bordered={false}
-                loading={this.props.predictorsLoad}
-                expandedRowRender={record => <p>{record.description}</p>}
-              />
-            </div>
-            <p style={{'float': 'right'}}>
-              {`Showing  ${filteredPredictors.length} of ${availablePredictors.length} predictors`}
-            </p>
-          </Col>
-          <Col xl={{span: 1}}/>
-          <Col xl={{span: 5}}>
-            <h4>Predictor Source Filter:</h4>
-            {this.state.sourceFilters.map(filter => 
-              <Checkbox
-                onChange={() => this.toggleFilter('source', filter.title)}
-                checked={filter.active}
-                key={filter.title}
-              >
-                  {filter.title}
-              </Checkbox>
-            )}
-            {!!this.state.modalityFilters.length && <h4>Modality Filter:</h4>}
-            {this.state.modalityFilters.map(filter => 
-              <Checkbox
-                onChange={() => this.toggleFilter('modality', filter.title)}
-                checked={filter.active}
-                key={filter.title}
-              >
-                  {filter.title}
-              </Checkbox>
-            )}
-            <h4>Selected Predictors:</h4>
-            {selectedPredictors.map(p =>
-              <Tag closable={true} onClose={ev => this.removePredictor(p.id)} key={p.id}>
-                {p.name}
-              </Tag>
-            )}
-          </Col>
-        </Row>
+        <Tabs type="card">
+          <TabPane tab="Available" key="1">
+            <Row>
+              <Col xl={{span: 16}} lg={{span: 24}}>
+                <div>
+                  <Input
+                    placeholder="Search predictor name or description..."
+                    value={this.state.searchText}
+                    onChange={this.onInputChange}
+                  />
+                  <br />
+                  <br />
+                </div>
+                <div>
+                  <Table
+                    locale={{ emptyText: this.state.searchText ? 'No results found' : 'No data'}}
+                    columns={columns}
+                    rowKey="id"
+                    pagination={{defaultPageSize: 100}}
+                    scroll={{y: 465}}
+                    size="small"
+                    dataSource={filteredPredictors}
+                    rowSelection={rowSelection}
+                    bordered={false}
+                    loading={this.props.predictorsLoad}
+                    expandedRowRender={record => <p>{record.description}</p>}
+                  />
+                </div>
+                <p style={{'float': 'right'}}>
+                  {`Showing  ${filteredPredictors.length} of ${availablePredictors.length} predictors`}
+                </p>
+              </Col>
+              <Col xl={{span: 1}}/>
+              <Col xl={{span: 7}}>
+                <h4>Source:</h4>
+                {filterCheckboxes}
+                {!!this.state.modalityFilters.length && <h4>Modality Filter:</h4>}
+                {this.state.modalityFilters.map(filter =>
+                  <Checkbox
+                    onChange={() => this.toggleFilter('modality', filter.title)}
+                    checked={filter.active}
+                    key={filter.title}
+                  >
+                      {filter.title}
+                  </Checkbox>
+                )}
+              </Col>
+            </Row>
+          </TabPane>
+          <TabPane tab={`Selected (${numSelected})`} key="2">
+            <PredictorReview selectedPredictors={selectedPredictors} removePredictor={this.removePredictor} />
+          </TabPane>
+        </Tabs>
       </div>
     );
   }
