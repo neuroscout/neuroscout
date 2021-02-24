@@ -73,7 +73,7 @@ class PredictorListResource(MethodResource):
         },
         location='query')
     @cache.cached(60 * 60 * 24 * 300, query_string=True)
-    @marshal_with(PredictorSchema(many=True, exclude=['num_na', 'max', 'min', 'mean']))
+    @marshal_with(PredictorSchema(many=True))
     def get(self, **kwargs):
         newest = kwargs.pop('newest')
         active = kwargs.pop('active_only')
