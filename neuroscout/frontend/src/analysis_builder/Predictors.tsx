@@ -84,12 +84,12 @@ export class PredictorSelector extends React.Component<
         );
       }
       let stateField = field + 'Filters';
-      let updatedFilters = [...unique].map(x => {
+      let updatedFilters = [...unique].sort().map(x => {
         return {title: x, active: !!this.state[stateField].active};
       });
       updatedState[stateField] = updatedFilters;
     });
-    this.setState(updatedState);
+    this.setState(updatedState, this.applyFilters);
   };
 
   toggleFilter = (field, title) => {
@@ -118,18 +118,26 @@ export class PredictorSelector extends React.Component<
   });
 
   applyFilters = () => {
-    let filteredPredictors = this.props.availablePredictors.filter(predictor => {
-      let keep = false;
-      this.filterFields.map(filterField => {
-        this.state[filterField + 'Filters'].map(filter => {
-          if (filter.active === true && predictor[filterField] === filter.title) {
-            keep = true;
-            return;
-          }
-        });
-      });
-      return keep;
+    let filteredPredictors = this.props.availablePredictors;
+
+    let anyActive = !!this.filterFields.find(filterField => {
+        return !!this.state[filterField + 'Filters'].find(filter => filter.active === true);
     });
+
+    if (anyActive) {
+      filteredPredictors = this.props.availablePredictors.filter(predictor => {
+        let keep = false;
+        this.filterFields.map(filterField => {
+          this.state[filterField + 'Filters'].map(filter => {
+            if (filter.active === true && predictor[filterField] === filter.title) {
+              keep = true;
+              return;
+            }
+          });
+        });
+        return keep;
+      });
+    }
     this.setState({filteredPredictors: filteredPredictors});
   };
 
