@@ -19,11 +19,12 @@ class PredictorSchema(Schema):
     source = fields.Str()
     private = fields.Boolean(
         description="Predictor visible to the public or not")
+
     max = fields.Float(description="Maximum value")
     min = fields.Float(description="Minimum value")
     mean = fields.Float(description="Mean value")
-    stddev = fields.Float(description="Standard deviation of value")
-    num_na = fields.Int(description="Number of missing values")
+    num_na = fields.Int(description="Numbers of n/as")
+    
     dataset_id = fields.Int()
 
     @post_dump
@@ -31,6 +32,7 @@ class PredictorSchema(Schema):
         if data.get('extracted_feature', True) is None:
             data.pop('extracted_feature')
         return data
+
 
 
 class PredictorRunSchema(Schema):
