@@ -52,6 +52,7 @@ export class PredictorReview extends React.Component<PredictorReviewProps, {} > 
     );
   }
 }
+
 interface PredictorSelectorProps {
   availablePredictors: Predictor[]; // All available predictors to select from
   selectedPredictors: Predictor[]; // List of predicors selected by the user (when used as a controlled component)
@@ -138,6 +139,19 @@ export class PredictorSelector extends React.Component<
     this.setState(stateUpdate, this.applyFilters);
   }
 
+  clearFilters = () => {
+    let stateUpdate = {};
+    this.filterFields.map((field) => {
+      let fieldName = field + 'Filters';
+      stateUpdate[fieldName] = this.state[fieldName].map(filter => {
+        filter.active = false;
+        filter.count = 0;
+        return filter;
+      });
+    });
+    this.setState({...stateUpdate, filteredPredictors: this.props.availablePredictors});
+  }
+
   searchFilter = memoize((searchText, filteredPredictors) => {
     const searchRegex = new RegExp(searchText.trim(), 'i');
     if (searchText.length > 2) {
@@ -163,9 +177,16 @@ export class PredictorSelector extends React.Component<
         this.state[filterField + 'Filters'].map(filter => {
           if (filter.active) {
             filter.count = this.props.availablePredictors.filter(predictor => {
-              if (predictor[filterField] === filter.title) {
-                filteredPredictors.add(predictor);
-                return true;
+              if (filterField === 'source') {
+                if (predictor[filterField] === filter.title) {
+                  filteredPredictors.add(predictor);
+                  return true;
+                }
+              } else if (!!predictor.extracted_feature) {
+                if (predictor.extracted_feature[filterField] === filter.title) {
+                  filteredPredictors.add(predictor);
+                  return true;
+                }
               }
               return false;
             }).length;
@@ -184,32 +205,30 @@ export class PredictorSelector extends React.Component<
     return x.localeCompare(y);
   }
 
-  sourceRender = (text, record) => {
-    let inner = (
-      <div style={{ wordWrap: 'break-word', wordBreak: 'break-word' }}>
-        {text}
-      </div>
-    );
-    if (this.props.extractorDescriptions && this.props.extractorDescriptions[text]) {
-      return (
-        <Tooltip color="pink" title={this.props.extractorDescriptions[text]}>
-          {inner}
-        </Tooltip>
-      );
-    } else {
-      return inner;
-    }
-  }
-
   componentDidUpdate(prevProps) {
     if (prevProps.predictorsLoad && !this.props.predictorsLoad) {
       this.updateFilters(this.props.availablePredictors);
     }
   }
 
+  filterCheckboxes = (filterType) => this.state[filterType + 'Filters'].map(filter => {
+    let display = !!filter.count && filter.active ? `${filter.title} (${filter.count})` : filter.title;
+    return (
+      <Checkbox
+        onChange={() => this.toggleFilter(filterType, filter.title)}
+        checked={filter.active}
+        key={filter.title}
+      >
+        {display}
+      </Checkbox>
+    );
+  })
+
   render() {
     let { availablePredictors, selectedPredictors, updateSelection } = this.props;
     let { filteredPredictors } = this.state;
+    // tslint:disable-next-line:no-console
+    console.log(this.props);
 
     filteredPredictors = this.searchFilter(this.state.searchText, filteredPredictors);
 
@@ -221,8 +240,8 @@ export class PredictorSelector extends React.Component<
         dataIndex: 'name',
         sorter: (a, b) => a.name.localeCompare(b.name),
         render: (text, record) => (
-          <div style={{ wordWrap: 'break-word', wordBreak: 'break-word' }}>
-            {text}
+          <div title={record.description} style={{ wordWrap: 'break-word', wordBreak: 'break-word' }}>
+              {text}
           </div>
         )
         // width: '35%'
@@ -232,7 +251,11 @@ export class PredictorSelector extends React.Component<
         dataIndex: 'source',
         sorter: this.sourceCmp,
         defaultSortOrder: 'ascend' as 'ascend',
-        render: this.sourceRender
+        render: (text, record) => (
+          <div title={record.description} style={{ wordWrap: 'break-word', wordBreak: 'break-word' }}>
+              {text}
+          </div>
+        )
         // width: '30%'
       },
     ];
@@ -285,18 +308,8 @@ export class PredictorSelector extends React.Component<
       );
     }
 
-    let filterCheckboxes = this.state.sourceFilters.map(filter => {
-      let display = !!filter.count ? `${filter.title} (${filter.count})` : filter.title;
-      return (
-        <Checkbox
-          onChange={() => this.toggleFilter('source', filter.title)}
-          checked={filter.active}
-          key={filter.title}
-        >
-          {display}
-        </Checkbox>
-      );
-    });
+    let sourceCheckboxes = this.filterCheckboxes('source');
+    let modalityCheckboxes = this.filterCheckboxes('modality');
 
     return (
       <div>
@@ -318,8 +331,7 @@ export class PredictorSelector extends React.Component<
                     locale={{ emptyText: this.state.searchText ? 'No results found' : 'No data'}}
                     columns={columns}
                     rowKey="id"
-                    pagination={{defaultPageSize: 100}}
-                    scroll={{y: 465}}
+                    pagination={{defaultPageSize: 20}}
                     size="small"
                     dataSource={filteredPredictors}
                     rowSelection={rowSelection}
@@ -335,17 +347,10 @@ export class PredictorSelector extends React.Component<
               <Col xl={{span: 1}}/>
               <Col xl={{span: 7}}>
                 <h4>Source:</h4>
-                {filterCheckboxes}
+                {sourceCheckboxes}
                 {!!this.state.modalityFilters.length && <h4>Modality Filter:</h4>}
-                {this.state.modalityFilters.map(filter =>
-                  <Checkbox
-                    onChange={() => this.toggleFilter('modality', filter.title)}
-                    checked={filter.active}
-                    key={filter.title}
-                  >
-                      {filter.title}
-                  </Checkbox>
-                )}
+                {modalityCheckboxes}
+                <a onClick={this.clearFilters}>Clear All</a>
               </Col>
             </Row>
           </TabPane>
