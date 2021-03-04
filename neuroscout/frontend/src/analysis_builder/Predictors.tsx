@@ -227,8 +227,6 @@ export class PredictorSelector extends React.Component<
   render() {
     let { availablePredictors, selectedPredictors, updateSelection } = this.props;
     let { filteredPredictors } = this.state;
-    // tslint:disable-next-line:no-console
-    console.log(this.props);
 
     filteredPredictors = this.searchFilter(this.state.searchText, filteredPredictors);
 
