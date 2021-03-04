@@ -28,7 +28,7 @@ describe('Analysis Builder', () => {
     /* Predictor Tab - select first 3 predictors */
     let count = 0
     cy.contains('Select Predictors').parent().within(() => {
-      cy.contains('RT')
+      cy.contains('Brightness')
       cy.get('.ant-table-tbody').find('input[type=checkbox]').each(($el, index, $list) => {
         if (count < predCount) {
           $el.click()
