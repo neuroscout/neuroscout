@@ -41,7 +41,7 @@ class RunListResource(MethodResource):
         return query.all()
 
 
-class RunTimingResource(MethodResource:
+class RunTimingResource(MethodResource):
     @doc(tags=['run'], summary='Get stimulus timing for a run.')
     def get(self, run_id):
         stim_paths  = Stimulus.query.filter(Stimulus.mimetype.like('video%')).join(
