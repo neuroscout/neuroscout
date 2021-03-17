@@ -48,9 +48,7 @@ export const ApiToAppAnalysis = (data: ApiAnalysis): AppAnalysis => ({
 
 const setPredictorSource = (predictors: Predictor[]): Predictor[] => {
   predictors.map((x) => {
-    if (!x.description && x.extracted_feature && x.extracted_feature.description) {
-      x.description = x.extracted_feature.description;
-    }
+    Object.assign(x, x.extracted_feature, x);
     if (x.extracted_feature && x.extracted_feature.extractor_name) {
       x.source = x.extracted_feature.extractor_name;
     }

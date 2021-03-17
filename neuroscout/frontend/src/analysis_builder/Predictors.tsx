@@ -4,7 +4,7 @@ predictors. The component includes a table of predictors as well as search box t
 filter the table down to predictors whose name or description match the entered search term
 */
 import * as React from 'react';
-import { Checkbox, Col, Input, Row, Table, Tabs, Tag, Tooltip } from 'antd';
+import { Checkbox, Col, Descriptions, Input, Row, Table, Tabs, Tag, Tooltip } from 'antd';
 import { TableRowSelection } from 'antd/lib/table/interface';
 
 import memoize from 'memoize-one';
@@ -111,13 +111,7 @@ export class PredictorSelector extends React.Component<
     let updatedState = this.state;
     this.filterFields.map(field => {
       let unique = new Set();
-      if (field === 'source') {
-        predictors.map(x => !!x[field] ? unique.add(x[field]) : null);
-      } else {
-        predictors.map(x =>
-          x.extracted_feature && !! x.extracted_feature[field] ? unique.add(x.extracted_feature[field]) : null
-        );
-      }
+      predictors.map(x => !!x[field] ? unique.add(x[field]) : null);
       let stateField = field + 'Filters';
       let updatedFilters = [...unique].sort().map(x => {
         return {title: x, active: !!this.state[stateField].active, count: 0};
@@ -177,16 +171,9 @@ export class PredictorSelector extends React.Component<
         this.state[filterField + 'Filters'].map(filter => {
           if (filter.active) {
             filter.count = this.props.availablePredictors.filter(predictor => {
-              if (filterField === 'source') {
-                if (predictor[filterField] === filter.title) {
-                  filteredPredictors.add(predictor);
-                  return true;
-                }
-              } else if (!!predictor.extracted_feature) {
-                if (predictor.extracted_feature[filterField] === filter.title) {
-                  filteredPredictors.add(predictor);
-                  return true;
-                }
+              if (predictor[filterField] === filter.title) {
+                filteredPredictors.add(predictor);
+                return true;
               }
               return false;
             }).length;
@@ -223,6 +210,22 @@ export class PredictorSelector extends React.Component<
       </Checkbox>
     );
   })
+
+  expandedRowRender = (predictor: Predictor) => {
+    const detailFields = {'max': 'maximum', 'min': 'minimum', 'mean': 'mean', 'num_na': 'number of N/As',
+      'modality': 'modality', 'description': 'description', 'resample_frequency': 'resample frequency'};
+    let descItems: JSX.Element[] = [];
+    for (const field in detailFields) {
+      if (field in predictor && predictor[field] !== null) {
+        descItems.push(<Descriptions.Item label={detailFields[field]}>{predictor[field]}</Descriptions.Item>);
+      }
+    }
+    return (
+      <Descriptions bordered={true} size="small">
+        {descItems}
+      </Descriptions>
+    );
+  }
 
   render() {
     let { availablePredictors, selectedPredictors, updateSelection } = this.props;
@@ -335,7 +338,7 @@ export class PredictorSelector extends React.Component<
                     rowSelection={rowSelection}
                     bordered={false}
                     loading={this.props.predictorsLoad}
-                    expandedRowRender={record => <p>{record.description}</p>}
+                    expandedRowRender={this.expandedRowRender}
                   />
                 </div>
                 <p style={{'float': 'right'}}>
