@@ -1,6 +1,6 @@
 from flask_apispec import MethodResource, marshal_with, use_kwargs, doc
 from webargs import fields
-from ..models import Run
+from ..models import Run, Stimulus, RunStimulus
 from .utils import first_or_404
 from ..schemas.run import RunSchema
 
