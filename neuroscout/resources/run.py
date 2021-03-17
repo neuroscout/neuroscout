@@ -39,3 +39,12 @@ class RunListResource(MethodResource):
         if dataset:
             query = query.join('dataset').filter_by(id=dataset)
         return query.all()
+
+
+class RunTimingResource(MethodResource:
+    @doc(tags=['run'], summary='Get stimulus timing for a run.')
+    def get(self, run_id):
+        stim_paths  = Stimulus.query.filter(Stimulus.mimetype.like('video%')).join(
+            RunStimulus).filter_by(run_id=r.id).with_entities('Stimulus.path', 'run_stimulus.onset').all()
+
+        return [{'filename': s[0].split('/')[-1], 'onset': s[1]} for s in stim_paths]
