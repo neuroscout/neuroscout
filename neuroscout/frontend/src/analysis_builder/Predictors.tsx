@@ -213,10 +213,10 @@ export class PredictorSelector extends React.Component<
 
   expandedRowRender = (predictor: Predictor) => {
     const detailFields = {'max': 'maximum', 'min': 'minimum', 'mean': 'mean', 'num_na': 'number of N/As',
-      'modality': 'modality', 'description': 'description', 'resample_frequency': 'resample frequency'};
+      'modality': 'modality', 'description': 'description'};
     let descItems: JSX.Element[] = [];
     for (const field in detailFields) {
-      if (field in predictor && predictor[field] !== null) {
+      if (field in predictor && predictor[field]) {
         descItems.push(<Descriptions.Item label={detailFields[field]}>{predictor[field]}</Descriptions.Item>);
       }
     }
