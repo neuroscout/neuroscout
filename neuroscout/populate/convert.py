@@ -258,7 +258,7 @@ def predictor_to_text_stim(predictor_id, task_name, transformer='reading',
 
     predictor = Predictor.query.filter_by(id=predictor_id).one()
     dataset_id = predictor.dataset_id
-    
+
     rst = namedtuple('RunStimulus', ['onset', 'duration', 'run_id'])
 
     if params is None:
@@ -268,13 +268,17 @@ def predictor_to_text_stim(predictor_id, task_name, transformer='reading',
         pes = PredictorEvent.query.filter_by(
             run_id=pr.run_id, predictor_id=predictor_id)
 
+        # Uniquify
+        pes = [(pe.value, pe.onset, pe.duration) for pe in pes]
+        pes = set(pes)
+
         # Calculate run duration
         duration = Run.query.filter_by(id=pr.run_id).one().duration
 
         # Create new stimuli
         new_stims = [
-            TextStim(text=pe.value, onset=pe.onset,
-                     duration=pe.duration)
+            TextStim(text=pe[0], onset=pe[1],
+                     duration=pe[2])
             for pe in pes]
 
         # Complete transcript stimulus stand in
