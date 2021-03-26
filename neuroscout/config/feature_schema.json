@@ -513,6 +513,9 @@
       "features": {
         "speech": {
           "description": "Speech (binarized, on or off)"
+        },
+        "reading": {
+          "description": "Reading (binarize, on or off"
         }
       }
     }
