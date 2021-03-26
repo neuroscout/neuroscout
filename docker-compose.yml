@@ -35,7 +35,7 @@ services:
     build: ./postgres
     shm_size: 1g
     volumes:
-      - /media/neuroscout-data/neuroscout/db_data:/var/lib/postgresql/data
+      - /media/neuroscout-db/db_data:/var/lib/postgresql/data
     expose:
       - '5432'
     environment:
