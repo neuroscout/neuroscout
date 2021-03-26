@@ -9,13 +9,15 @@ from pliers.stimuli import (TextStim, ImageStim, VideoFrameStim,
                             ComplexTextStim, VideoStim, AudioStim, load_stims)
 from pliers.graph import Graph
 
-from ..models import Dataset, Task, Run, Stimulus, RunStimulus
+from ..models import (
+    Dataset, Task, Run, Stimulus, RunStimulus, Predictor, PredictorEvent)
 from ..utils.core import listify
 from .utils import hash_stim
 from .ingest import add_stimulus
 
 import pandas as pd
 from tqdm import tqdm
+from collections import namedtuple
 
 
 def save_stim_filename(stimulus):
@@ -47,7 +49,7 @@ def save_stim_filename(stimulus):
         return stim_hash, path, None, None
 
 
-def create_new_stimuli(dataset_id, task_name, parent_id, new_stims, rs_orig,
+def create_new_stimuli(dataset_id, task_name, new_stims, rs_orig, parent_id=None,
                        transformer=None, transformer_params=None):
     new_models = {}
     print("Creating stimuli...")
@@ -146,7 +148,8 @@ def convert_stimuli(dataset_name, task_name, converters):
                 results = [res for res in results
                            if hasattr(res, 'data') and res.data != '']
                 new_stims += create_new_stimuli(
-                    dataset_id, task_name, stim.id, results, rs_orig,
+                    dataset_id, task_name, results, rs_orig,
+                    parent_id=stim.id,
                     transformer=name,
                     transformer_params=params)
 
@@ -165,7 +168,7 @@ def convert_stimuli(dataset_name, task_name, converters):
 
 def ingest_text_stimuli(filename, dataset_name, task_name, parent_ids=None,
                         transformer='FAVEAlign', params=None, onsets=None,
-                        resample_ratio=1, complete_only=False):
+                        resample_ratio=1, complete_only=False, col_name='text'):
     """ Ingest converted text stimuli from file.
     Args:
         filename - aligned transcript, with onset, duration and text columns
@@ -242,5 +245,56 @@ def ingest_text_stimuli(filename, dataset_name, task_name, parent_ids=None,
         params['resample_ratio'] = resample_ratio
 
         create_new_stimuli(
-            dataset_id, task_name, parent_id, new_stims, rs_orig,
+            dataset_id, task_name, new_stims, rs_orig,
+            parent_id=parent_id, transformer=transformer, 
+            transformer_params=params)
+
+
+def predictor_to_text_stim(predictor_id, task_name, transformer='reading',
+                           params=None):
+    """ Convert Predictors that were ingested from the original dataset's
+    event files into a Stimulus. This is useful for Predictors which are
+    speech or reading transcripts with word specific onsets and durations """
+
+    predictor = Predictor.query.filter_by(id=predictor_id).one()
+    dataset_id = predictor.dataset_id
+    
+    rst = namedtuple('RunStimulus', ['onset', 'duration', 'run_id'])
+
+    if params is None:
+        params = {}
+
+    for pr in predictor.predictor_run:
+        pes = PredictorEvent.query.filter_by(
+            run_id=pr.run_id, predictor_id=predictor_id)
+
+        # Calculate run duration
+        duration = Run.query.filter_by(id=pr.run_id).one().duration
+
+        # Create new stimuli
+        new_stims = [
+            TextStim(text=pe.value, onset=pe.onset,
+                     duration=pe.duration)
+            for pe in pes]
+
+        # Complete transcript stimulus stand in
+        transcript_stim = ComplexTextStim(
+            elements=new_stims)
+        transcript_stim.name = 'FULL_TRANSCRIPT'
+
+        new_stims.append(transcript_stim)
+
+        onset = 0
+
+        # Duration is the max onset + that duration
+        duration = max([pe.onset for pe in pes])
+        duration += [pe.duration for pe in pes if pe.onset == duration][0]
+
+        rs = rst(onset=onset, duration=duration, run_id=pr.run_id)
+
+        params['onset'] = onset
+        params['duration'] = duration
+
+        create_new_stimuli(
+            dataset_id, task_name, new_stims, [rs],
             transformer=transformer, transformer_params=params)
