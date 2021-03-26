@@ -291,8 +291,8 @@ def predictor_to_text_stim(predictor_id, task_name, transformer='reading',
         onset = 0
 
         # Duration is the max onset + that duration
-        duration = max([pe.onset for pe in pes])
-        duration += [pe.duration for pe in pes if pe.onset == duration][0]
+        duration = max([pe[1] for pe in pes])
+        duration += [pe[2] for pe in pes if pe[1] == duration][0]
 
         rs = rst(onset=onset, duration=duration, run_id=pr.run_id)
 
