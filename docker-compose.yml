@@ -52,7 +52,7 @@ services:
     expose:
       - '8080'
 
-  redis:
+  scout_redis:
     image: redis
 
   worker:
@@ -60,7 +60,7 @@ services:
       context: ./
       dockerfile: celery_worker/Dockerfile
     depends_on:
-      - redis
+      - scout_redis
     entrypoint: celery -A tasks worker --loglevel=info
     volumes:
       - ${FILE_DATA}:/file-data
@@ -79,7 +79,7 @@ services:
     volumes:
       - ./celery_worker:/celery_worker
     depends_on:
-      - redis
+      - scout_redis
     env_file:
        - .env
 
