@@ -50,7 +50,18 @@ def save_stim_filename(stimulus):
 
 
 def create_new_stimuli(dataset_id, task_name, new_stims, rs_orig, parent_id=None,
-                       transformer=None, transformer_params=None):
+                       transformer=None, transformer_params=None, delete_old=True):
+    """ Create new derived stimuli and insert into the database
+    Args:
+        dataset_id - Dataset id.
+        task_name - Task name.
+        new_stims - List of Pliers stimuli object to insert
+        rs_orig - RunStimulus associations of parent stimuli
+        parent_id - Optional parent_id
+        transfer - Optional transformer to annotate in db
+        transformer_params - Parameters to record in db
+        delete_old - Deletes old RunStimulus associated with derived stimulus
+    """
     new_models = {}
     print("Creating stimuli...")
     for stim in tqdm(new_stims):
@@ -68,7 +79,7 @@ def create_new_stimuli(dataset_id, task_name, new_stims, rs_orig, parent_id=None
                 dataset_id=dataset_id,
                 mimetype=mimetype)
 
-            if not new:
+            if delete_old and not new:
                 # Delete previous RS associations with this derived stim
                 delete = db.session.query(RunStimulus.id).filter_by(
                     stimulus_id=stim_model.id).join(Run).join(
@@ -301,4 +312,5 @@ def predictor_to_text_stim(predictor_id, task_name, transformer='reading',
 
         create_new_stimuli(
             dataset_id, task_name, new_stims, [rs],
-            transformer=transformer, transformer_params=params)
+            transformer=transformer, transformer_params=params,
+            delete_old=False)
