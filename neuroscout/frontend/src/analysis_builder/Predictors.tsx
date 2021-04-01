@@ -55,7 +55,7 @@ export class PredictorReview extends React.Component<PredictorReviewProps, {} > 
 
 interface PredictorSelectorProps {
   availablePredictors: Predictor[]; // All available predictors to select from
-  selectedPredictors: Predictor[]; // List of predicors selected by the user (when used as a controlled component)
+  selectedPredictors: Predictor[]; // List of predictors selected by the user (when used as a controlled component)
   // Callback to parent component to update selection
   updateSelection: (newPredictors: Predictor[], filteredPredictors: Predictor[]) => void;
   predictorsLoad?: boolean;
@@ -66,8 +66,7 @@ interface PredictorSelectorProps {
 
 interface PredictorsSelectorState {
   searchText: string;  // Search term entered in search box
-  filteredPredictors: Predictor[]; // Subset of available preditors whose name or description match the search term
-  selectedPredictors: Predictor[]; // List of selected predictors (when used as an uncontrolled component)
+  filteredPredictors: Predictor[]; // Subset of available predictors whose name or description match the search term
   selectedText?: string;
   sourceFilters: PredictorFilter[];
   modalityFilters: PredictorFilter[];
@@ -85,7 +84,6 @@ export class PredictorSelector extends React.Component<
     this.state = {
       searchText: '',
       filteredPredictors: availablePredictors,
-      selectedPredictors,
       selectedText: selectedText ? selectedText : '',
       sourceFilters: [],
       modalityFilters: [],
@@ -160,30 +158,27 @@ export class PredictorSelector extends React.Component<
   });
 
   applyFilters = () => {
+    let filterOn = this.props.availablePredictors;
 
-    let anyActive = !!this.filterFields.find(filterField => {
-        return !!this.state[filterField + 'Filters'].find(filter => filter.active === true);
-    });
-    let filteredPredictors;
-    if (anyActive) {
-      filteredPredictors = new Set();
-      this.filterFields.map(filterField => {
-        this.state[filterField + 'Filters'].map(filter => {
-          if (filter.active) {
-            filter.count = this.props.availablePredictors.filter(predictor => {
-              if (predictor[filterField] === filter.title) {
-                filteredPredictors.add(predictor);
-                return true;
-              }
-              return false;
-            }).length;
-          }
-        });
+    this.filterFields.map(filterField => {
+      if (!this.state[filterField + 'Filters'].find(filter => filter.active === true)) {
+        return;
+      }
+      let filterClassPredictors = [] as Predictor[];
+      this.state[filterField + 'Filters'].map(filter => {
+        if (filter.active) {
+          filter.count = filterOn.filter(predictor => {
+            if (predictor[filterField] === filter.title) {
+              filterClassPredictors.push(predictor);
+              return true;
+            }
+            return false;
+          }).length;
+        }
       });
-    } else {
-      filteredPredictors = this.props.availablePredictors;
-    }
-    this.setState({filteredPredictors: [...filteredPredictors]});
+      filterOn = filterClassPredictors;
+    });
+    this.setState({filteredPredictors: [...filterOn]});
   };
 
   sourceCmp = (a, b) => {
@@ -252,11 +247,17 @@ export class PredictorSelector extends React.Component<
         dataIndex: 'source',
         sorter: this.sourceCmp,
         defaultSortOrder: 'ascend' as 'ascend',
-        render: (text, record) => (
-          <div title={record.description} style={{ wordWrap: 'break-word', wordBreak: 'break-word' }}>
-              {text}
-          </div>
-        )
+        render: (text, record) => {
+          let description = '';
+          if (this.props.extractorDescriptions && this.props.extractorDescriptions[text]) {
+            description = this.props.extractorDescriptions[text];
+          }
+          return (
+            <div title={description} style={{ wordWrap: 'break-word', wordBreak: 'break-word' }}>
+                {text}
+            </div>
+          );
+        }
         // width: '30%'
       },
     ];

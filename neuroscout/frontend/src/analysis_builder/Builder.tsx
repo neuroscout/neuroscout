@@ -124,6 +124,7 @@ let initializeStore = (): Store => ({
   fillAnalysis: false,
   analysis404: false,
   doTooltip: false,
+  extractorDescriptions: {}
 });
 
 // Get list of tasks from a given dataset
@@ -742,7 +743,7 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
     let stateUpdate: any = {};
     let newAnalysis = { ...this.state.analysis };
     let filteredIds = filteredPredictors.map(x => x.id);
-    let valueIds = value.map(x => x.id);
+    let valueIds = value.filter(x => !!x).map(x => x.id);
     let selectedPredictors = hrf ? 'selectedHRFPredictors' : 'selectedPredictors';
     let predictorIds = hrf ? 'hrfPredictorIds' : 'predictorIds';
 
@@ -1091,6 +1092,9 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
       })
       .catch(displayError);
     }
+    api.getExtractorDescriptions().then(response => {
+      this.setState({extractorDescriptions: response});
+    });
   }
 
   componentWillUnmount() {
@@ -1203,6 +1207,7 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
                     selectedPredictors={selectedPredictors}
                     updateSelection={this.updatePredictorState}
                     predictorsLoad={this.state.predictorsLoad || this.state.fillAnalysis}
+                    extractorDescriptions={this.state.extractorDescriptions}
                   />
                   <br/>
                   {this.navButtons(!(selectedPredictors.length > 0))}

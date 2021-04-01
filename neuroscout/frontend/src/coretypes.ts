@@ -204,6 +204,7 @@ export interface Store {
   analysis404: boolean;
   doTooltip: boolean;
   user?: UserStore;
+  extractorDescriptions: ExtractorDescriptions;
 }
 
 export interface ApiRun {

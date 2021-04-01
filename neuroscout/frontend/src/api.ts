@@ -9,6 +9,7 @@ import {
   ApiUser,
   AppAnalysis,
   Dataset,
+  ExtractorDescriptions,
   Predictor,
   Run,
   User
@@ -247,8 +248,14 @@ export const api = {
   getPublicProfile: (user_name: string): Promise<ApiUser & {statusCode: number}> => {
     return jwtFetch(`${domainRoot}/api/user/${user_name}`);
   },
-  getExtractorDescriptions: (user_name: string): Promise<ApiUser & {statusCode: number}> => {
-    return jwtFetch(`${domainRoot}/api/extractors`);
+  getExtractorDescriptions: (): Promise<ExtractorDescriptions> => {
+    return jwtFetch(`${domainRoot}/api/extractors`).then(response => {
+      let descriptions = {};
+      response.map(elem => {
+        descriptions[elem.name] = elem.description;
+      });
+      return descriptions;
+    });
   },
   getImageVersion: (): Promise<string> => {
     return jwtFetch(`${domainRoot}/api/image_version`).then((res) => {
