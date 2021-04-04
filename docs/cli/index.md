@@ -25,9 +25,9 @@ Unlike docker, you control where your images are built.
 To build a _neuroscout-cli_ singularity image on your own, modify
 the template command below:
 
-    singularity build /my_images/ceuroscout-cli-<version>.simg docker://neuroscout/neuroscout-cli:<version>
+    singularity build /my_images/ceuroscout-cli-<version>.simg docker://neuroscout/neuroscout-cli:version-<version>
 
-where `<version>` should be replaced with the desired version of neuroscout-cli that you want to download.
+where `<version>` should be replaced with the desired version of neuroscout-cli that you want to download (e.g., `docker://neuroscout/neuroscout-cli:version-0.4.2`).
 
 ### Manual installation
 

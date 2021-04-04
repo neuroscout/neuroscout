@@ -6,7 +6,7 @@ Docker commands for _neuroscout-cli_ will always being with:
 
     docker run -it --rm
 
-Singularity commands for _neuroscout-cli_ will always being with:
+Or if you are using Singularity:
 
     singularity run --cleanenv
 
