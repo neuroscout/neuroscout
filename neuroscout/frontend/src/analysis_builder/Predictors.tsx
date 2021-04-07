@@ -198,7 +198,7 @@ export class PredictorSelector extends React.Component<
 
   filterCheckboxes = (filterType) => this.state[filterType + 'Filters'].map(filter => {
     let display = !!filter.count && filter.active ? `${filter.title} (${filter.count})` : filter.title;
-    return (
+    let checkbox = (
       <Checkbox
         onChange={() => this.toggleFilter(filterType, filter.title)}
         checked={filter.active}
@@ -207,6 +207,12 @@ export class PredictorSelector extends React.Component<
         {display}
       </Checkbox>
     );
+
+    if (this.props.extractorDescriptions && this.props.extractorDescriptions[filter.title]) {
+      let description = this.props.extractorDescriptions[filter.title];
+      checkbox = (<div title={description}>{checkbox}</div>);
+    }
+    return checkbox;
   })
 
   expandedRowRender = (predictor: Predictor) => {
