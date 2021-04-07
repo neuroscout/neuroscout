@@ -89,6 +89,9 @@ export class PredictorSelector extends React.Component<
       modalityFilters: [],
       extractor_nameFilters: []
     };
+    if (availablePredictors.length > 0) {
+      this.updateFilters(availablePredictors);
+    }
   }
 
   onInputChange = e => {
