@@ -156,17 +156,18 @@ def create_predictors(features, dataset_name, task_name=None, run_ids=None,
     # Create/Get Predictors
     all_preds = []
     for ef in features:
-        # Calculate num of runs this feature is present in
-        unique_runs = RunStimulus.query.filter(
-            RunStimulus.stimulus_id.in_(
-                set([ee.stimulus_id for ee in ef.extracted_events]))).\
-                distinct('run_id')
-
-        if unique_runs.count() / n_runs > percentage_include:
-            all_preds.append(get_or_create(
-                Predictor, name=ef.feature_name, description=ef.description,
-                dataset_id=dataset.id,
-                source='extracted', ef_id=ef.id)[0])
+        create = True
+        if percentage_include:
+            # Calculate num of runs this feature is present in
+            unique_runs = RunStimulus.query.filter(
+                RunStimulus.stimulus_id.in_(
+                    set([ee.stimulus_id for ee in ef.extracted_events]))).\
+                    distinct('run_id')
+            create = unique_runs.count() / n_runs > percentage_include
+        all_preds.append(get_or_create(
+            Predictor, name=ef.feature_name, description=ef.description,
+            dataset_id=dataset.id,
+            source='extracted', ef_id=ef.id)[0])
 
     # Create PredictorRuns
     for ix, predictor in enumerate(tqdm(all_preds)):

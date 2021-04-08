@@ -74,6 +74,10 @@ def writeout_events(analysis, pes, outdir, run_ids=None):
 def build_analysis(analysis, predictor_events, bids_dir,
                    run_ids=None, build=True):
     """ Write out and build analysis object """
+    
+    if predictor_events == []:
+        raise Exception("Error: Predictor events are null")
+
     tmp_dir = Path(mkdtemp())
 
     # Get set of entities across analysis

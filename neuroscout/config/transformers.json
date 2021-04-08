@@ -58,6 +58,11 @@
       "extractor_name": "ComplexTextExtractor"
     },
     {
+      "function": "dummy",
+      "new_name": "reading",
+      "extractor_name": "ComplexTextExtractor"
+    },
+    {
       "function": "dummy_value",
       "new_name": "shot_change",
       "extractor_name": "GoogleVideoAPIShotDetectionExtractor",

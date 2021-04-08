@@ -81,13 +81,19 @@ class PredictorSerializer(Serializer):
 
         events = []
         for i, onset in enumerate(onsets):
-            events.append(
-                {
-                    'onset': onset,
-                    'duration': durations[i],
-                    'value': values[i]
-                 }
-            )
+            try:
+                events.append(
+                    {
+                        'onset': onset,
+                        'duration': durations[i],
+                        'value': values[i]
+                    }
+                )
+            except IndexError:
+                if len(onsets) - len(values) == 1:
+                    pass
+                else:
+                    raise IndexError
 
         return annotated, events
 
