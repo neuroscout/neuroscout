@@ -82,7 +82,7 @@ def build_analysis(analysis, predictor_events, bids_dir,
 
     # Get set of entities across analysis
     if run_ids is None:
-        run_entities = [run['id'] for run in analysis['runs']]
+        run_entities = [_get_entities(run) for run in analysis['runs']]
     else:
         run_entities = []
         for rid in run_ids:
