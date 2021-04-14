@@ -56,7 +56,10 @@ jobs:
       if: matrix.type == 'frontend'
     - uses: actions/cache@v2
       with:
-        path: 'neuroscout/frontend/node_modules'
+        path: |
+            'neuroscout/frontend/node_modules'
+            ~/.cache/Cypress
+            build
         key: modules-${{ hashFiles('**/yarn.lock') }}
       if: matrix.type == 'frontend'
     - name: Install frontend dependencies
