@@ -35,7 +35,8 @@ imageio==2.5.0
 imageio-ffmpeg
 ipython==6.2.1
 itsdangerous==0.24
-Jinja2==2.10.1
+jedi==0.17.2
+Jinja2==2.11.3
 MarkupSafe==1.0
 marshmallow==3.7.1
 moviepy==0.2.3.5

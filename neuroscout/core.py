@@ -46,6 +46,7 @@ route_factory(
         ('AnalysisFillResource', 'analyses/<analysis_id>/fill'),
         ('RunListResource', 'runs'),
         ('RunResource', 'runs/<int:run_id>'),
+        ('RunTimingResource', 'runs/<int:run_id>/timing'),
         ('PredictorListResource', 'predictors'),
         ('PredictorResource', 'predictors/<int:predictor_id>'),
         ('PredictorCollectionResource', 'predictors/collection/<int:pc_id>'),

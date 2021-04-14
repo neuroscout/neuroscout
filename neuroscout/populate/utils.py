@@ -7,6 +7,7 @@ import warnings
 from pathlib import Path
 import contextlib
 import joblib
+import numpy as np
 
 def hash_stim(stim, blocksize=65536):
     """ Hash a pliers stimulus """
@@ -65,3 +66,43 @@ def tqdm_joblib(tqdm_object):
     finally:
         joblib.parallel.Parallel.print_progress = original_print_progress
         tqdm_object.close()
+        
+        
+def compute_pred_stats(session, pred, commit=False):
+    """ Computes hard coded pre-computed metrics upon ingestion (or on demand)
+    for a Predictor """
+    def get_max(vals):
+        if vals:
+            vals =  max(vals)
+        return vals
+
+    def get_min(vals):
+        if vals:
+            vals =  min(vals)
+        return vals
+    
+    def remove_nas(vals):
+        return [v for v in vals if v == 'n/a']
+
+    def num_na(vals):
+        if vals:
+            vals = len(remove_nas(vals))
+        return vals
+    
+    def mean(vals):
+        if vals:
+            vals = np.mean(vals)
+        return vals
+    
+    values = pred.float_values
+    
+    pred.max = get_max(values)
+    pred.min = get_min(values)
+    pred.num_na = num_na(values)
+    pred.mean = mean(values)
+        
+    if commit:
+        session.add(pred)
+        session.commit()
+        
+    return pred
