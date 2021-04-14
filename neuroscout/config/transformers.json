@@ -34,7 +34,7 @@
   ],
   "tokenized_extractors": [
     [
-      [{"transformer": "PretrainedBertEncodingExtractor"}], {"window": "pre", "n": 25}
+      [{"transformer": "BertLMExtractor"}], {"window": "pre", "n": 25}
     ],
     [
       [{"transformer": "BertLMExtractor", "parameters": {"mask": 24, "top_n": 100, "return_softmax": true}, "children": [{"transformer": "MetricExtractor", "parameters": {"functions": "scipy.stats.entropy"}}]}],
