@@ -35,11 +35,11 @@ class RunListResource(MethodResource):
             dataset = None
 
         query = Run.query
-        for param in kwargs:
-            query = query.filter(getattr(Run, param).in_(kwargs[param]))
-
         if kwargs.pop('active_only'):
             query = query.filter_by(active=True)
+            
+        for param in kwargs:
+            query = query.filter(getattr(Run, param).in_(kwargs[param]))
             
         if dataset:
             query = query.join('dataset').filter_by(id=dataset)
