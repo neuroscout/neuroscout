@@ -18,6 +18,7 @@
     "suppressImplicitAnyIndexErrors": true,
     "allowSyntheticDefaultImports": true,
     "noUnusedLocals": false,
+    "resolveJsonModule": true,
     "skipLibCheck": true
   },
   "exclude": [
