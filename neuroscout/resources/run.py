@@ -24,6 +24,8 @@ class RunListResource(MethodResource):
         'subject': fields.DelimitedList(
             fields.Str(), description='Subject id(s).'),
         'dataset_id': fields.Int(description='Dataset id.'),
+        'active_only': fields.Boolean(
+            missing=True, description="Return only active Runs")
     }, location='query')
     @marshal_with(RunSchema(many=True))
     def get(self, **kwargs):
@@ -36,6 +38,9 @@ class RunListResource(MethodResource):
         for param in kwargs:
             query = query.filter(getattr(Run, param).in_(kwargs[param]))
 
+        if kwargs.pop('active_only'):
+            query = query.filter_by(active=True)
+            
         if dataset:
             query = query.join('dataset').filter_by(id=dataset)
         return query.all()
