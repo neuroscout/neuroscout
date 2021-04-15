@@ -289,7 +289,6 @@ def extract_tokenized_features(dataset_name, task_name, extractors):
     """ Extract features that require a ComplexTextStim to give context to
     individual words within a run """
     stims = _load_complex_text_stim_models(dataset_name, task_name)
-    serializer = FeatureSerializer()
 
     results = []
     # For every extractor, extract from complex stims
@@ -300,7 +299,9 @@ def extract_tokenized_features(dataset_name, task_name, extractors):
         window_n = cts_params.get("n", 25) if window == "pre" else None
 
         object_id = 'max' if window == 'pre' else None
-    
+        serializer = FeatureSerializer(
+            object_id=object_id, splat=True,
+            add_all=False, round_n=4)
         for node in g.nodes.values():
             setattr(node.transformer, "window_method", window)
             if window_n:
@@ -312,9 +313,7 @@ def extract_tokenized_features(dataset_name, task_name, extractors):
             elif window == "pre":
                 for sli in _window_stim(s, window_n):
                     for res in g.transform(sli, merge=False):
-                        res = serializer.load(
-                            res, object_id=object_id, splat=True,
-                            add_all=False, round_n=4)
+                        res = serializer.load(res)
                         results.append((sm.id, res))
 
 
