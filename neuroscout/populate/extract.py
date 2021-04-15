@@ -225,6 +225,9 @@ def extract_features(graphs, dataset_name=None, task_name=None, n_jobs=1,
 
         # Flatten
         results = [item for sublist in results for item in sublist]
+        
+        # Serialize
+        serializer = Ser
 
         # Insert results to db as ExtractedFeatures
         ext_feats = _create_efs(results)
@@ -299,6 +302,8 @@ def extract_tokenized_features(dataset_name, task_name, extractors):
         window = cts_params.get("window", "transcript")
         window_n = cts_params.get("n", 25) if window == "pre" else None
 
+        object_id = 'max' if window == 'pre' else None
+    
         for node in g.nodes.values():
             setattr(node.transformer, "window_method", window)
             if window_n:
@@ -310,17 +315,14 @@ def extract_tokenized_features(dataset_name, task_name, extractors):
             elif window == "pre":
                 for sli in _window_stim(s, window_n):
                     for res in g.transform(sli, merge=False):
-                        res = serializer.load(res)
+                        res = serializer.load(
+                            res, object_id=object_id, splat=True,
+                            add_all=False, round_n=4)
                         results.append((sm.id, res))
 
-    # These results may not be fully recoverable
-    # _to_csv(results, dataset_name, task_name)
-    object_id = 'max' if window == 'pre' else None
 
     # Serialize result objects first
-    results = []
-    ext_feats = _create_efs(
-        results, object_id=object_id, splat=True, add_all=False, round_n=4)
+    ext_feats = _create_efs(results)
 
     return create_predictors([ef for ef in ext_feats.values() if ef.active],
                              dataset_name, task_name)
