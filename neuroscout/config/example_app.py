@@ -4,10 +4,10 @@
 
 import datetime
 from pathlib import Path
-
+import os
 
 class Config(object):
-    # SERVER_NAME = localhost
+    SERVER_NAME = os.environ['VIRTUAL_HOST']
     GOOGLE_CLIENT_ID = 'clientid'  # Must set this for frontend to build
     SECRET_KEY = 'A_SECRET!'
     HASH_SALT = 'dfdfdf'
