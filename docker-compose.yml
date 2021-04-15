@@ -23,8 +23,8 @@ services:
     expose:
       - "80"
     environment:
-      - VIRTUAL_HOST=${VIRTUAL_HOST}
-      - LETSENCRYPT_HOST=${VIRTUAL_HOST}
+      - VIRTUAL_HOST=${V_HOST}
+      - LETSENCRYPT_HOST=${V_HOST}
     volumes:
       - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
     volumes_from:
@@ -48,7 +48,7 @@ services:
   swagger-ui:
     image: swaggerapi/swagger-ui
     environment:
-      - "API_URL=https://${VIRTUAL_HOST}/swagger/"
+      - "API_URL=https://${V_HOST}/swagger/"
     expose:
       - '8080'
 
