@@ -7,7 +7,7 @@ from pathlib import Path
 import os
 
 class Config(object):
-    SERVER_NAME = os.environ['VIRTUAL_HOST']
+    SERVER_NAME = os.environ.get('VIRTUAL_HOST', None)
     GOOGLE_CLIENT_ID = 'clientid'  # Must set this for frontend to build
     SECRET_KEY = 'A_SECRET!'
     HASH_SALT = 'dfdfdf'
