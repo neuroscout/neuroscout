@@ -225,9 +225,6 @@ def extract_features(graphs, dataset_name=None, task_name=None, n_jobs=1,
 
         # Flatten
         results = [item for sublist in results for item in sublist]
-        
-        # Serialize
-        serializer = Ser
 
         # Insert results to db as ExtractedFeatures
         ext_feats = _create_efs(results)
