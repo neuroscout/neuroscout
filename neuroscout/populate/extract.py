@@ -65,7 +65,10 @@ def _query_stim_models(dataset_name, task_name=None, graphs=None):
     if task_name is not None:
         stim_models = stim_models.filter_by(name=task_name)
 
-    stim_models = stim_models.join(Dataset).filter_by(name=dataset_name)
+    stim_models = stim_models.join(Dataset).filter_by(name=dataset_name).all()
+
+    if not stim_models:
+        raise ValueError("No stimuli found for {dataset_name}- {task_name}!")
 
     return stim_models.all()
 
@@ -226,7 +229,10 @@ def extract_features(graphs, dataset_name=None, task_name=None, n_jobs=1,
         # Flatten
         results = [item for sublist in results for item in sublist]
 
-        # Insert results to db as ExtractedFeatures
+        if not results:
+            raise ValueError("No features could be extracted")
+
+        # Insert resultsw to db as ExtractedFeatures
         ext_feats = _create_efs(results)
 
         # Create Predictors for ExtractedFeatures
