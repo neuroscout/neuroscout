@@ -70,7 +70,7 @@ def _query_stim_models(dataset_name, task_name=None, graphs=None):
     if not stim_models:
         raise ValueError("No stimuli found for {dataset_name}- {task_name}!")
 
-    return stim_models.all()
+    return stim_models
 
 
 def _extract_to_serial(graphs, stim_object, serializer):
