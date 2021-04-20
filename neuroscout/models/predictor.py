@@ -1,4 +1,7 @@
+from sqlalchemy import cast, func, Float, desc
 from ..database import db
+from .features import ExtractedEvent, ExtractedFeature
+from .stimulus import Stimulus
 import datetime
 
 
@@ -24,6 +27,39 @@ class Predictor(db.Model):
     predictor_run = db.relationship('PredictorRun')
     active = db.Column(db.Boolean, default=True)  # Actively display or not
     private = db.Column(db.Boolean, default=False)
+    
+
+    # Summary statistics computed upon ingeston (or ad hock)
+    # These are not updated on the fly
+    max = db.Column(db.Float)
+    min = db.Column(db.Float)
+    num_na = db.Column(db.Integer)
+    mean = db.Column(db.Float)
+
+    @property
+    def float_values(self):
+        if self.extracted_feature:
+            key = self.extracted_feature.extracted_events
+        else:
+            key = self.predictor_events
+            
+        try:
+            vals = [float(ee.value) for ee in key]
+        except:
+            vals = None
+        return vals or None
+
+
+    def get_top_bottom(self, bottom=False, limit=None):
+        """ Get the Stimuli associated with the top or botton N values for this Predictor """
+        try:
+            val = cast(ExtractedEvent.value, Float)
+            if bottom:
+                val = desc(val)
+            res = Stimulus.query.join(ExtractedEvent).filter_by(ef_id=self.ef_id).order_by(val).limit(limit).all()
+        except:
+            res = None
+        return res
 
     def __repr__(self):
         return '<models.Predictor[name=%s]>' % self.name

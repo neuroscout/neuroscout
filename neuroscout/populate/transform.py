@@ -117,7 +117,8 @@ class Postprocessing(object):
             db.session.commit()
 
             # Create Predictors from EFs
-            create_predictors([new_ef], self.dataset_name, self.task_name)
+            create_predictors([new_ef], self.dataset_name, self.task_name,
+                              percentage_include=False)
 
             return new_ef.id
         else:

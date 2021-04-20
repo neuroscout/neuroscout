@@ -14,6 +14,7 @@ class Run(db.Model):
             'session', 'subject', 'number', 'task_id', 'dataset_id'),
     )
     id = db.Column(db.Integer, primary_key=True)
+    active = db.Column(db.Boolean, default=True)
     session = db.Column(db.Text)
     acquisition = db.Column(db.Text)
 

@@ -1,6 +1,6 @@
 from flask_apispec import MethodResource, marshal_with, use_kwargs, doc
 from webargs import fields
-from ..models import Run
+from ..models import Run, Stimulus, RunStimulus
 from .utils import first_or_404
 from ..schemas.run import RunSchema
 
@@ -24,6 +24,8 @@ class RunListResource(MethodResource):
         'subject': fields.DelimitedList(
             fields.Str(), description='Subject id(s).'),
         'dataset_id': fields.Int(description='Dataset id.'),
+        'active_only': fields.Boolean(
+            missing=True, description="Return only active Runs")
     }, location='query')
     @marshal_with(RunSchema(many=True))
     def get(self, **kwargs):
@@ -33,9 +35,21 @@ class RunListResource(MethodResource):
             dataset = None
 
         query = Run.query
+        if kwargs.pop('active_only'):
+            query = query.filter_by(active=True)
+            
         for param in kwargs:
             query = query.filter(getattr(Run, param).in_(kwargs[param]))
-
+            
         if dataset:
             query = query.join('dataset').filter_by(id=dataset)
         return query.all()
+
+
+class RunTimingResource(MethodResource):
+    @doc(tags=['run'], summary='Get stimulus timing for a run.')
+    def get(self, run_id):
+        stim_paths  = Stimulus.query.filter(Stimulus.mimetype.like('video%')).join(
+            RunStimulus).filter_by(run_id=run_id).with_entities('Stimulus.path', 'run_stimulus.onset').all()
+
+        return [{'filename': s[0].split('/')[-1], 'onset': s[1]} for s in stim_paths]

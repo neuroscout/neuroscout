@@ -13,7 +13,7 @@ from .predictor import (PredictorListResource, PredictorResource,
                         TaskPredictorsResource,
                         PredictorCollectionResource, prepare_upload,
                         PredictorEventListResource)
-from .run import RunResource, RunListResource
+from .run import RunResource, RunListResource, RunTimingResource
 from .user import (UserRootResource, UserTriggerResetResource,
                    UserResetSubmitResource, UserResendConfirm,
                    UserPredictorListResource, UserDetailResource,
@@ -43,6 +43,7 @@ __all__ = [
     'PredictorCollectionCreateResource',
     'RunResource',
     'RunListResource',
+    'RunTimingResource',
     'UserDetailResource',
     'UserRootResource',
     'UserTriggerResetResource',

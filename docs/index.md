@@ -1,6 +1,6 @@
 # What is Neuroscout?
 
-_Neuroscout is a web-based platform for fast and flexible analysis of fMRI data._
+_Neuroscout is an online platform for fast and flexible analysis of fMRI data._
 
 fMRI studies using complex naturalistic stimulation, such as movies or audio narratives, hold great promise to reveal the neural activity underlying dynamic perception. However, this potential is limited by the resource-intensive nature of fMRI analysis, and exacerbated by the difficulty of encoding relevant events in rich, multi-modal stimuli.
 
