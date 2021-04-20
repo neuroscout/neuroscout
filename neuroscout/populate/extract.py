@@ -65,9 +65,12 @@ def _query_stim_models(dataset_name, task_name=None, graphs=None):
     if task_name is not None:
         stim_models = stim_models.filter_by(name=task_name)
 
-    stim_models = stim_models.join(Dataset).filter_by(name=dataset_name)
+    stim_models = stim_models.join(Dataset).filter_by(name=dataset_name).all()
 
-    return stim_models.all()
+    if not stim_models:
+        raise ValueError("No stimuli found for {dataset_name}- {task_name}!")
+
+    return stim_models
 
 
 def _extract_to_serial(graphs, stim_object, serializer):
@@ -226,7 +229,10 @@ def extract_features(graphs, dataset_name=None, task_name=None, n_jobs=1,
         # Flatten
         results = [item for sublist in results for item in sublist]
 
-        # Insert results to db as ExtractedFeatures
+        if not results:
+            raise ValueError("No features could be extracted")
+
+        # Insert resultsw to db as ExtractedFeatures
         ext_feats = _create_efs(results)
 
         # Create Predictors for ExtractedFeatures
@@ -289,7 +295,6 @@ def extract_tokenized_features(dataset_name, task_name, extractors):
     """ Extract features that require a ComplexTextStim to give context to
     individual words within a run """
     stims = _load_complex_text_stim_models(dataset_name, task_name)
-    serializer = FeatureSerializer()
 
     results = []
     # For every extractor, extract from complex stims
@@ -299,6 +304,10 @@ def extract_tokenized_features(dataset_name, task_name, extractors):
         window = cts_params.get("window", "transcript")
         window_n = cts_params.get("n", 25) if window == "pre" else None
 
+        object_id = 'max' if window == 'pre' else None
+        serializer = FeatureSerializer(
+            object_id=object_id, splat=True,
+            add_all=False, round_n=4)
         for node in g.nodes.values():
             setattr(node.transformer, "window_method", window)
             if window_n:
@@ -313,14 +322,9 @@ def extract_tokenized_features(dataset_name, task_name, extractors):
                         res = serializer.load(res)
                         results.append((sm.id, res))
 
-    # These results may not be fully recoverable
-    # _to_csv(results, dataset_name, task_name)
-    object_id = 'max' if window == 'pre' else None
 
     # Serialize result objects first
-    results = []
-    ext_feats = _create_efs(
-        results, object_id=object_id, splat=True, add_all=False, round_n=4)
+    ext_feats = _create_efs(results)
 
     return create_predictors([ef for ef in ext_feats.values() if ef.active],
                              dataset_name, task_name)
