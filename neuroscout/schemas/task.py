@@ -16,3 +16,5 @@ class TaskSchema(Schema):
         description='Repetition Time')
     summary = fields.Str(
         description='Task summary description')
+    runs = fields.Pluck(
+        'RunSchema', 'id', many=True)
