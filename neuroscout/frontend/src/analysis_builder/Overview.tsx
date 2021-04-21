@@ -87,7 +87,9 @@ export class OverviewTab extends React.Component<OverviewTabProps, OverviewTabSt
       this.setState({clearFilteredVal: true});
     }
 
-    if (this.props.availableRuns.length !== prevProps.availableRuns.length) {
+    if (this.props.availableRuns.length !== prevProps.availableRuns.length 
+        || this.props.selectedTaskId !== prevProps.selectedTaskId
+    ) {
       let subCol = this.makeCol('Subject', 'subject', sortSub);
       let runCol = this.makeCol('Run Number', 'number', sortNum);
       let sesCol = this.makeCol('Session', 'session', sortSes);
@@ -106,7 +108,7 @@ export class OverviewTab extends React.Component<OverviewTabProps, OverviewTabSt
   */
   makeCol = (title: string, _key: string, sortFn) => {
     let extractKey: string[] = this.props.availableRuns.filter((x) => {
-      return (x !== null) && (this.props.analysis.runIds.indexOf(x.id) > -1);
+      return (x !== null && x.task === this.props.selectedTaskId);
     }).map(x => String(x[_key]));
 
     let unique = Array.from(
@@ -324,7 +326,7 @@ export class OverviewTab extends React.Component<OverviewTabProps, OverviewTabSt
                   columns={this.state.runColumns}
                   rowKey="id"
                   size="small"
-                  dataSource={availableRuns.filter(r => r.task === selectedTaskId).sort(sortSub)}
+                  dataSource={availableRuns.filter(r => '' + r.task === '' + selectedTaskId).sort(sortSub)}
                   pagination={(availableRuns.length > 10) ? {'position': ['bottomCenter']} : false}
                   rowSelection={runRowSelection}
                   onChange={this.applyFilter}

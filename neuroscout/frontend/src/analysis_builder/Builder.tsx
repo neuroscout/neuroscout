@@ -839,7 +839,7 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
         jwtFetch(`${domainRoot}/api/runs?dataset_id=${updatedAnalysis.datasetId}`)
           .then((data: Run[]) => {
             let availTasks = getTasks(datasets, updatedAnalysis.datasetId);
-            updatedAnalysis.runIds = data.map(x => x.id);
+            updatedAnalysis.runIds = [];
             if (updatedAnalysis.model && updatedAnalysis.model.Input) {
               if (analysis.datasetId !== null) {
                 stateUpdate.fillAnalysis = true;
@@ -857,6 +857,7 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
                 !!updatedAnalysis.model.Input.Task)
             ) {
               if (availTasks.length === 1) {
+                updatedAnalysis.runIds = data.map(x => x.id);
                 stateUpdate = {
                   ...stateUpdate,
                   selectedTaskId: availTasks[0].id,
@@ -903,11 +904,11 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
       stateUpdate.transformationsActive = value.predictorIds.length > 0;
     } else if (attrName === 'selectedTaskId') {
       // When a different task is selected, autoselect all its associated run IDs
-      this.updateState('analysis')({
+      stateUpdate.analysis = {
         ...analysis,
-        runids: availableRuns.filter(r => r.task === value).map(r => r.id),
+        runIds: availableRuns.filter(r => '' + r.task === '' + value).map(r => r.id),
         predictorsLoad: true
-      });
+      };
     }
 
     stateUpdate[attrName] = value;
