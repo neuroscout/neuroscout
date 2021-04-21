@@ -30,9 +30,9 @@
     "regexpu-core": "^4.7.1",
     "serialize-javascript": "^3.1.0",
     "styled-components": "^4.0.0",
-    "vega": "^5.17.3",
-    "vega-embed": "^5.0.0",
-    "vega-lite": "^5.0.0",
+    "vega": "5.20.0",
+    "vega-embed": "6.17",
+    "vega-lite": "5.0.0",
     "wait-on": "^5.2.0",
     "webpack-dev-server": "^3.1.11"
   },
