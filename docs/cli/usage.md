@@ -19,16 +19,16 @@ Usually, you'll at least want to mount a directory where you want to save the re
 
 In this example, we mount both of these directories to local volumes:
 
-    docker run -it --rm -v /home/myuser/out:/out neuroscout/neuroscout-cli run /out 5xH93
+    docker run -it --rm -v /home/user/out:/out neuroscout/neuroscout-cli run /out 5xH93
 
 
-In this command, the path preceding `:/out` specifies the local directory where the outputs will be stored. For example, a local folder `/home/myuser/out`.
+In this command, the path preceding `:/out` specifies the local directory where the outputs will be stored. For example, a local folder `/home/user/out`.
 
 Neuroscout creates a unique output directory `neuroscout-{analysis_id}`.
 Given the `analysis_id`: `5xH93` and `dataset_name`: `Budapest`, this is a representative directory structure:
 
 
-    /home/myuser/out/neuroscout-5xH93  
+    /home/user/out/neuroscout-5xH93  
     └───inputs
     │   │
     │   └───Budapest
@@ -49,12 +49,12 @@ Note that by default Neuroscout will save the input preprocessed fMRI images in 
 
 If you wish to save the input preprocessed datasets elsewhere, simply specify a data installation directory with `-i`, and mount the corresponding local directory.
 
-    docker run -it --rm -v /home/myuser/out:/out -v /home/myuser/scout-data:/data neuroscout/neuroscout-cli run /out 5xH93 -i /data
+    docker run -it --rm -v /home/user/out:/out -v /home/user/data:/data neuroscout/neuroscout-cli run /out 5xH93 -i /data
 
 The resulting cached data directory will look sonething like this, if you've run several analyses from different datasets:
 
 
-    /home/myuser/scout-data  
+    /home/user/scout-data  
     └───Budapest
     │   └───fmriprep
     └───studyforrest
