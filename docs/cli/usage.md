@@ -42,7 +42,7 @@ Given the `analysis_id`: `5xH93` and `dataset_name`: `Budapest`, this is a repre
     │       └───sub-01
     │       └───reports
     │       │   task-movie_space-MNI152NLin2009cAsym_contrast-{name}_stat-effect_statmap.nii.gz
-            |   ...
+    |       |   ...
 
 
 Note that by default Neuroscout will save the input preprocessed fMRI images in the output folder, to create a fully reproducible result package.
