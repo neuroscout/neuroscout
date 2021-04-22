@@ -27,7 +27,6 @@ In this command, the path preceding `:/out` specifies the local directory where 
 Neuroscout creates a unique output directory (`neuroscout-{analysis_id}`) with the following structure:
 
 
-    ```
     neuroscout-{analysis_id}    
     └───inputs
     │   │
@@ -43,7 +42,6 @@ Neuroscout creates a unique output directory (`neuroscout-{analysis_id}`) with t
     │       └───reports
     │       │   task-{task_name}_space-MNI152NLin2009cAsym_contrast-{name}_stat-effect_statmap.nii.gz
 
-    ```
 
 Note that by default Neuroscout will save the input preprocessed fMRI images in the output folder, to create a fully reproducible result package.
 
@@ -53,13 +51,12 @@ If you wish to save the input preprocessed datasets elsewhere, simply specify a 
 
 The resulting cached data directory will look sonething like this, if you've run several analyses from different datasets:
 
-    ```
+
     /home/myuser/scout-data  
     └───Budapest
     │   └───fmriprep
     └───studyforrest
     │   └───fmriprep
-    ```
 
 
 The next time you run a model with a previously downloaded dataset, it will not need to re-download the fMRI data. </br>
