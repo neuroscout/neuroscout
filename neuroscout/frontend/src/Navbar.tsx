@@ -1,5 +1,6 @@
 import * as React from 'react';
-import { Avatar, Row, Button, Menu, Icon } from 'antd';
+import { PlusOutlined, QuestionCircleOutlined, SearchOutlined, UserOutlined } from '@ant-design/icons';
+import { Avatar, Row, Button, Menu } from 'antd';
 import { Link } from 'react-router-dom';
 
 import { MainCol } from './HelperComponents';
@@ -8,7 +9,7 @@ import { UserStore } from './user';
 class Navbar extends React.Component<UserStore, {}> {
   render() {
     return (
-      <Row type="flex" justify="center" style={{padding: 0 }}>
+      <Row justify="center" style={{padding: 0 }}>
         <MainCol>
           <Menu
             mode="horizontal"
@@ -24,7 +25,7 @@ class Navbar extends React.Component<UserStore, {}> {
                 title={
                   <Avatar
                     shape="circle"
-                    icon="user"
+                    icon={<UserOutlined />}
                     src={this.props.profile.picture}
                     className="headerAvatar"
                   />
@@ -67,14 +68,14 @@ class Navbar extends React.Component<UserStore, {}> {
               key="help"
              >
                <a href="https://neuroscout.github.io/neuroscout/" target="_blank"><span>
-               <Icon type="question-circle"/>Help</span></a>
+               <QuestionCircleOutlined />Help</span></a>
              </Menu.Item>
 
              <Menu.SubMenu
               style={{float: 'right'}}
               key="browse"
               className="browseMain"
-              title={<span><Icon type="search"/>Browse</span>}
+              title={<span><SearchOutlined />Browse</span>}
              >
                {this.props.loggedIn &&
                  <Menu.Item key="mine" >
@@ -97,7 +98,7 @@ class Navbar extends React.Component<UserStore, {}> {
                  <Link
                    to={{pathname: '/builder'}}
                  >
-                   <Icon type="plus" /> New Analysis
+                   <PlusOutlined /> New Analysis
                  </Link>
                </Menu.Item>
              }

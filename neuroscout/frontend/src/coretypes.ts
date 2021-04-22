@@ -93,8 +93,11 @@ export interface Predictor {
 }
 
 export interface ExtractedFeature {
+  id: number;
+  resample_frequency: number;
   description: string;
   extractor_name: string;
+  modality: string;
 }
 
 export interface AnalysisConfig {
@@ -203,6 +206,7 @@ export interface Store {
   analysis404: boolean;
   doTooltip: boolean;
   user?: UserStore;
+  extractorDescriptions: ExtractorDescriptions;
 }
 
 export interface ApiRun {
@@ -335,4 +339,13 @@ export interface ApiUpload {
   collection_id: number;
   uploaded_at: string;
   files: [{level: string, status: string, traceback: (null | string)}];
+}
+
+export interface ApiExtractorDescription {
+  description: string;
+  name: string;
+}
+
+export interface ExtractorDescriptions {
+  [key: string]: string;
 }

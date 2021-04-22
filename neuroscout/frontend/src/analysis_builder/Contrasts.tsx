@@ -5,7 +5,8 @@
  - ContrastDisplay: component to display a single contrast
 */
 import * as React from 'react';
-import { Button, Row, Col, Icon, List } from 'antd';
+import { DeleteOutlined, EditOutlined, PlusOutlined } from '@ant-design/icons';
+import { Button, Row, Col, List } from 'antd';
 import {
   DragDropContext,
   Draggable,
@@ -33,10 +34,10 @@ const ContrastDisplay = (props: ContrastDisplayProps) => {
     <div style={{'width': '100%'}}>
       <div  style={{'float': 'right'}}>
         <Button type="primary" onClick={() => onEdit(index)}>
-          <Icon type="edit" />
+          <EditOutlined />
         </Button>
-        <Button type="danger" onClick={() => onDelete(index)}>
-          <Icon type="delete" />
+        <Button danger={true} onClick={() => onDelete(index)}>
+          <DeleteOutlined />
         </Button>
       </div>
       <div>
@@ -226,7 +227,6 @@ export class ContrastsTab extends React.Component<ContrastsTabProps, ContrastsTa
                                     onDelete={this.onDelete}
                                     onEdit={this.onEdit}
                                   />
-                                  {providedDraggable.placeholder}
                                 </div>
                               </div>
                           )}
@@ -240,11 +240,11 @@ export class ContrastsTab extends React.Component<ContrastsTabProps, ContrastsTa
         </DragDropContext>
         <br />
         <Button type="default" onClick={() => this.setState({ mode: 'add' })}>
-          <Icon type="plus" /> Add Contrast
+          <PlusOutlined /> Add Contrast
         </Button>
         <p />
         <Button type="default" onClick={this.addDummyContrasts}>
-          <Icon type="plus" /> Generate Dummy Contrasts
+          <PlusOutlined /> Generate Dummy Contrasts
         </Button>
       </div>
     );

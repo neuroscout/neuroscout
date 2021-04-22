@@ -96,7 +96,7 @@ export class AnalysisListTable extends React.Component<AnalysisListProps, {redir
         {
           title: 'Author',
           dataIndex: 'user_name',
-          sorter: (a, b) => a.user_name.localeCompare(b.user_name),
+          sorter: (a, b) => ('' + a.user_name).localeCompare(b.user_name),
           render: (text, record) => <Link to={`/profile/${record.user_name}`}> {record.user_name} </Link>
         }
       );
@@ -128,7 +128,7 @@ export class AnalysisListTable extends React.Component<AnalysisListProps, {redir
                 <Space /></>}
               {!publicList &&
                 ['DRAFT', 'FAILED'].includes(record.status) &&
-                <Button type="danger" ghost={true} onClick={() => onDelete!(record)}>
+                <Button danger={true} ghost={true} onClick={() => onDelete!(record)}>
                   Delete
                 </Button>}
             </span>
@@ -149,7 +149,7 @@ export class AnalysisListTable extends React.Component<AnalysisListProps, {redir
             <p>
               {record.description}
             </p>}
-          pagination={(analyses !== null && analyses.length > 20) ? {'position': 'bottom'} : false}
+          pagination={(analyses !== null && analyses.length > 20) ? {'position': ['bottomRight']} : false}
           locale={tableLocale}
         />
       </div>
@@ -161,7 +161,7 @@ export class AnalysisListTable extends React.Component<AnalysisListProps, {redir
 const AnalysisList = (props: AnalysisListProps) => {
   return (
     <div>
-      <Row type="flex" justify="center">
+      <Row justify="center">
         <MainCol>
         <h3>
           {props.publicList ? 'Public analyses' : 'Your saved analyses'}

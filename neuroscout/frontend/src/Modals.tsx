@@ -1,6 +1,9 @@
 import * as React from 'react';
-import { Alert, Button, Divider, Form, Icon, Input, Modal } from 'antd';
-import { FormComponentProps } from 'antd/es/form';
+import { GoogleOutlined, LockOutlined, MailOutlined, TagsOutlined } from '@ant-design/icons';
+import { Form } from '@ant-design/compatible';
+import '@ant-design/compatible/assets/index.css';
+import { Alert, Button, Divider, Input, Modal } from 'antd';
+import { FormComponentProps } from '@ant-design/compatible/es/form';
 import { GoogleLogin } from 'react-google-login';
 
 import { config } from './config';
@@ -22,7 +25,7 @@ class GoogleLoginBtn extends React.Component<UserStore, {}> {
             type="primary"
             ghost={true}
           >
-            <Icon type="google" />
+            <GoogleOutlined />
           </Button>
         )}
         buttonText="Log in"
@@ -74,7 +77,7 @@ export class ResetPasswordModal extends React.Component<UserStore, {}> {
         >
           <FormItem>
             <Input
-              prefix={<Icon type="mail" style={{ fontSize: 13 }}/>}
+              prefix={<MailOutlined style={{ fontSize: 13 }} />}
               placeholder="Email"
               type="email"
               size="large"
@@ -117,7 +120,7 @@ export class EnterResetTokenModal extends React.Component<UserStore, {}> {
         >
           <FormItem>
             <Input
-              prefix={<Icon type="tags" style={{ fontSize: 13 }}/>}
+              prefix={<TagsOutlined style={{ fontSize: 13 }} />}
               placeholder="Token"
               type="token"
               size="large"
@@ -127,7 +130,7 @@ export class EnterResetTokenModal extends React.Component<UserStore, {}> {
           </FormItem>
           <FormItem>
             <Input
-              prefix={<Icon type="lock" style={{ fontSize: 13 }}/>}
+              prefix={<LockOutlined style={{ fontSize: 13 }} />}
               placeholder="Password"
               type="password"
               size="large"
@@ -174,7 +177,7 @@ export class LoginModal extends React.Component<UserStore, {}> {
         >
           <FormItem>
             <Input
-              prefix={<Icon type="mail" style={{ fontSize: 13 }}/>}
+              prefix={<MailOutlined style={{ fontSize: 13 }} />}
               placeholder="Email"
               type="email"
               size="large"
@@ -186,7 +189,7 @@ export class LoginModal extends React.Component<UserStore, {}> {
           </FormItem>
           <FormItem>
             <Input
-              prefix={<Icon type="lock" style={{ fontSize: 13 }}/>}
+              prefix={<LockOutlined style={{ fontSize: 13 }} />}
               placeholder="Password"
               type="password"
               value={this.props.password}

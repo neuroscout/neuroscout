@@ -12,7 +12,7 @@ describe('Analysis Builder', () => {
     cy.get('.builderAnalysisNameInput').type(name)
     cy.get(`.ant-col > .ant-input[value=${name}]`)
     cy.get('.builderAnalysisDescriptionInput').type(name)
-    cy.get('.ant-form-item-children > .ant-input').contains(name)
+    cy.get('.builderAnalysisDescriptionInput').contains(name)
 
     cy.get('.selectDataset')
     cy.get('td').contains('Test Dataset').parent().within(() => {
@@ -29,37 +29,39 @@ describe('Analysis Builder', () => {
     let count = 0
     cy.contains('Select Predictors').parent().within(() => {
       cy.contains('Brightness')
-      cy.get('.ant-table-body').find('input[type=checkbox]').each(($el, index, $list) => {
+      cy.get('.ant-table-tbody').find('input[type=checkbox]').each(($el, index, $list) => {
         if (count < predCount) {
           $el.click()
           count++
         }
       })
     })
-    cy.get('.ant-tag').its('length').should('be.gte', predCount)
+    cy.contains('Selected').click()
+    cy.get('.ant-table-tbody').its('length').should('be.gte', predCount)
     cy.get('button:visible').contains('Next').parent().click()
 
     /* Transformation Tab - create a scale xform with all predictors */
     cy.get('button').contains('Add Transformation').parent().click()
-    cy.get('.ant-select').click()
-    cy.get('li').contains('Scale').click()
+    cy.get('.ant-legacy-form-item-children > .ant-select > .ant-select-selector').click()
+    cy.get('.ant-select-item-option-content').contains('Scale').click()
     cy.get('.ant-table-body:visible').find('input[type=checkbox]').each(($el, index, $list) => {
       $el.click()
     })
     cy.get('button:visible').contains('OK').parent().click()
     cy.get('button:visible').contains('Next').parent().click()
-    let xformCount = 2
+    let xformCount = 1
 
     /* HRF Tab - select all non counfound predictors, check length is correct */
     cy.get('button').contains('Select All Non-Confound').parent().click()
-    cy.get('.ant-tag:visible').its('length').should('be.eq', predCount + 1)
+    cy.get('#rc-tabs-0-panel-hrf').contains('Selected').click()
+    cy.get('#rc-tabs-0-panel-hrf').get('.ant-table-tbody').its('length').should('be.gte', predCount)
     cy.get('button:visible').contains('Next').parent().click()
 
     /* Contrast Tab - generate dummy contrasts, then delete one of them */
     cy.get('button').contains('Generate Dummy').parent().click()
-    cy.get('.ant-list:visible').find('.ant-btn-danger').its('length').should('be.eq', predCount)
-    cy.get('.ant-list:visible').find('.ant-btn-danger').first().click()
-    cy.get('.ant-list:visible').find('.ant-btn-danger').its('length').should('be.eq', predCount - 1)
+    cy.get('.ant-list:visible').find('.ant-btn-dangerous').its('length').should('be.eq', predCount)
+    cy.get('.ant-list:visible').find('.ant-btn-dangerous').first().click()
+    cy.get('.ant-list:visible').find('.ant-btn-dangerous').its('length').should('be.eq', predCount - 1)
     cy.get('button:visible').contains('Next').parent().click()
 
     /* Review Tab

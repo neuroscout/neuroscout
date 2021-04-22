@@ -1,6 +1,8 @@
 import * as React from 'react';
 import memoize from 'memoize-one';
 
+import { UserOutlined } from '@ant-design/icons';
+
 import { Avatar, Card, Col, List, Row, Spin } from 'antd';
 import { Link, withRouter } from 'react-router-dom';
 
@@ -87,7 +89,7 @@ class PublicProfile extends React.Component<PublicProfileProps & { history: any 
     }
 
     return (
-      <Row type="flex" justify="center" style={{ background: '#fff', padding: 0 }}>
+      <Row justify="center" style={{ background: '#fff', padding: 0 }}>
         <MainCol>
           {!this.state.loaded &&
             <Spin spinning={!this.state.loaded} />
@@ -97,7 +99,7 @@ class PublicProfile extends React.Component<PublicProfileProps & { history: any 
               <div className="profileHeader">
                 <Avatar
                   shape="circle"
-                  icon="user"
+                  icon={<UserOutlined />}
                   src={profile.picture}
                 />
                 <Space />

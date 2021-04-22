@@ -1,5 +1,18 @@
 import * as React from 'react';
-import { Alert, Button, Tabs, Collapse, Card, Tooltip, Icon, Select, Spin, Switch, Popconfirm, Tag } from 'antd';
+import { InfoCircleOutlined } from '@ant-design/icons';
+import {
+  Alert,
+  Button,
+  Tabs,
+  Collapse,
+  Card,
+  Tooltip,
+  Select,
+  Spin,
+  Switch,
+  Popconfirm,
+  Tag,
+} from 'antd';
 import vegaEmbed from 'vega-embed';
 
 import { OptionProps } from 'antd/lib/select';
@@ -84,7 +97,7 @@ class Plots extends React.Component<PlotsProps, {}> {
                 <Tooltip
                   title={'Scale variables in the design matrix plot (only for visual purposes)'}
                 >
-                  Scale Design Matrix <Icon type="info-circle" /><Space />
+                  Scale Design Matrix <InfoCircleOutlined /><Space />
                   <Switch onChange={this.props.updateScale} checked={this.props.scale} />
                 </Tooltip>
               </div>
@@ -325,7 +338,8 @@ export class Report extends React.Component<ReportProps, ReportState> {
     );
   }
 
-  filterRuns = (inputValue: string, option:  React.ReactElement<OptionProps>): boolean => {
+  // proper type used by antd coming from rc-select FilterFunc
+  filterRuns: any = (inputValue: string, option:  React.ReactElement<OptionProps>): boolean => {
 
     if (option.props.children) {
       return ('' + option.props.children).includes(inputValue);
@@ -379,7 +393,9 @@ export class Report extends React.Component<ReportProps, ReportState> {
 
   render() {
     const runIdsOptions: JSX.Element[] = [];
-    this.props.runs.map(x => runIdsOptions.push(<Option key={'' + x.id}>{this.formatRun(x)}</Option>));
+    this.props.runs.map(
+      x => runIdsOptions.push(<Option key={'' + x.id} value={this.formatRun(x)}>{this.formatRun(x)}</Option>)
+    );
     const cardTitle = (
       <>
           Design Reports
@@ -394,7 +410,7 @@ export class Report extends React.Component<ReportProps, ReportState> {
           \nClick on the design matrix columns to view the timecourse in detail.'}
           defaultVisible={this.props.defaultVisible}
         >
-          <Icon type="info-circle" style={{ fontSize: '15px'}}/>
+          <InfoCircleOutlined style={{ fontSize: '15px'}} />
         </Tooltip>
       </>
     );

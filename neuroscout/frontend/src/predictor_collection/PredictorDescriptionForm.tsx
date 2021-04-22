@@ -1,5 +1,7 @@
 import * as React from 'react';
-import { Form, Input } from 'antd';
+import { Form } from '@ant-design/compatible';
+import '@ant-design/compatible/assets/index.css';
+import { Input } from 'antd';
 
 type PDFProps = {
   predictors: string[],

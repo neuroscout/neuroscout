@@ -2,16 +2,9 @@
  Options tab of the analysis builder
 */
 import * as React from 'react';
-import {
-  Form,
-  Row,
-  Col,
-  Slider,
-  InputNumber,
-  Collapse,
-  Checkbox,
-  Select
-} from 'antd';
+import { Form } from '@ant-design/compatible';
+import '@ant-design/compatible/assets/index.css';
+import { Row, Col, Slider, InputNumber, Collapse, Checkbox, Select } from 'antd';
 import { Analysis, AnalysisConfig, Predictor, PredictorConfig } from '../coretypes';
 const FormItem = Form.Item;
 const Panel = Collapse.Panel;

@@ -5,19 +5,10 @@ This module comtains the following components:
  - XformEditor: component to add/edit a transformtion
 */
 import * as React from 'react';
-import {
-  Button,
-  Checkbox,
-  Col,
-  Form,
-  Icon,
-  Input,
-  InputNumber,
-  List,
-  Radio,
-  Row,
-  Select
-} from 'antd';
+import { DeleteOutlined, EditOutlined, PlusOutlined } from '@ant-design/icons';
+import { Form } from '@ant-design/compatible';
+import '@ant-design/compatible/assets/index.css';
+import { Button, Checkbox, Col, Input, InputNumber, List, Radio, Row, Select } from 'antd';
 import {
   DragDropContext,
   Draggable,
@@ -78,10 +69,10 @@ const XformDisplay = (props: XformDisplayProps) => {
     <div>
       <div  style={{'float': 'right'}}>
         <Button type="primary" onClick={() => onEdit(index)}>
-          <Icon type="edit" />
+          <EditOutlined />
         </Button>
-        <Button type="danger" onClick={() => onDelete(index)}>
-          <Icon type="delete" />
+        <Button danger={true} onClick={() => onDelete(index)}>
+          <DeleteOutlined />
         </Button>
       </div>
       <div>
@@ -324,7 +315,7 @@ class XformEditor extends React.Component<XformEditorProps, XformEditorState> {
     return (
       <div>
         <Form layout="horizontal">
-          <Row type="flex">
+          <Row>
             <Col lg={{span: 24}} xs={{span: 24}}>
               <FormItem label="Transformation:">
                 <Select value={name} onChange={this.updateXformType}>
@@ -537,7 +528,6 @@ export class XformsTab extends React.Component<XformsTabProps,  XformsTabState> 
                                     onDelete={this.onDeleteXform}
                                     onEdit={this.onEditXform}
                                   />
-                                  {providedDraggable.placeholder}
                               </div>
                             </div>
                         )}
@@ -551,7 +541,7 @@ export class XformsTab extends React.Component<XformsTabProps,  XformsTabState> 
         </DragDropContext>
         <br />
         <Button type="default" onClick={this.onAddXform}>
-          <Icon type="plus" /> Add Transformation
+          <PlusOutlined /> Add Transformation
         </Button>
       </div>
     );

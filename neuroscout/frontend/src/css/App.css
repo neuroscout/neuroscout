@@ -159,3 +159,20 @@ pre {
     background-color: #fff;
     border: 0px;
 }
+
+.ant-table-expand-icon-col {
+    width: 32px;
+}
+
+.ant-checkbox-wrapper {
+    display: flex;
+}
+
+.ant-checkbox-wrapper :not(.ant-checkbox) {
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.ant-checkbox-wrapper + .ant-checkbox-wrapper {
+    margin-left: 0px;
+}

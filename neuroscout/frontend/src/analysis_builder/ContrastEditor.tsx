@@ -2,7 +2,9 @@
  ContrastEditor module for adding/editing a contrast (used in the Contrasts tab)
 */
 import * as React from 'react';
-import { Form, Input, InputNumber, Button, Radio, Modal } from 'antd';
+import { Form } from '@ant-design/compatible';
+import '@ant-design/compatible/assets/index.css';
+import { Input, InputNumber, Button, Radio, Modal } from 'antd';
 import { Predictor, Contrast, ContrastTypeEnum } from '../coretypes';
 import { PredictorSelector } from './Predictors';
 import { DisplayErrorsInline, Space } from '../HelperComponents';

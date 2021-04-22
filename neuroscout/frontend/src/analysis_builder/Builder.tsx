@@ -6,9 +6,10 @@ import { RouteComponentProps } from 'react-router';
 import { Redirect } from 'react-router-dom';
 import { createBrowserHistory } from 'history';
 import * as React from 'react';
-import {
-  Alert, Tag, Tabs, Row, Button, Modal, Icon, message, Tooltip, Form, Input, Collapse
-} from 'antd';
+import { InfoCircleOutlined, PlusOutlined } from '@ant-design/icons';
+import { Form } from '@ant-design/compatible';
+import '@ant-design/compatible/assets/index.css';
+import { Alert, Tag, Tabs, Row, Button, Modal, message, Tooltip, Input, Collapse } from 'antd';
 import { Prompt } from 'react-router-dom';
 import memoize from 'memoize-one';
 
@@ -123,6 +124,7 @@ let initializeStore = (): Store => ({
   fillAnalysis: false,
   analysis404: false,
   doTooltip: false,
+  extractorDescriptions: {}
 });
 
 // Get list of tasks from a given dataset
@@ -193,7 +195,7 @@ class EditDetails extends React.Component<editDetailsProps, editDetailsState> {
               <Input.TextArea
                 placeholder="Description of your analysis"
                 value={this.state.newDescription}
-                autosize={{ minRows: 2, maxRows: 10 }}
+                autoSize={{ minRows: 2, maxRows: 10 }}
                 onChange={(e) => this.setState({newDescription: e.currentTarget.value})}
               />
             </FormItem>
@@ -741,7 +743,7 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
     let stateUpdate: any = {};
     let newAnalysis = { ...this.state.analysis };
     let filteredIds = filteredPredictors.map(x => x.id);
-    let valueIds = value.map(x => x.id);
+    let valueIds = value.filter(x => !!x).map(x => x.id);
     let selectedPredictors = hrf ? 'selectedHRFPredictors' : 'selectedPredictors';
     let predictorIds = hrf ? 'hrfPredictorIds' : 'predictorIds';
 
@@ -837,7 +839,7 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
         jwtFetch(`${domainRoot}/api/runs?dataset_id=${updatedAnalysis.datasetId}`)
           .then((data: Run[]) => {
             let availTasks = getTasks(datasets, updatedAnalysis.datasetId);
-            updatedAnalysis.runIds = data.map(x => x.id);
+            updatedAnalysis.runIds = [];
             if (updatedAnalysis.model && updatedAnalysis.model.Input) {
               if (analysis.datasetId !== null) {
                 stateUpdate.fillAnalysis = true;
@@ -845,11 +847,17 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
                 updatedAnalysis.runIds = this.runIdsFromModel(data, updatedAnalysis.model.Input);
               }
             } 
+
+            /* If we haven't set a task when changing datasets, select default if only 1 task present.
+               Else we are going to fill the model from the api, so well keep the old model with its task 
+               selection in place.
+            */
             if (
               !(updatedAnalysis && updatedAnalysis.model && updatedAnalysis.model.Input &&
                 !!updatedAnalysis.model.Input.Task)
             ) {
               if (availTasks.length === 1) {
+                updatedAnalysis.runIds = data.map(x => x.id);
                 stateUpdate = {
                   ...stateUpdate,
                   selectedTaskId: availTasks[0].id,
@@ -863,6 +871,7 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
               }
             } else {
               stateUpdate.model = updatedAnalysis.model;
+              stateUpdate.predictorsLoad = true;
             }
 
             stateUpdate = {
@@ -895,11 +904,11 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
       stateUpdate.transformationsActive = value.predictorIds.length > 0;
     } else if (attrName === 'selectedTaskId') {
       // When a different task is selected, autoselect all its associated run IDs
-      this.updateState('analysis')({
+      stateUpdate.analysis = {
         ...analysis,
-        runids: availableRuns.filter(r => r.task === value).map(r => r.id),
+        runIds: availableRuns.filter(r => '' + r.task === '' + value).map(r => r.id),
         predictorsLoad: true
-      });
+      };
     }
 
     stateUpdate[attrName] = value;
@@ -1084,6 +1093,9 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
       })
       .catch(displayError);
     }
+    api.getExtractorDescriptions().then(response => {
+      this.setState({extractorDescriptions: response});
+    });
   }
 
   componentWillUnmount() {
@@ -1141,11 +1153,11 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
             message={'You have unsaved changes. Are you sure you want leave this page?'}
           />
           <div style={{ overflow: 'scroll' }}>
-          <Row type="flex" justify="center" style={{ background: '#fff', padding: 0 }}>
+          <Row justify="center" style={{ background: '#fff', padding: 0 }}>
             <MainCol>
               <Tabs
                 activeKey={activeTab}
-                onTabClick={newTab => this.onTabClick(newTab)}
+                onTabClick={newTab => this.onTabClick(newTab as TabName)}
                 onChange={this.postTabChange}
                 className="builderTabs"
                 tabPosition="left"
@@ -1181,14 +1193,13 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
                   key="predictors"
                   disabled={(!predictorsActive || !isEditable) && !isFailed}
                 >
-                  <h2>Select Predictors&nbsp;&nbsp;
-                  {this.state.activeTab === ('predictors' as TabName) &&
+                  <h2>Select Predictors&nbsp;&nbsp; {this.state.activeTab === ('predictors' as TabName) &&
                   <Tooltip
                    title={'Use the search bar to find and select predictors to add to your analysis.\
                    For example, try searching for "face" or "fmriprep"'}
                    defaultVisible={this.state.doTooltip && this.state.activeTab === ('predictors' as TabName)}
                   >
-                    <Icon type="info-circle" style={{ fontSize: '15px'}}/>
+                    <InfoCircleOutlined style={{ fontSize: '15px'}} />
                   </Tooltip>
                   }
                   </h2>
@@ -1197,6 +1208,7 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
                     selectedPredictors={selectedPredictors}
                     updateSelection={this.updatePredictorState}
                     predictorsLoad={this.state.predictorsLoad || this.state.fillAnalysis}
+                    extractorDescriptions={this.state.extractorDescriptions}
                   />
                   <br/>
                   {this.navButtons(!(selectedPredictors.length > 0))}
@@ -1214,7 +1226,7 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
                    prior to constructing the final design matrix.'}
                    defaultVisible={this.state.doTooltip && this.state.activeTab === ('transformations' as TabName)}
                   >
-                    <Icon type="info-circle" style={{ fontSize: '15px'}}/>
+                    <InfoCircleOutlined style={{ fontSize: '15px'}} />
                   </Tooltip>
                   }
                   </h2>
@@ -1240,7 +1252,7 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
                    click "Select All Non-Confounds"'}
                    defaultVisible={this.state.doTooltip && this.state.activeTab === ('hrf' as TabName)}
                   >
-                    <Icon type="info-circle" style={{ fontSize: '15px'}}/>
+                    <InfoCircleOutlined style={{ fontSize: '15px'}} />
                   </Tooltip>
                   }
                   </h2>
@@ -1252,7 +1264,7 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
                   <br/>
                   <p>
                   <Button type="default" onClick={this.addAllHRF}>
-                    <Icon type="plus" /> Select All Non-Confounds
+                    <PlusOutlined /> Select All Non-Confounds
                   </Button>
                   </p>
                   {this.navButtons()}
@@ -1270,7 +1282,7 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
                    To create identity contrasts [1, 0] for each predictor, use "Generate Automatic Contrasts"'}
                    defaultVisible={this.state.doTooltip && this.state.activeTab === ('contrasts' as TabName)}
                   >
-                    <Icon type="info-circle" style={{ fontSize: '15px'}}/>
+                    <InfoCircleOutlined style={{ fontSize: '15px'}} />
                   </Tooltip>
                   }
                   </h2>

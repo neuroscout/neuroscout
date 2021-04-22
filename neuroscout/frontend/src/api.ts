@@ -9,6 +9,7 @@ import {
   ApiUser,
   AppAnalysis,
   Dataset,
+  ExtractorDescriptions,
   Predictor,
   Run,
   User
@@ -45,6 +46,27 @@ export const ApiToAppAnalysis = (data: ApiAnalysis): AppAnalysis => ({
   modified_at: data.modified_at,
   user_name: data.user
 });
+
+const ef_fields = ['description', 'created_at', 'resample_frequency', 'modality'];
+
+const setPredictorSource = (predictors: Predictor[]): Predictor[] => {
+  predictors.map((x) => {
+    if (x && x.extracted_feature && x.extracted_feature.id) {
+      delete x.extracted_feature.id;
+    }
+    ef_fields.map(field => {
+      if (x.extracted_feature && x.extracted_feature[field] !== undefined && x.extracted_feature[field] !== null) {
+        x[field] = x.extracted_feature[field];
+      }
+    });
+    
+    Object.assign(x, x.extracted_feature, x);
+    if (x.extracted_feature && x.extracted_feature.extractor_name) {
+      x.source = x.extracted_feature.extractor_name;
+    }
+  });
+  return predictors;
+};
 
 export const api = {
   getUser: (): Promise<ApiUser & {statusCode: number}> => {
@@ -92,7 +114,7 @@ export const api = {
       if (data.statusCode && data.statusCode === 422) {
         return [] as Predictor[];
       }
-      return data;
+      return setPredictorSource(data);
     });
   },
 
@@ -101,7 +123,7 @@ export const api = {
       if (data.statusCode && data.statusCode === 422) {
         return [] as Predictor[];
       }
-      return data;
+      return setPredictorSource(data);
     });
   },
 
@@ -236,6 +258,15 @@ export const api = {
   },
   getPublicProfile: (user_name: string): Promise<ApiUser & {statusCode: number}> => {
     return jwtFetch(`${domainRoot}/api/user/${user_name}`);
+  },
+  getExtractorDescriptions: (): Promise<ExtractorDescriptions> => {
+    return jwtFetch(`${domainRoot}/api/extractors`).then(response => {
+      let descriptions = {};
+      response.map(elem => {
+        descriptions[elem.name] = elem.description;
+      });
+      return descriptions;
+    });
   },
   getImageVersion: (): Promise<string> => {
     return jwtFetch(`${domainRoot}/api/image_version`).then((res) => {

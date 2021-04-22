@@ -1,5 +1,7 @@
 import * as React from 'react';
-import { Alert, message, Divider, Row, Col, Button, Card, Form, Input, Switch } from 'antd';
+import { Form } from '@ant-design/compatible';
+import '@ant-design/compatible/assets/index.css';
+import { Alert, message, Divider, Row, Col, Button, Card, Input, Switch } from 'antd';
 import { MainCol, Space } from '../HelperComponents';
 import { withRouter } from 'react-router-dom';
 
@@ -27,7 +29,7 @@ class EditProfile extends React.Component<ProfileState & { history: any }, Profi
     this.profileLoaded(...profileEditItems.map(x => this.props[x]));
     return (
     <div>
-      <Row type="flex" justify="center" style={{ background: '#fff', padding: 0 }}>
+      <Row justify="center" style={{ background: '#fff', padding: 0 }}>
         <MainCol>
           {!!this.state.errors &&
               <Row>

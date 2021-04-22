@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { DownloadOutlined } from '@ant-design/icons';
 import { Button, Card, Skeleton } from 'antd';
 import { config } from '../config';
 import { jwtFetch } from '../utils';
@@ -39,9 +40,9 @@ class DownloadButton extends React.Component<{data: any[], title: string, filena
     let data = this.props.data;
     let formatted = 'data: text/json;charset=utf-8,' + encodeURIComponent(JSON.stringify(data));
 
-    return(
+    return (
       <a href={formatted} download={this.props.filename}>
-        <Button type="primary" icon="download">{this.props.title}</Button>
+        <Button type="primary" icon={<DownloadOutlined />}>{this.props.title}</Button>
       </a>
     );
   }

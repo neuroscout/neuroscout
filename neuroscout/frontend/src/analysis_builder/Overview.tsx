@@ -2,8 +2,12 @@
  OverviewTab component
 */
 import * as React from 'react';
-import { Col, Collapse, Form, Icon, Input, Row, Table, Tooltip, Button, List, Descriptions } from 'antd';
-import { ColumnProps, TableRowSelection } from 'antd/lib/table';
+import { InfoCircleOutlined } from '@ant-design/icons';
+import { Form } from '@ant-design/compatible';
+import '@ant-design/compatible/assets/index.css';
+import { Col, Collapse, Input, Row, Table, Tooltip, Button, List, Descriptions } from 'antd';
+import { ColumnProps } from 'antd/lib/table';
+import { TableRowSelection } from 'antd/lib/table/interface';
 
 import { getTasks } from './Builder';
 import { Analysis, Dataset, Run, Task } from '../coretypes';
@@ -83,7 +87,9 @@ export class OverviewTab extends React.Component<OverviewTabProps, OverviewTabSt
       this.setState({clearFilteredVal: true});
     }
 
-    if (this.props.availableRuns.length !== prevProps.availableRuns.length) {
+    if (this.props.availableRuns.length !== prevProps.availableRuns.length 
+        || this.props.selectedTaskId !== prevProps.selectedTaskId
+    ) {
       let subCol = this.makeCol('Subject', 'subject', sortSub);
       let runCol = this.makeCol('Run Number', 'number', sortNum);
       let sesCol = this.makeCol('Session', 'session', sortSes);
@@ -102,7 +108,7 @@ export class OverviewTab extends React.Component<OverviewTabProps, OverviewTabSt
   */
   makeCol = (title: string, _key: string, sortFn) => {
     let extractKey: string[] = this.props.availableRuns.filter((x) => {
-      return (x !== null) && (this.props.analysis.runIds.indexOf(x.id) > -1);
+      return (x !== null && x.task === this.props.selectedTaskId);
     }).map(x => String(x[_key]));
 
     let unique = Array.from(
@@ -256,7 +262,7 @@ export class OverviewTab extends React.Component<OverviewTabProps, OverviewTabSt
       <div className="builderCol">
         <Form layout="vertical">
           <FormItem label="Analysis name" required={true}>
-            <Row type="flex" justify="space-between">
+            <Row justify="space-between">
               <Col xs={24}>
                 <Input
                   className="builderAnalysisNameInput"
@@ -281,7 +287,7 @@ export class OverviewTab extends React.Component<OverviewTabProps, OverviewTabSt
               <span>
                 Dataset&nbsp;&nbsp;
                 <Tooltip title="Choose from a curated set of openly available, naturalistic datasets.">
-                  <Icon type="info-circle" />
+                  <InfoCircleOutlined />
                 </Tooltip>
               </span>
             }
@@ -296,7 +302,7 @@ export class OverviewTab extends React.Component<OverviewTabProps, OverviewTabSt
               return x.active === true || x.id === this.props.analysis.datasetId;
             })}
             rowSelection={datasetRowSelection}
-            pagination={(datasets.length > 10) ? {'position': 'bottom'} : false}
+            pagination={(datasets.length > 10) ? {'position': ['bottomCenter']} : false}
             expandedRowRender={this.datasetExpandRow}
           />
           <br />
@@ -311,7 +317,7 @@ export class OverviewTab extends React.Component<OverviewTabProps, OverviewTabSt
                     size="small"
                     dataSource={availableTasks}
                     rowSelection={taskRowSelection}
-                    pagination={(datasets.length > 10) ? {'position': 'bottom'} : false}
+                    pagination={(datasets.length > 10) ? {'position': ['bottomCenter']} : false}
                   />
               </Panel>
               <Panel header={runMsg} key="runs">
@@ -320,8 +326,8 @@ export class OverviewTab extends React.Component<OverviewTabProps, OverviewTabSt
                   columns={this.state.runColumns}
                   rowKey="id"
                   size="small"
-                  dataSource={availableRuns.filter(r => r.task === selectedTaskId).sort(sortSub)}
-                  pagination={(availableRuns.length > 10) ? {'position': 'bottom'} : false}
+                  dataSource={availableRuns.filter(r => '' + r.task === '' + selectedTaskId).sort(sortSub)}
+                  pagination={(availableRuns.length > 10) ? {'position': ['bottomCenter']} : false}
                   rowSelection={runRowSelection}
                   onChange={this.applyFilter}
                 />
@@ -331,7 +337,7 @@ export class OverviewTab extends React.Component<OverviewTabProps, OverviewTabSt
                    title={'You can filter runs using the filter icon in each column,\
                     and clear the filters using this button'}
                   >
-                    <Icon type="info-circle" />
+                    <InfoCircleOutlined />
                   </Tooltip>
                 </div>
               </Panel>

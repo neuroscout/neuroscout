@@ -1,5 +1,6 @@
 import * as React from 'react';
-import { Alert, Col, Divider, Icon, Row, Tag, Tooltip } from 'antd';
+import { LockOutlined, UnlockOutlined } from '@ant-design/icons';
+import { Alert, Col, Divider, Row, Tag, Tooltip } from 'antd';
 import { createBrowserHistory } from 'history';
 
 // Simple space component to seperate buttons, etc.
@@ -57,10 +58,10 @@ export class StatusTag extends React.Component<{status?: string, analysisId?: st
       PASSED: 'green'
     }[status];
 
-    return(
+    return (
       <span>
         <Tag color={color}>
-          {status === 'DRAFT' ? <Icon type="unlock" /> : <Icon type="lock" />}
+          {status === 'DRAFT' ? <UnlockOutlined /> : <LockOutlined />}
           {' ' + status}
         </Tag>
       </span>
@@ -72,7 +73,7 @@ export class NotFound extends React.Component<{}, {}> {
   render() {
     const history = createBrowserHistory();
     return (
-      <Row type="flex" justify="center" style={{padding: 0 }}>
+      <Row justify="center" style={{padding: 0 }}>
         <MainCol>
           <Divider>Not found</Divider>
           The requested URL {history.location.pathname} was not found.

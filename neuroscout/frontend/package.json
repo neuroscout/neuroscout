@@ -4,13 +4,14 @@
   "proxy": "http://neuroscout.org:80",
   "private": true,
   "dependencies": {
-    "@sentry/browser": "5.7.0",
-    "@types/antd": "^1.0.0",
+    "@ant-design/compatible": "^1.0.8",
+    "@ant-design/icons": "^4.4.0",
+    "@sentry/browser": "^6.0.0",
     "@types/node": "^9.6.47",
-    "@types/react": "^16.7.18",
-    "@types/react-beautiful-dnd": "^7.1.2",
-    "@types/react-dom": "^16.0.5",
-    "antd": "^3.13.2",
+    "@types/react": "^16.9.56",
+    "@types/react-beautiful-dnd": "^13.0.0",
+    "@types/react-dom": "^17.0.3",
+    "antd": "^4.0.0",
     "handlebars": "^4.3.0",
     "js-yaml": "^3.13.1",
     "jwt-decode": "^2.2.0",
@@ -19,7 +20,7 @@
     "memoize-one": "^5.1.1",
     "n": "^6.7.0",
     "react": "^16.3.2",
-    "react-beautiful-dnd": "^10.0.3",
+    "react-beautiful-dnd": "^13.0.0",
     "react-dom": "^16.3.2",
     "react-ga": "^2.6.0",
     "react-google-login": "^3.2.1",
@@ -29,9 +30,9 @@
     "regexpu-core": "^4.7.1",
     "serialize-javascript": "^3.1.0",
     "styled-components": "^4.0.0",
-    "vega": "^5.17.3",
-    "vega-embed": "^4.0.0",
-    "vega-lite": "^4.0.0",
+    "vega": "5.20.0",
+    "vega-embed": "6.17",
+    "vega-lite": "5.0.0",
     "wait-on": "^5.2.0",
     "webpack-dev-server": "^3.1.11"
   },
@@ -48,6 +49,9 @@
     "tslint-etc": "^1.5.6",
     "tsutils": "^2.26.2",
     "typescript": "^3"
+  },
+  "resolutions": {
+    "@types/react": "^16.7.18"
   },
   "scripts": {
     "start": "react-scripts-ts start",
