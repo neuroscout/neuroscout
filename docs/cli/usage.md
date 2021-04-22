@@ -9,7 +9,7 @@ Assuming you've already created an analysis on neuroscout.org, and have its anal
 
     docker run -it --rm neuroscout/neuroscout-cli run /out 5xH93
 
-Neuroscout will download the necessary images, analysis bundle, and fit your model. The fitted images will be upload to NeuroVault and linked to your analysis on neuroscout.org.
+Neuroscout will download the necessary images, analysis bundle, and fit your model. The fitted images will be upload to NeuroVault and linked to your analysis on (neuroscout.org)[htts://neuroscout.org].
 
 ## Saving data to disk
 
