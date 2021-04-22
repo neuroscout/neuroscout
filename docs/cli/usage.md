@@ -24,13 +24,14 @@ In this example, we mount both of these directories to local volumes:
 
 In this command, the path preceding `:/out` specifies the local directory where the outputs will be stored (i.e. your local volume `/home/myuser/out`). 
 
-Neuroscout creates a unique output directory (`neuroscout-{analysis_id}`) with the following structure:
+Neuroscout creates a unique output directory `neuroscout-{analysis_id}`.
+Given the `analysis_id`: `5xH93` and `dataset_name`: `Budapest`, this is a representative directory structure:
 
 
-    /home/myuser/out/neuroscout-{analysis_id}    
+    /home/myuser/out/neuroscout-5xH93  
     └───inputs
     │   │
-    │   └───{dataset_name}
+    │   └───Budapest
     │       └───fmriprep
     │   └───bundle
     │       └───events
@@ -40,7 +41,8 @@ Neuroscout creates a unique output directory (`neuroscout-{analysis_id}`) with t
     │   └───fitlins
     │       └───sub-01
     │       └───reports
-    │       │   task-{task_name}_space-MNI152NLin2009cAsym_contrast-{name}_stat-effect_statmap.nii.gz
+    │       │   task-movie_space-MNI152NLin2009cAsym_contrast-{name}_stat-effect_statmap.nii.gz
+            |   ...
 
 
 Note that by default Neuroscout will save the input preprocessed fMRI images in the output folder, to create a fully reproducible result package.
