@@ -27,7 +27,7 @@ In this command, the path preceding `:/out` specifies the local directory where 
 Neuroscout creates a unique output directory (`neuroscout-{analysis_id}`) with the following structure:
 
 
-    neuroscout-{analysis_id}    
+    /home/myuser/out/neuroscout-{analysis_id}    
     └───inputs
     │   │
     │   └───{dataset_name}
