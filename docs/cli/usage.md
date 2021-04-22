@@ -54,7 +54,7 @@ If you wish to save the input preprocessed datasets elsewhere, simply specify a 
 The resulting cached data directory will look sonething like this, if you've run several analyses from different datasets:
 
 
-    /home/user/scout-data  
+    /home/user/data  
     └───Budapest
     │   └───fmriprep
     └───studyforrest
