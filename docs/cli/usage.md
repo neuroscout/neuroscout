@@ -22,7 +22,7 @@ In this example, we mount both of these directories to local volumes:
     docker run -it --rm -v /home/myuser/out:/out neuroscout/neuroscout-cli run /out 5xH93
 
 
-In this command, the path preceding `:/out` specifies the local directory where the outputs will be stored (i.e. your local volume `/home/myuser/out`). 
+In this command, the path preceding `:/out` specifies the local directory where the outputs will be stored. For example, a local folder `/home/myuser/out`.
 
 Neuroscout creates a unique output directory `neuroscout-{analysis_id}`.
 Given the `analysis_id`: `5xH93` and `dataset_name`: `Budapest`, this is a representative directory structure:
