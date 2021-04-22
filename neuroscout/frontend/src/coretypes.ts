@@ -93,6 +93,7 @@ export interface Predictor {
 }
 
 export interface ExtractedFeature {
+  id: number;
   description: string;
   extractor_name: string;
   modality: string;
