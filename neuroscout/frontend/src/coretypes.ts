@@ -94,6 +94,7 @@ export interface Predictor {
 
 export interface ExtractedFeature {
   id: number;
+  resample_frequency: number;
   description: string;
   extractor_name: string;
   modality: string;

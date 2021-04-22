@@ -47,11 +47,19 @@ export const ApiToAppAnalysis = (data: ApiAnalysis): AppAnalysis => ({
   user_name: data.user
 });
 
+const ef_fields = ['description', 'created_at', 'resample_frequency', 'modality'];
+
 const setPredictorSource = (predictors: Predictor[]): Predictor[] => {
   predictors.map((x) => {
     if (x && x.extracted_feature && x.extracted_feature.id) {
       delete x.extracted_feature.id;
     }
+    ef_fields.map(field => {
+      if (x.extracted_feature && x.extracted_feature[field] !== undefined && x.extracted_feature[field] !== null) {
+        x[field] = x.extracted_feature[field];
+      }
+    });
+    
     Object.assign(x, x.extracted_feature, x);
     if (x.extracted_feature && x.extracted_feature.extractor_name) {
       x.source = x.extracted_feature.extractor_name;
