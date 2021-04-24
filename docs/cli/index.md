@@ -1,8 +1,8 @@
 # Neuroscout-cli
 
-The Neuroscout Command Line Interface (_neuroscout-cli_) allows you to easily execute analyses created on [neuroscout.org](https://www.neuroscout.org).
+The Neuroscout Command Line Interface (_neuroscout-cli_) allows you to easily execute analyses created on [neuroscout.org](https://neuroscout.org).
 
-_neuroscout-cli_ makes it easy to run your analysis with no configuration by fetching a self-contained analysis bundle, and downloading the required preprocessed fMRI data at run time using [DataLad](https://www.datalad.org/). _neuroscout-cli_ internally uses [FitLins](https://github.com/poldracklab/fitlins), a python pipeline for fMRI analysis in BIDS, to fits a statistical model to the fMRI data, and produce comprehensive reports. _neuroscout-cli_ automaticallys upload the fitted images to [Neurovault](https://www.datalad.org/), and links them to the analysis listing, making it easy to view and share your results.
+_neuroscout-cli_ makes it easy to run your analysis with no configuration by fetching a self-contained analysis bundle, and downloading the required preprocessed fMRI data at run time using [DataLad](https://www.datalad.org/). _neuroscout-cli_ internally uses [FitLins](https://github.com/poldracklab/fitlins), a python pipeline for fMRI analysis in BIDS, to fits a statistical model to the fMRI data, and produce comprehensive reports. _neuroscout-cli_ automatically uploads the fitted images to [Neurovault](https://www.neurovault.org/), and links them to the analysis listing, making it easy to view and share your results.
 
 ## Installation
 

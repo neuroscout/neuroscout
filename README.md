@@ -168,8 +168,3 @@ In a separate window, you can run cypress:
 Once done, kill the first command, and run the following to tear down the test db
 
    docker-compose exec -e APP_SETTINGS=neuroscout.config.app.DockerTestConfig neuroscout python manage.py teardown_test_db
-
-## Renewing HTTPS certs
-Ideally, this is take care of by a cronjob
-
-    docker run -it --rm -v /home/alejandro/www/neuroscout/nginx/certs/:/etc/letsencrypt -v /home/alejandro/www/neuroscout/nginx/certs-data/:/data/letsencrypt deliverous/certbot certonly --webroot --webroot-path=/data/letsencrypt -d neuroscout.org -d alpha.neuroscout.org -d www.neuroscout.org
