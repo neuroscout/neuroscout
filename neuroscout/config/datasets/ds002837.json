@@ -1,6 +1,6 @@
 {
   "NaturalisticNeuroimagingDatabase": {
-    "preproc_address": "https://github.com/neuroscout-datasets/NaturalisticNeuroimagingDatabase.git",
+    "preproc_address": "https://github.com/neuroscout-datasets/ds002837",
     "path": "/datasets/raw/ds002837/",
     "summary": "Movie watching of 10 full-length movies",
     "long_description": "The Naturalistic Neuroimaging Database (NNDb v1.0) contains datasets from 86 human participants watching 10 full-length movies during fMRI. Each participant watched a distinct movie. Movies were stopped in 40-50 minute intervals or when participants asked for a break. However, the run files were concatenated into a single image during preprocessing. ",
