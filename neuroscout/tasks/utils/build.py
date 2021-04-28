@@ -80,18 +80,16 @@ def build_analysis(analysis, predictor_events, bids_dir,
 
     tmp_dir = Path(mkdtemp())
 
-    # Get set of entities across analysis
+    # Get durations and set of entities across analysis runs
     if run_ids is None:
-        run_entities = [_get_entities(run) for run in analysis['runs']]
+        run_entities = [(run['duration'], _get_entities(run)) for run in analysis['runs']]
     else:
         run_entities = []
         for rid in run_ids:
             for run in analysis['runs']:
                 if rid == run['id']:
-                    run_entities.append(_get_entities(run))
+                    run_entities.append((run['duration'], _get_entities(run)))
                     break
-
-    scan_length = max([r['duration'] for r in analysis['runs']])
 
     # Write out all events
     paths = writeout_events(
@@ -107,11 +105,8 @@ def build_analysis(analysis, predictor_events, bids_dir,
         bids_analysis = BIDSAnalysis(
             bids_layout, deepcopy(analysis.get('model')))
 
-        if run_entities:
-            for ents in run_entities:
-                bids_analysis.setup(**ents, scan_length=scan_length)
-        else:
-            bids_analysis.setup(scan_length=scan_length)
+        for dur, ents in run_entities:
+            bids_analysis.setup(**ents, scan_length=dur)
 
     return tmp_dir, paths, bids_analysis
 
