@@ -251,7 +251,7 @@ export class Report extends React.Component<ReportProps, ReportState> {
         if (res.result === undefined) {
           return;
         }
-        let scale = true;
+        let scale = false;
         if (this.state.scale !== undefined) {
           scale = this.state.scale;
         } else if (res.scale !== null) {
