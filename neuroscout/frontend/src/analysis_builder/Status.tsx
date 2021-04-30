@@ -102,7 +102,7 @@ export class Submit extends React.Component<submitProps, {tosAgree: boolean, val
       <div className="statusTOS">
         {!this.props.name &&
           <span>
-           <br/><Alert message="Analysis needs name to be generated" type="warning" showIcon={true} closable={true} />
+           <br /><Alert message="Analysis needs name to be generated" type="warning" showIcon={true} closable={true} />
           </span>
         }
         <br/>
@@ -268,65 +268,68 @@ export class StatusTab extends React.Component<submitProps, statusTabState> {
     this.analysisIdChange(this.props.analysisId);
     return(
       <div>
-      <div className="statusHeader">
-        {this.props.userOwns &&
-          <>
-          <PubAccess private={this.props.private} updateAnalysis={this.props.updateAnalysis!} />
-          <span>{' '}</span>
-          </>}
-        <DateTag modified_at={this.props.modified_at} />
-        <StatusTag status={this.props.status} analysisId={this.props.analysisId} />
-      </div>
-      {this.props.children}
-      {(this.props.status === 'PASSED') &&
-        <div>
-          <h3>Analysis Passed</h3>
-          <p>
-            {this.props.userOwns && 'Congratulations, your analysis has been compiled!'}
-            <br>Run the analysis with this this command, replacing '/local/out' with a local directory.
-            See the <a href="https://neuroscout.github.io/neuroscout/cli/">neuroscout-cli documentation </a>
-             for a complete user guide.
-          </p>
-          <pre>
-            <code>
-              docker run --rm -it -v /local/outputdirectory:/out
-              {` neuroscout/neuroscout-cli${this.state.imageVersion}`} run /out {this.props.analysisId}
-            </code>
-          </pre>
-          <Card size="small" title="System Requirements" style={{ width: 400 }}>
-            <p>OS: Windows/Linux/Mac OS with <a href="https://docs.docker.com/install/">Docker</a></p>
-            <p>RAM: 8GB+ RAM</p>
-            <p>Disk space: 4GB + ~1 GB/subject</p>
-          </Card>
-          <br/>
+        <div className="statusHeader">
+          {this.props.userOwns &&
+            <>
+            <PubAccess private={this.props.private} updateAnalysis={this.props.updateAnalysis!} />
+            <span>{' '}</span>
+            </>
+          }
+          <DateTag modified_at={this.props.modified_at} />
+          <StatusTag status={this.props.status} analysisId={this.props.analysisId} />
         </div>
-      }
-      {(this.props.status === 'DRAFT' || this.props.status === 'FAILED') &&
-        <Submit
-          status={this.props.status}
-          name={this.props.name}
-          analysisId={this.props.analysisId}
-          confirmSubmission={this.props.confirmSubmission}
-          private={this.props.private}
-        />
-      }
-      {(this.props.status === 'FAILED') &&
-        <div>
-          <br/>
-          <Tracebacks
-            message="Analysis failed to compile"
-            traceback={this.state.compileTraceback}
+        {this.props.children}
+        {(this.props.status === 'PASSED') &&
+          <div>
+            <h3>Analysis Passed</h3>
+            <p>
+              {this.props.userOwns && 'Congratulations, your analysis has been compiled!'}
+              <br />Run the analysis with this this command, replacing '/local/out' with a local directory.
+              See the <a href="https://neuroscout.github.io/neuroscout/cli/">neuroscout-cli documentation </a>
+               for a complete user guide.
+            </p>
+            <pre>
+              <code>
+                docker run --rm -it -v /local/outputdirectory:/out
+                {` neuroscout/neuroscout-cli${this.state.imageVersion}`} run /out {this.props.analysisId}
+              </code>
+            </pre>
+            <Card size="small" title="System Requirements" style={{ width: 400 }}>
+              <p>OS: Windows/Linux/Mac OS with <a href="https://docs.docker.com/install/">Docker</a></p>
+              <p>RAM: 8GB+ RAM</p>
+              <p>Disk space: 4GB + ~1 GB/subject</p>
+            </Card>
+            <br/>
+          </div>
+        }
+        {(this.props.status === 'DRAFT' || this.props.status === 'FAILED') &&
+          <Submit
+            status={this.props.status}
+            name={this.props.name}
+            analysisId={this.props.analysisId}
+            confirmSubmission={this.props.confirmSubmission}
+            private={this.props.private}
           />
-          <br/>
-        </div>
-      }
-      {(this.props.status === 'PENDING' || this.props.status === 'SUBMITTING') &&
-        <div>
-          <h3>Analysis Pending Generation</h3>
-          <p>Analysis generation may take some time. This page will update when complete.</p>
-        </div>
-      }
-      {this.state.nvUploads && this.nvStatus(this.state.nvUploads)}
+        }
+        {(this.props.status === 'FAILED') &&
+          <div>
+            <br/>
+            <Tracebacks
+              message="Analysis failed to compile"
+              traceback={this.state.compileTraceback}
+            />
+            <br/>
+          </div>
+        }
+        {(this.props.status === 'PENDING' || this.props.status === 'SUBMITTING') &&
+          <div>
+            <h3>Analysis Pending Generation</h3>
+            <p>Analysis generation may take some time. This page will update when complete.</p>
+          </div>
+        }
+        {this.state.nvUploads &&
+          this.nvStatus(this.state.nvUploads)
+        }
       </div>
     );
   }
