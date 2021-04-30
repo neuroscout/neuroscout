@@ -251,7 +251,7 @@ export class Report extends React.Component<ReportProps, ReportState> {
         if (res.result === undefined) {
           return;
         }
-        let scale = true;
+        let scale = false;
         if (this.state.scale !== undefined) {
           scale = this.state.scale;
         } else if (res.scale !== null) {
@@ -270,7 +270,7 @@ export class Report extends React.Component<ReportProps, ReportState> {
         state.reportTraceback = res.traceback;
         this.setState({reportsPosted: true});
       } else if (res.statusCode === 404 && !this.state.reportsPosted) {
-        this.generateReport();
+        this.generateReport(false);
         this.setState({reportsPosted: true, reportsLoaded: false});
         return;
       } else {
