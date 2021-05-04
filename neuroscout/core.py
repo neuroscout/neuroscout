@@ -85,10 +85,3 @@ def confirm(token):
     return render_template(
         'confirm.html', confirmed=confirmed, expired=expired, invalid=invalid,
         name=name, action_url=url_for('index', _external=True))
-
-
-@app.route('/', defaults={'path': ''})
-@app.route('/<path:path>')
-def index(path):
-    ''' Serve index '''
-    return send_file("frontend/build/index.html")
