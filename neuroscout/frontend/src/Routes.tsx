@@ -4,7 +4,8 @@ import { message } from 'antd';
 
 import './css/App.css';
 import AnalysisList from './AnalysisList';
-import AnalysisBuilder from './analysis_builder/Builder';
+// import AnalysisBuilder from './analysis_builder/Builder';
+const AnalysisBuilder = React.lazy(() => import('./analysis_builder/Builder'));
 import { AppState } from './coretypes';
 import { NotFound } from './HelperComponents';
 import Home from './Home';
@@ -16,6 +17,7 @@ import UserList from './profile/UserList';
 export default class Routes extends React.Component<AppState, {}> {
   render() {
     return (
+      <React.Suspense fallback={<div>Loading...</div>}>
       <Switch>
         <Route
           exact={true}
@@ -143,6 +145,7 @@ export default class Routes extends React.Component<AppState, {}> {
       />
       <Route component={NotFound} />
       </Switch>
+      </React.Suspense>
     );
   }
 }
