@@ -168,3 +168,4 @@ In a separate window, you can run cypress:
 Once done, kill the first command, and run the following to tear down the test db
 
    docker-compose exec -e APP_SETTINGS=neuroscout.config.app.DockerTestConfig neuroscout python manage.py teardown_test_db
+
