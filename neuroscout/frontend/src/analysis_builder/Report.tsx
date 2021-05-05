@@ -260,6 +260,7 @@ export class Report extends React.Component<ReportProps, ReportState> {
         state.scale = scale;
         state.matrices = res.result.design_matrix;
         state.plots = res.result.design_matrix_plot;
+        state.corr_plots = res.result.design_matrix_corrplot;
         state.reportTimestamp = res.generated_at;
         if (res.traceback) {
           state.reportTraceback = res.traceback;
