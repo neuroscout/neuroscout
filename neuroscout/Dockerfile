@@ -13,8 +13,8 @@ RUN wget -O- http://neuro.debian.net/lists/stretch.us-nh.full | tee /etc/apt/sou
 RUN apt-get update && apt-get install -yq datalad && pip install datalad
 
 RUN curl -sSL https://deb.nodesource.com/gpgkey/nodesource.gpg.key | apt-key add -
-RUN echo "deb https://deb.nodesource.com/node_11.x jessie main" | tee /etc/apt/sources.list.d/nodesource.list
-RUN echo "deb-src https://deb.nodesource.com/node_11.x jessie main" | tee -a /etc/apt/sources.list.d/nodesource.list
+RUN echo "deb https://deb.nodesource.com/node_12.x buster main" | tee /etc/apt/sources.list.d/nodesource.list
+RUN echo "deb-src https://deb.nodesource.com/node_12.x buster main" | tee -a /etc/apt/sources.list.d/nodesource.list
 RUN apt-get update
 RUN apt-get install -y nodejs
 RUN npm install -g yarn
