@@ -46,7 +46,6 @@ class ExtractorDistinctResource(MethodResource):
             description="Return results only for active Datasets")
         },
         location='query')
-    @marshal_with(ExtractorSchema(many=True))
     def get(self, **kwargs):
         count = kwargs.pop('count')
         active = kwargs.pop('active_only')
