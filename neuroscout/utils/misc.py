@@ -6,7 +6,7 @@ from .. import models as ms
 def distinct_extractors(count=True, active=True):
     """ Tool to count unique number of predictors for each Dataset/Task """
     active_datasets = ms.Dataset.query.filter_by(active=active)
-    superset = set([v for (v, ) in ms.Predictor.query.filter(
+    superset = set([v for (v, ) in ms.Predictor.query.filter_by(active=True).filter(
         ms.Predictor.dataset_id.in_(
             active_datasets.with_entities('id'))).join(
                 ms.ExtractedFeature).distinct(
