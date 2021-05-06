@@ -16,7 +16,7 @@ pynv==0.2
 Flask==1.1.1
 flask-apispec==0.10.0
 Flask-Caching==1.3.3
-Flask-cors==3.0.2
+Flask-cors==3.0.9
 Flask-JWT==0.3.2
 Flask-Login==0.3.2
 Flask-Mail==0.9.1
