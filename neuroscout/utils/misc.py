@@ -21,7 +21,7 @@ def distinct_extractors(count=True, active=True):
                 if name not in res:
                     res[name] = {}
                 preds = ms.Predictor.query.filter_by(
-                    dataset_id=ds.id).join(
+                    dataset_id=ds.id, active=True).join(
                         ms.ExtractedFeature).filter_by(
                             extractor_name=en).distinct('feature_name')
                 if count:
