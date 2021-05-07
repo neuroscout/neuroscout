@@ -75,7 +75,7 @@ services:
       dockerfile: celery_worker/Dockerfile
     ports:
      - "5555:5555"
-    entrypoint: celery -A tasks flower --auth="aleph4@gmail.com|rosswilsonblair@gmail.com|rbrrcc@gmail.com" --url-prefix=flower
+    entrypoint: celery -A tasks flower --auth="aleph4@gmail.com|rosswilsonblair@gmail.com|rbrrcc@gmail.com"
     volumes:
       - ./celery_worker:/celery_worker
     depends_on:
