@@ -9,7 +9,7 @@ nistats
 nilearn
 sklearn
 networkx==1.9
-celery
+celery~=4.0
 hashids==1.2.0
 marshmallow==3.7.1
 psycopg2==2.8.3
