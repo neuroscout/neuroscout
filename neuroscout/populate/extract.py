@@ -298,11 +298,20 @@ def extract_tokenized_features(dataset_name, task_name, extractors):
     The extractors object is a list of lists, of pairs of pliers Graphs
     paired with arguments regading the window method.
     
-    The valid arguments are window_method, which can be either "pre" or
+    The valid options are window_method, which can be either "pre" or
     "transcript". "pre" defined a "window_n" to look prior to a word, 
     while a "transcript" window passes the entire transcript to the
     Graph.
-    
+
+    Args:
+        dataset_name - dataset name
+        task_name - Task name
+        extractors - List of lists of pairs of Graphs and arguments
+        e.g:
+        [[[{"transformer": "WordCounterExtractor"}], {"window": "transcript"}]]
+    Output:
+        list of created Predictor ids
+            
     """
     stims = _load_complex_text_stim_models(dataset_name, task_name)
 
