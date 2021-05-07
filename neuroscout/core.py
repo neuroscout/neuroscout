@@ -66,7 +66,8 @@ route_factory(
         ('TaskPredictorsResource', 'tasks/<int:task_id>/predictors'),
         ('TaskListResource', 'tasks'),
         ('ImageVersionResource', 'image_version'),
-        ('ExtractorListResource', 'extractors')
+        ('ExtractorListResource', 'extractors'),
+        ('ExtractorDistinctResource', 'extractors/distinct')
     ])
 
 
