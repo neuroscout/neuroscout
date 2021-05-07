@@ -293,7 +293,17 @@ def _window_stim(cts, n):
 
 def extract_tokenized_features(dataset_name, task_name, extractors):
     """ Extract features that require a ComplexTextStim to give context to
-    individual words within a run """
+    individual words within a run.
+    
+    The extractors object is a list of lists, of pairs of pliers Graphs
+    paired with arguments regading the window method.
+    
+    The valid arguments are window_method, which can be either "pre" or
+    "transcript". "pre" defined a "window_n" to look prior to a word, 
+    while a "transcript" window passes the entire transcript to the
+    Graph.
+    
+    """
     stims = _load_complex_text_stim_models(dataset_name, task_name)
 
     results = []
