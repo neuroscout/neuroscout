@@ -1,4 +1,7 @@
 {
   "baseUrl": "http://localhost:3000",
-  "projectId": "jfpnqv"
+  "projectId": "jfpnqv",
+  "retries": { "runMode": 1, "openMode": 1 },
+  "defaultCommandTimeout": 6000,
+  "requestTimeout": 8000
 }
