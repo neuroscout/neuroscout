@@ -70,4 +70,3 @@ class GHIConfig(TestingConfig):
 
 class GHIConfigBackend(GHIConfig):
     SERVER_NAME = 'localhost'
-    ENV = 'development'
