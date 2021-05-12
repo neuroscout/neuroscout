@@ -1,0 +1,4 @@
+export const config =  {
+  'server_url': 'http://localhost/',
+  'google_client_id': 'client_id'
+};
