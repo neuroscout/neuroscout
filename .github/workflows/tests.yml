@@ -62,6 +62,8 @@ jobs:
             build
         key: modules-${{ hashFiles('**/yarn.lock') }}
       if: matrix.type == 'frontend'
+    - name: Start nginx
+      run: docker-compose up -d -f docker-compose.yml -f docker-compose.dev.yml
     - name: Install frontend dependencies
       run: |
          cd neuroscout/frontend
