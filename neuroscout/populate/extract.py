@@ -110,7 +110,7 @@ def _create_efs(results):
     print("Creating ExtractedFeatures...")
     for stim_id, ser in tqdm(results):
         for ee_props, ef_props in ser:
-            # Hash extractor name + feaFture name
+            # Hash extractor name + feature name
             feat_hash = ef_props['sha1_hash']
 
             # If we haven't already added this feature
@@ -306,22 +306,24 @@ def extract_tokenized_features(dataset_name, task_name, extractors):
 
         object_id = 'max' if window == 'pre' else None
         serializer = FeatureSerializer(
-            object_id=object_id, splat=True,
-            add_all=False, round_n=4)
+            object_id=object_id, splat=True, add_all=False, round_n=4)
+
+        # Save window params as Graph attributes
         for node in g.nodes.values():
             setattr(node.transformer, "window_method", window)
             if window_n:
                 setattr(node.transformer, "window_n", window_n)
-        for sm, s in tqdm(stims):
-            if window == "transcript":
-                # In complete transcript window, save all results
-                results += [(sm, res) for res in g.transform(s, merge=False)]
-            elif window == "pre":
-                for sli in _window_stim(s, window_n):
-                    for res in g.transform(sli, merge=False):
-                        res = serializer.load(res)
-                        results.append((sm.id, res))
 
+        for sm, s in tqdm(stims):
+            # Slice stims if window type is "pre"
+            w_stim = _window_stim(s, window_n) if window == "pre" else [s]
+
+            # Extract for every windowed slice
+            for sli in w_stim:
+                results += [
+                    (sm.id, serializer.load(res)) 
+                    for res in g.transform(sli, merge=False)
+                ]
 
     # Serialize result objects first
     ext_feats = _create_efs(results)
