@@ -241,13 +241,17 @@ def extract_features(graphs, dataset_name=None, task_name=None, n_jobs=1,
             dataset_name, task_name)
 
 
-def _load_complex_text_stim_models(dataset_name, task_name):
+def _load_complex_text_stim_models(dataset_name, task_name=None):
     """ Reconstruct ComplexTextStim object of complete run transcript
     for each run in a task """
     stim_models = Stimulus.query.filter_by(
         active=True, mimetype='text/csv').join(
-            RunStimulus).join(Run).join(Task).filter_by(name=task_name).join(
-            Dataset).filter_by(name=dataset_name)
+            RunStimulus).join(Run).join(Task)
+        
+    if task_name is not None:
+        stim_models = stim_models.filter_by(name=task_name)
+        
+    stim_models = stim_models.join(Dataset).filter_by(name=dataset_name)
 
     stims = []
     print("Loading stim models...")
@@ -291,7 +295,7 @@ def _window_stim(cts, n):
     return slices
 
 
-def extract_tokenized_features(dataset_name, task_name, extractors):
+def extract_tokenized_features(dataset_name, extractors, task_name=None):
     """ Extract features that require a ComplexTextStim to give context to
     individual words within a run """
     stims = _load_complex_text_stim_models(dataset_name, task_name)
