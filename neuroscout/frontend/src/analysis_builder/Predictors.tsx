@@ -364,13 +364,15 @@ export class PredictorSelector extends React.Component<
               <Col xl={{span: 7}}>
                 <h4>Source:</h4>
                 {sourceCheckboxes}
-                {!!this.state.modalityFilters.length && <h4>Modality: <Tooltip
+                {!!this.state.modalityFilters.length && <h4>Modality:
+                  <Tooltip
                    title={'Note that modality reflects the final mimetype prior to applying extractors. \
                    In many cases, stimuli are converted to a secondary modality. \
                    For example, "video" stimuli are sampled as "image" stimuli in order to apply most extractors.'}
                   >
                     <QuestionCircleTwoTone style={{ fontSize: '12px'}} />
-                  </Tooltip></h4>}
+                  </Tooltip>
+                  </h4>}
                 {modalityCheckboxes}
                 <a onClick={this.clearFilters}>Clear All</a>
               </Col>
