@@ -1226,7 +1226,7 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
                    prior to constructing the final design matrix.'}
                    defaultVisible={this.state.doTooltip && this.state.activeTab === ('transformations' as TabName)}
                   >
-                    <QuestionCircleTwoTone style={{ fontSize: '15px'}} />
+                    <QuestionCircleTwoTone style={{ fontSize: '17px'}} />
                   </Tooltip>
                   }
                   </h2>
@@ -1252,7 +1252,7 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
                    click "Select All Non-Confounds"'}
                    defaultVisible={this.state.doTooltip && this.state.activeTab === ('hrf' as TabName)}
                   >
-                    <QuestionCircleTwoTone style={{ fontSize: '15px'}} />
+                    <QuestionCircleTwoTone style={{ fontSize: '17px'}} />
                   </Tooltip>
                   }
                   </h2>
@@ -1282,7 +1282,7 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
                    To create identity contrasts [1, 0] for each predictor, use "Generate Automatic Contrasts"'}
                    defaultVisible={this.state.doTooltip && this.state.activeTab === ('contrasts' as TabName)}
                   >
-                    <QuestionCircleTwoTone style={{ fontSize: '15px'}} />
+                    <QuestionCircleTwoTone style={{ fontSize: '17px'}} />
                   </Tooltip>
                   }
                   </h2>

@@ -411,7 +411,7 @@ export class Report extends React.Component<ReportProps, ReportState> {
           \nClick on the design matrix columns to view the timecourse in detail.'}
           defaultVisible={this.props.defaultVisible}
         >
-          <QuestionCircleTwoTone style={{ fontSize: '15px'}} />
+          <QuestionCircleTwoTone style={{ fontSize: '17px'}} />
         </Tooltip>
       </>
     );
