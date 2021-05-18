@@ -2,7 +2,7 @@
  OverviewTab component
 */
 import * as React from 'react';
-import { QuestionCircleTwoToned } from '@ant-design/icons';
+import { QuestionCircleTwoTone } from '@ant-design/icons';
 import { Form } from '@ant-design/compatible';
 import '@ant-design/compatible/assets/index.css';
 import { Col, Collapse, Input, Row, Table, Tooltip, Button, List, Descriptions } from 'antd';
@@ -287,7 +287,7 @@ export class OverviewTab extends React.Component<OverviewTabProps, OverviewTabSt
               <span>
                 Dataset&nbsp;&nbsp;
                 <Tooltip title="Choose from a curated set of openly available, naturalistic datasets.">
-                  <QuestionCircleTwoToned />
+                  <QuestionCircleTwoTone />
                 </Tooltip>
               </span>
             }
@@ -337,7 +337,7 @@ export class OverviewTab extends React.Component<OverviewTabProps, OverviewTabSt
                    title={'You can filter runs using the filter icon in each column,\
                     and clear the filters using this button'}
                   >
-                    <QuestionCircleTwoToned />
+                    <QuestionCircleTwoTone />
                   </Tooltip>
                 </div>
               </Panel>
