@@ -1199,7 +1199,7 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
                    For example, try searching for "face" or "fmriprep"'}
                    defaultVisible={this.state.doTooltip && this.state.activeTab === ('predictors' as TabName)}
                   >
-                    <QuestionCircleTwoTone style={{ fontSize: '15px'}} />
+                    <QuestionCircleTwoTone style={{ fontSize: '17px'}} />
                   </Tooltip>
                   }
                   </h2>
