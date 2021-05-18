@@ -364,7 +364,7 @@ export class PredictorSelector extends React.Component<
               <Col xl={{span: 7}}>
                 <h4>Source</h4>
                 {sourceCheckboxes}
-                {!!this.state.modalityFilters.length && <h4>Modality {" "}
+                {!!this.state.modalityFilters.length && <h4>Modality {' '}
                   <Tooltip
                    title={'Modality reflects the final mimetype prior to applying extractors. \
                    For example, transcripts are encoded as "text" stimuli. \
