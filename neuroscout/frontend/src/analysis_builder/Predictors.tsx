@@ -364,7 +364,7 @@ export class PredictorSelector extends React.Component<
               <Col xl={{span: 7}}>
                 <h4>Source</h4>
                 {sourceCheckboxes}
-                {!!this.state.modalityFilters.length && <h4>Modality 
+                {!!this.state.modalityFilters.length && <h4>Modality&nbsp
                   <Tooltip
                    title={'Modality reflects the final mimetype prior to applying extractors. \
                    In many cases, stimuli are converted to a secondary modality. \
