@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { InfoCircleOutlined } from '@ant-design/icons';
+import { QuestionCircleTwoTone } from '@ant-design/icons';
 import {
   Alert,
   Button,
@@ -97,7 +97,7 @@ class Plots extends React.Component<PlotsProps, {}> {
                 <Tooltip
                   title={'Scale variables in the design matrix plot (only for visual purposes)'}
                 >
-                  Scale Design Matrix <InfoCircleOutlined /><Space />
+                  Scale Design Matrix <QuestionCircleTwoTone /><Space />
                   <Switch onChange={this.props.updateScale} checked={this.props.scale} />
                 </Tooltip>
               </div>
@@ -411,7 +411,7 @@ export class Report extends React.Component<ReportProps, ReportState> {
           \nClick on the design matrix columns to view the timecourse in detail.'}
           defaultVisible={this.props.defaultVisible}
         >
-          <InfoCircleOutlined style={{ fontSize: '15px'}} />
+          <QuestionCircleTwoTone style={{ fontSize: '17px'}} />
         </Tooltip>
       </>
     );

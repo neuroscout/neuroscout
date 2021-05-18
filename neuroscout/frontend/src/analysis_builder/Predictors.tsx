@@ -6,6 +6,7 @@ filter the table down to predictors whose name or description match the entered 
 import * as React from 'react';
 import { Checkbox, Col, Descriptions, Input, Row, Table, Tabs, Tag, Tooltip } from 'antd';
 import { TableRowSelection } from 'antd/lib/table/interface';
+import { QuestionCircleTwoTone, PlusOutlined } from '@ant-design/icons';
 
 import memoize from 'memoize-one';
 
@@ -361,9 +362,18 @@ export class PredictorSelector extends React.Component<
               </Col>
               <Col xl={{span: 1}}/>
               <Col xl={{span: 7}}>
-                <h4>Source:</h4>
+                <h4>Source</h4>
                 {sourceCheckboxes}
-                {!!this.state.modalityFilters.length && <h4>Modality Filter:</h4>}
+                {!!this.state.modalityFilters.length && <h4>Modality {' '}
+                  <Tooltip
+                   title={'Modality reflects the final mimetype prior to applying extractors. \
+                   For example, transcripts are encoded as "text" stimuli. \
+                   Video stimuli are sampled to "image" and "audio" stimuli \
+                   in order to apply extractors that do not operate on videos directly.'}
+                  >
+                    <QuestionCircleTwoTone style={{ fontSize: '13px'}} />
+                  </Tooltip>
+                  </h4>}
                 {modalityCheckboxes}
                 <a onClick={this.clearFilters}>Clear All</a>
               </Col>

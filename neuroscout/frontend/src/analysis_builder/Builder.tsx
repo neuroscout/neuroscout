@@ -6,7 +6,7 @@ import { RouteComponentProps } from 'react-router';
 import { Redirect } from 'react-router-dom';
 import { createBrowserHistory } from 'history';
 import * as React from 'react';
-import { InfoCircleOutlined, PlusOutlined } from '@ant-design/icons';
+import { QuestionCircleTwoTone, PlusOutlined } from '@ant-design/icons';
 import { Form } from '@ant-design/compatible';
 import '@ant-design/compatible/assets/index.css';
 import { Alert, Tag, Tabs, Row, Button, Modal, message, Tooltip, Input, Collapse } from 'antd';
@@ -1199,7 +1199,7 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
                    For example, try searching for "face" or "fmriprep"'}
                    defaultVisible={this.state.doTooltip && this.state.activeTab === ('predictors' as TabName)}
                   >
-                    <InfoCircleOutlined style={{ fontSize: '15px'}} />
+                    <QuestionCircleTwoTone style={{ fontSize: '17px'}} />
                   </Tooltip>
                   }
                   </h2>
@@ -1226,7 +1226,7 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
                    prior to constructing the final design matrix.'}
                    defaultVisible={this.state.doTooltip && this.state.activeTab === ('transformations' as TabName)}
                   >
-                    <InfoCircleOutlined style={{ fontSize: '15px'}} />
+                    <QuestionCircleTwoTone style={{ fontSize: '17px'}} />
                   </Tooltip>
                   }
                   </h2>
@@ -1252,7 +1252,7 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
                    click "Select All Non-Confounds"'}
                    defaultVisible={this.state.doTooltip && this.state.activeTab === ('hrf' as TabName)}
                   >
-                    <InfoCircleOutlined style={{ fontSize: '15px'}} />
+                    <QuestionCircleTwoTone style={{ fontSize: '17px'}} />
                   </Tooltip>
                   }
                   </h2>
@@ -1282,7 +1282,7 @@ export default class AnalysisBuilder extends React.Component<BuilderProps & Rout
                    To create identity contrasts [1, 0] for each predictor, use "Generate Automatic Contrasts"'}
                    defaultVisible={this.state.doTooltip && this.state.activeTab === ('contrasts' as TabName)}
                   >
-                    <InfoCircleOutlined style={{ fontSize: '15px'}} />
+                    <QuestionCircleTwoTone style={{ fontSize: '17px'}} />
                   </Tooltip>
                   }
                   </h2>
