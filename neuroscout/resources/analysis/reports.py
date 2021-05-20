@@ -109,6 +109,7 @@ class ReportResource(MethodResource):
         if scale is not None:
             filters['scale'] = scale
 
+
         candidate = Report.query.filter_by(**filters)
         if candidate.count() == 0:
             abort(404, "Report not found")
