@@ -1,6 +1,7 @@
 import datetime
 from hashids import Hashids
 from webargs import fields
+from sqlalchemy import desc
 from marshmallow import INCLUDE, Schema
 from flask_apispec import doc, use_kwargs, MethodResource, marshal_with
 from flask import current_app
@@ -96,17 +97,23 @@ class ReportResource(MethodResource):
 
     @doc(summary='Get analysis reports.')
     @fetch_analysis
-    def get(self, analysis, run_id=None):
+    def get(self, analysis, run_id=None, sampling_rate=None, scale=None):
         filters = {'analysis_id': analysis.hash_id}
+
         if run_id is not None:
             filters['runs'] = run_id
+
+        if sampling_rate is not None:
+            filters['sampling_rate'] = sampling_rate
+
+        if scale is not None:
+            filters['scale'] = scale
 
         candidate = Report.query.filter_by(**filters)
         if candidate.count() == 0:
             abort(404, "Report not found")
 
-        report = candidate.filter_by(
-            generated_at=max(candidate.with_entities('generated_at'))).one()
+        report = candidate.order_by(desc(Report.generated_at)).first()
 
         if report.generated_at < analysis.modified_at:
             abort(404, "No fresh reports available")
