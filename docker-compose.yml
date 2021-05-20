@@ -62,7 +62,7 @@ services:
       dockerfile: celery_worker/Dockerfile
     depends_on:
       - scout_redis
-    entrypoint: celery -A tasks worker --loglevel=info --log-file /logs/celery.log
+    entrypoint: celery -A tasks worker --loglevel=info
     volumes:
       - ${FILE_DATA}:/file-data
       - ${DATASET_DIR}:/datasets
