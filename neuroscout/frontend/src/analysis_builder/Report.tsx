@@ -395,7 +395,7 @@ export class Report extends React.Component<ReportProps, ReportState> {
   render() {
     const runIdsOptions: JSX.Element[] = [];
     this.props.runs.map(
-      x => runIdsOptions.push(<Option key={'' + x.id} value={this.formatRun(x)}>{this.formatRun(x)}</Option>)
+      x => runIdsOptions.push(<Option key={'' + x.id} value={'' + x.id}>{this.formatRun(x)}</Option>)
     );
     const cardTitle = (
       <>
