@@ -1,8 +1,6 @@
 import * as React from 'react';
 import { GoogleOutlined, LockOutlined, MailOutlined, TagsOutlined } from '@ant-design/icons';
-import { Form } from '@ant-design/compatible';
-import '@ant-design/compatible/assets/index.css';
-import { Alert, Button, Divider, Input, Modal } from 'antd';
+import { Alert, Button, Divider, Input, Modal, Form } from 'antd';
 import { FormComponentProps } from '@ant-design/compatible/es/form';
 import { GoogleLogin } from 'react-google-login';
 
@@ -12,7 +10,7 @@ import { UserStore } from './user';
 const FormItem = Form.Item;
 const GOOGLECLIENTID = config.google_client_id;
 
-class GoogleLoginBtn extends React.Component<UserStore, {}> {
+class GoogleLoginBtn extends React.Component<UserStore, Record<string, never>> {
   render() {
     return (
       <GoogleLogin
@@ -54,7 +52,7 @@ class GoogleLoginBtn extends React.Component<UserStore, {}> {
   }
 }
 
-export class ResetPasswordModal extends React.Component<UserStore, {}> {
+export class ResetPasswordModal extends React.Component<UserStore, Record<string, never>> {
   render() {
     return (
       <Modal
@@ -96,7 +94,7 @@ export class ResetPasswordModal extends React.Component<UserStore, {}> {
   }
 }
 
-export class EnterResetTokenModal extends React.Component<UserStore, {}> {
+export class EnterResetTokenModal extends React.Component<UserStore, Record<string, never>> {
   render () {
     return (
       <Modal
@@ -152,7 +150,7 @@ export class EnterResetTokenModal extends React.Component<UserStore, {}> {
   }
 }
 
-export class LoginModal extends React.Component<UserStore, {}> {
+export class LoginModal extends React.Component<UserStore, Record<string, never>> {
   render () {
     return (
       <Modal
@@ -214,7 +212,7 @@ interface RegistrationFormProps extends FormComponentProps {
   signup: (any) => void;
 }
 
-class RegistrationForm extends React.Component<RegistrationFormProps, {}> {
+class RegistrationForm extends React.Component<RegistrationFormProps, Record<string, never>> {
   handleSubmit = e => {
     e.preventDefault();
     this.props.form.validateFieldsAndScroll((err, values) => {
@@ -248,71 +246,81 @@ class RegistrationForm extends React.Component<RegistrationFormProps, {}> {
         <Form
           onSubmit={this.handleSubmit}
         >
-          <FormItem label="Name">
-            {getFieldDecorator('name', {
-              rules: [
-                {
-                  type: 'string'
-                },
-                {
-                  required: true,
-                  message: 'Please input your name!',
-                },
-              ],
-            })(<Input />)}
-          </FormItem>
-          <FormItem label="Email">
-            {getFieldDecorator('email', {
-              rules: [
-                {
-                  type: 'email',
-                  message: 'Invalid email address.'
-                },
-                {
-                  required: true,
-                  message: 'Please input your email address.',
-                },
-              ],
-            })(<Input />)}
-          </FormItem>
-          <Form.Item label="Password" hasFeedback={true}>
-            {getFieldDecorator('password', {
-              rules: [
-                {
-                  required: true,
-                  message: 'Please input your password.',
-                },
-                {
-                  validator: this.validateToNextPassword,
-                },
-              ],
-            })(<Input.Password />)}
+          <Form.Item
+            label="Name"
+            name="name"
+            rules={[
+              {
+                type: 'string'
+              },
+              {
+                required: true,
+                message: 'Please input your name!',
+              },
+            ]}
+          >
+            <Input />
           </Form.Item>
-          <Form.Item label="Confirm Password" hasFeedback={true}>
-            {getFieldDecorator('confirm', {
-              rules: [
-                {
-                  required: true,
-                  message: 'Please confirm your password.',
-                },
-                {
-                  validator: this.compareToFirstPassword,
-                },
-              ],
-            })(<Input.Password />)}
+          <Form.Item 
+            label="Email"
+            name="email"
+            rules={[
+              {
+                type: 'email',
+                message: 'Invalid email address.'
+              },
+              {
+                required: true,
+                message: 'Please input your email address.',
+              },
+            ]}
+          >
+            <Input />
           </Form.Item>
-          <FormItem>
+          <Form.Item
+            label="Password"
+            name="password"
+            hasFeedback={true}>
+            rules={[
+              {
+                required: true,
+                message: 'Please input your password.',
+              },
+              {
+                validator: this.validateToNextPassword,
+              },
+            ]}
+          >
+            <Input.Password />
+          </Form.Item>
+          <Form.Item
+            label="Confirm Password"
+            hasFeedback={true}>
+            name="confirm"
+            rules={[
+              {
+                required: true,
+                message: 'Please confirm your password.',
+              },
+              {
+                validator: this.compareToFirstPassword,
+              },
+            ]}
+          >
+            <Input.Password />
+          </Form.Item>
+          <Form.Item>
             <Button style={{ width: '100%' }} type="primary" htmlType="submit">
               Sign up
             </Button>
-          </FormItem>
+          </Form.Item>
         </Form>
     );
  
   }
 }
 
-const WrappedRegistrationForm = Form.create<RegistrationFormProps>({ name: 'register' })(RegistrationForm);
+// const WrappedRegistrationForm = Form.create<RegistrationFormProps>({ name: 'register' })(RegistrationForm);
 
 export class SignupModal extends React.Component<UserStore, {secPassword: string}> {
   render() {
@@ -328,7 +336,7 @@ export class SignupModal extends React.Component<UserStore, {secPassword: string
             <Alert message={this.props.signupError} type="error" />
         }
         <br />
-        <WrappedRegistrationForm signup={this.props.signup}/>
+        <RegistrationForm signup={this.props.signup}/>
         <Divider> Or sign up using a Google account </Divider>
         <GoogleLoginBtn {...this.props} />
       </Modal>

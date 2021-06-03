@@ -12,36 +12,36 @@ ReactGA.initialize('foo', { testMode: true });
 
 window.matchMedia =
   window.matchMedia ||
-  function() {
-    return {
-      matches: false,
-      addListener: function() {},
-      removeListener: function() {}
-    };
+  function () {
+      return {
+          matches: false,
+          addListener: function () {},
+          removeListener: function () {},
+      };
   };
 
 class LocalStorageMock {
-  store = {};
-  constructor() {
-    this.store = {};
-  }
+    store = {};
+    constructor() {
+        this.store = {};
+    }
 
-  clear() {
-    this.store = {};
-  }
+    clear() {
+        this.store = {};
+    }
 
-  getItem(key) {
-    return this.store[key];
-  }
+    getItem(key) {
+        return this.store[key];
+    }
 
-  setItem(key, value) {
-    this.store[key] = value.toString();
-  }
+    setItem(key, value) {
+        this.store[key] = value.toString();
+    }
 
-  removeItem(key) {
-    delete this.store[key];
-  }
+    removeItem(key) {
+        delete this.store[key];
+    }
 }
 
-let localStorageMock =  new LocalStorageMock();
+const localStorageMock = new LocalStorageMock();
 Object.defineProperty(window, 'localStorage', { value: localStorageMock });
