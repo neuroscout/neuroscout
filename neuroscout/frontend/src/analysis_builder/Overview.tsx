@@ -15,14 +15,10 @@ import {
   Form,
 } from 'antd'
 import { ColumnType, ColumnProps } from 'antd/lib/table'
-import {
-  ColumnFilterItem,
-  TableRowSelection,
-  FilterValue,
-} from 'antd/lib/table/interface'
+import { TableRowSelection, CompareFn } from 'antd/lib/table/interface'
 
 import { getTasks } from './Builder'
-import { Analysis, Dataset, Run, Task } from '../coretypes'
+import { Analysis, Dataset, Run, RunFilters, Task } from '../coretypes'
 import { datasetColumns } from '../HelperComponents'
 import { sortSub, sortNum, sortSes } from '../utils'
 
@@ -41,7 +37,7 @@ interface OverviewTabProps {
 
 interface OverviewTabState {
   clearFilteredVal: boolean
-  filteredVal: FilterValue[]
+  filteredVal: RunFilters
   runColumns: ColumnType<Run>[]
   taskMsg: string
 }
@@ -50,19 +46,20 @@ export class OverviewTab extends React.Component<
   OverviewTabProps,
   OverviewTabState
 > {
-  constructor(props) {
+  constructor(props: OverviewTabProps) {
     super(props)
     this.state = {
       clearFilteredVal: false,
-      filteredVal: [],
+      filteredVal: { numbers: [], subjects: [], sessions: [] },
       runColumns: [] as ColumnType<Run>[],
       taskMsg: 'Please Select',
     }
   }
 
   updateAnalysis =
-    (attrName: keyof Analysis) => (value: Analysis[keyof Analysis]) => {
-      const newAnalysis = { ...this.props.analysis }
+    (attrName: keyof Analysis) =>
+    (value: Analysis[keyof Analysis]): void => {
+      const newAnalysis: Analysis = { ...this.props.analysis }
       newAnalysis[attrName] = value
       this.props.updateAnalysis(newAnalysis)
     }
@@ -73,17 +70,17 @@ export class OverviewTab extends React.Component<
       event:
         | React.FormEvent<HTMLInputElement>
         | React.FormEvent<HTMLTextAreaElement>,
-    ) => {
+    ): void => {
       this.updateAnalysis(attrName)(event.currentTarget.value)
     }
 
-  applyFilter = (pagination, filters: FilterValue[], sorter) => {
+  applyFilter = (pagination, filters: RunFilters, sorter): void => {
     /* If we have no set filters, but some selected subjects and we change pages then all subjects will
      * be selected. To prevent this we return immediatly if no filters are set.
      */
     if (
       Object.keys(filters)
-        .map(y => filters[y])
+        .map(y => filters[y as keyof RunFilters])
         .filter(z => z.length > 0).length === 0
     ) {
       return
@@ -93,16 +90,19 @@ export class OverviewTab extends React.Component<
     )
     let newRunColumns = this.state.runColumns
     Object.keys(filters).map(key => {
-      if (filters[key] === null || filters[key].length === 0) {
+      if (
+        filters[key] === null ||
+        filters[key as keyof RunFilters].length === 0
+      ) {
         return
       }
       newRunIds = newRunIds.filter(x => {
-        return filters[key].includes(String(x[key]))
+        return filters[key as keyof RunFilters].includes(String(x[key]))
       })
       newRunColumns = newRunColumns.map(x => {
         if (x.key === key) {
           const newCol = x
-          newCol.filteredValue = filters[key]
+          newCol.filteredValue = filters[key as keyof RunFilters]
           return newCol
         }
         return x
@@ -112,7 +112,7 @@ export class OverviewTab extends React.Component<
     this.setState({ filteredVal: filters })
   }
 
-  componentDidUpdate(prevProps: OverviewTabProps) {
+  componentDidUpdate(prevProps: OverviewTabProps): void {
     if (this.props.analysis.datasetId !== prevProps.analysis.datasetId) {
       this.setState({ clearFilteredVal: true })
     }
@@ -124,16 +124,17 @@ export class OverviewTab extends React.Component<
       const subCol = this.makeCol('Subject', 'subject', sortSub)
       const runCol = this.makeCol('Run Number', 'number', sortNum)
       const sesCol = this.makeCol('Session', 'session', sortSes)
-      const _runColumns = [subCol, runCol, sesCol].filter(
-        x => x !== undefined,
-      ) as ColumnType<Run>[]
+      const _runColumns = [subCol, runCol, sesCol].filter(x => x !== undefined)
       if (_runColumns[0]) {
         _runColumns[0].defaultSortOrder = 'ascend' as const
       }
       if (this.state.clearFilteredVal) {
-        _runColumns.map(x => (x.filteredValue = []))
+        _runColumns.map(x => (x ? (x.filteredValue = []) : null))
       }
-      this.setState({ runColumns: _runColumns, clearFilteredVal: false })
+      this.setState({
+        runColumns: _runColumns as ColumnType<Run>[],
+        clearFilteredVal: false,
+      })
     }
   }
 
@@ -141,7 +142,11 @@ export class OverviewTab extends React.Component<
      The cast to String before sort is to account for run numbers being a
      numeric type.
   */
-  makeCol = (title: string, _key: string, sortFn): ColumnType<Run> => {
+  makeCol = (
+    title: string,
+    _key: string,
+    sortFn: CompareFn<Run>,
+  ): ColumnType<Run> | undefined => {
     const extractKey: string[] = this.props.availableRuns
       .filter(x => {
         return x !== null && x.task === this.props.selectedTaskId
@@ -171,7 +176,7 @@ export class OverviewTab extends React.Component<
       if (
         this.props.analysis.runIds.length === this.props.availableRuns.length
       ) {
-        col.filteredValue = this.state.filteredVal[_key]
+        col.filteredValue = this.state.filteredVal[_key as keyof RunFilters]
         const newFilteredVal = this.state.filteredVal
         newFilteredVal[_key] = unique
         this.setState({ filteredVal: newFilteredVal })
@@ -182,7 +187,7 @@ export class OverviewTab extends React.Component<
     return col
   }
 
-  clearFilters = () => {
+  clearFilters = (): void => {
     let newRunCols = this.state.runColumns
     newRunCols = newRunCols.map(x => {
       x.filteredValue = []
@@ -196,13 +201,13 @@ export class OverviewTab extends React.Component<
     {
       title: 'Name',
       dataIndex: 'name',
-      sorter: (a, b) => a.name.localeCompare(b.name),
+      sorter: (a: Task, b: Task): number => a.name.localeCompare(b.name),
     },
     { title: 'Summary', dataIndex: 'summary' },
     {
       title: 'Subjects',
       dataIndex: 'n_subjects',
-      sorter: (a, b) => a.numRuns - b.numRuns,
+      sorter: (a: Task, b: Task): number => a.numRuns - b.numRuns,
     },
     {
       title: 'Runs Per Subject',
@@ -211,12 +216,17 @@ export class OverviewTab extends React.Component<
     {
       title: 'Avg Run Length',
       dataIndex: 'avg_run_duration',
-      render: text => text + 's',
+      render: text => String(text) + 's',
     },
-    { title: 'TR', dataIndex: 'TR', render: text => text + 's' },
+    { title: 'TR', dataIndex: 'TR', render: text => String(text) + 's' },
   ]
 
-  datasetExpandRow = (record, index, indent, expanded) => {
+  datasetExpandRow = (
+    record: Dataset,
+    index,
+    indent,
+    expanded,
+  ): JSX.Element => {
     const rowData: { title?: string; content: string; span?: number }[] = [
       { content: record.longDescription ? record.longDescription : 'n/a' },
       { title: 'Authors', content: record.authors.join(', ') },
@@ -234,7 +244,7 @@ export class OverviewTab extends React.Component<
       },
       {
         title: 'References and Links',
-        content: <a href={record.url}>{record.url}</a>,
+        content: `<a href=${record.url}>${record.url}</a>`,
       },
     ]
 
@@ -260,7 +270,7 @@ export class OverviewTab extends React.Component<
 
     const datasetRowSelection: TableRowSelection<Dataset> = {
       type: 'radio',
-      onSelect: (record, selected, selectedRows) => {
+      onSelect: (record, _selected, _selectedRows) => {
         this.updateAnalysis('datasetId')(record.id)
       },
       selectedRowKeys: selectedDatasetId,
@@ -269,7 +279,7 @@ export class OverviewTab extends React.Component<
 
     const taskRowSelection: TableRowSelection<Task> = {
       type: 'radio',
-      onSelect: (record, selected, selectedRows) => {
+      onSelect: (record, _selected, _selectedRows) => {
         this.clearFilters()
         this.props.updateSelectedTaskId(record.id)
       },
@@ -278,10 +288,10 @@ export class OverviewTab extends React.Component<
 
     const runRowSelection: TableRowSelection<Run> = {
       type: 'checkbox',
-      onSelect: (record, selected, selectedRows) => {
+      onSelect: (_record, _selected, selectedRows) => {
         this.updateAnalysis('runIds')(selectedRows.map(x => x.id))
       },
-      onSelectAll: (selected, selectedRows, changeRows) => {
+      onSelectAll: (selected, _selectedRows, _changeRows) => {
         if (selected) {
           this.applyFilter(undefined, this.state.filteredVal, undefined)
         } else {

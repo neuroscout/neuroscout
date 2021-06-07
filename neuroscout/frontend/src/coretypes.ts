@@ -153,7 +153,6 @@ export interface Transformation {
   Binarize?: boolean
   Above?: boolean
   Signed?: boolean
-  Replace?: any
 }
 
 // Lookup hash of available transformations (as specified in transforms.ts) by their name
