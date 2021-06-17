@@ -6,7 +6,7 @@ import {
   TagsOutlined,
 } from '@ant-design/icons'
 import { Alert, Button, Divider, Input, Modal, Form } from 'antd'
-import { FormComponentProps } from 'antd/lib/form/Form'
+import { FormProps } from 'antd/lib/form/Form'
 import { GoogleLogin } from 'react-google-login'
 
 import { config } from './config'
@@ -72,8 +72,7 @@ export class ResetPasswordModal extends React.Component<
         }}>
         <p>Please enter an email address to send reset instructions</p>
         <Form
-          onSubmit={e => {
-            e.preventDefault()
+          onFinish={e => {
             this.props.resetPassword()
           }}>
           <FormItem>
@@ -117,8 +116,7 @@ export class EnterResetTokenModal extends React.Component<
           account.
         </p>
         <Form
-          onSubmit={e => {
-            e.preventDefault()
+          onFinish={e => {
             this.props.submitToken()
           }}>
           <FormItem>
@@ -170,8 +168,7 @@ export class LoginModal extends React.Component<
         <p>{this.props.loginError ? this.props.loginError : ''}</p>
         <br />
         <Form
-          onSubmit={e => {
-            e.preventDefault()
+          onFinish={e => {
             void this.props.login()
           }}>
           <FormItem>
@@ -215,23 +212,18 @@ export class LoginModal extends React.Component<
   }
 }
 
-interface RegistrationFormProps extends FormComponentProps {
+interface RegistrationFormProps extends FormProps {
   signup: (any) => void
 }
 
 class RegistrationForm extends React.Component<RegistrationFormProps> {
-  handleSubmit = e => {
-    e.preventDefault()
-    this.props.form.validateFieldsAndScroll((err, values) => {
-      if (!err) {
-        this.props.signup(values)
-      }
-    })
+  handleSubmit = values => {
+    this.props.signup(values)
   }
 
   compareToFirstPassword = (rule, value, callback) => {
     const { form } = this.props
-    if (value && value !== form.getFieldValue('password')) {
+    if (value && form && value !== form.getFieldValue('password')) {
       callback('Password do not match.')
     } else {
       callback()
@@ -240,17 +232,15 @@ class RegistrationForm extends React.Component<RegistrationFormProps> {
 
   validateToNextPassword = (rule, value, callback) => {
     const { form } = this.props
-    if (value) {
-      form.validateFields(['confirm'], { force: true })
+    if (value && form) {
+      void form.validateFields(['confirm'])
     }
     callback()
   }
 
   render() {
-    const { getFieldDecorator } = this.props.form
-
     return (
-      <Form onSubmit={this.handleSubmit}>
+      <Form onFinish={this.handleSubmit}>
         <FormItem
           label="Name"
           name="name"

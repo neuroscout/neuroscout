@@ -2,8 +2,8 @@ import * as React from 'react'
 import Reactour from 'reactour'
 import { withRouter } from 'react-router-dom'
 
-const Tour = withRouter(
-  ({ isOpen, closeTour, location: { pathname }, history }) => {
+const Tour = (isOpen, closeTour) => {
+  return withRouter(({ location: { pathname }, history }) => {
     const steps = [
       {
         content:
@@ -52,7 +52,7 @@ const Tour = withRouter(
         update={pathname}
       />
     )
-  },
-)
+  })
+}
 
 export default Tour

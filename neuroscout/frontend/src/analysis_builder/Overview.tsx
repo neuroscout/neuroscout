@@ -59,8 +59,7 @@ export class OverviewTab extends React.Component<
   updateAnalysis =
     (attrName: keyof Analysis) =>
     (value: Analysis[keyof Analysis]): void => {
-      const newAnalysis: Analysis = { ...this.props.analysis }
-      newAnalysis[attrName] = value
+      const newAnalysis = { ...this.props.analysis, [attrName]: value }
       this.props.updateAnalysis(newAnalysis)
     }
 
@@ -417,7 +416,7 @@ export class OverviewTab extends React.Component<
                           : false
                       }
                       rowSelection={runRowSelection}
-                      onChange={this.applyFilter}
+                      // onChange={this.applyFilter}
                     />
                     <div>
                       <Button onClick={this.clearFilters}>Clear Filters</Button>

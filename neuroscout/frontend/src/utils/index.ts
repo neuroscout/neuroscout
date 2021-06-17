@@ -19,7 +19,7 @@ export type MoveItem<T> = (
   index: number,
   direction: 'up' | 'down',
 ) => Array<T>
-export const moveItem: MoveItem<T> = (
+export const moveItem = <T>(
   array: Array<T>,
   index: number,
   direction: 'up' | 'down',

@@ -227,10 +227,7 @@ class App extends React.Component<Record<string, never>, AppState> {
             <ResetPasswordModal {...this.state.user} />
           )}
           {this.state.user.openSignup && <SignupModal {...this.state.user} />}
-          <Tour
-            isOpen={this.state.user.openTour}
-            closeTour={this.state.user.closeTour}
-          />
+          {Tour(this.state.user.openTour, this.state.user.closeTour)}
           <Layout>
             <Content style={{ background: '#fff' }}>
               <Navbar {...this.state.user} />

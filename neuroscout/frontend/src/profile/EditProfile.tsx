@@ -13,6 +13,7 @@ import {
 } from 'antd'
 import { MainCol, Space } from '../HelperComponents'
 import { withRouter } from 'react-router-dom'
+import { RouteComponentProps } from 'react-router'
 
 import memoize from 'memoize-one'
 
@@ -27,7 +28,7 @@ const formItemLayout = {
 }
 
 class EditProfile extends React.Component<
-  ProfileState & { history: any },
+  ProfileState & RouteComponentProps,
   ProfileState & { errors: string }
 > {
   constructor(props) {

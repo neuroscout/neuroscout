@@ -98,7 +98,7 @@ export interface Predictor {
 }
 
 export interface ExtractedFeature {
-  id: number
+  id?: number
   resample_frequency: number
   description: string
   extractor_name: string
@@ -359,6 +359,15 @@ export interface ApiUpload {
   collection_id: number
   uploaded_at: string
   files: [{ level: string; status: string; traceback: null | string }]
+}
+
+export interface NvUploads {
+  failed: number
+  pending: number
+  ok: number
+  total: number
+  id: number
+  tracebacks: (string | null)[]
 }
 
 export interface ApiExtractorDescription {

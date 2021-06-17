@@ -13,7 +13,7 @@ import {
   Popconfirm,
   Tag,
 } from 'antd'
-import { VegaEmbed } from 'react-vega'
+import { VegaLite } from 'react-vega'
 
 import { OptionProps } from 'antd/lib/select'
 
@@ -103,12 +103,12 @@ class Plots extends React.Component<PlotsProps, Record<string, never>> {
                   />
                 </Tooltip>
               </div>
-              <VegaEmbed spec={this.props.plots[i]} />
+              <VegaLite spec={this.props.plots[i]} />
               <br />
               <a href={this.props.matrices[i]}>Download Design Matrix</a>
             </Panel>
             <Panel header="Correlation Matrix" key="cm">
-              <VegaEmbed spec={this.props.plots[i]} />
+              <VegaLite spec={this.props.plots[i]} />
             </Panel>
           </Collapse>
         </TabPane>,
@@ -417,7 +417,9 @@ export class Report extends React.Component<ReportProps, ReportState> {
 
     const cardExtra = (
       <>
-        <DateTag modified_at={this.props.modified_at} />
+        <DateTag
+          modified_at={this.props.modified_at ? this.props.modified_at : ''}
+        />
         <Tooltip
           title={
             'Here you can preview the final design and correlation matrices. \
@@ -428,9 +430,6 @@ export class Report extends React.Component<ReportProps, ReportState> {
         </Tooltip>
       </>
     )
-
-    // eslint-disable-next-line
-    console.log(this.state)
 
     return (
       <div>

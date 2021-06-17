@@ -98,7 +98,7 @@ const XformDisplay = (props: XformDisplayProps) => {
 interface ParameterFieldProps {
   name: string
   kind: string
-  options?: Record<string, unknown>[]
+  options?: Predictor[]
   value?: any
   onChange: (value: any) => void
 }
@@ -176,11 +176,12 @@ class ParameterField extends React.Component<ParameterFieldProps> {
     )
   }
 
+  /*
   WrtField = () => {
     const { name, onChange, value, options } = this.props
     // const selectedPredictors = (options as Predictor[] || []).filter(p => value.indexOf(p.id) > -1);
     const wrtSet = new Set(value as string[])
-    const selectedPredictors = ((options as Predictor[]) || []).filter(p =>
+    const selectedPredictors = (options as Predictor[]).filter(p =>
       wrtSet.has(p.name),
     )
     return (
@@ -198,6 +199,7 @@ class ParameterField extends React.Component<ParameterFieldProps> {
       </div>
     )
   }
+  */
 
   ReplaceNAField = () => {
     const { name, value, onChange } = this.props
@@ -216,6 +218,7 @@ class ParameterField extends React.Component<ParameterFieldProps> {
     )
   }
 
+  // {name === 'Other' && this.WrtField()}
   render() {
     const { kind, name, onChange } = this.props
     const options = this.props.options as Predictor[]
@@ -223,7 +226,6 @@ class ParameterField extends React.Component<ParameterFieldProps> {
       <span>
         {kind === 'number' && this.NumberField()}
         {kind === 'boolean' && this.BooleanField()}
-        {name === 'Other' && this.WrtField()}
         {name === 'Replace' && this.ReplaceField()}
         {name === 'Weights' &&
           options &&

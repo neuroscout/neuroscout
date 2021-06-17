@@ -192,7 +192,8 @@ export class Review extends React.Component<
   render() {
     const model = this.props.model
     const dataset = this.props.dataset
-    const { Name, Description, Steps } = model
+    let { Name, Steps } = model
+    const { Description } = model
     if (model && model.Name) {
       Name = model.Name
     }
@@ -244,7 +245,7 @@ export class Review extends React.Component<
             <ReviewObjects input={xforms} />
           </Panel>
           <Panel header="Contrasts" key="contrasts">
-            <ReviewObjects input={contrasts} dummyContrasts={dummyContrasts} />
+            <ReviewObjects input={contrasts} />
           </Panel>
           <Panel header="BIDS StatsModel" key="model">
             <pre>{JSON.stringify(this.props.model, null, 2)}</pre>

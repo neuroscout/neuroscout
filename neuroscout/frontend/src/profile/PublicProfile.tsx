@@ -5,6 +5,7 @@ import { UserOutlined } from '@ant-design/icons'
 
 import { Avatar, Card, Col, List, Row, Spin } from 'antd'
 import { Link, withRouter } from 'react-router-dom'
+import { RouteComponentProps } from 'react-router'
 
 import { AnalysisListTable } from '../AnalysisList'
 import { MainCol, Space } from '../HelperComponents'
@@ -36,7 +37,7 @@ interface PublicProfileState {
 }
 
 class PublicProfile extends React.Component<
-  PublicProfileProps & { history: any },
+  PublicProfileProps & RouteComponentProps,
   PublicProfileState
 > {
   constructor(props) {

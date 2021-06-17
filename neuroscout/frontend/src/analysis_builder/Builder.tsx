@@ -1080,7 +1080,8 @@ export default class AnalysisBuilder extends React.Component<
         stateUpdate.predictorsLoad = true
       }
 
-      Object.assign(stateUpdate, { attrName: value })
+      Object.assign(stateUpdate, { [attrName]: value })
+      console.log(stateUpdate)
 
       if (!keepClean) stateUpdate.unsavedChanges = true
       if (saveToAPI) stateUpdate.saveFromUpdate = true
@@ -1251,7 +1252,7 @@ export default class AnalysisBuilder extends React.Component<
             this.setState({ analysis404: true })
             return
           } else {
-            void this.loadAnalysis(data as ApiAnalysis)
+            this.loadAnalysis(data as ApiAnalysis)
             return data as ApiAnalysis
           }
         })

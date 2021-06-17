@@ -4,7 +4,7 @@ import memoize from 'memoize-one'
 
 import { config } from '../config'
 import { jwtFetch } from '../utils'
-import { Analysis } from '../coretypes'
+import { Analysis, NvUploads } from '../coretypes'
 import { DateTag, StatusTag } from '../HelperComponents'
 import { api } from '../api'
 import { Tracebacks } from './Report'
@@ -16,7 +16,8 @@ export class DLLink extends React.Component<{
   analysisId?: string
 }> {
   render() {
-    const { analysisId, status } = this.props
+    let status = this.props.status
+    const analysisId = this.props.analysisId
     if (status === undefined) {
       status = 'DRAFT'
     }
@@ -182,7 +183,7 @@ export class Submit extends React.Component<
 
 type statusTabState = {
   compileTraceback: string
-  nvUploads?: any
+  nvUploads?: NvUploads[]
   imageVersion: string
 }
 
@@ -250,13 +251,13 @@ export class StatusTab extends React.Component<submitProps, statusTabState> {
     )
   }
 
-  nvStatus(uploads: string[]) {
+  nvStatus(uploads: NvUploads[]) {
     const statuses = [] as JSX.Element[]
     uploads.map(x => {
       statuses.push(
         <Card
-          key={x.id}
-          title={this.nvLink(x.id)}
+          key={String(x.id)}
+          title={this.nvLink(String(x.id))}
           style={{ display: 'inline-block' }}>
           {x.pending > 0 && (
             <span>
@@ -324,7 +325,9 @@ export class StatusTab extends React.Component<submitProps, statusTabState> {
               <span> </span>
             </>
           )}
-          <DateTag modified_at={this.props.modified_at} />
+          <DateTag
+            modified_at={this.props.modified_at ? this.props.modified_at : ''}
+          />
           <StatusTag
             status={this.props.status}
             analysisId={this.props.analysisId}

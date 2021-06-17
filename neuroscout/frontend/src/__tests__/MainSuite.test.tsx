@@ -2,8 +2,9 @@
  Main frontend test suite
 */
 import * as React from 'react'
-import { BrowserRouter } from 'react-router-dom'
+import { MemoryRouter } from 'react-router-dom'
 import { mount } from 'enzyme'
+import 'jest-canvas-mock'
 import { moveItem } from '../utils'
 import { Analysis } from '../coretypes'
 import { OverviewTab } from '../analysis_builder/Overview'
@@ -62,9 +63,9 @@ it('Overview tab renders without errors', () => {
 
 it('Analysis builder renders without errors', () => {
   const wrapper = mount(
-    <BrowserRouter>
+    <MemoryRouter>
       <AnalysisBuilder updatedAnalysis={() => {}} datasets={[]} />
-    </BrowserRouter>,
+    </MemoryRouter>,
   )
   // Expect 7 tabs
   expect(wrapper.find('div[role="tab"]').length).toBe(7)
@@ -74,7 +75,7 @@ test('App renders without crashing and homepage looks ok', () => {
   document.createElement('div')
   window.localStorage.removeItem('jwt')
 
-  const wrapper = mount(<App />)
+  const wrapper = mount(<MemoryRouter><App /></MemoryRouter>)
   // Create new analysis button
   expect(wrapper.text().toLowerCase()).toContain('neuroscout')
   expect(wrapper.text().toLowerCase()).toContain('sign up')
@@ -87,6 +88,7 @@ test('Homepage has 1 buttons with user is not logged in', () => {
   document.getElementsByTagName('head')[0].appendChild(script)
 
   window.localStorage.removeItem('jwt')
-  const wrapper = mount(<App />)
+  const wrapper = mount(<MemoryRouter><App /></MemoryRouter>)
+    
   expect(wrapper.find('button').length).toBe(1)
 })

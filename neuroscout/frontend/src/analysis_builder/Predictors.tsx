@@ -136,7 +136,11 @@ export class PredictorSelector extends React.Component<
       predictors.map(x => (x[field] ? unique.add(x[field]) : null))
       const stateField = field + 'Filters'
       const updatedFilters: PredictorFilter[] = [...unique].sort().map(x => {
-        return { title: x, active: !!this.state[stateField].active, count: 0 }
+        return {
+          title: String(x),
+          active: !!this.state[stateField].active,
+          count: 0,
+        }
       })
       updatedState[stateField] = updatedFilters
     })
@@ -225,7 +229,7 @@ export class PredictorSelector extends React.Component<
     }
   }
 
-  filterCheckboxes = (filterType: string): void =>
+  filterCheckboxes = (filterType: string): JSX.Element[] =>
     (this.state[filterType + 'Filters'] as PredictorFilter[]).map(
       (filter: PredictorFilter) => {
         const display =

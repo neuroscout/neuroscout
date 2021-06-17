@@ -66,7 +66,7 @@ export default class Routes extends React.Component<
                         ).length > 0
                   }
                   datasets={this.props.datasets}
-                  doTooltip
+                  doTour={this.props.user.openTour}
                   checkJWT={() => this.props.user.checkJWT(undefined)}
                 />
               )
@@ -87,7 +87,7 @@ export default class Routes extends React.Component<
                       ).length > 0
                 }
                 datasets={this.props.datasets}
-                doTooltip
+                doTour={this.props.user.openTour}
                 checkJWT={() => this.props.user.checkJWT(undefined)}
               />
             )}

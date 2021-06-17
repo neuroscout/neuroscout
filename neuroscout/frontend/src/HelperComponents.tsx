@@ -7,9 +7,7 @@ import { createBrowserHistory } from 'history'
 // eslint-disable-next-line react/self-closing-comp
 export const Space = () => <span> </span>
 
-export const MainCol = (props: {
-  children: React.ReactNode
-}): React.ReactNode => {
+export const MainCol = (props: { children: React.ReactNode }): JSX.Element => {
   return (
     <Col
       xxl={{ span: 16 }}
@@ -58,7 +56,7 @@ export class StatusTag extends React.Component<{
     if (status === undefined) {
       status = 'DRAFT'
     }
-    const color: string = {
+    const color = {
       DRAFT: 'blue',
       PENDING: 'orange',
       FAILED: 'red',

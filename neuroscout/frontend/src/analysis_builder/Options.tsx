@@ -36,8 +36,7 @@ export default class OptionsTab extends React.Component<OptionsTabProps, void> {
     (key: keyof AnalysisConfig) =>
     (value: AnalysisConfig[keyof AnalysisConfig]) => {
       const { analysis, updateConfig } = this.props
-      const newConfig: AnalysisConfig = { ...analysis.config }
-      newConfig[key] = value
+      const newConfig = { ...analysis.config, [key]: value }
       updateConfig(newConfig)
     }
 
