@@ -45,7 +45,7 @@ def auth_required(function):
            current_identity.last_activity_at is not None):
             current_identity.first_login = False
         current_identity.last_activity_at = datetime.datetime.now()
-        current_identity.last_activity_ip = request.environ['REMOTE_ADDR']
+        current_identity.last_activity_ip = request.remote_addr
         db.session.commit()
 
         if current_identity.active is False:
