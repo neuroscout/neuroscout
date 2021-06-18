@@ -67,8 +67,8 @@ it('Analysis builder renders without errors', () => {
       <AnalysisBuilder updatedAnalysis={() => {}} datasets={[]} />
     </MemoryRouter>,
   )
-  // Expect 7 tabs
-  expect(wrapper.find('div[role="tab"]').length).toBe(7)
+  // Expect 7 tabs, task menu in overview also has div with tab role
+  expect(wrapper.find('div[role="tab"]').length).toBe(8)
 })
 
 test('App renders without crashing and homepage looks ok', () => {
@@ -90,5 +90,5 @@ test('Homepage has 1 buttons with user is not logged in', () => {
   window.localStorage.removeItem('jwt')
   const wrapper = mount(<MemoryRouter><App /></MemoryRouter>)
     
-  expect(wrapper.find('button').length).toBe(1)
+  expect(wrapper.find('button').length).toBe(2)
 })
