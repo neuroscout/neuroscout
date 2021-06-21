@@ -42,7 +42,7 @@ describe('Analysis Builder', () => {
 
     /* Transformation Tab - create a scale xform with all predictors */
     cy.get('button').contains('Add Transformation').parent().click()
-    cy.get('.ant-form-item > .ant-select > .ant-select-selector').click()
+    cy.get('.ant-select > .ant-select-selector').click()
     cy.get('.ant-select-item-option-content').contains('Scale').click()
     cy.get('.ant-table-body:visible').find('input[type=checkbox]').each(($el, index, $list) => {
       $el.click()
