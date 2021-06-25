@@ -108,7 +108,7 @@ class Plots extends React.Component<PlotsProps, Record<string, never>> {
               <a href={this.props.matrices[i]}>Download Design Matrix</a>
             </Panel>
             <Panel header="Correlation Matrix" key="cm">
-              <VegaLite spec={this.props.plots[i]} />
+              <VegaLite spec={this.props.corr_plots[i]} />
             </Panel>
           </Collapse>
         </TabPane>,
@@ -362,13 +362,13 @@ export class Report extends React.Component<ReportProps, ReportState> {
 
   formatRun = (run: Run) => {
     let ret = ''
-    if (run.subject !== undefined) {
+    if (run.subject !== undefined && run.subject !== null) {
       ret = ret.concat('subject - ', String(run.subject), ' ')
     }
-    if (run.session !== undefined) {
+    if (run.session !== undefined && run.session !== null) {
       ret = ret.concat('Session - ', String(run.session), ' ')
     }
-    if (run.number !== undefined) {
+    if (run.number !== undefined && run.number !== null) {
       ret = ret.concat('Run - ', String(run.number), ' ')
     }
     if (ret === '') {

@@ -32,7 +32,7 @@ class DatasetInfo extends React.Component<
         <p>{dataset.summary}</p>
         <p>
           Authors:
-          <br /> {dataset.authors}
+          <br /> {dataset.authors.join(', ')}
         </p>
         <a href={dataset.url} target="_blank" rel="noopener noreferrer">
           {dataset.url}

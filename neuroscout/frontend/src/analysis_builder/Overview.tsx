@@ -226,7 +226,11 @@ export class OverviewTab extends React.Component<
     indent,
     expanded,
   ): JSX.Element => {
-    const rowData: { title?: string; content: string; span?: number }[] = [
+    const rowData: {
+      title?: string
+      content: string | JSX.Element
+      span?: number
+    }[] = [
       { content: record.longDescription ? record.longDescription : 'n/a' },
       { title: 'Authors', content: record.authors.join(', ') },
       {
@@ -243,7 +247,7 @@ export class OverviewTab extends React.Component<
       },
       {
         title: 'References and Links',
-        content: `<a href=${record.url}>${record.url}</a>`,
+        content: React.createElement('a', { href: record.url }, [record.url]),
       },
     ]
 

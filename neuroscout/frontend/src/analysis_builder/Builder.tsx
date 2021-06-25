@@ -1081,7 +1081,6 @@ export default class AnalysisBuilder extends React.Component<
       }
 
       Object.assign(stateUpdate, { [attrName]: value })
-      console.log(stateUpdate)
 
       if (!keepClean) stateUpdate.unsavedChanges = true
       if (saveToAPI) stateUpdate.saveFromUpdate = true

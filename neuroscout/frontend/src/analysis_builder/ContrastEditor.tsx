@@ -75,20 +75,16 @@ export class ContrastEditor extends React.Component<
   constructor(props: ContrastEditorProps) {
     super(props)
     const { activeContrast, availablePredictors } = props
-    let state: Partial<ContrastEditorState>
-    if (activeContrast) {
-      state = {
-        selectedPredictors: availablePredictors.filter(
-          x => activeContrast.ConditionList.indexOf(x.name) >= 0,
-        ),
-      }
-    } else {
-      state = {
-        selectedPredictors: [],
-      }
-      this.props.updateBuilderState('activeContrast')(emptyContrast())
+    const state: ContrastEditorState = {
+      ...emptyContrast(),
+      selectedPredictors: [],
     }
-    Object.assign(this.state, state)
+    if (activeContrast) {
+      state.selectedPredictors = availablePredictors.filter(
+        x => activeContrast.ConditionList.indexOf(x.name) >= 0,
+      )
+    }
+    this.state = state
   }
 
   // Validate and save contrast

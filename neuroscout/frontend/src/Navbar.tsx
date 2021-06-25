@@ -8,7 +8,7 @@ import {
 import { Avatar, Row, Button, Menu } from 'antd'
 import { Link } from 'react-router-dom'
 
-import { MainCol } from './HelperComponents'
+import { MainCol, Space } from './HelperComponents'
 import { UserStore } from './user'
 
 class Navbar extends React.Component<UserStore, Record<string, never>> {
@@ -88,6 +88,7 @@ class Navbar extends React.Component<UserStore, Record<string, never>> {
                 rel="noreferrer">
                 <span>
                   <QuestionCircleOutlined />
+                  <Space />
                   Help
                 </span>
               </a>
@@ -100,6 +101,7 @@ class Navbar extends React.Component<UserStore, Record<string, never>> {
               title={
                 <span>
                   <SearchOutlined />
+                  <Space />
                   Browse
                 </span>
               }>
