@@ -73,7 +73,7 @@ export class OverviewTab extends React.Component<
       this.updateAnalysis(attrName)(event.currentTarget.value)
     }
 
-  applyFilter = (pagination, filters: RunFilters, sorter): void => {
+  applyFilter = (pagination, filters, sorter, extra): void => {
     /* If we have no set filters, but some selected subjects and we change pages then all subjects will
      * be selected. To prevent this we return immediatly if no filters are set.
      */
@@ -296,7 +296,12 @@ export class OverviewTab extends React.Component<
       },
       onSelectAll: (selected, _selectedRows, _changeRows) => {
         if (selected) {
-          this.applyFilter(undefined, this.state.filteredVal, undefined)
+          this.applyFilter(
+            undefined,
+            this.state.filteredVal,
+            undefined,
+            undefined,
+          )
         } else {
           this.updateAnalysis('runIds')([])
         }
@@ -420,7 +425,7 @@ export class OverviewTab extends React.Component<
                           : false
                       }
                       rowSelection={runRowSelection}
-                      // onChange={this.applyFilter}
+                      onChange={this.applyFilter}
                     />
                     <div>
                       <Button onClick={this.clearFilters}>Clear Filters</Button>

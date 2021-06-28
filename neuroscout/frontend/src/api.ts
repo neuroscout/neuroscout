@@ -192,7 +192,6 @@ export const api = {
   getPublicAnalyses: (): Promise<AppAnalysis[]> => {
     return _fetch(`${domainRoot}/api/analyses`)
       .then(response => {
-        console.log(response)
         return response.filter(x => !!x.status).map(x => ApiToAppAnalysis(x))
       })
       .catch(error => {
