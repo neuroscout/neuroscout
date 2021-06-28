@@ -121,7 +121,9 @@ class Navbar extends React.Component<UserStore, Record<string, never>> {
                 style={{ float: 'right' }}
                 className="newAnalysis">
                 <Link to={{ pathname: '/builder' }}>
-                  <PlusOutlined /> New Analysis
+                  <PlusOutlined />
+                  <Space />
+                  New Analysis
                 </Link>
               </Menu.Item>
             )}
