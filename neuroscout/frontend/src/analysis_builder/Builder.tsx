@@ -1016,7 +1016,9 @@ export default class AnalysisBuilder extends React.Component<
                   updatedAnalysis &&
                   updatedAnalysis.model &&
                   updatedAnalysis.model.Input &&
-                  !!updatedAnalysis.model.Input.Task
+                  updatedAnalysis.model.Input.Task &&
+                  analysis.predictorIds.length &&
+                  (analysis.contrasts.length || analysis.transformations.length)
                 )
               ) {
                 if (availTasks.length === 1) {

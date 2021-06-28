@@ -37,7 +37,7 @@ interface OverviewTabProps {
 
 interface OverviewTabState {
   clearFilteredVal: boolean
-  filteredVal: RunFilters
+  filteredVal: RunFilters | null
   runColumns: ColumnType<Run>[]
   taskMsg: string
 }
@@ -127,9 +127,8 @@ export class OverviewTab extends React.Component<
       if (_runColumns[0]) {
         _runColumns[0].defaultSortOrder = 'ascend' as const
       }
-      if (this.state.clearFilteredVal) {
-        _runColumns.map(x => (x ? (x.filteredValue = []) : null))
-      }
+      _runColumns.map(x => (x ? (x.filteredValue = []) : null))
+
       this.setState({
         runColumns: _runColumns as ColumnType<Run>[],
         clearFilteredVal: false,
@@ -173,7 +172,8 @@ export class OverviewTab extends React.Component<
       }
 
       if (
-        this.props.analysis.runIds.length === this.props.availableRuns.length
+        this.props.analysis.runIds.length === this.props.availableRuns.length &&
+        this.state.filteredVal
       ) {
         col.filteredValue = this.state.filteredVal[_key as keyof RunFilters]
         const newFilteredVal = this.state.filteredVal
