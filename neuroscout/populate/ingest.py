@@ -146,13 +146,6 @@ def add_task(task_name, dataset_name=None, local_path=None,
     """
     cache.clear()
 
-    if dataset_address is not None and local_path is None:
-        local_path = install(
-            source=dataset_address,
-            path=(Path(
-                current_app.config['DATASET_DIR']) / dataset_name).as_posix()
-            ).path
-
     local_path = Path(local_path)
 
     assert isfile(str(local_path / 'dataset_description.json'))
