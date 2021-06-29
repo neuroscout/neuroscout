@@ -9,13 +9,15 @@ from .transform import Postprocessing
 from pathlib import Path
 from datalad.api import install
 from datalad.distribution.utils import _get_installationpath_from_url
+from bids.layout import BIDSLayout
 
 
 def setup_dataset(preproc_address, setup_preproc=True,
-                  dataset_address=None, dataset_path=None, url=None, 
+                  dataset_address=None, dataset_path=None, url=None,
                   summary=None, long_description=None, tasks=None):
-    """ Installs Dataset (if a dataset_path is not given), and configures it. 
-    Sets up a template JSON file for the dataset which can be then used to ingest it"""
+    """ Installs Dataset (if a dataset_path is not given), and configures it.
+    Sets up a template JSON for the dataset for subequent ingestion. """
+
     if dataset_path is None:
         if dataset_address is None:
             raise ValueError(
@@ -69,20 +71,20 @@ def setup_dataset(preproc_address, setup_preproc=True,
         derivatives.mkdir()
         symlink(str(preproc_path), str(derivatives / preproc_path.stem))
 
-    # Create template JSON file
-    template = {
-        "name": dataset_name,
-        "dataset_address": dataset_address,
-        "preproc_address": preproc_address,
-        "path": dataset_path,
-        "url": url,
-        "summary": summary,
-        "long_description": long_description
-    }
-
     # Extract dataset summary
+    layout = BIDSLayout(path, index_metadata=False)
 
     # Extract tasks and task summaries
+    tasks = {}
+    for t in layout.get_tasks():
+        try:
+            summary = layout.get(task=t, extension='nii.gz')[0].get_metadata()
+        except ValueError:
+            summary = ""
+
+        tasks[t] = {
+            "summary": summary
+        }
 
     # Create template JSON file
     template = {
@@ -92,7 +94,8 @@ def setup_dataset(preproc_address, setup_preproc=True,
         "path": dataset_path,
         "url": url,
         "summary": summary,
-        "long_description": long_description
+        "long_description": long_description,
+        "tasks": tasks
     }
 
     config_file_path = current_app.config['CONFIG_PATH'] \
