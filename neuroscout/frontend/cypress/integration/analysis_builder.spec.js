@@ -6,7 +6,7 @@ describe('Analysis Builder', () => {
   })
 
   let name = 'dataset_name';
-  let pp_name = 'Budapest';
+  let pp_name = 'Test Dataset';
   let predCount = 3;
   it('analysis builder', () => {
     /* Overview Tab */
