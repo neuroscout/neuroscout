@@ -70,6 +70,7 @@ jobs:
     - name: Run frontend tests with backend
       env:
         APP_SETTINGS: neuroscout.config.app.GHIConfig
+        CHOKIDAR_USEPOLLING: 1
       run: |
        bash setup_frontend_tests.sh
        sleep 15
