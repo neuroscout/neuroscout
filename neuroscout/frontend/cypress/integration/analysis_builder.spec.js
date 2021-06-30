@@ -6,7 +6,7 @@ describe('Analysis Builder', () => {
   })
 
   let name = 'dataset_name';
-  let pp_name = 'Test Dataset';
+  let pp_name = 'Budapest';
   let predCount = 3;
   it('analysis builder', () => {
     /* Overview Tab */
@@ -43,7 +43,7 @@ describe('Analysis Builder', () => {
 
     /* Transformation Tab - create a scale xform with all predictors */
     cy.get('button').contains('Add Transformation').parent().click()
-    cy.get('#rc_select_2').click()
+    cy.get('.ant-form-item-control-input-content > .ant-select > .ant-select-selector').click()
     cy.get('.ant-select-item-option-content').contains('Scale').click()
     cy.get('.ant-table-body:visible').find('input[type=checkbox]').each(($el, index, $list) => {
       $el.click()
