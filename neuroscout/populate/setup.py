@@ -47,7 +47,7 @@ def setup_dataset(preproc_address, dataset_address=None, dataset_path=None,
 
         # If no container folder for preproc, add one
         if preproc_dataset_name in ['fmriprep', 'preproc']:
-            preproc_path = preproc_path / f"{dataset_name}-preprocessed"
+            preproc_path = preproc_path / f"{dataset_name}"
 
         preproc_path = preproc_path / preproc_dataset_name
         preproc_path.mkdir(parents=True)
