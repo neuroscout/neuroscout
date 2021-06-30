@@ -13,7 +13,7 @@ from bids.layout import BIDSLayout
 
 
 def setup_dataset(preproc_address, dataset_address=None, dataset_path=None,
-                  setup_preproc=True, url=None, summary=None, 
+                  setup_preproc=True, url=None, dataset_summary=None,
                   long_description=None, tasks=None):
     """ Installs Dataset (if a dataset_path is not given), and configures it.
     Sets up a template JSON for the dataset for subequent ingestion. """
@@ -72,13 +72,13 @@ def setup_dataset(preproc_address, dataset_address=None, dataset_path=None,
         symlink(str(preproc_path), str(derivatives / preproc_path.stem))
 
     # Extract dataset summary
-    layout = BIDSLayout(path, index_metadata=False)
+    layout = BIDSLayout(path)
 
     # Extract tasks and task summaries
     tasks = {}
     for t in layout.get_tasks():
         try:
-            summary = layout.get(task=t, extension='nii.gz')[0].get_metadata()
+            summary = layout.get(task=t, extension='nii.gz')[0].get_metadata()['TaskDescription']
         except ValueError:
             summary = ""
 
@@ -93,7 +93,7 @@ def setup_dataset(preproc_address, dataset_address=None, dataset_path=None,
         "preproc_address": preproc_address,
         "path": dataset_path,
         "url": url,
-        "summary": summary,
+        "summary": dataset_summary,
         "long_description": long_description,
         "tasks": tasks
     }
@@ -101,7 +101,7 @@ def setup_dataset(preproc_address, dataset_address=None, dataset_path=None,
     config_file_path = (current_app.config['CONFIG_PATH'] \
         / 'datasets' / dataset_name).with_suffix('.json')
 
-    json.dump(template, config_file_path.open('w'), indent=4)
+    json.dump(template, config_file_path.open('w'), indent=4 )
     return str(config_file_path)
 
 
