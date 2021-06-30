@@ -98,11 +98,11 @@ def setup_dataset(preproc_address, dataset_address=None, dataset_path=None,
         "tasks": tasks
     }
 
-    config_file_path = current_app.config['CONFIG_PATH'] \
-        / 'datasets' / dataset_name
+    config_file_path = (current_app.config['CONFIG_PATH'] \
+        / 'datasets' / dataset_name).with_suffix(.'.json')
 
     json.dump(template, config_file_path.open('w'))
-    return config_file_path
+    return str(config_file_path)
 
 
 def _add_dataset():
