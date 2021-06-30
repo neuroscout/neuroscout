@@ -52,7 +52,7 @@ def setup_dataset(preproc_address, dataset_address=None, dataset_path=None,
         preproc_path = preproc_path / preproc_dataset_name
         preproc_path.mkdir(parents=True)
 
-        preproc_path = install(
+        install(
             source=preproc_address,
             path=str(preproc_path)
         )
