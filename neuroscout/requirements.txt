@@ -7,7 +7,7 @@ celery
 citeproc-py==0.4.0
 citeproc-py-styles==0.1.1
 datalad==0.10.2
-dataclasses==0.7
+dataclasses==0.6
 decorator==4.0.11
 docopt==0.6.2
 duecredit==0.6.1
@@ -15,7 +15,7 @@ pybids==0.12.3
 pynv==0.2
 Flask==1.1.1
 flask-apispec==0.10.0
-Flask-Caching==1.3.3
+Flask-Caching==1.10.1
 Flask-cors==3.0.9
 Flask-JWT==0.3.2
 Flask-Login==0.3.2
@@ -25,7 +25,7 @@ Flask-Principal==0.4.0
 Flask-Script==2.0.5
 Flask-Security==1.7.5
 Flask-SQLAlchemy==2.4
-Flask-WTF==0.14.2
+Flask-WTF==0.15.1
 google-api-python-client
 grabbit
 gensim==3.8.3
@@ -69,6 +69,5 @@ pytesseract
 SQLAlchemy==1.3.0
 shortuuid==1.0.1
 webargs==6.1.1
-Werkzeug==0.15.3
 WTForms==2.1
 xlrd
