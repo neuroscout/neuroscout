@@ -101,7 +101,7 @@ def setup_dataset(preproc_address, dataset_address=None, dataset_path=None,
     config_file_path = (current_app.config['CONFIG_PATH'] \
         / 'datasets' / dataset_name).with_suffix('.json')
 
-    json.dump(template, config_file_path.open('w'))
+    json.dump(template, config_file_path.open('w'), indent=4)
     return str(config_file_path)
 
 
