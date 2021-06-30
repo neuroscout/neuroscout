@@ -12,9 +12,9 @@ from datalad.distribution.utils import _get_installationpath_from_url
 from bids.layout import BIDSLayout
 
 
-def setup_dataset(preproc_address, setup_preproc=True,
-                  dataset_address=None, dataset_path=None, url=None,
-                  summary=None, long_description=None, tasks=None):
+def setup_dataset(preproc_address, dataset_address=None, dataset_path=None,
+                  setup_preproc=True, url=None, summary=None, 
+                  long_description=None, tasks=None):
     """ Installs Dataset (if a dataset_path is not given), and configures it.
     Sets up a template JSON for the dataset for subequent ingestion. """
 
@@ -54,7 +54,7 @@ def setup_dataset(preproc_address, setup_preproc=True,
 
         preproc_path = install(
             source=preproc_address,
-            path=preproc_path
+            path=str(preproc_path)
         )
 
         # Set preproc path
