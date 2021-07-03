@@ -12,5 +12,6 @@ __all__ = [
     'convert_stimuli',
     'delete_task',
     'extract_features',
-    'ingest_from_json'
+    'ingest_from_json',
+    'setup_datset'
 ]

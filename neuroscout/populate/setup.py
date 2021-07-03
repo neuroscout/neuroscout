@@ -2,7 +2,7 @@ import json
 import shutil
 from os import symlink
 from flask import current_app
-from .ingest import add_task
+from .ingest import add_task, add_dataset
 from .extract import extract_features, extract_tokenized_features
 from .convert import convert_stimuli
 from .transform import Postprocessing
@@ -15,8 +15,23 @@ from bids.layout import BIDSLayout
 def setup_dataset(preproc_address, dataset_address=None, dataset_path=None,
                   setup_preproc=True, url=None, dataset_summary=None,
                   long_description=None, tasks=None):
-    """ Installs Dataset (if a dataset_path is not given), and configures it.
-    Sets up a template JSON for the dataset for subequent ingestion. """
+    """ Installs Dataset using DataLad (unless a dataset_path is given),
+    links preproc and raw dataset, and creates a template config file
+    for the dataset.
+
+    Args:
+       preproc_address: DataLad address of a fmripreprocessed dataset
+       dataset_address: DataLad address to raw dataset
+       dataset_path: path on disk to raw BIDS dataset. If provided,
+                     `dataset_address` is optional.
+       setup_preproc: Install preproc dataset, and symlink in raw dataset
+       url: URL to dataset information
+       dataset_summary: Short summary of dataset
+       long_description: Longer description of dataset
+       tasks: List of tasks to include in config file
+
+    Returns:
+       path to template config_file """
 
     if dataset_path is None:
         if dataset_address is None:
@@ -32,13 +47,16 @@ def setup_dataset(preproc_address, dataset_address=None, dataset_path=None,
                     iter += 1
                     path = Path('/datasets/raw') / f"{dataset_name}_{iter}"
 
-            dataset_name = path.stem
-
             # Install dataset
-            dataset_path = install(
+            dataset_path = Path(install(
                 source=dataset_address,
                 path=str(path)
-                ).path
+                ).path)
+
+    else:
+        dataset_path = Path(dataset_path)
+
+    dataset_name = dataset_path.stem
 
     if setup_preproc:
         # Clone preproc dataset
@@ -64,7 +82,7 @@ def setup_dataset(preproc_address, dataset_address=None, dataset_path=None,
                             if not f.name.startswith(".")][0]
 
         # Reset derivatives folder
-        derivatives = Path(dataset_path) / 'derivatives'
+        derivatives = dataset_path / 'derivatives'
         shutil.rmtree(derivatives)
 
         # Add symlink to derivative in raw dataset
@@ -72,7 +90,7 @@ def setup_dataset(preproc_address, dataset_address=None, dataset_path=None,
         symlink(str(preproc_path), str(derivatives / preproc_path.stem))
 
     # Extract dataset summary
-    layout = BIDSLayout(path)
+    layout = BIDSLayout(dataset_path)
 
     # Extract tasks and task summaries
     tasks = {}
@@ -91,108 +109,85 @@ def setup_dataset(preproc_address, dataset_address=None, dataset_path=None,
         "name": dataset_name,
         "dataset_address": dataset_address,
         "preproc_address": preproc_address,
-        "path": dataset_path,
+        "path": str(dataset_path),
         "url": url,
         "summary": dataset_summary,
         "long_description": long_description,
         "tasks": tasks
     }
 
-    config_file_path = (current_app.config['CONFIG_PATH'] \
-        / 'datasets' / dataset_name).with_suffix('.json')
+    config_file_path = (current_app.config['CONFIG_PATH']
+                        / 'datasets' / dataset_name).with_suffix('.json')
 
     json.dump(template, config_file_path.open('w'), indent=4)
     return str(config_file_path)
 
 
-def _add_dataset():
-    pass
-
-
-def _get_tasks():
-    pass
-
-
-def ingest_from_json(config_file, reingest=False, setup_only=False):
+def ingest_from_json(config_file, reingest=False):
     """ Adds a dataset from a JSON configuration file
         Args:
             config_file - a path to a json file
             reingest - force reingest tasks
-            setup_only - Only set up dataset
         Output:
             list of dataset model ids
     """
-    if not (config_file or reingest):
-        return []
+    config = json.load(config_file)
 
-    dataset_address = config_file.get('dataset_address')
-    preproc_address = config_file.get('preproc_address')
-    dataset_name = config_file.get('name')
-    local_path = config_file.get('path')
-
-    if not local_path:
-        local_path, dataset_id = _setup_dataset(
-            dataset_address, preproc_address, local_path)
-
-    if setup_only:
-        return dataset_id
+    dataset_name = config['name']
+    local_path = config['path']
 
     # Add dataset
-    _add_dataset(
+    dataset_id = add_dataset(
         dataset_name=dataset_name,
-        dataset_summary=config_file.get('summary'),
-        dataset_long_description=config_file.get('long_description'),
+        dataset_address=config.get('dataset_address'),
+        dataset_summary=config.get('summary'),
+        preproc_address=config['preproc_address'],
+        dataset_long_description=config.get('long_description'),
         local_path=local_path,
-        url=config_file.get('url')
+        url=config.get('url')
     )
 
-    tasks = config_file['tasks']
-    if len(tasks) == 1 and '*' in tasks:
-        unique_tasks = _get_tasks(local_path)
-
-    for t in unique_tasks:
-        pass  # Set up empty defaul structure
-
     task_ids = []
-    for task_name, params in config_file['tasks'].items():
+    for task_name, params in config['tasks'].items():
         """ Add task to database"""
-        dp = params.get('ingest_args', {})
-        dp.update(params.get('filters', {}))
         task_id = add_task(
             task_name,
             local_path=local_path,
             reingest=reingest,
-            task_summary=params.get('summary'),
-            **dp)
+            **params)
         task_ids.append(task_id)
 
-        """ Convert stimuli """
-        converters = params.get('converters', None)
-        if converters:
-            print("Converting... {}".format(converters))
-            convert_stimuli(dataset_name, task_name, converters)
-
-        """ Extract features from applicable stimuli """
-        extractor_graphs = params.get('extractors', None)
-        if extractor_graphs:
-            print("Extracting...")
-            extract_features(
-                extractor_graphs, dataset_name, task_name)
-
-        """ Extract features that require pre-tokenization """
-        tokenized_extractors = params.get('tokenized_extractors', None)
-        if tokenized_extractors:
-            print("Tokenizing and extracting... {}".format(
-                tokenized_extractors))
-            extract_tokenized_features(
-                dataset_name, task_name, tokenized_extractors)
-
-        """ Apply transformations """
-        transformations = params.get("transformations", [])
-        post = Postprocessing(dataset_name, task_name)
-        for args in transformations:
-            print("Applying transformation... {}".format(args))
-            post = Postprocessing(dataset_name, task_name)
-            post.apply_transformation(**args)
-
     return dataset_id
+
+
+def extract_from_json(dataset_name, tasks, config):  
+    ## TODO: Use list of datasets and tasks to filter candidate tasks, and then apply to all
+
+    """ Convert stimuli """
+    converters = params.get('converters', None)
+    if converters:
+        print("Converting... {}".format(converters))
+        convert_stimuli(dataset_name, task_name, converters)
+
+    """ Extract features from applicable stimuli """
+    extractor_graphs = params.get('extractors', None)
+    if extractor_graphs:
+        print("Extracting...")
+        extract_features(
+            extractor_graphs, dataset_name, task_name)
+
+    """ Extract features that require pre-tokenization """
+    tokenized_extractors = params.get('tokenized_extractors', None)
+    if tokenized_extractors:
+        print("Tokenizing and extracting... {}".format(
+            tokenized_extractors))
+        extract_tokenized_features(
+            dataset_name, task_name, tokenized_extractors)
+
+    """ Apply transformations """
+    transformations = params.get("transformations", [])
+    post = Postprocessing(dataset_name, task_name)
+    for args in transformations:
+        print("Applying transformation... {}".format(args))
+        post = Postprocessing(dataset_name, task_name)
+        post.apply_transformation(**args)
