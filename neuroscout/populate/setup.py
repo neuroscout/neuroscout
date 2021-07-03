@@ -144,7 +144,8 @@ def ingest_from_json(config_file, reingest=False):
         preproc_address=config['preproc_address'],
         dataset_long_description=config.get('long_description'),
         local_path=local_path,
-        url=config.get('url')
+        url=config.get('url'),
+        reingest=reingest
     )
 
     task_ids = []
@@ -152,7 +153,8 @@ def ingest_from_json(config_file, reingest=False):
         """ Add task to database"""
         task_id = add_task(
             task_name,
-            local_path=local_path,
+            dataset_name,
+            local_path,
             reingest=reingest,
             **params)
         task_ids.append(task_id)

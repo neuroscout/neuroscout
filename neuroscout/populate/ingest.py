@@ -132,7 +132,7 @@ def add_dataset(dataset_name, dataset_summary, preproc_address, local_path,
     # Get or create dataset model from name
     dataset_model, new_ds = get_or_create(Dataset, name=dataset_name)
 
-    if new_ds:
+    if new_ds or reingest:
         dataset_model.description = layout.description
         dataset_model.summary = dataset_summary,
         dataset_model.long_description = dataset_long_description,
@@ -141,7 +141,7 @@ def add_dataset(dataset_name, dataset_summary, preproc_address, local_path,
         dataset_model.preproc_address = preproc_address
         dataset_model.local_path = local_path.as_posix()
         db.session.commit()
-    elif not reingest:
+    else:
         print("Dataset found, skipping ingestion...")
         return dataset_model.id
 
@@ -152,24 +152,19 @@ def add_dataset(dataset_name, dataset_summary, preproc_address, local_path,
     return dataset_model.id
 
 
-def add_task(task_name, dataset_name=None, local_path=None,
+def add_task(task_name, dataset_name, local_path,
              include_predictors=None, exclude_predictors=None,
              reingest=False, scan_length=1000,
              task_summary=None, **kwargs):
     """ Adds a BIDS dataset task to the database.
         Args:
             task_name - task to add
-            dataset_name - overide dataset name
+            dataset_name - dataset name
             local_path - path to local bids dataset.
-            dataset_address - remote address of BIDS dataset.
-            preproc_address - remote address of preprocessed files.
             include_predictors - set of predictors to ingest
             exclude_predictors - set of predictors to exclude from ingestions
             reingest - force reingesting even if dataset already exists
             scan_length - default scan length in case it cant be found in image
-            dataset_summary - Dataset summary description,
-            dataset_summary - Dataset long description,
-            url - Dataset external link,
             task_summary - Task summary description,
             kwargs - arguments to filter runs by
         Output:
