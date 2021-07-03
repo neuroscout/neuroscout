@@ -119,12 +119,43 @@ def add_stimulus(stim_hash, dataset_id, parent_id=None, path=None,
     return model, new
 
 
+def add_dataset(dataset_name, dataset_summary, preproc_address, local_path,
+                dataset_address=None, dataset_long_description=None, url=None,
+                reingest=False):
+    cache.clear()
+
+    local_path = Path(local_path)
+    assert isfile(str(local_path / 'dataset_description.json'))
+
+    layout = BIDSLayout(str(local_path), derivatives=True)
+
+    # Get or create dataset model from name
+    dataset_model, new_ds = get_or_create(Dataset, name=dataset_name)
+
+    if new_ds:
+        dataset_model.description = layout.description
+        dataset_model.summary = dataset_summary,
+        dataset_model.long_description = dataset_long_description,
+        dataset_model.url = url,
+        dataset_model.dataset_address = dataset_address
+        dataset_model.preproc_address = preproc_address
+        dataset_model.local_path = local_path.as_posix()
+        db.session.commit()
+    elif not reingest:
+        print("Dataset found, skipping ingestion...")
+        return dataset_model.id
+
+    """ Add GroupPredictors """
+    print("Adding group predictors")
+    add_group_predictors(dataset_model.id, local_path / 'participants.tsv')
+
+    return dataset_model.id
+
+
 def add_task(task_name, dataset_name=None, local_path=None,
-             dataset_address=None, preproc_address=None,
              include_predictors=None, exclude_predictors=None,
              reingest=False, scan_length=1000,
-             dataset_summary=None, dataset_long_description=None,
-             url=None, task_summary=None, **kwargs):
+             task_summary=None, **kwargs):
     """ Adds a BIDS dataset task to the database.
         Args:
             task_name - task to add
@@ -146,33 +177,17 @@ def add_task(task_name, dataset_name=None, local_path=None,
     """
     cache.clear()
 
-    local_path = Path(local_path)
-
-    assert isfile(str(local_path / 'dataset_description.json'))
-
     layout = BIDSLayout(str(local_path), derivatives=True)
     if task_name not in layout.get_tasks():
         raise ValueError("Task {} not found in dataset {}".format(
             task_name, local_path))
 
-    dataset_name = dataset_name if dataset_name is not None \
-        else layout.description['Name']
-
-    # Get or create dataset model from mandatory arguments
-    dataset_model, new_ds = get_or_create(Dataset, name=dataset_name)
-
-    if new_ds:
-        dataset_model.description = layout.description
-        dataset_model.summary = dataset_summary,
-        dataset_model.long_description = dataset_long_description,
-        dataset_model.url = url,
-        dataset_model.dataset_address = dataset_address
-        dataset_model.preproc_address = preproc_address
-        dataset_model.local_path = local_path.as_posix()
-        db.session.commit()
-    elif not reingest:
-        print("Dataset found, skipping ingestion...")
-        return dataset_model.id
+    # Get dataset model from name
+    dataset_model = Dataset.query.filter_by(name=dataset_name)
+    if dataset_model.count != 1:
+        raise Exception("Dataset not found")
+    else:
+        dataset_model = dataset_model.one()
 
     # Get or create task
     task_model, new_task = get_or_create(
@@ -184,6 +199,9 @@ def add_task(task_name, dataset_name=None, local_path=None,
         task_model.summary = task_summary,
         task_model.TR = task_model.description['RepetitionTime']
         db.session.commit()
+    elif not reingest:
+        print("Task found, skipping ingestion...")
+        return task_model.id
 
     stims_processed = {}
     """ Parse every Run """
@@ -263,8 +281,4 @@ def add_task(task_name, dataset_name=None, local_path=None,
                 runstim.duration = stims.duration.tolist()[i]
                 db.session.commit()
 
-    """ Add GroupPredictors """
-    print("Adding group predictors")
-    add_group_predictors(dataset_model.id, local_path / 'participants.tsv')
-
-    return dataset_model.id
+    return task_model.id
