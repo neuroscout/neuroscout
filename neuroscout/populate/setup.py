@@ -12,7 +12,7 @@ from datalad.distribution.utils import _get_installationpath_from_url
 from bids.layout import BIDSLayout
 
 
-def setup_dataset(preproc_address, dataset_address=None, dataset_path=None,
+def setup_dataset(preproc_address, dataset_address=None, path=None,
                   setup_preproc=True, url=None, dataset_summary=None,
                   long_description=None, tasks=None):
     """ Installs Dataset using DataLad (unless a dataset_path is given),
@@ -22,7 +22,7 @@ def setup_dataset(preproc_address, dataset_address=None, dataset_path=None,
     Args:
        preproc_address: DataLad address of a fmripreprocessed dataset
        dataset_address: DataLad address to raw dataset
-       dataset_path: path on disk to raw BIDS dataset. If provided,
+       path: path on disk to raw BIDS dataset. If provided,
                      `dataset_address` is optional.
        setup_preproc: Install preproc dataset, and symlink in raw dataset
        url: URL to dataset information
@@ -33,28 +33,28 @@ def setup_dataset(preproc_address, dataset_address=None, dataset_path=None,
     Returns:
        path to template config_file """
 
-    if dataset_path is None:
+    if path is None:
         if dataset_address is None:
             raise ValueError(
                 "Either dataset_path or dataset_address must be specified.")
         else:
             # Find unique folder name
             dataset_name = _get_installationpath_from_url(dataset_address)
-            path = Path('/datasets/raw') / dataset_name
-            if path.exists():
+            candidate_path = Path('/datasets/raw') / dataset_name
+            if candidate_path.exists():
                 iter = 1
-                while path.exists():
+                while candidate_path.exists():
                     iter += 1
-                    path = Path('/datasets/raw') / f"{dataset_name}_{iter}"
+                    candidate_path = Path('/datasets/raw') / f"{dataset_name}_{iter}"
 
             # Install dataset
             dataset_path = Path(install(
                 source=dataset_address,
-                path=str(path)
+                path=str(candidate_path)
                 ).path)
 
     else:
-        dataset_path = Path(dataset_path)
+        dataset_path = Path(path)
 
     dataset_name = dataset_path.stem
 

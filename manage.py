@@ -52,7 +52,7 @@ def add_user(email, password, confirm=True):
 
 
 @manager.command
-def setup_dataset(preproc_address, dataset_address=None, dataset_path=None,
+def setup_dataset(preproc_address, dataset_address=None, path=None,
                   setup_preproc=True, url=None, dataset_summary=None,
                   dataset_name=None, long_description=None, tasks=None):
     """ Installs Dataset using DataLad (unless a dataset_path is given),
@@ -62,7 +62,7 @@ def setup_dataset(preproc_address, dataset_address=None, dataset_path=None,
     Args:
        preproc_address: DataLad address of a fmripreprocessed dataset
        dataset_address: DataLad address to raw dataset
-       dataset_path: path on disk to raw BIDS dataset. If provided,
+       path: path on disk to raw BIDS dataset. If provided,
                      `dataset_address` is optional.
        setup_preproc: Install preproc dataset, and symlink in raw dataset
        url: URL to dataset information
@@ -73,7 +73,7 @@ def setup_dataset(preproc_address, dataset_address=None, dataset_path=None,
     Returns:
        path to template config_file """
     populate.setup_dataset(
-        preproc_address, dataset_address, dataset_path, setup_preproc, url,
+        preproc_address, dataset_address, path, setup_preproc, url,
         dataset_summary, long_description, tasks)
 
 
