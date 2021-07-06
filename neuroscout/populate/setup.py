@@ -1,6 +1,6 @@
 import json
 import shutil
-from os import symlink
+from os import symlink, path
 from flask import current_app
 from .ingest import add_task, add_dataset
 from .extract import extract_features, extract_tokenized_features
@@ -85,9 +85,10 @@ def setup_dataset(preproc_address, raw_address=None, path=None,
         derivatives = dataset_path / 'derivatives'
         shutil.rmtree(derivatives)
 
-        # Add symlink to derivative in raw dataset
+        # Add relative symlink to derivative in raw dataset
         derivatives.mkdir()
-        symlink(str(preproc_path), str(derivatives / preproc_path.stem))
+        symlink(path.relpath(str(preproc_path), str(derivatives)),
+                str(derivatives / preproc_path.stem))
 
     # Extract dataset summary
     layout = BIDSLayout(dataset_path)
