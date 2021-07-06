@@ -12,7 +12,7 @@ from datalad.distribution.utils import _get_installationpath_from_url
 from bids.layout import BIDSLayout
 
 
-def setup_dataset(preproc_address, dataset_address=None, path=None,
+def setup_dataset(preproc_address, raw_address=None, path=None,
                   setup_preproc=True, url=None, dataset_summary=None,
                   long_description=None, tasks=None):
     """ Installs Dataset using DataLad (unless a dataset_path is given),
@@ -34,12 +34,12 @@ def setup_dataset(preproc_address, dataset_address=None, path=None,
        path to template config_file """
 
     if path is None:
-        if dataset_address is None:
+        if raw_address is None:
             raise ValueError(
                 "Either dataset_path or dataset_address must be specified.")
         else:
             # Find unique folder name
-            dataset_name = _get_installationpath_from_url(dataset_address)
+            dataset_name = _get_installationpath_from_url(raw_address)
             candidate_path = Path('/datasets/raw') / dataset_name
             if candidate_path.exists():
                 iter = 1
@@ -49,7 +49,7 @@ def setup_dataset(preproc_address, dataset_address=None, path=None,
 
             # Install dataset
             dataset_path = Path(install(
-                source=dataset_address,
+                source=raw_address,
                 path=str(candidate_path)
                 ).path)
 
@@ -107,7 +107,7 @@ def setup_dataset(preproc_address, dataset_address=None, path=None,
     # Create template JSON file
     template = {
         "name": dataset_name,
-        "dataset_address": dataset_address,
+        "dataset_address": raw_address,
         "preproc_address": preproc_address,
         "path": str(dataset_path),
         "url": url,

@@ -52,8 +52,8 @@ def add_user(email, password, confirm=True):
 
 
 @manager.command
-def setup_dataset(preproc_address, dataset_address=None, path=None,
-                  setup_preproc=True, url=None, dataset_summary=None,
+def setup_dataset(preproc_address, raw_address=None, path=None,
+                  setup_preproc=True, url=None, summary=None,
                   dataset_name=None, long_description=None, tasks=None):
     """ Installs Dataset using DataLad (unless a dataset_path is given),
     links preproc and raw dataset, and creates a template config file
@@ -73,8 +73,8 @@ def setup_dataset(preproc_address, dataset_address=None, path=None,
     Returns:
        path to template config_file """
     populate.setup_dataset(
-        preproc_address, dataset_address, path, setup_preproc, url,
-        dataset_summary, long_description, tasks)
+        preproc_address, raw_address, path, setup_preproc, url,
+        summary, long_description, tasks)
 
 
 @manager.command
