@@ -159,10 +159,10 @@ class Home extends React.Component<UserStore, Record<string, never>> {
               headStyle={titleStyle}
               bordered={false}>
               <Row justify="center">
-                <Col span={5} offset={2}>
+                <Col span={5} offset={3}>
                   <img className="instLogo2" src="/static/utlogo.png" />
                 </Col>
-                <Col span={5} offset={2}>
+                <Col span={5} offset={3}>
                   <img className="instLogo2" src="/static/nihlogo.png" />
                 </Col>
               </Row>
