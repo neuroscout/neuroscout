@@ -39,7 +39,6 @@ class Home extends React.Component<UserStore, Record<string, never>> {
                   href="/public">
                   Browse public analyses
                 </Button>{' '}
-
                 {this.props.loggedIn === false && (
                   <Button
                     size="large"
@@ -69,10 +68,10 @@ class Home extends React.Component<UserStore, Record<string, never>> {
               <img className="splashLogo" src="/static/browse.svg" />
               <br />
               <div className="introCardsText">
-              Select from openly available naturalistic fMRI datasets, from
-              sources such as
-              <a href="https://openneuro.org/"> OpenNeuro</a> and{' '}
-              <a href="https://datalad.org/">DataLad</a>.
+                Select from openly available naturalistic fMRI datasets, from
+                sources such as
+                <a href="https://openneuro.org/"> OpenNeuro</a> and{' '}
+                <a href="https://datalad.org/">DataLad</a>.
               </div>
             </Card>
           </Col>
@@ -89,12 +88,9 @@ class Home extends React.Component<UserStore, Record<string, never>> {
               <img className="splashLogo" src="/static/design.svg" />
               <br />
               <div className="introCardsText">
-
-              Browse hundreds of annotations automatically extracted from
-              stimuli using <strong>
-                state-of-the-art machine learning
-              </strong>{' '}
-              platforms, such as Google Cloud Vision, TensorFlow and more.
+                Browse hundreds of annotations automatically extracted from
+                stimuli using <strong>state-of-the-art machine learning</strong>{' '}
+                platforms, such as Google Cloud Vision, TensorFlow and more.
               </div>
             </Card>
           </Col>
@@ -111,10 +107,11 @@ class Home extends React.Component<UserStore, Record<string, never>> {
               <img className="splashLogo" src="/static/share.svg" />
               <br />
               <div className="introCardsText">
-              Portable BIDS pipelines enable <strong>execution with no configuration</strong>.
-              Results are automatically uploaded to
-              <a href="https://neurovault.org/"> NeuroVault</a> for easy
-              sharing.
+                Portable BIDS pipelines enable{' '}
+                <strong>execution with no configuration</strong>. Results are
+                automatically uploaded to
+                <a href="https://neurovault.org/"> NeuroVault</a> for easy
+                sharing.
               </div>
             </Card>
           </Col>
@@ -127,6 +124,7 @@ class Home extends React.Component<UserStore, Record<string, never>> {
                 size="large"
                 className="splashButton"
                 href="https://neuroscout.github.io/neuroscout/">
+                <BookOutlined />
                 Learn more
               </Button>
             </div>
