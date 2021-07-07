@@ -158,19 +158,15 @@ class Home extends React.Component<UserStore, Record<string, never>> {
               title="Support provided by"
               headStyle={titleStyle}
               bordered={false}>
-              <div className="home-flex-item">
-                <img className="instLogo" src="/static/utlogo.png" />
-                <img className="instLogo" src="/static/nihlogo.png" />
-              </div>
+              <Row justify="center">
+                <Col span={5} offset={2}>
+                  <img className="instLogo2" src="/static/utlogo.png" />
+                </Col>
+                <Col span={5} offset={2}>
+                  <img className="instLogo2" src="/static/nihlogo.png" />
+                </Col>
+              </Row>
             </Card>
-            <Row justify="center">
-              <Col span={6} offset={2}>
-                <img className="instLogo2" src="/static/utlogo.png" />
-              </Col>
-              <Col span={6} offset={2}>
-                <img className="instLogo2" src="/static/nihlogo.png" />
-              </Col>
-            </Row>
           </MainCol>
         </Row>
         <Row justify="center" style={{ background: '#fff', padding: 0 }}>
