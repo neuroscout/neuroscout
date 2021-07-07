@@ -158,9 +158,6 @@ class Home extends React.Component<UserStore, Record<string, never>> {
                 Learn more
               </Button>
             </div>
-
-            <br />
-            <Divider />
           </MainCol>
         </Row>
 
@@ -170,6 +167,7 @@ class Home extends React.Component<UserStore, Record<string, never>> {
               title="Support provided by"
               headStyle={titleStyle}
               bordered={false}>
+              <img className="instLogo" src="/static/utlogo.png" />
               <img className="instLogo" src="/static/nihlogo.png" />
             </Card>
           </MainCol>
@@ -179,10 +177,8 @@ class Home extends React.Component<UserStore, Record<string, never>> {
           <MainCol>
             <div className="footerText">
               <p>
-                Created by the Psychoinformatics Lab at the University of Texas
-                at Austin. Supported by NIH award R01MH109682-03.
-                <br />
-                Icons by Smashicons from www.flaticon.com
+                Supported by NIH award R01MH109682-03. Icons by Smashicons from
+                www.flaticon.com
               </p>
             </div>
           </MainCol>
