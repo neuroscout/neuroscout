@@ -62,11 +62,15 @@ class Home extends React.Component<UserStore, Record<string, never>> {
             xl={{ span: 6 }}
             lg={{ span: 7 }}
             xs={{ span: 8 }}>
-            <div style={{ display: 'flex', justifyContent: 'center' }}>
+            <div
+              style={{
+                display: 'flex',
+                justifyContent: 'center',
+              }}>
               <Statistic
-                title="Active datasets"
+                title={<div style={{ fontSize: '22px' }}>Active datasets</div>}
                 value={12}
-                valueStyle={{ color: '#3f8600' }}
+                valueStyle={{ fontSize: '30px', color: '#3f8600' }}
               />
             </div>
           </Col>
@@ -77,9 +81,9 @@ class Home extends React.Component<UserStore, Record<string, never>> {
             xs={{ span: 8 }}>
             <div style={{ display: 'flex', justifyContent: 'center' }}>
               <Statistic
-                title="Number of tasks"
+                title={<div style={{ fontSize: '22px' }}>Number of tasks</div>}
                 value={25}
-                valueStyle={{ color: '#3f8600' }}
+                valueStyle={{ fontSize: '30px', color: '#3f8600' }}
               />
             </div>
           </Col>
@@ -172,6 +176,14 @@ class Home extends React.Component<UserStore, Record<string, never>> {
                 <img className="instLogo" src="/static/nihlogo.png" />
               </div>
             </Card>
+            <Row justify="center">
+              <Col span={6} offset={2}>
+                <img className="instLogo2" src="/static/utlogo.png" />
+              </Col>
+              <Col span={6} offset={2}>
+                <img className="instLogo2" src="/static/nihlogo.png" />
+              </Col>
+            </Row>
           </MainCol>
         </Row>
 
