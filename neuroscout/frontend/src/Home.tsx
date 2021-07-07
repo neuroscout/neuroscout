@@ -2,7 +2,7 @@
  Home component for the homepage
 */
 import * as React from 'react'
-import { Statistic, Divider, Row, Col, Button, Card } from 'antd'
+import { Divider, Row, Col, Button, Card } from 'antd'
 import { MainCol } from './HelperComponents'
 import { UserStore } from './user'
 import { BookOutlined } from '@ant-design/icons'
@@ -55,23 +55,15 @@ class Home extends React.Component<UserStore, Record<string, never>> {
             <Divider />
           </MainCol>
         </Row>
-
         <Row justify="center" style={{ background: '#fff', padding: 0 }}>
           <Col
             xxl={{ span: 5 }}
             xl={{ span: 6 }}
             lg={{ span: 7 }}
             xs={{ span: 8 }}>
-            <div
-              style={{
-                display: 'flex',
-                justifyContent: 'center',
-              }}>
-              <Statistic
-                title={<div style={{ fontSize: '22px' }}>Active datasets</div>}
-                value={12}
-                valueStyle={{ fontSize: '30px', color: '#3f8600' }}
-              />
+            <div className="stat-container">
+              <div className="stat-title">Active Datasets</div>
+              <div className="stat-value">12</div>
             </div>
           </Col>
           <Col
@@ -79,16 +71,12 @@ class Home extends React.Component<UserStore, Record<string, never>> {
             xl={{ span: 6 }}
             lg={{ span: 7 }}
             xs={{ span: 8 }}>
-            <div style={{ display: 'flex', justifyContent: 'center' }}>
-              <Statistic
-                title={<div style={{ fontSize: '22px' }}>Number of tasks</div>}
-                value={25}
-                valueStyle={{ fontSize: '30px', color: '#3f8600' }}
-              />
+            <div className="stat-container">
+              <div className="stat-title">Number of Tasks</div>
+              <div className="stat-value">25</div>
             </div>
           </Col>
         </Row>
-
         <Row justify="center" style={{ background: '#fff', padding: 0 }}>
           <Col
             xxl={{ span: 5 }}
@@ -164,7 +152,6 @@ class Home extends React.Component<UserStore, Record<string, never>> {
             </div>
           </MainCol>
         </Row>
-
         <Row justify="center" style={{ background: '#fff', padding: 0 }}>
           <MainCol>
             <Card
@@ -186,7 +173,6 @@ class Home extends React.Component<UserStore, Record<string, never>> {
             </Row>
           </MainCol>
         </Row>
-
         <Row justify="center" style={{ background: '#fff', padding: 0 }}>
           <MainCol>
             <div className="footerText">
