@@ -51,7 +51,6 @@ class Home extends React.Component<UserStore, Record<string, never>> {
                 )}
               </div>
             </div>
-            <br />
             <Divider />
           </MainCol>
         </Row>
@@ -77,7 +76,6 @@ class Home extends React.Component<UserStore, Record<string, never>> {
             </div>
           </Col>
         </Row>
-        <br />
         <br />
         <Row justify="center" style={{ background: '#fff', padding: 0 }}>
           <Col
