@@ -53,33 +53,33 @@ class Home extends React.Component<UserStore, Record<string, never>> {
             </div>
             <br />
             <Divider />
-            </MainCol>
-            </Row>
+          </MainCol>
+        </Row>
 
-            <Row justify="center" style={{ background: '#fff', padding: 0 }}>
-              <Col span={12}>
-              <Card>
-                <Statistic
-                  title="Active"
-                  value={11.28}
-                  precision={2}
-                  valueStyle={{ color: '#3f8600' }}
-                  suffix="%"
-                />
-              </Card>
-            </Col>
-            <Col span={12}>
-              <Card>
-                <Statistic
-                  title="Idle"
-                  value={9.3}
-                  precision={2}
-                  valueStyle={{ color: '#cf1322' }}
-                  suffix="%"
-                />
-              </Card>
-            </Col>
-            </Row>
+        <Row justify="center" style={{ background: '#fff', padding: 0 }}>
+          <Col span={12}>
+            <Card>
+              <Statistic
+                title="Active"
+                value={11.28}
+                precision={2}
+                valueStyle={{ color: '#3f8600' }}
+                suffix="%"
+              />
+            </Card>
+          </Col>
+          <Col span={12}>
+            <Card>
+              <Statistic
+                title="Idle"
+                value={9.3}
+                precision={2}
+                valueStyle={{ color: '#cf1322' }}
+                suffix="%"
+              />
+            </Card>
+          </Col>
+        </Row>
 
         <Row justify="center" style={{ background: '#fff', padding: 0 }}>
           <Col
@@ -160,7 +160,7 @@ class Home extends React.Component<UserStore, Record<string, never>> {
           </MainCol>
         </Row>
 
-       <Row justify="center" style={{ background: '#fff', padding: 0 }}>
+        <Row justify="center" style={{ background: '#fff', padding: 0 }}>
           <MainCol>
             <Card
               title="Support provided by"
