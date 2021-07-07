@@ -2,7 +2,7 @@
  Home component for the homepage
 */
 import * as React from 'react'
-import { Divider, Row, Col, Button, Card } from 'antd'
+import { Statistic, Divider, Row, Col, Button, Card } from 'antd'
 import { MainCol } from './HelperComponents'
 import { UserStore } from './user'
 import { BookOutlined } from '@ant-design/icons'
@@ -53,8 +53,33 @@ class Home extends React.Component<UserStore, Record<string, never>> {
             </div>
             <br />
             <Divider />
-          </MainCol>
-        </Row>
+            </MainCol>
+            </Row>
+
+            <Row justify="center" style={{ background: '#fff', padding: 0 }}>
+              <Col span={12}>
+              <Card>
+                <Statistic
+                  title="Active"
+                  value={11.28}
+                  precision={2}
+                  valueStyle={{ color: '#3f8600' }}
+                  suffix="%"
+                />
+              </Card>
+            </Col>
+            <Col span={12}>
+              <Card>
+                <Statistic
+                  title="Idle"
+                  value={9.3}
+                  precision={2}
+                  valueStyle={{ color: '#cf1322' }}
+                  suffix="%"
+                />
+              </Card>
+            </Col>
+            </Row>
 
         <Row justify="center" style={{ background: '#fff', padding: 0 }}>
           <Col
@@ -134,6 +159,18 @@ class Home extends React.Component<UserStore, Record<string, never>> {
             <Divider />
           </MainCol>
         </Row>
+
+       <Row justify="center" style={{ background: '#fff', padding: 0 }}>
+          <MainCol>
+            <Card
+              title="Support provided by"
+              headStyle={titleStyle}
+              bordered={false}>
+              <img className="splashLogo" src="/static/nihlogo.png" />
+            </Card>
+          </MainCol>
+        </Row>
+
         <Row justify="center" style={{ background: '#fff', padding: 0 }}>
           <MainCol>
             <div className="footerText">
