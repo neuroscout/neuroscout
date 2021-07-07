@@ -8,7 +8,7 @@ import { UserStore } from './user'
 
 const titleStyle: any = {
   textAlign: 'center' as React.CSSProperties,
-  fontSize: '20px',
+  fontSize: '22px',
   padding: '0px 0px 0px 0px',
 }
 
@@ -39,7 +39,7 @@ class Home extends React.Component<UserStore, Record<string, never>> {
                   href="/public">
                   Browse public analyses
                 </Button>{' '}
-                <br />
+
                 {this.props.loggedIn === false && (
                   <Button
                     size="large"
@@ -68,10 +68,12 @@ class Home extends React.Component<UserStore, Record<string, never>> {
               bordered={false}>
               <img className="splashLogo" src="/static/browse.svg" />
               <br />
+              <div className="introCardsText">
               Select from openly available naturalistic fMRI datasets, from
               sources such as
               <a href="https://openneuro.org/"> OpenNeuro</a> and{' '}
               <a href="https://datalad.org/">DataLad</a>.
+              </div>
             </Card>
           </Col>
 
@@ -86,11 +88,14 @@ class Home extends React.Component<UserStore, Record<string, never>> {
               bordered={false}>
               <img className="splashLogo" src="/static/design.svg" />
               <br />
+              <div className="introCardsText">
+
               Browse hundreds of annotations automatically extracted from
               stimuli using <strong>
                 state-of-the-art machine learning
               </strong>{' '}
-              algorithms, such as Google Cloud Vision, IBM Watson, and more.
+              platforms, such as Google Cloud Vision, TensorFlow and more.
+              </div>
             </Card>
           </Col>
 
@@ -105,10 +110,12 @@ class Home extends React.Component<UserStore, Record<string, never>> {
               bordered={false}>
               <img className="splashLogo" src="/static/share.svg" />
               <br />
-              Portable BIDS pipelines enable execution with no configuration.
+              <div className="introCardsText">
+              Portable BIDS pipelines enable <strong>execution with no configuration</strong>.
               Results are automatically uploaded to
               <a href="https://neurovault.org/"> NeuroVault</a> for easy
               sharing.
+              </div>
             </Card>
           </Col>
         </Row>

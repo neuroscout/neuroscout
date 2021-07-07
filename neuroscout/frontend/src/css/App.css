@@ -74,6 +74,11 @@ pre {
   font-size: 25px;
 }
 
+.introCardsText {
+    font-size: 18px;
+  }
+
+
 .footerText {
   text-align: center;
   font-size: 12px;
