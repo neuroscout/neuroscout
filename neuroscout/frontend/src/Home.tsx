@@ -77,6 +77,8 @@ class Home extends React.Component<UserStore, Record<string, never>> {
             </div>
           </Col>
         </Row>
+        <br />
+        <br />
         <Row justify="center" style={{ background: '#fff', padding: 0 }}>
           <Col
             xxl={{ span: 5 }}
