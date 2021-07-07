@@ -57,25 +57,29 @@ class Home extends React.Component<UserStore, Record<string, never>> {
         </Row>
 
         <Row justify="center" style={{ background: '#fff', padding: 0 }}>
-          <Col span={12}>
+          <Col
+            xxl={{ span: 5 }}
+            xl={{ span: 6 }}
+            lg={{ span: 7 }}
+            xs={{ span: 8 }}>
             <Card>
               <Statistic
-                title="Active"
-                value={11.28}
-                precision={2}
+                title="Active datasets"
+                value={12}
                 valueStyle={{ color: '#3f8600' }}
-                suffix="%"
               />
             </Card>
           </Col>
-          <Col span={12}>
+          <Col
+            xxl={{ span: 5 }}
+            xl={{ span: 6 }}
+            lg={{ span: 7 }}
+            xs={{ span: 8 }}>
             <Card>
               <Statistic
-                title="Idle"
-                value={9.3}
-                precision={2}
-                valueStyle={{ color: '#cf1322' }}
-                suffix="%"
+                title="Number of tasks"
+                value={25}
+                valueStyle={{ color: '#3f8600' }}
               />
             </Card>
           </Col>
@@ -166,7 +170,7 @@ class Home extends React.Component<UserStore, Record<string, never>> {
               title="Support provided by"
               headStyle={titleStyle}
               bordered={false}>
-              <img className="splashLogo" src="/static/nihlogo.png" />
+              <img className="instLogo" src="/static/nihlogo.png" />
             </Card>
           </MainCol>
         </Row>

@@ -69,6 +69,14 @@ pre {
   width: 33%;
 }
 
+.splashLogo {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    width: 15%;
+  }
+
+
 .splashText {
   text-align: center;
   font-size: 25px;
