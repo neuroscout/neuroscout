@@ -189,3 +189,9 @@ pre {
 .ant-checkbox-wrapper + .ant-checkbox-wrapper {
     margin-left: 0px;
 }
+
+.home-flex-item {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+}
