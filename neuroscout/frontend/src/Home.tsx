@@ -62,26 +62,26 @@ class Home extends React.Component<UserStore, Record<string, never>> {
             xl={{ span: 6 }}
             lg={{ span: 7 }}
             xs={{ span: 8 }}>
-            <Card>
+            <div style={{ display: 'flex', justifyContent: 'center' }}>
               <Statistic
                 title="Active datasets"
                 value={12}
                 valueStyle={{ color: '#3f8600' }}
               />
-            </Card>
+            </div>
           </Col>
           <Col
             xxl={{ span: 5 }}
             xl={{ span: 6 }}
             lg={{ span: 7 }}
             xs={{ span: 8 }}>
-            <Card>
+            <div style={{ display: 'flex', justifyContent: 'center' }}>
               <Statistic
                 title="Number of tasks"
                 value={25}
                 valueStyle={{ color: '#3f8600' }}
               />
-            </Card>
+            </div>
           </Col>
         </Row>
 
@@ -167,10 +167,8 @@ class Home extends React.Component<UserStore, Record<string, never>> {
               title="Support provided by"
               headStyle={titleStyle}
               bordered={false}>
-              <div>
+              <div className="home-flex-item">
                 <img className="instLogo" src="/static/utlogo.png" />
-              </div>
-              <div>
                 <img className="instLogo" src="/static/nihlogo.png" />
               </div>
             </Card>
