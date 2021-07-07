@@ -167,8 +167,8 @@ class Home extends React.Component<UserStore, Record<string, never>> {
               title="Support provided by"
               headStyle={titleStyle}
               bordered={false}>
-              <img className="instLogo" src="/static/utlogo.png" />
-              <img className="instLogo" src="/static/nihlogo.png" />
+                <div><img className="instLogo" src="/static/utlogo.png" /></div>
+                <div><img className="instLogo" src="/static/nihlogo.png" /></div>
             </Card>
           </MainCol>
         </Row>
