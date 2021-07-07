@@ -132,7 +132,9 @@ def ingest_from_json(config_file, reingest=False):
         Output:
             list of dataset model ids
     """
-    config = json.load(config_file)
+
+    with open(config_file) as f:
+        config = json.load(f)
 
     dataset_name = config['name']
     local_path = config['path']

@@ -179,7 +179,7 @@ def add_task(task_name, dataset_name, local_path,
 
     # Get dataset model from name
     dataset_model = Dataset.query.filter_by(name=dataset_name)
-    if dataset_model.count != 1:
+    if dataset_model.count() != 1:
         raise Exception("Dataset not found")
     else:
         dataset_model = dataset_model.one()
