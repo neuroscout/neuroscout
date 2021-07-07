@@ -5,6 +5,7 @@ import * as React from 'react'
 import { Divider, Row, Col, Button, Card } from 'antd'
 import { MainCol } from './HelperComponents'
 import { UserStore } from './user'
+import { BookOutlined } from '@ant-design/icons'
 
 const titleStyle: any = {
   textAlign: 'center' as React.CSSProperties,
