@@ -133,7 +133,7 @@ def ingest_from_json(config_file, reingest=False):
             list of dataset model ids
     """
 
-    with open(config_file) as f:
+    with open(config_file, 'r') as f:
         config = json.load(f)
 
     dataset_name = config['name']

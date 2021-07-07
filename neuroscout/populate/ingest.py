@@ -187,6 +187,8 @@ def add_task(task_name, dataset_name, local_path,
     # Get or create task
     task_model, new_task = get_or_create(
         Task, name=task_name, dataset_id=dataset_model.id)
+    
+    local_path = Path(local_path)
 
     if new_task:
         task_model.description = json.load(
