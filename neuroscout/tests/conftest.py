@@ -160,7 +160,7 @@ def add_task_remote(session):
       url="https://github.com/adelavega/bids_test", subject="01", run=1
       )
 
-    return populate.ingest_from_json(config_path)[0]
+    return populate.ingest_from_json(config_path)
 
 
 @pytest.fixture(scope="function")
@@ -173,7 +173,7 @@ def add_local_task_json(session):
       skip_preproc=True, 
       url="https://github.com/adelavega/bids_test", subject="01", run=1
       )
-    return populate.ingest_from_json(config_path)[0]
+    return populate.ingest_from_json(config_path)
 
 
 @pytest.fixture(scope="function")
