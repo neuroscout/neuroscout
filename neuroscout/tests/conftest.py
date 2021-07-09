@@ -150,13 +150,28 @@ def add_task(session):
 @pytest.fixture(scope="function")
 def add_task_remote(session):
     """ Add a dataset with two subjects. """
-    return populate.ingest_from_json(REMOTE_JSON_PATH)[0]
+    config_path = populate.setup_dataset(
+      '///fake/dataset', 
+      raw_address='https://github.com/adelavega/bids_test', 
+      dataset_summary="A test dataset", 
+      skip_preproc=True, 
+      url="https://github.com/adelavega/bids_test", subject="01", run=1
+      )
+
+    return populate.ingest_from_json(config_path)[0]
 
 
 @pytest.fixture(scope="function")
 def add_local_task_json(session):
     """ Add a dataset with two subjects. """
-    return populate.ingest_from_json(LOCAL_JSON_PATH)[0]
+    config_path = populate.setup_dataset(
+      '///fake/dataset', 
+      path="./neuroscout/tests/data/bids_test",
+      dataset_summary="A test dataset",
+      skip_preproc=True, 
+      url="https://github.com/adelavega/bids_test", subject="01", run=1
+      )
+    return populate.ingest_from_json(config_path)[0]
 
 
 @pytest.fixture(scope="function")

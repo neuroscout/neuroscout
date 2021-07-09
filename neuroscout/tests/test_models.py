@@ -85,22 +85,6 @@ def test_json_local_dataset(session, add_local_task_json):
     assert GroupPredictor.query.filter_by(
             dataset_id=add_local_task_json).count() == 3
 
-    # Test that stimuli were converted
-    converted_stim = [s for s in Stimulus.query if s.parent_id is not None][0]
-    assert converted_stim.converter_name == 'TesseractConverter'
-
-    bright = ExtractedFeature.query.filter_by(
-        feature_name='Brightness').one()
-    assert bright.original_name == 'brightness'
-
-    num_bright = ExtractedFeature.query.filter_by(feature_name='num_bright')
-    assert num_bright.count() == 1
-    assert len(num_bright.first().extracted_events) == 3
-
-    for ee in num_bright.first().extracted_events:
-        assert ee.value == '1'
-
-
 
 def test_extracted_features(session, add_task, extract_features):
     """ This tests feature extraction from a remote dataset"""
