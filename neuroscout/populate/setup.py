@@ -15,7 +15,7 @@ from bids.layout import BIDSLayout
 
 
 def setup_dataset(preproc_address, raw_address=None, path=None,
-                  setup_preproc=True, url=None, dataset_summary=None,
+                  skip_preproc=False, url=None, dataset_summary=None,
                   long_description=None, tasks=None, bib_entries=[]):
     """ Installs Dataset using DataLad (unless a dataset_path is given),
     links preproc and raw dataset, and creates a template config file
@@ -26,7 +26,7 @@ def setup_dataset(preproc_address, raw_address=None, path=None,
        dataset_address: DataLad address to raw dataset
        path: path on disk to raw BIDS dataset. If provided,
                      `dataset_address` is optional.
-       setup_preproc: Install preproc dataset, and symlink in raw dataset
+       skip_preproc: if False, Install preproc dataset, and symlink in raw dataset
        url: URL to dataset information
        dataset_summary: Short summary of dataset
        long_description: Longer description of dataset
@@ -61,7 +61,7 @@ def setup_dataset(preproc_address, raw_address=None, path=None,
 
     dataset_name = dataset_path.stem
 
-    if setup_preproc:
+    if not skip_preproc:
         # Clone preproc dataset
         preproc_dataset_name = _get_installationpath_from_url(preproc_address)
         preproc_path = Path("/datasets/neuroscout-datasets")
