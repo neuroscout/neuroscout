@@ -7,6 +7,7 @@ from .ingest import add_task, add_dataset
 from .extract import extract_features, extract_tokenized_features
 from .convert import convert_stimuli
 from .transform import Postprocessing
+from .utils import add_to_bibliography
 from pathlib import Path
 from datalad.api import install
 from datalad.distribution.utils import _get_installationpath_from_url
@@ -15,7 +16,7 @@ from bids.layout import BIDSLayout
 
 def setup_dataset(preproc_address, raw_address=None, path=None,
                   setup_preproc=True, url=None, dataset_summary=None,
-                  long_description=None, tasks=None):
+                  long_description=None, tasks=None, bib_entries=[]):
     """ Installs Dataset using DataLad (unless a dataset_path is given),
     links preproc and raw dataset, and creates a template config file
     for the dataset.
@@ -30,6 +31,7 @@ def setup_dataset(preproc_address, raw_address=None, path=None,
        dataset_summary: Short summary of dataset
        long_description: Longer description of dataset
        tasks: List of tasks to include in config file
+       bib_entries: List of bibliography entries in CSL format
 
     Returns:
        path to template config_file """
@@ -115,7 +117,8 @@ def setup_dataset(preproc_address, raw_address=None, path=None,
         "url": url,
         "summary": dataset_summary,
         "long_description": long_description,
-        "tasks": tasks
+        "tasks": tasks,
+        "bib_entries": bib_entries
     }
 
     config_file_path = (current_app.config['CONFIG_PATH']
@@ -163,6 +166,9 @@ def ingest_from_json(config_file, reingest=False):
             reingest=reingest,
             **params)
         task_ids.append(task_id)
+
+    # Add bibliography entry
+    add_to_bibliography(dataset_name, config['bib_entries'])
 
     return dataset_id
 
