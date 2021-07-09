@@ -236,6 +236,137 @@
             }
         ]
     },
+    "NaturalisticNeuroimagingDatabase":{
+        ".*": [
+            {
+              "container-title": "Scientific Data",
+              "abstract": "Neuroimaging has advanced our understanding of human psychology using reductionist stimuli that often do not resemble information the brain naturally encounters. It has improved our understanding of the network organization of the brain mostly through analyses of ‘resting-state’ data for which the functions of networks cannot be verifiably labelled. We make a ‘Naturalistic Neuroimaging Database’ (NNDb v1.0) publically available to allow for a more complete understanding of the brain under more ecological conditions during which networks can be labelled. Eighty-six participants underwent behavioural testing and watched one of 10 full-length movies while functional magnetic resonance imaging was acquired. Resulting timeseries data are shown to be of high quality, with good signal-to-noise ratio, few outliers and low movement. Data-driven functional analyses provide further evidence of data quality. They also demonstrate accurate timeseries/movie alignment and how movie annotations might be used to label networks. The NNDb can be used to answer questions previously unaddressed with standard neuroimaging approaches, progressing our knowledge of how the brain works in the real world.",
+              "accessed": {
+                "date-parts": [
+                  [
+                    2021,
+                    7,
+                    9
+                  ]
+                ]
+              },
+              "author": [
+                {
+                  "given": "Sarah",
+                  "family": "Aliko"
+                },
+                {
+                  "given": "Jiawen",
+                  "family": "Huang"
+                },
+                {
+                  "given": "Florin",
+                  "family": "Gheorghiu"
+                },
+                {
+                  "given": "Stefanie",
+                  "family": "Meliss"
+                },
+                {
+                  "given": "Jeremy I.",
+                  "family": "Skipper"
+                }
+              ],
+              "DOI": "10.1038/s41597-020-00680-2",
+              "type": "article-journal",
+              "id": "aliko_naturalistic_2020",
+              "citation-label": "aliko_naturalistic_2020",
+              "ISSN": "2052-4463",
+              "issue": 1,
+              "issued": {
+                "date-parts": [
+                  [
+                    2020,
+                    10
+                  ]
+                ]
+              },
+              "language": "en",
+              "page": "347",
+              "title": "A naturalistic neuroimaging database for understanding the brain using ecological stimuli",
+              "URL": "https://www.nature.com/articles/s41597-020-00680-2",
+              "volume": 7,
+              "_graph": [
+                {
+                  "type": "@csl/list+object",
+                  "data": [
+                    {
+                      "container-title": "Scientific Data",
+                      "abstract": "Neuroimaging has advanced our understanding of human psychology using reductionist stimuli that often do not resemble information the brain naturally encounters. It has improved our understanding of the network organization of the brain mostly through analyses of ‘resting-state’ data for which the functions of networks cannot be verifiably labelled. We make a ‘Naturalistic Neuroimaging Database’ (NNDb v1.0) publically available to allow for a more complete understanding of the brain under more ecological conditions during which networks can be labelled. Eighty-six participants underwent behavioural testing and watched one of 10 full-length movies while functional magnetic resonance imaging was acquired. Resulting timeseries data are shown to be of high quality, with good signal-to-noise ratio, few outliers and low movement. Data-driven functional analyses provide further evidence of data quality. They also demonstrate accurate timeseries/movie alignment and how movie annotations might be used to label networks. The NNDb can be used to answer questions previously unaddressed with standard neuroimaging approaches, progressing our knowledge of how the brain works in the real world.",
+                      "accessed": {
+                        "date-parts": [
+                          [
+                            2021,
+                            7,
+                            9
+                          ]
+                        ]
+                      },
+                      "author": [
+                        {
+                          "given": "Sarah",
+                          "family": "Aliko"
+                        },
+                        {
+                          "given": "Jiawen",
+                          "family": "Huang"
+                        },
+                        {
+                          "given": "Florin",
+                          "family": "Gheorghiu"
+                        },
+                        {
+                          "given": "Stefanie",
+                          "family": "Meliss"
+                        },
+                        {
+                          "given": "Jeremy I.",
+                          "family": "Skipper"
+                        }
+                      ],
+                      "DOI": "10.1038/s41597-020-00680-2",
+                      "type": "article-journal",
+                      "id": "aliko_naturalistic_2020",
+                      "citation-label": "aliko_naturalistic_2020",
+                      "ISSN": "2052-4463",
+                      "issue": "1",
+                      "issued": {
+                        "date-parts": [
+                          [
+                            2020,
+                            10
+                          ]
+                        ]
+                      },
+                      "language": "en",
+                      "page": "347",
+                      "title": "A naturalistic neuroimaging database for understanding the brain using ecological stimuli",
+                      "URL": "https://www.nature.com/articles/s41597-020-00680-2",
+                      "volume": "7",
+                      "_graph": [
+                        {
+                          "type": "@biblatex/text",
+                          "data": "@article{aliko_naturalistic_2020,\ttitle = {A naturalistic neuroimaging database for understanding the brain using ecological stimuli},\tvolume = {7},\tcopyright = {2020 The Author(s)},\tissn = {2052-4463},\turl = {https://www.nature.com/articles/s41597-020-00680-2},\tdoi = {10.1038/s41597-020-00680-2},\tabstract = {Neuroimaging has advanced our understanding of human psychology using reductionist stimuli that often do not resemble information the brain naturally encounters. It has improved our understanding of the network organization of the brain mostly through analyses of ‘resting-state’ data for which the functions of networks cannot be verifiably labelled. We make a ‘Naturalistic Neuroimaging Database’ (NNDb v1.0) publically available to allow for a more complete understanding of the brain under more ecological conditions during which networks can be labelled. Eighty-six participants underwent behavioural testing and watched one of 10 full-length movies while functional magnetic resonance imaging was acquired. Resulting timeseries data are shown to be of high quality, with good signal-to-noise ratio, few outliers and low movement. Data-driven functional analyses provide further evidence of data quality. They also demonstrate accurate timeseries/movie alignment and how movie annotations might be used to label networks. The NNDb can be used to answer questions previously unaddressed with standard neuroimaging approaches, progressing our knowledge of how the brain works in the real world.},\tlanguage = {en},\tnumber = {1},\turldate = {2021-07-09},\tjournal = {Scientific Data},\tauthor = {Aliko, Sarah and Huang, Jiawen and Gheorghiu, Florin and Meliss, Stefanie and Skipper, Jeremy I.},\tmonth = oct,\tyear = {2020},\tpages = {347},}"
+                        },
+                        {
+                          "type": "@biblatex/entries+list"
+                        },
+                        {
+                          "type": "@csl/list+object"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+    },
     "SherlockMerlin":{
       ".*":[
       	{
