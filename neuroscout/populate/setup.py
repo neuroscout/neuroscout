@@ -16,7 +16,7 @@ from bids.layout import BIDSLayout
 
 def setup_dataset(preproc_address, raw_address=None, path=None,
                   skip_preproc=False, url=None, dataset_summary=None,
-                  long_description=None, tasks=None, bib_entries=[]):
+                  long_description=None, tasks=None, bib_entries=[], **kwargs):
     """ Installs Dataset using DataLad (unless a dataset_path is given),
     links preproc and raw dataset, and creates a template config file
     for the dataset.
@@ -26,12 +26,13 @@ def setup_dataset(preproc_address, raw_address=None, path=None,
        dataset_address: DataLad address to raw dataset
        path: path on disk to raw BIDS dataset. If provided,
                      `dataset_address` is optional.
-       skip_preproc: if False, Install preproc dataset, and symlink in raw dataset
+       skip_preproc: if False, install preproc remote, add symlink to raw
        url: URL to dataset information
        dataset_summary: Short summary of dataset
        long_description: Longer description of dataset
        tasks: List of tasks to include in config file
-       bib_entries: List of bibliography entries in CSL format
+       bib_entries: List of bibliography entries in CSL format.
+       kwargs: Additional arguments to add to the config file (i.e. filters)
 
     Returns:
        path to template config_file """
@@ -106,7 +107,8 @@ def setup_dataset(preproc_address, raw_address=None, path=None,
             summary = ""
 
         tasks[t] = {
-            "summary": summary
+            "summary": summary,
+            **kwargs
         }
 
     # Create template JSON file
