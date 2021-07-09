@@ -9,7 +9,7 @@ from .convert import convert_stimuli
 from .transform import Postprocessing
 from .utils import add_to_bibliography
 from pathlib import Path
-from datalad.api import install
+from datalad.api import install, get
 from datalad.distribution.utils import _get_installationpath_from_url
 from bids.layout import BIDSLayout
 
@@ -55,6 +55,7 @@ def setup_dataset(preproc_address, raw_address=None, path=None,
                 source=raw_address,
                 path=str(candidate_path)
                 ).path)
+            get(str(candidate_path / 'dataset_description.json'))
 
     else:
         dataset_path = Path(path)
