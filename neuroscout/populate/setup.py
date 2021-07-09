@@ -102,7 +102,7 @@ def setup_dataset(preproc_address, raw_address=None, path=None,
     for t in layout.get_tasks():
         try:
             summary = layout.get(task=t, extension='nii.gz')[0].get_metadata()['TaskDescription']
-        except ValueError:
+        except KeyError:
             summary = ""
 
         tasks[t] = {
