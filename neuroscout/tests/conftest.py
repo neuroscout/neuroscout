@@ -139,7 +139,7 @@ def add_users(app, db, session):
 def add_task(session):
     """ Add a dataset with two subjects """
     dataset_id = populate.add_dataset(
-      'test_dataset',
+      'Test Dataset',
       'example dataset',
       '///datalad/preproc/address',
       DATASET_PATH
