@@ -79,7 +79,7 @@ def test_json_local_dataset(session, add_local_task_json):
     assert len(predictor.predictor_events) == 4
 
     # Test that Stimiuli were extracted
-    assert Stimulus.query.count() == 8
+    assert Stimulus.query.count() == 4
 
     # Test participants.tsv ingestion
     assert GroupPredictor.query.filter_by(
