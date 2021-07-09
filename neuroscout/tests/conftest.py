@@ -138,13 +138,15 @@ def add_users(app, db, session):
 @pytest.fixture(scope="function")
 def add_task(session):
     """ Add a dataset with two subjects """
-    populate.add_dataset(
+    dataset_id = populate.add_dataset(
       'test_dataset',
       'example dataset',
       '///datalad/preproc/address',
       DATASET_PATH
     )
-    return populate.add_task('bidstest', 'test_dataset', DATASET_PATH)
+
+    populate.add_task('bidstest', 'test_dataset', DATASET_PATH)
+    return dataset_id
 
 
 @pytest.fixture(scope="function")
