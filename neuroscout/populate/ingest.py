@@ -155,7 +155,7 @@ def add_dataset(dataset_name, dataset_summary, preproc_address, local_path,
 def add_task(task_name, dataset_name, local_path,
              include_predictors=None, exclude_predictors=None,
              reingest=False, scan_length=1000,
-             task_summary=None, **kwargs):
+             summary=None, **kwargs):
     """ Adds a BIDS dataset task to the database.
         Args:
             task_name - task to add
@@ -165,7 +165,7 @@ def add_task(task_name, dataset_name, local_path,
             exclude_predictors - set of predictors to exclude from ingestions
             reingest - force reingesting even if dataset already exists
             scan_length - default scan length in case it cant be found in image
-            task_summary - Task summary description,
+            summary - Task summary description,
             kwargs - arguments to filter runs by
         Output:
             dataset model id
@@ -193,7 +193,7 @@ def add_task(task_name, dataset_name, local_path,
     if new_task:
         task_model.description = json.load(
             (local_path / 'task-{}_bold.json'.format(task_name)).open())
-        task_model.summary = task_summary,
+        task_model.summary = summary,
         task_model.TR = task_model.description['RepetitionTime']
         db.session.commit()
     elif not reingest:
