@@ -145,7 +145,7 @@ def add_task(session):
       DATASET_PATH
     )
 
-    populate.add_task('bidstest', 'test_dataset', DATASET_PATH)
+    populate.add_task('bidstest', 'Test Dataset', DATASET_PATH)
     return dataset_id
 
 
