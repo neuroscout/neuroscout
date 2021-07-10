@@ -1,4 +1,4 @@
-import { Transformation, ReplaceNA } from '../coretypes';
+import { Transformation, ReplaceNA } from '../coretypes'
 
 // Todo: Add more transformations, from pybids
 // At first, only allow transformations that occur in place
@@ -13,19 +13,19 @@ const transformDefinitions: Transformation[] = [
     Name: 'Scale',
     Demean: true,
     Rescale: true,
-    ReplaceNA: 'after' as ReplaceNA
+    ReplaceNA: 'after' as ReplaceNA,
   },
   {
     Name: 'Orthogonalize',
-    Other: []
+    Other: [],
   },
   {
     Name: 'Threshold',
     Threshold: 0,
     Above: true,
     Binarize: false,
-    Signed: true
-  }
-];
+    Signed: true,
+  },
+]
 
-export default transformDefinitions;
+export default transformDefinitions

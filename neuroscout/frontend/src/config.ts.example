@@ -1,5 +1,5 @@
-export const config =  {
-  'server_url': 'http://localhost:4000/',
-  'google_client_id': 'GOOGLE_CLIENT_ID',
-  'ga_key': 'GA_KEY'
-};
+export const config = {
+  server_url: 'http://localhost:4000/',
+  google_client_id: 'GOOGLE_CLIENT_ID',
+  ga_key: 'GA_KEY',
+}

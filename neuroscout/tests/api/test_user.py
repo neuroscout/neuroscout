@@ -29,7 +29,6 @@ def test_get(auth_client):
 
     user = User.query.filter_by(email=decode_json(resp)['email']).one()
     assert user.last_activity_at > time
-    assert user.last_activity_ip is not None
 
 
 def test_put(auth_client):

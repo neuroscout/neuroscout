@@ -2,12 +2,16 @@
   "compilerOptions": {
     "baseUrl": ".",
     "outDir": "build/dist",
-    "module": "commonjs",
+    "module": "esnext",
     "target": "es6",
-    "lib": ["es7", "dom", "es2019"],
+    "lib": [
+      "es7",
+      "dom",
+      "es2019"
+    ],
     "sourceMap": true,
     "allowJs": true,
-    "jsx": "react",
+    "jsx": "react-jsx",
     "moduleResolution": "node",
     "rootDir": "src",
     "forceConsistentCasingInFileNames": true,
@@ -19,7 +23,12 @@
     "allowSyntheticDefaultImports": true,
     "noUnusedLocals": false,
     "resolveJsonModule": true,
-    "skipLibCheck": true
+    "skipLibCheck": true,
+    "esModuleInterop": true,
+    "strict": true,
+    "noFallthroughCasesInSwitch": true,
+    "isolatedModules": true,
+    "noEmit": true
   },
   "exclude": [
     "node_modules",
@@ -31,7 +40,7 @@
     "src/tests/setupTests.ts",
     "cypress"
   ],
-  "types": [
-    "typePatches"
+  "include": [
+    "src"
   ]
 }
