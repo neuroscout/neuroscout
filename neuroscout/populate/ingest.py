@@ -187,12 +187,16 @@ def add_task(task_name, dataset_name, local_path,
     # Get or create task
     task_model, new_task = get_or_create(
         Task, name=task_name, dataset_id=dataset_model.id)
-    
+  
     local_path = Path(local_path)
 
+    all_runs = layout.get(task=task_name, suffix='bold', extension='nii.gz',
+                          scope='raw', **kwargs)
+
     if new_task:
-        task_model.description = json.load(
-            (local_path / 'task-{}_bold.json'.format(task_name)).open())
+        # Pull first run's metadata as representative
+        task_metadata = all_runs[0].get_metadata()
+        task_model.description = task_metadata
         task_model.summary = summary,
         task_model.TR = task_model.description['RepetitionTime']
         db.session.commit()
@@ -203,8 +207,6 @@ def add_task(task_name, dataset_name, local_path,
     stims_processed = {}
     """ Parse every Run """
     print("Parsing runs")
-    all_runs = layout.get(task=task_name, suffix='bold', extension='nii.gz',
-                          scope='raw', **kwargs)
     for img in tqdm(all_runs):
         """ Extract Run information """
         # Get entities
