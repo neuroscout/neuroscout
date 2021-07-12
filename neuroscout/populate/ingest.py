@@ -10,7 +10,6 @@ from pathlib import Path
 import pandas as pd
 
 from bids.layout import BIDSLayout
-from datalad.api import install
 
 from ..core import cache
 from .utils import hash_stim
@@ -187,7 +186,7 @@ def add_task(task_name, dataset_name, local_path,
     # Get or create task
     task_model, new_task = get_or_create(
         Task, name=task_name, dataset_id=dataset_model.id)
-  
+
     local_path = Path(local_path)
 
     all_runs = layout.get(task=task_name, suffix='bold', extension='nii.gz',

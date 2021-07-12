@@ -79,6 +79,8 @@ def setup_dataset(preproc_address, raw_address=None, path=None,
             source=preproc_address,
             path=str(preproc_path)
         )
+        
+        get(str(preproc_path / 'dataset_description.json'))
 
         # Set preproc path
         if preproc_path.stem not in ['fmriprep', 'preproc']:
