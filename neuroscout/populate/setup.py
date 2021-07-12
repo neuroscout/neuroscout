@@ -56,7 +56,10 @@ def setup_dataset(preproc_address, raw_address=None, path=None,
                 source=raw_address,
                 path=str(candidate_path)
                 ).path)
-            get(str(candidate_path / 'dataset_description.json'))
+
+            # Get all json and tsv files in dataset
+            get([str(p) for p in candidate_path.rglob('*.json')])
+            get([str(p) for p in candidate_path.rglob('*.tsv')])
 
     else:
         dataset_path = Path(path)
@@ -79,8 +82,10 @@ def setup_dataset(preproc_address, raw_address=None, path=None,
             source=preproc_address,
             path=str(preproc_path)
         )
-        
-        get(str(preproc_path / 'dataset_description.json'))
+
+        # Get all json and tsv files in dataset
+        get([str(p) for p in preproc_address.rglob('*.json')])
+        get([str(p) for p in preproc_address.rglob('*.tsv')])
 
         # Set preproc path
         if preproc_path.stem not in ['fmriprep', 'preproc']:
