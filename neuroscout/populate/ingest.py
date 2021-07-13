@@ -132,6 +132,7 @@ def add_dataset(dataset_name, dataset_summary, preproc_address, local_path,
     dataset_model, new_ds = get_or_create(Dataset, name=dataset_name)
 
     if new_ds or reingest:
+        print(f"Adding dataset {dataset_name}")
         dataset_model.description = description
         dataset_model.summary = dataset_summary,
         dataset_model.long_description = dataset_long_description,
@@ -171,6 +172,7 @@ def add_task(task_name, dataset_name, local_path,
             dataset model id
     """
     cache.clear()
+    print(f"Adding task {task_name}")
 
     if not layout:
         layout = BIDSLayout(
@@ -195,7 +197,7 @@ def add_task(task_name, dataset_name, local_path,
 
     local_path = Path(local_path)
 
-    all_runs = base_layout.get(
+    all_runs = layout.get(
         task=task_name, suffix='bold', extension='nii.gz',
         scope='raw', **kwargs)
 
