@@ -192,14 +192,14 @@ def add_task(task_name, dataset_name, local_path,
     all_runs = layout.get(task=task_name, suffix='bold', extension='nii.gz',
                           scope='raw', **kwargs)
 
-    if new_task:
+    if new_task or reingest:
         # Pull first run's metadata as representative
         task_metadata = all_runs[0].get_metadata()
         task_model.description = task_metadata
         task_model.summary = summary,
-        task_model.TR = task_model.description['RepetitionTime']
+        task_model.TR = task_metadata['RepetitionTime']
         db.session.commit()
-    elif not reingest:
+    else:
         print("Task found, skipping ingestion...")
         return task_model.id
 
