@@ -124,15 +124,15 @@ def add_dataset(dataset_name, dataset_summary, preproc_address, local_path,
     cache.clear()
 
     local_path = Path(local_path)
-    assert isfile(str(local_path / 'dataset_description.json'))
 
-    layout = BIDSLayout(str(local_path), derivatives=True)
+    with (local_path / 'dataset_description.json'.open() as f:
+        description = json.load(f)
 
     # Get or create dataset model from name
     dataset_model, new_ds = get_or_create(Dataset, name=dataset_name)
 
     if new_ds or reingest:
-        dataset_model.description = layout.description
+        dataset_model.description = description
         dataset_model.summary = dataset_summary,
         dataset_model.long_description = dataset_long_description,
         dataset_model.url = url,
@@ -154,7 +154,7 @@ def add_dataset(dataset_name, dataset_summary, preproc_address, local_path,
 def add_task(task_name, dataset_name, local_path,
              include_predictors=None, exclude_predictors=None,
              reingest=False, scan_length=1000,
-             summary=None, **kwargs):
+             summary=None, layout=None, **kwargs):
     """ Adds a BIDS dataset task to the database.
         Args:
             task_name - task to add
@@ -165,13 +165,19 @@ def add_task(task_name, dataset_name, local_path,
             reingest - force reingesting even if dataset already exists
             scan_length - default scan length in case it cant be found in image
             summary - Task summary description,
+            layout - Preinstantiated BIDSLayout
             kwargs - arguments to filter runs by
         Output:
             dataset model id
     """
     cache.clear()
 
-    layout = BIDSLayout(str(local_path), derivatives=True)
+    if not layout:
+        layout = BIDSLayout(
+            str(local_path), derivatives=True, 
+            suffix='bold', extension='nii.gz'
+            )
+
     if task_name not in layout.get_tasks():
         raise ValueError("Task {} not found in dataset {}".format(
             task_name, local_path))
@@ -189,8 +195,9 @@ def add_task(task_name, dataset_name, local_path,
 
     local_path = Path(local_path)
 
-    all_runs = layout.get(task=task_name, suffix='bold', extension='nii.gz',
-                          scope='raw', **kwargs)
+    all_runs = base_layout.get(
+        task=task_name, suffix='bold', extension='nii.gz',
+        scope='raw', **kwargs)
 
     if new_task or reingest:
         # Pull first run's metadata as representative

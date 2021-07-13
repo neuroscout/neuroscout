@@ -103,7 +103,7 @@ def setup_dataset(preproc_address, raw_address=None, path=None,
                 str(derivatives / preproc_path.stem))
 
     # Extract dataset summary
-    layout = BIDSLayout(dataset_path)
+    layout = BIDSLayout(dataset_path, suffix='bold', extension='nii.gz')
 
     # Extract tasks and task summaries
     tasks = {}
@@ -166,6 +166,9 @@ def ingest_from_json(config_file, reingest=False):
         reingest=reingest
     )
 
+    layout = BIDSLayout(str(local_path), derivatives=True,
+                        suffix='bold', extension='nii.gz')
+
     task_ids = []
     for task_name, params in config['tasks'].items():
         """ Add task to database"""
@@ -174,6 +177,7 @@ def ingest_from_json(config_file, reingest=False):
             dataset_name,
             local_path,
             reingest=reingest,
+            layout=layout,
             **params)
         task_ids.append(task_id)
 
