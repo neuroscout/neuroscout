@@ -84,8 +84,8 @@ def setup_dataset(preproc_address, raw_address=None, path=None,
         )
 
         # Get all json and tsv files in dataset
-        get([str(p) for p in preproc_address.rglob('*.json')])
-        get([str(p) for p in preproc_address.rglob('*.tsv')])
+        get([str(p) for p in preproc_path.rglob('*.json')])
+        get([str(p) for p in preproc_path.rglob('*.tsv')])
 
         # Set preproc path
         if preproc_path.stem not in ['fmriprep', 'preproc']:
