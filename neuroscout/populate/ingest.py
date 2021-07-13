@@ -125,7 +125,7 @@ def add_dataset(dataset_name, dataset_summary, preproc_address, local_path,
 
     local_path = Path(local_path)
 
-    with (local_path / 'dataset_description.json'.open() as f:
+    with (local_path / 'dataset_description.json').open() as f:
         description = json.load(f)
 
     # Get or create dataset model from name
