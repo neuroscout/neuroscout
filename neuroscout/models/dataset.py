@@ -51,7 +51,7 @@ class Dataset(db.Model):
         except ValueError:
             return None
 
-        if val:
+        if vals:
             return statistics.mean(vals)
         else:
             return None
