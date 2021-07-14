@@ -112,12 +112,13 @@ def setup_dataset(preproc_address, raw_address=None, path=None,
             summary = layout.get(task=t, extension='nii.gz')[0].get_metadata()['TaskDescription']
         except KeyError:
             summary = ""
-
+        print(summary)
         tasks[t] = {
             "summary": summary,
             **kwargs
         }
 
+    print(dataset_summary)
     # Create template JSON file
     template = {
         "name": dataset_name,
