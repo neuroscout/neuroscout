@@ -52,7 +52,7 @@ class Dataset(db.Model):
             return None
 
         if val:
-            return statistics.mean(val)
+            return statistics.mean(vals)
         else:
             return None
 
