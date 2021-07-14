@@ -37,10 +37,19 @@ class Dataset(db.Model):
 
     @hybrid_property
     def mean_age(self):
-        val = GroupPredictorValue.query.join(GroupPredictor).filter_by(
-            dataset_id=self.id, name='age').values('value')
-        age_map = {'20-25': 22.5, '25-30': 27.5, '30-35': 32.5, '35-40': 37.5}
-        val = [age_map[v[0]] if v[0] in age_map else float(v[0]) for v in val]
+        try:
+            val = GroupPredictorValue.query.join(GroupPredictor).filter_by(
+                dataset_id=self.id, name='age').values('value')
+            # Translating age ranges to
+            age_map = {'20-25': 22.5, '25-30': 27.5, '30-35': 32.5, '35-40': 37.5}
+            vals = []
+            for v in val:
+                if v[0] in age_map:
+                    vals.append(age_map[v[0]])
+                else:
+                    vals += [float(v) for v in v.split(",")]
+        except ValueError:
+            return None
 
         if val:
             return statistics.mean(val)
