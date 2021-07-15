@@ -218,7 +218,7 @@ def add_task(task_name, dataset_name, local_path,
     print("Parsing runs")
     for img in tqdm(all_runs):
         if auto_fetch:
-            get(img)
+            get(img.path)
 
         """ Extract Run information """
         # Get entities
