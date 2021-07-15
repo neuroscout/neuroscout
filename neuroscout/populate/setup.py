@@ -118,7 +118,6 @@ def setup_dataset(preproc_address, raw_address=None, path=None,
             **kwargs
         }
 
-    print(dataset_summary)
     # Create template JSON file
     template = {
         "name": dataset_name,
