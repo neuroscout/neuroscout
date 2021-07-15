@@ -139,11 +139,12 @@ def setup_dataset(preproc_address, raw_address=None, path=None,
     return str(config_file_path)
 
 
-def ingest_from_json(config_file, reingest=False):
+def ingest_from_json(config_file, reingest=False, auto_fetch=False):
     """ Adds a dataset from a JSON configuration file
         Args:
             config_file - a path to a json file
             reingest - force reingest tasks
+            auto_fetch - Automatically fetch and then drop nifti files
         Output:
             list of dataset model ids
     """
@@ -152,7 +153,7 @@ def ingest_from_json(config_file, reingest=False):
         config = json.load(f)
 
     dataset_name = config['name']
-    local_path = config['path']
+    local_path = config['path']        
 
     # Add dataset
     dataset_id = add_dataset(
@@ -178,8 +179,9 @@ def ingest_from_json(config_file, reingest=False):
             local_path,
             reingest=reingest,
             layout=layout,
+            auto_fetch=auto_fetch,
             **params)
-        task_ids.append(task_id)
+        task_ids.append(task_id)  
 
     # Add bibliography entry
     add_to_bibliography(dataset_name, config['bib_entries'])

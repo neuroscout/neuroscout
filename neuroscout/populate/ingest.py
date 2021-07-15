@@ -20,6 +20,7 @@ from ..models import (
 from ..database import db
 from tqdm import tqdm
 from .annotate import PredictorSerializer
+from datalad.api import drop, get
 
 
 def add_predictor_collection(collection, dataset_id, run_id,
@@ -155,7 +156,7 @@ def add_dataset(dataset_name, dataset_summary, preproc_address, local_path,
 def add_task(task_name, dataset_name, local_path,
              include_predictors=None, exclude_predictors=None,
              reingest=False, scan_length=1000,
-             summary=None, layout=None, **kwargs):
+             summary=None, layout=None, auto_fetch=False, **kwargs):
     """ Adds a BIDS dataset task to the database.
         Args:
             task_name - task to add
@@ -216,6 +217,9 @@ def add_task(task_name, dataset_name, local_path,
     """ Parse every Run """
     print("Parsing runs")
     for img in tqdm(all_runs):
+        if auto_fetch:
+            get(img)
+
         """ Extract Run information """
         # Get entities
         entities = {entity: getattr(img, entity)
@@ -287,5 +291,8 @@ def add_task(task_name, dataset_name, local_path,
                     onset=stims.onset.tolist()[i])
                 runstim.duration = stims.duration.tolist()[i]
                 db.session.commit()
+
+        if auto_fetch:
+            drop(img)
 
     return task_model.id
