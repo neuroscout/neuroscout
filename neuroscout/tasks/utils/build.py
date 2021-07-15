@@ -1,4 +1,5 @@
 import json
+import re
 import numpy as np
 import pandas as pd
 from flask import current_app
@@ -123,8 +124,9 @@ def _load_cached_layout(bids_dir, dataset_id):
             'extension': ['nii.gz'],
             'suffix': 'bold',
         }
+        patt = re.compile('(.*desc-confounds_regressors.*)')
         indexer = BIDSLayoutIndexer(
-            validate=False, ignore='/(.*desc-confounds_regressors.tsv)/', 
+            validate=False, ignore=patt, 
             **metadata_filter)
         bids_layout = BIDSLayout(bids_dir, database_path=layout_path,
                                  indexer=indexer)
