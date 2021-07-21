@@ -1267,9 +1267,7 @@ export default class AnalysisBuilder extends React.Component<
           if (!this.props.userOwns && editableStatus.includes(data.status)) {
             editableStatus = []
           }
-          if (editableStatus.includes(data.status)) {
-            this.setState({ model: this.buildModel() })
-          }
+          this.setState({ model: this.buildModel() })
           if (data.status === 'FAILED') {
             this.setState({ activeTab: 'submit' })
           }
