@@ -1598,29 +1598,31 @@ export default class AnalysisBuilder extends React.Component<
                       </div>
                     )}
                 </TabPane>
-                <TabPane
-                  tab={isEditable ? 'Run' : 'Status'}
-                  key="submit"
-                  disabled={!submitActive && isDraft}>
-                  <h2>Finalize and Run</h2>
-                  <StatusTab
-                    status={analysis.status}
-                    name={analysis.name}
-                    analysisId={analysis.analysisId}
-                    confirmSubmission={this.confirmSubmission}
-                    private={analysis.private || false}
-                    updateAnalysis={this.updateAnalysis}
-                    userOwns={this.props.userOwns}
-                    modified_at={analysis.modified_at}>
-                    {this.props.userOwns && (
-                      <EditDetails
-                        name={analysis.name}
-                        description={analysis.description}
-                        updateAnalysis={this.updateAnalysis}
-                      />
-                    )}
-                  </StatusTab>
-                </TabPane>
+                {!(isDraft && !this.props.userOwns) && (
+                  <TabPane
+                    tab={isEditable ? 'Run' : 'Status'}
+                    key="submit"
+                    disabled={!submitActive && isDraft}>
+                    <h2>Finalize and Run</h2>
+                    <StatusTab
+                      status={analysis.status}
+                      name={analysis.name}
+                      analysisId={analysis.analysisId}
+                      confirmSubmission={this.confirmSubmission}
+                      private={analysis.private || false}
+                      updateAnalysis={this.updateAnalysis}
+                      userOwns={this.props.userOwns}
+                      modified_at={analysis.modified_at}>
+                      {this.props.userOwns && (
+                        <EditDetails
+                          name={analysis.name}
+                          description={analysis.description}
+                          updateAnalysis={this.updateAnalysis}
+                        />
+                      )}
+                    </StatusTab>
+                  </TabPane>
+                )}
                 {!isEditable && (
                   <TabPane tab="Bibliography" key="bib">
                     <h2>Bibliography</h2>
