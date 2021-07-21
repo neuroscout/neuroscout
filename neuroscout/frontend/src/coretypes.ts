@@ -214,6 +214,7 @@ export interface Store {
   doTooltip: boolean
   user?: UserStore
   extractorDescriptions: ExtractorDescriptions
+  loadingAnalysis: boolean
 }
 
 export interface ApiRun {

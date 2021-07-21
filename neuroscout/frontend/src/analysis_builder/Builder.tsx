@@ -18,6 +18,7 @@ import {
   Input,
   Collapse,
   Form,
+  Skeleton,
 } from 'antd'
 
 import { api } from '../api'
@@ -150,6 +151,7 @@ const initializeStore = (): Store => ({
   analysis404: false,
   doTooltip: false,
   extractorDescriptions: {},
+  loadingAnalysis: true,
 })
 
 // Get list of tasks from a given dataset
@@ -1013,12 +1015,13 @@ export default class AnalysisBuilder extends React.Component<
               */
               if (
                 !(
-                  updatedAnalysis &&
-                  updatedAnalysis.model &&
-                  updatedAnalysis.model.Input &&
-                  updatedAnalysis.model.Input.Task &&
-                  analysis.predictorIds.length &&
-                  (analysis.contrasts.length || analysis.transformations.length)
+                  (updatedAnalysis &&
+                    updatedAnalysis.model &&
+                    updatedAnalysis.model.Input &&
+                    updatedAnalysis.model.Input.Task) ||
+                  (analysis.predictorIds.length &&
+                    (analysis.contrasts.length ||
+                      analysis.transformations.length))
                 )
               ) {
                 if (availTasks.length === 1) {
@@ -1283,12 +1286,17 @@ export default class AnalysisBuilder extends React.Component<
           ) {
             const tab = localStorage.getItem('tab')
             if (!!tab && tabOrder.includes(tab)) {
-              this.setState({ activeTab: tab as TabName })
+              this.setState({
+                activeTab: tab as TabName,
+              })
               this.postTabChange(tab as TabName)
             }
           }
+          this.setState({ loadingAnalysis: false })
         })
         .catch(displayError)
+    } else {
+      this.setState({ loadingAnalysis: false })
     }
     void api.getExtractorDescriptions().then(response => {
       this.setState({ extractorDescriptions: response })
@@ -1303,6 +1311,16 @@ export default class AnalysisBuilder extends React.Component<
   render() {
     if (this.state.analysis404) {
       return <Redirect to="/builder/" />
+    } else if (this.state.loadingAnalysis) {
+      return (
+        <div className="App">
+          <Row justify="center" style={{ background: '#fff', padding: 0 }}>
+            <MainCol>
+              <Skeleton avatar paragraph={{ rows: 12 }} active={true} />
+            </MainCol>
+          </Row>
+        </div>
+      )
     }
 
     if (this.props.userOwns) {
@@ -1331,7 +1349,11 @@ export default class AnalysisBuilder extends React.Component<
     }
 
     const reportRuns = this.state.availableRuns
-      .filter(x => this.state.analysis.runIds.find(runId => runId === x.id))
+      .filter(x =>
+        this.state.analysis.runIds.find(
+          runId => runId === x.id && this.state.selectedTaskId === x.task,
+        ),
+      )
       .sort(sortSub)
     const isDraft = analysis.status === 'DRAFT'
     const isFailed = analysis.status === 'FAILED'
