@@ -200,7 +200,7 @@ export class Report extends React.Component<ReportProps, ReportState> {
   _timer: any = null
 
   generateReport = (scale?: boolean): void => {
-    const id = this.props.analysisId
+    const id = String(this.props.analysisId)
     let scale_param = ''
     if (scale === undefined) {
       scale_param =
@@ -210,9 +210,9 @@ export class Report extends React.Component<ReportProps, ReportState> {
     } else {
       scale_param = `&scale=${String(scale)}`
     }
-    const url = `${domainRoot}/api/analyses/${String(
-      id,
-    )}/report?run_id=${String(this.state.selectedRunIds)}${scale_param}`
+    const url = `${domainRoot}/api/analyses/${id}/report?run_id=${String(
+      this.state.selectedRunIds,
+    )}${scale_param}`
     void jwtFetch(url, { method: 'POST' }).then(res => {
       // Not sure what we want to do on failure here.
     })
@@ -243,51 +243,50 @@ export class Report extends React.Component<ReportProps, ReportState> {
     }
 
     const state = { ...this.state }
-    void jwtFetch(
-      `${domainRoot}/api/analyses/${id}/report?run_id=${String(
-        this.state.selectedRunIds,
-      )}`,
-    ).then(res => {
-      if (res.warnings) {
-        state.warnings = res.warnings
-      } else {
-        state.warnings = []
-      }
+    const ids = String(this.state.selectedRunIds)
+    void jwtFetch(`${domainRoot}/api/analyses/${id}/report?run_id=${ids}`).then(
+      res => {
+        if (res.warnings) {
+          state.warnings = res.warnings
+        } else {
+          state.warnings = []
+        }
 
-      if (res.status === 'OK') {
-        if (res.result === undefined) {
+        if (res.status === 'OK') {
+          if (res.result === undefined) {
+            return
+          }
+          let scale = false
+          if (this.state.scale !== undefined) {
+            scale = this.state.scale
+          } else if (res.scale !== null) {
+            scale = res.scale
+          }
+          state.scale = scale
+
+          state.matrices = res.result.design_matrix
+          state.plots = res.result.design_matrix_plot
+          state.corr_plots = res.result.design_matrix_corrplot
+          state.reportTimestamp = res.generated_at
+          if (res.traceback) {
+            state.reportTraceback = res.traceback
+          } else {
+            state.reportTraceback = ''
+          }
+        } else if (res.status === 'FAILED') {
+          state.reportTraceback = res.traceback
+          this.setState({ reportsPosted: true })
+        } else if (res.statusCode === 404 && !this.state.reportsPosted) {
+          this.generateReport(false)
+          this.setState({ reportsPosted: true, reportsLoaded: false })
+          return
+        } else {
           return
         }
-        let scale = false
-        if (this.state.scale !== undefined) {
-          scale = this.state.scale
-        } else if (res.scale !== null) {
-          scale = res.scale
-        }
-        state.scale = scale
-
-        state.matrices = res.result.design_matrix
-        state.plots = res.result.design_matrix_plot
-        state.corr_plots = res.result.design_matrix_corrplot
-        state.reportTimestamp = res.generated_at
-        if (res.traceback) {
-          state.reportTraceback = res.traceback
-        } else {
-          state.reportTraceback = ''
-        }
-      } else if (res.status === 'FAILED') {
-        state.reportTraceback = res.traceback
-        this.setState({ reportsPosted: true })
-      } else if (res.statusCode === 404 && !this.state.reportsPosted) {
-        this.generateReport(false)
-        this.setState({ reportsPosted: true, reportsLoaded: false })
-        return
-      } else {
-        return
-      }
-      state.reportsLoaded = true
-      this.setState({ ...state })
-    })
+        state.reportsLoaded = true
+        this.setState({ ...state })
+      },
+    )
   }
 
   updateSelectedRunIds = (values: string[]) => {
@@ -302,11 +301,9 @@ export class Report extends React.Component<ReportProps, ReportState> {
     }
 
     if (this.state.compileLoaded === false) {
-      const id = this.props.analysisId
+      const id = String(this.props.analysisId)
       const state = { ...this.state }
-      void jwtFetch(
-        `${domainRoot}/api/analyses/String(${String(id)})/compile`,
-      ).then(res => {
+      void jwtFetch(`${domainRoot}/api/analyses/${id}/compile`).then(res => {
         state.status = res.status
         state.compileLoaded = true
         this.setState({ ...state })
