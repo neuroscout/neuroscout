@@ -5,10 +5,11 @@ import * as React from 'react'
 import { Divider, Row, Col, Button, Card } from 'antd'
 import { MainCol } from './HelperComponents'
 import { UserStore } from './user'
+import { BookOutlined } from '@ant-design/icons'
 
 const titleStyle: any = {
   textAlign: 'center' as React.CSSProperties,
-  fontSize: '20px',
+  fontSize: '22px',
   padding: '0px 0px 0px 0px',
 }
 
@@ -39,7 +40,6 @@ class Home extends React.Component<UserStore, Record<string, never>> {
                   href="/public">
                   Browse public analyses
                 </Button>{' '}
-                <br />
                 {this.props.loggedIn === false && (
                   <Button
                     size="large"
@@ -51,11 +51,32 @@ class Home extends React.Component<UserStore, Record<string, never>> {
                 )}
               </div>
             </div>
-            <br />
             <Divider />
           </MainCol>
         </Row>
-
+        <Row justify="center" style={{ background: '#fff', padding: 0 }}>
+          <Col
+            xxl={{ span: 5 }}
+            xl={{ span: 6 }}
+            lg={{ span: 7 }}
+            xs={{ span: 8 }}>
+            <div className="stat-container">
+              <div className="stat-title">Active Datasets</div>
+              <div className="stat-value">12</div>
+            </div>
+          </Col>
+          <Col
+            xxl={{ span: 5 }}
+            xl={{ span: 6 }}
+            lg={{ span: 7 }}
+            xs={{ span: 8 }}>
+            <div className="stat-container">
+              <div className="stat-title">Number of Tasks</div>
+              <div className="stat-value">25</div>
+            </div>
+          </Col>
+        </Row>
+        <br />
         <Row justify="center" style={{ background: '#fff', padding: 0 }}>
           <Col
             xxl={{ span: 5 }}
@@ -68,10 +89,12 @@ class Home extends React.Component<UserStore, Record<string, never>> {
               bordered={false}>
               <img className="splashLogo" src="/static/browse.svg" />
               <br />
-              Select from openly available naturalistic fMRI datasets, from
-              sources such as
-              <a href="https://openneuro.org/"> OpenNeuro</a> and{' '}
-              <a href="https://datalad.org/">DataLad</a>.
+              <div className="introCardsText">
+                Select from openly available naturalistic fMRI datasets, from
+                sources such as
+                <a href="https://openneuro.org/"> OpenNeuro</a> and{' '}
+                <a href="https://datalad.org/">DataLad</a>.
+              </div>
             </Card>
           </Col>
 
@@ -86,11 +109,11 @@ class Home extends React.Component<UserStore, Record<string, never>> {
               bordered={false}>
               <img className="splashLogo" src="/static/design.svg" />
               <br />
-              Browse hundreds of annotations automatically extracted from
-              stimuli using <strong>
-                state-of-the-art machine learning
-              </strong>{' '}
-              algorithms, such as Google Cloud Vision, IBM Watson, and more.
+              <div className="introCardsText">
+                Browse hundreds of annotations automatically extracted from
+                stimuli using <strong>state-of-the-art machine learning</strong>{' '}
+                platforms, such as Google Cloud Vision, TensorFlow and more.
+              </div>
             </Card>
           </Col>
 
@@ -105,10 +128,13 @@ class Home extends React.Component<UserStore, Record<string, never>> {
               bordered={false}>
               <img className="splashLogo" src="/static/share.svg" />
               <br />
-              Portable BIDS pipelines enable execution with no configuration.
-              Results are automatically uploaded to
-              <a href="https://neurovault.org/"> NeuroVault</a> for easy
-              sharing.
+              <div className="introCardsText">
+                Portable BIDS pipelines enable{' '}
+                <strong>execution with no configuration</strong>. Results are
+                automatically uploaded to
+                <a href="https://neurovault.org/"> NeuroVault</a> for easy
+                sharing.
+              </div>
             </Card>
           </Col>
         </Row>
@@ -120,22 +146,35 @@ class Home extends React.Component<UserStore, Record<string, never>> {
                 size="large"
                 className="splashButton"
                 href="https://neuroscout.github.io/neuroscout/">
+                <BookOutlined />
                 Learn more
               </Button>
             </div>
-
-            <br />
-            <Divider />
+          </MainCol>
+        </Row>
+        <Row justify="center" style={{ background: '#fff', padding: 0 }}>
+          <MainCol>
+            <Card
+              title="Support provided by"
+              headStyle={titleStyle}
+              bordered={false}>
+              <Row justify="center">
+                <Col span={5}>
+                  <img className="instLogo2" src="/static/utlogo.png" />
+                </Col>
+                <Col span={5} offset={3}>
+                  <img className="instLogo2" src="/static/nihlogo.png" />
+                </Col>
+              </Row>
+            </Card>
           </MainCol>
         </Row>
         <Row justify="center" style={{ background: '#fff', padding: 0 }}>
           <MainCol>
             <div className="footerText">
               <p>
-                Created by the Psychoinformatics Lab at the University of Texas
-                at Austin. Supported by NIH award R01MH109682-03.
-                <br />
-                Icons by Smashicons from www.flaticon.com
+                Supported by NIH award R01MH109682-03. Icons by Smashicons from
+                www.flaticon.com
               </p>
             </div>
           </MainCol>
