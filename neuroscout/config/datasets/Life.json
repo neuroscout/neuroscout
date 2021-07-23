@@ -1,23 +1,14 @@
 {
-  "Life": {
+    "name": "Life",
     "dataset_address": "///labs/haxby/life",
     "preproc_address": "https://github.com/neuroscout-datasets/life-local",
-    "path": "/datasets/raw/life/",
+    "path": "/datasets/raw/Life/",
     "summary": "Four segments of the Life nature documentary",
     "long_description": "Participants watched four segments of the Life nature documentary, narrated by David Attenborough. Due to the nature of the stimulus, no faces were presented to participants.",
     "url": "http://datasets.datalad.org/?dir=/labs/haxby/life",
     "tasks": {
-      "life": {
-        "summary": "AV Presentation",
-        "converters": [
-        ],
-        "extractors": [
-          ],
-        "tokenized_extractors": [
-        ],
-        "transformations":[
-        ]
-      }
+        "life": {
+            "summary": "AV Presentation"
+        }
     }
-  }
 }

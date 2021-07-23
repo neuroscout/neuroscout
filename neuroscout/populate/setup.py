@@ -140,6 +140,32 @@ def setup_dataset(preproc_address, raw_address=None, path=None,
     return str(config_file_path)
 
 
+def convert_config(config_file):
+    with open(config_file, 'r') as f:
+        config = json.load(f)
+        
+    dataset_name = list(config.keys())[0]
+    sub_dict = config[dataset_name]
+    
+    new_dict = {'name': dataset_name, **sub_dict}
+    
+    tasks = sub_dict.pop('tasks')
+    
+    new_tasks = {}
+    for name, values in tasks.items():
+        for k in  ['converters' , 'extractors', 'tokenized_extractors', 'transformations']:
+            values.pop(k, None)
+            
+        if 'ingest_args' in values and (not values.get('ingest_args')):
+            values.pop('ingest_args')
+        new_tasks[name] = values
+        
+    new_dict['tasks'] = new_tasks
+    
+    with open(config_file, 'w') as f:
+        json.dump(new_dict, f, indent=4)
+
+
 def ingest_from_json(config_file, reingest=False, auto_fetch=False):
     """ Adds a dataset from a JSON configuration file
         Args:
@@ -196,7 +222,7 @@ def extract_from_json(extract_config, dataset_name=None, task_name=None):
 
     Args:
         extract_config: JSON specifying the arguments to each step
-          See: config/extract for examples
+          See: config/transformers.json for full example
         dataset_name: dataset name. If none, applied to all datasets / tasks
         task_name: If dataset_name is specified, can apply to specific task
     """
