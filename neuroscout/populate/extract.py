@@ -200,7 +200,7 @@ def extract_features(graphs, dataset_name=None, task_name=None, n_jobs=1,
     """ Extract features using pliers for a dataset/task
         Args:
             graphs - List of Graphs to apply to stimuli
-            dataset_name - dataset name
+            dataset_name - dataset name (optional;)
             task_name - task name (optional)
             serializer_kwargs - Arguments to pass to FeatureSerializer
         Output:
@@ -213,32 +213,32 @@ def extract_features(graphs, dataset_name=None, task_name=None, n_jobs=1,
         return [extract_features(
             graphs, dataset.name, None, **serializer_kwargs)
                 for dataset in Dataset.query.filter_by(active=True)]
-    else:
-        # Load Pliers Graph objects
-        graphs = [Graph(g) for g in graphs]
 
-        stims = _query_stim_models(dataset_name, task_name, graphs=graphs)
+    # Load Pliers Graph objects
+    graphs = [Graph(g) for g in graphs]
 
-        # Apply graphs to each stim_object in parallel
-        with parallel_backend('multiprocessing'):
-            with tqdm_joblib(tqdm(desc="Extracting...", total=len(stims))):
-                results = Parallel(n_jobs=n_jobs)(
-                    delayed(_extract_to_serial)(
-                        graphs, s, serializer) for s in stims)
+    stims = _query_stim_models(dataset_name, task_name, graphs=graphs)
 
-        # Flatten
-        results = [item for sublist in results for item in sublist]
+    # Apply graphs to each stim_object in parallel
+    with parallel_backend('multiprocessing'):
+        with tqdm_joblib(tqdm(desc="Extracting...", total=len(stims))):
+            results = Parallel(n_jobs=n_jobs)(
+                delayed(_extract_to_serial)(
+                    graphs, s, serializer) for s in stims)
 
-        if not results:
-            raise ValueError("No features could be extracted")
+    # Flatten
+    results = [item for sublist in results for item in sublist]
 
-        # Insert resultsw to db as ExtractedFeatures
-        ext_feats = _create_efs(results)
+    if not results:
+        raise ValueError("No features could be extracted")
 
-        # Create Predictors for ExtractedFeatures
-        return create_predictors(
-            [ef for ef in ext_feats.values() if ef.active],
-            dataset_name, task_name)
+    # Insert resultsw to db as ExtractedFeatures
+    ext_feats = _create_efs(results)
+
+    # Create Predictors for ExtractedFeatures
+    return create_predictors(
+        [ef for ef in ext_feats.values() if ef.active],
+        dataset_name, task_name)
 
 
 def _load_complex_text_stim_models(dataset_name, task_name=None):
@@ -295,10 +295,20 @@ def _window_stim(cts, n):
     return slices
 
 
-def extract_tokenized_features(dataset_name, extractors, task_name=None):
+def extract_tokenized_features(extractors, dataset_name=None, task_name=None):
     """ Extract features that require a ComplexTextStim to give context to
     individual words within a run """
+
+    if dataset_name is None:
+        return [extract_features(
+            extractors, dataset.name, None)
+                for dataset in Dataset.query.filter_by(active=True)]
+
     stims = _load_complex_text_stim_models(dataset_name, task_name)
+
+    if not stims:
+        print(f"Dataset {dataset_name} has no matching stimuli")
+        return None
 
     results = []
     # For every extractor, extract from complex stims

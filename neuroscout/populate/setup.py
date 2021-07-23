@@ -12,6 +12,7 @@ from pathlib import Path
 from datalad.api import install, get
 from datalad.distribution.utils import _get_installationpath_from_url
 from bids.layout import BIDSLayout
+from ..models import Dataset
 
 
 def setup_dataset(preproc_address, raw_address=None, path=None,
@@ -189,34 +190,51 @@ def ingest_from_json(config_file, reingest=False, auto_fetch=False):
     return dataset_id
 
 
-def extract_from_json(dataset_name, tasks, config):  
-    ## TODO: Use list of datasets and tasks to filter candidate tasks, and then apply to all
+def extract_from_json(extract_config, dataset_name=None, task_name=None):
+    """ Applies JSON file specifying conversion and extractions to
+    specifed tasks.
+
+    Args:
+        extract_config: JSON specifying the arguments to each step
+          See: config/extract for examples
+        dataset_name: dataset name. If none, applied to all datasets / tasks
+        task_name: If dataset_name is specified, can apply to specific task
+    """
+
+    if dataset_name is None and task_name is not None:
+        raise Exception(
+            "If no dataset_name is specified, no task_name can be set.")
+
+    with open(extract_config, 'r') as f:
+        config = json.load(f)
 
     """ Convert stimuli """
-    converters = params.get('converters', None)
+    converters = config.get('converters', None)
     if converters:
         print("Converting... {}".format(converters))
-        convert_stimuli(dataset_name, task_name, converters)
+        convert_stimuli(converters, dataset_name, task_name)
 
     """ Extract features from applicable stimuli """
-    extractor_graphs = params.get('extractors', None)
+    extractor_graphs = config.get('extractors', None)
     if extractor_graphs:
         print("Extracting...")
-        extract_features(
-            extractor_graphs, dataset_name, task_name)
+        extract_features(extractor_graphs, dataset_name, task_name)
 
     """ Extract features that require pre-tokenization """
-    tokenized_extractors = params.get('tokenized_extractors', None)
+    tokenized_extractors = config.get('tokenized_extractors', None)
     if tokenized_extractors:
         print("Tokenizing and extracting... {}".format(
             tokenized_extractors))
         extract_tokenized_features(
-            dataset_name, task_name, tokenized_extractors)
+            tokenized_extractors, dataset_name, task_name)
 
     """ Apply transformations """
-    transformations = params.get("transformations", [])
-    post = Postprocessing(dataset_name, task_name)
+    transformations = config.get("transformations", [])
+
+    dataset_names = [dataset_name] if dataset_name else \
+        [d.name for d in Dataset.query.filter_by(active=True)]
     for args in transformations:
         print("Applying transformation... {}".format(args))
-        post = Postprocessing(dataset_name, task_name)
-        post.apply_transformation(**args)
+        for name in dataset_names:
+            post = Postprocessing(dataset_name, task_name)
+            post.apply_transformation(**args)
