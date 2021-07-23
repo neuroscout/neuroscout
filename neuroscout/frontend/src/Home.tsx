@@ -62,7 +62,7 @@ class Home extends React.Component<UserStore, Record<string, never>> {
             xs={{ span: 8 }}>
             <div className="stat-container">
               <div className="stat-title">Active Datasets</div>
-              <div className="stat-value">12</div>
+              <div className="stat-value">13/div>
             </div>
           </Col>
           <Col
@@ -72,7 +72,7 @@ class Home extends React.Component<UserStore, Record<string, never>> {
             xs={{ span: 8 }}>
             <div className="stat-container">
               <div className="stat-title">Number of Tasks</div>
-              <div className="stat-value">25</div>
+              <div className="stat-value">40</div>
             </div>
           </Col>
         </Row>
