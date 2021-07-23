@@ -1,12 +1,320 @@
 {
-  "name": "narratives",
-  "dataset_address": "///labs/hasson/narratives",
-  "preproc_address": "///labs/hasson/narratives/derivatives/fmriprep",
-  "path": "/datasets/raw/narratives",
-  "url": "https://openneuro.org/datasets/ds002345/",
-  "summary": "Narratives: fMRI data for evaluating models of naturalistic language comprehension",
-  "long_description": "The 'Narratives' collection aggregates auditory story-listening fMRI datasets acquired over the course of roughly seven years (2011–2018). Stimuli comprised 28 naturalistic spoken stories ranging from ~3 to ~56 minutes for a total of ~5 hours of unique audio stimuli. The collection includes 345 unique subjects participating in over 750 functional scans with accompanying anatomical data. This re-release of the dataset follows on ds002245 v.1.0.3 and fixes some issues with cropped and redundant T1w anatomical images.",
-  "tasks": {
-    "task_name": {
-      "summary": "task_summary"
-  }
+    "name": "narratives",
+    "dataset_address": "///labs/hasson/narratives/",
+    "preproc_address": "////labs/hasson/narratives/derivatives/fmriprep",
+    "path": "/datasets/raw/narratives",
+    "url": "https://openneuro.org/datasets/ds002345/",
+    "summary": "Narratives: fMRI data for evaluating models of naturalistic language comprehension",
+    "long_description": "The 'Narratives' collection aggregates auditory story-listening fMRI datasets acquired over the course of roughly seven years. Stimuli comprised 28 naturalistic spoken stories ranging from ~3 to ~56 minutes for a total of ~5 hours of unique audio stimuli. The collection includes 345 unique subjects participating in over 750 functional scans with accompanying anatomical data. This re-release of the dataset follows on ds002245 v.1.0.3 and fixes some issues with cropped and redundant T1w anatomical images.",
+    "tasks": {
+        "21styear": {
+            "summary": "Passively listened to audio story '21styear'"
+        },
+        "black": {
+            "summary": "Passively listened to audio story 'black'"
+        },
+        "bronx": {
+            "summary": "Passively listened to audio story 'bronx'"
+        },
+        "forgot": {
+            "summary": "Passively listened to audio story 'forgot'"
+        },
+        "lucy": {
+            "summary": "Passively listened to audio story 'lucy'"
+        },
+        "merlin": {
+            "summary": "Passively listened to audio story 'merlin'"
+        },
+        "notthefallintact": {
+            "summary": "Passively listened to audio story 'notthefallintact'"
+        },
+        "notthefalllongscram": {
+            "summary": "Passively listened to audio story 'notthefalllongscram'"
+        },
+        "notthefallshortscram": {
+            "summary": "Passively listened to audio story 'notthefallshortscram'"
+        },
+        "pieman": {
+            "summary": "Passively listened to audio story 'pieman'"
+        },
+        "piemanpni": {
+            "summary": "Passively listened to audio story 'piemanpni'"
+        },
+        "prettymouth": {
+            "summary": "Passively listened to audio story 'prettymouth'"
+        },
+        "schema": {
+            "summary": "Passively listened to audio story 'schema'"
+        },
+        "shapesphysical": {
+            "summary": "Passively listened to audio story 'shapesphysical'"
+        },
+        "shapessocial": {
+            "summary": "Passively listened to audio story 'shapessocial'"
+        },
+        "sherlock": {
+            "summary": "Passively listened to audio story 'sherlock'"
+        },
+        "slumlordreach": {
+            "summary": "Passively listened to audio story 'slumlordreach'"
+        },
+        "tunnel": {
+            "summary": "Passively listened to audio story 'tunnel'"
+        }
+    },
+    "bib_entries": [
+        {
+            "author": [
+                {
+                    "given": "Samuel A.",
+                    "family": "Nastase"
+                },
+                {
+                    "given": "Yun-Fei",
+                    "family": "Liu"
+                },
+                {
+                    "given": "Hanna",
+                    "family": "Hillman"
+                },
+                {
+                    "given": "Asieh",
+                    "family": "Zadbood"
+                },
+                {
+                    "given": "Liat",
+                    "family": "Hasenfratz"
+                },
+                {
+                    "given": "Neggin",
+                    "family": "Keshavarzian"
+                },
+                {
+                    "given": "Janice",
+                    "family": "Chen"
+                },
+                {
+                    "given": "Christopher J.",
+                    "family": "Honey"
+                },
+                {
+                    "given": "Yaara",
+                    "family": "Yeshurun"
+                },
+                {
+                    "given": "Mor",
+                    "family": "Regev"
+                },
+                {
+                    "given": "Mai",
+                    "family": "Nguyen"
+                },
+                {
+                    "given": "Claire H. C.",
+                    "family": "Chang"
+                },
+                {
+                    "given": "Christopher",
+                    "family": "Baldassano"
+                },
+                {
+                    "given": "Olga",
+                    "family": "Lositsky"
+                },
+                {
+                    "given": "Erez",
+                    "family": "Simony"
+                },
+                {
+                    "given": "Michael A.",
+                    "family": "Chow"
+                },
+                {
+                    "given": "Yuan Chang",
+                    "family": "Leong"
+                },
+                {
+                    "given": "Paula P.",
+                    "family": "Brooks"
+                },
+                {
+                    "given": "Emily",
+                    "family": "Micciche"
+                },
+                {
+                    "given": "Gina",
+                    "family": "Choe"
+                },
+                {
+                    "given": "Ariel",
+                    "family": "Goldstein"
+                },
+                {
+                    "given": "Tamara",
+                    "family": "Vanderwal"
+                },
+                {
+                    "given": "Yaroslav O.",
+                    "family": "Halchenko"
+                },
+                {
+                    "given": "Kenneth A.",
+                    "family": "Norman"
+                },
+                {
+                    "given": "Uri",
+                    "family": "Hasson"
+                }
+            ],
+            "DOI": "10.18112/openneuro.ds002345.v1.1.4",
+            "type": "dataset",
+            "id": "ds002345:1.1.4",
+            "citation-label": "ds002345:1.1.4",
+            "issued": {
+                "date-parts": [
+                    [
+                        2020
+                    ]
+                ]
+            },
+            "publisher": "OpenNeuro",
+            "title": "\"Narratives\"",
+            "_graph": [
+                {
+                    "type": "@csl/list+object",
+                    "data": [
+                        {
+                            "author": [
+                                {
+                                    "given": "Samuel A.",
+                                    "family": "Nastase"
+                                },
+                                {
+                                    "given": "Yun-Fei",
+                                    "family": "Liu"
+                                },
+                                {
+                                    "given": "Hanna",
+                                    "family": "Hillman"
+                                },
+                                {
+                                    "given": "Asieh",
+                                    "family": "Zadbood"
+                                },
+                                {
+                                    "given": "Liat",
+                                    "family": "Hasenfratz"
+                                },
+                                {
+                                    "given": "Neggin",
+                                    "family": "Keshavarzian"
+                                },
+                                {
+                                    "given": "Janice",
+                                    "family": "Chen"
+                                },
+                                {
+                                    "given": "Christopher J.",
+                                    "family": "Honey"
+                                },
+                                {
+                                    "given": "Yaara",
+                                    "family": "Yeshurun"
+                                },
+                                {
+                                    "given": "Mor",
+                                    "family": "Regev"
+                                },
+                                {
+                                    "given": "Mai",
+                                    "family": "Nguyen"
+                                },
+                                {
+                                    "given": "Claire H. C.",
+                                    "family": "Chang"
+                                },
+                                {
+                                    "given": "Christopher",
+                                    "family": "Baldassano"
+                                },
+                                {
+                                    "given": "Olga",
+                                    "family": "Lositsky"
+                                },
+                                {
+                                    "given": "Erez",
+                                    "family": "Simony"
+                                },
+                                {
+                                    "given": "Michael A.",
+                                    "family": "Chow"
+                                },
+                                {
+                                    "given": "Yuan Chang",
+                                    "family": "Leong"
+                                },
+                                {
+                                    "given": "Paula P.",
+                                    "family": "Brooks"
+                                },
+                                {
+                                    "given": "Emily",
+                                    "family": "Micciche"
+                                },
+                                {
+                                    "given": "Gina",
+                                    "family": "Choe"
+                                },
+                                {
+                                    "given": "Ariel",
+                                    "family": "Goldstein"
+                                },
+                                {
+                                    "given": "Tamara",
+                                    "family": "Vanderwal"
+                                },
+                                {
+                                    "given": "Yaroslav O.",
+                                    "family": "Halchenko"
+                                },
+                                {
+                                    "given": "Kenneth A.",
+                                    "family": "Norman"
+                                },
+                                {
+                                    "given": "Uri",
+                                    "family": "Hasson"
+                                }
+                            ],
+                            "DOI": "10.18112/openneuro.ds002345.v1.1.4",
+                            "type": "dataset",
+                            "id": "ds002345:1.1.4",
+                            "citation-label": "ds002345:1.1.4",
+                            "issued": {
+                                "date-parts": [
+                                    [
+                                        2020
+                                    ]
+                                ]
+                            },
+                            "publisher": "OpenNeuro",
+                            "title": "\"Narratives\"",
+                            "_graph": [
+                                {
+                                    "type": "@biblatex/text",
+                                    "data": "@dataset{ds002345:1.1.4,\n  author = {Samuel A. Nastase and Yun-Fei Liu and Hanna Hillman and Asieh Zadbood and Liat Hasenfratz and Neggin Keshavarzian and Janice Chen and Christopher J. Honey and Yaara Yeshurun and Mor Regev and Mai Nguyen and Claire H. C. Chang and Christopher Baldassano and Olga Lositsky and Erez Simony and Michael A. Chow and Yuan Chang Leong and Paula P. Brooks and Emily Micciche and Gina Choe and Ariel Goldstein and Tamara Vanderwal and Yaroslav O. Halchenko and Kenneth A. Norman and Uri Hasson},\n  title = {\"Narratives\"},\n  year = {2020},\n  doi = {10.18112/openneuro.ds002345.v1.1.4},\n  publisher = {OpenNeuro}\n}"
+                                },
+                                {
+                                    "type": "@biblatex/entries+list"
+                                },
+                                {
+                                    "type": "@csl/list+object"
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}

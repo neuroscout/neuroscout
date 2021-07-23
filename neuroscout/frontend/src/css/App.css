@@ -66,17 +66,35 @@ pre {
   display: block;
   margin-left: auto;
   margin-right: auto;
-  width: 36%;
+  width: 33%;
 }
+
+.instLogo {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    width: 15%;
+  }
+
+.instLogo2 {
+    height: auto;
+    width: 100%
+}
+
 
 .splashText {
   text-align: center;
   font-size: 25px;
 }
 
+.introCardsText {
+    font-size: 16px;
+  }
+
+
 .footerText {
   text-align: center;
-  font-size: 12px;
+  font-size: 10px;
 }
 
 .splashButtonParent {
@@ -175,4 +193,25 @@ pre {
 
 .ant-checkbox-wrapper + .ant-checkbox-wrapper {
     margin-left: 0px;
+}
+
+.home-flex-item {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.stat-title {
+    color: rgba(0, 0, 0, 0.45);
+    font-size: 20px;
+}
+.stat-value {
+    font-size: 28px;
+    color: #3f8600;
+}
+.stat-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    text-align: center;
 }
