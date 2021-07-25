@@ -122,13 +122,21 @@ def setup_test_db():
 
     id_1 = user_datastore.find_user(email=users[0][0]).id
 
-    dataset_id = populate.add_task(
-        'bidstest', local_path=conftest.DATASET_PATH)
+    dataset_id = populate.add_dataset(
+        'Test Dataset',
+        'A test dataset',
+        '///fake/preproc/address',
+        conftest.DATASET_PATH
+    )
 
-    predictor_id = populate.extract_features(
+    _ = populate.add_task(
+        'bidstest', 'Test Dataset', conftest.DATASET_PATH
+    )
+
+    _ = populate.extract_features(
         conftest.EXTRACTORS, 'Test Dataset', 'bidstest')
 
-    analysis_id = conftest.add_analysis_abstract(db.session, id_1, dataset_id)
+    _ = conftest.add_analysis_abstract(db.session, id_1, dataset_id)
 
     pred = models.Predictor(dataset_id=dataset_id, name="RT")
 
