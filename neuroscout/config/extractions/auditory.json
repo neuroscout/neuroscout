@@ -1,0 +1,14 @@
+{
+    "extractors": [
+      [{"transformer": "STFTAudioExtractor"}],
+      [{"transformer": "MeanAmplitudeExtractor"}],
+      [{"transformer": "SpectralCentroidExtractor"}],
+      [{"transformer": "TonnetzExtractor"}],
+      [{"transformer": "ComplexTextExtractor"}],
+      [{"transformer": "ChromaSTFTExtractor"}],
+      [{"transformer": "ChromaCQTExtractor"}],
+      [{"transformer": "MFCCExtractor"}],
+      [{"transformer": "MelspectrogramExtractor"}],
+      [{"transformer": "AudiosetLabelExtractor", "parameters": {"labels": ["Whistling", "Heart sounds, heartbeat", "Wild animals", "Vehicle", "Fire", "Silence", "Domestic animals, pets", "Livestock, farm animals, working animals", "Alarm", "Tools", "Explosion", "Thunderstorm", "Engine", "Noise", "Water", "Wind", "Glass", "Animal", "Liquid", "Wood", "Mechanisms", "Musical instrument", "Hands", "Music"]}}]
+    ]
+}
