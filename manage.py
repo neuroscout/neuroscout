@@ -3,7 +3,6 @@
 """
 import os
 import requests
-import json
 import datetime
 
 from flask_script import Manager, Shell
@@ -53,19 +52,38 @@ def add_user(email, password, confirm=True):
 
 
 @manager.command
-def add_task(local_path, task, include_predictors=None,
-             exclude_predictors=None, filters='{}', reingest=False):
-    """ Add BIDS dataset to database.
-    local_path - Path to local_path directory
-    task - Task name
-    include_predictors - Set of predictors to ingest. "None" ingests all.
-    filters - string JSON object with optional run filters
+def setup_dataset(preproc_address, raw_address=None, path=None,
+                  skip_preproc=False, url=None, dataset_summary=None,
+                  long_description=None, tasks=None):
+    """ Installs Dataset using DataLad (unless a dataset_path is given),
+    links preproc and raw dataset, and creates a template config file
+    for the dataset.
+
+    Args:
+       preproc_address: DataLad address of a fmripreprocessed dataset
+       raw_address: DataLad address to raw dataset
+       path: path on disk to raw BIDS dataset. If provided,
+                     `raw_addrss` is optional.
+       dataset_summary: Install preproc dataset, and symlink in raw dataset
+       url: URL to dataset information
+       dataset_summary: Short summary of dataset
+       long_description: Longer description of dataset
+       tasks: List of tasks to include in config file
+
+    Returns:
+       path to template config_file """
+    populate.setup_dataset(
+        preproc_address, raw_address, path, skip_preproc, url,
+        dataset_summary, long_description, tasks)
+
+
+@manager.command
+def ingest_from_json(config, reingest=False):
+    """ Ingest/update datasets and extracted features from a json config file.
+    config_file - json config file detailing datasets and pliers graph_json
+    automagic - Force enable datalad automagic
     """
-    populate.add_task(
-        task, local_path=local_path, **json.loads(filters),
-        include_predictors=include_predictors,
-        exclude_predictors=exclude_predictors,
-        reingest=reingest)
+    populate.ingest_from_json(config, reingest=reingest)
 
 
 @manager.command
@@ -80,17 +98,6 @@ def extract_features(extractor_graphs, dataset_name=None, task_name=None,
     populate.extract_features(
         extractor_graphs, dataset_name, task_name,
         resample_frequency=resample_frequency)
-
-
-@manager.command
-def ingest_from_json(config_file, update_features=False, reingest=False):
-    """ Ingest/update datasets and extracted features from a json config file.
-    config_file - json config file detailing datasets and pliers graph_json
-    automagic - Force enable datalad automagic
-    """
-    populate.ingest_from_json(
-        config_file, update_features=update_features,
-        reingest=reingest)
 
 
 @manager.command
@@ -115,13 +122,21 @@ def setup_test_db():
 
     id_1 = user_datastore.find_user(email=users[0][0]).id
 
-    dataset_id = populate.add_task(
-        'bidstest', local_path=conftest.DATASET_PATH)
+    dataset_id = populate.add_dataset(
+        'Test Dataset',
+        'A test dataset',
+        '///fake/preproc/address',
+        conftest.DATASET_PATH
+    )
 
-    predictor_id = populate.extract_features(
+    _ = populate.add_task(
+        'bidstest', 'Test Dataset', conftest.DATASET_PATH
+    )
+
+    _ = populate.extract_features(
         conftest.EXTRACTORS, 'Test Dataset', 'bidstest')
 
-    analysis_id = conftest.add_analysis_abstract(db.session, id_1, dataset_id)
+    _ = conftest.add_analysis_abstract(db.session, id_1, dataset_id)
 
     pred = models.Predictor(dataset_id=dataset_id, name="RT")
 

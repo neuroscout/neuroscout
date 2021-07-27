@@ -1,13 +1,36 @@
 """ Populaton utilities
 """
-import requests
-import urllib.parse
+from flask import current_app
+import json
 import hashlib
-import warnings
 from pathlib import Path
 import contextlib
 import joblib
 import numpy as np
+from citeproc.source.json import CiteProcJSON
+
+
+def add_to_bibliography(entry_name, bib_entries, sub_match='.*'):
+    if isinstance(bib_entries, list) and not bib_entries:
+        return None
+
+    try:
+        CiteProcJSON(bib_entries)
+    except Exception:
+        raise ValueError("Incorrect bibliography format")
+
+    with open(current_app.config['BIBLIOGRAPHY'], 'r') as f:
+        bib = json.load(f)
+    if entry_name not in bib:
+        bib[entry_name] = {}
+
+    bib[entry_name][sub_match] = bib_entries
+
+    with open(current_app.config['BIBLIOGRAPHY'], 'w') as f:
+        json.dump(bib, f)
+
+    return True
+
 
 def hash_stim(stim, blocksize=65536):
     """ Hash a pliers stimulus """

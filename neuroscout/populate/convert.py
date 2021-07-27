@@ -108,25 +108,68 @@ def create_new_stimuli(dataset_id, task_name, new_stims, rs_orig, parent_id=None
     return [v[0].id for v in new_models.values()]
 
 
-def convert_stimuli(dataset_name, task_name, converters):
+    # If no dataset is specified extract for all datasets recursively
+    if dataset_name is None:
+        return [extract_features(
+            graphs, dataset.name, None, **serializer_kwargs)
+                for dataset in Dataset.query.filter_by(active=True)]
+    else:
+        # Load Pliers Graph objects
+        graphs = [Graph(g) for g in graphs]
+
+        stims = _query_stim_models(dataset_name, task_name, graphs=graphs)
+
+        # Apply graphs to each stim_object in parallel
+        with parallel_backend('multiprocessing'):
+            with tqdm_joblib(tqdm(desc="Extracting...", total=len(stims))):
+                results = Parallel(n_jobs=n_jobs)(
+                    delayed(_extract_to_serial)(
+                        graphs, s, serializer) for s in stims)
+
+        # Flatten
+        results = [item for sublist in results for item in sublist]
+
+        if not results:
+            raise ValueError("No features could be extracted")
+
+        # Insert resultsw to db as ExtractedFeatures
+        ext_feats = _create_efs(results)
+
+        # Create Predictors for ExtractedFeatures
+        return create_predictors(
+            [ef for ef in ext_feats.values() if ef.active],
+            dataset_name, task_name)
+
+
+def convert_stimuli(converters, dataset_name=None, task_name=None):
     """ Convert stimuli to different modality using pliers.
         Args:
+            converters - dictionary of converter names to parameters
             dataset_name - dataset name
             task_name - task name
-            converters - dictionary of converter names to parameters
         Output:
             list of db ids of converted stimuli
     """
-    print("Converting stimuli")
+    if dataset_name is None:
+        return [convert_stimuli(
+            converters, dataset.name, None)
+                for dataset in Dataset.query.filter_by(active=True)]
 
-    dataset_id = Dataset.query.filter_by(name=dataset_name).one().id
+    dataset = Dataset.query.filter_by(name=dataset_name).one()
+    dataset_id = dataset.id
+
+    print(f"Converting stimuli for dataset: {dataset.name}")
 
     converters = [Graph(n) for n in converters]
 
     # Load all active original stimuli for task
     stim_objects = Stimulus.query.filter_by(active=True, parent_id=None).join(
-        RunStimulus).join(Run).join(Task).filter_by(name=task_name).join(
-            Dataset).filter_by(name=dataset_name)
+        RunStimulus).join(Run).join(Task)
+
+    if task_name is not None:
+        stim_objects = stim_objects.filter_by(name=task_name)
+
+    stim_objects = stim_objects.join(Dataset).filter_by(name=dataset_name)
 
     total_new_stims = []
     # Extract new stimuli from original stimuli

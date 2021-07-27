@@ -1,7 +1,7 @@
 from ..request_utils import decode_json
 
 
-def test_extractor_desc(auth_client, add_local_task_json):
+def test_extractor_desc(auth_client, extract_features):
     # List of datasets
     resp = auth_client.get('/api/extractors')
     assert resp.status_code == 200

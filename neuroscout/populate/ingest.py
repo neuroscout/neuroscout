@@ -10,7 +10,6 @@ from pathlib import Path
 import pandas as pd
 
 from bids.layout import BIDSLayout
-from datalad.api import install
 
 from ..core import cache
 from .utils import hash_stim
@@ -21,6 +20,7 @@ from ..models import (
 from ..database import db
 from tqdm import tqdm
 from .annotate import PredictorSerializer
+from datalad.api import drop, get
 
 
 def add_predictor_collection(collection, dataset_id, run_id,
@@ -119,57 +119,22 @@ def add_stimulus(stim_hash, dataset_id, parent_id=None, path=None,
     return model, new
 
 
-def add_task(task_name, dataset_name=None, local_path=None,
-             dataset_address=None, preproc_address=None,
-             include_predictors=None, exclude_predictors=None,
-             reingest=False, scan_length=1000,
-             dataset_summary=None, dataset_long_description=None,
-             url=None, task_summary=None, **kwargs):
-    """ Adds a BIDS dataset task to the database.
-        Args:
-            task_name - task to add
-            dataset_name - overide dataset name
-            local_path - path to local bids dataset.
-            dataset_address - remote address of BIDS dataset.
-            preproc_address - remote address of preprocessed files.
-            include_predictors - set of predictors to ingest
-            exclude_predictors - set of predictors to exclude from ingestions
-            reingest - force reingesting even if dataset already exists
-            scan_length - default scan length in case it cant be found in image
-            dataset_summary - Dataset summary description,
-            dataset_summary - Dataset long description,
-            url - Dataset external link,
-            task_summary - Task summary description,
-            kwargs - arguments to filter runs by
-        Output:
-            dataset model id
-    """
+def add_dataset(dataset_name, dataset_summary, preproc_address, local_path,
+                dataset_address=None, dataset_long_description=None, url=None,
+                reingest=False):
     cache.clear()
-
-    if dataset_address is not None and local_path is None:
-        local_path = install(
-            source=dataset_address,
-            path=(Path(
-                current_app.config['DATASET_DIR']) / dataset_name).as_posix()
-            ).path
 
     local_path = Path(local_path)
 
-    assert isfile(str(local_path / 'dataset_description.json'))
+    with (local_path / 'dataset_description.json').open() as f:
+        description = json.load(f)
 
-    layout = BIDSLayout(str(local_path), derivatives=True)
-    if task_name not in layout.get_tasks():
-        raise ValueError("Task {} not found in dataset {}".format(
-            task_name, local_path))
-
-    dataset_name = dataset_name if dataset_name is not None \
-        else layout.description['Name']
-
-    # Get or create dataset model from mandatory arguments
+    # Get or create dataset model from name
     dataset_model, new_ds = get_or_create(Dataset, name=dataset_name)
 
-    if new_ds:
-        dataset_model.description = layout.description
+    if new_ds or reingest:
+        print(f"Adding dataset {dataset_name}")
+        dataset_model.description = description
         dataset_model.summary = dataset_summary,
         dataset_model.long_description = dataset_long_description,
         dataset_model.url = url,
@@ -177,27 +142,84 @@ def add_task(task_name, dataset_name=None, local_path=None,
         dataset_model.preproc_address = preproc_address
         dataset_model.local_path = local_path.as_posix()
         db.session.commit()
-    elif not reingest:
+    else:
         print("Dataset found, skipping ingestion...")
         return dataset_model.id
+
+    """ Add GroupPredictors """
+    print("Adding group predictors")
+    add_group_predictors(dataset_model.id, local_path / 'participants.tsv')
+
+    return dataset_model.id
+
+
+def add_task(task_name, dataset_name, local_path,
+             include_predictors=None, exclude_predictors=None,
+             reingest=False, scan_length=1000,
+             summary=None, layout=None, auto_fetch=False, **kwargs):
+    """ Adds a BIDS dataset task to the database.
+        Args:
+            task_name - task to add
+            dataset_name - dataset name
+            local_path - path to local bids dataset.
+            include_predictors - set of predictors to ingest
+            exclude_predictors - set of predictors to exclude from ingestions
+            reingest - force reingesting even if dataset already exists
+            scan_length - default scan length in case it cant be found in image
+            summary - Task summary description,
+            layout - Preinstantiated BIDSLayout
+            kwargs - arguments to filter runs by
+        Output:
+            dataset model id
+    """
+    cache.clear()
+    print(f"Adding task {task_name}")
+
+    if not layout:
+        layout = BIDSLayout(
+            str(local_path), derivatives=True, 
+            suffix='bold', extension='nii.gz'
+            )
+
+    if task_name not in layout.get_tasks():
+        raise ValueError("Task {} not found in dataset {}".format(
+            task_name, local_path))
+
+    # Get dataset model from name
+    dataset_model = Dataset.query.filter_by(name=dataset_name)
+    if dataset_model.count() != 1:
+        raise Exception("Dataset not found")
+    else:
+        dataset_model = dataset_model.one()
 
     # Get or create task
     task_model, new_task = get_or_create(
         Task, name=task_name, dataset_id=dataset_model.id)
 
-    if new_task:
-        task_model.description = json.load(
-            (local_path / 'task-{}_bold.json'.format(task_name)).open())
-        task_model.summary = task_summary,
-        task_model.TR = task_model.description['RepetitionTime']
+    local_path = Path(local_path)
+
+    all_runs = layout.get(
+        task=task_name, suffix='bold', extension='nii.gz',
+        scope='raw', **kwargs)
+
+    if new_task or reingest:
+        # Pull first run's metadata as representative
+        task_metadata = all_runs[0].get_metadata()
+        task_model.description = task_metadata
+        task_model.summary = summary,
+        task_model.TR = task_metadata['RepetitionTime']
         db.session.commit()
+    else:
+        print("Task found, skipping ingestion...")
+        return task_model.id
 
     stims_processed = {}
     """ Parse every Run """
     print("Parsing runs")
-    all_runs = layout.get(task=task_name, suffix='bold', extension='nii.gz',
-                          scope='raw', **kwargs)
     for img in tqdm(all_runs):
+        if auto_fetch:
+            get(img.path)
+
         """ Extract Run information """
         # Get entities
         entities = {entity: getattr(img, entity)
@@ -270,8 +292,7 @@ def add_task(task_name, dataset_name=None, local_path=None,
                 runstim.duration = stims.duration.tolist()[i]
                 db.session.commit()
 
-    """ Add GroupPredictors """
-    print("Adding group predictors")
-    add_group_predictors(dataset_model.id, local_path / 'participants.tsv')
+        if auto_fetch:
+            drop(img)
 
-    return dataset_model.id
+    return task_model.id
