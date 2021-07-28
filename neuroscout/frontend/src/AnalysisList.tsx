@@ -185,7 +185,7 @@ export class AnalysisListTable extends React.Component<
     return (
       <div>
         <Input
-          placeholder="Search predictor name or description..."
+          placeholder="Search by analyses name or dataset name..."
           value={this.state.searchText}
           onChange={this.onInputChange}
         />
