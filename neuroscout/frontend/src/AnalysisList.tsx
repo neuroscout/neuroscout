@@ -56,7 +56,14 @@ export class AnalysisListTable extends React.Component<
     if (searchText.length < 2 || !this.props.analyses) {
       return this.props.analyses
     }
-    return this.props.analyses.filter(x => x.name.includes(searchText))
+    const dataset_ids = this.props.datasets
+      .filter(x => x.name.includes(searchText))
+      .map(x => x.id)
+    return this.props.analyses.filter(
+      x =>
+        x.name.includes(searchText) ||
+        dataset_ids.includes(String(x.dataset_id)),
+    )
   })
   render() {
     if (this.state.redirectId !== '') {
