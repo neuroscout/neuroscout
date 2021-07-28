@@ -56,13 +56,8 @@ export class AnalysisListTable extends React.Component<
     if (searchText.length < 2 || !this.props.analyses) {
       return this.props.analyses
     }
-    const dataset_ids = this.props.datasets
-      .filter(x => x.name.includes(searchText))
-      .map(x => x.id)
     return this.props.analyses.filter(
-      x =>
-        x.name.includes(searchText) ||
-        dataset_ids.includes(String(x.dataset_id)),
+      x => x.name.includes(searchText) || x.dataset_name.includes(searchText),
     )
   })
   render() {
@@ -125,30 +120,10 @@ export class AnalysisListTable extends React.Component<
       },
       {
         title: 'Dataset',
-        dataIndex: 'dataset_id',
-        render: (text, record) => {
-          const dataset: any = datasets.filter(x => {
-            return x.id === text.toString()
-          })
-          let name = ' '
-          if (!!dataset && dataset.length === 1) {
-            name = dataset[0].name
-          }
-          return <>{name}</>
-        },
-        sorter: (a, b) => {
-          let dataset: Dataset | undefined = datasets.find(x => {
-            return x.id === a.name.toString()
-          })
-          a = !!dataset && !!dataset.name ? dataset.name : ''
-          dataset = datasets.find(x => {
-            return x.id === b.name.toString()
-          })
-          b = !!dataset && !!dataset.name ? dataset.name : ''
-          return a.localeCompare(b)
-        },
+        dataIndex: 'dataset_name',
+        sorter: (a, b) => a.localeCompare(b),
         filters: datasetFilters,
-        onFilter: (value, record) => record.name === value,
+        onFilter: (value, record) => record === value.dataset_name,
       },
     ]
 

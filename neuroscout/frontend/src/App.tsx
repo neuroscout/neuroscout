@@ -87,9 +87,24 @@ class App extends React.Component<Record<string, never>, AppState> {
   }
 
   componentDidMount() {
-    void api.getPublicAnalyses().then(publicAnalyses => {
-      this.setState({ publicAnalyses })
-    })
+    void api
+      .getDatasets(false)
+      .then(datasets => {
+        if (datasets.length !== 0) {
+          datasets.sort((a, b) => a.name.localeCompare(b.name))
+          this.setState({ datasets })
+        }
+        return datasets
+      })
+      .then(datasets => {
+        void api.getPublicAnalyses().then(publicAnalyses => {
+          publicAnalyses.map(x => {
+            x.dataset_name =
+              datasets.find(ds => ds.id === x.dataset_id)?.name ?? ' '
+          })
+          this.setState({ publicAnalyses })
+        })
+      })
     if (window.localStorage.getItem('jwt')) {
       void api
         .getUser()
@@ -104,12 +119,6 @@ class App extends React.Component<Record<string, never>, AppState> {
           return
         })
     }
-    void api.getDatasets(false).then(datasets => {
-      if (datasets.length !== 0) {
-        datasets.sort((a, b) => a.name.localeCompare(b.name))
-        this.setState({ datasets })
-      }
-    })
   }
 
   /* short polling function checking api for inprocess analyses to see if
