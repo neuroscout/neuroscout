@@ -106,6 +106,7 @@ class App extends React.Component<Record<string, never>, AppState> {
     }
     void api.getDatasets(false).then(datasets => {
       if (datasets.length !== 0) {
+        datasets.sort((a, b) => a.name.localeCompare(b.name))
         this.setState({ datasets })
       }
     })

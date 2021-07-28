@@ -3,10 +3,12 @@ Resuable AnalysisList component used for displaying a list of analyses, e.g. on
 the home page or on the 'browse public analysis' page
 */
 import * as React from 'react'
-import { Button, Row, Table } from 'antd'
+import { Button, Row, Table, Input } from 'antd'
 import { MainCol, Space, StatusTag } from './HelperComponents'
 import { AppAnalysis, Dataset } from './coretypes'
 import { Link, Redirect } from 'react-router-dom'
+
+import memoize from 'memoize-one'
 
 const tableLocale = {
   filterConfirm: 'Ok',
@@ -28,10 +30,34 @@ export interface AnalysisListProps {
 
 export class AnalysisListTable extends React.Component<
   AnalysisListProps,
-  { redirectId: string }
+  { redirectId: string; owners: string[]; searchText: string }
 > {
-  state = { redirectId: '' }
+  state = { redirectId: '', owners: [], searchText: '' }
 
+  componentDidUpdate(prevProps) {
+    const length = prevProps.analyses ? prevProps.analyses.length : 0
+    if (
+      this.props.showOwner &&
+      this.props.analyses &&
+      length !== this.props.analyses.length
+    ) {
+      const owners = new Set(
+        this.props.analyses.filter(x => x.user_name).map(x => x.user_name),
+      )
+      this.setState({ owners: [...owners] as string[] })
+    }
+  }
+
+  onInputChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
+    this.setState({ searchText: e.target.value })
+  }
+
+  applySearch = memoize((searchText, length) => {
+    if (searchText.length < 2 || !this.props.analyses) {
+      return this.props.analyses
+    }
+    return this.props.analyses.filter(x => x.name.includes(searchText))
+  })
   render() {
     if (this.state.redirectId !== '') {
       return <Redirect to={'/builder/' + this.state.redirectId} />
@@ -44,6 +70,10 @@ export class AnalysisListTable extends React.Component<
       onDelete,
       showOwner,
     } = this.props
+
+    const datasetFilters = datasets.map(x => {
+      return { text: x.name, value: x.name }
+    })
 
     // Define columns of the analysis table
     // Open link: always (opens analysis in Builder)
@@ -110,6 +140,8 @@ export class AnalysisListTable extends React.Component<
           b = !!dataset && !!dataset.name ? dataset.name : ''
           return a.localeCompare(b)
         },
+        filters: datasetFilters,
+        onFilter: (value, record) => record.name === value,
       },
     ]
 
@@ -125,6 +157,10 @@ export class AnalysisListTable extends React.Component<
             {record.user_name}{' '}
           </Link>
         ),
+        filters: this.state.owners.map(x => {
+          return { text: x, value: x }
+        }),
+        onFilter: (value, record) => record.user_name === value,
       })
     }
 
@@ -161,14 +197,21 @@ export class AnalysisListTable extends React.Component<
         ),
       })
     }
+    const length = analyses ? analyses.length : 0
+    const dataSource = this.applySearch(this.state.searchText, length)
 
     return (
       <div>
+        <Input
+          placeholder="Search predictor name or description..."
+          value={this.state.searchText}
+          onChange={this.onInputChange}
+        />
         <Table
           columns={analysisTableColumns}
           rowKey="id"
           size="small"
-          dataSource={analyses === null ? [] : analyses}
+          dataSource={dataSource === null ? [] : dataSource}
           loading={analyses === null || !!this.props.loading}
           expandedRowRender={record => <p>{record.description}</p>}
           pagination={
