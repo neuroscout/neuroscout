@@ -301,6 +301,7 @@ export interface AppAnalysis {
   dataset_id?: string
   modified_at?: string
   user_name?: string
+  dataset_name: string
 }
 
 export const profileEditItems = [
