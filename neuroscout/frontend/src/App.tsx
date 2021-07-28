@@ -23,6 +23,7 @@ import {
   ApiAnalysis,
   AppAnalysis,
   AppState,
+  Dataset,
   profileEditItems,
   ProfileState,
 } from './coretypes'
@@ -51,6 +52,12 @@ type JWTChangeProps = {
 // This global var lets the dumb polling loops know when to exit.
 let checkCount = 0
 
+function setDatasetNames(analyses: AppAnalysis[], datasets: Dataset[]) {
+  analyses.map(x => {
+    x.dataset_name = datasets.find(ds => ds.id === x.dataset_id)?.name ?? ' '
+  })
+}
+
 class JWTChange extends React.Component<JWTChangeProps, Record<string, never>> {
   jwtChanged = memoize((jwt, user_name) => {
     if (!!jwt && !!user_name) {
@@ -74,6 +81,7 @@ class App extends React.Component<Record<string, never>, AppState> {
     this.state = {
       loadAnalyses: () => {
         void api.getMyAnalyses().then(analyses => {
+          setDatasetNames(analyses, this.state.datasets)
           this.setState({ analyses })
         })
       },
@@ -98,10 +106,7 @@ class App extends React.Component<Record<string, never>, AppState> {
       })
       .then(datasets => {
         void api.getPublicAnalyses().then(publicAnalyses => {
-          publicAnalyses.map(x => {
-            x.dataset_name =
-              datasets.find(ds => ds.id === x.dataset_id)?.name ?? ' '
-          })
+          setDatasetNames(publicAnalyses, datasets)
           this.setState({ publicAnalyses })
         })
       })
@@ -254,7 +259,7 @@ class App extends React.Component<Record<string, never>, AppState> {
     )
   }
 
-  componentDidUpdate(prevProps, prevState) {
+  componentDidUpdate(prevProps: Record<string, never>, prevState: AppState) {
     // Need to do this so logout redirect only happens once, otherwise it'd be an infinite loop
     if (this.state.user.loggingOut) {
       this.state.user.update({ loggingOut: false })
