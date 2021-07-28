@@ -360,7 +360,7 @@ export class PredictorSelector extends React.Component<
             <Col span={24}>
               {filteredPredictors && filteredPredictors.length > 20 && (
                 <div>
-                  <Input
+                  <Input.Search
                     placeholder="Search predictor name or description..."
                     value={this.state.searchText}
                     onChange={this.onInputChange}
