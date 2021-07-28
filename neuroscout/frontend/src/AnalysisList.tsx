@@ -123,7 +123,7 @@ export class AnalysisListTable extends React.Component<
         dataIndex: 'dataset_name',
         sorter: (a, b) => a.dataset_name.localeCompare(b.dataset_name),
         filters: datasetFilters,
-        onFilter: (value, record) => record === value.dataset_name,
+        onFilter: (value, record) => record.dataset_name === value,
       },
     ]
 
