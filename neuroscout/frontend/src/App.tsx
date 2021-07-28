@@ -106,8 +106,12 @@ class App extends React.Component<Record<string, never>, AppState> {
       })
       .then(datasets => {
         void api.getPublicAnalyses().then(publicAnalyses => {
+          const analyses = this.state.analyses
+          if (this.state.analyses) {
+            setDatasetNames(this.state.analyses, datasets)
+          }
           setDatasetNames(publicAnalyses, datasets)
-          this.setState({ publicAnalyses })
+          this.setState({ analyses, publicAnalyses })
         })
       })
     if (window.localStorage.getItem('jwt')) {
