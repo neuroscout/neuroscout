@@ -186,6 +186,10 @@ pre {
     display: flex;
 }
 
+.ant-dropdown-menu-item .ant-checkbox-wrapper {
+    display: inline-flex;
+}
+
 .ant-checkbox-wrapper :not(.ant-checkbox) {
     overflow: hidden;
     text-overflow: ellipsis;
