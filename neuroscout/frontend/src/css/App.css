@@ -219,6 +219,7 @@ pre {
 
 .analysisListRouteWrapper {
     display: flex;
+    flex-wrap: wrap;
 }
 
 .analysisListRouteWrapper .analysisListTitle {
