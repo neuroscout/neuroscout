@@ -30,9 +30,14 @@ export interface AnalysisListProps {
 
 export class AnalysisListTable extends React.Component<
   AnalysisListProps,
-  { redirectId: string; owners: string[]; searchText: string }
+  {
+    redirectId: string
+    owners: string[]
+    searchText: string
+    ownersWidth: number
+  }
 > {
-  state = { redirectId: '', owners: [], searchText: '' }
+  state = { redirectId: '', owners: [], searchText: '', ownersWidth: 10 }
 
   componentDidUpdate(prevProps) {
     const length = prevProps.analyses ? prevProps.analyses.length : 0
@@ -41,10 +46,15 @@ export class AnalysisListTable extends React.Component<
       this.props.analyses &&
       length !== this.props.analyses.length
     ) {
-      const owners = new Set(
-        this.props.analyses.filter(x => x.user_name).map(x => x.user_name),
-      )
-      this.setState({ owners: [...owners] as string[] })
+      const owners = [
+        ...new Set(
+          this.props.analyses.map(x => (x.user_name ? x.user_name : ' ')),
+        ),
+      ]
+
+      /* no science behind adding 4, just a bit of buffer */
+      const ownersWidth = Math.max(...owners.map(x => (x ? x.length : 0))) + 4
+      this.setState({ owners, ownersWidth })
     }
   }
 
@@ -60,6 +70,7 @@ export class AnalysisListTable extends React.Component<
       x => x.name.includes(searchText) || x.dataset_name.includes(searchText),
     )
   })
+
   render() {
     if (this.state.redirectId !== '') {
       return <Redirect to={'/builder/' + this.state.redirectId} />
@@ -76,6 +87,8 @@ export class AnalysisListTable extends React.Component<
     const datasetFilters = datasets.map(x => {
       return { text: x.name, value: x.name }
     })
+    const datasetWidth =
+      Math.max(...datasets.map(x => (x.name ? x.name.length : 0))) + 4
 
     // Define columns of the analysis table
     // Open link: always (opens analysis in Builder)
@@ -86,7 +99,7 @@ export class AnalysisListTable extends React.Component<
         title: 'ID',
         dataIndex: 'id',
         sorter: (a, b) => a.id.localeCompare(b.id),
-        width: 100,
+        width: '6ch',
       },
       {
         title: 'Name',
@@ -118,7 +131,7 @@ export class AnalysisListTable extends React.Component<
             </>
           )
         },
-        width: 100,
+        width: '14ch',
       },
       {
         title: 'Dataset',
@@ -126,7 +139,7 @@ export class AnalysisListTable extends React.Component<
         sorter: (a, b) => a.dataset_name.localeCompare(b.dataset_name),
         filters: datasetFilters,
         onFilter: (value, record) => record.dataset_name === value,
-        width: 100,
+        width: `${datasetWidth}ch`,
         textWrap: 'break-word',
       },
     ]
@@ -147,7 +160,7 @@ export class AnalysisListTable extends React.Component<
           return { text: x, value: x }
         }),
         onFilter: (value, record) => record.user_name === value,
-        width: 100,
+        width: `${this.state.ownersWidth}ch`,
       })
     }
 
@@ -182,6 +195,7 @@ export class AnalysisListTable extends React.Component<
             )}
           </span>
         ),
+        width: '15ch',
       })
     }
     const length = analyses ? analyses.length : 0
