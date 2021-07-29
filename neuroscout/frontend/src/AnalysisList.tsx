@@ -183,11 +183,12 @@ export class AnalysisListTable extends React.Component<
     const dataSource = this.applySearch(this.state.searchText, length)
 
     return (
-      <div>
+      <>
         <Input.Search
           placeholder="Search by analyses name or dataset name..."
           value={this.state.searchText}
           onChange={this.onInputChange}
+          className="analysisListSearch"
         />
         <Table
           columns={analysisTableColumns}
@@ -202,8 +203,9 @@ export class AnalysisListTable extends React.Component<
               : false
           }
           locale={tableLocale}
+          className="analysisListTable"
         />
-      </div>
+      </>
     )
   }
 }
@@ -214,11 +216,12 @@ const AnalysisList = (props: AnalysisListProps) => {
     <div>
       <Row justify="center">
         <MainCol>
-          <h3>
-            {props.publicList ? 'Public analyses' : 'Your saved analyses'}
-          </h3>
-          <br />
-          <AnalysisListTable {...props} />
+          <div className="analysisListRouteWrapper">
+            <div className="analysisListTitle">
+              {props.publicList ? 'Public analyses' : 'Your saved analyses'}
+            </div>
+            <AnalysisListTable {...props} />
+          </div>
         </MainCol>
       </Row>
     </div>

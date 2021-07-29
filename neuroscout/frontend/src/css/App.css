@@ -205,6 +205,7 @@ pre {
     color: rgba(0, 0, 0, 0.45);
     font-size: 20px;
 }
+
 .stat-value {
     font-size: 28px;
     color: #3f8600;
@@ -214,4 +215,23 @@ pre {
     flex-direction: column;
     justify-content: center;
     text-align: center;
+}
+
+.analysisListRouteWrapper {
+    display: flex;
+}
+
+.analysisListRouteWrapper .analysisListTitle {
+    font-size: 28px;
+}
+.analysisListRouteWrapper .analysisListSearch {
+    align-self: flex-end;
+    flex: 1;
+    margin-left: 32px;
+    height: 100%;
+    margin-top: auto;
+    margin-bottom: auto;
+}
+.analysisListRouteWrapper .analysisListTable {
+    flex-basis: 100%;
 }
