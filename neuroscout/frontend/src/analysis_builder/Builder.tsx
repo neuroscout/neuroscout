@@ -326,12 +326,6 @@ export default class AnalysisBuilder extends React.Component<
       .filter(x => x.id === this.state.selectedTaskId)
       .map(y => y.name)
 
-    let runs: number[] = this.state.availableRuns
-      .filter(x => this.state.analysis.runIds.find(runId => runId === x.id))
-      .filter(y => y.number !== null)
-      .map(z => parseInt(z.number, 10))
-    runs = Array.from(new Set(runs))
-
     let sessions: string[] = this.state.availableRuns
       .filter(x => this.state.analysis.runIds.find(runId => runId === x.id))
       .filter(y => y.session !== null)
@@ -410,10 +404,6 @@ export default class AnalysisBuilder extends React.Component<
     }
 
     const imgInput: ImageInput = {}
-    if (runs.length > 0) {
-      imgInput.Run = runs
-    }
-
     if (sessions.length > 0) {
       imgInput.Session = sessions
     }
@@ -954,15 +944,12 @@ export default class AnalysisBuilder extends React.Component<
     if (!this.state.model || !this.state.model.Input) {
       return []
     }
-    const keys: (keyof ImageInput)[] = ['Subject', 'Session', 'Run']
+    const keys: (keyof ImageInput)[] = ['Subject', 'Session']
     keys.map(key => {
       if (!input[key]) {
         return
       }
       runIds = runIds.filter(x => {
-        if (key === 'Run') {
-          return input[key]!.indexOf(parseInt(x.number, 10)) > -1
-        }
         return input[key]!.indexOf(x[key.toLowerCase()]) > -1
       })
     })

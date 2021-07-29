@@ -252,7 +252,6 @@ export interface BidsModel {
 
 export interface ImageInput {
   Task?: string
-  Run?: number[]
   Session?: string[]
   Subject?: string[]
 }
