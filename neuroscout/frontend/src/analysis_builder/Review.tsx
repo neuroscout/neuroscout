@@ -51,9 +51,6 @@ class ModelInput extends React.Component<
       return
     }
     const input = this.props.model.Input
-    const runs = input.Run
-      ? input.Run.sort().map(x => <li key={x}>{x}</li>)
-      : []
     const subjects = input.Subject ? alphaSort(input.Subject).join(', ') : []
     const sessions = input.Session ? alphaSort(input.Session).join(', ') : []
 
@@ -62,11 +59,6 @@ class ModelInput extends React.Component<
         <Card title="Task" key="task">
           {input.Task ? input.Task : ''}
         </Card>
-        {runs.length > 0 && (
-          <Card title="Runs" key="runs">
-            <ul>{runs}</ul>
-          </Card>
-        )}
         {subjects.length > 0 && (
           <Card title="Subjects" key="subjects">
             <p>{subjects}</p>
