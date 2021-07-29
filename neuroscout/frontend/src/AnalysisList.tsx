@@ -86,6 +86,7 @@ export class AnalysisListTable extends React.Component<
         title: 'ID',
         dataIndex: 'id',
         sorter: (a, b) => a.id.localeCompare(b.id),
+        width: 100,
       },
       {
         title: 'Name',
@@ -117,6 +118,7 @@ export class AnalysisListTable extends React.Component<
             </>
           )
         },
+        width: 100,
       },
       {
         title: 'Dataset',
@@ -124,6 +126,8 @@ export class AnalysisListTable extends React.Component<
         sorter: (a, b) => a.dataset_name.localeCompare(b.dataset_name),
         filters: datasetFilters,
         onFilter: (value, record) => record.dataset_name === value,
+        width: 100,
+        textWrap: 'break-word',
       },
     ]
 
@@ -143,6 +147,7 @@ export class AnalysisListTable extends React.Component<
           return { text: x, value: x }
         }),
         onFilter: (value, record) => record.user_name === value,
+        width: 100,
       })
     }
 
