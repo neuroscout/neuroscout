@@ -40,6 +40,7 @@ interface OverviewTabState {
   filteredVal: RunFilters | null
   runColumns: ColumnType<Run>[]
   taskMsg: string
+  searchText: string
 }
 
 export class OverviewTab extends React.Component<
@@ -53,7 +54,12 @@ export class OverviewTab extends React.Component<
       filteredVal: { numbers: [], subjects: [], sessions: [] },
       runColumns: [] as ColumnType<Run>[],
       taskMsg: 'Please Select',
+      searchText: '',
     }
+  }
+
+  onInputChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
+    this.setState({ searchText: e.target.value })
   }
 
   updateAnalysis =
@@ -264,6 +270,7 @@ export class OverviewTab extends React.Component<
 
   render() {
     const { analysis, datasets, availableRuns, selectedTaskId } = this.props
+    const { searchText } = this.state
 
     const availableTasks = getTasks(datasets, analysis.datasetId)
 
@@ -338,6 +345,13 @@ export class OverviewTab extends React.Component<
       }
     }
 
+    const datasetDataSource = datasets
+      .filter(x => x.active === true || x.id === this.props.analysis.datasetId)
+      .filter(
+        x =>
+          searchText.length < 3 ||
+          JSON.stringify(x).toLowerCase().includes(searchText.toLowerCase()),
+      )
     return (
       <div className="builderCol">
         <Form layout="vertical">
@@ -372,16 +386,18 @@ export class OverviewTab extends React.Component<
               </span>
             }
             required>
+            <Input.Search
+              placeholder="Search by dataset or task name..."
+              value={this.state.searchText}
+              onChange={this.onInputChange}
+              className="datasetListSearch"
+            />
             <Table
               className="selectDataset"
               columns={datasetColumns}
               rowKey="id"
               size="small"
-              dataSource={datasets.filter(x => {
-                return (
-                  x.active === true || x.id === this.props.analysis.datasetId
-                )
-              })}
+              dataSource={datasetDataSource}
               rowSelection={datasetRowSelection}
               pagination={
                 datasets.length > 10 ? { position: ['bottomCenter'] } : false
