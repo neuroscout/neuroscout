@@ -117,6 +117,7 @@ export class AnalysisListTable extends React.Component<
         dataIndex: 'status',
         render: (text, record) => <StatusTag status={record.status} />,
         sorter: (a, b) => a.status.localeCompare(b.status),
+        width: '14ch',
       },
       {
         title: 'Modified at',
