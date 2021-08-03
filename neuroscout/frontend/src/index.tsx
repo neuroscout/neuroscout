@@ -4,7 +4,7 @@ import * as Sentry from '@sentry/browser'
 import App from './App'
 import { config } from './config'
 
-if (config.sentry_uri !== '') {
+if (config.sentry_uri && config.sentry_uri !== '') {
   Sentry.init({
     dsn: config.sentry_uri,
   })

@@ -3,10 +3,12 @@ Resuable AnalysisList component used for displaying a list of analyses, e.g. on
 the home page or on the 'browse public analysis' page
 */
 import * as React from 'react'
-import { Button, Row, Table } from 'antd'
+import { Button, Row, Table, Input } from 'antd'
 import { MainCol, Space, StatusTag } from './HelperComponents'
 import { AppAnalysis, Dataset } from './coretypes'
 import { Link, Redirect } from 'react-router-dom'
+
+import memoize from 'memoize-one'
 
 const tableLocale = {
   filterConfirm: 'Ok',
@@ -28,9 +30,48 @@ export interface AnalysisListProps {
 
 export class AnalysisListTable extends React.Component<
   AnalysisListProps,
-  { redirectId: string }
+  {
+    redirectId: string
+    owners: string[]
+    searchText: string
+    ownersWidth: number
+  }
 > {
-  state = { redirectId: '' }
+  state = { redirectId: '', owners: [], searchText: '', ownersWidth: 10 }
+
+  componentDidUpdate(prevProps) {
+    const length = prevProps.analyses ? prevProps.analyses.length : 0
+    if (
+      this.props.showOwner &&
+      this.props.analyses &&
+      length !== this.props.analyses.length
+    ) {
+      const owners = [
+        ...new Set(
+          this.props.analyses.map(x => (x.user_name ? x.user_name : ' ')),
+        ),
+      ]
+
+      /* no science behind adding 4, just a bit of buffer */
+      const ownersWidth = Math.max(...owners.map(x => (x ? x.length : 0))) + 4
+      this.setState({ owners, ownersWidth })
+    }
+  }
+
+  onInputChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
+    this.setState({ searchText: e.target.value })
+  }
+
+  applySearch = memoize((searchText, length) => {
+    if (searchText.length < 2 || !this.props.analyses) {
+      return this.props.analyses
+    }
+    return this.props.analyses.filter(
+      x =>
+        x.name.toLowerCase().includes(searchText.toLowerCase()) ||
+        x.dataset_name.toLowerCase().includes(searchText.toLowerCase()),
+    )
+  })
 
   render() {
     if (this.state.redirectId !== '') {
@@ -45,6 +86,12 @@ export class AnalysisListTable extends React.Component<
       showOwner,
     } = this.props
 
+    const datasetFilters = datasets.map(x => {
+      return { text: x.name, value: x.name }
+    })
+    const datasetWidth =
+      Math.max(...datasets.map(x => (x.name ? x.name.length : 0))) + 4
+
     // Define columns of the analysis table
     // Open link: always (opens analysis in Builder)
     // Delete button: only if not a public list and analysis is in draft mode
@@ -54,6 +101,7 @@ export class AnalysisListTable extends React.Component<
         title: 'ID',
         dataIndex: 'id',
         sorter: (a, b) => a.id.localeCompare(b.id),
+        width: '6ch',
       },
       {
         title: 'Name',
@@ -71,6 +119,7 @@ export class AnalysisListTable extends React.Component<
         dataIndex: 'status',
         render: (text, record) => <StatusTag status={record.status} />,
         sorter: (a, b) => a.status.localeCompare(b.status),
+        width: '14ch',
       },
       {
         title: 'Modified at',
@@ -85,31 +134,16 @@ export class AnalysisListTable extends React.Component<
             </>
           )
         },
+        width: '14ch',
       },
       {
         title: 'Dataset',
-        dataIndex: 'dataset_id',
-        render: (text, record) => {
-          const dataset: any = datasets.filter(x => {
-            return x.id === text.toString()
-          })
-          let name = ' '
-          if (!!dataset && dataset.length === 1) {
-            name = dataset[0].name
-          }
-          return <>{name}</>
-        },
-        sorter: (a, b) => {
-          let dataset: Dataset | undefined = datasets.find(x => {
-            return x.id === a.name.toString()
-          })
-          a = !!dataset && !!dataset.name ? dataset.name : ''
-          dataset = datasets.find(x => {
-            return x.id === b.name.toString()
-          })
-          b = !!dataset && !!dataset.name ? dataset.name : ''
-          return a.localeCompare(b)
-        },
+        dataIndex: 'dataset_name',
+        sorter: (a, b) => a.dataset_name.localeCompare(b.dataset_name),
+        filters: datasetFilters,
+        onFilter: (value, record) => record.dataset_name === value,
+        width: `${datasetWidth}ch`,
+        textWrap: 'break-word',
       },
     ]
 
@@ -125,6 +159,11 @@ export class AnalysisListTable extends React.Component<
             {record.user_name}{' '}
           </Link>
         ),
+        filters: this.state.owners.map(x => {
+          return { text: x, value: x }
+        }),
+        onFilter: (value, record) => record.user_name === value,
+        width: `${this.state.ownersWidth}ch`,
       })
     }
 
@@ -159,16 +198,25 @@ export class AnalysisListTable extends React.Component<
             )}
           </span>
         ),
+        width: '15ch',
       })
     }
+    const length = analyses ? analyses.length : 0
+    const dataSource = this.applySearch(this.state.searchText, length)
 
     return (
-      <div>
+      <>
+        <Input.Search
+          placeholder="Search by analyses name or dataset name..."
+          value={this.state.searchText}
+          onChange={this.onInputChange}
+          className="analysisListSearch"
+        />
         <Table
           columns={analysisTableColumns}
           rowKey="id"
           size="small"
-          dataSource={analyses === null ? [] : analyses}
+          dataSource={dataSource === null ? [] : dataSource}
           loading={analyses === null || !!this.props.loading}
           expandedRowRender={record => <p>{record.description}</p>}
           pagination={
@@ -177,8 +225,9 @@ export class AnalysisListTable extends React.Component<
               : false
           }
           locale={tableLocale}
+          className="analysisListTable"
         />
-      </div>
+      </>
     )
   }
 }
@@ -189,11 +238,12 @@ const AnalysisList = (props: AnalysisListProps) => {
     <div>
       <Row justify="center">
         <MainCol>
-          <h3>
-            {props.publicList ? 'Public analyses' : 'Your saved analyses'}
-          </h3>
-          <br />
-          <AnalysisListTable {...props} />
+          <div className="analysisListRouteWrapper">
+            <div className="analysisListTitle">
+              {props.publicList ? 'Public analyses' : 'Your saved analyses'}
+            </div>
+            <AnalysisListTable {...props} />
+          </div>
         </MainCol>
       </Row>
     </div>

@@ -95,6 +95,7 @@ export default class Routes extends React.Component<
           <Route
             exact
             path="/public"
+            key="public"
             render={props => (
               <AnalysisList
                 analyses={this.props.publicAnalyses}
@@ -109,6 +110,7 @@ export default class Routes extends React.Component<
           <Route
             exact
             path="/myanalyses"
+            key="myanalyses"
             render={props => (
               <AnalysisList
                 analyses={this.props.analyses}

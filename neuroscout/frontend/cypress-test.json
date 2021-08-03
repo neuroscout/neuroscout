@@ -3,5 +3,6 @@
   "projectId": "jfpnqv",
   "retries": { "runMode": 1, "openMode": 1 },
   "defaultCommandTimeout": 6000,
+  "pageLoadTimeout": 180000,
   "requestTimeout": 8000
 }

@@ -360,7 +360,7 @@ export class PredictorSelector extends React.Component<
             <Col span={24}>
               {filteredPredictors && filteredPredictors.length > 20 && (
                 <div>
-                  <Input
+                  <Input.Search
                     placeholder="Search predictor name or description..."
                     value={this.state.searchText}
                     onChange={this.onInputChange}
@@ -398,12 +398,12 @@ export class PredictorSelector extends React.Component<
 
     return (
       <div>
-        <Tabs type="card">
+        <Tabs type="card" className="predictorTabs">
           <TabPane tab="Available" key="1">
             <Row>
               <Col xl={{ span: 16 }} lg={{ span: 24 }}>
                 <div>
-                  <Input
+                  <Input.Search
                     placeholder="Search predictor name or description..."
                     value={this.state.searchText}
                     onChange={this.onInputChange}
