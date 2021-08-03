@@ -326,11 +326,14 @@ export default class AnalysisBuilder extends React.Component<
       .filter(x => x.id === this.state.selectedTaskId)
       .map(y => y.name)
 
-    let runs: number[] = this.state.availableRuns
-      .filter(x => this.state.analysis.runIds.find(runId => runId === x.id))
-      .filter(y => y.number !== null)
-      .map(z => parseInt(z.number, 10))
-    runs = Array.from(new Set(runs))
+    let runs = [] as number[]
+    if (this.state.availableRuns.length !== this.state.analysis.runIds.length) {
+      runs = this.state.availableRuns
+        .filter(x => this.state.analysis.runIds.find(runId => runId === x.id))
+        .filter(y => y.number !== null)
+        .map(z => parseInt(z.number, 10))
+      runs = Array.from(new Set(runs))
+    }
 
     let sessions: string[] = this.state.availableRuns
       .filter(x => this.state.analysis.runIds.find(runId => runId === x.id))
