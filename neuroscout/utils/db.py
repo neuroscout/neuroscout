@@ -4,7 +4,7 @@
 from flask import abort, current_app
 from sqlalchemy.exc import SQLAlchemyError, IntegrityError
 from ..models import (Analysis, RunStimulus, Predictor, PredictorEvent,
-                      ExtractedEvent, Stimulus)
+                      ExtractedEvent, Stimulus, Report)
 from ..database import db
 from sqlalchemy.event import listens_for
 from sqlalchemy.dialects import postgresql
