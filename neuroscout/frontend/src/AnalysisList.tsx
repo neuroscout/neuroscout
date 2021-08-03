@@ -68,8 +68,8 @@ export class AnalysisListTable extends React.Component<
     }
     return this.props.analyses.filter(
       x =>
-        x.name.toLowerCase().includes(searchText) ||
-        x.dataset_name.toLowerCase().includes(searchText),
+        x.name.toLowerCase().includes(searchText.toLowerCase()) ||
+        x.dataset_name.toLowerCase().includes(searchText.toLowerCase()),
     )
   })
 
