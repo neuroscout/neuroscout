@@ -228,11 +228,12 @@ pre {
 
 .analysisListRouteWrapper .analysisListTitle {
     font-size: 20px;
+    margin-left: 20px;
 }
 .analysisListRouteWrapper .analysisListSearch {
     align-self: flex-end;
     flex: 1;
-    margin-left: 32px;
+    margin-left: 20px;
     height: 100%;
     margin-top: auto;
     margin-bottom: auto;
