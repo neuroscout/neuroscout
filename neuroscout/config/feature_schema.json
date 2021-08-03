@@ -2,7 +2,7 @@
   "AudiosetLabelExtractor":[
     {
       "features": {
-        "(Animal|Music)$": {
+        "(Animal|Music|Speech)$": {
           "description": "AudioSet Level 1 label: \\1",
           "name": "as-\\1"
         },

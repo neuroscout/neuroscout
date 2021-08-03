@@ -1,22 +1,13 @@
 {
-  "Raiders": {
+    "name": "Raiders",
     "dataset_address": "///labs/haxby/raiders",
-    "path": "/datasets/raw/raiders/",
+    "path": "/datasets/raw/Raiders/",
     "summary": "Raiders of the Lost Ark movie",
     "long_description": "The ~2 hour long film (Raiders of the Lost Ark) was presented in eight parts (corresponding to 8 runs) in two sessions with 4 runs in each session. Each movie part was of approximately the same duration (~14.5 min), with about 20 seconds of movie overlap between consecutive parts (For example, last 20 seconds of the movie at the end of the first run were shown at the beginning of the 2nd run).",
     "url": "https://github.com/HaxbyLab/raiders_data",
     "tasks": {
-      "raiders": {
-        "summary": "AV Presentation",
-        "converters": [
-        ],
-        "extractors": [
-        ],
-        "tokenized_extractors": [
-        ],
-        "transformations":[
-        ]
-      }
+        "raiders": {
+            "summary": "AV Presentation"
+        }
     }
-  }
 }

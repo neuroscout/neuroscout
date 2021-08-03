@@ -3,11 +3,11 @@
     "description": "Behavioral reaction time in seconds",
     "name": "rt"
   },
-  "^motion_outlier([0-9]{2})$": {
+  "^motion_outlier([0-9]{2,3})$": {
     "description": "Spike regressors",
     "source": "fmriprep"
   },
-  "^(a|t)_comp_cor_([0-9]{2})$": {
+  "^(a|t)_comp_cor_([0-9]{2,3})$": {
     "description": "Noise components estimated using component based noise correction method",
     "source": "fmriprep"
   },
@@ -19,7 +19,7 @@
     "description": "Esimated bulk-head motion",
     "source": "fmriprep"
   },
-  "^non_steady_state_outlier([0-9]{2})$": {
+  "^non_steady_state_outlier([0-9]{2,3})$": {
     "description": "Non-steady state volume detection",
     "source": "fmriprep"
   },
@@ -43,11 +43,11 @@
     "description": "Average signal in White Matter mask",
     "source": "fmriprep"
   },
-  "^rot_([x-z]?)$": {
+  "^rot_([x-z]?).*$": {
     "description": "Rigid-body transform parameter (rotation)",
     "source": "fmriprep"
   },
-  "^trans_[x-z]?$": {
+  "^trans_[x-z]?.*$": {
     "description": "Rigid-body transform parameter (translation)",
     "source": "fmriprep"
   },

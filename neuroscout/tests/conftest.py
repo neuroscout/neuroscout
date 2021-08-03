@@ -138,19 +138,42 @@ def add_users(app, db, session):
 @pytest.fixture(scope="function")
 def add_task(session):
     """ Add a dataset with two subjects """
-    return populate.add_task('bidstest', local_path=DATASET_PATH)
+    dataset_id = populate.add_dataset(
+      'Test Dataset',
+      'example dataset',
+      '///datalad/preproc/address',
+      DATASET_PATH
+    )
+
+    populate.add_task('bidstest', 'Test Dataset', DATASET_PATH)
+    return dataset_id
 
 
 @pytest.fixture(scope="function")
 def add_task_remote(session):
     """ Add a dataset with two subjects. """
-    return populate.ingest_from_json(REMOTE_JSON_PATH)[0]
+    config_path = populate.setup_dataset(
+      '///fake/dataset', 
+      raw_address='https://github.com/adelavega/bids_test', 
+      dataset_summary="A test dataset", 
+      skip_preproc=True, 
+      url="https://github.com/adelavega/bids_test", subject="01", run=1
+      )
+
+    return populate.ingest_from_json(config_path)
 
 
 @pytest.fixture(scope="function")
 def add_local_task_json(session):
     """ Add a dataset with two subjects. """
-    return populate.ingest_from_json(LOCAL_JSON_PATH)[0]
+    config_path = populate.setup_dataset(
+      '///fake/dataset', 
+      path="./neuroscout/tests/data/bids_test",
+      dataset_summary="A test dataset",
+      skip_preproc=True, 
+      url="https://github.com/adelavega/bids_test", subject="01", run=1
+      )
+    return populate.ingest_from_json(config_path)
 
 
 @pytest.fixture(scope="function")

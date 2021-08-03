@@ -60,10 +60,6 @@ def test_dataset_ingestion(session, add_task):
     assert GroupPredictor.query.count() == 3
     assert GroupPredictor.query.filter_by(name='sex').count() == 1
 
-    gpv = GroupPredictor.query.filter_by(name='sex').one().values
-    assert len(gpv) == 4
-    assert 'F' in [v.value for v in gpv]
-
 
 def test_json_local_dataset(session, add_local_task_json):
     dataset_model = Dataset.query.filter_by(id=add_local_task_json).one()
@@ -79,27 +75,11 @@ def test_json_local_dataset(session, add_local_task_json):
     assert len(predictor.predictor_events) == 4
 
     # Test that Stimiuli were extracted
-    assert Stimulus.query.count() == 8
+    assert Stimulus.query.count() == 4
 
     # Test participants.tsv ingestion
     assert GroupPredictor.query.filter_by(
             dataset_id=add_local_task_json).count() == 3
-
-    # Test that stimuli were converted
-    converted_stim = [s for s in Stimulus.query if s.parent_id is not None][0]
-    assert converted_stim.converter_name == 'TesseractConverter'
-
-    bright = ExtractedFeature.query.filter_by(
-        feature_name='Brightness').one()
-    assert bright.original_name == 'brightness'
-
-    num_bright = ExtractedFeature.query.filter_by(feature_name='num_bright')
-    assert num_bright.count() == 1
-    assert len(num_bright.first().extracted_events) == 3
-
-    for ee in num_bright.first().extracted_events:
-        assert ee.value == '1'
-
 
 
 def test_extracted_features(session, add_task, extract_features):

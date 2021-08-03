@@ -18,7 +18,6 @@ def test_get_dataset(auth_client, add_local_task_json):
     dataset = decode_json(resp)
     assert first_dataset_id == dataset['id']
     assert dataset['tasks'][0]['name'] == 'bidstest'
-    assert dataset['tasks'][0]['summary'] == 'AV Movie'
     assert dataset['name'] == 'bids_test'
     assert dataset['summary'] == "A test dataset"
     assert dataset['url'] == "https://github.com/adelavega/bids_test"
