@@ -258,10 +258,9 @@ class BibliographyResource(MethodResource):
 class ImageVersionResource(MethodResource):
     @doc(tags=['analysis'],
          summary='Get latest version of neuroscout cli docker image')
-    @cache.cached(60 * 60 * 24)
+    @cache.cached(60 * 60)
     def get(self):
-        url = "https://hub.docker.com/v2/repositories/neuroscout/\
-            neuroscout-cli/tags"
+        url = "https://hub.docker.com/v2/repositories/neuroscout/neuroscout-cli/tags"
         req = requests.get(url)
         try:
             req = req.json()
