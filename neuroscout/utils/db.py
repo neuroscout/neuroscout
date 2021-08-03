@@ -11,6 +11,16 @@ from sqlalchemy.dialects import postgresql
 import shortuuid
 
 
+def delete_analysis(analysis):
+    analysis.runs = []
+
+    # Delete reports
+    Report.query.filter_by(analysis_id=analysis.hash_id).delete()
+
+    db.session.delete(analysis)
+    db.session.commit()
+
+
 def create_pes(predictors, run_ids=None, stimulus_timing=False):
     """ Create PredictorEvents from EFs """
     all_pes = []
