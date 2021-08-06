@@ -145,6 +145,8 @@ def upload_neurovault(flask_app, file_id, n_subjects=None):
             modality="fMRI-BOLD", map_type=map_type,
             analysis_level=analysis_level, cognitive_paradigm_cogatlas='None',
             number_of_subjects=n_subjects, is_valid=True)
+
+        path.unlink()
     except Exception as e:
         update_record(
             file_object,
