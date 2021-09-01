@@ -24,7 +24,7 @@ class PredictorSchema(Schema):
     min = fields.Float(description="Minimum value")
     mean = fields.Float(description="Mean value")
     num_na = fields.Int(description="Numbers of n/as")
-    
+
     dataset_id = fields.Int()
 
     @post_dump
