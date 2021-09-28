@@ -13,4 +13,3 @@ For now, we are applying a ["SPM" style](https://en.wikibooks.org/wiki/SPM/Haemo
 
 !!! Note
     In reality, HRF convolution is another transformation that is applied after all other transformations.
-    Thus, the transformed variables will be the ones that are convolved.
