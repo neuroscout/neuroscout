@@ -48,7 +48,7 @@ class Dataset(db.Model):
                 if v in age_map:
                     vals.append(age_map[v])
                 elif "," in v:
-                    vals += [float(v) for v in v.split(",")]
+                    vals += [float(v) for v in v.split(",") if v != "n/a"]
                 else:
                     vals.append(float(v))
         except ValueError:
