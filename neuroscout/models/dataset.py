@@ -40,17 +40,21 @@ class Dataset(db.Model):
         try:
             val = GroupPredictorValue.query.join(GroupPredictor).filter_by(
                 dataset_id=self.id, name='age').values('value')
-            # Translating age ranges to
-            age_map = {'20-25': 22.5, '25-30': 27.5, '30-35': 32.5, '35-40': 37.5}
+            # Translating age ranges to numeric
+            age_map = {
+                '20-25': 22.5, '25-30': 27.5, '30-35': 32.5, '35-40': 37.5}
             vals = []
             for v in val:
                 v = v[0]
                 if v in age_map:
-                    vals.append(age_map[v])
+                    new_val = age_map[v]
                 elif "," in v:
-                    vals += [float(v) for v in v.split(",") if v != "n/a"]
+                    # If age is comma separated
+                    new_val = statistics.mean(
+                        [float(v) for v in v.split(",") if v != "n/a"])
                 else:
-                    vals.append(float(v))
+                    new_val = float(v)
+                vals.append(new_val)
         except ValueError:
             return None
 
