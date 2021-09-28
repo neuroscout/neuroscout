@@ -52,8 +52,9 @@ class Dataset(db.Model):
                     # If age is comma separated
                     new_val = [float(v) for v in v.split(",") if v != "n/a"]
                     if new_val:
+                        mv = statistics.mean(new_val)
                         vals.append(statistics.mean(new_val))
-                else:
+                elif v != 'nan':
                     vals.append(float(v))
         except ValueError:
             return None
