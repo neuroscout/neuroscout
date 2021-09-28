@@ -47,14 +47,14 @@ class Dataset(db.Model):
             for v in val:
                 v = v[0]
                 if v in age_map:
-                    new_val = age_map[v]
+                    vals.append(age_map[v])
                 elif "," in v:
                     # If age is comma separated
-                    new_val = statistics.mean(
-                        [float(v) for v in v.split(",") if v != "n/a"])
+                    new_val = [float(v) for v in v.split(",") if v != "n/a"]
+                    if new_val:
+                        vals.append(statistics.mean(new_val))
                 else:
-                    new_val = float(v)
-                vals.append(new_val)
+                    vals.append(float(v))
         except ValueError:
             return None
 
