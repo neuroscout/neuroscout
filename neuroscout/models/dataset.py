@@ -44,10 +44,13 @@ class Dataset(db.Model):
             age_map = {'20-25': 22.5, '25-30': 27.5, '30-35': 32.5, '35-40': 37.5}
             vals = []
             for v in val:
-                if v[0] in age_map:
-                    vals.append(age_map[v[0]])
-                else:
+                v = v[0]
+                if v in age_map:
+                    vals.append(age_map[v])
+                elif "," in v:
                     vals += [float(v) for v in v.split(",")]
+                else:
+                    vals.append(float(v))
         except ValueError:
             return None
 
