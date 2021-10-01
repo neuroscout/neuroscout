@@ -37,7 +37,26 @@ export class AnalysisListTable extends React.Component<
     ownersWidth: number
   }
 > {
-  state = { redirectId: '', owners: [], searchText: '', ownersWidth: 10 }
+  constructor(props) {
+    super(props)
+    let owners: string[] = []
+    let ownersWidth = 10
+
+    if (props.analyses !== null && props.analyses.length > 0) {
+      owners = [
+        ...new Set(
+          props.analyses.filter(x => x.user_name).map(x => x.user_name),
+        ),
+      ].sort() as string[]
+      ownersWidth = Math.max(...owners.map(x => (x ? x.length : 0))) + 4
+    }
+    this.state = {
+      redirectId: '',
+      owners: owners,
+      searchText: '',
+      ownersWidth: ownersWidth,
+    }
+  }
 
   componentDidUpdate(prevProps) {
     const length = prevProps.analyses ? prevProps.analyses.length : 0
@@ -48,9 +67,9 @@ export class AnalysisListTable extends React.Component<
     ) {
       const owners = [
         ...new Set(
-          this.props.analyses.map(x => (x.user_name ? x.user_name : ' ')),
+          this.props.analyses.filter(x => x.user_name).map(x => x.user_name),
         ),
-      ]
+      ].sort() as string[]
 
       /* no science behind adding 4, just a bit of buffer */
       const ownersWidth = Math.max(...owners.map(x => (x ? x.length : 0))) + 4
