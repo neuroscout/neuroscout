@@ -4,11 +4,21 @@
 from flask import abort, current_app
 from sqlalchemy.exc import SQLAlchemyError, IntegrityError
 from ..models import (Analysis, RunStimulus, Predictor, PredictorEvent,
-                      ExtractedEvent, Stimulus)
+                      ExtractedEvent, Stimulus, Report)
 from ..database import db
 from sqlalchemy.event import listens_for
 from sqlalchemy.dialects import postgresql
 import shortuuid
+
+
+def delete_analysis(analysis):
+    analysis.runs = []
+
+    # Delete reports
+    Report.query.filter_by(analysis_id=analysis.hash_id).delete()
+
+    db.session.delete(analysis)
+    db.session.commit()
 
 
 def create_pes(predictors, run_ids=None, stimulus_timing=False):

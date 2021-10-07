@@ -49,6 +49,7 @@ export const ApiToAppAnalysis = (data: ApiAnalysis): AppAnalysis => ({
   dataset_id: data.dataset_id ? String(data.dataset_id) : '',
   modified_at: data.modified_at,
   user_name: data.user,
+  dataset_name: '',
 })
 
 const ef_fields = [

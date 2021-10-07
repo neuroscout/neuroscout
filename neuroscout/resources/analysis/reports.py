@@ -259,4 +259,4 @@ class AnalysisUploadResource(MethodResource):
     @fetch_analysis
     def get(self, analysis):
         return NeurovaultCollection.query.filter_by(
-            analysis_id=analysis.hash_id)
+            analysis_id=analysis.hash_id).order_by('collection_id')

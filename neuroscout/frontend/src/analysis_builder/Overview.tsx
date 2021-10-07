@@ -40,6 +40,8 @@ interface OverviewTabState {
   filteredVal: RunFilters | null
   runColumns: ColumnType<Run>[]
   taskMsg: string
+  searchText: string
+  datasetDataSource: Dataset[]
 }
 
 export class OverviewTab extends React.Component<
@@ -53,7 +55,22 @@ export class OverviewTab extends React.Component<
       filteredVal: { numbers: [], subjects: [], sessions: [] },
       runColumns: [] as ColumnType<Run>[],
       taskMsg: 'Please Select',
+      searchText: '',
+      datasetDataSource: props.datasets.filter(x => x.active),
     }
+  }
+
+  onInputChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
+    this.setState({
+      searchText: e.target.value,
+      datasetDataSource: this.props.datasets.filter(
+        x =>
+          e.target.value.length < 3 ||
+          JSON.stringify(x)
+            .toLowerCase()
+            .includes(e.target.value.toLowerCase()),
+      ),
+    })
   }
 
   updateAnalysis =
@@ -113,6 +130,18 @@ export class OverviewTab extends React.Component<
 
   componentDidUpdate(prevProps: OverviewTabProps): void {
     if (this.props.analysis.datasetId !== prevProps.analysis.datasetId) {
+      const datasetId = this.props.analysis.datasetId
+      if (
+        datasetId &&
+        !this.state.datasetDataSource.map(x => x.id).includes(datasetId)
+      ) {
+        const dataset = this.props.datasets.find(x => x.id === datasetId)
+        if (dataset) {
+          this.setState({
+            datasetDataSource: [...this.state.datasetDataSource, dataset],
+          })
+        }
+      }
       this.setState({ clearFilteredVal: true })
     }
 
@@ -264,6 +293,7 @@ export class OverviewTab extends React.Component<
 
   render() {
     const { analysis, datasets, availableRuns, selectedTaskId } = this.props
+    const { searchText } = this.state
 
     const availableTasks = getTasks(datasets, analysis.datasetId)
 
@@ -372,16 +402,18 @@ export class OverviewTab extends React.Component<
               </span>
             }
             required>
+            <Input.Search
+              placeholder="Search by dataset or task name..."
+              value={this.state.searchText}
+              onChange={this.onInputChange}
+              className="datasetListSearch"
+            />
             <Table
               className="selectDataset"
               columns={datasetColumns}
               rowKey="id"
               size="small"
-              dataSource={datasets.filter(x => {
-                return (
-                  x.active === true || x.id === this.props.analysis.datasetId
-                )
-              })}
+              dataSource={this.state.datasetDataSource}
               rowSelection={datasetRowSelection}
               pagination={
                 datasets.length > 10 ? { position: ['bottomCenter'] } : false

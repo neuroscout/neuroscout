@@ -10,7 +10,7 @@ from webargs import fields
 import json
 import requests
 
-from ...utils.db import put_record
+from ...utils.db import put_record, delete_analysis
 from .bib import format_bibliography, find_predictor_citation, _flatten
 from ..utils import owner_required, auth_required, fetch_analysis, abort
 from ..predictor import get_predictors
@@ -81,14 +81,8 @@ class AnalysisResource(AnalysisMethodResource):
     def delete(self, analysis):
         if analysis.status not in ['DRAFT', 'FAILED'] or analysis.locked:
             abort(422, "Analysis not editable, cannot delete.")
-
-        analysis.runs = []
-
-        # Delete reports
-        Report.query.filter_by(analysis_id=analysis.hash_id).delete()
-
-        db.session.delete(analysis)
-        db.session.commit()
+            
+        delete_analysis(analysis)
 
         return {'message': 'deleted!'}, 200
 
