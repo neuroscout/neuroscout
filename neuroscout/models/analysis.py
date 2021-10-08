@@ -1,5 +1,6 @@
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.ext.hybrid import hybrid_property
+from sqlalchemy.orm import column_property
 
 from ..database import db
 from .utils import copy_row
@@ -55,6 +56,9 @@ class Analysis(db.Model):
     runs = db.relationship('Run', secondary='analysis_run')
     neurovault_collections = db.relationship(
         'NeurovaultCollection')
+    nv_count = column_property(
+        select([func.count(neurovault_collections.id)]).where(neurovault_collections.analysis_id==id)
+    )
 
     def clone(self, user):
         """ Make copy of analysis, with new id, and linking to parent """
