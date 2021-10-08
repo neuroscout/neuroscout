@@ -1,6 +1,7 @@
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import column_property
+from sqlalchemy import select, func
 
 from ..database import db
 from .utils import copy_row
