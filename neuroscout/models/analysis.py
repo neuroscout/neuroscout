@@ -58,7 +58,10 @@ class Analysis(db.Model):
     neurovault_collections = db.relationship(
         'NeurovaultCollection')
     nv_count = column_property(
-        select([func.count(neurovault_collections.id)]).where(neurovault_collections.analysis_id==id)
+        select([func.count(NeurovaultCollection.id)]).where(NeurovaultCollection.analysis_id==id)
+    )
+    nv_count2 = column_property(
+       len(neurovault_collections)
     )
 
     def clone(self, user):
