@@ -1,7 +1,5 @@
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.ext.hybrid import hybrid_property
-from sqlalchemy.orm import column_property
-from sqlalchemy import select, func
 
 from ..database import db
 from .utils import copy_row
@@ -57,12 +55,10 @@ class Analysis(db.Model):
     runs = db.relationship('Run', secondary='analysis_run')
     neurovault_collections = db.relationship(
         'NeurovaultCollection')
-    nv_count = column_property(
-        select([func.count(NeurovaultCollection.id)]).where(NeurovaultCollection.analysis_id==id)
-    )
-    nv_count2 = column_property(
-       len(neurovault_collections)
-    )
+
+    @hybrid_property
+    def nv_count(self):
+        return len(self.neurovault_collections)
 
     def clone(self, user):
         """ Make copy of analysis, with new id, and linking to parent """
