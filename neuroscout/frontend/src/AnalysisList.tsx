@@ -190,7 +190,7 @@ export class AnalysisListTable extends React.Component<
       title: 'Uploaded',
       dataIndex: 'nv_count',
       width: '2ch',
-      sorter: (a, b) => a.nv_count,
+      sorter: (a, b) => a.nv_count - b.nv_count,
       render: (text, record: AppAnalysis) => {
         if (record.nv_count) {
           return <CheckCircleTwoTone twoToneColor="#52c41a" />
