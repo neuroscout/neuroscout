@@ -50,6 +50,7 @@ export const ApiToAppAnalysis = (data: ApiAnalysis): AppAnalysis => ({
   modified_at: data.modified_at,
   user_name: data.user,
   dataset_name: '',
+  nv_count: data.nv_count ? data.nv_count : 0,
 })
 
 const ef_fields = [
