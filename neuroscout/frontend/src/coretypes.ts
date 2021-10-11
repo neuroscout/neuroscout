@@ -241,6 +241,7 @@ export interface ApiAnalysis {
   modified_at?: string
   model?: BidsModel
   user?: string
+  nv_count?: number
 }
 
 export interface BidsModel {
@@ -302,6 +303,7 @@ export interface AppAnalysis {
   modified_at?: string
   user_name?: string
   dataset_name: string
+  nv_count?: number
 }
 
 export const profileEditItems = [
