@@ -187,7 +187,7 @@ export class AnalysisListTable extends React.Component<
       })
     }
     analysisTableColumns.push({
-      title: 'Uploaded',
+      title: 'NeuroVault',
       dataIndex: 'nv_count',
       width: '2ch',
       sorter: (a, b) => a.nv_count - b.nv_count,
