@@ -51,3 +51,4 @@ All application state is contained in two main components:
 
 `coretypes.tsx` contains the type definitinos for most key models, such as analysis, run, predictor, contrast, transformation, etc. The data models in this module are largely UI agonstic. This file is a good starting point to understand the
  shape of the data in the frontend app. All resusable type definitions should go into this module.
+
