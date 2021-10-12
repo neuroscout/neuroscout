@@ -117,6 +117,7 @@ class NeurovaultCollectionSchema(Schema):
     uploaded_at = fields.Time(description='Time collections was created')
     collection_id = fields.Dict(description='NeuroVault collection id')
     cli_version = fields.Str(description='neuroscout-cli version at runtime')
+    cli_args = fields.Dict(description='neuroscout-cli runtime arguments')
     fmriprep_version = fields.Str(description='fmriprep version at runtime')
     estimator = fields.Str(description='estimator used in fitlins')
 
