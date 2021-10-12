@@ -275,7 +275,12 @@ export class StatusTab extends React.Component<submitProps, statusTabState> {
         >
           <Collapse>
             <Panel
-              header={<>Uploaded: {x.uploaded_at ? x.uploaded_at : 'n/a'}</>}
+              header={
+                <>
+                  Uploaded:{' '}
+                  {x.uploaded_at ? x.uploaded_at.split('T')[0] : 'n/a'}
+                </>
+              }
               key={String(x.id)}
             >
               <p>Estimator: {x.estimator ? x.estimator : 'n/a'}</p>
