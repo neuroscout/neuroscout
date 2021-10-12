@@ -65,7 +65,8 @@ export class RunSelector extends React.Component<
               type="primary"
               size="small"
               onClick={this.selectAll(key)}
-              style={{ float: 'right' }}>
+              style={{ float: 'right' }}
+            >
               All
             </Button>
           </h4>

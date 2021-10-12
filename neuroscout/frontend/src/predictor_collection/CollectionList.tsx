@@ -136,7 +136,8 @@ export class PredictorCollectionList extends React.Component<
               visible={this.state.formModal}
               onCancel={() => this.setState({ formModal: false })}
               okButtonProps={{ hidden: true }}
-              cancelButtonProps={{ hidden: true }}>
+              cancelButtonProps={{ hidden: true }}
+            >
               <AddPredictorsForm
                 datasets={datasets}
                 closeModal={this.closeModal}

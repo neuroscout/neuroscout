@@ -226,7 +226,8 @@ export class ContrastsTab extends React.Component<
                       <Draggable
                         key={index}
                         draggableId={String(index)}
-                        index={index}>
+                        index={index}
+                      >
                         {(
                           providedDraggable: DraggableProvided,
                           snapshotDraggable: DraggableStateSnapshot,
@@ -235,7 +236,8 @@ export class ContrastsTab extends React.Component<
                             style={{ width: '100%' }}
                             // eslint-disable-next-line @typescript-eslint/unbound-method
                             ref={providedDraggable.innerRef}
-                            {...providedDraggable.dragHandleProps}>
+                            {...providedDraggable.dragHandleProps}
+                          >
                             <div {...providedDraggable.draggableProps}>
                               <ContrastDisplay
                                 key={index}

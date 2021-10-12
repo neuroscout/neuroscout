@@ -3,7 +3,7 @@ Jest (the test runner) runs this file first before running any of the test suite
 Create mock matchMedia and localStorage for the tests to work.
 */
 import { configure } from 'enzyme'
-import Adapter from '@wojtekmaj/enzyme-adapter-react-17';
+import Adapter from '@wojtekmaj/enzyme-adapter-react-17'
 import ReactGA from 'react-ga'
 
 configure({ adapter: new Adapter() })

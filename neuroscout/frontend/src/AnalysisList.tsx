@@ -216,7 +216,8 @@ export class AnalysisListTable extends React.Component<
                     void this.props.cloneAnalysis(record.id).then(id => {
                       this.setState({ redirectId: id })
                     })
-                  }}>
+                  }}
+                >
                   Clone
                 </Button>
                 <Space />

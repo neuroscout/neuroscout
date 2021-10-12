@@ -37,7 +37,8 @@ class Home extends React.Component<UserStore, Record<string, never>> {
                   size="large"
                   className="splashButton"
                   type="default"
-                  href="/public">
+                  href="/public"
+                >
                   Browse public analyses
                 </Button>{' '}
                 {this.props.loggedIn === false && (
@@ -45,7 +46,8 @@ class Home extends React.Component<UserStore, Record<string, never>> {
                     size="large"
                     className="splashButton"
                     type="primary"
-                    onClick={e => this.props.update({ openSignup: true })}>
+                    onClick={e => this.props.update({ openSignup: true })}
+                  >
                     Sign up to get started!
                   </Button>
                 )}
@@ -59,7 +61,8 @@ class Home extends React.Component<UserStore, Record<string, never>> {
             xxl={{ span: 5 }}
             xl={{ span: 6 }}
             lg={{ span: 7 }}
-            xs={{ span: 8 }}>
+            xs={{ span: 8 }}
+          >
             <div className="stat-container">
               <div className="stat-title">Active Datasets</div>
               <div className="stat-value">13</div>
@@ -69,7 +72,8 @@ class Home extends React.Component<UserStore, Record<string, never>> {
             xxl={{ span: 5 }}
             xl={{ span: 6 }}
             lg={{ span: 7 }}
-            xs={{ span: 8 }}>
+            xs={{ span: 8 }}
+          >
             <div className="stat-container">
               <div className="stat-title">Number of Tasks</div>
               <div className="stat-value">40</div>
@@ -82,11 +86,13 @@ class Home extends React.Component<UserStore, Record<string, never>> {
             xxl={{ span: 5 }}
             xl={{ span: 6 }}
             lg={{ span: 7 }}
-            xs={{ span: 8 }}>
+            xs={{ span: 8 }}
+          >
             <Card
               title="Re-use public data"
               headStyle={titleStyle}
-              bordered={false}>
+              bordered={false}
+            >
               <img className="splashLogo" src="/static/browse.svg" />
               <br />
               <div className="introCardsText">
@@ -102,11 +108,13 @@ class Home extends React.Component<UserStore, Record<string, never>> {
             xxl={{ span: 5 }}
             xl={{ span: 6 }}
             lg={{ span: 7 }}
-            xs={{ span: 8 }}>
+            xs={{ span: 8 }}
+          >
             <Card
               title="Design your analysis"
               headStyle={titleStyle}
-              bordered={false}>
+              bordered={false}
+            >
               <img className="splashLogo" src="/static/design.svg" />
               <br />
               <div className="introCardsText">
@@ -121,11 +129,13 @@ class Home extends React.Component<UserStore, Record<string, never>> {
             xxl={{ span: 5 }}
             xl={{ span: 6 }}
             lg={{ span: 7 }}
-            xs={{ span: 8 }}>
+            xs={{ span: 8 }}
+          >
             <Card
               title="Execute and share"
               headStyle={titleStyle}
-              bordered={false}>
+              bordered={false}
+            >
               <img className="splashLogo" src="/static/share.svg" />
               <br />
               <div className="introCardsText">
@@ -145,7 +155,8 @@ class Home extends React.Component<UserStore, Record<string, never>> {
               <Button
                 size="large"
                 className="splashButton"
-                href="https://neuroscout.github.io/neuroscout/">
+                href="https://neuroscout.github.io/neuroscout/"
+              >
                 <BookOutlined />
                 Learn more
               </Button>
@@ -157,7 +168,8 @@ class Home extends React.Component<UserStore, Record<string, never>> {
             <Card
               title="Support provided by"
               headStyle={titleStyle}
-              bordered={false}>
+              bordered={false}
+            >
               <Row justify="center">
                 <Col span={5}>
                   <img className="instLogo2" src="/static/utlogo.png" />

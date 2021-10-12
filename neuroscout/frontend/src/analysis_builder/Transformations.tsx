@@ -209,7 +209,8 @@ class ParameterField extends React.Component<ParameterFieldProps> {
         <br />
         <RadioGroup
           onChange={event => onChange(event.target.value)}
-          value={value}>
+          value={value}
+        >
           <Radio.Button value={'before'}>Before</Radio.Button>
           <Radio.Button value={'after'}>After</Radio.Button>
           <Radio.Button value={undefined}>Don&apos;t Replace</Radio.Button>
@@ -397,7 +398,8 @@ class XformEditor extends React.Component<XformEditorProps, XformEditorState> {
           <Button
             type="primary"
             onClick={this.onSave}
-            disabled={!this.props.xform.Name}>
+            disabled={!this.props.xform.Name}
+          >
             OK{' '}
           </Button>
           <Space />
@@ -546,7 +548,8 @@ export class XformsTab extends React.Component<XformsTabProps, XformsTabState> {
                       <Draggable
                         key={index}
                         draggableId={String(index)}
-                        index={index}>
+                        index={index}
+                      >
                         {(
                           providedDraggable: DraggableProvided,
                           snapshotDraggable: DraggableStateSnapshot,
@@ -554,7 +557,8 @@ export class XformsTab extends React.Component<XformsTabProps, XformsTabState> {
                           <div
                             style={{ width: '100%' }}
                             ref={providedDraggable.innerRef}
-                            {...providedDraggable.dragHandleProps}>
+                            {...providedDraggable.dragHandleProps}
+                          >
                             <div {...providedDraggable.draggableProps}>
                               <XformDisplay
                                 key={index}

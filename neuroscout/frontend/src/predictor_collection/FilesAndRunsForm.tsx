@@ -177,7 +177,8 @@ export class FilesAndRunsForm extends React.Component<
                 this.props.filesAndRuns.length > 1 && (
                   <CloseOutlined onClick={this.remove(i)} />
                 )
-              }>
+              }
+            >
               {this.props.filesAndRuns[i].display && (
                 <>
                   <RunSelector
@@ -188,7 +189,8 @@ export class FilesAndRunsForm extends React.Component<
                   <Button
                     className="runSelectorBtn"
                     type="primary"
-                    onClick={() => this.onChange(i)('display')(false)}>
+                    onClick={() => this.onChange(i)('display')(false)}
+                  >
                     Ok
                   </Button>
                 </>
@@ -200,7 +202,8 @@ export class FilesAndRunsForm extends React.Component<
               <span>{fileName}</span>
               <Button
                 style={{ margin: '0 0 0 10px' }}
-                onClick={() => this.onChange(i)('display')(true)}>
+                onClick={() => this.onChange(i)('display')(true)}
+              >
                 <EditOutlined /> Edit
               </Button>
             </>

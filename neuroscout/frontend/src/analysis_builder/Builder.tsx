@@ -228,7 +228,8 @@ class EditDetails extends React.Component<editDetailsProps, editDetailsState> {
         <Collapse
           bordered={false}
           activeKey={this.state.visible}
-          onChange={this.onChange}>
+          onChange={this.onChange}
+        >
           <Panel header="Edit Analysis Details" key="1">
             <Form layout="vertical">
               <FormItem label="Name">
@@ -259,7 +260,8 @@ class EditDetails extends React.Component<editDetailsProps, editDetailsState> {
                 this.update()
                 this.setState({ visible: '' })
               }}
-              size={'small'}>
+              size={'small'}
+            >
               Save Changes
             </Button>
           </Panel>
@@ -1188,7 +1190,8 @@ export default class AnalysisBuilder extends React.Component<
           type="primary"
           onClick={this.nextTab()}
           className="nextButton"
-          disabled={disabled}>
+          disabled={disabled}
+        >
           Next
         </Button>
       </Button.Group>
@@ -1205,7 +1208,8 @@ export default class AnalysisBuilder extends React.Component<
         <Button
           onClick={this.saveAnalysis({ compile: false })}
           disabled={!this.saveEnabled()}
-          type={'primary'}>
+          type={'primary'}
+        >
           Save
         </Button>
         <Space />
@@ -1381,7 +1385,8 @@ export default class AnalysisBuilder extends React.Component<
                 onTabClick={newTab => this.onTabClick(newTab as TabName)}
                 onChange={this.postTabChange}
                 className="builderTabs"
-                tabPosition="left">
+                tabPosition="left"
+              >
                 {!this.props.userOwns && isDraft && (
                   <Alert
                     message="This analysis is a draft and is currently read only. Only the owner 
@@ -1417,7 +1422,8 @@ export default class AnalysisBuilder extends React.Component<
                   <TabPane
                     tab="Predictors"
                     key="predictors"
-                    disabled={(!predictorsActive || !isEditable) && !isFailed}>
+                    disabled={(!predictorsActive || !isEditable) && !isFailed}
+                  >
                     <h2>
                       Select Predictors&nbsp;&nbsp;{' '}
                       {this.state.activeTab === ('predictors' as TabName) && (
@@ -1430,7 +1436,8 @@ export default class AnalysisBuilder extends React.Component<
                           defaultVisible={
                             this.state.doTooltip &&
                             this.state.activeTab === ('predictors' as TabName)
-                          }>
+                          }
+                        >
                           <QuestionCircleTwoTone style={{ fontSize: '17px' }} />
                         </Tooltip>
                       )}
@@ -1455,7 +1462,8 @@ export default class AnalysisBuilder extends React.Component<
                     key="transformations"
                     disabled={
                       (!transformationsActive || !isEditable) && !isFailed
-                    }>
+                    }
+                  >
                     <h2>
                       Add Transformations&nbsp;&nbsp;
                       {this.state.activeTab ===
@@ -1469,7 +1477,8 @@ export default class AnalysisBuilder extends React.Component<
                             this.state.doTooltip &&
                             this.state.activeTab ===
                               ('transformations' as TabName)
-                          }>
+                          }
+                        >
                           <QuestionCircleTwoTone style={{ fontSize: '17px' }} />
                         </Tooltip>
                       )}
@@ -1494,7 +1503,8 @@ export default class AnalysisBuilder extends React.Component<
                   <TabPane
                     tab="HRF"
                     key="hrf"
-                    disabled={(!hrfActive || !isEditable) && !isFailed}>
+                    disabled={(!hrfActive || !isEditable) && !isFailed}
+                  >
                     <h2>
                       HRF Convolution&nbsp;&nbsp;
                       {this.state.activeTab === ('hrf' as TabName) && (
@@ -1507,7 +1517,8 @@ export default class AnalysisBuilder extends React.Component<
                           defaultVisible={
                             this.state.doTooltip &&
                             this.state.activeTab === ('hrf' as TabName)
-                          }>
+                          }
+                        >
                           <QuestionCircleTwoTone style={{ fontSize: '17px' }} />
                         </Tooltip>
                       )}
@@ -1531,7 +1542,8 @@ export default class AnalysisBuilder extends React.Component<
                   <TabPane
                     tab="Contrasts"
                     key="contrasts"
-                    disabled={(!contrastsActive || !isEditable) && !isFailed}>
+                    disabled={(!contrastsActive || !isEditable) && !isFailed}
+                  >
                     <h2>
                       Add Contrasts&nbsp;&nbsp;
                       {this.state.activeTab === ('contrasts' as TabName) && (
@@ -1544,7 +1556,8 @@ export default class AnalysisBuilder extends React.Component<
                           defaultVisible={
                             this.state.doTooltip &&
                             this.state.activeTab === ('contrasts' as TabName)
-                          }>
+                          }
+                        >
                           <QuestionCircleTwoTone style={{ fontSize: '17px' }} />
                         </Tooltip>
                       )}
@@ -1570,7 +1583,8 @@ export default class AnalysisBuilder extends React.Component<
                 <TabPane
                   tab="Review"
                   key="review"
-                  disabled={(!reviewActive || !analysis.analysisId) && isDraft}>
+                  disabled={(!reviewActive || !analysis.analysisId) && isDraft}
+                >
                   {this.state.model &&
                     activeTab === ('review' as TabName) &&
                     reportRuns.length > 0 && (
@@ -1605,7 +1619,8 @@ export default class AnalysisBuilder extends React.Component<
                   <TabPane
                     tab={isEditable ? 'Run' : 'Status'}
                     key="submit"
-                    disabled={!submitActive && isDraft}>
+                    disabled={!submitActive && isDraft}
+                  >
                     <h2>Finalize and Run</h2>
                     <StatusTab
                       status={analysis.status}
@@ -1615,7 +1630,8 @@ export default class AnalysisBuilder extends React.Component<
                       private={analysis.private || false}
                       updateAnalysis={this.updateAnalysis}
                       userOwns={this.props.userOwns}
-                      modified_at={analysis.modified_at}>
+                      modified_at={analysis.modified_at}
+                    >
                       {this.props.userOwns && (
                         <EditDetails
                           name={analysis.name}

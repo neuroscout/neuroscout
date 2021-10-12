@@ -244,6 +244,9 @@ export const api = {
 
         data.map(collection => {
           const upload = {
+            uploaded_at: collection.uploaded_at,
+            estimator: collection.estimator,
+            fmriprep_version: collection.fmriprep_version,
             failed: 0,
             pending: 0,
             ok: 0,
