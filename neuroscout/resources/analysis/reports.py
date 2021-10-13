@@ -2,11 +2,12 @@ import datetime
 from hashids import Hashids
 from webargs import fields
 from sqlalchemy import desc
-from marshmallow import INCLUDE, Schema
+from marshmallow import INCLUDE, Schema, pre_load
 from flask_apispec import doc, use_kwargs, MethodResource, marshal_with
 from flask import current_app
 from pathlib import Path
 from pynv import Client
+import json
 
 from ...models import Report, NeurovaultCollection, NeurovaultFileUpload
 from ...database import db
@@ -141,8 +142,8 @@ def _truncate_string(si, max_char):
 
 
 def _create_collection(
-      analysis, cli_version=None, fmriprep_version=None, estimator=None,
-      force=False):
+      analysis, cli_version=None,  cli_args=None, 
+      fmriprep_version=None, estimator=None, force=False):
     collection_name = f"{analysis.name} - {analysis.hash_id}"
     if force is True:
         timestamp = datetime.datetime.utcnow().strftime(
@@ -169,6 +170,7 @@ def _create_collection(
         analysis_id=analysis.hash_id,
         collection_id=collection['id'],
         cli_version=cli_version,
+        cli_args=cli_args,
         fmriprep_version=fmriprep_version,
         estimator=estimator
         )
@@ -189,11 +191,19 @@ class NVUploadFormSchema(Schema):
     level = fields.Str()
     n_subjects = fields.Number()
     cli_version = fields.Str()
+    cli_args = fields.Dict()
     fmriprep_version = fields.Str()
     estimator = fields.Str()
 
     class Meta:
         unknown = INCLUDE
+
+    @pre_load
+    def json_load(self, args, **kwargs):
+        args = args.to_dict()
+        if 'cli_args' in args:
+            args['cli_args'] = json.loads(args['cli_args'])
+        return args
 
 
 class NVUploadFileSchema(Schema):
@@ -212,15 +222,17 @@ class AnalysisUploadResource(MethodResource):
     @use_kwargs(NVUploadFileSchema, location="files")
     @fetch_analysis
     def post(self, analysis, validation_hash, collection_id=None,
-             cli_version=None, fmriprep_version=None, estimator=None,
-             image_file=None, level=None, n_subjects=None, force=False):
+             cli_version=None, cli_args=None, fmriprep_version=None,
+             estimator=None, image_file=None, level=None, n_subjects=None, 
+             force=False):
         if validation_hash != _validation_hash(analysis.id):
             abort(422, "Invalid validation hash.")
 
         # Create or fetch NeurovaultCollection
         if collection_id is None:
             upload = _create_collection(
-                analysis, cli_version, fmriprep_version, estimator, force)
+                analysis, cli_version, cli_args, fmriprep_version, 
+                estimator, force)
             collection_id = upload.collection_id
         else:
             upload = NeurovaultCollection.query.filter_by(

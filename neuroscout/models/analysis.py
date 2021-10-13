@@ -100,6 +100,7 @@ class NeurovaultCollection(db.Model):
     files = db.relationship('NeurovaultFileUpload', backref='collection')
 
     cli_version = db.Column(db.Text)  # neuroscout-cli version
+    cli_args = db.Column(JSONB)  # Dictionary of cli arguments
     fmriprep_version = db.Column(db.Text)
     estimator = db.Column(db.Text)
 
