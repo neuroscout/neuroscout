@@ -333,7 +333,7 @@ export class StatusTab extends React.Component<submitProps, statusTabState> {
       return (
         <>
           <h3>NeuroVault Uploads</h3>
-          {statuses}
+          <div style={{ display: 'flex', flexWrap: 'wrap' }}>{statuses}</div>
         </>
       )
     }
@@ -372,7 +372,7 @@ export class StatusTab extends React.Component<submitProps, statusTabState> {
                 'Congratulations, your analysis has been compiled!'}
               <br />
               Run the analysis with this this command, replacing
-              &apos;/local/out&apos; with a local directory. See the{' '}
+              &apos;/local/outputdirectory&apos; with a local directory. See the{' '}
               <a href="https://neuroscout.github.io/neuroscout/cli/">
                 neuroscout-cli documentation{' '}
               </a>
