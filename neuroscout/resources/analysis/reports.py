@@ -200,6 +200,7 @@ class NVUploadFormSchema(Schema):
 
     @pre_load
     def json_load(self, args, **kwargs):
+        args = args.to_dict()
         if 'cli_args' in args:
             args['cli_args'] = json.loads(args['cli_args'])
         return args
