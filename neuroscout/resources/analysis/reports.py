@@ -2,11 +2,12 @@ import datetime
 from hashids import Hashids
 from webargs import fields
 from sqlalchemy import desc
-from marshmallow import INCLUDE, Schema
+from marshmallow import INCLUDE, Schema, pre_load
 from flask_apispec import doc, use_kwargs, MethodResource, marshal_with
 from flask import current_app
 from pathlib import Path
 from pynv import Client
+import json
 
 from ...models import Report, NeurovaultCollection, NeurovaultFileUpload
 from ...database import db
@@ -196,6 +197,12 @@ class NVUploadFormSchema(Schema):
 
     class Meta:
         unknown = INCLUDE
+
+    @pre_load
+    def json_load(self, args, **kwargs):
+        if 'cli_args' in args:
+            args['cli_args'] = json.load(args['cli_args'])
+        return args
 
 
 class NVUploadFileSchema(Schema):
