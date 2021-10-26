@@ -70,7 +70,7 @@ Note that you need to specify **absolute paths** for both directories.
     neuroscout
 
     Usage:
-        neuroscout run [-dfuv -i <dir> -w <dir> -s <k> -c <n> -n <nv> -e <es>] <outdir> <bundle_id>...
+        neuroscout run [-mfuvd -i <dir> -w <dir> -s <k> -c <n> -n <nv> -e <es>] <outdir> <bundle_id>...
         neuroscout install [-ui <dir>] <outdir> <bundle_id>...
         neuroscout upload [-f -n <nv>] <outdir> <bundle_id>...
         neuroscout ls <bundle_id>
@@ -82,16 +82,18 @@ Note that you need to specify **absolute paths** for both directories.
         -w, --work-dir <dir>     Optional Fitlins working directory 
         -c, --n-cpus <n>         Maximum number of threads across all processes
                                  [default: 1]
-        -s, --smoothing <k>      Smoothing kernel FWHM at group level
-                                 [default: 4]
+        -s, --smoothing <k>      Smoothing to apply in format: FWHM:level:type.
+                                 See fitlins documentation for more information.
+                                 [default: 4:Dataset:iso]
         -u, --unlock             Unlock datalad dataset
         -n, --neurovault <nv>    Upload mode (disable, all, or group)
                                  [default: group]
         -e, --estimator <es>     Estimator to use for first-level model
-                                 [default: nistats]
+                                 [default: afni]
         -f, --force-neurovault   Force upload, if a NV collection already exists
-        -d, --drop-missing       Drop missing contrasts
-        -v, --verbose	         Verbose mode
+        -m, --drop-missing       If contrast is missing in a run, skip.
+        -d, --no-datalad-drop    Don't drop DataLad sourcedata. True by default
+                                 if install-dir i
 
 
 ### Commands (first positional argument)

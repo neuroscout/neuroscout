@@ -6,15 +6,34 @@ _neuroscout-cli_ makes it easy to run your analysis with no configuration by fet
 
 ## Installation
 
-The recommended way to use the _neuroscout-cli_ is using a Docker Container. Docker Containers greatly facilitate the management of software dependencies, and increase reproducibility of results.
+The recommended way to use the _neuroscout-cli_ is using a container to run Neuroscout. Containers greatly facilitate the management of software dependencies, and increase reproducibility of results. For workstations or PCs, we recommend using Docker. For HPCs, it's best to use a Singularity container
 
 ### Docker Container
 
 In order to run _neuroscout-cli_ in a Docker Container, you must first install [Docker](https://docs.docker.com/engine/installation/).
 
-Once Docker is is installed, pull down the latest _neuroscout-cli_ Docker image:
+Once Docker is is installed, pull down the latest _neuroscout-cli_ Docker image. This will be automatically done if you execute a `run` command.
 
     docker pull neuroscout/neuroscout-cli
+
+### Singularity Container
+
+In order to run _neuroscout-cli_ in High Performance Computing (HPC) environment, we recommend using Singularity, as Docker is not typically supported on HPCs.
+First, check with your HPC administrator to ensure Singulraity is available, and for instructions on how to load it.
+
+We host pre-build Singularity containers using Github Packages, which can be easily pulled like this:
+
+    singularity pull oras://ghcr.io/neuroscout/neuroscout-cli:master
+
+
+Note that typically you must be in on a compute node in order to execute singularity commands. 
+For example, this could be done on TACC on an interactive node as follows:
+
+    idev
+    module load tacc_singularity
+    singularity pull oras://ghcr.io/neuroscout/neuroscout-cli:master
+
+In the current directory, you would now find an image file that can use to execute Neuroscout bundles.
 
 ### Manual installation
 
