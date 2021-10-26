@@ -1,15 +1,29 @@
 # Usage
 
-This assumes that you are using the Docker Container.
 Docker commands for _neuroscout-cli_ will always being with:
 
     docker run -it --rm
+
+
+Or if you are using Singularity:
+
+    singularity run --cleanenv
+
 
 Assuming you've already created an analysis on neuroscout.org, and have its analysis id (e.g.: `5xH93`), you can run it in one line:
 
     docker run -it --rm neuroscout/neuroscout-cli run /out 5xH93
 
+or singularity:
+
+    singularity run --cleanenv neuroscout-cli-<version>.simg /out 5xH93
+ 
 Neuroscout will download the necessary images, analysis bundle, and fit your model. The fitted images will be upload to NeuroVault and linked to your analysis on (neuroscout.org)[htts://neuroscout.org].
+
+!!! Note
+    Singularity commands cannot be run on login nodes on HPCs. Typically these commands need to be executed in an interactive session (i.e. idev)
+    or in a script submitted to workflow manager (i.e. sbatch on slurm)
+
 
 ## Saving data to disk
 
@@ -17,7 +31,7 @@ In order to save your fitted images to your local filesystem, you must mount vol
 
 Usually, you'll at least want to mount a directory where you want to save the results. 
 
-In this example, we mount both of these directories to local volumes:
+In this example, we mount both of these directories to local volumes in Docker:
 
     docker run -it --rm -v /home/user/out:/out neuroscout/neuroscout-cli run /out 5xH93
 
