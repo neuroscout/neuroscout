@@ -8,7 +8,7 @@ _neuroscout-cli_ makes it easy to run your analysis with no configuration by fet
 
 The recommended way to install and use _neuroscout-cli_ is using container technologies. Containers greatly facilitate the management of software dependencies, and increase reproducibility of results. 
 
-You can also install _neuroscout-cli_ directly on your system using a manually prepared environment. Note that it may be more difficult to pin down dependencies using thier approach. 
+You can also install _neuroscout-cli_ directly on your system using a manually prepared environment. Note that it may be more difficult to pin down dependencies using their approach. 
 
 ### Containerized Execution
 
@@ -22,7 +22,7 @@ Next, follow our guide for running [Neuroscout on Docker](docker.md)
 
 [Singularity](https://sylabs.io/singularity/) containers are a great solution for High Performance Computing (HPC) environments, where _Docker_ cannot typically be used due to more tightly controlled [user privileges](https://researchcomputing.princeton.edu/support/knowledge-base/singularity).
 
-First, check with your HPC administrator that _Singularity_ is available for use. If so, follow our guide for running [Neuroscout on Singulraity](singulraity.md).
+First, check with your HPC administrator that _Singularity_ is available for use. If so, follow our guide for running [Neuroscout on Singularity](singulraity.md).
 
 
 ### Manually prepared environment
@@ -30,7 +30,7 @@ First, check with your HPC administrator that _Singularity_ is available for use
 !!! Danger
     Manually installing _neuroscout-cli_ is not currently recommended. Proceed only if you really need to do this.
 
-Use pip to install _neuroscout-cli_ directly from the github repo:
+Use pip to install _neuroscout-cli_ directly from the GitHub repo:
 
     pip install -e git+https://www.github.com/neuroscout/neuroscout-cli#egg=neuroscout_cli
 

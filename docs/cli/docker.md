@@ -9,9 +9,9 @@ Assuming you've already created an analysis on [neuroscout.org](https://neurosco
 
     docker run -it --rm neuroscout/neuroscout-cli run /out Mv3ev
 
-This commmand will first download the _latest_ stable release of _neuroscout-cli_.
+This command will first download the _latest_ stable release of _neuroscout-cli_.
 
-Next, _neuroscout-cli_ will download the correponding preprocessed images, event files and model specification, and fit a multi-level GLM model.
+Next, _neuroscout-cli_ will download the corresponding preprocessed images, event files and model specification, and fit a multi-level GLM model.
 The results will be automatically uploaded to NeuroVault, and the analysis page will link to this upload: https://neuroscout.org/builder/Mv3ev.
 
 `-it --rm` simply tells Docker to run in _interactive_ mode and _remove_ the running container after execution.
@@ -44,7 +44,7 @@ You can also reference a `<version>` in the run command. For example:
 Containers are by default sandboxed so that they have access to a clean and separate environment.
 To access files in the container, you must explicitly mount volumes from your system to the Docker container.
 
-You can mount local directories to Docker containers using the `-v` argumement, with the following syntax: `/local/host/path:/absolute/path/in/container`.
+You can mount local directories to Docker containers using the `-v` argument, with the following syntax: `/local/host/path:/absolute/path/in/container`.
 
 Here we mount the local `/home/user/out` directory to `/out` on the container.:
 
@@ -110,7 +110,7 @@ _neuroscout-cli_ has many more command line arguments which can be specified at 
 
     docker run -it --rm neuroscout/neuroscout-cli run /out Mv3ev <args>
 
-For example, if you wanted to specify the estimator to be `AFNI` instead of `nilearn`, and the number of cpus to be `15`:
+For example, if you wanted to specify the estimator to be `AFNI` instead of `nilearn`, and the number of CPU's to be `15`:
 
     docker run -it --rm neuroscout/neuroscout-cli run /out Mv3ev --n-cpus=15 --estimator=afni
 

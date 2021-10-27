@@ -6,14 +6,14 @@
 
 !!! important
     HPCs typically require jobs to be submitted using a scheduled such as SLURM. 
-    This will not be convered in this guide, and will assume commands are run on compute nodes (via interactive sessions or submitted scripts)
+    This will not be covered in this guide, and will assume commands are run on compute nodes (via interactive sessions or submitted scripts)
 
 
 ## Preparing Singularity Images.
 
 Unlike _Docker_, you must explicitly download or compile Singularity images to a file prior to execution.
 
-For every release of _neuroscout-cli_, we publish Singularity images to Github Packages which mirror the images published on Docker Hub. 
+For every release of _neuroscout-cli_, we publish Singularity images to GitHub Packages which mirror the images published on Docker Hub. 
 
 You can download the latest pre-compiled image as follows:
 
@@ -22,7 +22,7 @@ You can download the latest pre-compiled image as follows:
 where `<version>` is the version of neuroscout-cli that you want to download.
 You must specify a version.
 
-You can see the tags available for download on [Github Packages](https://github.com/neuroscout/neuroscout-cli/pkgs/container/neuroscout-cli).
+You can see the tags available for download on [GitHub Packages](https://github.com/neuroscout/neuroscout-cli/pkgs/container/neuroscout-cli).
 
 
 !!! note
@@ -30,7 +30,7 @@ You can see the tags available for download on [Github Packages](https://github.
 `latest` refers to the latest _stable_ release.
 
 
-## Executing Singularity imaage
+## Executing Singularity image
 
 Assuming you've already created an analysis on [neuroscout.org](https://neuroscout.org), and have its analysis id (e.g.: `Mv3ev`), you can run it in one line:
 
@@ -38,7 +38,7 @@ Assuming you've already created an analysis on [neuroscout.org](https://neurosco
 
 Where `<outdir>` is a directory you can save files to.
 
-This command will download the correponding preprocessed images, event files and model specification, and fit a multi-level GLM model.
+This command will download the corresponding preprocessed images, event files and model specification, and fit a multi-level GLM model.
 The results will be automatically uploaded to NeuroVault, and the analysis page will link to this upload: https://neuroscout.org/builder/Mv3ev.
 
 !!! important
@@ -47,7 +47,7 @@ The results will be automatically uploaded to NeuroVault, and the analysis page 
 
 ## Saving data to disk
 
-`Singularity` typically automatically mounts host volumes to the container. This may differ between systems, so see the documentation for your HPC for more etails.
+`Singularity` typically automatically mounts host volumes to the container. This may differ between systems, so see the documentation for your HPC for more details.
 
 Thus, you can simplify modify `<outdir>` to a directory of your choice: 
 
