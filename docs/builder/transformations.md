@@ -2,7 +2,7 @@
 
 The next step in defining model is to transform the variables you've selected. This step is optional-- for many models you may not need to make any modifications to the input variables.
 
-To add a transformation, click `Add Transformation` and select an operation from the dropdown list.
+To add a transformation, click `Add Transformation` and select an operation from the drop-down list.
 
 ![Add transformation](img/transformation_add.png)
 
@@ -10,7 +10,7 @@ The transformations currently supported by Neuroscout are a subset of the comple
 
 | Transformation      | Description                                                                                                                                |
 |---------------------|--------------------------------------------------------------------------------------------------------------------------------------------|
-| Scale               | Standardize the value of one or more variables. Can independently choose to denmean and/or rescale.                                        |
+| Scale               | Standardize the value of one or more variables. Can independently choose to demean and/or rescale.                                        |
 | Orthogonalize       | Orthogonalizes one or more input columns with respect to one or more other columns.                                                        |
 
 ## Select input
