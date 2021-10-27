@@ -1617,7 +1617,7 @@ export default class AnalysisBuilder extends React.Component<
                 </TabPane>
                 {!(isDraft && !this.props.userOwns) && (
                   <TabPane
-                    tab={isEditable ? 'Run' : 'Status'}
+                    tab="Run"
                     key="submit"
                     disabled={!submitActive && isDraft}
                   >
