@@ -11,7 +11,7 @@ export class UserList extends React.Component<
   Record<string, never>,
   { users: User[] }
 > {
-  constructor(props) {
+  constructor(props: Record<string, never>) {
     super(props)
     this.state = { users: [] as User[] }
   }
@@ -28,7 +28,7 @@ export class UserList extends React.Component<
         title: 'Name',
         dataIndex: 'name',
         render: (text, record) => (
-          <Link to={'/profile/' + record.user_name}>{record.name}</Link>
+          <Link to={`/profile/${record.user_name}`}>{record.name}</Link>
         ),
       },
     ]

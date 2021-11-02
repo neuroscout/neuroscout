@@ -1,6 +1,17 @@
 import * as React from 'react'
-import { Alert, Button, Card, Checkbox, Modal, Tooltip, Switch } from 'antd'
+import {
+  Alert,
+  Button,
+  Card,
+  Checkbox,
+  Collapse,
+  Modal,
+  Tooltip,
+  Switch,
+} from 'antd'
 import memoize from 'memoize-one'
+
+const { Panel } = Collapse
 
 import { config } from '../config'
 import { jwtFetch } from '../utils'
@@ -173,7 +184,8 @@ export class Submit extends React.Component<
             !this.state.tosAgree ||
             !['DRAFT', 'FAILED'].includes(status) ||
             !this.props.name
-          }>
+          }
+        >
           Generate
         </Button>
       </div>
@@ -258,7 +270,24 @@ export class StatusTab extends React.Component<submitProps, statusTabState> {
         <Card
           key={String(x.id)}
           title={this.nvLink(String(x.id))}
-          style={{ display: 'inline-block' }}>
+          style={{ display: 'inline-block' }}
+          size="small"
+        >
+          <Collapse>
+            <Panel
+              header={
+                <>
+                  Uploaded:{' '}
+                  {x.uploaded_at ? x.uploaded_at.split('T')[0] : 'n/a'}
+                </>
+              }
+              key={String(x.id)}
+            >
+              <p>Estimator: {x.estimator ? x.estimator : 'n/a'}</p>
+              <p>fMRIPrep: {x.fmriprep_version ? x.fmriprep_version : 'n/a'}</p>
+              <p>neuroscout-cli: {x.cli_version ? x.cli_version : 'n/a'}</p>
+            </Panel>
+          </Collapse>
           {x.pending > 0 && (
             <span>
               <Alert
@@ -285,7 +314,8 @@ export class StatusTab extends React.Component<submitProps, statusTabState> {
                     <p key={i}>{y}</p>
                   ))}
                 </>
-              }>
+              }
+            >
               <div>
                 <Alert
                   message={`${String(x.failed)}/${String(
@@ -303,7 +333,7 @@ export class StatusTab extends React.Component<submitProps, statusTabState> {
       return (
         <>
           <h3>NeuroVault Uploads</h3>
-          {statuses}
+          <div style={{ display: 'flex', flexWrap: 'wrap' }}>{statuses}</div>
         </>
       )
     }
@@ -342,7 +372,7 @@ export class StatusTab extends React.Component<submitProps, statusTabState> {
                 'Congratulations, your analysis has been compiled!'}
               <br />
               Run the analysis with this this command, replacing
-              &apos;/local/out&apos; with a local directory. See the{' '}
+              &apos;/local/outputdirectory&apos; with a local directory. See the{' '}
               <a href="https://neuroscout.github.io/neuroscout/cli/">
                 neuroscout-cli documentation{' '}
               </a>
@@ -358,7 +388,8 @@ export class StatusTab extends React.Component<submitProps, statusTabState> {
             <Card
               size="small"
               title="System Requirements"
-              style={{ width: 400 }}>
+              style={{ width: 400 }}
+            >
               <p>
                 OS: Windows/Linux/Mac OS with{' '}
                 <a href="https://docs.docker.com/install/">Docker</a>

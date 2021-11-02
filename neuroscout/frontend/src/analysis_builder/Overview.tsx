@@ -401,7 +401,8 @@ export class OverviewTab extends React.Component<
                 </Tooltip>
               </span>
             }
-            required>
+            required
+          >
             <Input.Search
               placeholder="Search by dataset or task name..."
               value={this.state.searchText}
@@ -426,7 +427,8 @@ export class OverviewTab extends React.Component<
                 <Collapse
                   accordion
                   bordered={false}
-                  defaultActiveKey={['task']}>
+                  defaultActiveKey={['task']}
+                >
                   <Panel header={`Task: ${taskMsg}`} key="task">
                     <Table
                       className="builderAnalysisTaskSelect"
@@ -466,7 +468,8 @@ export class OverviewTab extends React.Component<
                         title={
                           'You can filter runs using the filter icon in each column,\
                     and clear the filters using this button'
-                        }>
+                        }
+                      >
                         <QuestionCircleTwoTone />
                       </Tooltip>
                     </div>

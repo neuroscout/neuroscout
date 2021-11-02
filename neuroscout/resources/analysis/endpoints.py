@@ -30,7 +30,7 @@ class AnalysisRootResource(AnalysisMethodResource):
     @marshal_with(AnalysisSchema(
         many=True,
         only=['hash_id', 'name', 'description', 'status',
-              'dataset_id', 'modified_at', 'user']))
+              'dataset_id', 'modified_at', 'user', 'nv_count']))
     @doc(summary='Returns list of public analyses.')
     @use_kwargs({
         'name': fields.DelimitedList(

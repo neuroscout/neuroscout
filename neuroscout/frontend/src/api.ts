@@ -50,6 +50,7 @@ export const ApiToAppAnalysis = (data: ApiAnalysis): AppAnalysis => ({
   modified_at: data.modified_at,
   user_name: data.user,
   dataset_name: '',
+  nv_count: data.nv_count ? data.nv_count : 0,
 })
 
 const ef_fields = [
@@ -243,6 +244,9 @@ export const api = {
 
         data.map(collection => {
           const upload = {
+            uploaded_at: collection.uploaded_at,
+            estimator: collection.estimator,
+            fmriprep_version: collection.fmriprep_version,
             failed: 0,
             pending: 0,
             ok: 0,

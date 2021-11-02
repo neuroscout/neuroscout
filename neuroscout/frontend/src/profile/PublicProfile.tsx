@@ -8,7 +8,7 @@ import { Link, withRouter } from 'react-router-dom'
 import { RouteComponentProps } from 'react-router'
 
 import { AnalysisListTable } from '../AnalysisList'
-import { MainCol, Space } from '../HelperComponents'
+import { MainCol, Space, NotFound } from '../HelperComponents'
 import {
   profileEditItems,
   ApiUser,
@@ -18,7 +18,6 @@ import {
 } from '../coretypes'
 import { api } from '../api'
 import { profileInit } from '../user'
-import { NotFound } from '../HelperComponents'
 
 interface PublicProfileProps {
   user_name: string
@@ -92,7 +91,8 @@ class PublicProfile extends React.Component<
             <a
               target="_blank"
               href={'https://twitter.com/' + profile.twitter_handle}
-              rel="noreferrer">
+              rel="noreferrer"
+            >
               {'@' + profile.twitter_handle}
             </a>
           ),
@@ -106,7 +106,8 @@ class PublicProfile extends React.Component<
             <a
               target="_blank"
               href={'https://' + profile.personal_site}
-              rel="noreferrer">
+              rel="noreferrer"
+            >
               {profile.personal_site}
             </a>
           ),

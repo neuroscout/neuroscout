@@ -240,7 +240,8 @@ export class PredictorSelector extends React.Component<
           <Checkbox
             onChange={() => this.toggleFilter(filterType, filter.title)}
             checked={filter.active}
-            key={filter.title}>
+            key={filter.title}
+          >
             {display}
           </Checkbox>
         )
@@ -310,7 +311,8 @@ export class PredictorSelector extends React.Component<
         render: (text, record: Predictor) => (
           <div
             title={String(record.description)}
-            style={{ wordWrap: 'break-word', wordBreak: 'break-word' }}>
+            style={{ wordWrap: 'break-word', wordBreak: 'break-word' }}
+          >
             {text}
           </div>
         ),
@@ -332,7 +334,8 @@ export class PredictorSelector extends React.Component<
           return (
             <div
               title={description}
-              style={{ wordWrap: 'break-word', wordBreak: 'break-word' }}>
+              style={{ wordWrap: 'break-word', wordBreak: 'break-word' }}
+            >
               {text}
             </div>
           )
@@ -446,7 +449,8 @@ export class PredictorSelector extends React.Component<
                    For example, transcripts are encoded as "text" stimuli. \
                    Video stimuli are sampled to "image" and "audio" stimuli \
                    in order to apply extractors that do not operate on videos directly.'
-                      }>
+                      }
+                    >
                       <QuestionCircleTwoTone style={{ fontSize: '13px' }} />
                     </Tooltip>
                   </h4>

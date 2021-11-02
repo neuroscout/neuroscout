@@ -4,6 +4,7 @@ the home page or on the 'browse public analysis' page
 */
 import * as React from 'react'
 import { Button, Row, Table, Input } from 'antd'
+import { CheckCircleTwoTone } from '@ant-design/icons'
 import { MainCol, Space, StatusTag } from './HelperComponents'
 import { AppAnalysis, Dataset } from './coretypes'
 import { Link, Redirect } from 'react-router-dom'
@@ -185,7 +186,18 @@ export class AnalysisListTable extends React.Component<
         width: `${this.state.ownersWidth}ch`,
       })
     }
-
+    analysisTableColumns.push({
+      title: 'NeuroVault',
+      dataIndex: 'nv_count',
+      width: '2ch',
+      sorter: (a, b) => a.nv_count - b.nv_count,
+      render: (text, record: AppAnalysis) => {
+        if (record.nv_count) {
+          return <CheckCircleTwoTone twoToneColor="#52c41a" />
+        }
+        return
+      },
+    })
     if (publicList) {
       analysisTableColumns.splice(2, 1)
     }
@@ -204,7 +216,8 @@ export class AnalysisListTable extends React.Component<
                     void this.props.cloneAnalysis(record.id).then(id => {
                       this.setState({ redirectId: id })
                     })
-                  }}>
+                  }}
+                >
                   Clone
                 </Button>
                 <Space />

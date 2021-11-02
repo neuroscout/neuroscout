@@ -193,7 +193,8 @@ export class ContrastEditor extends React.Component<
               labelCol={{ span: 4 }}
               wrapperCol={{ span: 2 }}
               required
-              className="contrast-type-form-item">
+              className="contrast-type-form-item"
+            >
               <InputNumber
                 value={Weights[i]}
                 onChange={this.updateWeight.bind(this, i)}
@@ -209,7 +210,8 @@ export class ContrastEditor extends React.Component<
                   ...this.props.activeContrast,
                   Type: event.target.value as 't' | 'F',
                 })
-              }>
+              }
+            >
               {CONTRAST_TYPE_OPTIONS.map(x => (
                 <Radio key={x} value={x}>
                   {x}

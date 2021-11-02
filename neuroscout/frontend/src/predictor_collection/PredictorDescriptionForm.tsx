@@ -15,7 +15,8 @@ export class PredictorDescriptionForm extends React.Component<
     const formList = this.props.predictors.map((predictor, index) => (
       <Form.Item
         key={`PDF${index}`}
-        label={`Description for predictor ${predictor}`}>
+        label={`Description for predictor ${predictor}`}
+      >
         <Input
           value={this.props.descriptions[index]}
           onChange={e => {

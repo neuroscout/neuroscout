@@ -26,7 +26,8 @@ class GoogleLoginBtn extends React.Component<UserStore, Record<string, never>> {
             style={{ width: '100%' }}
             htmlType="submit"
             type="primary"
-            ghost={true}>
+            ghost={true}
+          >
             <GoogleOutlined />
           </Button>
         )}
@@ -69,12 +70,14 @@ export class ResetPasswordModal extends React.Component<
         maskClosable={true}
         onCancel={e => {
           this.props.update({ openReset: false })
-        }}>
+        }}
+      >
         <p>Please enter an email address to send reset instructions</p>
         <Form
           onFinish={e => {
             this.props.resetPassword()
-          }}>
+          }}
+        >
           <FormItem>
             <Input
               prefix={<MailOutlined style={{ fontSize: 13 }} />}
@@ -109,7 +112,8 @@ export class EnterResetTokenModal extends React.Component<
         maskClosable={true}
         onCancel={e => {
           this.props.update({ openEnterResetToken: false })
-        }}>
+        }}
+      >
         <p>
           We have sent a reset token to {this.props.profile.email} <br />
           Please enter the token below, along with a new password for the
@@ -118,7 +122,8 @@ export class EnterResetTokenModal extends React.Component<
         <Form
           onFinish={e => {
             this.props.submitToken()
-          }}>
+          }}
+        >
           <FormItem>
             <Input
               prefix={<TagsOutlined style={{ fontSize: 13 }} />}
@@ -164,13 +169,15 @@ export class LoginModal extends React.Component<
         onCancel={e => {
           this.props.logout()
           this.props.update({ openLogin: false })
-        }}>
+        }}
+      >
         <p>{this.props.loginError ? this.props.loginError : ''}</p>
         <br />
         <Form
           onFinish={e => {
             void this.props.login()
-          }}>
+          }}
+        >
           <FormItem>
             <Input
               prefix={<MailOutlined style={{ fontSize: 13 }} />}
@@ -196,7 +203,8 @@ export class LoginModal extends React.Component<
             <a
               onClick={e => {
                 this.props.update({ openLogin: false, openReset: true })
-              }}>
+              }}
+            >
               Forgot password
             </a>
             <br />
@@ -252,7 +260,8 @@ class RegistrationForm extends React.Component<RegistrationFormProps> {
               required: true,
               message: 'Please input your name!',
             },
-          ]}>
+          ]}
+        >
           <Input />
         </FormItem>
         <FormItem
@@ -267,7 +276,8 @@ class RegistrationForm extends React.Component<RegistrationFormProps> {
               required: true,
               message: 'Please input your email address.',
             },
-          ]}>
+          ]}
+        >
           <Input />
         </FormItem>
         <FormItem
@@ -282,7 +292,8 @@ class RegistrationForm extends React.Component<RegistrationFormProps> {
             {
               validator: this.validateToNextPassword,
             },
-          ]}>
+          ]}
+        >
           <Input.Password />
         </FormItem>
         <FormItem
@@ -297,7 +308,8 @@ class RegistrationForm extends React.Component<RegistrationFormProps> {
             {
               validator: this.compareToFirstPassword,
             },
-          ]}>
+          ]}
+        >
           <Input.Password />
         </FormItem>
         <FormItem>
@@ -323,7 +335,8 @@ export class SignupModal extends React.Component<
         visible={this.props.openSignup}
         footer={null}
         maskClosable={true}
-        onCancel={e => this.props.update({ openSignup: false })}>
+        onCancel={e => this.props.update({ openSignup: false })}
+      >
         {this.props.signupError && (
           <Alert message={this.props.signupError} type="error" />
         )}

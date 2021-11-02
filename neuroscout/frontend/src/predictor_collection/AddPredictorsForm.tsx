@@ -176,7 +176,8 @@ export class AddPredictorsForm extends React.Component<
     return (
       <Tabs
         activeKey={String(this.state.key)}
-        onTabClick={newTab => this.onTabClick(newTab)}>
+        onTabClick={newTab => this.onTabClick(newTab)}
+      >
         <Tabs.TabPane tab="Select Dataset" key={String(1)}>
           <Alert
             message="Select a dataset for which you want to upload custom predictors."
@@ -199,7 +200,8 @@ export class AddPredictorsForm extends React.Component<
           <a
             href="https://neuroscout.github.io/neuroscout/faq/#can-i-contribute-my-own-predictors-to-neuroscout"
             target="_blank"
-            rel="noreferrer">
+            rel="noreferrer"
+          >
             <Button icon={<QuestionOutlined />}>Help</Button>
           </a>
         </Tabs.TabPane>
@@ -225,7 +227,8 @@ export class AddPredictorsForm extends React.Component<
               <Button
                 type="primary"
                 style={{ margin: '10px 0 0 0', float: 'right' }}
-                onClick={this.nextTab}>
+                onClick={this.nextTab}
+              >
                 Next
               </Button>
             </>
@@ -241,7 +244,8 @@ export class AddPredictorsForm extends React.Component<
           <a
             href="https://neuroscout.github.io/neuroscout/faq/#can-i-contribute-my-own-predictors-to-neuroscout"
             target="_blank"
-            rel="noreferrer">
+            rel="noreferrer"
+          >
             <Button icon={<QuestionOutlined />}>Help</Button>
           </a>
         </Tabs.TabPane>
