@@ -7,12 +7,13 @@
 
 Assuming you've already created an analysis on [neuroscout.org](https://neuroscout.org), and have its analysis id (e.g.: `Mv3ev`), you can run it in one line:
 
-    docker run -it --rm neuroscout/neuroscout-cli run /out Mv3ev
+    docker run -it --rm -v $HOME/neuroscout_out:/out neuroscout/neuroscout-cli run /out Mv3ev
 
 This command will first download the _latest_ stable release of _neuroscout-cli_.
 
 Next, _neuroscout-cli_ will download the corresponding preprocessed images, event files and model specification, and fit a multi-level GLM model.
-The results will be automatically uploaded to NeuroVault, and the analysis page will link to this upload: https://neuroscout.org/builder/Mv3ev.
+The results will be output to a directory called neuroscout_out inside your home directory and automatically uploaded to NeuroVault,
+and the analysis page will link to this upload: https://neuroscout.org/builder/Mv3ev.
 
 `-it --rm` simply tells Docker to run in _interactive_ mode and _remove_ the running container after execution.
 
@@ -36,7 +37,7 @@ You can also reference a `<version>` in the run command. For example:
     docker run -it --rm neuroscout/neuroscout-cli:version-0.5.1 run /out Mv3ev
 
 !!! note
-`master` is a special tag name which refers to the most recent _unstable_ commit to GitHub. 
+`master` is a special tag name which refers to the most recent _unstable_ commit to the master branch on GitHub. 
 
 
 ## Saving outputs to disk
