@@ -88,7 +88,7 @@ class ReviewObjects extends React.Component<{
 }> {
   render() {
     const input = this.props.input
-    const display: any[] = []
+    const display: JSX.Element[] = []
     input.map((x, i) =>
       display.push(
         <div key={i}>
@@ -157,7 +157,7 @@ class X extends React.Component<{ model: BidsModel; available: Predictor[] }> {
     const displayVars = available.filter(
       x => modelVars.indexOf('' + x.name) > -1,
     )
-    const display: any[] = []
+    const display: JSX.Element[] = []
     displayVars.map((x, i) =>
       display.push(
         <div key={i}>
@@ -166,7 +166,7 @@ class X extends React.Component<{ model: BidsModel; available: Predictor[] }> {
         </div>,
       ),
     )
-    displayVars.map((x, i) => {
+    displayVars.map(x => {
       return { name: x.name, description: x.description }
     })
     const columns = [
@@ -189,7 +189,7 @@ export class Review extends React.Component<
   ReviewProps,
   Record<string, never>
 > {
-  render() {
+  render(): JSX.Element {
     const model = this.props.model
     const dataset = this.props.dataset
     let { Name, Steps } = model
@@ -204,18 +204,13 @@ export class Review extends React.Component<
     // Only looking at run level transfomraitons right now.
     let xforms: Transformation[] = []
     if (Steps && Steps[0] && Steps[0].Transformations) {
-      xforms = Steps[0].Transformations!
+      xforms = Steps[0].Transformations
     }
 
     // Only looking at run level transfomraitons right now.
     let contrasts: Contrast[] = []
     if (Steps && Steps[0] && Steps[0].Contrasts) {
-      contrasts = Steps[0].Contrasts!
-    }
-
-    let dummyContrasts = {}
-    if (Steps && Steps[0] && Steps[0].DummyContrasts) {
-      dummyContrasts = Steps[0].DummyContrasts!
+      contrasts = Steps[0].Contrasts
     }
 
     return (

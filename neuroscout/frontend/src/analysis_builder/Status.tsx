@@ -19,6 +19,7 @@ import { Analysis, NvUploads } from '../coretypes'
 import { DateTag, StatusTag } from '../HelperComponents'
 import { api } from '../api'
 import { Tracebacks } from './Report'
+import NeurovaultLinks from './NeuroVault'
 
 const domainRoot = config.server_url
 
@@ -26,14 +27,14 @@ export class DLLink extends React.Component<{
   status?: string
   analysisId?: string
 }> {
-  render() {
+  render(): JSX.Element {
     let status = this.props.status
     const analysisId = this.props.analysisId
     if (status === undefined) {
       status = 'DRAFT'
     }
 
-    let bundleLink
+    let bundleLink = ''
     if (status === 'PASSED' && analysisId) {
       bundleLink = `${domainRoot}/analyses/${analysisId}_bundle.tar.gz`
     }
@@ -86,7 +87,7 @@ export class Submit extends React.Component<
   submitProps,
   { tosAgree: boolean; validate: boolean }
 > {
-  constructor(props) {
+  constructor(props: submitProps) {
     super(props)
 
     this.state = {
@@ -95,11 +96,11 @@ export class Submit extends React.Component<
     }
   }
 
-  onChange(e) {
+  onChange(e): void {
     this.setState({ tosAgree: e.target.checked })
   }
 
-  validateChange(e) {
+  validateChange(e): void {
     const setState = this.setState.bind(this)
     if (!e.target.checked) {
       Modal.confirm({
@@ -115,7 +116,7 @@ export class Submit extends React.Component<
     }
   }
 
-  render() {
+  render(): JSX.Element {
     let { status } = this.props
     if (status === undefined) {
       status = 'DRAFT'
@@ -200,7 +201,7 @@ type statusTabState = {
 }
 
 export class StatusTab extends React.Component<submitProps, statusTabState> {
-  constructor(props) {
+  constructor(props: submitProps) {
     super(props)
     this.state = {
       compileTraceback: '',
@@ -208,14 +209,16 @@ export class StatusTab extends React.Component<submitProps, statusTabState> {
     }
   }
 
-  componentDidMount() {
+  componentDidMount(): void {
     if (this.props.analysisId !== undefined) {
       this.getTraceback(this.props.analysisId)
-      void api.getNVUploads(this.props.analysisId).then(nvUploads => {
-        if (nvUploads !== null) {
-          this.setState({ nvUploads: nvUploads })
-        }
-      })
+      void api
+        .getNVUploads(this.props.analysisId)
+        .then((nvUploads: NvUploads[]) => {
+          if (nvUploads !== null) {
+            this.setState({ nvUploads: nvUploads })
+          }
+        })
     }
     void api.getImageVersion().then(version => {
       if (version) {
@@ -224,12 +227,12 @@ export class StatusTab extends React.Component<submitProps, statusTabState> {
     })
   }
 
-  getTraceback(id) {
+  getTraceback(id: number | string | undefined): void {
     if (id === undefined) {
       return
     }
     void jwtFetch(`${domainRoot}/api/analyses/${String(id)}/compile`).then(
-      res => {
+      (res: { traceback?: string }) => {
         if (res.traceback) {
           this.setState({ compileTraceback: res.traceback })
         }
@@ -254,7 +257,7 @@ export class StatusTab extends React.Component<submitProps, statusTabState> {
     }
   })
 
-  nvLink(collection_id: string) {
+  nvLink(collection_id: string): JSX.Element {
     const url = `https://neurovault.org/collections/${collection_id}`
     return (
       <a href={url} target="_blank" rel="noreferrer">
@@ -263,7 +266,7 @@ export class StatusTab extends React.Component<submitProps, statusTabState> {
     )
   }
 
-  nvStatus(uploads: NvUploads[]) {
+  nvStatus(uploads: NvUploads[]): JSX.Element {
     const statuses = [] as JSX.Element[]
     uploads.map(x => {
       statuses.push(
@@ -340,7 +343,7 @@ export class StatusTab extends React.Component<submitProps, statusTabState> {
     return <div />
   }
 
-  render() {
+  render(): JSX.Element {
     this.newlyFailed(this.props.status)
     this.analysisIdChange(this.props.analysisId)
     return (
@@ -429,6 +432,7 @@ export class StatusTab extends React.Component<submitProps, statusTabState> {
             </p>
           </div>
         )}
+        <NeurovaultLinks analysisId={this.props.analysisId} />
         {this.state.nvUploads && this.nvStatus(this.state.nvUploads)}
       </div>
     )

@@ -1,6 +1,6 @@
 import { message } from 'antd'
 // Display error to user as a UI notification and log it to console
-export const displayError = (error: Error) => {
+export const displayError = (error: Error): void => {
   try {
     void message.error(error.toString(), 5)
   } catch (e) {
@@ -23,7 +23,7 @@ export const moveItem = <T>(
   array: Array<T>,
   index: number,
   direction: 'up' | 'down',
-) => {
+): Array<T> => {
   const newArray: Array<T> = [...array]
   if (direction === 'up') {
     if (index === 0) return newArray
