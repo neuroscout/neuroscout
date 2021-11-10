@@ -214,7 +214,7 @@ export class Review extends React.Component<
     }
 
     return (
-      <Card title={'Overview of ' + (Name ? Name : 'Untitled')}>
+      <Card>
         Author:{' '}
         <Link to={`/profile/${String(this.props.user_name)}`}>
           {' '}

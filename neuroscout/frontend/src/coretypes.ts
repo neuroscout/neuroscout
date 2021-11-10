@@ -168,6 +168,7 @@ export type TabName =
   | 'modeling'
   | 'review'
   | 'submit'
+  | 'summary'
 
 export type ContrastTypeEnum = 't' | 'F'
 

@@ -1284,7 +1284,7 @@ export default class AnalysisBuilder extends React.Component<
             !editableStatus.includes(data.status) &&
             data.status !== 'DRAFT'
           ) {
-            this.setState({ activeTab: 'review' })
+            this.setState({ activeTab: 'summary' })
             this.postTabChange('review')
           }
           if (
