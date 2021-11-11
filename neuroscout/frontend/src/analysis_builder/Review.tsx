@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { Collapse, Card, Table } from 'antd'
+import { Collapse, Card, Table, Tag, Space } from 'antd'
 import { Link } from 'react-router-dom'
 
 import {
@@ -10,11 +10,13 @@ import {
   BidsModel,
 } from '../coretypes'
 import { alphaSort } from '../utils'
+import NeurovaultLinks from './NeuroVault'
 
 const Panel = Collapse.Panel
 
 interface ReviewProps {
   model: BidsModel
+  analysisId?: string
   unsavedChanges: boolean
   availablePredictors: Predictor[]
   dataset?: Dataset
@@ -141,22 +143,27 @@ class ModelSteps extends React.Component<{Steps: Step[]}, Record<string, never>>
 }
 */
 
+function getPredictorNames(
+  model: BidsModel,
+  availablePredictors: Predictor[],
+): Predictor[] {
+  let modelVars: string[] = []
+  if (
+    model.Steps &&
+    model.Steps[0] &&
+    model.Steps[0].Model &&
+    model.Steps[0].Model.X
+  ) {
+    modelVars = model.Steps[0].Model.X
+  }
+  console.log(modelVars)
+  return availablePredictors.filter(x => modelVars.indexOf('' + x.name) > -1)
+}
 // In the future this will include the new named outputs from transformations.
 class X extends React.Component<{ model: BidsModel; available: Predictor[] }> {
   render() {
     const { model, available } = this.props
-    let modelVars: string[] = []
-    if (
-      model.Steps &&
-      model.Steps[0] &&
-      model.Steps[0].Model &&
-      model.Steps[0].Model.X
-    ) {
-      modelVars = model.Steps[0].Model.X
-    }
-    const displayVars = available.filter(
-      x => modelVars.indexOf('' + x.name) > -1,
-    )
+    const displayVars = getPredictorNames(model, available)
     const display: JSX.Element[] = []
     displayVars.map((x, i) =>
       display.push(
@@ -192,8 +199,13 @@ export class Review extends React.Component<
   render(): JSX.Element {
     const model = this.props.model
     const dataset = this.props.dataset
+    const predictors = getPredictorNames(model, this.props.availablePredictors)
+    const numberOfSubjects = model.Input?.Subject
+      ? model.Input.Subject.length
+      : 0
     let { Name, Steps } = model
     const { Description } = model
+
     if (model && model.Name) {
       Name = model.Name
     }
@@ -221,6 +233,18 @@ export class Review extends React.Component<
           {this.props.user_name}{' '}
         </Link>
         <p>{Description ? Description : 'No description.'}</p>
+        <p>Number of subjects: {numberOfSubjects}</p>
+        <p>
+          Predictors used: <Space />
+          {predictors.map(x => (
+            <Tag color="green" key={x.name}>
+              {x.name}
+            </Tag>
+          ))}
+        </p>
+        Neurovault Links:
+        <br />
+        <NeurovaultLinks analysisId={this.props.analysisId} />
         <Collapse bordered={false}>
           {dataset && (
             <Panel header={`Dataset - ${dataset.name}`} key="dataset">

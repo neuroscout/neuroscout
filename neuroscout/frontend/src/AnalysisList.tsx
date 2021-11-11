@@ -8,6 +8,7 @@ import { CheckCircleTwoTone } from '@ant-design/icons'
 import { MainCol, Space, StatusTag } from './HelperComponents'
 import { AppAnalysis, Dataset } from './coretypes'
 import { Link, Redirect } from 'react-router-dom'
+import { ColumnsType } from 'antd/es/table'
 
 import memoize from 'memoize-one'
 
@@ -38,7 +39,7 @@ export class AnalysisListTable extends React.Component<
     ownersWidth: number
   }
 > {
-  constructor(props) {
+  constructor(props: AnalysisListProps) {
     super(props)
     let owners: string[] = []
     let ownersWidth = 10
@@ -59,7 +60,7 @@ export class AnalysisListTable extends React.Component<
     }
   }
 
-  componentDidUpdate(prevProps) {
+  componentDidUpdate(prevProps: AnalysisListProps): void {
     const length = prevProps.analyses ? prevProps.analyses.length : 0
     if (
       this.props.showOwner &&
@@ -79,10 +80,10 @@ export class AnalysisListTable extends React.Component<
   }
 
   onInputChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
-    this.setState({ searchText: e.target.value })
+    this.setState({ searchText: String(e.target.value) })
   }
 
-  applySearch = memoize((searchText, length) => {
+  applySearch = memoize((searchText: string, length: number) => {
     if (searchText.length < 2 || !this.props.analyses) {
       return this.props.analyses
     }
@@ -93,18 +94,11 @@ export class AnalysisListTable extends React.Component<
     )
   })
 
-  render() {
+  render(): React.ReactNode {
     if (this.state.redirectId !== '') {
       return <Redirect to={'/builder/' + this.state.redirectId} />
     }
-    const {
-      analyses,
-      datasets,
-      publicList,
-      cloneAnalysis,
-      onDelete,
-      showOwner,
-    } = this.props
+    const { analyses, datasets, publicList, onDelete, showOwner } = this.props
 
     const datasetFilters = datasets.map(x => {
       return { text: x.name, value: x.name }
@@ -116,7 +110,9 @@ export class AnalysisListTable extends React.Component<
     // Open link: always (opens analysis in Builder)
     // Delete button: only if not a public list and analysis is in draft mode
     // Clone button: any analysis
-    const analysisTableColumns: any[] = [
+    const analysisTableColumns: ColumnsType<AppAnalysis> & {
+      textWrap?: string
+    } = [
       {
         title: 'ID',
         dataIndex: 'id',
@@ -145,8 +141,9 @@ export class AnalysisListTable extends React.Component<
         title: 'Modified at',
         dataIndex: 'modified_at',
         defaultSortOrder: 'descend' as const,
-        sorter: (a, b) => a.modified_at.localeCompare(b.modified_at),
-        render: text => {
+        sorter: (a, b) =>
+          a.modified_at?.localeCompare(String(b.modified_at)) ?? 0,
+        render: (text: string) => {
           const date = text.split('-')
           return (
             <>
@@ -190,7 +187,7 @@ export class AnalysisListTable extends React.Component<
       title: 'NeuroVault',
       dataIndex: 'nv_count',
       width: '2ch',
-      sorter: (a, b) => a.nv_count - b.nv_count,
+      sorter: (a, b) => Number(a.nv_count) - Number(b.nv_count),
       render: (text, record: AppAnalysis) => {
         if (record.nv_count) {
           return <CheckCircleTwoTone twoToneColor="#52c41a" />
@@ -265,7 +262,7 @@ export class AnalysisListTable extends React.Component<
 }
 
 // wrap table in components for use by itself as route
-const AnalysisList = (props: AnalysisListProps) => {
+const AnalysisList = (props: AnalysisListProps): JSX.Element => {
   return (
     <div>
       <Row justify="center">

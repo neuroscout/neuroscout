@@ -102,12 +102,7 @@ const NeurovaultLinks: React.FC<{ analysisId: string | undefined }> = props => {
 
   const statuses = nvUploads.map(x => nvCard({ nvUpload: x }))
 
-  return (
-    <>
-      <h3>NeuroVault Uploads</h3>
-      <div style={{ display: 'flex', flexWrap: 'wrap' }}>{statuses}</div>
-    </>
-  )
+  return <div style={{ display: 'flex', flexWrap: 'wrap' }}>{statuses}</div>
 }
 
 export default NeurovaultLinks

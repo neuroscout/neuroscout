@@ -1646,6 +1646,7 @@ export default class AnalysisBuilder extends React.Component<
                         x => x.id === this.state.analysis.datasetId,
                       )}
                       user_name={this.state.analysis.user_name}
+                      analysisId={analysis.analysisId}
                     />
                   </TabPane>
                 )}

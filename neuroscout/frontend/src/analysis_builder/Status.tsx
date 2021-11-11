@@ -1,17 +1,6 @@
 import * as React from 'react'
-import {
-  Alert,
-  Button,
-  Card,
-  Checkbox,
-  Collapse,
-  Modal,
-  Tooltip,
-  Switch,
-} from 'antd'
+import { Alert, Button, Card, Checkbox, Modal, Tooltip, Switch } from 'antd'
 import memoize from 'memoize-one'
-
-const { Panel } = Collapse
 
 import { config } from '../config'
 import { jwtFetch } from '../utils'
@@ -49,7 +38,7 @@ export class DLLink extends React.Component<{
 
 type PubAccessProps = {
   private: boolean | undefined
-  updateAnalysis: (
+  updateAnalysis?: (
     value: Partial<Analysis>,
     unsavedChanges: boolean,
     save: boolean,
@@ -63,9 +52,11 @@ class PubAccess extends React.Component<PubAccessProps, Record<string, never>> {
           checked={!this.props.private}
           checkedChildren="Public"
           unCheckedChildren="Private"
-          onChange={checked =>
-            this.props.updateAnalysis({ private: !checked }, false, true)
-          }
+          onChange={checked => {
+            if (this.props.updateAnalysis) {
+              this.props.updateAnalysis({ private: !checked }, false, true)
+            }
+          }}
         />
       </Tooltip>
     )
@@ -245,7 +236,7 @@ export class StatusTab extends React.Component<submitProps, statusTabState> {
             <>
               <PubAccess
                 private={this.props.private}
-                updateAnalysis={this.props.updateAnalysis!}
+                updateAnalysis={this.props.updateAnalysis}
               />
               <span> </span>
             </>
