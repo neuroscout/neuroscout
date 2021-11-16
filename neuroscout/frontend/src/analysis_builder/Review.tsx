@@ -156,7 +156,10 @@ function getPredictorNames(
   ) {
     modelVars = model.Steps[0].Model.X
   }
+  console.log('mdl vars')
   console.log(modelVars)
+  console.log(availablePredictors)
+  console.log('---------------')
   return availablePredictors.filter(x => modelVars.indexOf('' + x.name) > -1)
 }
 // In the future this will include the new named outputs from transformations.
