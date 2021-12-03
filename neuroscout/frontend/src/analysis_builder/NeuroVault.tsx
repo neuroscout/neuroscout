@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 
-import { Alert, Card, Collapse, Tooltip } from 'antd'
+import { Alert, Card, Collapse, Tag, Tooltip } from 'antd'
 
 import { api } from '../api'
 import { NvUploads } from '../coretypes'
@@ -102,7 +102,16 @@ const NeurovaultLinks: React.FC<{ analysisId: string | undefined }> = props => {
 
   const statuses = nvUploads.map(x => nvCard({ nvUpload: x }))
 
-  return <div style={{ display: 'flex', flexWrap: 'wrap' }}>{statuses}</div>
+  if (nvUploads.length === 0) {
+    return <Tag color="red">No Uploads Found. </Tag>
+  } else {
+    return (
+      <div style={{ display: 'flex', flexWrap: 'wrap' }}>
+        <br />
+        {statuses}
+      </div>
+    )
+  }
 }
 
 export default NeurovaultLinks
