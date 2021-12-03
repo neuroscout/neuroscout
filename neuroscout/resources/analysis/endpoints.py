@@ -190,9 +190,7 @@ class AnalysisResourcesResource(AnalysisMethodResource):
     @doc(summary='Get analysis resources.')
     @fetch_analysis
     def get(self, analysis):
-        predictor_ids = analysis.predictors
-        predictors = Predictor.query.filter(Predictor.id.in_(predictor_ids))
-        return {**analysis, 'predictors': predictors}, 200
+        return analysis, 200
 
 
 class AnalysisBundleResource(MethodResource):
