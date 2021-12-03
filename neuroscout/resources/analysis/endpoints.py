@@ -191,7 +191,7 @@ class AnalysisResourcesResource(AnalysisMethodResource):
     @fetch_analysis
     def get(self, analysis):
         predictor_ids = analysis.predictors
-        predictors = Predictor.objects.filter(Predictor.id.in_(predictor_ids))
+        predictors = Predictor.query.filter(Predictor.id.in_(predictor_ids))
         return {**analysis, 'predictors': predictors}, 200
 
 
