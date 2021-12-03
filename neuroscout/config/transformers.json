@@ -39,10 +39,24 @@
       [{"transformer": "BertLMExtractor"}], {"window": "pre", "n": 25}
     ],
     [
-      [{"transformer": "WordCounterExtractor"}], {"window": "transcript"}
-    ]
+      [{"transformer": "BertLMExtractor"}], {"window": "pre", "n": 25}
+    ],
     [
-      [{"transformer": "BertLMExtractor", "parameters": {"mask": 24, "top_n": 100, "return_softmax": true}, "children": [{"transformer": "MetricExtractor", "parameters": {"functions": "scipy.stats.entropy"}}]}],
+      [{"transformer": "WordCounterExtractor"}], {"window": "transcript"}
+    ],
+    [
+      [{"transformer": "GPTForwardLMExtractor", "parameters": {"top_n": 1000, "return_softmax": true, "return_true_word": false, "return_true_token": false, "return_context": false, "return_input": false, "onset": "last_context"}, 
+        "children": [{"transformer": "MetricExtractor", "parameters": {"functions": "scipy.stats.entropy"}}]}],
+      {"window": "pre", "n": 25}
+    ],
+    [
+      [{"transformer": "GPTForwardLMExtractor", "parameters": {"top_n": 1, "return_softmax": true, "return_true_word": true, "return_true_token": true, "return_context": true, "return_input": true, "onset": "target"}, "children": [
+        {"transformer": "MetricExtractor", "parameters": {"subset_idx": ["true_word_score"], "functions": "lambda x: -np.log(x.values.astype(float))[0] if not x.isna()[0] else 'n/a'", "var_names": ["surprisal"]}}]}],
+      {"window": "pre", "n": 25}
+    ],
+    [
+      [{"transformer": "BertLMExtractor", "parameters": {"mask": 24, "top_n": 100, "return_softmax": true}, 
+        "children": [{"transformer": "MetricExtractor", "parameters": {"functions": "scipy.stats.entropy"}}]}],
       {"window": "pre", "n": 25}
     ],
     [
