@@ -56,6 +56,10 @@ class Analysis(db.Model):
     neurovault_collections = db.relationship(
         'NeurovaultCollection')
 
+    @hybrid_property
+    def nv_count(self):
+        return len(self.neurovault_collections)
+
     def clone(self, user):
         """ Make copy of analysis, with new id, and linking to parent """
         clone_row = copy_row(Analysis, self,

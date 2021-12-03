@@ -106,7 +106,8 @@ export default class OptionsTab extends React.Component<OptionsTabProps, void> {
                       value={convolution}
                       onChange={value =>
                         this.updatePredictorConfig(id, 'convolution', value)
-                      }>
+                      }
+                    >
                       {['Gamma', 'Alpha', 'Beta'].map(conv => (
                         <Option value={conv} key={conv}>
                           {conv}
@@ -122,7 +123,8 @@ export default class OptionsTab extends React.Component<OptionsTabProps, void> {
                         'temporalDerivative',
                         !temporalDerivative,
                       )
-                    }>
+                    }
+                  >
                     {'Temporal Derivative'}
                   </Checkbox>
                   <Checkbox
@@ -133,7 +135,8 @@ export default class OptionsTab extends React.Component<OptionsTabProps, void> {
                         'orthogonalize',
                         !orthogonalize,
                       )
-                    }>
+                    }
+                  >
                     {'Orthogonalize'}
                   </Checkbox>
                 </Panel>

@@ -32,7 +32,7 @@ Optionally, also give your analysis a `description`. If you make many analyses, 
 
 ![Choose a dataset](img/datasets.png)
 
-Neuroscout currently indexes a curated set of nine public naturalstic fMRI datasets.
+Neuroscout currently indexes a curated set of nine public naturalistic fMRI datasets.
 
 Datasets were specifically chosen for their compliance to the BIDS standard, and availability of original naturalistic stimuli.
 You can find detailed information on each dataset by clicking on the blue link icon.

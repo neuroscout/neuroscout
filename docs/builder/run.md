@@ -1,6 +1,6 @@
 # Finalize and Run
 
-After you've sufficiently reviewed your analysis, you need to generate an executable analysis bundle prior to being able to execute it.
+After you've reviewed your analysis, you need to generate an executable analysis bundle prior to being able to execute it.
 
 ![Run](img/run.png)
 

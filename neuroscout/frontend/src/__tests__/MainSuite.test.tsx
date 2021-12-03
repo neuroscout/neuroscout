@@ -75,7 +75,11 @@ test('App renders without crashing and homepage looks ok', () => {
   document.createElement('div')
   window.localStorage.removeItem('jwt')
 
-  const wrapper = mount(<MemoryRouter><App /></MemoryRouter>)
+  const wrapper = mount(
+    <MemoryRouter>
+      <App />
+    </MemoryRouter>,
+  )
   // Create new analysis button
   expect(wrapper.text().toLowerCase()).toContain('neuroscout')
   expect(wrapper.text().toLowerCase()).toContain('sign up')
@@ -88,7 +92,11 @@ test('Homepage has 1 buttons with user is not logged in', () => {
   document.getElementsByTagName('head')[0].appendChild(script)
 
   window.localStorage.removeItem('jwt')
-  const wrapper = mount(<MemoryRouter><App /></MemoryRouter>)
-    
+  const wrapper = mount(
+    <MemoryRouter>
+      <App />
+    </MemoryRouter>,
+  )
+
   expect(wrapper.find('button').length).toBe(2)
 })

@@ -94,7 +94,8 @@ class Plots extends React.Component<PlotsProps, Record<string, never>> {
                 <Tooltip
                   title={
                     'Scale variables in the design matrix plot (only for visual purposes)'
-                  }>
+                  }
+                >
                   Scale Design Matrix <QuestionCircleTwoTone />
                   <Space />
                   <Switch
@@ -422,7 +423,8 @@ export class Report extends React.Component<ReportProps, ReportState> {
             'Here you can preview the final design and correlation matrices. \
           \nClick on the design matrix columns to view the timecourse in detail.'
           }
-          defaultVisible={this.props.defaultVisible}>
+          defaultVisible={this.props.defaultVisible}
+        >
           <QuestionCircleTwoTone style={{ fontSize: '17px' }} />
         </Tooltip>
       </>
@@ -438,7 +440,8 @@ export class Report extends React.Component<ReportProps, ReportState> {
                 onChange={this.updateSelectedRunIds}
                 filterOption={this.filterRuns}
                 defaultValue={this.state.selectedRunIds}
-                className="plotRunSelector">
+                className="plotRunSelector"
+              >
                 {runIdsOptions}
               </Select>
               <Popconfirm
@@ -448,11 +451,13 @@ export class Report extends React.Component<ReportProps, ReportState> {
                 onConfirm={this.confirm}
                 onCancel={this.cancel}
                 okText="Ok"
-                cancelText="Cancel">
+                cancelText="Cancel"
+              >
                 <Button
                   loading={!this.state.reportsLoaded}
                   type="primary"
-                  className="plotRunSelectorBtn">
+                  className="plotRunSelectorBtn"
+                >
                   Get Reports
                 </Button>
               </Popconfirm>

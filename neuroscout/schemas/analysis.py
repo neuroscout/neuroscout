@@ -48,6 +48,8 @@ class AnalysisSchema(Schema):
     user = fields.Pluck(
         UserSchema, "user_name", many=False, dump_only=True)
 
+    nv_count = fields.Int(description='Number of NeuroVault collections.', dump_only=True)
+
     @validates('dataset_id')
     def validate_dsid(self, value):
         if Dataset.query.filter_by(id=value).count() == 0:

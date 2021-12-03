@@ -14,7 +14,8 @@ export const MainCol = (props: { children: React.ReactNode }): JSX.Element => {
       xl={{ span: 18 }}
       lg={{ span: 20 }}
       xs={{ span: 24 }}
-      className="mainCol">
+      className="mainCol"
+    >
       {props.children}
     </Col>
   )

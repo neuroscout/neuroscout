@@ -21,7 +21,7 @@ If you're ready to build your own analysis, head over to [Getting Started](build
     - [HRF Convolution](builder/hrf.md)
     - [Contrasts](builder/contrasts.md)
     - [Review](builder/review.md)
-    - [Run / Status](builder/run.md)
+    - [Run](builder/run.md)
     - [Bibliography](builder/bib.md)
 - Browse analyses
     - [Browse & manage](browse/index.md)

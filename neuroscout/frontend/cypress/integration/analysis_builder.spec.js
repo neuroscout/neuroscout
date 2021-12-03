@@ -1,7 +1,7 @@
 describe('Analysis Builder', () => {
   beforeEach(() => {
     cy.login('user@example.com', 'string')
-    cy.get('.newAnalysis > a')
+    cy.get('.newAnalysis a')
     cy.visit('/builder')
   })
 

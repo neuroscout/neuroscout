@@ -241,6 +241,7 @@ export interface ApiAnalysis {
   modified_at?: string
   model?: BidsModel
   user?: string
+  nv_count?: number
 }
 
 export interface BidsModel {
@@ -302,6 +303,7 @@ export interface AppAnalysis {
   modified_at?: string
   user_name?: string
   dataset_name: string
+  nv_count?: number
 }
 
 export const profileEditItems = [
@@ -360,10 +362,19 @@ export interface RunFilters {
 export interface ApiUpload {
   collection_id: number
   uploaded_at: string
+  estimator: string | null
+  fmriprep_version: string | null
+  cli_version: string | null
   files: [{ level: string; status: string; traceback: null | string }]
 }
 
 export interface NvUploads {
+  api_upload: ApiUpload
+  uploaded_at: string
+  estimator: string | null
+  fmriprep_version: string | null
+  cli_version: string | null
+  files: [{ level: string; status: string; traceback: null | string }]
   failed: number
   pending: number
   ok: number

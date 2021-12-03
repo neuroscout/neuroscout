@@ -174,7 +174,8 @@ class EditProfile extends React.Component<
                       this.setState({ errors: errorMessage })
                     })
                 }}
-                size={'small'}>
+                size={'small'}
+              >
                 Update Profile
               </Button>
             </div>
