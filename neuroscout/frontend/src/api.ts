@@ -8,6 +8,7 @@ import {
   ApiUpload,
   ApiUser,
   AppAnalysis,
+  AnalysisResources,
   Dataset,
   ExtractorDescriptions,
   Predictor,
@@ -314,6 +315,11 @@ export const api = {
         return res.version
       }
       return ''
+    })
+  },
+  getAnalysisResources: (id: string): Promise<AnalysisResources> => {
+    return jwtFetch(`${domainRoot}/api/analyses/${id}/resources`, {
+      method: 'get',
     })
   },
 }

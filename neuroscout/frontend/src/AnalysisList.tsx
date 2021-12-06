@@ -3,15 +3,54 @@ Resuable AnalysisList component used for displaying a list of analyses, e.g. on
 the home page or on the 'browse public analysis' page
 */
 import * as React from 'react'
-import { Button, Row, Table, Input } from 'antd'
+import { Button, Row, Table, Tag, Input } from 'antd'
 import { CheckCircleTwoTone } from '@ant-design/icons'
 import { MainCol, Space, StatusTag } from './HelperComponents'
-import { AppAnalysis, Dataset } from './coretypes'
+import { AppAnalysis, AnalysisResources, Dataset } from './coretypes'
+import { api } from './api'
 import { Link, Redirect } from 'react-router-dom'
 import { ColumnsType } from 'antd/es/table'
 
 import memoize from 'memoize-one'
 
+class AnalysisResourcesDisplay extends React.Component<
+  { analysisId: string },
+  { resources?: AnalysisResources }
+> {
+  constructor(props: { analysisId: string }) {
+    super(props)
+    this.state = { resources: undefined }
+  }
+  componentDidMount() {
+    api.getAnalysisResources(this.props.analysisId).then(res => {
+      this.setState({ resources: res })
+    })
+  }
+  render() {
+    if (!this.state.resources) {
+      return <div>Loading...</div>
+    }
+    return (
+      <div>
+        <Space />
+        <Button
+          href={this.state.resources.preproc_address}
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          Download Preprocessed Data
+        </Button>
+        <Space />
+        <h3>Predictors:</h3>
+        {this.state.resources.predictors.map(predictor => (
+          <Tag key={predictor} color="green">
+            {predictor}
+          </Tag>
+        ))}
+      </div>
+    )
+  }
+}
 const tableLocale = {
   filterConfirm: 'Ok',
   filterReset: 'Reset',
@@ -247,7 +286,9 @@ export class AnalysisListTable extends React.Component<
           size="small"
           dataSource={dataSource === null ? [] : dataSource}
           loading={analyses === null || !!this.props.loading}
-          expandedRowRender={record => <p>{record.description}</p>}
+          expandedRowRender={record => (
+            <AnalysisResourcesDisplay analysisId={record.id} />
+          )}
           pagination={
             analyses !== null && analyses.length > 20
               ? { position: ['bottomRight'] }

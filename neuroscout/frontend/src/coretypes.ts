@@ -393,6 +393,13 @@ export interface ExtractorDescriptions {
   [key: string]: string
 }
 
+export interface AnalysisResources {
+  preproc_address: string
+  dataset_address: string
+  dataset_name: string
+  predictors: [string]
+}
+
 export type UpdateBuilderStateValue = (value: Store[keyof Store]) => void
 
 export type UpdateBuilderState = (
