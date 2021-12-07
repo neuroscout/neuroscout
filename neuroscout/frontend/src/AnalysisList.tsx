@@ -32,15 +32,6 @@ class AnalysisResourcesDisplay extends React.Component<
     }
     return (
       <div>
-        <Space />
-        <Button
-          href={this.state.resources.preproc_address}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Download Preprocessed Data
-        </Button>
-        <Space />
         <h3>Predictors:</h3>
         {this.state.resources.predictors.map(predictor => (
           <Tag key={predictor} color="green">

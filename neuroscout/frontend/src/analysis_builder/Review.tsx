@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { Collapse, Card, Table, Tag, Space } from 'antd'
+import { Collapse, Col, Card, Table, Tag, Row, Statistic } from 'antd'
 import { Link } from 'react-router-dom'
 
 import {
@@ -21,6 +21,8 @@ interface ReviewProps {
   availablePredictors: Predictor[]
   dataset?: Dataset
   user_name?: string
+  created_at?: string
+  modified_at?: string
 }
 
 class DatasetInfo extends React.Component<
@@ -225,24 +227,40 @@ export class Review extends React.Component<
     }
 
     return (
-      <Card>
-        Author:{' '}
-        <Link to={`/profile/${String(this.props.user_name)}`}>
-          {' '}
-          {this.props.user_name}{' '}
-        </Link>
-        <p>{Description ? Description : 'No description.'}</p>
-        <p>Number of subjects: {numberOfSubjects}</p>
+      <Card title={Name}>
         <p>
-          Predictors used: <Space />
+          <div className="ant-statistic-title">Author</div>
+          <Link to={`/profile/${String(this.props.user_name)}`}>
+            {' '}
+            {this.props.user_name}{' '}
+          </Link>
+        </p>
+        {this.props.created_at && (
+          <p>
+            <div className="ant-statistic-title">Created at</div>
+            {this.props.created_at}
+          </p>
+        )}
+        {this.props.modified_at && (
+          <p>
+            <div className="ant-statistic-title">Last Modified</div>
+            {this.props.modified_at}
+          </p>
+        )}
+        {Description ? <p>{Description}</p> : ''}
+        <p>
+          <div className="ant-statistic-title">Predictors</div>
           {predictors.map(x => (
             <Tag color="green" key={x.name}>
               {x.name}
             </Tag>
           ))}
         </p>
-        Neurovault Links: <Space />
-        <NeurovaultLinks analysisId={this.props.analysisId} />
+        <Statistic title="Number of Subjects" value={numberOfSubjects} />
+        <p>
+          <div className="ant-statistic-title">Neurovault</div>
+          <NeurovaultLinks analysisId={this.props.analysisId} />{' '}
+        </p>
         <Collapse bordered={false}>
           {dataset && (
             <Panel header={`Dataset - ${dataset.name}`} key="dataset">

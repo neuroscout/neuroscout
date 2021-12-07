@@ -24,6 +24,7 @@ export interface Analysis {
   hrfPredictorIds: string[]
   status: AnalysisStatus
   private?: boolean
+  created_at?: string
   modified_at?: string
   config: AnalysisConfig
   transformations: Transformation[]
@@ -239,6 +240,7 @@ export interface ApiAnalysis {
   transformations?: Transformation[]
   contrasts?: Contrast[]
   config: AnalysisConfig
+  created_at?: string
   modified_at?: string
   model?: BidsModel
   user?: string
@@ -301,6 +303,7 @@ export interface AppAnalysis {
   description: string
   status: AnalysisStatus
   dataset_id?: string
+  created_at?: string
   modified_at?: string
   user_name?: string
   dataset_name: string

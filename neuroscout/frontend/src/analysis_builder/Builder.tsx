@@ -573,6 +573,7 @@ export default class AnalysisBuilder extends React.Component<
                 analysisId: analysisId,
                 status: data.status,
                 modified_at: data.modified_at,
+                created_at: data.created_at,
               },
               postReports: analysis.contrasts.length > 0,
               unsavedChanges: false,
@@ -1637,7 +1638,6 @@ export default class AnalysisBuilder extends React.Component<
                 )}
                 {!isEditable && (
                   <TabPane tab="Summary" key="summary">
-                    <h2>Summary</h2>
                     <Review
                       model={this.state.model}
                       unsavedChanges={this.state.unsavedChanges}
@@ -1647,6 +1647,8 @@ export default class AnalysisBuilder extends React.Component<
                       )}
                       user_name={this.state.analysis.user_name}
                       analysisId={analysis.analysisId}
+                      created_at={analysis.created_at}
+                      modified_at={analysis.modified_at}
                     />
                   </TabPane>
                 )}
