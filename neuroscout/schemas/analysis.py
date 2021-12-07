@@ -94,8 +94,8 @@ class AnalysisResourcesSchema(Schema):
         DatasetSchema, 'dataset_address', attribute='dataset', dump_only=True)
     dataset_name = fields.Pluck(
         DatasetSchema, 'name', attribute='dataset', dump_only=True)
-    predictors = fields.Pluck(
-        PredictorSchema, 'name', attribute='predictors', dump_only=True, many=True)
+    predictors = fields.Nested(PredictorSchema, dump_only=True, many=True)
+
 
 
 class AnalysisCompiledSchema(Schema):
