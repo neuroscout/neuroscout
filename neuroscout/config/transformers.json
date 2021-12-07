@@ -32,6 +32,7 @@
     [{"transformer": "PredefinedDictionaryExtractor", "parameters": {"variables": {"affect": ["V.Mean.Sum", "A.Mean.Sum", "D.Mean.Sum"], "aoa": ["AoA_Kup"], "concreteness": ["Conc.M"], "massiveauditorylexicaldecision": ["FreqCOCAspok", "NumSylls", "NumPhones", "Duration", "PhonLev"]}, "missing": "n/a"}}],
     [{"transformer": "PredefinedDictionaryExtractor", "parameters": {"variables": {"lancastersensorimotornorms": ["Auditory.mean", "Gustatory.mean", "Haptic.mean", "Interoceptive.mean", "Olfactory.mean", "Visual.mean", "Foot_leg.mean", "Hand_arm.mean", "Head.mean", "Mouth.mean", "Torso.mean"]}, "missing": "n/a"}}],
     [{"transformer": "LengthExtractor"}],
+    [{"transformer": "FundamentalFrequencyExtractor"}],
     [{"transformer": "AudiosetLabelExtractor", "parameters": {"labels": ["Whistling", "Heart sounds, heartbeat", "Wild animals", "Vehicle", "Fire", "Silence", "Domestic animals, pets", "Livestock, farm animals, working animals", "Alarm", "Tools", "Explosion", "Thunderstorm", "Engine", "Noise", "Water", "Wind", "Glass", "Animal", "Liquid", "Wood", "Mechanisms", "Musical instrument", "Hands", "Music"]}}]
   ],
   "tokenized_extractors": [

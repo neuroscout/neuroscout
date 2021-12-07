@@ -160,6 +160,15 @@
       "resample_frequency": 3
     }
   ],
+  "FundamentalFrequencyExtractor":[
+    {
+      "features": {
+        "yin": {
+          "description": "Fundamental frequency (F0) estimation using the YIN algorithm"
+        }
+      }
+    }
+  ],
   "ChromaSTFTExtractor": [
     {
       "features": {
