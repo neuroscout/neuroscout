@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { Collapse, Col, Card, Table, Tag, Row, Statistic } from 'antd'
+import { Collapse, Card, Table, Tag, Statistic, Space } from 'antd'
 import { Link } from 'react-router-dom'
 
 import {
@@ -229,25 +229,21 @@ export class Review extends React.Component<
     return (
       <Card title={Name}>
         <p>
-          <div className="ant-statistic-title">Author</div>
-          <Link to={`/profile/${String(this.props.user_name)}`}>
-            {' '}
-            {this.props.user_name}{' '}
-          </Link>
+          <Space>
+            <span className="ant-statistic-title">Author: </span>
+            <Link to={`/profile/${String(this.props.user_name)}`}>
+              {this.props.user_name}
+            </Link>
+            {this.props.modified_at && (
+              <>
+                |<span className="ant-statistic-title"> Last Modified: </span>
+                {formatDbTime(this.props.modified_at)}
+              </>
+            )}
+          </Space>
+          <br />
+          {Description ? { Description } : 'No description'}
         </p>
-        {this.props.created_at && (
-          <p>
-            <div className="ant-statistic-title">Created at</div>
-            {formatDbTime(this.props.created_at)}
-          </p>
-        )}
-        {this.props.modified_at && (
-          <p>
-            <div className="ant-statistic-title">Last Modified</div>
-            {formatDbTime(this.props.modified_at)}
-          </p>
-        )}
-        {Description ? <p>{Description}</p> : ''}
         <p>
           <div className="ant-statistic-title">Predictors</div>
           {predictors.map(x => (
@@ -256,12 +252,15 @@ export class Review extends React.Component<
             </Tag>
           ))}
         </p>
-        <Statistic title="Number of Subjects" value={numberOfSubjects} />
         <p>
-          <div className="ant-statistic-title">Neurovault</div>
+          <div className="ant-statistic-title">Number of Subjects</div>
+          {numberOfSubjects}
+        </p>
+        <p>
+          <div className="ant-statistic-title">Neurovault Uploads</div>
           <NeurovaultLinks analysisId={this.props.analysisId} />{' '}
         </p>
-        <Collapse bordered={false}>
+        <Collapse bordered={false} ghost>
           {dataset && (
             <Panel header={`Dataset - ${dataset.name}`} key="dataset">
               <DatasetInfo dataset={dataset} />

@@ -32,7 +32,6 @@ class AnalysisResourcesDisplay extends React.Component<
     }
     return (
       <div>
-        <h3>Predictors:</h3>
         {this.state.resources.predictors.map(predictor => (
           <Tag key={predictor} color="green">
             {predictor}
