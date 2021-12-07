@@ -9,7 +9,7 @@ import {
   Contrast,
   BidsModel,
 } from '../coretypes'
-import { alphaSort } from '../utils'
+import { alphaSort, formatDbTime } from '../utils'
 import NeurovaultLinks from './NeuroVault'
 
 const Panel = Collapse.Panel
@@ -238,13 +238,13 @@ export class Review extends React.Component<
         {this.props.created_at && (
           <p>
             <div className="ant-statistic-title">Created at</div>
-            {this.props.created_at}
+            {formatDbTime(this.props.created_at)}
           </p>
         )}
         {this.props.modified_at && (
           <p>
             <div className="ant-statistic-title">Last Modified</div>
-            {this.props.modified_at}
+            {formatDbTime(this.props.modified_at)}
           </p>
         )}
         {Description ? <p>{Description}</p> : ''}

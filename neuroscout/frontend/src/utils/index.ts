@@ -138,3 +138,8 @@ const _sortRuns = (keys, a, b) => {
 export const sortSub = _sortRuns.bind(null, ['subject', 'number', 'session'])
 export const sortNum = _sortRuns.bind(null, ['number', 'subject', 'session'])
 export const sortSes = _sortRuns.bind(null, ['session', 'subject', 'number'])
+
+export const formatDbTime = (inTime: string): string => {
+  const date = inTime.split('-')
+  return `${date[2].slice(0, 2)}-${date[1]}-${date[0].slice(2, 4)}`
+}
