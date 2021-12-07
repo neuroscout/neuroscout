@@ -1,4 +1,5 @@
 import { message } from 'antd'
+import { Predictor } from '../coretypes'
 // Display error to user as a UI notification and log it to console
 export const displayError = (error: Error): void => {
   try {
@@ -142,4 +143,23 @@ export const sortSes = _sortRuns.bind(null, ['session', 'subject', 'number'])
 export const formatDbTime = (inTime: string): string => {
   const date = inTime.split('-')
   return `${date[2].slice(0, 2)}-${date[1]}-${date[0].slice(2, 4)}`
+}
+
+export const predictorColor = (predictor: Predictor): string => {
+  const lookup = {
+    '': '#f5222d',
+    text: '#fa541c',
+    video: '#fa8c16',
+    audio: '#faad14',
+    image: '#a0d911',
+  }
+  if (
+    predictor &&
+    predictor.extracted_feature &&
+    predictor.extracted_feature.modality
+  ) {
+    return lookup[predictor.extracted_feature.modality]
+  } else {
+    return '#f5222d'
+  }
 }

@@ -9,7 +9,7 @@ import {
   Contrast,
   BidsModel,
 } from '../coretypes'
-import { alphaSort, formatDbTime } from '../utils'
+import { alphaSort, formatDbTime, predictorColor } from '../utils'
 import NeurovaultLinks from './NeuroVault'
 
 const Panel = Collapse.Panel
@@ -247,7 +247,7 @@ export class Review extends React.Component<
         <p>
           <div className="ant-statistic-title">Predictors</div>
           {predictors.map(x => (
-            <Tag color="green" key={x.name}>
+            <Tag color={predictorColor(x)} key={x.name}>
               {x.name}
             </Tag>
           ))}

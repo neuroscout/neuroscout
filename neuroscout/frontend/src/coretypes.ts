@@ -400,7 +400,7 @@ export interface AnalysisResources {
   preproc_address: string
   dataset_address: string
   dataset_name: string
-  predictors: [string]
+  predictors: Predictor[]
 }
 
 export type UpdateBuilderStateValue = (value: Store[keyof Store]) => void

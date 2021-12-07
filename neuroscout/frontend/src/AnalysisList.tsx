@@ -10,6 +10,7 @@ import { AppAnalysis, AnalysisResources, Dataset } from './coretypes'
 import { api } from './api'
 import { Link, Redirect } from 'react-router-dom'
 import { ColumnsType } from 'antd/es/table'
+import { predictorColor } from './utils'
 
 import memoize from 'memoize-one'
 
@@ -33,8 +34,9 @@ class AnalysisResourcesDisplay extends React.Component<
     return (
       <div>
         {this.state.resources.predictors.map(predictor => (
-          <Tag key={predictor} color="green">
-            {predictor}
+          <Tag key={predictor.name} color={predictorColor(predictor)}>
+            {' '}
+            {predictor.name}
           </Tag>
         ))}
       </div>
