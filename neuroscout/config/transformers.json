@@ -53,7 +53,17 @@
     [
       [{"transformer": "GPTForwardLMExtractor", "parameters": {"top_n": 1, "return_softmax": true, "return_true_word": true, "return_true_token": true, "return_context": true, "return_input": true, "onset": "target"}, "children": [
         {"transformer": "MetricExtractor", "parameters": {"subset_idx": ["true_token_score"], "functions": "lambda x: -np.log(x.values.astype(float))[0] if not x.isna()[0] else 'n/a'", "var_names": ["gpt_surprisal"]}}]}],
+      {"window": "pre", "n": 5}
+    ],
+    [
+      [{"transformer": "GPTForwardLMExtractor", "parameters": {"top_n": 1, "return_softmax": true, "return_true_word": true, "return_true_token": true, "return_context": true, "return_input": true, "onset": "target"}, "children": [
+        {"transformer": "MetricExtractor", "parameters": {"subset_idx": ["true_token_score"], "functions": "lambda x: -np.log(x.values.astype(float))[0] if not x.isna()[0] else 'n/a'", "var_names": ["gpt_surprisal"]}}]}],
       {"window": "pre", "n": 25}
+    ],
+    [
+      [{"transformer": "GPTForwardLMExtractor", "parameters": {"top_n": 1, "return_softmax": true, "return_true_word": true, "return_true_token": true, "return_context": true, "return_input": true, "onset": "target"}, "children": [
+        {"transformer": "MetricExtractor", "parameters": {"subset_idx": ["true_token_score"], "functions": "lambda x: -np.log(x.values.astype(float))[0] if not x.isna()[0] else 'n/a'", "var_names": ["gpt_surprisal"]}}]}],
+      {"window": "pre", "n": 50}
     ],
     [
       [{"transformer": "BertLMExtractor", "parameters": {"mask": 24, "top_n": 100, "return_softmax": true}, 
