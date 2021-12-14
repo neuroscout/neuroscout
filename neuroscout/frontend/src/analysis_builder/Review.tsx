@@ -252,15 +252,21 @@ export class Review extends React.Component<
           <br />
           {Description ? { Description } : 'No description'}
         </p>
-        <Row>
-          <Space>
-            {dataset && (
-              <Col>
-                <DatasetInfo dataset={dataset} />
-              </Col>
-            )}
+        <Row gutter={[24, 16]}>
+          {dataset && (
+            <Col>
+              <DatasetInfo dataset={dataset} />
+            </Col>
+          )}
+          <Col>
             <ModelInput model={model} />
-          </Space>
+          </Col>
+          <Col>
+            <p>
+              <div className="ant-statistic-title">Number of Subjects</div>
+              <Tooltip title={subjectIds}>{numberOfSubjects}</Tooltip>
+            </p>
+          </Col>
         </Row>
         <p>
           <div className="ant-statistic-title">Predictors</div>
@@ -271,10 +277,6 @@ export class Review extends React.Component<
               </Tag>
             </Tooltip>
           ))}
-        </p>
-        <p>
-          <div className="ant-statistic-title">Number of Subjects</div>
-          <Tooltip title={subjectIds}>{numberOfSubjects}</Tooltip>
         </p>
         <p>
           <div className="ant-statistic-title">Neurovault Uploads</div>
