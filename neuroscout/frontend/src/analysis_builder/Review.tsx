@@ -137,7 +137,11 @@ function getPredictorNames(
   ) {
     modelVars = model.Steps[0].Model.X
   }
-  return availablePredictors.filter(x => modelVars.indexOf('' + x.name) > -1)
+  const predictors = availablePredictors.filter(
+    x => modelVars.indexOf('' + x.name) > -1,
+  )
+  predictors.sort((a, b) => a.name.localeCompare(b.name))
+  return predictors
 }
 // In the future this will include the new named outputs from transformations.
 class X extends React.Component<{ model: BidsModel; available: Predictor[] }> {

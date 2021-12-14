@@ -159,6 +159,8 @@ export const predictorColor = (predictor: Predictor): string => {
     predictor.extracted_feature.modality
   ) {
     return lookup[predictor.extracted_feature.modality]
+  } else if (predictor.source === 'fmriprep') {
+    return '#858d99'
   } else {
     return '#474747'
   }
