@@ -1,15 +1,5 @@
 import * as React from 'react'
-import {
-  Col,
-  Collapse,
-  Card,
-  Row,
-  Table,
-  Tag,
-  Tooltip,
-  Statistic,
-  Space,
-} from 'antd'
+import { Col, Collapse, Card, Row, Table, Tag, Tooltip, Space } from 'antd'
 import { Link } from 'react-router-dom'
 
 import {
@@ -49,15 +39,6 @@ class DatasetInfo extends React.Component<
         </a>
       </p>
     )
-    /*
-    return (
-      <Card title="Dataset" size="small">
-        <a href={dataset.url} target="_blank" rel="noopener noreferrer">
-          {dataset.name}
-        </a>
-      </Card>
-    )
-    */
   }
 }
 
@@ -81,13 +62,6 @@ class ModelInput extends React.Component<
         {input.Task ? input.Task : ''}
       </p>
     )
-    /*
-    return (
-      <Card title="Task" size="small">
-        {input.Task ? input.Task : ''}
-      </Card>
-    )
-    */
   }
 }
 
