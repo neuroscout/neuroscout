@@ -148,7 +148,7 @@ export const formatDbTime = (inTime: string): string => {
 export const predictorColor = (predictor: Predictor): string => {
   const lookup = {
     '': '#f5222d',
-    text: '#fa541c',
+    text: '#cc7ee0',
     video: '#fa8c16',
     audio: '#faad14',
     image: '#a0d911',
@@ -160,6 +160,6 @@ export const predictorColor = (predictor: Predictor): string => {
   ) {
     return lookup[predictor.extracted_feature.modality]
   } else {
-    return '#f5222d'
+    return '#474747'
   }
 }

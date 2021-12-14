@@ -1583,6 +1583,22 @@ export default class AnalysisBuilder extends React.Component<
                     <br />
                   </TabPane>
                 )}
+                {!isEditable && (
+                  <TabPane tab="Summary" key="summary">
+                    <Review
+                      model={this.state.model}
+                      unsavedChanges={this.state.unsavedChanges}
+                      availablePredictors={this.state.availablePredictors}
+                      dataset={this.props.datasets.find(
+                        x => x.id === this.state.analysis.datasetId,
+                      )}
+                      user_name={this.state.analysis.user_name}
+                      analysisId={analysis.analysisId}
+                      created_at={analysis.created_at}
+                      modified_at={analysis.modified_at}
+                    />
+                  </TabPane>
+                )}
                 <TabPane
                   tab="Report"
                   key="review"
@@ -1603,6 +1619,13 @@ export default class AnalysisBuilder extends React.Component<
                           activeTab={activeTab}
                           modified_at={analysis.modified_at}
                         />
+                        <Collapse bordered={false} ghost>
+                          <Panel header="BIDS StatsModel" key="model">
+                            <pre>
+                              {JSON.stringify(this.state.model, null, 2)}
+                            </pre>
+                          </Panel>
+                        </Collapse>
                         <br />
                         {isEditable && this.navButtons(false, isEditable)}
                         <br />
@@ -1634,22 +1657,6 @@ export default class AnalysisBuilder extends React.Component<
                         />
                       )}
                     </StatusTab>
-                  </TabPane>
-                )}
-                {!isEditable && (
-                  <TabPane tab="Summary" key="summary">
-                    <Review
-                      model={this.state.model}
-                      unsavedChanges={this.state.unsavedChanges}
-                      availablePredictors={this.state.availablePredictors}
-                      dataset={this.props.datasets.find(
-                        x => x.id === this.state.analysis.datasetId,
-                      )}
-                      user_name={this.state.analysis.user_name}
-                      analysisId={analysis.analysisId}
-                      created_at={analysis.created_at}
-                      modified_at={analysis.modified_at}
-                    />
                   </TabPane>
                 )}
                 {!isEditable && (

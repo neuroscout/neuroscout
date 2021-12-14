@@ -1,5 +1,15 @@
 import * as React from 'react'
-import { Collapse, Card, Table, Tag, Statistic, Space } from 'antd'
+import {
+  Col,
+  Collapse,
+  Card,
+  Row,
+  Table,
+  Tag,
+  Tooltip,
+  Statistic,
+  Space,
+} from 'antd'
 import { Link } from 'react-router-dom'
 
 import {
@@ -32,17 +42,22 @@ class DatasetInfo extends React.Component<
   render() {
     const dataset = this.props.dataset
     return (
-      <>
-        <p>{dataset.summary}</p>
-        <p>
-          Authors:
-          <br /> {dataset.authors.join(', ')}
-        </p>
+      <p>
+        <div className="ant-statistic-title">Dataset</div>
         <a href={dataset.url} target="_blank" rel="noopener noreferrer">
-          {dataset.url}
+          {dataset.name}
         </a>
-      </>
+      </p>
     )
+    /*
+    return (
+      <Card title="Dataset" size="small">
+        <a href={dataset.url} target="_blank" rel="noopener noreferrer">
+          {dataset.name}
+        </a>
+      </Card>
+    )
+    */
   }
 }
 
@@ -58,31 +73,21 @@ class ModelInput extends React.Component<
     const runs = input.Run
       ? input.Run.sort().map(x => <li key={x}>{x}</li>)
       : []
-    const subjects = input.Subject ? alphaSort(input.Subject).join(', ') : []
     const sessions = input.Session ? alphaSort(input.Session).join(', ') : []
 
     return (
-      <div>
-        <Card title="Task" key="task">
-          {input.Task ? input.Task : ''}
-        </Card>
-        {runs.length > 0 && (
-          <Card title="Runs" key="runs">
-            <ul>{runs}</ul>
-          </Card>
-        )}
-        {subjects.length > 0 && (
-          <Card title="Subjects" key="subjects">
-            <p>{subjects}</p>
-          </Card>
-        )}
-        {sessions.length > 0 && (
-          <Card title="Sessions" key="sessions">
-            <p>{sessions}</p>
-          </Card>
-        )}
-      </div>
+      <p>
+        <div className="ant-statistic-title">Task</div>
+        {input.Task ? input.Task : ''}
+      </p>
     )
+    /*
+    return (
+      <Card title="Task" size="small">
+        {input.Task ? input.Task : ''}
+      </Card>
+    )
+    */
   }
 }
 
@@ -204,6 +209,9 @@ export class Review extends React.Component<
     const numberOfSubjects = model.Input?.Subject
       ? model.Input.Subject.length
       : 0
+    const subjectIds = model.Input?.Subject
+      ? alphaSort(model.Input.Subject).join(', ')
+      : []
     let { Name, Steps } = model
     const { Description } = model
 
@@ -244,47 +252,34 @@ export class Review extends React.Component<
           <br />
           {Description ? { Description } : 'No description'}
         </p>
+        <Row>
+          <Space>
+            {dataset && (
+              <Col>
+                <DatasetInfo dataset={dataset} />
+              </Col>
+            )}
+            <ModelInput model={model} />
+          </Space>
+        </Row>
         <p>
           <div className="ant-statistic-title">Predictors</div>
           {predictors.map(x => (
-            <Tag color={predictorColor(x)} key={x.name}>
-              {x.name}
-            </Tag>
+            <Tooltip key={x.name} title={x.description}>
+              <Tag color={predictorColor(x)} key={x.name}>
+                {x.name}
+              </Tag>
+            </Tooltip>
           ))}
         </p>
         <p>
           <div className="ant-statistic-title">Number of Subjects</div>
-          {numberOfSubjects}
+          <Tooltip title={subjectIds}>{numberOfSubjects}</Tooltip>
         </p>
         <p>
           <div className="ant-statistic-title">Neurovault Uploads</div>
           <NeurovaultLinks analysisId={this.props.analysisId} />{' '}
         </p>
-        <Collapse bordered={false} ghost>
-          {dataset && (
-            <Panel header={`Dataset - ${dataset.name}`} key="dataset">
-              <DatasetInfo dataset={dataset} />
-            </Panel>
-          )}
-          <Panel header="Inputs" key="inputs">
-            <ModelInput model={model} />
-          </Panel>
-          <Panel header="X (Variables)" key="X">
-            <X
-              model={this.props.model}
-              available={this.props.availablePredictors}
-            />
-          </Panel>
-          <Panel header="Transformations" key="xforms">
-            <ReviewObjects input={xforms} />
-          </Panel>
-          <Panel header="Contrasts" key="contrasts">
-            <ReviewObjects input={contrasts} />
-          </Panel>
-          <Panel header="BIDS StatsModel" key="model">
-            <pre>{JSON.stringify(this.props.model, null, 2)}</pre>
-          </Panel>
-        </Collapse>
       </Card>
     )
   }
