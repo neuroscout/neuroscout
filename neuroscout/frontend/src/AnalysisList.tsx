@@ -33,7 +33,7 @@ class AnalysisResourcesDisplay extends React.Component<
     }
     return (
       <div>
-        Predictors
+        <span class="ant-statistic-title">Predictors</span>
         <Space />
         {this.state.resources.predictors.map(predictor => (
           <Tag key={predictor.name} color={predictorColor(predictor)}>
