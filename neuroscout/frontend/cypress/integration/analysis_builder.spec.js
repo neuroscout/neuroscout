@@ -1,14 +1,20 @@
 describe('Analysis Builder', () => {
   beforeEach(() => {
+    /*
     cy.login('user@example.com', 'string')
     cy.get('.newAnalysis a')
     cy.visit('/builder')
+    */
   })
 
   let name = 'dataset_name';
   let pp_name = 'Test Dataset';
   let predCount = 3;
   it('analysis builder', () => {
+    cy.login('user@example.com', 'string')
+    cy.get('.newAnalysis a')
+    cy.visit('/builder')
+
     /* Overview Tab */
     cy.get('.builderAnalysisNameInput').type(name)
     cy.get(`.ant-col > .ant-input[value=${name}]`)
