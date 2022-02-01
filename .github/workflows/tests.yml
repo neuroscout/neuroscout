@@ -76,6 +76,6 @@ jobs:
         CHOKIDAR_USEPOLLING: 1
       run: |
        bash setup_frontend_tests.sh
-       sleep 60
+       sleep 120
        cd neuroscout/frontend && ./node_modules/.bin/cypress run --record --key ${{ secrets.CYPRESS_RECORD_KEY }}
       if: matrix.type == 'frontend'
