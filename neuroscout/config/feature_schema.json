@@ -30,9 +30,17 @@
           "description": "Entropy of BERT LM encoding vectors.",
           "name": "BERTLM_{window_method}_{window_n}_entropy"
         },
+        "gpt_entropy$": {
+          "description": "Entropy of BERT LM encoding vectors.",
+          "name": "GPT2_{window_method}_{window_n}_entropy"
+        },
         "surprisal$": {
           "description": "BERTLM_{window_method}_{window_n} surprisal (-log(masked_prediction))",
           "name": "BERTLM_{window_method}_{window_n}_surprisal"
+        },
+        "gpt_surprisal$": {
+          "description": "BERTLM_{window_method}_{window_n} surprisal (-log(masked_prediction))",
+          "name": "GPT2_{window_method}_{window_n}_surprisal"
         }
       }
     }
@@ -147,6 +155,16 @@
       "features": {
         "tonal_centroid_(.*)": {
           "description": "Tonal centroid \\1"
+        }
+      },
+      "resample_frequency": 3
+    }
+  ],
+  "FundamentalFrequencyExtractor":[
+    {
+      "features": {
+        "yin": {
+          "description": "Fundamental frequency (F0) estimation using the YIN algorithm"
         }
       },
       "resample_frequency": 3

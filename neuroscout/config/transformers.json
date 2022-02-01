@@ -27,11 +27,12 @@
     [{"transformer": "ChromaSTFTExtractor"}],
     [{"transformer": "ChromaCQTExtractor"}],
     [{"transformer": "MFCCExtractor"}],
-    [{"transformer": "MelspectrogramExtractor"}],
+    [{"transformer": "MelspectrogramExtractor", "parameters": {"n_mels":64, "fmax":8000, "fmin": 20}}],
     [{"transformer": "PredefinedDictionaryExtractor", "parameters": {"variables": {"subtlexusfrequency": ["FREQcount", "CDcount", "FREQlow", "Cdlow", "SUBTLWF", "Lg10WF", "SUBTLCD", "Lg10CD", "Dom_PoS_SUBTLEX", "Freq_dom_PoS_SUBTLEX", "Percentage_dom_PoS", "All_PoS_SUBTLEX", "All_freqs_SUBTLEX", "Zipf-value"]}, "missing": "n/a"}}],
     [{"transformer": "PredefinedDictionaryExtractor", "parameters": {"variables": {"affect": ["V.Mean.Sum", "A.Mean.Sum", "D.Mean.Sum"], "aoa": ["AoA_Kup"], "concreteness": ["Conc.M"], "massiveauditorylexicaldecision": ["FreqCOCAspok", "NumSylls", "NumPhones", "Duration", "PhonLev"]}, "missing": "n/a"}}],
     [{"transformer": "PredefinedDictionaryExtractor", "parameters": {"variables": {"lancastersensorimotornorms": ["Auditory.mean", "Gustatory.mean", "Haptic.mean", "Interoceptive.mean", "Olfactory.mean", "Visual.mean", "Foot_leg.mean", "Hand_arm.mean", "Head.mean", "Mouth.mean", "Torso.mean"]}, "missing": "n/a"}}],
     [{"transformer": "LengthExtractor"}],
+    [{"transformer": "FundamentalFrequencyExtractor"}],
     [{"transformer": "AudiosetLabelExtractor", "parameters": {"labels": ["Whistling", "Heart sounds, heartbeat", "Wild animals", "Vehicle", "Fire", "Silence", "Domestic animals, pets", "Livestock, farm animals, working animals", "Alarm", "Tools", "Explosion", "Thunderstorm", "Engine", "Noise", "Water", "Wind", "Glass", "Animal", "Liquid", "Wood", "Mechanisms", "Musical instrument", "Hands", "Music"]}}]
   ],
   "tokenized_extractors": [
@@ -39,10 +40,34 @@
       [{"transformer": "BertLMExtractor"}], {"window": "pre", "n": 25}
     ],
     [
-      [{"transformer": "WordCounterExtractor"}], {"window": "transcript"}
-    ]
+      [{"transformer": "BertLMExtractor"}], {"window": "pre", "n": 25}
+    ],
     [
-      [{"transformer": "BertLMExtractor", "parameters": {"mask": 24, "top_n": 100, "return_softmax": true}, "children": [{"transformer": "MetricExtractor", "parameters": {"functions": "scipy.stats.entropy"}}]}],
+      [{"transformer": "WordCounterExtractor"}], {"window": "transcript"}
+    ],
+    [
+      [{"transformer": "GPTForwardLMExtractor", "parameters": {"top_n": 1000, "return_softmax": true, "return_true_word": false, "return_true_token": false, "return_context": false, "return_input": false, "onset": "last_context"}, 
+        "children": [{"transformer": "MetricExtractor", "parameters": {"functions": "scipy.stats.entropy", "var_names": ["gpt_entropy"]}}]}],
+      {"window": "pre", "n": 25}
+    ],
+    [
+      [{"transformer": "GPTForwardLMExtractor", "parameters": {"top_n": 1, "return_softmax": true, "return_true_word": true, "return_true_token": true, "return_context": true, "return_input": true, "onset": "target"}, "children": [
+        {"transformer": "MetricExtractor", "parameters": {"subset_idx": ["true_token_score"], "functions": "lambda x: -np.log(x.values.astype(float))[0] if not x.isna()[0] else 'n/a'", "var_names": ["gpt_surprisal"]}}]}],
+      {"window": "pre", "n": 5}
+    ],
+    [
+      [{"transformer": "GPTForwardLMExtractor", "parameters": {"top_n": 1, "return_softmax": true, "return_true_word": true, "return_true_token": true, "return_context": true, "return_input": true, "onset": "target"}, "children": [
+        {"transformer": "MetricExtractor", "parameters": {"subset_idx": ["true_token_score"], "functions": "lambda x: -np.log(x.values.astype(float))[0] if not x.isna()[0] else 'n/a'", "var_names": ["gpt_surprisal"]}}]}],
+      {"window": "pre", "n": 25}
+    ],
+    [
+      [{"transformer": "GPTForwardLMExtractor", "parameters": {"top_n": 1, "return_softmax": true, "return_true_word": true, "return_true_token": true, "return_context": true, "return_input": true, "onset": "target"}, "children": [
+        {"transformer": "MetricExtractor", "parameters": {"subset_idx": ["true_token_score"], "functions": "lambda x: -np.log(x.values.astype(float))[0] if not x.isna()[0] else 'n/a'", "var_names": ["gpt_surprisal"]}}]}],
+      {"window": "pre", "n": 50}
+    ],
+    [
+      [{"transformer": "BertLMExtractor", "parameters": {"mask": 24, "top_n": 100, "return_softmax": true}, 
+        "children": [{"transformer": "MetricExtractor", "parameters": {"functions": "scipy.stats.entropy"}}]}],
       {"window": "pre", "n": 25}
     ],
     [
