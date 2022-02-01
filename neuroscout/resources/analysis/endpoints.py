@@ -1,7 +1,7 @@
 from flask import send_file, current_app
 from flask_apispec import MethodResource, marshal_with, use_kwargs, doc
 from flask_jwt import current_identity
-from ...models import Analysis, Report
+from ...models import Analysis, Report, Predictor
 from ...database import db
 from ...core import cache
 from os.path import exists
@@ -17,7 +17,6 @@ from ..predictor import get_predictors
 from ...schemas.analysis import (
     AnalysisSchema, AnalysisFullSchema,
     AnalysisResourcesSchema, BibliographySchema)
-
 
 @doc(tags=['analysis'])
 @marshal_with(AnalysisSchema)

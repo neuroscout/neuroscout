@@ -407,9 +407,14 @@ export default class AnalysisBuilder extends React.Component<
           Input: hrfX,
         }
         // Right now we only want one HRF transform, remove all others to prevent duplicates
-        steps[0].Transformations = steps[0].Transformations!.filter(
-          x => x.Name !== 'Convolve',
-        )
+        if (steps[0].Transformations) {
+          steps[0].Transformations = steps[0].Transformations.filter(
+            x => x.Name !== 'Convolve',
+          )
+        } else {
+          steps[0].Transformations = []
+        }
+
         steps[0].Transformations.push(hrfTransforms)
       }
     }
@@ -440,7 +445,7 @@ export default class AnalysisBuilder extends React.Component<
   }
 
   // A one off poll for when the analysis is submitted.
-  checkAnalysisStatus = async () => {
+  checkAnalysisStatus = async (): Promise<void> => {
     while (this.state.poll) {
       const id = this.state.analysis.analysisId
       if (id === undefined || this.state.analysis.status === undefined) {
@@ -468,7 +473,13 @@ export default class AnalysisBuilder extends React.Component<
 
   // Save analysis to server, either with lock=false (just save), or lock=true (save & submit)
   saveAnalysis =
-    ({ compile = false, build = true }) =>
+    ({
+      compile = false,
+      build = true,
+    }: {
+      compile?: boolean
+      build?: boolean
+    }) =>
     (): Promise<boolean> => {
       /*
     if ((!compile && !this.saveEnabled()) || (compile && !this.submitEnabled())) {
@@ -562,6 +573,7 @@ export default class AnalysisBuilder extends React.Component<
                 analysisId: analysisId,
                 status: data.status,
                 modified_at: data.modified_at,
+                created_at: data.created_at,
               },
               postReports: analysis.contrasts.length > 0,
               unsavedChanges: false,
@@ -600,19 +612,15 @@ export default class AnalysisBuilder extends React.Component<
         if (data.model.Steps[i].Level !== this.state.currentLevel) {
           continue
         }
+        const xforms = data.model.Steps[i].Transformations
+        if (xforms !== undefined) {
+          data.transformations = xforms.filter(x => {
+            return x.Name !== ('Convolve' as TransformName)
+          })
 
-        if (data.model.Steps[i].Transformations) {
-          data.transformations = data.model.Steps[i].Transformations!.filter(
-            x => {
-              return x.Name !== ('Convolve' as TransformName)
-            },
-          )
-
-          const hrfTransforms = data.model.Steps[i].Transformations!.filter(
-            x => {
-              return x.Name === ('Convolve' as TransformName)
-            },
-          )
+          const hrfTransforms = xforms.filter(x => {
+            return x.Name === ('Convolve' as TransformName)
+          })
           if (hrfTransforms.length > 0) {
             hrfTransforms.map(x =>
               x.Input ? x.Input.map(y => hrfPredictorIds.push(y)) : null,
@@ -671,7 +679,7 @@ export default class AnalysisBuilder extends React.Component<
     return Promise.resolve(analysis)
   }
 
-  setActiveTabs = (analysis: Analysis) => {
+  setActiveTabs = (analysis: Analysis): void => {
     if (analysis.predictorIds && analysis.predictorIds.length > 0) {
       this.setState({
         transformationsActive: true,
@@ -698,7 +706,7 @@ export default class AnalysisBuilder extends React.Component<
   }
 
   nextTab = (direction = 1) => {
-    return e => {
+    return (): void => {
       const nextIndex = tabOrder.indexOf(this.state.activeTab) + direction
       const nextTab = tabOrder[nextIndex]
       const update = { activeTab: nextTab as TabName }
@@ -725,7 +733,7 @@ export default class AnalysisBuilder extends React.Component<
   /* we can change tabs by clicking next/back or on tab itself. Before we change some tabs we need to validate their
    * current contents
    */
-  onTabClick = (newTab: TabName) => {
+  onTabClick = (newTab: TabName): void => {
     if (!this.preTabChange(newTab)) {
       return
     }
@@ -759,7 +767,7 @@ export default class AnalysisBuilder extends React.Component<
    * the analysis but leaves predictorIds alone in the model, a prerequisite for /fill endpoint
    * to work. We then post to /fill, and attempt to reload the analysis from what /fill returns.
    */
-  fillAnalysis = () => {
+  fillAnalysis = (): void => {
     const url = `${domainRoot}/api/analyses/${String(
       this.state.analysis.analysisId,
     )}/fill`
@@ -788,7 +796,7 @@ export default class AnalysisBuilder extends React.Component<
 
   // run any time we attempt to leave tab
   // xform and contrast checks are more or less the same save validate funciton call...
-  preTabChange = (nextTab: TabName) => {
+  preTabChange = (nextTab: TabName): boolean => {
     let errors: string[] = []
     if (this.state.activeTab === 'transformations') {
       if (this.state.activeXform === undefined) {
@@ -840,11 +848,7 @@ export default class AnalysisBuilder extends React.Component<
   /* The updateAnalysis inside Overview is doing the same as the following updateAnalysis and should be replaced with
       this one. Also the update xforms and contrasts after it could be replaced with this updateAnalysis.
    */
-  updateAnalysis = (
-    value: Partial<Analysis>,
-    unsavedChanges = false,
-    save = false,
-  ) => {
+  updateAnalysis = (value: Partial<Analysis>, save = false): void => {
     const updatedAnalysis: Analysis = { ...this.state.analysis, ...value }
     this.updateState('analysis', false, save)(updatedAnalysis)
   }
@@ -871,7 +875,7 @@ export default class AnalysisBuilder extends React.Component<
     value: Predictor[],
     filteredPredictors: Predictor[],
     hrf = false,
-  ) => {
+  ): void => {
     const stateUpdate: Partial<Store> = {}
     const newAnalysis: Analysis = { ...this.state.analysis }
     const filteredIds = filteredPredictors.map(x => x.id)
@@ -950,11 +954,11 @@ export default class AnalysisBuilder extends React.Component<
   updateHRFPredictorState = (
     value: Predictor[],
     filteredPredictors: Predictor[],
-  ) => {
-    return this.updatePredictorState(value, filteredPredictors, true)
+  ): void => {
+    this.updatePredictorState(value, filteredPredictors, true)
   }
 
-  runIdsFromModel = (availableRuns: Run[], input: ImageInput) => {
+  runIdsFromModel = (availableRuns: Run[], input: ImageInput): string[] => {
     let runIds: Run[] = availableRuns
     if (!this.state.model || !this.state.model.Input) {
       return []
@@ -983,8 +987,8 @@ export default class AnalysisBuilder extends React.Component<
   */
   updateState =
     (attrName: keyof Store, keepClean = false, saveToAPI = false) =>
-    (value: Store[keyof Store]) => {
-      const { analysis, availableRuns, availablePredictors } = this.state
+    (value: Store[keyof Store]): void => {
+      const { analysis, availableRuns } = this.state
       const { datasets } = this.props
       /*
       if (!editableStatus.includes(analysis.status) && !keepClean) {
@@ -1098,8 +1102,7 @@ export default class AnalysisBuilder extends React.Component<
       this.setState(stateUpdate as Pick<Store, keyof Store>)
     }
 
-  postTabChange = activeKey => {
-    const analysis = this.state.analysis
+  postTabChange = (activeKey: string): void => {
     if (this.state.fillAnalysis) {
       this.fillAnalysis()
     } else if (editableStatus.includes(this.state.analysis.status)) {
@@ -1178,7 +1181,7 @@ export default class AnalysisBuilder extends React.Component<
       .catch(displayError)
   }
 
-  nextbackButtons = (disabled = false, prev = true) => {
+  nextbackButtons = (disabled = false, prev = true): JSX.Element => {
     return (
       <Button.Group style={{ float: 'right' }}>
         {prev && (
@@ -1198,7 +1201,7 @@ export default class AnalysisBuilder extends React.Component<
     )
   }
 
-  navButtons = (disabled = false, prev = true) => {
+  navButtons = (disabled = false, prev = true): JSX.Element => {
     let analysisId: string | undefined = undefined
     if (this.state.analysis && this.state.analysis.analysisId) {
       analysisId = this.state.analysis.analysisId
@@ -1249,7 +1252,7 @@ export default class AnalysisBuilder extends React.Component<
     }
   }
 
-  componentDidMount() {
+  componentDidMount(): void {
     if (this.props.doTour) {
       this.setState({ doTooltip: true })
     }
@@ -1282,7 +1285,7 @@ export default class AnalysisBuilder extends React.Component<
             !editableStatus.includes(data.status) &&
             data.status !== 'DRAFT'
           ) {
-            this.setState({ activeTab: 'review' })
+            this.setState({ activeTab: 'summary' })
             this.postTabChange('review')
           }
           if (
@@ -1313,7 +1316,7 @@ export default class AnalysisBuilder extends React.Component<
     document.title = 'Neuroscout'
   }
 
-  render() {
+  render(): JSX.Element {
     if (this.state.analysis404) {
       return <Redirect to="/builder/" />
     } else if (this.state.loadingAnalysis) {
@@ -1580,8 +1583,24 @@ export default class AnalysisBuilder extends React.Component<
                     <br />
                   </TabPane>
                 )}
+                {!isEditable && (
+                  <TabPane tab="Summary" key="summary">
+                    <Review
+                      model={this.state.model}
+                      unsavedChanges={this.state.unsavedChanges}
+                      availablePredictors={this.state.availablePredictors}
+                      dataset={this.props.datasets.find(
+                        x => x.id === this.state.analysis.datasetId,
+                      )}
+                      user_name={this.state.analysis.user_name}
+                      analysisId={analysis.analysisId}
+                      created_at={analysis.created_at}
+                      modified_at={analysis.modified_at}
+                    />
+                  </TabPane>
+                )}
                 <TabPane
-                  tab="Review"
+                  tab="Report"
                   key="review"
                   disabled={(!reviewActive || !analysis.analysisId) && isDraft}
                 >
@@ -1600,15 +1619,13 @@ export default class AnalysisBuilder extends React.Component<
                           activeTab={activeTab}
                           modified_at={analysis.modified_at}
                         />
-                        <Review
-                          model={this.state.model}
-                          unsavedChanges={this.state.unsavedChanges}
-                          availablePredictors={this.state.availablePredictors}
-                          dataset={this.props.datasets.find(
-                            x => x.id === this.state.analysis.datasetId,
-                          )}
-                          user_name={this.state.analysis.user_name}
-                        />
+                        <Collapse bordered={false} ghost>
+                          <Panel header="BIDS StatsModel" key="model">
+                            <pre>
+                              {JSON.stringify(this.state.model, null, 2)}
+                            </pre>
+                          </Panel>
+                        </Collapse>
                         <br />
                         {isEditable && this.navButtons(false, isEditable)}
                         <br />

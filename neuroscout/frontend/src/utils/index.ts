@@ -1,6 +1,7 @@
 import { message } from 'antd'
+import { Predictor } from '../coretypes'
 // Display error to user as a UI notification and log it to console
-export const displayError = (error: Error) => {
+export const displayError = (error: Error): void => {
   try {
     void message.error(error.toString(), 5)
   } catch (e) {
@@ -23,7 +24,7 @@ export const moveItem = <T>(
   array: Array<T>,
   index: number,
   direction: 'up' | 'down',
-) => {
+): Array<T> => {
   const newArray: Array<T> = [...array]
   if (direction === 'up') {
     if (index === 0) return newArray
@@ -138,3 +139,29 @@ const _sortRuns = (keys, a, b) => {
 export const sortSub = _sortRuns.bind(null, ['subject', 'number', 'session'])
 export const sortNum = _sortRuns.bind(null, ['number', 'subject', 'session'])
 export const sortSes = _sortRuns.bind(null, ['session', 'subject', 'number'])
+
+export const formatDbTime = (inTime: string): string => {
+  const date = inTime.split('-')
+  return `${date[2].slice(0, 2)}-${date[1]}-${date[0].slice(2, 4)}`
+}
+
+export const predictorColor = (predictor: Predictor): string => {
+  const lookup = {
+    '': '#f5222d',
+    text: '#cc7ee0',
+    video: '#fa8c16',
+    audio: '#faad14',
+    image: '#a0d911',
+  }
+  if (
+    predictor &&
+    predictor.extracted_feature &&
+    predictor.extracted_feature.modality
+  ) {
+    return lookup[predictor.extracted_feature.modality]
+  } else if (predictor.source === 'fmriprep') {
+    return '#858d99'
+  } else {
+    return '#474747'
+  }
+}

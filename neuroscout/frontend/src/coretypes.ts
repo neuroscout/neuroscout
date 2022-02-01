@@ -24,6 +24,7 @@ export interface Analysis {
   hrfPredictorIds: string[]
   status: AnalysisStatus
   private?: boolean
+  created_at?: string
   modified_at?: string
   config: AnalysisConfig
   transformations: Transformation[]
@@ -168,6 +169,7 @@ export type TabName =
   | 'modeling'
   | 'review'
   | 'submit'
+  | 'summary'
 
 export type ContrastTypeEnum = 't' | 'F'
 
@@ -238,6 +240,7 @@ export interface ApiAnalysis {
   transformations?: Transformation[]
   contrasts?: Contrast[]
   config: AnalysisConfig
+  created_at?: string
   modified_at?: string
   model?: BidsModel
   user?: string
@@ -300,6 +303,7 @@ export interface AppAnalysis {
   description: string
   status: AnalysisStatus
   dataset_id?: string
+  created_at?: string
   modified_at?: string
   user_name?: string
   dataset_name: string
@@ -390,6 +394,13 @@ export interface ApiExtractorDescription {
 
 export interface ExtractorDescriptions {
   [key: string]: string
+}
+
+export interface AnalysisResources {
+  preproc_address: string
+  dataset_address: string
+  dataset_name: string
+  predictors: Predictor[]
 }
 
 export type UpdateBuilderStateValue = (value: Store[keyof Store]) => void

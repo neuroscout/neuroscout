@@ -1,17 +1,6 @@
 import * as React from 'react'
-import {
-  Alert,
-  Button,
-  Card,
-  Checkbox,
-  Collapse,
-  Modal,
-  Tooltip,
-  Switch,
-} from 'antd'
+import { Alert, Button, Card, Checkbox, Modal, Tooltip, Switch } from 'antd'
 import memoize from 'memoize-one'
-
-const { Panel } = Collapse
 
 import { config } from '../config'
 import { jwtFetch } from '../utils'
@@ -19,6 +8,7 @@ import { Analysis, NvUploads } from '../coretypes'
 import { DateTag, StatusTag } from '../HelperComponents'
 import { api } from '../api'
 import { Tracebacks } from './Report'
+import NeurovaultLinks from './NeuroVault'
 
 const domainRoot = config.server_url
 
@@ -26,14 +16,14 @@ export class DLLink extends React.Component<{
   status?: string
   analysisId?: string
 }> {
-  render() {
+  render(): JSX.Element {
     let status = this.props.status
     const analysisId = this.props.analysisId
     if (status === undefined) {
       status = 'DRAFT'
     }
 
-    let bundleLink
+    let bundleLink = ''
     if (status === 'PASSED' && analysisId) {
       bundleLink = `${domainRoot}/analyses/${analysisId}_bundle.tar.gz`
     }
@@ -48,7 +38,7 @@ export class DLLink extends React.Component<{
 
 type PubAccessProps = {
   private: boolean | undefined
-  updateAnalysis: (
+  updateAnalysis?: (
     value: Partial<Analysis>,
     unsavedChanges: boolean,
     save: boolean,
@@ -62,9 +52,11 @@ class PubAccess extends React.Component<PubAccessProps, Record<string, never>> {
           checked={!this.props.private}
           checkedChildren="Public"
           unCheckedChildren="Private"
-          onChange={checked =>
-            this.props.updateAnalysis({ private: !checked }, false, true)
-          }
+          onChange={checked => {
+            if (this.props.updateAnalysis) {
+              this.props.updateAnalysis({ private: !checked }, false, true)
+            }
+          }}
         />
       </Tooltip>
     )
@@ -86,7 +78,7 @@ export class Submit extends React.Component<
   submitProps,
   { tosAgree: boolean; validate: boolean }
 > {
-  constructor(props) {
+  constructor(props: submitProps) {
     super(props)
 
     this.state = {
@@ -95,11 +87,11 @@ export class Submit extends React.Component<
     }
   }
 
-  onChange(e) {
+  onChange(e): void {
     this.setState({ tosAgree: e.target.checked })
   }
 
-  validateChange(e) {
+  validateChange(e): void {
     const setState = this.setState.bind(this)
     if (!e.target.checked) {
       Modal.confirm({
@@ -115,7 +107,7 @@ export class Submit extends React.Component<
     }
   }
 
-  render() {
+  render(): JSX.Element {
     let { status } = this.props
     if (status === undefined) {
       status = 'DRAFT'
@@ -200,7 +192,7 @@ type statusTabState = {
 }
 
 export class StatusTab extends React.Component<submitProps, statusTabState> {
-  constructor(props) {
+  constructor(props: submitProps) {
     super(props)
     this.state = {
       compileTraceback: '',
@@ -208,15 +200,7 @@ export class StatusTab extends React.Component<submitProps, statusTabState> {
     }
   }
 
-  componentDidMount() {
-    if (this.props.analysisId !== undefined) {
-      this.getTraceback(this.props.analysisId)
-      void api.getNVUploads(this.props.analysisId).then(nvUploads => {
-        if (nvUploads !== null) {
-          this.setState({ nvUploads: nvUploads })
-        }
-      })
-    }
+  componentDidMount(): void {
     void api.getImageVersion().then(version => {
       if (version) {
         this.setState({ imageVersion: `:${version}` })
@@ -224,12 +208,12 @@ export class StatusTab extends React.Component<submitProps, statusTabState> {
     })
   }
 
-  getTraceback(id) {
+  getTraceback(id: number | string | undefined): void {
     if (id === undefined) {
       return
     }
     void jwtFetch(`${domainRoot}/api/analyses/${String(id)}/compile`).then(
-      res => {
+      (res: { traceback?: string }) => {
         if (res.traceback) {
           this.setState({ compileTraceback: res.traceback })
         }
@@ -243,106 +227,8 @@ export class StatusTab extends React.Component<submitProps, statusTabState> {
     }
   })
 
-  analysisIdChange = memoize(analysisId => {
-    if (analysisId !== undefined) {
-      this.getTraceback(analysisId)
-      void api.getNVUploads(analysisId).then(nvUploads => {
-        if (nvUploads !== null) {
-          this.setState({ nvUploads: nvUploads })
-        }
-      })
-    }
-  })
-
-  nvLink(collection_id: string) {
-    const url = `https://neurovault.org/collections/${collection_id}`
-    return (
-      <a href={url} target="_blank" rel="noreferrer">
-        Collection ID: {collection_id}
-      </a>
-    )
-  }
-
-  nvStatus(uploads: NvUploads[]) {
-    const statuses = [] as JSX.Element[]
-    uploads.map(x => {
-      statuses.push(
-        <Card
-          key={String(x.id)}
-          title={this.nvLink(String(x.id))}
-          style={{ display: 'inline-block' }}
-          size="small"
-        >
-          <Collapse>
-            <Panel
-              header={
-                <>
-                  Uploaded:{' '}
-                  {x.uploaded_at ? x.uploaded_at.split('T')[0] : 'n/a'}
-                </>
-              }
-              key={String(x.id)}
-            >
-              <p>Estimator: {x.estimator ? x.estimator : 'n/a'}</p>
-              <p>fMRIPrep: {x.fmriprep_version ? x.fmriprep_version : 'n/a'}</p>
-              <p>neuroscout-cli: {x.cli_version ? x.cli_version : 'n/a'}</p>
-            </Panel>
-          </Collapse>
-          {x.pending > 0 && (
-            <span>
-              <Alert
-                message={`${String(x.pending)}/${String(
-                  x.total,
-                )} image uploads pending`}
-                type="warning"
-              />
-            </span>
-          )}
-          {x.ok > 0 && (
-            <Alert
-              message={`${String(x.ok)}/${String(
-                x.total,
-              )} image uploads succeeded`}
-              type="success"
-            />
-          )}
-          {x.failed > 0 && (
-            <Tooltip
-              title={
-                <>
-                  {x.tracebacks.map((y, i) => (
-                    <p key={i}>{y}</p>
-                  ))}
-                </>
-              }
-            >
-              <div>
-                <Alert
-                  message={`${String(x.failed)}/${String(
-                    x.total,
-                  )} image uploads failed`}
-                  type="error"
-                />
-              </div>
-            </Tooltip>
-          )}
-        </Card>,
-      )
-    })
-    if (statuses.length > 0) {
-      return (
-        <>
-          <h3>NeuroVault Uploads</h3>
-          <div style={{ display: 'flex', flexWrap: 'wrap' }}>{statuses}</div>
-        </>
-      )
-    }
-    return <div />
-  }
-
-  render() {
+  render(): JSX.Element {
     this.newlyFailed(this.props.status)
-    this.analysisIdChange(this.props.analysisId)
     return (
       <div>
         <div className="statusHeader">
@@ -350,7 +236,7 @@ export class StatusTab extends React.Component<submitProps, statusTabState> {
             <>
               <PubAccess
                 private={this.props.private}
-                updateAnalysis={this.props.updateAnalysis!}
+                updateAnalysis={this.props.updateAnalysis}
               />
               <span> </span>
             </>
@@ -429,7 +315,7 @@ export class StatusTab extends React.Component<submitProps, statusTabState> {
             </p>
           </div>
         )}
-        {this.state.nvUploads && this.nvStatus(this.state.nvUploads)}
+        <NeurovaultLinks analysisId={this.props.analysisId} />
       </div>
     )
   }

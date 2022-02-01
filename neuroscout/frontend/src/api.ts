@@ -8,6 +8,7 @@ import {
   ApiUpload,
   ApiUser,
   AppAnalysis,
+  AnalysisResources,
   Dataset,
   ExtractorDescriptions,
   Predictor,
@@ -47,6 +48,7 @@ export const ApiToAppAnalysis = (data: ApiAnalysis): AppAnalysis => ({
   description: data.description,
   status: data.status,
   dataset_id: data.dataset_id ? String(data.dataset_id) : '',
+  created_at: data.modified_at,
   modified_at: data.modified_at,
   user_name: data.user,
   dataset_name: '',
@@ -314,6 +316,11 @@ export const api = {
         return res.version
       }
       return ''
+    })
+  },
+  getAnalysisResources: (id: string): Promise<AnalysisResources> => {
+    return jwtFetch(`${domainRoot}/api/analyses/${id}/resources`, {
+      method: 'get',
     })
   },
 }
