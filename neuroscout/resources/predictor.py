@@ -13,8 +13,9 @@ from ..models import (
 from ..database import db
 from ..core import cache
 from ..schemas.predictor import (
-    AnalysisSchema, DatasetSchema, PredictorSchema, PredictorEventSchema,
-    PredictorCollectionSchema)
+    PredictorSchema, PredictorEventSchema, PredictorCollectionSchema)
+from ..schemas.analysis import AnalysisSchema
+from ..schemas.dataset import DatasetSchema
 from ..api_spec import FileField
 from ..worker import celery_app
 from ..utils.db import dump_predictor_events
@@ -232,7 +233,7 @@ class PredictorRelatedResource(MethodResource):
     def get(self, predictor_id):
         predictor = Predictor.query.get(id=predictor_id)
         analyses = []
-        for a in [x.analysis for x in Predictor.query.filter_by(name=predcitor.name).all()]
+        for a in [x.analysis for x in Predictor.query.filter_by(name=predcitor.name).all()]:
             analyses.extend(a)
         datasets = [x.dataset for x in Predictor.query.filter_by(name='rms').distinct('dataset_id').all()]
         aSchema = AnalysisSchema(many=True)
