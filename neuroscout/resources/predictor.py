@@ -9,6 +9,7 @@ from flask import current_app
 from pathlib import Path
 from .utils import abort, auth_required, first_or_404
 from ..models import (
+    Analysis, Dataset,
     Predictor, PredictorRun, PredictorCollection, Task)
 from ..database import db
 from ..core import cache
@@ -231,12 +232,13 @@ class PredictorRelatedResource(MethodResource):
             required=True),
     })
     def get(self, predictor_id):
-        predictor = Predictor.query.get(id=predictor_id)
-        analyses = []
-        for a in [x.analysis for x in Predictor.query.filter_by(name=predcitor.name).all()]:
-            analyses.extend(a)
-        datasets = [x.dataset for x in Predictor.query.filter_by(name='rms').distinct('dataset_id').all()]
-        aSchema = AnalysisSchema(many=True)
-        dSchema = DatasetSchema(many=True)
-        return {analyses: aSchema.dump(analyses), datasets: dSchema.dump(datasets)}
-        
+        predictor = Predictor.query.get(predictor_id)
+        analyses = Analysis.query.filter_by(private=False, status='PASSED').filter(Analysis.predictors.any(name=predictor.name)).all()
+        datasets = Dataset.query.filter_by(active=True).filter(Dataset.predictors.any(name=predictor.name)).distinct(Dataset.id).all()
+        aSchema = AnalysisSchema(
+            many=True,
+            only=['hash_id', 'name', 'description', 'status',
+                  'dataset_id', 'modified_at', 'user', 'nv_count']
+        )
+        dSchema = DatasetSchema(many=True, exclude=['dataset_address', 'preproc_address', 'runs'])
+        return {"analyses": aSchema.dump(analyses), "datasets": dSchema.dump(datasets)}
