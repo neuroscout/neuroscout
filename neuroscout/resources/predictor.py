@@ -13,7 +13,8 @@ from ..models import (
 from ..database import db
 from ..core import cache
 from ..schemas.predictor import (
-    PredictorSchema, PredictorEventSchema, PredictorCollectionSchema)
+    AnalysisSchema, DatasetSchema, PredictorSchema, PredictorEventSchema,
+    PredictorCollectionSchema)
 from ..api_spec import FileField
 from ..worker import celery_app
 from ..utils.db import dump_predictor_events
@@ -216,3 +217,25 @@ class PredictorEventListResource(MethodResource):
     def get(self, predictor_id, run_id=None, stimulus_timing=False):
         return dump_predictor_events(
             predictor_id, run_id, stimulus_timing=stimulus_timing)
+
+''' Get the ExtractedFeature for the predictor, get all ExtractedFeatures
+    with same feature_name and extractor, get all dataset_ids from Predictor
+    table that use any of those ef_ids.
+'''
+class PredictorRelatedResource(MethodResource):
+    @use_kwargs({
+        'predictor_id': fields.DelimitedList(
+            fields.Int(),
+            description="Predictor id(s)",
+            required=True),
+    })
+    def get(self, predictor_id):
+        predictor = Predictor.query.get(id=predictor_id)
+        analyses = []
+        for a in [x.analysis for x in Predictor.query.filter_by(name=predcitor.name).all()]
+            analyses.extend(a)
+        datasets = [x.dataset for x in Predictor.query.filter_by(name='rms').distinct('dataset_id').all()]
+        aSchema = AnalysisSchema(many=True)
+        dSchema = DatasetSchema(many=True)
+        return {analyses: aSchema.dump(analyses), datasets: dSchema.dump(datasets)}
+        
