@@ -225,12 +225,6 @@ class PredictorEventListResource(MethodResource):
     table that use any of those ef_ids.
 '''
 class PredictorRelatedResource(MethodResource):
-    @use_kwargs({
-        'predictor_id': fields.DelimitedList(
-            fields.Int(),
-            description="Predictor id(s)",
-            required=True),
-    })
     def get(self, predictor_id):
         predictor = Predictor.query.get(predictor_id)
         analyses = Analysis.query.filter_by(private=False, status='PASSED').filter(Analysis.predictors.any(name=predictor.name)).all()
