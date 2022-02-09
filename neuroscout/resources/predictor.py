@@ -226,7 +226,11 @@ class PredictorEventListResource(MethodResource):
 '''
 class PredictorRelatedResource(MethodResource):
     def get(self, predictor_id):
-        predictor = first_or_404(Predictor.query.filter(or_(Predictor.id == predictor_id, Predictor.name == predictor_id)))
+        try(int(predictor_id)):
+            predictor = first_or_404(Predictor.query.filter_by(id=predictor_id))
+        except ValueError:
+            predictor = first_or_404(Predictor.query.filter_by(name=predictor_id))
+            
         analyses = Analysis.query.filter_by(private=False, status='PASSED').filter(Analysis.predictors.any(name=predictor.name)).all()
         datasets = Dataset.query.filter_by(active=True).filter(Dataset.predictors.any(name=predictor.name)).distinct(Dataset.id).all()
         aSchema = AnalysisSchema(
