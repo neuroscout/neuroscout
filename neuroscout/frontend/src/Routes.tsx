@@ -13,12 +13,13 @@ import { PredictorCollectionList } from './predictor_collection/CollectionList'
 import EditProfile from './profile/EditProfile'
 import PublicProfile from './profile/PublicProfile'
 import UserList from './profile/UserList'
+import PredictorRelatedDetailsView from './PredictorRelatedDetailsView'
 
 export default class Routes extends React.Component<
   AppState,
   Record<string, never>
 > {
-  render() {
+  render(): JSX.Element {
     return (
       <React.Suspense fallback={<div>Loading...</div>}>
         <Switch>
@@ -164,6 +165,16 @@ export default class Routes extends React.Component<
                 )
               }
               return <Redirect to="/profiles" />
+            }}
+          />
+          <Route
+            path="/predictor/:id"
+            render={props => {
+              return (
+                <PredictorRelatedDetailsView
+                  id={Number(props.match.params.id)}
+                />
+              )
             }}
           />
           <Route component={NotFound} />

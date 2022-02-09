@@ -12,6 +12,7 @@ import {
   Dataset,
   ExtractorDescriptions,
   Predictor,
+  PredictorRelatedDetails,
   Run,
   User,
 } from './coretypes'
@@ -126,6 +127,23 @@ export const api = {
 
   getPredictor: (id: number): Promise<Predictor | null> => {
     return jwtFetch(`${domainRoot}/api/predictors/${id}`)
+  },
+  getPredictorRelatedDetails: (
+    id: number,
+  ): Promise<PredictorRelatedDetails | null> => {
+    return jwtFetch(`${domainRoot}/api/predictors/${id}/related`).then(data => {
+      const details: PredictorRelatedDetails = { analyses: [], datasets: [] }
+      if (data.analyses) {
+        details.analyses = data.analyses.map(x => ApiToAppAnalysis(x))
+      }
+      if (data.datasets) {
+        details.datasets = data.datasets
+      }
+      if (data.predictor) {
+        details.predictor = data.predictor
+      }
+      return details
+    })
   },
 
   getPredictors: (ids: number[] | string[]): Promise<Predictor[] | null> => {

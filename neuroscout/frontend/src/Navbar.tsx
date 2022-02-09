@@ -12,7 +12,7 @@ import { MainCol, Space } from './HelperComponents'
 import { UserStore } from './user'
 
 class Navbar extends React.Component<UserStore, Record<string, never>> {
-  render() {
+  render(): JSX.Element {
     return (
       <Row justify="center" style={{ padding: 0 }}>
         <MainCol>

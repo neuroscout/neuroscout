@@ -22,7 +22,7 @@ export const MainCol = (props: { children: React.ReactNode }): JSX.Element => {
 }
 
 export class DisplayErrorsInline extends React.Component<{ errors: string[] }> {
-  render() {
+  render(): JSX.Element {
     return (
       <>
         {this.props.errors.length > 0 && (
@@ -112,7 +112,7 @@ export const datasetColumns = [
     dataIndex: 'authors',
     width: 200,
     render: text => {
-      if (text.length > 1) {
+      if (text && text.length > 1) {
         return <Tooltip title={text.join(', ')}>{text[0]}, et al.</Tooltip>
       } else {
         return <>{text[0]}</>

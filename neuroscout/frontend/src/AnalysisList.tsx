@@ -55,7 +55,7 @@ export interface AnalysisListProps {
   loggedIn?: boolean
   publicList?: boolean
   analyses: AppAnalysis[] | null
-  cloneAnalysis: (id: string) => Promise<string>
+  cloneAnalysis?: (id: string) => Promise<string>
   onDelete?: (analysis: AppAnalysis) => void
   children?: React.ReactNode
   datasets: Dataset[]
@@ -243,9 +243,11 @@ export class AnalysisListTable extends React.Component<
                   type="primary"
                   ghost
                   onClick={() => {
-                    void this.props.cloneAnalysis(record.id).then(id => {
-                      this.setState({ redirectId: id })
-                    })
+                    if (this.props.cloneAnalysis) {
+                      void this.props.cloneAnalysis(record.id).then(id => {
+                        this.setState({ redirectId: id })
+                      })
+                    }
                   }}
                 >
                   Clone
