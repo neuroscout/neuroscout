@@ -235,4 +235,8 @@ class PredictorRelatedResource(MethodResource):
                   'dataset_id', 'modified_at', 'user', 'nv_count']
         )
         dSchema = DatasetSchema(many=True, exclude=['dataset_address', 'preproc_address', 'runs'])
-        return {"analyses": aSchema.dump(analyses), "datasets": dSchema.dump(datasets)}
+        return {
+            "predictor": PredictorSchema().dump(predictor),
+            "analyses": aSchema.dump(analyses),
+            "datasets": dSchema.dump(datasets)
+        }
