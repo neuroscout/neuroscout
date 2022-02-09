@@ -226,8 +226,8 @@ class PredictorEventListResource(MethodResource):
 '''
 class PredictorRelatedResource(MethodResource):
     def get(self, predictor_id):
-        try(int(predictor_id)):
-            predictor = first_or_404(Predictor.query.filter_by(id=predictor_id))
+        try:
+            predictor = first_or_404(Predictor.query.filter_by(id=int(predictor_id)))
         except ValueError:
             predictor = first_or_404(Predictor.query.filter_by(name=predictor_id))
             
