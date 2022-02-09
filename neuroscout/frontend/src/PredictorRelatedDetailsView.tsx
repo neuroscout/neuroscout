@@ -7,7 +7,7 @@ import { PredictorRelatedDetails, ApiAnalysis, Dataset } from './coretypes'
 import { AnalysisListTable } from './AnalysisList'
 import { setDatasetNames } from './App'
 
-const PredictorRelatedDetailsView = (props: { id: number }): JSX.Element => {
+const PredictorRelatedDetailsView = (props: { id: string }): JSX.Element => {
   const [details, setDetails] = useState<PredictorRelatedDetails>({
     analyses: [],
     datasets: [],

@@ -170,11 +170,7 @@ export default class Routes extends React.Component<
           <Route
             path="/predictor/:id"
             render={props => {
-              return (
-                <PredictorRelatedDetailsView
-                  id={Number(props.match.params.id)}
-                />
-              )
+              return <PredictorRelatedDetailsView id={props.match.params.id} />
             }}
           />
           <Route component={NotFound} />

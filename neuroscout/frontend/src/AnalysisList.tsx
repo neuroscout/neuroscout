@@ -38,7 +38,7 @@ class AnalysisResourcesDisplay extends React.Component<
         {this.state.resources.predictors.map(predictor => (
           <Tag key={predictor.name} color={predictorColor(predictor)}>
             {' '}
-            {predictor.name}
+            <Link to={`/predictor/${predictor.name}`}>{predictor.name}</Link>
           </Tag>
         ))}
       </div>

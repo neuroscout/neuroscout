@@ -129,7 +129,7 @@ export const api = {
     return jwtFetch(`${domainRoot}/api/predictors/${id}`)
   },
   getPredictorRelatedDetails: (
-    id: number,
+    id: string,
   ): Promise<PredictorRelatedDetails | null> => {
     return jwtFetch(`${domainRoot}/api/predictors/${id}/related`).then(data => {
       const details: PredictorRelatedDetails = { analyses: [], datasets: [] }
