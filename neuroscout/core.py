@@ -49,7 +49,7 @@ route_factory(
         ('RunTimingResource', 'runs/<int:run_id>/timing'),
         ('PredictorListResource', 'predictors'),
         ('PredictorResource', 'predictors/<int:predictor_id>'),
-        ('PredictorRelatedResource', 'predictors/<int:predictor_id>/related'),
+        ('PredictorRelatedResource', 'predictors/<predictor_id>/related'),
         ('PredictorCollectionResource', 'predictors/collection/<int:pc_id>'),
         ('PredictorCollectionCreateResource', 'predictors/collection'),
         ('PredictorEventListResource', 'predictor-events'),
