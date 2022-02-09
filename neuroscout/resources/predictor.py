@@ -2,7 +2,7 @@ from webargs import fields
 import tempfile
 import json
 from marshmallow import INCLUDE, Schema
-from sqlalchemy import func
+from sqlalchemy import func, or_
 from flask_apispec import MethodResource, marshal_with, use_kwargs, doc
 from flask_jwt import current_identity
 from flask import current_app
@@ -226,7 +226,7 @@ class PredictorEventListResource(MethodResource):
 '''
 class PredictorRelatedResource(MethodResource):
     def get(self, predictor_id):
-        predictor = first_or_404(Predictor.query.filter_by(id=predictor_id))
+        predictor = first_or_404(Predictor.query.filter_by(or_(id=predictor_id, name=predictor_id)))
         analyses = Analysis.query.filter_by(private=False, status='PASSED').filter(Analysis.predictors.any(name=predictor.name)).all()
         datasets = Dataset.query.filter_by(active=True).filter(Dataset.predictors.any(name=predictor.name)).distinct(Dataset.id).all()
         aSchema = AnalysisSchema(
