@@ -287,13 +287,15 @@ export class StatusTab extends React.Component<submitProps, statusTabState> {
           </div>
         )}
         {(this.props.status === 'DRAFT' || this.props.status === 'FAILED') && (
-          <Submit
-            status={this.props.status}
-            name={this.props.name}
-            analysisId={this.props.analysisId}
-            confirmSubmission={this.props.confirmSubmission}
-            private={this.props.private}
-          />
+          <p>
+            <Submit
+              status={this.props.status}
+              name={this.props.name}
+              analysisId={this.props.analysisId}
+              confirmSubmission={this.props.confirmSubmission}
+              private={this.props.private}
+            />
+          </p>
         )}
         {this.props.status === 'FAILED' && (
           <div>
