@@ -226,6 +226,7 @@ class PredictorEventListResource(MethodResource):
 '''
 class PredictorRelatedResource(MethodResource):
     def get(self, predictor_id):
+        # try to cast predictor_id as int, if it works we have an actual predictor id, if not search predictors by name and grab first one.
         try:
             predictor = first_or_404(Predictor.query.filter_by(id=int(predictor_id)))
         except ValueError:

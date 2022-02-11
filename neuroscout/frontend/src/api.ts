@@ -180,6 +180,16 @@ export const api = {
         return null
       })
   },
+  getPredictorsByTask: (taskId: string): Promise<Predictor[]> => {
+    return jwtFetch(`${domainRoot}/api/tasks/${taskId}/predictors`)
+      .then(data => {
+        return data as Predictor[]
+      })
+      .catch(error => {
+        displayError(error)
+        return [] as Predictor[]
+      })
+  },
 
   // Gets a logged in users own analyses
   getMyAnalyses: (): Promise<AppAnalysis[]> => {

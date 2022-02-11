@@ -6,7 +6,7 @@ import * as React from 'react'
 import { Button, Row, Table, Tag, Input } from 'antd'
 import { CheckCircleTwoTone } from '@ant-design/icons'
 import { MainCol, Space, StatusTag } from './HelperComponents'
-import { AppAnalysis, AnalysisResources, Dataset } from './coretypes'
+import { AppAnalysis, AnalysisResources, Dataset, Predictor } from './coretypes'
 import { api } from './api'
 import { Link, Redirect } from 'react-router-dom'
 import { ColumnsType } from 'antd/es/table'
@@ -35,15 +35,25 @@ class AnalysisResourcesDisplay extends React.Component<
       <div>
         <span className="ant-statistic-title">Predictors:</span>
         <Space />
-        {this.state.resources.predictors.map(predictor => (
-          <Tag key={predictor.name} color={predictorColor(predictor)}>
-            {' '}
-            <Link to={`/predictor/${predictor.name}`}>{predictor.name}</Link>
-          </Tag>
-        ))}
+        <PredictorTagList predictors={this.state.resources.predictors} />
       </div>
     )
   }
+}
+
+export const PredictorTagList = (props: {
+  predictors: Predictor[]
+}): JSX.Element => {
+  return (
+    <div>
+      {props.predictors.map(predictor => (
+        <Tag key={predictor.name} color={predictorColor(predictor)}>
+          {' '}
+          <Link to={`/predictor/${predictor.name}`}>{predictor.name}</Link>
+        </Tag>
+      ))}
+    </div>
+  )
 }
 const tableLocale = {
   filterConfirm: 'Ok',

@@ -14,6 +14,7 @@ import EditProfile from './profile/EditProfile'
 import PublicProfile from './profile/PublicProfile'
 import UserList from './profile/UserList'
 import PredictorRelatedDetailsView from './PredictorRelatedDetailsView'
+import { DatasetDetailView } from './DatasetDetailView'
 
 export default class Routes extends React.Component<
   AppState,
@@ -171,6 +172,19 @@ export default class Routes extends React.Component<
             path="/predictor/:id"
             render={props => {
               return <PredictorRelatedDetailsView id={props.match.params.id} />
+            }}
+          />
+          <Route
+            path="/dataset/:id"
+            render={props => {
+              const dataset = this.props.datasets.find(
+                x => String(x.id) === String(props.match.params.id),
+              )
+              if (dataset) {
+                return <DatasetDetailView {...dataset} />
+              } else {
+                return <NotFound />
+              }
             }}
           />
           <Route component={NotFound} />
