@@ -287,15 +287,13 @@ export class StatusTab extends React.Component<submitProps, statusTabState> {
           </div>
         )}
         {(this.props.status === 'DRAFT' || this.props.status === 'FAILED') && (
-          <p>
-            <Submit
-              status={this.props.status}
-              name={this.props.name}
-              analysisId={this.props.analysisId}
-              confirmSubmission={this.props.confirmSubmission}
-              private={this.props.private}
-            />
-          </p>
+          <Submit
+            status={this.props.status}
+            name={this.props.name}
+            analysisId={this.props.analysisId}
+            confirmSubmission={this.props.confirmSubmission}
+            private={this.props.private}
+          />
         )}
         {this.props.status === 'FAILED' && (
           <div>
@@ -310,6 +308,7 @@ export class StatusTab extends React.Component<submitProps, statusTabState> {
         {(this.props.status === 'PENDING' ||
           this.props.status === 'SUBMITTING') && (
           <div>
+            <br />
             <h3>Analysis Pending Generation</h3>
             <p>
               Analysis generation may take some time. This page will update when
