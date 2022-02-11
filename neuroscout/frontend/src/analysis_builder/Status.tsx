@@ -315,7 +315,6 @@ export class StatusTab extends React.Component<submitProps, statusTabState> {
             </p>
           </div>
         )}
-        <NeurovaultLinks analysisId={this.props.analysisId} />
       </div>
     )
   }
