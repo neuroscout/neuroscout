@@ -1,11 +1,22 @@
 import React, { useState, useEffect } from 'react'
-import { Row } from 'antd'
-import { MainCol, datasetColumns } from './HelperComponents'
+import { Row, Table } from 'antd'
+import { MainCol } from './HelperComponents'
 import { api } from './api'
 import { Link, Redirect } from 'react-router-dom'
 import { PredictorRelatedDetails, ApiAnalysis, Dataset } from './coretypes'
 import { AnalysisListTable } from './AnalysisList'
 import { setDatasetNames } from './App'
+
+const datasetColumns = [
+  {
+    title: 'Name',
+    dataIndex: 'name',
+    width: 130,
+    sorter: (a, b) => a.name.localeCompare(b.name),
+    render: (text, record) => <Link to={`/dataset/${record.id}`}>{text}</Link>,
+  },
+  { title: 'Summary', dataIndex: 'summary' },
+]
 
 const PredictorRelatedDetailsView = (props: { id: string }): JSX.Element => {
   const [details, setDetails] = useState<PredictorRelatedDetails>({
@@ -35,13 +46,24 @@ const PredictorRelatedDetailsView = (props: { id: string }): JSX.Element => {
       <Row justify="center">
         <MainCol>
           <Row>
-            <span className="viewTitle">{name}</span>
+            <div className="viewTitle">{name}</div>
+            <div className="viewTitleDescriptor"> - {description}</div>
           </Row>
-          <Row>
-            <p>{description}</p>
-          </Row>
+          <Row></Row>
+          <h3>Used in these Analyses</h3>
           <Row>
             <AnalysisListTable {...analysisListProps} />
+          </Row>
+          <h3>Present in these Datasets</h3>
+          <Row>
+            <Table
+              className="selectDataset"
+              columns={datasetColumns}
+              rowKey="id"
+              size="small"
+              dataSource={details.datasets}
+              pagination={false}
+            />
           </Row>
         </MainCol>
       </Row>

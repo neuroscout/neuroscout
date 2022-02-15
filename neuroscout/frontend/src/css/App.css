@@ -145,9 +145,15 @@ pre {
 }
 
 .viewTitle {
-  font-size: 16px;
+  font-size: 18px;
   height: 32px;
   padding: 0px 15px;
+} 
+
+.viewTitleDescriptor {
+  font-size: 12px;
+  height: 32px;
+  margin-top: .5em
 } 
 
 .plotRunSelectorContainer {

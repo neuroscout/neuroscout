@@ -114,8 +114,10 @@ export const datasetColumns = [
     render: text => {
       if (text && text.length > 1) {
         return <Tooltip title={text.join(', ')}>{text[0]}, et al.</Tooltip>
-      } else {
+      } else if (text && text.length == 1) {
         return <>{text[0]}</>
+      } else {
+        return <></>
       }
     },
   },
