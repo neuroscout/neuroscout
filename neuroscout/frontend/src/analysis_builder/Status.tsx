@@ -308,6 +308,7 @@ export class StatusTab extends React.Component<submitProps, statusTabState> {
         {(this.props.status === 'PENDING' ||
           this.props.status === 'SUBMITTING') && (
           <div>
+            <br />
             <h3>Analysis Pending Generation</h3>
             <p>
               Analysis generation may take some time. This page will update when
@@ -315,7 +316,6 @@ export class StatusTab extends React.Component<submitProps, statusTabState> {
             </p>
           </div>
         )}
-        <NeurovaultLinks analysisId={this.props.analysisId} />
       </div>
     )
   }
