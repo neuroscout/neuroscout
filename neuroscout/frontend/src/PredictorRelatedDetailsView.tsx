@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { Row, Table } from 'antd'
+import { Row, Table, Skeleton } from 'antd'
 import { MainCol } from './HelperComponents'
 import { api } from './api'
 import { Link, Redirect } from 'react-router-dom'
@@ -46,26 +46,28 @@ const PredictorRelatedDetailsView = (props: { id: string }): JSX.Element => {
     <div>
       <Row justify="center">
         <MainCol>
-          <Row>
-            <div className="viewTitle">{name}</div>
-            <div className="viewTitleDescriptor"> - {description}</div>
-          </Row>
-          <Row></Row>
-          <h3>Used in these Analyses</h3>
-          <Row>
-            <AnalysisListTable {...analysisListProps} />
-          </Row>
-          <h3>Present in these Datasets</h3>
-          <Row>
-            <Table
-              className="selectDataset"
-              columns={datasetColumns}
-              rowKey="id"
-              size="small"
-              dataSource={details.datasets}
-              pagination={false}
-            />
-          </Row>
+          <Skeleton loading={!details.predictor}>
+            <Row>
+              <div className="viewTitle">{name}</div>
+              <div className="viewTitleDescriptor"> - {description}</div>
+            </Row>
+            <Row></Row>
+            <h3>Used in these Analyses</h3>
+            <Row>
+              <AnalysisListTable {...analysisListProps} />
+            </Row>
+            <h3>Present in these Datasets</h3>
+            <Row>
+              <Table
+                className="selectDataset"
+                columns={datasetColumns}
+                rowKey="id"
+                size="small"
+                dataSource={details.datasets}
+                pagination={false}
+              />
+            </Row>
+          </Skeleton>
         </MainCol>
       </Row>
     </div>
