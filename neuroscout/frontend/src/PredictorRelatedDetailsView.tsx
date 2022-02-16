@@ -40,6 +40,7 @@ const PredictorRelatedDetailsView = (props: { id: string }): JSX.Element => {
     publicList: true,
     analyses: details.analyses,
     datasets: details.datasets,
+    showOwner: true,
   }
   return (
     <div>
