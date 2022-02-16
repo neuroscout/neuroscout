@@ -231,6 +231,8 @@ export class AnalysisListTable extends React.Component<
       dataIndex: 'nv_count',
       width: '2ch',
       sorter: (a, b) => Number(a.nv_count) - Number(b.nv_count),
+      filters: [{ text: 'Has Uploads', value: 0 }],
+      onFilter: (value, record) => !!record.nv_count,
       render: (text, record: AppAnalysis) => {
         if (record.nv_count) {
           return <CheckCircleTwoTone twoToneColor="#52c41a" />
