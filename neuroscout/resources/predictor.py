@@ -14,9 +14,7 @@ from ..models import (
 from ..database import db
 from ..core import cache
 from ..schemas.predictor import (
-    PredictorSchema, PredictorEventSchema, PredictorCollectionSchema)
-from ..schemas.analysis import AnalysisSchema
-from ..schemas.dataset import DatasetSchema
+    PredictorSchema, PredictorEventSchema, PredictorCollectionSchema, PredictorRelatedSchema)
 from ..api_spec import FileField
 from ..worker import celery_app
 from ..utils.db import dump_predictor_events
@@ -225,6 +223,8 @@ class PredictorEventListResource(MethodResource):
     table that use any of those ef_ids.
 '''
 class PredictorRelatedResource(MethodResource):
+    @doc(summary='Get the analyses and datasets that use predictor.')
+    @marshal_with(PredictorRelatedSchema)
     def get(self, predictor_id):
         # try to cast predictor_id as int, if it works we have an actual predictor id, if not search predictors by name and grab first one.
         try:
@@ -234,14 +234,8 @@ class PredictorRelatedResource(MethodResource):
             
         analyses = Analysis.query.filter_by(private=False, status='PASSED').filter(Analysis.predictors.any(name=predictor.name)).all()
         datasets = Dataset.query.filter_by(active=True).filter(Dataset.predictors.any(name=predictor.name)).distinct(Dataset.id).all()
-        aSchema = AnalysisSchema(
-            many=True,
-            only=['hash_id', 'name', 'description', 'status',
-                  'dataset_id', 'modified_at', 'user', 'nv_count']
-        )
-        dSchema = DatasetSchema(many=True, exclude=['dataset_address', 'preproc_address', 'runs'])
         return {
-            "predictor": PredictorSchema().dump(predictor),
-            "analyses": aSchema.dump(analyses),
-            "datasets": dSchema.dump(datasets)
+            "predictor": predictor,
+            "analyses": analyses,
+            "datasets": datasets
         }

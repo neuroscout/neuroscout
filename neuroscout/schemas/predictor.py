@@ -63,3 +63,15 @@ class PredictorEventSchema(Schema):
     stimulus_onset = fields.Number(description='Stimulus onset')
     stimulus_duration = fields.Number(description='Stimulus duration')
     stimulus_path = fields.Str(description='Stimulus path')
+
+class PredictorRelatedSchema(Schema):
+    from .analysis import AnalysisSchema
+    from .dataset import DatasetSchema
+
+    predictor = fields.Nested(PredictorSchema)
+    datasets = fields.Nested(DatasetSchema(many=True, exclude=['dataset_address', 'preproc_address', 'runs']))
+    analyses = AnalysisSchema(
+        many=True,
+        only=['hash_id', 'name', 'description', 'status',
+              'dataset_id', 'modified_at', 'user', 'nv_count']
+    )
