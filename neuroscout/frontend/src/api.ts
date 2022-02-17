@@ -351,4 +351,9 @@ export const api = {
       method: 'get',
     })
   },
+  getDatasetAnalyses: (id: string): Promise<AppAnalysis[]> => {
+    return jwtFetch(`${domainRoot}/api/datasets/${id}/analyses`).then(res => {
+      return res.map(x => ApiToAppAnalysis(x))
+    })
+  },
 }

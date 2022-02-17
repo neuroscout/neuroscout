@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react'
 import { MainCol } from './HelperComponents'
 import { Row, Table } from 'antd'
-import { Dataset, Predictor, Task } from './coretypes'
+import { AppAnalysis, Dataset, Predictor, Task } from './coretypes'
 import { api } from './api'
-import { PredictorTagList } from './AnalysisList'
+import { AnalysisListTable, PredictorTagList } from './AnalysisList'
 
 /*
 export interface Dataset {
@@ -28,8 +28,20 @@ interface TaskPredictors {
 
 export const DatasetDetailView = (props: Dataset): JSX.Element => {
   const [taskPredictors, setTaskPredictors] = useState<TaskPredictors[]>([])
+  const [analyses, setAnalyses] = useState<AppAnalysis[]>([])
+
+  const analysisListProps = {
+    loggedIn: false,
+    publicList: true,
+    analyses: analyses,
+    datasets: [props],
+    showOwner: true,
+  }
+
   useEffect(() => {
-    setTaskPredictors([] as TaskPredictors[])
+    api.getDatasetAnalyses(props.id).then(data => {
+      setAnalyses(data)
+    })
     Promise.all(
       props.tasks.map(task => {
         return api.getPredictorsByTask(task.id).then(data => {
@@ -43,10 +55,16 @@ export const DatasetDetailView = (props: Dataset): JSX.Element => {
       }),
     ).then(newTaskPredictors => setTaskPredictors(newTaskPredictors))
   }, [props.id])
-  console.log(taskPredictors)
   return (
     <Row justify="center">
       <MainCol>
+        <Row key="analyses">
+          <h3>Used in these Analyses</h3>
+          <AnalysisListTable {...analysisListProps} />
+        </Row>
+        <Row>
+          <h3>Predictors Available Per Task</h3>
+        </Row>
         {taskPredictors.map(taskPredictor => (
           <Row key={taskPredictor.task.id}>
             <div className="viewTitle">{taskPredictor.task.name}</div>
