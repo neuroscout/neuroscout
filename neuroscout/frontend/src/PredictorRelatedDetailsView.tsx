@@ -35,6 +35,18 @@ const PredictorRelatedDetailsView = (props: { id: string }): JSX.Element => {
 
   const name = details.predictor ? details.predictor.name : ' '
   const description = details.predictor ? details.predictor.description : ' '
+  let extractor = <></>
+  if (details.predictor?.extracted_feature?.extractor_name) {
+    extractor = extractor = (
+      <>
+        {' '}
+        - Extractor:{' '}
+        <a href="http://psychoinformaticslab.github.io/pliers/reference.html#module-pliers.extractors">
+          {details.predictor.extracted_feature.extractor_name}
+        </a>
+      </>
+    )
+  }
   const analysisListProps = {
     loggedIn: false,
     publicList: true,
@@ -49,7 +61,10 @@ const PredictorRelatedDetailsView = (props: { id: string }): JSX.Element => {
           <Skeleton loading={!details.predictor}>
             <Row>
               <div className="viewTitle">{name}</div>
-              <div className="viewTitleDescriptor"> - {description}</div>
+              <div className="viewTitleDescriptor">
+                - {description}
+                {extractor}
+              </div>
             </Row>
             <Row></Row>
             <h3>Used in these Analyses</h3>
