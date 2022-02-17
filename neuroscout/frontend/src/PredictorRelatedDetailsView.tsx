@@ -66,11 +66,11 @@ const PredictorRelatedDetailsView = (props: { id: string }): JSX.Element => {
                 {extractor}
               </div>
             </Row>
-            <Row></Row>
             <h3>Used in these Analyses</h3>
             <Row>
               <AnalysisListTable {...analysisListProps} />
             </Row>
+            <br />
             <h3>Present in these Datasets</h3>
             <Row>
               <Table
