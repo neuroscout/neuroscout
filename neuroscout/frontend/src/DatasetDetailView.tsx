@@ -21,30 +21,29 @@ export interface Dataset {
 }
 */
 
-/*
-export const DatasetListTable = (props: {datasets: Dataset[]}): JSX.Element => {
-  return (
-}
-*/
 interface TaskPredictors {
   task: Task
   predictors: Predictor[]
 }
 
 export const DatasetDetailView = (props: Dataset): JSX.Element => {
-  console.log(props)
   const [taskPredictors, setTaskPredictors] = useState<TaskPredictors[]>([])
   useEffect(() => {
-    const newTaskPredictors = [] as TaskPredictors[]
-    props.tasks.map(task => {
-      const taskPredictors = { task: task, predictors: [] as Predictor[] }
-      api.getPredictorsByTask(task.id).then(data => {
-        console.log(data)
-        taskPredictors.predictors.push(...data)
-      })
-    })
-    setTaskPredictors(newTaskPredictors)
+    setTaskPredictors([] as TaskPredictors[])
+    Promise.all(
+      props.tasks.map(task => {
+        return api.getPredictorsByTask(task.id).then(data => {
+          const newTaskPredictors = {
+            task: task,
+            predictors: [] as Predictor[],
+          }
+          newTaskPredictors.predictors.push(...data)
+          return newTaskPredictors
+        })
+      }),
+    ).then(newTaskPredictors => setTaskPredictors(newTaskPredictors))
   }, [props.id])
+  console.log(taskPredictors)
   return (
     <Row justify="center">
       <MainCol>
