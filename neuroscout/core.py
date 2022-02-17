@@ -33,6 +33,7 @@ route_factory(
     [
         ('DatasetResource', 'datasets/<int:dataset_id>'),
         ('DatasetListResource', 'datasets'),
+        ('DatasetAnalysisListResource', 'datasets/<int:dataset_id>/analyses'),
         ('AnalysisRootResource', 'analyses'),
         ('AnalysisResource', 'analyses/<analysis_id>'),
         ('AnalysisFullResource', 'analyses/<analysis_id>/full'),
