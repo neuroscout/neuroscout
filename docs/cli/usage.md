@@ -94,7 +94,7 @@ analyses using `--download-dir`
 
 For example:
 
-    neuroscout get --download-dir=/home/user/data a54oo /home/user/outputs
+    neuroscout get --download-dir /home/user/data a54oo /home/user/outputs
 
 In this case, the fMRI dataset will be downloaded to `/home/user/data` and the output folder will be `/home/user/outputs/neuroscout-a54oo`,
 with the bundle contents saved in the output folder.
