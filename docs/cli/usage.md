@@ -84,11 +84,9 @@ Options:
   --help               Show this message and exit.
 ```
 
-The `get` command prepares your system for analysis execution by:
+The `get` command prepares your system for analysis execution by 1) preparing the output directory, 2) downloading the analysis bundle (containing the BIDS StatsModel specification, event files, and more), and 3) downloading the preprocessed fMRI data. 
 
-    1) preparing the output directory
-    1) downloading the analysis bundle (containing the BIDS StatsModel specification, event files, and more configuration)
-    2) downloading the preprocessed fMRI data. Note that only the specific files for that analysis will be download (i.e. only those runs/subjects)
+Note that only the specific files for that analysis will be download (i.e. only those runs/subjects)
 
 By default, the input fMRI data is downloaded to the output directory under `sourcedata`, forming a fully re-executable output.
 However, if you run many analyses with the same dataset, it can be useful to download the data to a common folder that can be re-used in other
@@ -96,7 +94,7 @@ analyses using `--download-dir`
 
 For example:
 
-    ```neuroscout get --download-dir=/home/user/data a54oo /home/user/outputs```
+    neuroscout get --download-dir=/home/user/data a54oo /home/user/outputs
 
 In this case, the fMRI dataset will be downloaded to `/home/user/data` and the output folder will be `/home/user/outputs/neuroscout-a54oo`,
 with the bundle contents saved in the output folder.
@@ -108,6 +106,7 @@ with the bundle contents saved in the output folder.
 
 ### Upload
 
+```
 Usage: neuroscout upload [OPTIONS] ANALYSIS_ID OUT_DIR
 
   Upload results.
@@ -121,6 +120,7 @@ Options:
   --no-upload           Don't upload results to NeuroVault
   --upload-first-level  Upload first-level results, in addition to group
   --help                Show this message and exit.
+```
 
 The `upload` command may be useful in case the `run` command experienced an error uploading results,
 particularly if there was a connection error, and you wish to try again. 

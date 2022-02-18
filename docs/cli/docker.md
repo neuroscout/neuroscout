@@ -37,8 +37,8 @@ You can also reference a `<version>` in the run command. For example:
 
     docker run -it --rm neuroscout/neuroscout-cli:version-0.5.1 run Mv3ev /out
 
-!!! note
-`master` is a special tag name which refers to the most recent _unstable_ commit to GitHub. 
+!!! Note
+    `master` is a special tag name which refers to the most recent _unstable_ commit to GitHub. 
 
 ## Saving outputs to disk
 
@@ -52,9 +52,9 @@ Here we mount the local `/home/user/out` directory to `/out` on the container.:
 
     docker run -it --rm -v /home/user/out:/out neuroscout/neuroscout-cli run 5xH93 /out 
 
-!!! note
-After the `run` command, we are telling _neuroscout-cli_ to save the outputs to the `/out` directory on `Docker`,
-which is mapped to `/home/user/out` on our local system.
+!!! Note
+    After the `run` command, we are telling _neuroscout-cli_ to save the outputs to the `/out` directory on `Docker`,
+    which is mapped to `/home/user/out` on our local system.
 
 ### Output derivative structure
 Neuroscout creates a unique output directory `neuroscout-{analysis_id}` for each analysis.
@@ -99,7 +99,7 @@ The resulting cached data directory will look something like this, if you've run
 The next time you run a model with a previously downloaded dataset, it will not need to re-download the fMRI data. </br>
 
 !!! important
-Docker expects **absolute paths** for mounted directories
+    Docker expects **absolute paths** for mounted directories
 
 
 ## Other command line arguments
