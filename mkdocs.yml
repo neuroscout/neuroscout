@@ -17,7 +17,9 @@ nav:
       - Clone: browse/clone.md
     - Running analyses:
       - Introduction: cli/index.md
-      - Usage: cli/usage.md
+      - Docker: cli/docker.md
+      - Singularity: cli/singularity.md
+      - General Usage: cli/usage.md
     - FAQ: faq.md
 
 theme: readthedocs
