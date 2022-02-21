@@ -32,8 +32,3 @@ First, check with your HPC administrator that _Singularity_ is available for use
 Use pip to install _neuroscout-cli_ directly from the GitHub repo:
 
     pip install git+https://www.github.com/neuroscout/neuroscout-cli
-
-
-## General usage and reference
-
-Continue [here](usage.md) for a general guide to neuroscout-cli
