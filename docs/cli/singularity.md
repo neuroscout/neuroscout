@@ -34,7 +34,7 @@ You can see the tags available for download on [GitHub Packages](https://github.
 
 Assuming you've already created an analysis on [neuroscout.org](https://neuroscout.org), and have its analysis id (e.g.: `Mv3ev`), you can run it in one line:
 
-    singularity run --cleanenv neuroscout-cli-<version>.simg <outdir> Mv3ev
+    singularity run --cleanenv neuroscout-cli-<version>.simg Mv3ev <outdir>
 
 Where `<outdir>` is a directory you can save files to.
 
@@ -42,7 +42,7 @@ This command will download the corresponding preprocessed images, event files an
 The results will be automatically uploaded to NeuroVault, and the analysis page will link to this upload: https://neuroscout.org/builder/Mv3ev.
 
 !!! important
- `neuroscout-cli-<version>.simg` refers to a specific downloaded image on your system. 
+    `neuroscout-cli-<version>.simg` refers to a specific downloaded image on your system. 
 
 
 ## Saving data to disk
@@ -57,8 +57,12 @@ Thus, you can simplify modify `<outdir>` to a directory of your choice:
 
 ## Caching input datasets
 
-If you wish to save the input preprocessed datasets elsewhere, simply specify a data installation directory with `-i`, and mount the corresponding local directory.
+If you wish to save the input preprocessed datasets elsewhere, simply specify a data installation directory with `--download-dir`L
 
-     singularity run --cleanenv neuroscout-cli-<version>.simg run /work/dir/out Mv3ev -i /data
+     singularity run --cleanenv neuroscout-cli-<version>.simg run --download-dir=/data Mv3ev /work/dir/out 
 
 [See here](docker.md#caching-input-datasets) for more details on the cached data structure. 
+
+For further guidance, see our [usage](usage.md) reference guide.
+
+ for more details on the cached data structure. 

@@ -268,7 +268,7 @@ export class StatusTab extends React.Component<submitProps, statusTabState> {
               <code>
                 docker run --rm -it -v /local/outputdirectory:/out
                 {` neuroscout/neuroscout-cli${this.state.imageVersion}`} run
-                /out {this.props.analysisId}
+                {this.props.analysisId} /out
               </code>
             </pre>
             <Card
@@ -308,6 +308,7 @@ export class StatusTab extends React.Component<submitProps, statusTabState> {
         {(this.props.status === 'PENDING' ||
           this.props.status === 'SUBMITTING') && (
           <div>
+            <br />
             <h3>Analysis Pending Generation</h3>
             <p>
               Analysis generation may take some time. This page will update when
@@ -315,7 +316,6 @@ export class StatusTab extends React.Component<submitProps, statusTabState> {
             </p>
           </div>
         )}
-        <NeurovaultLinks analysisId={this.props.analysisId} />
       </div>
     )
   }

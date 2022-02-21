@@ -28,9 +28,10 @@ If you're ready to build your own analysis, head over to [Getting Started](build
     - [Clone](browse/clone.md)
 - Running analyses:
     - [Introduction](cli/index.md)
-    - [Usage](cli/usage.md)
+    - [Docker](cli/docker.md)
+    - [Singularity](cli/singularity.md)
+    - [General usage](cli/usage.md)
 - [FAQ](faq.md)
-
 
 
 ## Where can I get more help?
