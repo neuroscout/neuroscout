@@ -42,7 +42,7 @@ This command will download the corresponding preprocessed images, event files an
 The results will be automatically uploaded to NeuroVault, and the analysis page will link to this upload: https://neuroscout.org/builder/Mv3ev.
 
 !!! important
- `neuroscout-cli-<version>.simg` refers to a specific downloaded image on your system. 
+    `neuroscout-cli-<version>.simg` refers to a specific downloaded image on your system. 
 
 
 ## Saving data to disk

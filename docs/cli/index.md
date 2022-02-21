@@ -27,13 +27,8 @@ First, check with your HPC administrator that _Singularity_ is available for use
 ### Manually prepared environment
 
 !!! Danger
-    Manually installing _neuroscout-cli_ is not currently recommended. Proceed only if you really need to do this.
+    Manually installing _neuroscout-cli_ can be difficult due to complex dependencies. Proceed only if you really need to do this.
 
 Use pip to install _neuroscout-cli_ directly from the GitHub repo:
 
     pip install git+https://www.github.com/neuroscout/neuroscout-cli
-
-
-## General usage and reference
-
-Continue [here](usage.md) for a general guide to neuroscout-cli

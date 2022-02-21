@@ -268,7 +268,7 @@ export class StatusTab extends React.Component<submitProps, statusTabState> {
               <code>
                 docker run --rm -it -v /local/outputdirectory:/out
                 {` neuroscout/neuroscout-cli${this.state.imageVersion}`} run
-                /out {this.props.analysisId}
+                {this.props.analysisId} /out
               </code>
             </pre>
             <Card
