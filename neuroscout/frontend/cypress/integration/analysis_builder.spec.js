@@ -76,11 +76,6 @@ describe('Analysis Builder', () => {
         - Intercept call to generate design matrix, reply with known good response.
         - ensure that vega embed is displayed
      */
-    cy.get('.ant-collapse-item').contains('Contrasts').click()
-    cy.get('.ant-collapse-item').contains('Contrasts').parent().find('.ant-collapse-content-box > div').children().should('have.length', predCount - 1)
-    cy.get('.ant-collapse-item').contains('Transformations').click()
-    cy.get('.ant-collapse-item').contains('Transformations').parent().find('.ant-collapse-content-box > div').children().should('have.length', xformCount)
-    cy.get('.ant-spin-spinning:visible')
     let dmResp;
     cy.fixture('design_matrix_response.json').then(dmBody => {
       dmResp = dmBody
