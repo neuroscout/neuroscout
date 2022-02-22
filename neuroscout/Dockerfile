@@ -1,4 +1,4 @@
-FROM python:3.6-buster
+FROM python:3.7-buster
 ARG DEBIAN_FRONTEND=noninteractive
 
 RUN mkdir -p /usr/src/app
@@ -9,7 +9,7 @@ RUN apt-get install -yq ffmpeg tesseract-ocr apt-transport-https libnss3 xvfb
 RUN pip install -e git+https://github.com/PsychoinformaticsLab/pliers.git#egg=pliers
 RUN pip install clarifai duecredit google-api-python-client IndicoIo librosa>=0.6.3 pysrt pytesseract spacy rev_ai
 
-RUN wget -O- http://neuro.debian.net/lists/stretch.us-nh.full | tee /etc/apt/sources.list.d/neurodebian.sources.list && apt-key adv --recv-keys --keyserver hkps://keyserver.ubuntu.com 0xA5D32F012649A5A9
+RUN wget -O- http://neuro.debian.net/lists/buster.us-nh.libre | tee /etc/apt/sources.list.d/neurodebian.sources.list && apt-key adv --recv-keys --keyserver hkps://keyserver.ubuntu.com 0xA5D32F012649A5A9
 RUN apt-get update && apt-get install -yq datalad && pip install datalad
 
 RUN curl -sSL https://deb.nodesource.com/gpgkey/nodesource.gpg.key | apt-key add -
