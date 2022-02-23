@@ -10,6 +10,7 @@ import {
   BidsModel,
 } from '../coretypes'
 import { alphaSort, formatDbTime, predictorColor } from '../utils'
+import { PredictorLink } from '../HelperComponents'
 import NeurovaultLinks from './NeuroVault'
 
 const Panel = Collapse.Panel
@@ -250,9 +251,7 @@ export class Review extends React.Component<
           <div className="ant-statistic-title">Predictors</div>
           {predictors.map(x => (
             <Tooltip key={x.name} title={x.description}>
-              <Tag color={predictorColor(x)} key={x.name}>
-                {x.name}
-              </Tag>
+              <PredictorLink {...x} />
             </Tooltip>
           ))}
         </p>

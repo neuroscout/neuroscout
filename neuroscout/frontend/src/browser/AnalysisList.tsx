@@ -5,7 +5,7 @@ the home page or on the 'browse public analysis' page
 import * as React from 'react'
 import { Button, Row, Table, Tag, Input } from 'antd'
 import { CheckCircleTwoTone } from '@ant-design/icons'
-import { MainCol, Space, StatusTag } from '../HelperComponents'
+import { MainCol, PredictorLink, Space, StatusTag } from '../HelperComponents'
 import {
   AppAnalysis,
   AnalysisResources,
@@ -15,7 +15,6 @@ import {
 import { api } from '../api'
 import { Link, Redirect } from 'react-router-dom'
 import { ColumnsType } from 'antd/es/table'
-import { predictorColor } from '../utils'
 
 import memoize from 'memoize-one'
 
@@ -53,10 +52,7 @@ export const PredictorTagList = (props: {
   return (
     <div>
       {props.predictors.map(predictor => (
-        <Tag key={predictor.name} color={predictorColor(predictor)}>
-          {' '}
-          <Link to={`/predictor/${predictor.name}`}>{predictor.name}</Link>
-        </Tag>
+        <PredictorLink key={predictor.id} {...predictor} />
       ))}
     </div>
   )
@@ -310,6 +306,7 @@ export class AnalysisListTable extends React.Component<
           }
           locale={tableLocale}
           className="analysisListTable"
+          style={{ width: '100%' }}
         />
       </>
     )

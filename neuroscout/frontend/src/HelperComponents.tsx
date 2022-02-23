@@ -2,6 +2,9 @@ import * as React from 'react'
 import { LockOutlined, UnlockOutlined } from '@ant-design/icons'
 import { Alert, Col, Divider, Row, Tag, Tooltip } from 'antd'
 import { createBrowserHistory } from 'history'
+import { Link } from 'react-router-dom'
+import { predictorColor } from './utils'
+import { Predictor } from './coretypes'
 
 // Simple space component to seperate buttons, etc.
 // eslint-disable-next-line react/self-closing-comp
@@ -137,5 +140,14 @@ export function DateTag(props: { modified_at: string }) {
         </Tag>
       )}
     </>
+  )
+}
+
+export const PredictorLink = (predictor: Predictor): JSX.Element => {
+  return (
+    <Tag key={predictor.name} color={predictorColor(predictor)}>
+      {' '}
+      <Link to={`/predictor/${predictor.name}`}>{predictor.name}</Link>
+    </Tag>
   )
 }
