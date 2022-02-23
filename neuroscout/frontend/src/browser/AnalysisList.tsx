@@ -12,6 +12,7 @@ import {
   Dataset,
   Predictor,
 } from '../coretypes'
+import { PredictorTagList } from './PredictorList'
 import { api } from '../api'
 import { Link, Redirect } from 'react-router-dom'
 import { ColumnsType } from 'antd/es/table'
@@ -45,18 +46,6 @@ class AnalysisResourcesDisplay extends React.Component<
   }
 }
 
-export const PredictorTagList = (props: {
-  predictors: Predictor[]
-}): JSX.Element => {
-  props.predictors.sort((a, b) => a.name.localeCompare(b.name))
-  return (
-    <div>
-      {props.predictors.map(predictor => (
-        <PredictorLink key={predictor.id} {...predictor} />
-      ))}
-    </div>
-  )
-}
 const tableLocale = {
   filterConfirm: 'Ok',
   filterReset: 'Reset',

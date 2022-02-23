@@ -15,6 +15,7 @@ import PublicProfile from './profile/PublicProfile'
 import UserList from './profile/UserList'
 import PredictorRelatedDetailsView from './browser/PredictorRelatedDetailsView'
 import { DatasetDetailView } from './browser/DatasetDetailView'
+import { PredictorListView } from './browser/PredictorList'
 
 export default class Routes extends React.Component<
   AppState,
@@ -174,6 +175,7 @@ export default class Routes extends React.Component<
               return <PredictorRelatedDetailsView id={props.match.params.id} />
             }}
           />
+          <Route path="/predictors" component={PredictorListView} />
           <Route
             path="/dataset/:id"
             render={props => {
