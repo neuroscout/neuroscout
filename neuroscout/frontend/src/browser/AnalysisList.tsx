@@ -5,12 +5,17 @@ the home page or on the 'browse public analysis' page
 import * as React from 'react'
 import { Button, Row, Table, Tag, Input } from 'antd'
 import { CheckCircleTwoTone } from '@ant-design/icons'
-import { MainCol, Space, StatusTag } from './HelperComponents'
-import { AppAnalysis, AnalysisResources, Dataset, Predictor } from './coretypes'
-import { api } from './api'
+import { MainCol, Space, StatusTag } from '../HelperComponents'
+import {
+  AppAnalysis,
+  AnalysisResources,
+  Dataset,
+  Predictor,
+} from '../coretypes'
+import { api } from '../api'
 import { Link, Redirect } from 'react-router-dom'
 import { ColumnsType } from 'antd/es/table'
-import { predictorColor } from './utils'
+import { predictorColor } from '../utils'
 
 import memoize from 'memoize-one'
 
@@ -44,6 +49,7 @@ class AnalysisResourcesDisplay extends React.Component<
 export const PredictorTagList = (props: {
   predictors: Predictor[]
 }): JSX.Element => {
+  props.predictors.sort((a, b) => a.name.localeCompare(b.name))
   return (
     <div>
       {props.predictors.map(predictor => (

@@ -146,15 +146,17 @@ export const api = {
     })
   },
 
-  getPredictors: (ids: number[] | string[]): Promise<Predictor[] | null> => {
-    return jwtFetch(`${domainRoot}/api/predictors?run_id=${String(ids)}`).then(
-      data => {
-        if (data.statusCode && data.statusCode === 422) {
-          return [] as Predictor[]
-        }
-        return setPredictorSource(data)
-      },
-    )
+  getPredictors: (ids?: number[] | string[]): Promise<Predictor[]> => {
+    let url = `${domainRoot}/api/predictors`
+    if (ids) {
+      url = `${domainRoot}/api/predictors?run_id=${String(ids)}`
+    }
+    return jwtFetch(url).then(data => {
+      if (data.statusCode && data.statusCode === 422) {
+        return [] as Predictor[]
+      }
+      return setPredictorSource(data)
+    })
   },
 
   getUserPredictors: (

@@ -3,7 +3,7 @@ import { Route, Redirect, Switch } from 'react-router-dom'
 import { message } from 'antd'
 
 import './css/App.css'
-import AnalysisList from './AnalysisList'
+import AnalysisList from './browser/AnalysisList'
 // import AnalysisBuilder from './analysis_builder/Builder';
 const AnalysisBuilder = React.lazy(() => import('./analysis_builder/Builder'))
 import { AppState } from './coretypes'
@@ -13,8 +13,8 @@ import { PredictorCollectionList } from './predictor_collection/CollectionList'
 import EditProfile from './profile/EditProfile'
 import PublicProfile from './profile/PublicProfile'
 import UserList from './profile/UserList'
-import PredictorRelatedDetailsView from './PredictorRelatedDetailsView'
-import { DatasetDetailView } from './DatasetDetailView'
+import PredictorRelatedDetailsView from './browser/PredictorRelatedDetailsView'
+import { DatasetDetailView } from './browser/DatasetDetailView'
 
 export default class Routes extends React.Component<
   AppState,

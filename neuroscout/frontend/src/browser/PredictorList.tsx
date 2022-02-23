@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
-import { Predictor } from './coretypes'
-import { api } from './api'
+import { Predictor } from '../coretypes'
+import { api } from '../api'
 
 const PredictorListView = (): JSX.Element => {
   const [predictors, setPredictors] = useState<Predictor[]>([])

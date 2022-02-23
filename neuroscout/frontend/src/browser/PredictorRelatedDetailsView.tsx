@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react'
-import { Row, Table, Skeleton } from 'antd'
-import { MainCol } from './HelperComponents'
-import { api } from './api'
+import { Divider, Row, Skeleton, Table } from 'antd'
+import { MainCol } from '../HelperComponents'
+import { api } from '../api'
 import { Link, Redirect } from 'react-router-dom'
-import { PredictorRelatedDetails, ApiAnalysis, Dataset } from './coretypes'
+import { PredictorRelatedDetails, ApiAnalysis, Dataset } from '../coretypes'
 import { AnalysisListTable } from './AnalysisList'
-import { setDatasetNames } from './App'
+import { setDatasetNames } from '../App'
 
 const datasetColumns = [
   {
@@ -61,18 +61,21 @@ const PredictorRelatedDetailsView = (props: { id: string }): JSX.Element => {
           <Skeleton loading={!details.predictor}>
             <Row>
               <div className="viewTitle">{name}</div>
-              <div className="viewTitleDescriptor">
-                - {description}
+            </Row>
+            <Row>
+              <div>
+                {description}
                 {extractor}
               </div>
             </Row>
-            <h3>Used in these Analyses</h3>
+            <Divider />
             <Row>
+              <h3>Used in these Analyses</h3>
               <AnalysisListTable {...analysisListProps} />
             </Row>
-            <br />
-            <h3>Present in these Datasets</h3>
+            <Divider />
             <Row>
+              <h3>Present in these Datasets</h3>
               <Table
                 className="selectDataset"
                 columns={datasetColumns}
@@ -80,6 +83,7 @@ const PredictorRelatedDetailsView = (props: { id: string }): JSX.Element => {
                 size="small"
                 dataSource={details.datasets}
                 pagination={false}
+                style={{ width: '100%' }}
               />
             </Row>
           </Skeleton>

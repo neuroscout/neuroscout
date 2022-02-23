@@ -7,7 +7,7 @@ import { Avatar, Card, Col, List, Row, Spin } from 'antd'
 import { Link, withRouter } from 'react-router-dom'
 import { RouteComponentProps } from 'react-router'
 
-import { AnalysisListTable } from '../AnalysisList'
+import { AnalysisListTable } from '../browser/AnalysisList'
 import { MainCol, Space, NotFound } from '../HelperComponents'
 import {
   profileEditItems,
