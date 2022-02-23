@@ -79,11 +79,14 @@ export const DatasetDetailView = (props: Dataset): JSX.Element => {
             task: task,
             predictors: [] as Predictor[],
           }
+          data.sort((a, b) => a.name.localeCompare(b.name))
           newTaskPredictors.predictors.push(...data)
           return newTaskPredictors
         })
       }),
-    ).then(newTaskPredictors => setTaskPredictors(newTaskPredictors))
+    ).then(newTaskPredictors => {
+      setTaskPredictors(newTaskPredictors)
+    })
   }, [props.id])
   return (
     <Row justify="center">
