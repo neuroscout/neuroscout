@@ -62,6 +62,7 @@ export interface AnalysisListProps {
   datasets: Dataset[]
   loading?: boolean
   showOwner?: boolean
+  hideDatasets?: boolean
 }
 
 export class AnalysisListTable extends React.Component<
@@ -195,8 +196,16 @@ export class AnalysisListTable extends React.Component<
         onFilter: (value, record) => record.dataset_name === value,
         width: `${datasetWidth}ch`,
         textWrap: 'break-word',
+        render: (text, record) => (
+          <Link to={`/dataset/${record.dataset_id}`}>
+            {record.dataset_name}
+          </Link>
+        ),
       },
     ]
+    if (this.props.hideDatasets) {
+      analysisTableColumns.pop()
+    }
 
     if (showOwner) {
       analysisTableColumns.push({

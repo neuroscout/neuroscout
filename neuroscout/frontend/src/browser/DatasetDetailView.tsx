@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { Link, Redirect } from 'react-router-dom'
-import { MainCol } from '../HelperComponents'
-import { Collapse, Row, Table, Tag } from 'antd'
+import { Header, MainCol } from '../HelperComponents'
+import { Collapse, Descriptions, Row, Table, Tag } from 'antd'
 import { AppAnalysis, Dataset, Predictor, Task } from '../coretypes'
 import { api } from '../api'
 import { predictorColor } from '../utils'
@@ -31,6 +31,43 @@ interface TaskPredictors {
   predictors: Predictor[]
 }
 
+export const DatasetDescription = (props: Dataset): JSX.Element => {
+  const rowData: {
+    title?: string
+    content: string | JSX.Element
+    span?: number
+  }[] = [
+    { content: props.longDescription ? props.longDescription : 'n/a' },
+    { title: 'Authors', content: props.authors.join(', ') },
+    {
+      title: 'Mean Age',
+      content: props.meanAge ? props.meanAge.toFixed(1) : 'n/a',
+      span: 1,
+    },
+    {
+      title: 'Percent Female',
+      content: props.percentFemale
+        ? (props.percentFemale * 100).toFixed(1)
+        : 'n/a',
+      span: 4,
+    },
+    {
+      title: 'References and Links',
+      content: React.createElement('a', { href: props.url }, [props.url]),
+    },
+  ]
+
+  return (
+    <Descriptions column={5} size="small">
+      {rowData.map((x, i) => (
+        <Descriptions.Item label={x.title} key={i} span={x.span ? x.span : 5}>
+          {x.content}
+        </Descriptions.Item>
+      ))}
+    </Descriptions>
+  )
+}
+
 export const DatasetDetailView = (props: Dataset): JSX.Element => {
   const [taskPredictors, setTaskPredictors] = useState<TaskPredictors[]>([])
   const [analyses, setAnalyses] = useState<AppAnalysis[]>([])
@@ -41,6 +78,7 @@ export const DatasetDetailView = (props: Dataset): JSX.Element => {
     analyses: analyses,
     datasets: [props],
     showOwner: true,
+    hideDatasets: true,
   }
 
   useEffect(() => {
@@ -63,26 +101,26 @@ export const DatasetDetailView = (props: Dataset): JSX.Element => {
       setTaskPredictors(newTaskPredictors)
     })
   }, [props.id])
+
   return (
     <Row justify="center">
       <MainCol>
-        <Row>
-          <h2>{props.name}</h2>
-        </Row>
-        <Row key="analyses">
-          <h3>Used in these Analyses</h3>
-          <AnalysisListTable {...analysisListProps} />
-        </Row>
-        <Row>
-          <h3>Predictors Available Per Task</h3>
-        </Row>
+        <div className="viewTitle">Dataset - {props.name}</div>
+        <DatasetDescription {...props} />
+        <Header title="Available Tasks" />
         {taskPredictors.map(taskPredictor => (
           <Row key={taskPredictor.task.id}>
-            <div className="viewTitle">{taskPredictor.task.name}</div>
-            <br />
+            <Header
+              title={taskPredictor.task.name}
+              subtitle={taskPredictor.task.summary}
+            />
             <PredictorByExtractorList predictors={taskPredictor.predictors} />
           </Row>
         ))}
+        <Row key="analyses">
+          <h3>Used by these Analyses</h3>
+          <AnalysisListTable {...analysisListProps} />
+        </Row>
       </MainCol>
     </Row>
   )

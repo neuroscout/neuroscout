@@ -147,7 +147,7 @@ export const api = {
   },
 
   getPredictors: (ids?: number[] | string[]): Promise<Predictor[]> => {
-    let url = `${domainRoot}/api/predictors`
+    let url = `${domainRoot}/api/predictors?newest=true&active_only=true`
     if (ids) {
       url = `${domainRoot}/api/predictors?run_id=${String(ids)}`
     }

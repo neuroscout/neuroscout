@@ -102,6 +102,7 @@ export const datasetColumns = [
     dataIndex: 'name',
     width: 130,
     sorter: (a, b) => a.name.localeCompare(b.name),
+    render: (text, record) => <Link to={`/dataset/${record.id}`}>{text}</Link>,
   },
   { title: 'Summary', dataIndex: 'summary' },
   {
@@ -149,5 +150,26 @@ export const PredictorLink = (predictor: Predictor): JSX.Element => {
       {' '}
       <Link to={`/predictor/${predictor.name}`}>{predictor.name}</Link>
     </Tag>
+  )
+}
+
+export const Header = (props: {
+  title: string
+  subtitle?: string
+}): JSX.Element => {
+  return (
+    <div className="ant-page-header-heading-left">
+      <span className="ant-page-header-heading-title" title={props.title}>
+        {props.title}
+      </span>
+      {props.subtitle && (
+        <span
+          className="ant-page-header-heading-sub-title"
+          title={props.subtitle}
+        >
+          {props.subtitle}
+        </span>
+      )}
+    </div>
   )
 }
