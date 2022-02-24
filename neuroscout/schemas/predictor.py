@@ -69,7 +69,7 @@ class PredictorRelatedSchema(Schema):
     from .dataset import DatasetSchema
 
     predictor = fields.Nested(PredictorSchema)
-    datasets = fields.Nested(DatasetSchema(many=True, exclude=['dataset_address', 'preproc_address', 'runs']))
+    datasets = fields.Nested(DatasetSchema(many=True, exclude=['dataset_address', 'preproc_address', 'runs', 'tasks.n_runs_subject']))
     analyses = fields.Nested(AnalysisSchema(
         many=True,
         only=['hash_id', 'name', 'description', 'status',
