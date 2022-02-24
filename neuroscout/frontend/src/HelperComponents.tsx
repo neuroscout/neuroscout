@@ -146,10 +146,12 @@ export function DateTag(props: { modified_at: string }) {
 
 export const PredictorLink = (predictor: Predictor): JSX.Element => {
   return (
-    <Tag key={predictor.name} color={predictorColor(predictor)}>
-      {' '}
-      <Link to={`/predictor/${predictor.name}`}>{predictor.name}</Link>
-    </Tag>
+    <Tooltip title={predictor.description}>
+      <Tag key={predictor.name} color={predictorColor(predictor)}>
+        {' '}
+        <Link to={`/predictor/${predictor.name}`}>{predictor.name}</Link>
+      </Tag>
+    </Tooltip>
   )
 }
 
