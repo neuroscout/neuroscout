@@ -246,3 +246,11 @@ pre {
 .analysisListRouteWrapper .analysisListTable {
     flex-basis: 100%;
 }
+
+.tagLink {
+ text-decoration: underline;
+}
+
+.tagLink:hover {
+ text-decoration: none;
+}
