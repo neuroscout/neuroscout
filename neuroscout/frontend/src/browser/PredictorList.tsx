@@ -1,10 +1,24 @@
 import React, { useState, useEffect } from 'react'
-import { Collapse, Row, Space } from 'antd'
+import { Col, Collapse, Divider, Row, Space, Tag } from 'antd'
 import { Predictor } from '../coretypes'
 import { Header, MainCol, PredictorLink } from '../HelperComponents'
 import { api } from '../api'
+import { modalityColor } from '../utils'
 
 const { Panel } = Collapse
+
+const ModalityColorIndex = (): JSX.Element => (
+  <>
+    <Divider orientation="left">Modality Color Key</Divider>
+    <Space direction="horizontal">
+      {Object.keys(modalityColor).map(key => (
+        <Tag key={key} color={modalityColor[key]}>
+          {key}
+        </Tag>
+      ))}
+    </Space>
+  </>
+)
 
 export const PredictorTagList = (props: {
   predictors: Predictor[]
@@ -105,12 +119,15 @@ export const PredictorListView = (): JSX.Element => {
       setPredictors(data)
     })
   }, [])
+
+  console.log(predictors)
   return (
     <div className="App">
       <Row justify="center" style={{ background: '#fff', padding: 0 }}>
         <MainCol>
           <Header title="All Predictors" subtitle="grouped by source" />
           <PredictorByExtractorList predictors={predictors} />
+          <ModalityColorIndex />
         </MainCol>
       </Row>
     </div>
