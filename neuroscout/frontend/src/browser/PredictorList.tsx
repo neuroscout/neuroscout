@@ -127,7 +127,9 @@ export const PredictorListView = (): JSX.Element => {
         <MainCol>
           <Header title="All Predictors" subtitle="grouped by source" />
           <PredictorByExtractorList predictors={predictors} />
-          <ModalityColorIndex />
+          <div className="colorIndexPredictorList">
+            <ModalityColorIndex />
+          </div>
         </MainCol>
       </Row>
     </div>

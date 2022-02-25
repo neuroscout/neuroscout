@@ -254,3 +254,7 @@ pre {
 .tagLink:hover {
  text-decoration: none;
 }
+
+.colorIndexPredictorList {
+    margin-bottom: 20px;
+}
