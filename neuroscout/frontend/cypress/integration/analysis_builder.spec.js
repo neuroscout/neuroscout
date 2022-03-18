@@ -8,7 +8,6 @@ describe('Analysis Builder', () => {
   })
 
   let name = 'dataset_name';
-  let pp_name = 'Test Dataset';
   let predCount = 3;
   it('analysis builder', () => {
     cy.login('user@example.com', 'string')
@@ -22,10 +21,7 @@ describe('Analysis Builder', () => {
     cy.get('.builderAnalysisDescriptionInput').contains(name)
 
     cy.get('.selectDataset')
-    cy.get('td').contains(pp_name).parent().within(() => {
-      cy.get('input[type=radio]').click()
-
-    })
+    cy.get('input[type=radio]').first().click()
     cy.get('.builderAnalysisTaskSelect')
     cy.get('.ant-collapse-item > .ant-collapse-header').contains('Runs: All selected').click()
     cy.get('.builderAnalysisRunsSelect')
