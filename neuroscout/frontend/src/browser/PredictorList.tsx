@@ -7,7 +7,7 @@ import { modalityColor } from '../utils'
 
 const { Panel } = Collapse
 
-const ModalityColorIndex = (): JSX.Element => (
+export const ModalityColorIndex = (): JSX.Element => (
   <>
     <Divider orientation="left">Modality Color Key</Divider>
     <Space direction="horizontal">

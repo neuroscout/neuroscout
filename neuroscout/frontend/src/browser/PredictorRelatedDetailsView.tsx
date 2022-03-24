@@ -1,22 +1,11 @@
 import React, { useState, useEffect } from 'react'
-import { Divider, Row, Skeleton, Table } from 'antd'
+import { Divider, Row, Skeleton, Space, Table } from 'antd'
 import { MainCol } from '../HelperComponents'
 import { api } from '../api'
 import { Link, Redirect } from 'react-router-dom'
 import { PredictorRelatedDetails, ApiAnalysis, Dataset } from '../coretypes'
 import { AnalysisListTable } from './AnalysisList'
 import { setDatasetNames } from '../App'
-
-const datasetColumns = [
-  {
-    title: 'Name',
-    dataIndex: 'name',
-    width: 130,
-    sorter: (a, b) => a.name.localeCompare(b.name),
-    render: (text, record) => <Link to={`/dataset/${record.id}`}>{text}</Link>,
-  },
-  { title: 'Summary', dataIndex: 'summary' },
-]
 
 const PredictorRelatedDetailsView = (props: { id: string }): JSX.Element => {
   const [details, setDetails] = useState<PredictorRelatedDetails>({
@@ -54,6 +43,7 @@ const PredictorRelatedDetailsView = (props: { id: string }): JSX.Element => {
     datasets: details.datasets,
     showOwner: true,
   }
+  const datasets = details.datasets.sort((a, b) => a.name.localeCompare(b.name))
   return (
     <div>
       <Row justify="center">
@@ -76,15 +66,15 @@ const PredictorRelatedDetailsView = (props: { id: string }): JSX.Element => {
             <Divider />
             <Row>
               <h3>Present in these Datasets</h3>
-              <Table
-                className="selectDataset"
-                columns={datasetColumns}
-                rowKey="id"
-                size="small"
-                dataSource={details.datasets}
-                pagination={false}
-                style={{ width: '100%' }}
-              />
+            </Row>
+            <Row>
+              <Space>
+                {datasets.map(ds => (
+                  <>
+                    <Link to={`/dataset/${ds.id}`}>{ds.name}</Link>
+                  </>
+                ))}
+              </Space>
             </Row>
           </Skeleton>
         </MainCol>

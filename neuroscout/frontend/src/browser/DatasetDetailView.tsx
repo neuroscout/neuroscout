@@ -6,7 +6,11 @@ import { AppAnalysis, Dataset, Predictor, Task } from '../coretypes'
 import { api } from '../api'
 import { predictorColor } from '../utils'
 import { AnalysisListTable } from './AnalysisList'
-import { PredictorByExtractorList, PredictorTagList } from './PredictorList'
+import {
+  ModalityColorIndex,
+  PredictorByExtractorList,
+  PredictorTagList,
+} from './PredictorList'
 
 const { Panel } = Collapse
 
@@ -115,12 +119,11 @@ export const DatasetDetailView = (props: Dataset): JSX.Element => {
               subtitle={taskPredictor.task.summary}
             />
             <PredictorByExtractorList predictors={taskPredictor.predictors} />
+            <div className="colorIndexPredictorList">
+              <ModalityColorIndex />
+            </div>
           </Row>
         ))}
-        <Row key="analyses">
-          <h3>Used by these Analyses</h3>
-          <AnalysisListTable {...analysisListProps} />
-        </Row>
       </MainCol>
     </Row>
   )
