@@ -5,7 +5,13 @@ the home page or on the 'browse public analysis' page
 import * as React from 'react'
 import { Button, Row, Table, Tag, Input } from 'antd'
 import { CheckCircleTwoTone } from '@ant-design/icons'
-import { MainCol, PredictorLink, Space, StatusTag } from '../HelperComponents'
+import {
+  Header,
+  MainCol,
+  PredictorLink,
+  Space,
+  StatusTag,
+} from '../HelperComponents'
 import {
   AppAnalysis,
   AnalysisResources,
@@ -318,9 +324,11 @@ const AnalysisList = (props: AnalysisListProps): JSX.Element => {
       <Row justify="center">
         <MainCol>
           <div className="analysisListRouteWrapper">
-            <div className="analysisListTitle">
-              {props.publicList ? 'Public analyses' : 'Your saved analyses'}
-            </div>
+            <Header
+              title={
+                props.publicList ? 'Public analyses' : 'Your saved analyses'
+              }
+            />
             <AnalysisListTable {...props} />
           </div>
         </MainCol>
