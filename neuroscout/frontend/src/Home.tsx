@@ -39,7 +39,7 @@ class Home extends React.Component<UserStore, Record<string, never>> {
                   type="default"
                   href="/public"
                 >
-                  Browse Public Analyses
+                  Browse public analyses
                 </Button>{' '}
                 <Button
                   size="large"
@@ -47,7 +47,7 @@ class Home extends React.Component<UserStore, Record<string, never>> {
                   type="default"
                   href="/predictors"
                 >
-                  Browse Predictors
+                  Browse predictors
                 </Button>
                 <Button
                   size="large"
@@ -55,7 +55,7 @@ class Home extends React.Component<UserStore, Record<string, never>> {
                   type="default"
                   href="/datasets"
                 >
-                  Browse Datasets
+                  Browse datasets
                 </Button>
                 <br />
                 {this.props.loggedIn === false && (
@@ -65,7 +65,7 @@ class Home extends React.Component<UserStore, Record<string, never>> {
                     type="primary"
                     onClick={e => this.props.update({ openSignup: true })}
                   >
-                    Sign up to Create Analyses!
+                    Sign up to create analyses!
                   </Button>
                 )}
               </div>
@@ -81,7 +81,7 @@ class Home extends React.Component<UserStore, Record<string, never>> {
             xs={{ span: 8 }}
           >
             <div className="stat-container">
-              <div className="stat-title">Active Datasets</div>
+              <div className="stat-title">Active datasets</div>
               <div className="stat-value">13</div>
             </div>
           </Col>
@@ -92,7 +92,7 @@ class Home extends React.Component<UserStore, Record<string, never>> {
             xs={{ span: 8 }}
           >
             <div className="stat-container">
-              <div className="stat-title">Number of Tasks</div>
+              <div className="stat-title">Number of tasks</div>
               <div className="stat-value">40</div>
             </div>
           </Col>
