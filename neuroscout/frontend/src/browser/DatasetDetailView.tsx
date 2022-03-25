@@ -119,11 +119,11 @@ export const DatasetDetailView = (props: Dataset): JSX.Element => {
               subtitle={taskPredictor.task.summary}
             />
             <PredictorByExtractorList predictors={taskPredictor.predictors} />
-            <div className="colorIndexPredictorList">
-              <ModalityColorIndex />
-            </div>
           </Row>
         ))}
+        <div className="colorIndexPredictorList">
+          <ModalityColorIndex />
+        </div>
       </MainCol>
     </Row>
   )
