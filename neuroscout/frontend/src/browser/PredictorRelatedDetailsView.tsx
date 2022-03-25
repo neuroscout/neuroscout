@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { Divider, Row, Skeleton, Space, Table } from 'antd'
-import { MainCol } from '../HelperComponents'
+import { Header, MainCol } from '../HelperComponents'
 import { api } from '../api'
 import { Link, Redirect } from 'react-router-dom'
 import { PredictorRelatedDetails, ApiAnalysis, Dataset } from '../coretypes'
@@ -49,9 +49,7 @@ const PredictorRelatedDetailsView = (props: { id: string }): JSX.Element => {
       <Row justify="center">
         <MainCol>
           <Skeleton loading={!details.predictor}>
-            <Row>
-              <div className="viewTitle">{name}</div>
-            </Row>
+            <Header title={name} />
             <Row>
               <div>
                 {description}
