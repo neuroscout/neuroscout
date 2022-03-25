@@ -109,7 +109,7 @@ export const DatasetDetailView = (props: Dataset): JSX.Element => {
   return (
     <Row justify="center">
       <MainCol>
-        <Header title={`Dataset: ${props.name}`} />
+        <Header title={props.name} subtitle="dataset" />
         <DatasetDescription {...props} />
         <Header title="Available Tasks" />
         {taskPredictors.map(taskPredictor => (
