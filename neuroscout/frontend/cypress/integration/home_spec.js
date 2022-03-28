@@ -28,7 +28,7 @@ describe('The Home Page', () => {
   it('splash page contents', () => {
     cy.get('.splashLogo').should('have.length', 4)
     cy.contains('A platform for fast and flexible re-analysis of (naturalistic) fMRI studies')
-    cy.get('.ant-btn').contains('Browse Public Analyses').parent().should(
+    cy.get('.ant-btn').contains('Browse public analyses').parent().should(
       'have.attr', 'href', '/public')
     cy.get('.ant-btn').contains('Learn more').parent().should(
       'have.attr', 'href', 'https://neuroscout.github.io/neuroscout/'
@@ -38,7 +38,7 @@ describe('The Home Page', () => {
 
   it('test sign up button 1', () => {
     cy.get('.ant-modal-content').should('not.exist')
-    cy.get('.ant-btn').contains('Sign up to Create Analyses!').parent().click()
+    cy.get('.ant-btn').contains('Sign up to create analyses!').parent().click()
     cy.get('.ant-modal-content')
     cy.contains("Sign up for a Neuroscout account")
     cy.get('.ant-modal-close-x').click()
