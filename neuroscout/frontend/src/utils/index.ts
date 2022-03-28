@@ -145,20 +145,22 @@ export const formatDbTime = (inTime: string): string => {
   return `${date[2].slice(0, 2)}-${date[1]}-${date[0].slice(2, 4)}`
 }
 
+export const modalityColor = {
+  text: '#cc7ee0',
+  video: '#fa8c16',
+  audio: '#faad14',
+  image: '#a0d911',
+  fmriprep: '#858d99',
+  other: '#474747',
+}
+
 export const predictorColor = (predictor: Predictor): string => {
-  const lookup = {
-    '': '#f5222d',
-    text: '#cc7ee0',
-    video: '#fa8c16',
-    audio: '#faad14',
-    image: '#a0d911',
-  }
   if (
     predictor &&
     predictor.extracted_feature &&
     predictor.extracted_feature.modality
   ) {
-    return lookup[predictor.extracted_feature.modality]
+    return modalityColor[predictor.extracted_feature.modality]
   } else if (predictor.source === 'fmriprep') {
     return '#858d99'
   } else {

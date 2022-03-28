@@ -12,6 +12,7 @@ import {
   Dataset,
   ExtractorDescriptions,
   Predictor,
+  PredictorRelatedDetails,
   Run,
   User,
 } from './coretypes'
@@ -127,16 +128,35 @@ export const api = {
   getPredictor: (id: number): Promise<Predictor | null> => {
     return jwtFetch(`${domainRoot}/api/predictors/${id}`)
   },
+  getPredictorRelatedDetails: (
+    id: string,
+  ): Promise<PredictorRelatedDetails | null> => {
+    return jwtFetch(`${domainRoot}/api/predictors/${id}/related`).then(data => {
+      const details: PredictorRelatedDetails = { analyses: [], datasets: [] }
+      if (data.analyses) {
+        details.analyses = data.analyses.map(x => ApiToAppAnalysis(x))
+      }
+      if (data.datasets) {
+        details.datasets = data.datasets
+      }
+      if (data.predictor) {
+        details.predictor = data.predictor
+      }
+      return details
+    })
+  },
 
-  getPredictors: (ids: number[] | string[]): Promise<Predictor[] | null> => {
-    return jwtFetch(`${domainRoot}/api/predictors?run_id=${String(ids)}`).then(
-      data => {
-        if (data.statusCode && data.statusCode === 422) {
-          return [] as Predictor[]
-        }
-        return setPredictorSource(data)
-      },
-    )
+  getPredictors: (ids?: number[] | string[]): Promise<Predictor[]> => {
+    let url = `${domainRoot}/api/predictors?newest=true&active_only=true`
+    if (ids) {
+      url = `${domainRoot}/api/predictors?run_id=${String(ids)}`
+    }
+    return jwtFetch(url).then(data => {
+      if (data.statusCode && data.statusCode === 422) {
+        return [] as Predictor[]
+      }
+      return setPredictorSource(data)
+    })
   },
 
   getUserPredictors: (
@@ -160,6 +180,16 @@ export const api = {
       .catch(error => {
         displayError(error)
         return null
+      })
+  },
+  getPredictorsByTask: (taskId: string): Promise<Predictor[]> => {
+    return jwtFetch(`${domainRoot}/api/tasks/${taskId}/predictors`)
+      .then(data => {
+        return data as Predictor[]
+      })
+      .catch(error => {
+        displayError(error)
+        return [] as Predictor[]
       })
   },
 
@@ -321,6 +351,11 @@ export const api = {
   getAnalysisResources: (id: string): Promise<AnalysisResources> => {
     return jwtFetch(`${domainRoot}/api/analyses/${id}/resources`, {
       method: 'get',
+    })
+  },
+  getDatasetAnalyses: (id: string): Promise<AppAnalysis[]> => {
+    return jwtFetch(`${domainRoot}/api/datasets/${id}/analyses`).then(res => {
+      return res.map(x => ApiToAppAnalysis(x))
     })
   },
 }

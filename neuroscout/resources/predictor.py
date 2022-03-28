@@ -2,18 +2,19 @@ from webargs import fields
 import tempfile
 import json
 from marshmallow import INCLUDE, Schema
-from sqlalchemy import func
+from sqlalchemy import func, or_
 from flask_apispec import MethodResource, marshal_with, use_kwargs, doc
 from flask_jwt import current_identity
 from flask import current_app
 from pathlib import Path
 from .utils import abort, auth_required, first_or_404
 from ..models import (
+    Analysis, Dataset,
     Predictor, PredictorRun, PredictorCollection, Task)
 from ..database import db
 from ..core import cache
 from ..schemas.predictor import (
-    PredictorSchema, PredictorEventSchema, PredictorCollectionSchema)
+    PredictorSchema, PredictorEventSchema, PredictorCollectionSchema, PredictorRelatedSchema)
 from ..api_spec import FileField
 from ..worker import celery_app
 from ..utils.db import dump_predictor_events
@@ -216,3 +217,25 @@ class PredictorEventListResource(MethodResource):
     def get(self, predictor_id, run_id=None, stimulus_timing=False):
         return dump_predictor_events(
             predictor_id, run_id, stimulus_timing=stimulus_timing)
+
+''' Get the ExtractedFeature for the predictor, get all ExtractedFeatures
+    with same feature_name and extractor, get all dataset_ids from Predictor
+    table that use any of those ef_ids.
+'''
+class PredictorRelatedResource(MethodResource):
+    @doc(summary='Get the analyses and datasets that use predictor.')
+    @marshal_with(PredictorRelatedSchema)
+    def get(self, predictor_id):
+        # try to cast predictor_id as int, if it works we have an actual predictor id, if not search predictors by name and grab first one.
+        try:
+            predictor = first_or_404(Predictor.query.filter_by(id=int(predictor_id)))
+        except ValueError:
+            predictor = first_or_404(Predictor.query.filter_by(name=predictor_id))
+            
+        analyses = Analysis.query.filter_by(private=False, status='PASSED').filter(Analysis.predictors.any(name=predictor.name)).all()
+        datasets = Dataset.query.filter_by(active=True).filter(Dataset.predictors.any(name=predictor.name)).distinct(Dataset.id).all()
+        return {
+            "predictor": predictor,
+            "analyses": analyses,
+            "datasets": datasets
+        }

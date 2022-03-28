@@ -2,6 +2,9 @@ import * as React from 'react'
 import { LockOutlined, UnlockOutlined } from '@ant-design/icons'
 import { Alert, Col, Divider, Row, Tag, Tooltip } from 'antd'
 import { createBrowserHistory } from 'history'
+import { Link } from 'react-router-dom'
+import { predictorColor } from './utils'
+import { Predictor } from './coretypes'
 
 // Simple space component to seperate buttons, etc.
 // eslint-disable-next-line react/self-closing-comp
@@ -22,7 +25,7 @@ export const MainCol = (props: { children: React.ReactNode }): JSX.Element => {
 }
 
 export class DisplayErrorsInline extends React.Component<{ errors: string[] }> {
-  render() {
+  render(): JSX.Element {
     return (
       <>
         {this.props.errors.length > 0 && (
@@ -99,6 +102,7 @@ export const datasetColumns = [
     dataIndex: 'name',
     width: 130,
     sorter: (a, b) => a.name.localeCompare(b.name),
+    render: (text, record) => <Link to={`/dataset/${record.id}`}>{text}</Link>,
   },
   { title: 'Summary', dataIndex: 'summary' },
   {
@@ -112,10 +116,12 @@ export const datasetColumns = [
     dataIndex: 'authors',
     width: 200,
     render: text => {
-      if (text.length > 1) {
+      if (text && text.length > 1) {
         return <Tooltip title={text.join(', ')}>{text[0]}, et al.</Tooltip>
-      } else {
+      } else if (text && text.length == 1) {
         return <>{text[0]}</>
+      } else {
+        return <></>
       }
     },
   },
@@ -135,5 +141,39 @@ export function DateTag(props: { modified_at: string }) {
         </Tag>
       )}
     </>
+  )
+}
+
+export const PredictorLink = (predictor: Predictor): JSX.Element => {
+  return (
+    <Tooltip title={predictor.description}>
+      <Tag key={predictor.name} color={predictorColor(predictor)}>
+        {' '}
+        <Link className="tagLink" to={`/predictor/${predictor.name}`}>
+          {predictor.name}
+        </Link>
+      </Tag>
+    </Tooltip>
+  )
+}
+
+export const Header = (props: {
+  title: string
+  subtitle?: string
+}): JSX.Element => {
+  return (
+    <div className="ant-page-header-heading-left">
+      <span className="ant-page-header-heading-title" title={props.title}>
+        {props.title}
+      </span>
+      {props.subtitle && (
+        <span
+          className="ant-page-header-heading-sub-title"
+          title={props.subtitle}
+        >
+          {props.subtitle}
+        </span>
+      )}
+    </div>
   )
 }

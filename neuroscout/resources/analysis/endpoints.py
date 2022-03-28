@@ -266,3 +266,13 @@ class ImageVersionResource(MethodResource):
                     return {'version': res['name']}
 
         return {}
+
+@marshal_with(AnalysisSchema(many=True,
+                             only=['hash_id', 'name', 'description', 'status',
+                                   'dataset_id', 'modified_at', 'user', 'nv_count']))
+class DatasetAnalysisListResource(MethodResource):
+    @doc(tags=['analysis', 'dataset'], summary='Get a list of analyses that use a particular dataset.')
+    def get(self, dataset_id):
+        kwargs = {'private': False, 'status': 'PASSED', 'dataset_id': dataset_id}
+        return Analysis.query.filter_by(**kwargs)
+

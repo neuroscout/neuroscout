@@ -5,12 +5,7 @@ Top-level App component containing AppState. The App component is currently resp
 - Managing user's saved analyses (list display, clone and delete)
 */
 import * as React from 'react'
-import {
-  BrowserRouter as Router,
-  Route,
-  Redirect,
-  withRouter,
-} from 'react-router-dom'
+import { BrowserRouter as Router, Route, Redirect } from 'react-router-dom'
 import { Layout, Modal, message } from 'antd'
 import ReactGA from 'react-ga'
 import memoize from 'memoize-one'
@@ -25,7 +20,6 @@ import {
   AppState,
   Dataset,
   profileEditItems,
-  ProfileState,
 } from './coretypes'
 import { LoginModal, ResetPasswordModal, SignupModal } from './Modals'
 import Routes from './Routes'
@@ -52,9 +46,13 @@ type JWTChangeProps = {
 // This global var lets the dumb polling loops know when to exit.
 let checkCount = 0
 
-function setDatasetNames(analyses: AppAnalysis[], datasets: Dataset[]) {
+export const setDatasetNames = (
+  analyses: AppAnalysis[],
+  datasets: Dataset[],
+): void => {
   analyses.map(x => {
-    x.dataset_name = datasets.find(ds => ds.id === x.dataset_id)?.name ?? ' '
+    x.dataset_name =
+      datasets.find(ds => String(ds.id) === x.dataset_id)?.name ?? ' '
   })
 }
 
@@ -114,6 +112,7 @@ class App extends React.Component<Record<string, never>, AppState> {
           this.setState({ analyses, publicAnalyses })
         })
       })
+
     if (window.localStorage.getItem('jwt')) {
       void api
         .getUser()

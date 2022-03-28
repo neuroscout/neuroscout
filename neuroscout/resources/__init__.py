@@ -5,14 +5,15 @@ from .analysis import (AnalysisResource, AnalysisRootResource,
                        AnalysisBundleResource, AnalysisFullResource,
                        AnalysisResourcesResource, ReportResource,
                        AnalysisFillResource, AnalysisUploadResource,
-                       BibliographyResource, ImageVersionResource)
+                       BibliographyResource, ImageVersionResource,
+                       DatasetAnalysisListResource)
 from .dataset import DatasetResource, DatasetListResource
 from .extractor import ExtractorListResource, ExtractorDistinctResource
 from .predictor import (PredictorListResource, PredictorResource,
                         PredictorCollectionCreateResource,
                         TaskPredictorsResource,
                         PredictorCollectionResource, prepare_upload,
-                        PredictorEventListResource)
+                        PredictorEventListResource, PredictorRelatedResource)
 from .run import RunResource, RunListResource, RunTimingResource
 from .user import (UserRootResource, UserTriggerResetResource,
                    UserResetSubmitResource, UserResendConfirm,
@@ -35,6 +36,7 @@ __all__ = [
     'ReportResource',
     'DatasetResource',
     'DatasetListResource',
+    'DatasetAnalysisListResource',
     'ExtractorListResource',
     'ExtractorDistinctResource',
     'PredictorResource',
@@ -42,6 +44,7 @@ __all__ = [
     'PredictorEventListResource',
     'PredictorCollectionResource',
     'PredictorCollectionCreateResource',
+    'PredictorRelatedResource',
     'RunResource',
     'RunListResource',
     'RunTimingResource',

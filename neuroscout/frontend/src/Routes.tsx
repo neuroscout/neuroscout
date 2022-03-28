@@ -3,7 +3,7 @@ import { Route, Redirect, Switch } from 'react-router-dom'
 import { message } from 'antd'
 
 import './css/App.css'
-import AnalysisList from './AnalysisList'
+import AnalysisList from './browser/AnalysisList'
 // import AnalysisBuilder from './analysis_builder/Builder';
 const AnalysisBuilder = React.lazy(() => import('./analysis_builder/Builder'))
 import { AppState } from './coretypes'
@@ -13,12 +13,16 @@ import { PredictorCollectionList } from './predictor_collection/CollectionList'
 import EditProfile from './profile/EditProfile'
 import PublicProfile from './profile/PublicProfile'
 import UserList from './profile/UserList'
+import PredictorRelatedDetailsView from './browser/PredictorRelatedDetailsView'
+import { DatasetDetailView } from './browser/DatasetDetailView'
+import { DatasetListView } from './browser/DatasetList'
+import { PredictorListView } from './browser/PredictorList'
 
 export default class Routes extends React.Component<
   AppState,
   Record<string, never>
 > {
-  render() {
+  render(): JSX.Element {
     return (
       <React.Suspense fallback={<div>Loading...</div>}>
         <Switch>
@@ -164,6 +168,30 @@ export default class Routes extends React.Component<
                 )
               }
               return <Redirect to="/profiles" />
+            }}
+          />
+          <Route
+            path="/predictor/:id"
+            render={props => {
+              return <PredictorRelatedDetailsView id={props.match.params.id} />
+            }}
+          />
+          <Route path="/predictors" component={PredictorListView} />
+          <Route
+            path="/datasets"
+            render={props => <DatasetListView datasets={this.props.datasets} />}
+          />
+          <Route
+            path="/dataset/:id"
+            render={props => {
+              const dataset = this.props.datasets.find(
+                x => String(x.id) === String(props.match.params.id),
+              )
+              if (dataset) {
+                return <DatasetDetailView {...dataset} />
+              } else {
+                return <NotFound />
+              }
             }}
           />
           <Route component={NotFound} />

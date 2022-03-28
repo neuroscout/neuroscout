@@ -3,17 +3,7 @@
 */
 import * as React from 'react'
 import { QuestionCircleTwoTone } from '@ant-design/icons'
-import {
-  Col,
-  Collapse,
-  Input,
-  Row,
-  Table,
-  Tooltip,
-  Button,
-  Descriptions,
-  Form,
-} from 'antd'
+import { Col, Collapse, Input, Row, Table, Tooltip, Button, Form } from 'antd'
 import { ColumnType, ColumnProps } from 'antd/lib/table'
 import { TableRowSelection, CompareFn } from 'antd/lib/table/interface'
 
@@ -21,9 +11,17 @@ import { getTasks } from './Builder'
 import { Analysis, Dataset, Run, RunFilters, Task } from '../coretypes'
 import { datasetColumns } from '../HelperComponents'
 import { sortSub, sortNum, sortSes } from '../utils'
+import { DatasetDescription } from '../browser/DatasetDetailView'
 
 const FormItem = Form.Item
 const Panel = Collapse.Panel
+
+const DatasetDescriptionExpand = (
+  record: Dataset,
+  index,
+  indent,
+  string,
+): JSX.Element => <DatasetDescription {...record} />
 
 interface OverviewTabProps {
   analysis: Analysis
@@ -249,48 +247,6 @@ export class OverviewTab extends React.Component<
     { title: 'TR', dataIndex: 'TR', render: text => String(text) + 's' },
   ]
 
-  datasetExpandRow = (
-    record: Dataset,
-    index,
-    indent,
-    expanded,
-  ): JSX.Element => {
-    const rowData: {
-      title?: string
-      content: string | JSX.Element
-      span?: number
-    }[] = [
-      { content: record.longDescription ? record.longDescription : 'n/a' },
-      { title: 'Authors', content: record.authors.join(', ') },
-      {
-        title: 'Mean Age',
-        content: record.meanAge ? record.meanAge.toFixed(1) : 'n/a',
-        span: 1,
-      },
-      {
-        title: 'Percent Female',
-        content: record.percentFemale
-          ? (record.percentFemale * 100).toFixed(1)
-          : 'n/a',
-        span: 4,
-      },
-      {
-        title: 'References and Links',
-        content: React.createElement('a', { href: record.url }, [record.url]),
-      },
-    ]
-
-    return (
-      <Descriptions column={5} size="small">
-        {rowData.map((x, i) => (
-          <Descriptions.Item label={x.title} key={i} span={x.span ? x.span : 5}>
-            {x.content}
-          </Descriptions.Item>
-        ))}
-      </Descriptions>
-    )
-  }
-
   render() {
     const { analysis, datasets, availableRuns, selectedTaskId } = this.props
     const { searchText } = this.state
@@ -419,7 +375,7 @@ export class OverviewTab extends React.Component<
               pagination={
                 datasets.length > 10 ? { position: ['bottomCenter'] } : false
               }
-              expandedRowRender={this.datasetExpandRow}
+              expandedRowRender={DatasetDescriptionExpand}
             />
             <br />
             {availableRuns.length > 0 && (

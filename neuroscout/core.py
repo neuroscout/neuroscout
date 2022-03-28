@@ -33,6 +33,7 @@ route_factory(
     [
         ('DatasetResource', 'datasets/<int:dataset_id>'),
         ('DatasetListResource', 'datasets'),
+        ('DatasetAnalysisListResource', 'datasets/<int:dataset_id>/analyses'),
         ('AnalysisRootResource', 'analyses'),
         ('AnalysisResource', 'analyses/<analysis_id>'),
         ('AnalysisFullResource', 'analyses/<analysis_id>/full'),
@@ -49,6 +50,7 @@ route_factory(
         ('RunTimingResource', 'runs/<int:run_id>/timing'),
         ('PredictorListResource', 'predictors'),
         ('PredictorResource', 'predictors/<int:predictor_id>'),
+        ('PredictorRelatedResource', 'predictors/<predictor_id>/related'),
         ('PredictorCollectionResource', 'predictors/collection/<int:pc_id>'),
         ('PredictorCollectionCreateResource', 'predictors/collection'),
         ('PredictorEventListResource', 'predictor-events'),

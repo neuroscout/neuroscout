@@ -9,14 +9,14 @@ describe('The Home Page', () => {
       'have.attr', 'href', '/'
     )
     cy.get('.ant-menu').contains('Browse')
-    cy.get('.ant-menu').not('Public analyses')
+    cy.get('.ant-menu').not('Public Analyses')
     cy.get('.ant-menu').contains('Browse').click()
     cy.get('.ant-menu').contains('Browse').trigger('mouseover')
     cy.wait(100)
-    cy.get('.ant-menu').contains('Public analyses').should(
+    cy.get('.ant-menu').contains('Public Analyses').should(
       'have.attr', 'href', '/public'
     )
-    cy.get('.ant-menu').not('My analyses')
+    cy.get('.ant-menu').not('My Analyses')
     cy.get('.ant-menu').contains('Help').should(
       'have.attr', 'href', 'https://neuroscout.github.io/neuroscout/'
     )
@@ -38,7 +38,7 @@ describe('The Home Page', () => {
 
   it('test sign up button 1', () => {
     cy.get('.ant-modal-content').should('not.exist')
-    cy.get('.ant-btn').contains('Sign up to get started!').parent().click()
+    cy.get('.ant-btn').contains('Sign up to create analyses!').parent().click()
     cy.get('.ant-modal-content')
     cy.contains("Sign up for a Neuroscout account")
     cy.get('.ant-modal-close-x').click()

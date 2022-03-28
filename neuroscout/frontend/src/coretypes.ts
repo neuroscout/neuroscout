@@ -410,3 +410,9 @@ export type UpdateBuilderState = (
   keepClean?: boolean,
   saveToAPI?: boolean,
 ) => UpdateBuilderStateValue
+
+export interface PredictorRelatedDetails {
+  predictor?: Predictor
+  datasets: Dataset[]
+  analyses: AppAnalysis[]
+}

@@ -5,12 +5,23 @@ the home page or on the 'browse public analysis' page
 import * as React from 'react'
 import { Button, Row, Table, Tag, Input } from 'antd'
 import { CheckCircleTwoTone } from '@ant-design/icons'
-import { MainCol, Space, StatusTag } from './HelperComponents'
-import { AppAnalysis, AnalysisResources, Dataset } from './coretypes'
-import { api } from './api'
+import {
+  Header,
+  MainCol,
+  PredictorLink,
+  Space,
+  StatusTag,
+} from '../HelperComponents'
+import {
+  AppAnalysis,
+  AnalysisResources,
+  Dataset,
+  Predictor,
+} from '../coretypes'
+import { PredictorTagList } from './PredictorList'
+import { api } from '../api'
 import { Link, Redirect } from 'react-router-dom'
 import { ColumnsType } from 'antd/es/table'
-import { predictorColor } from './utils'
 
 import memoize from 'memoize-one'
 
@@ -35,16 +46,12 @@ class AnalysisResourcesDisplay extends React.Component<
       <div>
         <span className="ant-statistic-title">Predictors:</span>
         <Space />
-        {this.state.resources.predictors.map(predictor => (
-          <Tag key={predictor.name} color={predictorColor(predictor)}>
-            {' '}
-            {predictor.name}
-          </Tag>
-        ))}
+        <PredictorTagList predictors={this.state.resources.predictors} />
       </div>
     )
   }
 }
+
 const tableLocale = {
   filterConfirm: 'Ok',
   filterReset: 'Reset',
@@ -55,12 +62,13 @@ export interface AnalysisListProps {
   loggedIn?: boolean
   publicList?: boolean
   analyses: AppAnalysis[] | null
-  cloneAnalysis: (id: string) => Promise<string>
+  cloneAnalysis?: (id: string) => Promise<string>
   onDelete?: (analysis: AppAnalysis) => void
   children?: React.ReactNode
   datasets: Dataset[]
   loading?: boolean
   showOwner?: boolean
+  hideDatasets?: boolean
 }
 
 export class AnalysisListTable extends React.Component<
@@ -194,8 +202,16 @@ export class AnalysisListTable extends React.Component<
         onFilter: (value, record) => record.dataset_name === value,
         width: `${datasetWidth}ch`,
         textWrap: 'break-word',
+        render: (text, record) => (
+          <Link to={`/dataset/${record.dataset_id}`}>
+            {record.dataset_name}
+          </Link>
+        ),
       },
     ]
+    if (this.props.hideDatasets) {
+      analysisTableColumns.pop()
+    }
 
     if (showOwner) {
       analysisTableColumns.push({
@@ -221,6 +237,8 @@ export class AnalysisListTable extends React.Component<
       dataIndex: 'nv_count',
       width: '2ch',
       sorter: (a, b) => Number(a.nv_count) - Number(b.nv_count),
+      filters: [{ text: 'Has Uploads', value: 0 }],
+      onFilter: (value, record) => !!record.nv_count,
       render: (text, record: AppAnalysis) => {
         if (record.nv_count) {
           return <CheckCircleTwoTone twoToneColor="#52c41a" />
@@ -243,9 +261,11 @@ export class AnalysisListTable extends React.Component<
                   type="primary"
                   ghost
                   onClick={() => {
-                    void this.props.cloneAnalysis(record.id).then(id => {
-                      this.setState({ redirectId: id })
-                    })
+                    if (this.props.cloneAnalysis) {
+                      void this.props.cloneAnalysis(record.id).then(id => {
+                        this.setState({ redirectId: id })
+                      })
+                    }
                   }}
                 >
                   Clone
@@ -290,6 +310,7 @@ export class AnalysisListTable extends React.Component<
           }
           locale={tableLocale}
           className="analysisListTable"
+          style={{ width: '100%' }}
         />
       </>
     )
@@ -303,9 +324,11 @@ const AnalysisList = (props: AnalysisListProps): JSX.Element => {
       <Row justify="center">
         <MainCol>
           <div className="analysisListRouteWrapper">
-            <div className="analysisListTitle">
-              {props.publicList ? 'Public analyses' : 'Your saved analyses'}
-            </div>
+            <Header
+              title={
+                props.publicList ? 'Public analyses' : 'Your saved analyses'
+              }
+            />
             <AnalysisListTable {...props} />
           </div>
         </MainCol>

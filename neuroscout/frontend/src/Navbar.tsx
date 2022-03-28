@@ -12,7 +12,7 @@ import { MainCol, Space } from './HelperComponents'
 import { UserStore } from './user'
 
 class Navbar extends React.Component<UserStore, Record<string, never>> {
-  render() {
+  render(): JSX.Element {
     return (
       <Row justify="center" style={{ padding: 0 }}>
         <MainCol>
@@ -49,11 +49,17 @@ class Navbar extends React.Component<UserStore, Record<string, never>> {
             >
               {this.props.loggedIn && (
                 <Menu.Item key="mine">
-                  <Link to="/myanalyses">My analyses</Link>
+                  <Link to="/myanalyses">My Analyses</Link>
                 </Menu.Item>
               )}
               <Menu.Item key="public">
-                <Link to="/public">Public analyses</Link>
+                <Link to="/public">Public Analyses</Link>
+              </Menu.Item>
+              <Menu.Item key="predictors">
+                <Link to="/predictors">All Predictors</Link>
+              </Menu.Item>
+              <Menu.Item key="datasets">
+                <Link to="/datasets">All Datasets</Link>
               </Menu.Item>
             </Menu.SubMenu>
             <Menu.Item key="help">
