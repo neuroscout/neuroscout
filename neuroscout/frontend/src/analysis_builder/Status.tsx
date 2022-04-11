@@ -263,12 +263,8 @@ export class StatusTab extends React.Component<submitProps, statusTabState> {
                 />
               )}
               <br />
-              Run the analysis with this this command, replacing
-              <Text code>&apos;/local/outputdirectory&apos;</Text> with a local directory. <br></br> See the{' '}
-              <a href="https://neuroscout.github.io/neuroscout/cli/">
-                neuroscout-cli documentation{' '}
-              </a>
-              for a complete user guide.
+              Run the analysis with the following command, replacing
+              <Text code>&apos;/local/outputdirectory&apos;</Text> with a local directory. 
             </p>
             <pre>
               <code>
@@ -277,6 +273,13 @@ export class StatusTab extends React.Component<submitProps, statusTabState> {
                 {this.props.analysisId} /out
               </code>
             </pre>
+            <p>
+              <br></br> See the{' '}
+                <a href="https://neuroscout.github.io/neuroscout/cli/">
+                  neuroscout-cli documentation{' '}
+                </a>
+                for a complete user guide.
+            </p>
             <Card
               size="small"
               title="System Requirements"
