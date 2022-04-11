@@ -47,7 +47,7 @@ class Home extends React.Component<UserStore, Record<string, never>> {
                   type="default"
                   href="/predictors"
                 >
-                  Browse predictors
+                  Explore predictors
                 </Button>
                 <Button
                   size="large"
@@ -55,7 +55,7 @@ class Home extends React.Component<UserStore, Record<string, never>> {
                   type="default"
                   href="/datasets"
                 >
-                  Browse datasets
+                  View datasets
                 </Button>
                 <br />
                 {this.props.loggedIn === false && (
@@ -65,7 +65,7 @@ class Home extends React.Component<UserStore, Record<string, never>> {
                     type="primary"
                     onClick={e => this.props.update({ openSignup: true })}
                   >
-                    Sign up to create analyses!
+                    Sign up to get started!
                   </Button>
                 )}
               </div>

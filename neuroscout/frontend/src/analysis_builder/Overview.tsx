@@ -327,7 +327,7 @@ export class OverviewTab extends React.Component<
     return (
       <div className="builderCol">
         <Form layout="vertical">
-          <FormItem label="Analysis name" required>
+          <FormItem label="Name" required>
             <Row justify="space-between">
               <Col xs={24}>
                 <Input
