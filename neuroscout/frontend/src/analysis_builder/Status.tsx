@@ -254,16 +254,14 @@ export class StatusTab extends React.Component<submitProps, statusTabState> {
           <div>
             <h3>Analysis Passed</h3>
             <p>
-              {this.props.userOwns &&
-              (
+              {this.props.userOwns && (
                 <Alert
-                message="Passed"
-                description="Your analysis has been validated and compiled."
-                type="success"
-                showIcon
-              />
-              )
-                }
+                  message="Passed"
+                  description="Your analysis has been validated and compiled."
+                 type="success"
+                 showIcon
+                />
+              )}
               <br />
               Run the analysis with this this command, replacing
               &apos;/local/outputdirectory&apos; with a local directory. See the{' '}
