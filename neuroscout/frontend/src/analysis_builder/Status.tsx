@@ -1,5 +1,14 @@
 import * as React from 'react'
-import { Alert, Button, Card, Checkbox, Modal, Tooltip, Switch } from 'antd'
+import {
+  Alert,
+  Button,
+  Card,
+  Checkbox,
+  Modal,
+  Tooltip,
+  Switch,
+  Typography,
+} from 'antd'
 import memoize from 'memoize-one'
 
 import { config } from '../config'
@@ -11,6 +20,7 @@ import { Tracebacks } from './Report'
 import NeurovaultLinks from './NeuroVault'
 
 const domainRoot = config.server_url
+const { Text } = Typography
 
 export class DLLink extends React.Component<{
   status?: string
@@ -263,22 +273,32 @@ export class StatusTab extends React.Component<submitProps, statusTabState> {
                 />
               )}
               <br />
-              Run the analysis with the following command, replacing
-              <Text code>&apos;/local/outputdirectory&apos;</Text> with a local directory. 
+              Run the analysis using Docker, replacing
+              <Text code>/mydir</Text> with a local directory.
             </p>
             <pre>
               <code>
-                docker run --rm -it -v /local/outputdirectory:/out
+                docker run --rm -it -v /mydir:/out
                 {` neuroscout/neuroscout-cli${this.state.imageVersion} run `}
                 {this.props.analysisId} /out
               </code>
             </pre>
             <p>
-              <br></br> See the{' '}
-                <a href="https://neuroscout.github.io/neuroscout/cli/">
-                  neuroscout-cli documentation{' '}
-                </a>
-                for a complete user guide.
+              For help on how to use the <Text code>neuroscout-cli</Text>{' '}
+              execution engine, try:
+            </p>
+            <pre>
+              <code>
+                docker run --rm -it
+                {` neuroscout/neuroscout-cli${this.state.imageVersion} --help `}
+              </code>
+            </pre>
+            <p>
+              See the neuroscout-cli{' '}
+              <a href="https://neuroscout.github.io/neuroscout/cli/">
+                documentation{' '}
+              </a>
+              for a complete user guide.
             </p>
             <Card
               size="small"
