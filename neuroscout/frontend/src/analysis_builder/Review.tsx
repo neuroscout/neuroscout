@@ -221,7 +221,7 @@ export class Review extends React.Component<
             <Link to={`/profile/${String(this.props.user_name)}`}>
               {this.props.user_name}
             </Link>
-            <span className="ant-statistic-title">Author: </span>|{' '}
+            | <span className="ant-statistic-title">ID:</span>
             {this.props.analysisId}
             {this.props.modified_at && (
               <>
