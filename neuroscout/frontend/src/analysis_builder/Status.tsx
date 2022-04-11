@@ -267,7 +267,7 @@ export class StatusTab extends React.Component<submitProps, statusTabState> {
               {this.props.userOwns && (
                 <Alert
                   message="Passed"
-                  description="Your analysis has been validated and compiled."
+                  description="Analysis ID: {this.props.analysisId} has been validated and compiled."
                   type="success"
                   showIcon
                 />
