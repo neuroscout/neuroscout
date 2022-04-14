@@ -3,7 +3,7 @@ site_author: Alejandro de la Vega
 site_url: https://neuroscout.github.io/neuroscout/
 nav:
     - Home: index.md
-    - Building analyses:
+    - Analysis creation:
       - Getting started: builder/index.md
       - Predictors: builder/predictors.md
       - Transformations: builder/transformations.md
@@ -12,10 +12,10 @@ nav:
       - Review: builder/review.md
       - Run / Status: builder/run.md
       - Bibliography: builder/bib.md
-    - Browse analyses:
-      - Browse & manage: browse/index.md
+    - Browse & manage:
+      - Browse: browse/index.md
       - Clone: browse/clone.md
-    - Running analyses:
+    - Run analyses:
       - Introduction: cli/index.md
       - Docker: cli/docker.md
       - Singularity: cli/singularity.md
