@@ -22,6 +22,6 @@ nav:
       - General Usage: cli/usage.md
     - FAQ: faq.md
 
-theme: readthedocs
+theme: material
 markdown_extensions:
   - admonition
