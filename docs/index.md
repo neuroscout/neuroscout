@@ -12,28 +12,6 @@ Finally, we make it easy for researchers to _share their results_ with interacti
 
 If you're ready to build your own analysis, head over to [Getting Started](builder/index.md).
 
-## Table of Contents
-
-- Building analyses
-    - [Getting started](builder/index.md)
-    - [Predictors](builder/predictors.md)
-    - [Transformations](builder/transformations.md)
-    - [HRF Convolution](builder/hrf.md)
-    - [Contrasts](builder/contrasts.md)
-    - [Review](builder/review.md)
-    - [Run](builder/run.md)
-    - [Bibliography](builder/bib.md)
-- Browse analyses
-    - [Browse & manage](browse/index.md)
-    - [Clone](browse/clone.md)
-- Running analyses:
-    - [Introduction](cli/index.md)
-    - [Docker](cli/docker.md)
-    - [Singularity](cli/singularity.md)
-    - [General usage](cli/usage.md)
-- [FAQ](faq.md)
-
-
 ## Where can I get more help?
 
 The first time you use neuroscout.org, you will be given a tour of the interface. After the tour, be on the look out informational tooltips ("i" icon), provided throughout to clarify aspects of the web interface. Finally, please read the [FAQ](faq.md) thoroughly!
