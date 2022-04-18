@@ -1,20 +1,24 @@
 # What is Neuroscout?
 
-_Neuroscout is an online platform for fast and flexible analysis of fMRI data._
+_Neuroscout is an unified platform for generalizable and reproducible fMRI research._
 
-fMRI studies using complex naturalistic stimulation, such as movies or audio narratives, hold great promise to reveal the neural activity underlying dynamic perception. However, this potential is limited by the resource-intensive nature of fMRI analysis, and exacerbated by the difficulty of encoding relevant events in rich, multi-modal stimuli.
+Neuroscout is an end-to-end platform for analysis of *naturalistic* fMRI data designed to facilitate the adoption of *robust and generalizable research practices*. 
 
-Neuroscout leverages state-of-the-art _feature extraction_ tools to automatically extract hundreds of neural predictors from experimental stimuli. We pair this with an _easy-to-use [analysis builder](builder/index.md)_, enabling researchers to flexibly define novel statistical models.
+![fig2a](https://user-images.githubusercontent.com/2774448/163874691-c44ebc96-dd3f-4642-bf5a-0d1abd4ddbad.png)
 
-Analysis execution is achieved with _no configuration_ using self-contained bundles tied to unique analysis IDs, and run-time data retrieval using [DataLad](https://www.datalad.org/). Containerized _model-fitting pipelines_ minimize software dependencies and ensure _high portability_ across execution environments.
+Neuroscout leverages state-of-the-art machine learning models to *automatically annotate naturalistic stimuli* in [dozens of naturalistic fMRI datasets](https://neuroscout.org/datasets), resulting in [hundreds of potential neural predictors](https://neuroscout.org/predictors). 
 
-Finally, we make it easy for researchers to _share their results_ with interactive publication-like reports and statistical image hosting with [NeuroVault](https://www.neurovault.org/).
+We pair this with an _easy-to-use [analysis builder](builder/index.md)_, enabling researchers to flexibly define novel statistical models.
 
-If you're ready to build your own analysis, head over to [Getting Started](builder/index.md).
+![fig2b](https://user-images.githubusercontent.com/2774448/163874701-e2e6a18e-f9e6-451b-9014-ec2a2e3664e3.png)
+
+[Analysis execution](cli/index.md) is achieved with _no configuration_ using self-contained bundles tied to unique analysis IDs, and run-time data retrieval using [DataLad](https://www.datalad.org/). Containerized _model-fitting pipelines_ minimize software dependencies and ensure _high portability_ across execution environments.
+
+Finally, we make it easy for researchers to _share their results_ with interactive reports and automatic upload of statistical images to [NeuroVault](https://www.neurovault.org/).
 
 ## Where can I get more help?
 
-The first time you use neuroscout.org, you will be given a tour of the interface. After the tour, be on the look out informational tooltips ("i" icon), provided throughout to clarify aspects of the web interface. Finally, please read the [FAQ](faq.md) thoroughly!
+In the analysis builder, be on the look out informational tooltips ("i" icon), provided throughout to clarify aspects of the web interface. Also, please read the [FAQ](faq.md) if you have questions.
 
-For usage questions not addressed here, please ask a question on  [NeuroStars](https://neurostars.org). For bug reports, feature requests, feedback, etc.,
+For additional help, please ask questions on  [NeuroStars](https://neurostars.org/tag/neuroscout). For bug reports and feature requests 
 please open an issue on [open an issue on GitHub](https://github.com/neuroscout/neuroscout/issues).
