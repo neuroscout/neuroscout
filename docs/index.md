@@ -14,14 +14,15 @@ We pair this with an _easy-to-use [analysis builder](builder/index.md)_, enablin
 
 Finally, we make it easy for researchers to _share their results_ with interactive reports and automatic upload of statistical images to [NeuroVault](https://www.neurovault.org/).
 
-### Reference
-*Neuroscout, a unified platform for generalizable and reproducible fMRI research.*
-
-Alejandro de la Vega, Roberta Rocca, Ross W. Blair, Christopher J. Markiewicz, Jeff Mentch, James D. Kent, Peer Herholz, Satrajit S. Ghosh, Russell A. Poldrack, Tal Yarkoni.
-bioRxiv 2022.04.05.487222; doi: https://doi.org/10.1101/2022.04.05.487222 
 
 ## Where can I get more help?
 In the analysis builder, be on the look out informational tooltips ("i" icon), provided throughout to clarify aspects of the web interface. Also, please read the [FAQ](faq.md) if you have questions.
 
 For additional help, please ask questions on  [NeuroStars](https://neurostars.org/tag/neuroscout). For bug reports and feature requests 
 please open an issue on [open an issue on GitHub](https://github.com/neuroscout/neuroscout/issues).
+
+### Reference
+*Neuroscout, a unified platform for generalizable and reproducible fMRI research.*
+
+Alejandro de la Vega, Roberta Rocca, Ross W. Blair, Christopher J. Markiewicz, Jeff Mentch, James D. Kent, Peer Herholz, Satrajit S. Ghosh, Russell A. Poldrack, Tal Yarkoni.
+bioRxiv 2022.04.05.487222; doi: https://doi.org/10.1101/2022.04.05.487222 
