@@ -42,6 +42,7 @@ type FilesAndRunsFormProps = {
     runFilters: RunFilters
     display: boolean
   }[]
+  children?: React.ReactNode
 }
 
 function _empty(filters) {
