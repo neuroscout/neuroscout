@@ -1006,6 +1006,9 @@ export default class AnalysisBuilder extends React.Component<
           jwtFetch(`${domainRoot}/api/runs?dataset_id=${idParam}`)
             .then((data: Run[]) => {
               const availTasks = getTasks(datasets, updatedAnalysis.datasetId)
+              availTasks.map(
+                x => (x.description = x.description ? x.description : ''),
+              )
               updatedAnalysis.runIds = []
               if (updatedAnalysis.model && updatedAnalysis.model.Input) {
                 if (analysis.datasetId !== null) {

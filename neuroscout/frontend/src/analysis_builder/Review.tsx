@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { Col, Collapse, Card, Row, Table, Tag, Tooltip, Space } from 'antd'
+import { Col, Collapse, Card, Row, Table, Tooltip, Space } from 'antd'
 import { Link } from 'react-router-dom'
 
 import {
@@ -9,7 +9,7 @@ import {
   Contrast,
   BidsModel,
 } from '../coretypes'
-import { alphaSort, formatDbTime, predictorColor } from '../utils'
+import { alphaSort, formatDbTime } from '../utils'
 import { PredictorLink } from '../HelperComponents'
 import NeurovaultLinks from './NeuroVault'
 
@@ -56,7 +56,6 @@ class ModelInput extends React.Component<
       ? input.Run.sort().map(x => <li key={x}>{x}</li>)
       : []
     const sessions = input.Session ? alphaSort(input.Session).join(', ') : []
-
     return (
       <p>
         <div className="ant-statistic-title">Task</div>
@@ -215,7 +214,7 @@ export class Review extends React.Component<
 
     return (
       <Card title={Name}>
-        <p>
+        <div>
           <Space>
             <span className="ant-statistic-title">Author: </span>
             <Link to={`/profile/${String(this.props.user_name)}`}>
@@ -231,8 +230,8 @@ export class Review extends React.Component<
             )}
           </Space>
           <br />
-          {Description ? { Description } : 'No description'}
-        </p>
+          {Description ? Description : 'No description'}
+        </div>
         <Row gutter={[24, 16]}>
           {dataset && (
             <Col>
@@ -243,24 +242,24 @@ export class Review extends React.Component<
             <ModelInput model={model} />
           </Col>
           <Col>
-            <p>
+            <div>
               <div className="ant-statistic-title">Number of Subjects</div>
               <Tooltip title={subjectIds}>{numberOfSubjects}</Tooltip>
-            </p>
+            </div>
           </Col>
         </Row>
-        <p>
+        <div>
           <div className="ant-statistic-title">Predictors</div>
           {predictors.map(x => (
             <Tooltip key={x.name} title={x.description}>
               <PredictorLink {...x} />
             </Tooltip>
           ))}
-        </p>
-        <p>
+        </div>
+        <div>
           <div className="ant-statistic-title">Neurovault Uploads</div>
           <NeurovaultLinks analysisId={this.props.analysisId} />{' '}
-        </p>
+        </div>
       </Card>
     )
   }
