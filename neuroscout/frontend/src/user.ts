@@ -260,6 +260,7 @@ export class UserStore {
           password: '',
           loggedIn: true,
           nextURL: null,
+          openLogin: false,
           loginError: '',
         })
       })
