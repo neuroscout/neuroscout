@@ -1,9 +1,8 @@
 describe('Tour', () => {
   it('opens tour', () => {
     cy.visit('/')
-    cy.get('li').contains('Help').trigger('mouseover')
-    cy.wait(500)
-    cy.get('a').contains('Start Tour').click()
-    cy.get('div').contains('go on a tour!')
+    cy.login('user@example.com', 'string')
+    cy.wait(100)
+    cy.get('.ant-btn-primary').contains('Tour!').click()
   })
 })
