@@ -258,3 +258,17 @@ pre {
 .colorIndexPredictorList {
     margin-bottom: 20px;
 }
+
+@keyframes kfcolors {
+    0% {background:#1890ff;}
+    100% {background:#eb29f6;}
+}
+
+#rainbow-btn {
+    background:red;
+    animation: kfcolors ease;
+    animation-duration: 4s;
+    animation-iteration-count: infinite;
+}
+
+

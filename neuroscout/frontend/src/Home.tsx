@@ -73,6 +73,7 @@ class Home extends React.Component<UserStore, Record<string, never>> {
                   <Button
                     size="large"
                     className="splashButton"
+                    id="rainbow-btn"
                     type="primary"
                     onClick={e => this.props.update({ openTour: true })}
                   >
