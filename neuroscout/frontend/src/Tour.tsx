@@ -52,6 +52,9 @@ class Tour extends React.Component<TourProps, Record<string, never>> {
         : []),
     ]
 
+    if (!isOpen) {
+      return null
+    }
     return (
       <Reactour
         steps={steps}
