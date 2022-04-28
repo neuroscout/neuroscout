@@ -261,7 +261,8 @@ pre {
 
 @keyframes kfcolors {
     0% {background:#1890ff;}
-    100% {background:#eb29f6;}
+    50% {background:#eb29f6;}
+    100% {background:#1890ff;}
 }
 
 #rainbow-btn {
