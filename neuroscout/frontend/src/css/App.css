@@ -268,7 +268,7 @@ pre {
 #rainbow-btn {
     background:red;
     animation: kfcolors ease;
-    animation-duration: 4s;
+    animation-duration: 9s;
     animation-iteration-count: infinite;
 }
 
