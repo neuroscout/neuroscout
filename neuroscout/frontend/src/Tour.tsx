@@ -30,6 +30,7 @@ class Tour extends React.Component<TourProps, Record<string, never>> {
         ? [
             {
               action: () => history.push('/builder'),
+              content: '',
             },
           ]
         : pathname === '/builder'
