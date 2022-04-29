@@ -3,6 +3,7 @@
 */
 import * as React from 'react'
 import { Divider, Row, Col, Button, Card } from 'antd'
+import { CoffeeOutlined } from '@ant-design/icons'
 import { MainCol } from './HelperComponents'
 import { UserStore } from './user'
 import { BookOutlined } from '@ant-design/icons'
@@ -66,6 +67,18 @@ class Home extends React.Component<UserStore, Record<string, never>> {
                     onClick={e => this.props.update({ openSignup: true })}
                   >
                     Sign up to get started!
+                  </Button>
+                )}
+                {!this.props.loggedIn === false && (
+                  <Button
+                    size="large"
+                    className="splashButton"
+                    id="rainbow-btn"
+                    type="primary"
+                    onClick={e => this.props.update({ openTour: true })}
+                  >
+                    <CoffeeOutlined />
+                    Take a Tour!
                   </Button>
                 )}
               </div>

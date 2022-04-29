@@ -82,6 +82,7 @@ type submitProps = {
   private: boolean
   updateAnalysis?: (value: Partial<Analysis>) => void
   userOwns?: boolean
+  children?: React.ReactNode
 }
 
 export class Submit extends React.Component<

@@ -259,8 +259,8 @@ export class UserStore {
           jwt: jwt,
           password: '',
           loggedIn: true,
-          openLogin: false,
           nextURL: null,
+          openLogin: false,
           loginError: '',
         })
       })

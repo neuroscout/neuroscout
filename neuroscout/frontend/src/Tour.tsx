@@ -1,9 +1,17 @@
 import * as React from 'react'
 import Reactour from 'reactour'
 import { withRouter } from 'react-router-dom'
+import { RouteComponentProps } from 'react-router'
 
-const Tour = (isOpen, closeTour) => {
-  return withRouter(({ location: { pathname }, history }) => {
+type TourProps = RouteComponentProps & {
+  isOpen: boolean
+  closeTour: () => void
+}
+
+class Tour extends React.Component<TourProps, Record<string, never>> {
+  render() {
+    const { location, history, closeTour, isOpen } = this.props
+    const pathname = location.pathname
     const steps = [
       {
         content:
@@ -22,6 +30,7 @@ const Tour = (isOpen, closeTour) => {
         ? [
             {
               action: () => history.push('/builder'),
+              content: '',
             },
           ]
         : pathname === '/builder'
@@ -44,6 +53,9 @@ const Tour = (isOpen, closeTour) => {
         : []),
     ]
 
+    if (!isOpen) {
+      return null
+    }
     return (
       <Reactour
         steps={steps}
@@ -52,7 +64,7 @@ const Tour = (isOpen, closeTour) => {
         update={pathname}
       />
     )
-  })
+  }
 }
 
-export default Tour
+export default withRouter(Tour)
