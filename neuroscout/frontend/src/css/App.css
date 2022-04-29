@@ -260,15 +260,17 @@ pre {
 }
 
 @keyframes kfcolors {
-    0% {background:#1890ff;}
-    50% {background:#eb29f6;}
-    100% {background:#1890ff;}
+    0% {background:#69c0ff;}
+    40% {background:#1890ff;}
+    60% {background:#096dd9;}
+    100% {background:#0050b3;}
 }
 
 #rainbow-btn {
     background:red;
     animation: kfcolors ease;
-    animation-duration: 9s;
+    animation-direction: alternate;
+    animation-duration: 4s;
     animation-iteration-count: infinite;
 }
 
