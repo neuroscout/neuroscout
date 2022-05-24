@@ -1,0 +1,181 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   width="390"
+   height="90"
+   id="svg2"
+   version="1.1"
+   inkscape:version="1.1.2 (0a00cf5339, 2022-02-04)"
+   sodipodi:docname="neuroscout_simpler_dark_blue_medium.svg"
+   inkscape:export-filename="/home/zorro/Downloads/dark_blue.png"
+   inkscape:export-xdpi="90"
+   inkscape:export-ydpi="90"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <metadata
+     id="metadata49">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <defs
+     id="defs47">
+    <style
+       type="text/css"
+       id="style18849">
+   
+    .fil0 {fill:black;fill-rule:nonzero}
+   
+  </style>
+  </defs>
+  <sodipodi:namedview
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1"
+     objecttolerance="10"
+     gridtolerance="10"
+     guidetolerance="10"
+     inkscape:pageopacity="0"
+     inkscape:pageshadow="2"
+     inkscape:window-width="1551"
+     inkscape:window-height="752"
+     id="namedview45"
+     showgrid="false"
+     showguides="false"
+     inkscape:zoom="1.3350176"
+     inkscape:cx="241.19532"
+     inkscape:cy="49.063024"
+     inkscape:window-x="171"
+     inkscape:window-y="202"
+     inkscape:window-maximized="0"
+     inkscape:current-layer="g18864"
+     width="250px"
+     inkscape:pagecheckerboard="0" />
+  <style
+     type="text/css"
+     id="style4">.st0{fill:none;stroke:#000000;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;}
+	.st1{fill:none;stroke:#000000;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+	.st2{fill:none;stroke:#000000;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:2.9177,3.8902;}
+	.st3{fill:none;stroke:#000000;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:2.9655,3.954;}
+	.st4{fill:none;stroke:#000000;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:2.7633,3.6844;}
+	.st5{fill:none;stroke:#000000;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;}</style>
+  <g
+     id="g6"
+     transform="translate(0,-35)">
+    <title
+       id="title8">background</title>
+    <rect
+       id="canvas_background"
+       height="402"
+       width="582"
+       y="-1"
+       x="-1"
+       style="fill:none" />
+  </g>
+  <g
+     aria-label="Neuroscout"
+     id="text3377"
+     style="font-size:53.3333px;line-height:0%;letter-spacing:0px;word-spacing:0px;stroke-width:1px">
+    <path
+       d="M 117.75036,26.175585 V 56.735567 L 99.403702,26.175585 h -4.106665 v 37.173311 h 3.786665 V 32.628914 l 18.293318,30.719982 h 4.16 V 26.175585 Z"
+       style="line-height:1.25;font-family:'HK Grotesk';-inkscape-font-specification:'HK Grotesk';stroke:none;stroke-opacity:1;fill:#363636;fill-opacity:1"
+       id="path16195"
+       inkscape:export-filename="/home/zorro/Downloads/neuroscout_dark_blue_grey.png"
+       inkscape:export-xdpi="154.89"
+       inkscape:export-ydpi="154.89" />
+    <path
+       d="m 153.4303,48.895571 c 0,-5.973329 -3.36,-12.266659 -11.41333,-12.266659 -7.62666,0 -11.67999,6.29333 -11.67999,13.706658 0,7.466663 4.10666,13.439992 12.10666,13.439992 4.05333,0 7.09333,-1.173332 10.18666,-4.426664 l -2.56,-2.239998 c -2.4,2.559998 -4.69333,3.306664 -7.57333,3.306664 -5.17333,0 -8.37333,-3.466664 -8.47999,-9.226661 h 19.25332 c 0.10667,-0.639999 0.16,-1.546665 0.16,-2.293332 z m -11.41333,-9.173328 c 4.85333,0 7.57333,3.253332 7.84,7.519996 0,0.48 0.0533,0.746666 0.0533,0.853333 h -15.89332 c 0.32,-4.639997 3.25333,-8.373329 7.99999,-8.373329 z"
+       style="line-height:1.25;font-family:'HK Grotesk';-inkscape-font-specification:'HK Grotesk';stroke:none;stroke-opacity:1;fill:#363636;fill-opacity:1"
+       id="path16197"
+       inkscape:export-filename="/home/zorro/Downloads/neuroscout_dark_blue_grey.png"
+       inkscape:export-xdpi="154.89"
+       inkscape:export-ydpi="154.89" />
+    <path
+       d="m 177.4836,37.055578 v 12.10666 c 0,6.826662 -2.61333,11.359993 -7.83999,11.359993 -5.01333,0 -5.76,-3.999998 -5.76,-8.266662 V 37.055578 h -3.68 v 16.106657 c 0,6.506663 2.61333,10.613327 8.58666,10.613327 3.46667,0 6.82667,-1.386665 8.69333,-4.21333 v 3.786664 h 3.68 V 37.055578 Z"
+       style="line-height:1.25;font-family:'HK Grotesk';-inkscape-font-specification:'HK Grotesk';stroke:none;stroke-opacity:1;fill:#363636;fill-opacity:1"
+       id="path16199"
+       inkscape:export-filename="/home/zorro/Downloads/neuroscout_dark_blue_grey.png"
+       inkscape:export-xdpi="154.89"
+       inkscape:export-ydpi="154.89" />
+    <path
+       d="m 202.3369,36.628912 c -2.66667,0 -5.86667,0.906666 -7.78667,4.373331 v -3.946665 h -3.67999 v 26.293318 h 3.67999 V 48.682238 c 0,-5.706663 2.98667,-8.746661 7.04,-8.746661 1.12,0 2.24,0.266666 3.46667,0.799999 l 1.81333,-2.986665 c -1.44,-0.799999 -2.93333,-1.119999 -4.53333,-1.119999 z"
+       style="line-height:1.25;font-family:'HK Grotesk';-inkscape-font-specification:'HK Grotesk';stroke:none;stroke-opacity:1;fill:#363636;fill-opacity:1"
+       id="path16201"
+       inkscape:export-filename="/home/zorro/Downloads/neuroscout_dark_blue_grey.png"
+       inkscape:export-xdpi="154.89"
+       inkscape:export-ydpi="154.89" />
+    <path
+       d="m 220.20347,63.775562 c 7.52,0 12.64,-5.866663 12.64,-13.599991 0,-7.786662 -5.17333,-13.546659 -12.64,-13.546659 -7.51999,0 -12.58666,5.759997 -12.58666,13.546659 0,7.786662 5.06667,13.599991 12.58666,13.599991 z m 0,-3.253331 c -5.59999,0 -8.90666,-4.373331 -8.90666,-10.34666 0,-5.919997 3.25333,-10.293328 8.90666,-10.293328 5.6,0 8.96,4.319998 8.96,10.293328 0,5.866663 -3.30667,10.34666 -8.96,10.34666 z"
+       style="line-height:1.25;font-family:'HK Grotesk';-inkscape-font-specification:'HK Grotesk';stroke:none;stroke-opacity:1;fill:#363636;fill-opacity:1"
+       id="path16203"
+       inkscape:export-filename="/home/zorro/Downloads/neuroscout_dark_blue_grey.png"
+       inkscape:export-xdpi="154.89"
+       inkscape:export-ydpi="154.89" />
+    <path
+       d="m 248.20337,63.775562 c 5.06667,0 9.44,-2.666665 9.44,-7.999995 0,-9.973327 -15.19999,-6.026663 -15.19999,-12.266659 0,-2.293332 2.08,-3.626665 5.33333,-3.626665 3.25333,0 5.33333,1.493333 6.61333,3.839998 l 2.93333,-1.599999 c -1.81333,-3.733331 -5.22667,-5.49333 -9.44,-5.49333 -5.27999,0 -9.01332,2.826665 -9.01332,7.413329 0,9.333328 15.14665,4.959997 15.14665,11.946659 0,2.773332 -2.29333,4.533331 -5.86666,4.533331 -4.10666,0 -6.66666,-2.293332 -7.62666,-5.01333 l -3.09333,1.386666 c 1.38666,4.21333 5.59999,6.879995 10.77332,6.879995 z"
+       style="line-height:1.25;font-family:'HK Grotesk';-inkscape-font-specification:'HK Grotesk';stroke:none;stroke-opacity:1;fill:#363636;fill-opacity:1"
+       id="path16205"
+       inkscape:export-filename="/home/zorro/Downloads/neuroscout_dark_blue_grey.png"
+       inkscape:export-xdpi="154.89"
+       inkscape:export-ydpi="154.89" />
+    <path
+       d="m 274.54994,63.775562 c 4.74666,0 8.58666,-2.506665 10.34666,-7.306662 l -3.41334,-1.279999 c -1.01333,3.359998 -3.62666,5.33333 -6.93332,5.33333 -5.65333,0 -8.16,-4.85333 -8.16,-10.239994 0,-5.386663 2.50667,-10.399994 8.10666,-10.399994 3.30667,0 5.92,2.026666 7.14666,5.386664 l 3.52,-1.386666 c -2.08,-4.906664 -5.97333,-7.253329 -10.66666,-7.253329 -7.94666,0 -11.83999,6.719996 -11.83999,13.653325 0,7.306662 4.26666,13.493325 11.89333,13.493325 z"
+       style="line-height:1.25;font-family:'HK Grotesk';-inkscape-font-specification:'HK Grotesk';stroke:none;stroke-opacity:1;fill:#363636;fill-opacity:1"
+       id="path16207"
+       inkscape:export-filename="/home/zorro/Downloads/neuroscout_dark_blue_grey.png"
+       inkscape:export-xdpi="154.89"
+       inkscape:export-ydpi="154.89" />
+    <path
+       d="m 301.96317,63.775562 c 7.52,0 12.63999,-5.866663 12.63999,-13.599991 0,-7.786662 -5.17333,-13.546659 -12.63999,-13.546659 -7.51999,0 -12.58666,5.759997 -12.58666,13.546659 0,7.786662 5.06667,13.599991 12.58666,13.599991 z m 0,-3.253331 c -5.6,0 -8.90666,-4.373331 -8.90666,-10.34666 0,-5.919997 3.25333,-10.293328 8.90666,-10.293328 5.6,0 8.96,4.319998 8.96,10.293328 0,5.866663 -3.30667,10.34666 -8.96,10.34666 z"
+       style="line-height:1.25;font-family:'HK Grotesk';-inkscape-font-specification:'HK Grotesk';stroke:none;stroke-opacity:1;fill:#363636;fill-opacity:1"
+       id="path16209"
+       inkscape:export-filename="/home/zorro/Downloads/neuroscout_dark_blue_grey.png"
+       inkscape:export-xdpi="154.89"
+       inkscape:export-ydpi="154.89" />
+    <path
+       d="m 338.38967,37.055578 v 12.10666 c 0,6.826662 -2.61333,11.359993 -7.84,11.359993 -5.01333,0 -5.75999,-3.999998 -5.75999,-8.266662 V 37.055578 h -3.68 v 16.106657 c 0,6.506663 2.61333,10.613327 8.58666,10.613327 3.46666,0 6.82666,-1.386665 8.69333,-4.21333 v 3.786664 h 3.68 V 37.055578 Z"
+       style="line-height:1.25;font-family:'HK Grotesk';-inkscape-font-specification:'HK Grotesk';stroke:none;stroke-opacity:1;fill:#363636;fill-opacity:1"
+       id="path16211"
+       inkscape:export-filename="/home/zorro/Downloads/neuroscout_dark_blue_grey.png"
+       inkscape:export-xdpi="154.89"
+       inkscape:export-ydpi="154.89" />
+    <path
+       d="m 362.6563,59.828898 c -1.17334,0.373333 -2.18667,0.586666 -3.09333,0.586666 -2.08,0 -3.25334,-1.173332 -3.25334,-3.733331 V 40.14891 h 6.34667 v -3.093332 h -6.34667 v -9.599994 l -3.67999,2.773332 v 6.826662 h -4.37333 v 3.093332 h 4.37333 v 17.013323 c 0,4.639997 2.56,6.613329 6.07999,6.613329 1.22667,0 2.61334,-0.266666 4,-0.693332 z"
+       style="line-height:1.25;font-family:'HK Grotesk';-inkscape-font-specification:'HK Grotesk';stroke:none;stroke-opacity:1;fill:#363636;fill-opacity:1"
+       id="path16213"
+       inkscape:export-filename="/home/zorro/Downloads/neuroscout_dark_blue_grey.png"
+       inkscape:export-xdpi="154.89"
+       inkscape:export-ydpi="154.89" />
+  </g>
+  <style
+     type="text/css"
+     id="style4-7">.st0{fill:none;stroke:#000000;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;}
+	.st1{fill:none;stroke:#000000;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+	.st2{fill:none;stroke:#000000;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:2.9177,3.8902;}
+	.st3{fill:none;stroke:#000000;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:2.9655,3.954;}
+	.st4{fill:none;stroke:#000000;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:2.7633,3.6844;}
+	.st5{fill:none;stroke:#000000;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;}</style>
+  <g
+     style="clip-rule:evenodd;fill-rule:evenodd;image-rendering:optimizeQuality;shape-rendering:geometricPrecision;text-rendering:geometricPrecision"
+     id="g18864"
+     transform="matrix(0.08404081,0,0,0.08404081,11.839533,8.1429684)"
+     inkscape:export-filename="/home/zorro/Downloads/neuroscout_dark_blue_grey.png"
+     inkscape:export-xdpi="154.89"
+     inkscape:export-ydpi="154.89">
+    <path
+       class="fil0"
+       d="m 423.33,777.26 c 78.64682,0 151.29971,-25.64779 210.05141,-69.03609 C 720.65954,643.76875 777.26,540.16318 777.26,423.33 777.26,227.85 618.81,69.4 423.33,69.4 227.85,69.4 69.4,227.85 69.4,423.33 c 0,195.48 158.45,353.93 353.93,353.93 z m 22.2,-35.54 C 604.1,730.82 730.83,604.1 741.72,445.53 h -56.2 v -44.4 h 56.2 C 730.83,242.56 604.1,115.84 445.53,104.94 v 56.2 h -44.4 v -56.2 c -158.57,10.9 -285.3,137.62 -296.19,296.19 h 56.2 v 44.4 h -56.2 c 10.89,158.57 137.62,285.29 296.19,296.19 v -56.2 h 44.4 z M 557.56,241.13 516.72,461.98 c -1.69,9.14 -6.15,16.88 -13.22,22.91 L 332.65,630.68 c -21.57,18.44 -48.72,2.76 -43.55,-25.15 l 40.84,-220.85 c 1.69,-9.14 6.15,-16.88 13.22,-22.91 L 514.01,215.98 c 21.57,-18.44 48.72,-2.76 43.55,25.15 z M 440.98,392.75 c 16.89,9.76 22.67,31.35 12.93,48.23 -9.76,16.89 -31.35,22.67 -48.24,12.93 -16.88,-9.76 -22.66,-31.35 -12.92,-48.23 9.76,-16.89 31.35,-22.67 48.23,-12.93 z m -17.65,425.38 c -218.04,0 -394.8,-176.76 -394.8,-394.8 0,-218.04 176.76,-394.8 394.8,-394.8 218.04,0 394.8,176.76 394.8,394.8 0,218.04 -176.76,394.8 -394.8,394.8 z"
+       id="path18853"
+       style="fill:#3e68b6;fill-opacity:0.91165847"
+       sodipodi:nodetypes="sssssscccccccccccccccccccccccccccccccsssss" />
+  </g>
+</svg>
