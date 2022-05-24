@@ -22,11 +22,9 @@ class Navbar extends React.Component<UserStore, Record<string, never>> {
             selectedKeys={[]}
           >
             <Menu.Item style={{ marginRight: 'auto' }} key="home">
-              <div className="headLogo">
-                <Link to="/">
-                  <img src="/static/neuroscout_simpler_dark_blue_medium.svg" />
-                </Link>
-              </div>
+              <Link to="/" style={{ fontSize: 20 }}>
+                Neuroscout
+              </Link>
             </Menu.Item>
             {this.props.loggedIn && (
               <Menu.Item key="create" className="newAnalysis">
