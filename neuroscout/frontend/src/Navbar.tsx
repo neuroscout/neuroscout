@@ -23,8 +23,9 @@ class Navbar extends React.Component<UserStore, Record<string, never>> {
           >
             <Menu.Item style={{ marginRight: 'auto' }} key="home">
               <Link to="/" style={{ fontSize: 20 }}>
-                Neuroscout
-              </Link>
+              <img
+                src="/static/neuroscout_simpler_dark_blue_medium.svg"
+              />              </Link>
             </Menu.Item>
             {this.props.loggedIn && (
               <Menu.Item key="create" className="newAnalysis">
