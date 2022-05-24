@@ -23,11 +23,8 @@ class Home extends React.Component<UserStore, Record<string, never>> {
             <div>
               <img
                 className="splashLogo"
-                src="/static/neuroscout_blue_compass.svg"
+                src="/static/neuroscout_simpler_dark_blue.svg"
               />
-              <div className="splashText">
-                Neuroscout
-              </div>
               <br />
               <div className="splashText">
                 A platform for fast and flexible re-analysis of (naturalistic)
