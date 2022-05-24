@@ -23,7 +23,7 @@ class Home extends React.Component<UserStore, Record<string, never>> {
             <div>
               <img
                 className="splashLogo"
-                src="/static/neuroscout_simpler_dark_blue.svg"
+                src="/static/neuroscout_simpler_dark_blue_medium.svg"
               />
               <br />
               <div className="splashText">
