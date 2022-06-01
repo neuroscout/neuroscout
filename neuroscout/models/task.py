@@ -33,7 +33,7 @@ class Task(db.Model):
         """ Number of runs per subject """
         runs = [r[1] for r in db.session.query(
             Run.subject, func.count(Run.id)).filter_by(
-                task_id=self.id).group_by(Run.subject)])
+                task_id=self.id).group_by(Run.subject)]
         return statistics.mean(runs) if runs else 0
             
     @hybrid_property
