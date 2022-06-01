@@ -11,7 +11,6 @@ describe('Analysis Builder', () => {
   let predCount = 3;
   it('analysis builder', () => {
     cy.login('user@example.com', 'string')
-    cy.wait(1000)
     cy.get('.newAnalysis a')
     cy.visit('/builder')
 
@@ -91,7 +90,6 @@ describe('Analysis Builder', () => {
      */
     cy.get('.statusTOS').get('button:disabled')
     cy.get('span').contains('terms of service').parent().find('input').check()
-    cy.wait(500)
     cy.get('.statusTOS').get('span:visible').contains('Generate').parent().click()
     cy.intercept('GET', '**/report**', (req) => {
       req.reply(dmResp)
