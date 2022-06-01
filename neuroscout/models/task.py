@@ -31,11 +31,11 @@ class Task(db.Model):
     @hybrid_property
     def n_runs_subject(self):
         """ Number of runs per subject """
-        return statistics.mean(
-            [r[1] for r in db.session.query(
-                Run.subject, func.count(Run.id)).filter_by(
-                    task_id=self.id).group_by(Run.subject)])
-
+        runs = [r[1] for r in db.session.query(
+            Run.subject, func.count(Run.id)).filter_by(
+                task_id=self.id).group_by(Run.subject)])
+        return statistics.mean(runs) if runs else 0
+            
     @hybrid_property
     def avg_run_duration(self):
         """ Average run duration (seconds) """
