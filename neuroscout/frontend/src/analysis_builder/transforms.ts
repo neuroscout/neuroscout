@@ -16,12 +16,16 @@ const transformDefinitions: Transformation[] = [
     ReplaceNA: 'after' as ReplaceNA,
   },
   {
+    Name: 'Orthogonalize',
+    Other: [],
+  },
+  {
     Name: 'Threshold',
     Threshold: 0,
     Above: true,
     Binarize: false,
     Signed: true,
-  }
+  },
 ]
 
 export default transformDefinitions
