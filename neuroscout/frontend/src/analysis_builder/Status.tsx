@@ -254,7 +254,7 @@ export class StatusTab extends React.Component<submitProps, statusTabState> {
           )}
 
           {this.props.status === 'PASSED' && (
-            <a href="https://colab.research.google.com/github/neuroscout/neuroscout-cli/blob/master/examples/Neuroscout_Colab_Demo_NoMount.ipynb">
+            <a href="https://colab.research.google.com/github/neuroscout/neuroscout-cli/blob/master/examples/Neuroscout_Colab_Demo_NoMount.ipynb" class="colab-tag">
               <img
                 data-canonical-src="https://colab.research.google.com/assets/colab-badge.svg"
                 alt="Open In Colab"
