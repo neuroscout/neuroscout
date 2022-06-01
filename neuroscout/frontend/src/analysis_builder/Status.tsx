@@ -78,7 +78,7 @@ type submitProps = {
   analysisId?: string
   name?: string
   modified_at?: string
-  confirmSubmission: (build: boolean) => void
+  submitAnalysis: (build: boolean) => void
   private: boolean
   updateAnalysis?: (value: Partial<Analysis>) => void
   userOwns?: boolean
@@ -181,7 +181,7 @@ export class Submit extends React.Component<
         <br />
         <Button
           hidden={!this.props.analysisId}
-          onClick={this.props.confirmSubmission.bind(this, this.state.validate)}
+          onClick={this.props.submitAnalysis.bind(this, this.state.validate)}
           type={'primary'}
           disabled={
             !this.state.tosAgree ||
@@ -254,7 +254,10 @@ export class StatusTab extends React.Component<submitProps, statusTabState> {
           )}
 
           {this.props.status === 'PASSED' && (
-            <a href="https://colab.research.google.com/github/neuroscout/neuroscout-cli/blob/master/examples/Neuroscout_Colab_Demo_NoMount.ipynb" class="colab-tag">
+            <a
+              href="https://colab.research.google.com/github/neuroscout/neuroscout-cli/blob/master/examples/Neuroscout_Colab_Demo_NoMount.ipynb"
+              className="colab-tag"
+            >
               <img
                 data-canonical-src="https://colab.research.google.com/assets/colab-badge.svg"
                 alt="Open In Colab"
@@ -331,7 +334,7 @@ export class StatusTab extends React.Component<submitProps, statusTabState> {
             status={this.props.status}
             name={this.props.name}
             analysisId={this.props.analysisId}
-            confirmSubmission={this.props.confirmSubmission}
+            submitAnalysis={this.props.submitAnalysis}
             private={this.props.private}
           />
         )}

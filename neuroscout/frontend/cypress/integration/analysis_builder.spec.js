@@ -86,8 +86,7 @@ describe('Analysis Builder', () => {
         - ensure that generate button disabled
         - toggle TOS checkbox
         - generate button should now be enabled, hit it
-        - confirm in popup modal
-        - ensure transition to pending status after we confirm submit
+        - ensure transition to pending status after we submit
      */
     cy.get('.statusTOS').get('button:disabled')
     cy.get('span').contains('terms of service').parent().find('input').check()
@@ -103,8 +102,6 @@ describe('Analysis Builder', () => {
       statusCode: 200,
       body: {'status': 'PENDING', 'traceback': ''}
     })
-
-    cy.get('.ant-modal-body').contains('submit the analysis').get('button').contains('Yes').parent().click()
 
     cy.contains('Analysis Pending Generation')
   });
