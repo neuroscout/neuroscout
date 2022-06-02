@@ -4,5 +4,8 @@
   "retries": { "runMode": 1, "openMode": 1 },
   "defaultCommandTimeout": 30000,
   "pageLoadTimeout": 180000,
-  "requestTimeout": 30000 
+  "requestTimeout": 30000,
+  "numTestsKeptInMemory": 0,
+  "video": false,
+  "videoUploadOnPasses": false
 }

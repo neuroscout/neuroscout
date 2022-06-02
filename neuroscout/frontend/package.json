@@ -71,7 +71,8 @@
     "test": "react-scripts test --env=jsdom",
     "eject": "react-scripts eject",
     "cy:open": "cypress open",
-    "cy:run": "cypress run"
+    "cy:run": "cypress run",
+    "format": "eslint --fix --ext .ts,.tsx ."
   },
   "browserslist": {
     "production": [
