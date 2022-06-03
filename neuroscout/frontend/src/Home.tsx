@@ -3,10 +3,9 @@
 */
 import * as React from 'react'
 import { Divider, Row, Col, Button, Card } from 'antd'
-import { CoffeeOutlined } from '@ant-design/icons'
+import { CoffeeOutlined, BookOutlined } from '@ant-design/icons'
 import { MainCol } from './HelperComponents'
 import { UserStore } from './user'
-import { BookOutlined } from '@ant-design/icons'
 
 const titleStyle: any = {
   textAlign: 'center' as React.CSSProperties,

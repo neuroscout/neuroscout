@@ -690,19 +690,9 @@ export default class AnalysisBuilder extends React.Component<
     }
   }
 
-  confirmSubmission = (build: boolean): void => {
+  submitAnalysis = (build: boolean): void => {
     if (!this.submitEnabled()) return
-    const { saveAnalysis } = this
-    Modal.confirm({
-      title: 'Are you sure you want to submit the analysis?',
-      content: `Once you submit an analysis you will no longer be able to modify it.
-                You will, however, be able to clone it as a starting point for a new analysis.`,
-      okText: 'Yes',
-      cancelText: 'No',
-      onOk() {
-        void saveAnalysis({ compile: true, build: build })()
-      },
-    })
+    this.saveAnalysis({ compile: true, build: build })()
   }
 
   nextTab = (direction = 1) => {
@@ -1646,7 +1636,7 @@ export default class AnalysisBuilder extends React.Component<
                       status={analysis.status}
                       name={analysis.name}
                       analysisId={analysis.analysisId}
-                      confirmSubmission={this.confirmSubmission}
+                      submitAnalysis={this.submitAnalysis}
                       private={analysis.private || false}
                       updateAnalysis={this.updateAnalysis}
                       userOwns={this.props.userOwns}

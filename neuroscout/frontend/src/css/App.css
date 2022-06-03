@@ -274,4 +274,6 @@ pre {
     animation-iteration-count: infinite;
 }
 
-
+.colab-tag {
+    margin: 0px 8px;
+}

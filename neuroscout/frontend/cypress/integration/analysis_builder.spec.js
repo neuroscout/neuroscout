@@ -11,7 +11,7 @@ describe('Analysis Builder', () => {
   let predCount = 3;
   it('analysis builder', () => {
     cy.login('user@example.com', 'string')
-    cy.get('.newAnalysis a')
+    cy.get('.newAnalysis')
     cy.visit('/builder')
 
     /* Overview Tab */
@@ -61,7 +61,7 @@ describe('Analysis Builder', () => {
     cy.get('button:visible').contains('Next').parent().click()
 
     /* Contrast Tab - generate dummy contrasts, then delete one of them */
-    cy.get('button').contains('Generate Dummy').parent().click()
+    cy.get('button').contains('Generate Dummy').parent().trigger("click")
     cy.get('.ant-list:visible').find('.ant-btn-dangerous').its('length').should('be.eq', predCount)
     cy.get('.ant-list:visible').find('.ant-btn-dangerous').first().click()
     cy.get('.ant-list:visible').find('.ant-btn-dangerous').its('length').should('be.eq', predCount - 1)
@@ -86,8 +86,7 @@ describe('Analysis Builder', () => {
         - ensure that generate button disabled
         - toggle TOS checkbox
         - generate button should now be enabled, hit it
-        - confirm in popup modal
-        - ensure transition to pending status after we confirm submit
+        - ensure transition to pending status after we submit
      */
     cy.get('.statusTOS').get('button:disabled')
     cy.get('span').contains('terms of service').parent().find('input').check()
@@ -103,8 +102,6 @@ describe('Analysis Builder', () => {
       statusCode: 200,
       body: {'status': 'PENDING', 'traceback': ''}
     })
-
-    cy.get('.ant-modal-body').contains('submit the analysis').get('button').contains('Yes').parent().click()
 
     cy.contains('Analysis Pending Generation')
   });
