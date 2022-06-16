@@ -18,7 +18,7 @@ Finally, we make it easy for researchers to _share their results_ with interacti
 The _Analysis creation_ section serves as a step-by-step tutorial demonstrating how an analysis is created on the neuroscout website. Follow along through the sections sequentially to create an analysis or skip around for more information about sections of interest as needed. See _Browse & manage_ for details on viewing and working with already generated analyses. For information about running analyses using containers or the command line interface, see the _Run analyses_ section.
 
 ## Where can I get more help?
-In the analysis builder, be on the look out informational tooltips ("i" icon), provided throughout to clarify aspects of the web interface. Also, please read the [FAQ](faq.md) if you have questions.
+In the analysis builder, be on the look out for informational tooltips ("i" icon), provided throughout to clarify aspects of the web interface. Also, please read the [FAQ](faq.md) if you have questions.
 
 For additional help, please ask questions on  [NeuroStars](https://neurostars.org/tag/neuroscout). For bug reports and feature requests 
 please open an issue on [open an issue on GitHub](https://github.com/neuroscout/neuroscout/issues).
