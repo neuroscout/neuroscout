@@ -24,8 +24,8 @@ In the bottom plot, you can explore the predictor time courses in more detail. B
 
 ![Correlation matrix](img/review_cm.png)
 
-The correlation matrix provides you can opportunity to review the covariance between your predictors.
-Note that predictors that are highlight correlated with each other may result in a rank deficient design matrix which will cause model fitting to fail.
+The correlation matrix provides you an opportunity to review the covariance between your predictors.
+Note that predictors that are highly correlated with each other may result in a rank deficient design matrix which will cause model fitting to fail.
 
 !!! Hint
     Hover over values in the plot to see the correlation r-values.
