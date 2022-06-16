@@ -47,7 +47,7 @@ Once you've selected a dataset, you'll be able to choose which task and runs you
 
 Currently, we only support analyzing one task at a time. By default, all runs for that task are selected.
 
-If you want to select specific runs to analyze, either to only analyses a group of subjects, or to omit certain runs that might have a known issue, you can use the run selector interface.
+If you want to select specific runs to analyze, either to only analyze a subset of subjects, or to omit certain runs that might have a known issue, you can use the run selector interface.
 
 ![Select runs](img/runs.png)
 
