@@ -10,6 +10,8 @@ The recommended way to install and use _neuroscout-cli_ is using containers (i.e
 
 You can also install _neuroscout-cli_ directly on your system using a manually prepared environment, although this typically requires more effort. 
 
+A third method of running analyses is Google Colab, though larger analyses will take longer to run using the limited free resources.
+
 ### Containerized Execution
 
 #### Docker
@@ -23,6 +25,10 @@ Next, follow our guide for running [Neuroscout on Docker](docker.md)
 [Singularity](https://sylabs.io/singularity/) containers are a great solution for High Performance Computing (HPC) environments, where _Docker_ cannot typically be used due to more tightly controlled [user privileges](https://researchcomputing.princeton.edu/support/knowledge-base/singularity).
 
 First, check with your HPC administrator that _Singularity_ is available for use. If so, follow our guide for running [Neuroscout on Singularity](singulraity.md).
+
+### Google Colab
+
+A Google colab notebook is available [here](https://colab.research.google.com/github/neuroscout/neuroscout-cli/blob/master/examples/Neuroscout_Colab_Demo_NoMount.ipynb) where you can run a sample pre-generated analysis with an already provided id or provide your own analysis id. To run your own analysis, copy your id into the field in the cell labelled _1) Set Neuroscout Analysis ID_ and then run all of the cells. The provided id will run 10 subjects and 1 run from the Budapest dataset, and may take around 15 minutes. Larger analyses will take longer due to the limited free resources.
 
 ### Manually prepared environment
 

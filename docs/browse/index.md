@@ -1,6 +1,6 @@
 # Browsing analyses
 
-Neuroscout let's you browse analyses you've created, as well as analyses that are publicly listed by other members of the community.
+Neuroscout lets you browse analyses you've created, as well as analyses that are publicly listed by other members of the community.
 
 To browse analyses, select `My analyses` or `Public analyses` under `Browse` in the navigation bar. Sort by any column by clicking on it.
 
