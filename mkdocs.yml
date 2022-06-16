@@ -3,7 +3,7 @@ site_author: Alejandro de la Vega
 site_url: https://neuroscout.github.io/neuroscout/
 nav:
     - Home: index.md
-    - Analysis Tutorial:
+    - Analysis creation:
       - Getting started: builder/index.md
       - Predictors: builder/predictors.md
       - Transformations: builder/transformations.md
