@@ -1,4 +1,4 @@
-# Finalize and Run
+# Analysis Bundle Generation
 
 After you've reviewed your analysis, you need to generate an executable analysis bundle prior to being able to execute it.
 
@@ -15,7 +15,7 @@ If you agree to the terms, click `Generate` to submit.
 Be patient, analysis bundle generation may take a while.
 If you're in a rush, and are willing to risk additional run-time errors, uncheck `Validate design matrix`.
 
-# Status
+# After submission
 
 After submitting your analysis, it will no longer be editable unless there is an error in your design that you must fix.
 
@@ -23,7 +23,7 @@ If your analysis successfully compiles, an example `neuroscout-cli` command will
 
 ![Run Command](img/run_command.png)
 
-For more information on how to execute an analysis, head over to the [neuroscout-cli](../cli/index.md) documentation.
+For more information on how to execute an analysis, head over to the [Run analysis](../cli/index.md) section.
 
 !!! Note
     After your analysis is compiled, you can change the public/private settings of your analysis, as well as edit the `name` and `description`.
