@@ -4,7 +4,7 @@
 ### Is this service free to use?
 
 Yes! Note, however, that Neuroscout is a web-based engine for fMRI analysis specification; at the moment,
-we don't provide free computing resources for the execution of the resulting analysis bundles.
+we don't provide free computing resources for the execution of the resulting analysis bundles. Analyses can be run on Google Colab and a demo notebook is provided [here](https://colab.research.google.com/github/neuroscout/neuroscout-cli/blob/master/examples/Neuroscout_Colab_Demo_NoMount.ipynb).
 
 ### I plan to publish results I've obtained using Neuroscout, how do I cite?
 
