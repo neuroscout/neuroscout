@@ -1,6 +1,6 @@
 # Select Predictors
 
-In this tab, you can browse and search from hundreds automatically extracted predictors to include in your model.
+In this tab, you can browse and search from hundreds of automatically extracted predictors to include in your model.
 
 ![Select predictors](img/predictors.png)
 
