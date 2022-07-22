@@ -15,11 +15,9 @@ class TaskResource(MethodResource):
 class TaskListResource(MethodResource):
     @doc(tags=['run'], summary='Returns list of tasks.')
     @use_kwargs({
-        'dataset_id': fields.Int(description='Dataset id(s).'),
+        'dataset_id': fields.Int(description='Dataset id.'),
+        'name': fields.Str(description="Task name")
     }, location='query')
     @marshal_with(TaskSchema(many=True))
     def get(self, **kwargs):
-        query = Task.query
-        for param in kwargs:
-            query = query.filter(getattr(Task, param) == kwargs[param])
-        return query.all()
+        return Task.query.filter_by(**kwargs).all()

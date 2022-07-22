@@ -18,14 +18,14 @@ class DatasetListResource(MethodResource):
     @doc(tags=['dataset'], summary='Returns list of datasets.')
     @use_kwargs({
         'active_only': fields.Boolean(
-            missing=True, description="Return only active Datasets")
+            missing=True, description="Return only active Datasets"),
+        'name': fields.Str(description="Dataset name"),
         },
         location='query')
     @cache.cached(60 * 60 * 24 * 300, query_string=True)
     @marshal_with(DatasetSchema(
         many=True, exclude=['dataset_address', 'preproc_address', 'runs']))
     def get(self, **kwargs):
-        query = {}
         if kwargs.pop('active_only'):
-            query['active'] = True
-        return Dataset.query.filter_by(**query).all()
+            kwargs['active'] = True
+        return Dataset.query.filter_by(**kwargs).all()
