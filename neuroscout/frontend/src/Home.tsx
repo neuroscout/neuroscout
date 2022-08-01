@@ -184,7 +184,7 @@ class Home extends React.Component<UserStore, Record<string, never>> {
               <Button
                 size="large"
                 className="splashButton"
-                href="https://neuroscout.github.io/neuroscout/"
+                href="https://neuroscout.org/docs"
               >
                 <BookOutlined />
                 Learn more

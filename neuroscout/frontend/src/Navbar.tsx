@@ -64,7 +64,7 @@ class Navbar extends React.Component<UserStore, Record<string, never>> {
             </Menu.SubMenu>
             <Menu.Item key="help">
               <a
-                href="https://neuroscout.github.io/neuroscout/"
+                href="https://neuroscout.org/docs"
                 target="_blank"
                 rel="noreferrer"
               >
