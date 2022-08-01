@@ -198,7 +198,7 @@ export class AddPredictorsForm extends React.Component<
             }
           />
           <a
-            href="https://neuroscout.github.io/neuroscout/faq/#can-i-contribute-my-own-predictors-to-neuroscout"
+            href="https://neuroscout.org/docsfaq/#can-i-contribute-my-own-predictors-to-neuroscout"
             target="_blank"
             rel="noreferrer"
           >
@@ -242,7 +242,7 @@ export class AddPredictorsForm extends React.Component<
           )}
           <br />
           <a
-            href="https://neuroscout.github.io/neuroscout/faq/#can-i-contribute-my-own-predictors-to-neuroscout"
+            href="https://neuroscout.org/docsfaq/#can-i-contribute-my-own-predictors-to-neuroscout"
             target="_blank"
             rel="noreferrer"
           >
