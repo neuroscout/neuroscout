@@ -311,7 +311,7 @@ export class StatusTab extends React.Component<submitProps, statusTabState> {
             <p>
               See the neuroscout-cli{' '}
               <a href="https://neuroscout.org/docs/cli/intro.html">
-              documentation{' '}
+                documentation{' '}
               </a>
               for a complete user guide.
             </p>
