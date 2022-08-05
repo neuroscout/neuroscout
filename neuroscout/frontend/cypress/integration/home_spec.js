@@ -16,7 +16,6 @@ describe('The Home Page', () => {
     cy.get('.ant-menu').not('My Analyses')
     cy.get('.ant-menu')
       .contains('Help')
-      .should('have.attr', 'href', 'https://neuroscout.github.io/neuroscout/')
     cy.get('.ant-menu').contains('Sign in')
     cy.get('.ant-menu').contains('Sign up')
   })
@@ -33,7 +32,7 @@ describe('The Home Page', () => {
     cy.get('.ant-btn')
       .contains('Learn more')
       .parent()
-      .should('have.attr', 'href', 'https://neuroscout.github.io/neuroscout/')
+      .should('have.attr', 'href', 'https://neuroscout.org/docs')
   })
 
   it('test sign up button 1', () => {
