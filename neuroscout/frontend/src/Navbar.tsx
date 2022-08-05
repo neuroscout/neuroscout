@@ -81,14 +81,16 @@ class Navbar extends React.Component<UserStore, Record<string, never>> {
                   Documentation
                 </a>
               </Menu.Item>
-              <Menu.Item key="tour">
-                <Link
-                  to="/"
-                  onClick={e => this.props.update({ openTour: true })}
-                >
-                  Start tour
-                </Link>
-              </Menu.Item>
+              {this.props.loggedIn === true && (
+                <Menu.Item key="tour">
+                  <Link
+                    to="/"
+                    onClick={e => this.props.update({ openTour: true })}
+                  >
+                    Start tour
+                  </Link>
+                </Menu.Item>
+              )}
               <Menu.Item key="askAQuestion">
                 <a
                   href="https://neurostars.org/tag/neuroscout"
