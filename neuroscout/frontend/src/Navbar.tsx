@@ -62,19 +62,43 @@ class Navbar extends React.Component<UserStore, Record<string, never>> {
                 <Link to="/datasets">All Datasets</Link>
               </Menu.Item>
             </Menu.SubMenu>
-            <Menu.Item key="help">
-              <a
-                href="https://neuroscout.org/docs"
-                target="_blank"
-                rel="noreferrer"
-              >
+            <Menu.SubMenu
+              key="help"
+              title={
                 <span>
                   <QuestionCircleOutlined />
                   <Space />
                   Help
                 </span>
-              </a>
-            </Menu.Item>
+              }
+            >
+              <Menu.Item key="docs">
+                <a
+                  href="https://neuroscout.org/docs"
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  Documentation
+                </a>
+              </Menu.Item>
+              <Menu.Item key="tour">
+                <Link
+                  to="/"
+                  onClick={e => this.props.update({ openTour: true })}
+                >
+                  Start tour
+                </Link>
+              </Menu.Item>
+              <Menu.Item key="askAQuestion">
+                <a
+                  href="https://neurostars.org/tag/neuroscout"
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  Ask a question
+                </a>
+              </Menu.Item>
+            </Menu.SubMenu>
             {this.props.loggedIn === false && (
               <Menu.Item
                 onClick={e => this.props.update({ openLogin: true })}
