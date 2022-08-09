@@ -89,7 +89,7 @@ describe('Analysis Builder', () => {
         - ensure transition to pending status after we submit
      */
     cy.get('.statusTOS').get('button:disabled')
-    cy.get('span').contains('terms of service').parent().find('input').check()
+    cy.get(':nth-child(6) > .ant-checkbox > .ant-checkbox-input').check()
     cy.get('.statusTOS').get('span:visible').contains('Generate').parent().click()
     cy.intercept('GET', '**/report**', (req) => {
       req.reply(dmResp)
