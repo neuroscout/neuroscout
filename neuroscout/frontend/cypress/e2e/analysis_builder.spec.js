@@ -90,19 +90,21 @@ describe('Analysis Builder', () => {
      */
     cy.get('.statusTOS').get('button:disabled')
     cy.get(':nth-child(6) > .ant-checkbox > .ant-checkbox-input').check({force: true})
+    cy.wait(50)
     cy.get('.statusTOS').get('span:visible').contains('Generate').parent().click()
+    cy.wait(50)
     cy.intercept('GET', '**/report**', (req) => {
       req.reply(dmResp)
     })
     cy.intercept('POST', '**/compile**', {
       statusCode: 200,
-      body: {'status': 'SUBMITTING', 'traceback': ''}
+      body: {'status': 'PENDING', 'traceback': ''}
     })
     cy.intercept('GET', '**/compile', {
       statusCode: 200,
       body: {'status': 'PENDING', 'traceback': ''}
     })
-
+    cy.wait(200)
     cy.contains('Analysis Pending Generation')
   });
 });
