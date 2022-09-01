@@ -76,6 +76,7 @@ describe('Analysis Builder', () => {
     cy.fixture('design_matrix_response.json').then(dmBody => {
       dmResp = dmBody
     });
+
     cy.intercept('GET', '**/report**', (req) => {
       req.reply(dmResp)
     })
@@ -103,6 +104,13 @@ describe('Analysis Builder', () => {
     cy.intercept('GET', '**/compile', {
       statusCode: 200,
       body: {'status': 'PENDING', 'traceback': ''}
+    })
+    let respPostSubmit;
+    cy.fixture('get_post_submit.json').then(mBody => {
+      respPostSubmit = mBody
+    });
+    cy.intercept('GET', '**/analyses/**', (req) => {
+      req.reply(respPostSubmit)
     })
     cy.wait(200)
     cy.contains('Analysis Pending Generation')
