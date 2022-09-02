@@ -1,5 +1,6 @@
 describe('Tour', () => {
   it('opens tour', () => {
+    cy.reload(true)
     cy.visit('/')
     cy.login('user@example.com', 'string')
     cy.wait(200)
