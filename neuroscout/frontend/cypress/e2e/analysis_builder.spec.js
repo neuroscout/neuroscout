@@ -76,6 +76,7 @@ describe('Analysis Builder', () => {
     cy.fixture('design_matrix_response.json').then(dmBody => {
       dmResp = dmBody
     });
+
     cy.intercept('GET', '**/report**', (req) => {
       req.reply(dmResp)
     })
@@ -90,19 +91,34 @@ describe('Analysis Builder', () => {
      */
     cy.get('.statusTOS').get('button:disabled')
     cy.get(':nth-child(6) > .ant-checkbox > .ant-checkbox-input').check({force: true})
+    cy.wait(50)
     cy.get('.statusTOS').get('span:visible').contains('Generate').parent().click()
+    cy.wait(50)
     cy.intercept('GET', '**/report**', (req) => {
       req.reply(dmResp)
     })
     cy.intercept('POST', '**/compile**', {
       statusCode: 200,
-      body: {'status': 'SUBMITTING', 'traceback': ''}
+      body: {'status': 'PENDING', 'traceback': ''}
     })
     cy.intercept('GET', '**/compile', {
       statusCode: 200,
       body: {'status': 'PENDING', 'traceback': ''}
     })
-
+    let respPostSubmit;
+    cy.fixture('get_post_submit.json').then(mBody => {
+      respPostSubmit = mBody
+    });
+    cy.intercept('GET', '**/analyses/**', (req) => {
+      req.reply(respPostSubmit)
+    })
+    cy.wait(200)
     cy.contains('Analysis Pending Generation')
   });
+
+  it('opens tour', () => {
+    cy.get('.ant-menu').contains('Neuroscout').click()
+    cy.wait(200)
+    cy.get('#rainbow-btn').click()
+  })
 });
