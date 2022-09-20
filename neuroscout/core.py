@@ -3,6 +3,7 @@
 from flask import send_file, render_template, url_for
 from .basic import create_app
 from .models import db, user_datastore
+from .admin import admin_factory
 
 app, cache = create_app()
 
@@ -11,6 +12,12 @@ from flask_jwt import JWT
 from flask_security import Security
 from flask_security.confirmable import confirm_email_token_status, confirm_user
 from flask_cors import CORS
+from flask_admin import Admin
+
+app.config['FLASK_ADMIN_SWATCH'] = 'cerulean'
+admin = Admin(app, name='Neuroscout-Admin', template_mode='bootstrap3')
+
+admin_factory(['User', 'Analysis', 'Dataset'], db.session, admin)
 
 mail = Mail(app)
 # Enable CORS
