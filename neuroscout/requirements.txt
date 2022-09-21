@@ -13,8 +13,8 @@ docopt==0.6.2
 duecredit==0.6.1
 -e git+https://github.com/adelavega/pybids@0.13.1-patch#egg=pybids
 pynv==0.2
-flask_admin
-Flask==1.1.1
+Flask-Admin
+Flask==1.1.4
 flask-apispec==0.10.0
 Flask-Caching==1.10.1
 Flask-cors==3.0.9
