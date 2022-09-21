@@ -52,8 +52,8 @@ For the staging server, you can trigger a manual build as follows:
     docker-compose -f docker-compose.yml -f docker-compose.build.yml build
     docker-compose -f docker-compose.yml -f docker-compose.build.yml up -d
 
-For the prodocution server, you can trigger pull a pre-built image from GHCR:
-First set the variable `IMAGE_TAG` to the appriopriate image tag
+For the staging or production server, you can trigger pull a pre-built image from GHCR:
+First set the variable `IMAGE_TAG` to the apprioriate image tag
 
     docker-compose -f docker-compose.yml -f docker-compose.image.yml build
     docker-compose -f docker-compose.yml -f docker-compose.image.yml up -d
