@@ -2,7 +2,6 @@ version: "2"
 services:
   neuroscout:
     restart: always
-    image: ghcr.io/neuroscout/neuroscout:pr-1082
     expose:
       - "8000"
     volumes:
