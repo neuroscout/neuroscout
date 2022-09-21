@@ -7,6 +7,5 @@ services:
   neuroscout:
     command: /usr/local/bin/gunicorn -w 2 -b :8000 neuroscout.core:app --log-level debug --timeout 120 --reload
     restart: "no"
-    build: ./neuroscout
     ports:
       - "4000:4000"
