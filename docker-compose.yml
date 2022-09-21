@@ -1,7 +1,7 @@
 version: "2"
 services:
   neuroscout:
-    build: ./neuroscout
+    image: neuroscout
     restart: always
     expose:
       - "8000"
