@@ -1,8 +1,8 @@
 version: "2"
 services:
   neuroscout:
+    image: neuroscout_neuroscout
     restart: always
-    build: ./neuroscout
     expose:
       - "8000"
     volumes:
