@@ -38,4 +38,4 @@ RUN git config --global  user.email "delavega@utexas.edu"
 RUN crontab /usr/src/app/update.txt
 RUN service cron start
 
-WORKDIR /neuroscout
+RUN yarn install && yarn build
