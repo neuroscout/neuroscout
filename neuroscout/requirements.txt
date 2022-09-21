@@ -6,14 +6,15 @@ blinker==1.4
 celery
 citeproc-py==0.4.0
 citeproc-py-styles==0.1.1
-datalad==0.10.2
+datalad
 dataclasses==0.6
 decorator==4.0.11
 docopt==0.6.2
 duecredit==0.6.1
 -e git+https://github.com/adelavega/pybids@0.13.1-patch#egg=pybids
 pynv==0.2
-Flask==1.1.1
+Flask-Admin
+Flask==1.1.4
 flask-apispec==0.10.0
 Flask-Caching==1.10.1
 Flask-cors==3.0.9
@@ -66,6 +67,7 @@ scipy
 sentry-sdk[flask]==0.13
 soundfile
 pytesseract
+werkzeug<2.0
 SQLAlchemy==1.3.0
 shortuuid==1.0.1
 webargs==6.1.1
