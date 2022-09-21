@@ -32,7 +32,7 @@ Build the containers and start services using the development configuration:
     docker-compose -f docker-compose.yml -f docker-compose.dev.yml build
     docker-compose -f docker-compose.yml -f docker-compose.dev.yml up -d
 
-The server should now be running at http://localhost/
+The server should now be running at http://localhost/ 
 
 Next, initialize, migrate and upgrade the database migrations.
 If you have a database file, load it using `pg_restore`. Otherwise, delete the migrations folder,
