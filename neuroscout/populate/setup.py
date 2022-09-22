@@ -10,7 +10,7 @@ from .transform import Postprocessing
 from .utils import add_to_bibliography
 from pathlib import Path
 from datalad.api import install, get
-from datalad.distribution.utils import _get_installationpath_from_url
+from datalad.core.distributed.clone import _get_installationpath_from_url
 from bids.layout import BIDSLayout
 from ..models import Dataset
 

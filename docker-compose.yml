@@ -1,18 +1,18 @@
 version: "2"
 services:
   neuroscout:
+    image: neuroscout_neuroscout
     restart: always
-    build: ./neuroscout
     expose:
       - "8000"
+    command: /usr/local/bin/gunicorn --chdir /neuroscout -w 2 -b :8000 neuroscout.core:app --log-level debug --timeout 120 --log-file /logs/gunicorn.log
     volumes:
-      - ./postgres/migrations:/migrations
       - ./:/neuroscout
+      - ./postgres/migrations:/migrations
       - ${DATASET_DIR}:/datasets
       - ${KEY_DIR}:/keys
       - ${FILE_DATA}:/file-data
       - /logs/scout:/logs:rw
-    command: /usr/local/bin/gunicorn -w 2 -b :8000 neuroscout.core:app --log-level debug --timeout 120 --log-file /logs/gunicorn.log
     env_file:
       - .env
       - .pliersenv 

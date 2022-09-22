@@ -1,0 +1,4 @@
+version: "2"
+services:
+  neuroscout:
+    image: ghcr.io/neuroscout/neuroscout:${IMAGE_TAG}

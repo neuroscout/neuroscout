@@ -29,10 +29,10 @@ For single sign on using Google, a [sign-in project](https://developers.google.c
 ## Initalizing backend
 Build the containers and start services using the development configuration:
 
-    docker-compose build
+    docker-compose -f docker-compose.yml -f docker-compose.dev.yml build
     docker-compose -f docker-compose.yml -f docker-compose.dev.yml up -d
 
-The server should now be running at http://localhost/
+The server should now be running at http://localhost/ 
 
 Next, initialize, migrate and upgrade the database migrations.
 If you have a database file, load it using `pg_restore`. Otherwise, delete the migrations folder,
@@ -44,6 +44,20 @@ initalize the database and add a test user.
     python manage.py db migrate
     python manage.py db upgrade
     python manage.py add_user useremail password
+
+### Staging & production server
+
+For the staging server, you can trigger a manual build as follows:
+
+    docker-compose -f docker-compose.yml -f docker-compose.build.yml build
+    docker-compose -f docker-compose.yml -f docker-compose.build.yml up -d
+
+For the staging or production server, you can trigger pull a pre-built image from GHCR:
+First set the variable `IMAGE_TAG` to the apprioriate image tag
+
+    docker-compose -f docker-compose.yml -f docker-compose.image.yml build
+    docker-compose -f docker-compose.yml -f docker-compose.image.yml up -d
+
 
 ## Setting up front end
 The frontend dependencies are managed using `yarn`

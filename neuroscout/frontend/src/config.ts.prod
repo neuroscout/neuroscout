@@ -1,0 +1,7 @@
+export const config = {
+  server_url: 'https://neuroscout.org',
+  google_client_id:
+    '66127382167-v83riq5etne59h7v9ghqqs5t6a3i0rta.apps.googleusercontent.com',
+  ga_key: 'GAKEY',
+  sentry_uri: 'https://96e0d2454fea493e886b3122504e22d3@sentry.io/1776214',
+}
