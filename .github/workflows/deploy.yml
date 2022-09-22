@@ -1,3 +1,5 @@
+name: Deploy to staging
+
 on:
   workflow_dispatch:
 
