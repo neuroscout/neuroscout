@@ -40,4 +40,7 @@ RUN service cron start
 
 WORKDIR /usr/src/app/frontend
 
+RUN cp /usr/src/app/frontend/src/config.ts.prod /usr/src/app/frontend/src/config.ts
 RUN yarn install && yarn build
+
+WORKDIR /usr/src/app/
