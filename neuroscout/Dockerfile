@@ -1,8 +1,8 @@
 FROM python:3.8-bullseye
 ARG DEBIAN_FRONTEND=noninteractive
 
-RUN mkdir -p /usr/src/app
-WORKDIR /usr/src/app
+RUN mkdir -p /usr/src/app/neuroscout
+WORKDIR /usr/src/app/neuroscout
 
 RUN apt-get -qq update
 RUN apt-get install -yq ffmpeg tesseract-ocr apt-transport-https libnss3 xvfb
@@ -21,8 +21,8 @@ RUN apt-get update
 RUN apt-get install -y nodejs
 RUN npm install -g yarn
 
-COPY requirements.txt /usr/src/app/
-COPY optional_requirements.txt /usr/src/app
+COPY requirements.txt /usr/src/app/neuroscout/
+COPY optional_requirements.txt /usr/src/app/neuroscout/
 RUN pip install setuptools==45
 RUN pip uninstall -y enum34
 RUN pip install --no-cache-dir -r requirements.txt
@@ -30,17 +30,17 @@ RUN pip install --no-cache-dir -r optional_requirements.txt
 RUN python -m pliers.support.download
 RUN python -m pliers.support.setup_yamnet
 
-COPY . /usr/src/app
+COPY . /usr/src/app/neuroscout
 
 RUN git config --global user.name "Neuroscout"
 RUN git config --global  user.email "delavega@utexas.edu"
 
-RUN crontab /usr/src/app/update.txt
+RUN crontab /usr/src/app/neuroscout/update.txt
 RUN service cron start
 
-WORKDIR /usr/src/app/frontend
+WORKDIR /usr/src/app/neuroscout/frontend
 
-RUN cp /usr/src/app/frontend/src/config.ts.prod /usr/src/app/frontend/src/config.ts
+RUN cp /usr/src/app/neuroscout/frontend/src/config.ts.prod /usr/src/app/neuroscout/frontend/src/config.ts
 RUN yarn install && yarn build
 
 WORKDIR /usr/src/app/
