@@ -5,7 +5,7 @@ services:
       - "API_URL=http://localhost/swagger/"
 
   neuroscout:
-    command: cd /neuroscout && /usr/local/bin/gunicorn -w 2 -b :8000 neuroscout.core:app --log-level debug --timeout 120 --reload
+    command: /usr/local/bin/gunicorn --chdir /neuroscout -w 2 -b :8000 neuroscout.core:app --log-level debug --timeout 120 --reload
     restart: "no"
     build: ./neuroscout
     ports:
