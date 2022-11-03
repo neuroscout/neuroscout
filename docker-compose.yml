@@ -13,6 +13,7 @@ services:
       - ${KEY_DIR}:/keys
       - ${FILE_DATA}:/file-data
       - /logs/scout:/logs:rw
+      - ./neuroscout/config/app.py:/usr/src/app/neuroscout/config/app.py
     env_file:
       - .env
       - .pliersenv 
