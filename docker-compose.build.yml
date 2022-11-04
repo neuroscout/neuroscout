@@ -2,3 +2,5 @@ version: "2"
 services:
   neuroscout:
     build: ./neuroscout
+    volumes:
+      - ./neuroscout:/usr/src/app/neuroscout
