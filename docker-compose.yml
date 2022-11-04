@@ -7,7 +7,6 @@ services:
       - "8000"
     command: /usr/local/bin/gunicorn -w 2 -b :8000 neuroscout.core:app --log-level debug --timeout 120 --log-file /logs/gunicorn.log
     volumes:
-      - ./neuroscout:/usr/src/app/neuroscout
       - ./postgres/migrations:/migrations
       - ${DATASET_DIR}:/datasets
       - ${KEY_DIR}:/keys

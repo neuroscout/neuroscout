@@ -2,9 +2,3 @@ version: "2"
 services:
   neuroscout:
     image: ghcr.io/neuroscout/neuroscout:latest
-    volumes:
-      - ./postgres/migrations:/migrations
-      - ${DATASET_DIR}:/datasets
-      - ${KEY_DIR}:/keys
-      - ${FILE_DATA}:/file-data
-      - /logs/scout:/logs:rw
