@@ -11,8 +11,6 @@ services:
       - frontend_build:/usr/src/app/frontend/build
 
 
-
-
-
 volumes:
     frontend_build:
+      name: frontend_build
