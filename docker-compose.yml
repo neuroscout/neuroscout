@@ -12,7 +12,6 @@ services:
       - ${KEY_DIR}:/keys
       - ${FILE_DATA}:/file-data
       - /logs/scout:/logs:rw
-      - 
     env_file:
       - .env
       - .pliersenv 
