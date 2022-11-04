@@ -2,3 +2,5 @@ version: "2"
 services:
   neuroscout:
     image: ghcr.io/neuroscout/neuroscout:latest
+    volumes:
+      - ./neuroscout/config/app.py:/usr/src/app/neuroscout/config/app.py
