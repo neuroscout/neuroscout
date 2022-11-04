@@ -51,7 +51,7 @@ patsy
 Pillow==8.2.0
 tqdm
 psycopg2==2.8.3
-PyJWT==1.4.2
+PyJWT==2.4.0
 pyld==0.7.3
 pyparsing==2.2.0
 pytest>4.6
