@@ -4,3 +4,15 @@ services:
     image: ghcr.io/neuroscout/neuroscout:latest
     volumes:
       - ./neuroscout/config/app.py:/usr/src/app/neuroscout/config/app.py
+      - frontend-build:/usr/src/app/frontend/build
+
+  nginx:
+    volumes:
+      - frontend-build:/usr/src/app/frontend/build
+
+
+
+
+
+volumes:
+    frontend-build:
