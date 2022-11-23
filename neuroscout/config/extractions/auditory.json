@@ -1,5 +1,12 @@
 {
     "extractors": [
+      [{"transformer": "TFHubAudioExtractor", 
+        "parameters": {
+          "url_or_path": "https://tfhub.dev/google/spice/2",
+          "keras_kwargs": {
+            "signature": "serving_default", 
+            "signature_outputs_as_dict": true}}}]
+      [{"transformer": "STFTAudioExtractor"}],
       [{"transformer": "STFTAudioExtractor"}],
       [{"transformer": "MeanAmplitudeExtractor"}],
       [{"transformer": "SpectralCentroidExtractor"}],
