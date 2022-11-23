@@ -5,6 +5,8 @@ import os
 import requests
 import datetime
 
+sys.path.append('../')
+
 from flask_script import Manager, Shell
 from flask_migrate import Migrate, MigrateCommand
 from flask_security.utils import encrypt_password
