@@ -4,3 +4,7 @@ services:
     image: ghcr.io/neuroscout/neuroscout:${IMAGE_TAG}
     volumes:
       - ./neuroscout:/usr/src/app/neuroscout
+
+  nginx:
+    volumes:
+      - ./neuroscout/frontend/build:/usr/src/app/neuroscout/frontend/build

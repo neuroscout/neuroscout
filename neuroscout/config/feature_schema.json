@@ -546,5 +546,20 @@
         }
       }
     }
+  ],
+  "TFHubAudioExtractor": [
+    {
+      "attributes": {
+        "url_or_path": "https://tfhub.dev/google/spice/2"
+      },
+      "features": {
+        "pitch": {
+          "description": "Auditory pitch, values ranging from 0 to 1"
+        },
+        "uncertainty": {
+          "description": "Uncertainty of pitch, values ranging from 0 to 1"
+        }
+      }
+    }
   ]
 }
