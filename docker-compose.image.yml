@@ -8,8 +8,8 @@ services:
       resources:
         reservations:
           devices:
-          - driver: nvidia
-            capabilities: [gpu]
+            - capabilities: [gpu]
+              driver: nvidia
   nginx:
     volumes:
       - ./neuroscout/frontend/build:/usr/src/app/neuroscout/frontend/build
