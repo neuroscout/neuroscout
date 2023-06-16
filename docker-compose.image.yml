@@ -4,12 +4,7 @@ services:
     image: ghcr.io/neuroscout/neuroscout:${IMAGE_TAG}
     volumes:
       - ./neuroscout:/usr/src/app/neuroscout
-    deploy:
-      resources:
-        reservations:
-          devices:
-            - capabilities: [gpu]
-              driver: nvidia
+
   nginx:
     volumes:
       - ./neuroscout/frontend/build:/usr/src/app/neuroscout/frontend/build
