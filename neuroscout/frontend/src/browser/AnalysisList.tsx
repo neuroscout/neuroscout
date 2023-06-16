@@ -1,5 +1,5 @@
 /*
-Resuable AnalysisList component used for displaying a list of analyses, e.g. on
+Reusable AnalysisList component used for displaying a list of analyses, e.g. on
 the home page or on the 'browse public analysis' page
 */
 import * as React from 'react'

@@ -785,7 +785,7 @@ export default class AnalysisBuilder extends React.Component<
   }
 
   // run any time we attempt to leave tab
-  // xform and contrast checks are more or less the same save validate funciton call...
+  // xform and contrast checks are more or less the same save validate function call...
   preTabChange = (nextTab: TabName): boolean => {
     let errors: string[] = []
     if (this.state.activeTab === 'transformations') {

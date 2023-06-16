@@ -90,7 +90,7 @@ export class OverviewTab extends React.Component<
 
   applyFilter = (pagination, filters, sorter, extra): void => {
     /* If we have no set filters, but some selected subjects and we change pages then all subjects will
-     * be selected. To prevent this we return immediatly if no filters are set.
+     * be selected. To prevent this we return immediately if no filters are set.
      */
     if (
       Object.keys(filters)

@@ -114,7 +114,7 @@ class UserResetSubmitResource(MethodResource):
         else:
             user.password = kwargs['password']
             db.session.commit()
-            return {'message': 'Password reset succesfully.'}
+            return {'message': 'Password reset successfully.'}
 
 
 class UserPredictorListResource(MethodResource):

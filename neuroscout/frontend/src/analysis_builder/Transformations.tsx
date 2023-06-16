@@ -1,5 +1,5 @@
 /*
-This module comtains the following components:
+This module contains the following components:
  - XformsTab: parent component implementing the transformation tab of the analysis builder.
  - XformDisplay: component to display a single transformation
  - XformEditor: component to add/edit a transformtion
@@ -59,7 +59,7 @@ export function validateXform(xform: Transformation) {
   }
   if (xform.Name === 'Orthogonalize' && xform.Input !== undefined) {
     if (xform.Other === undefined || xform.Other.length < 1) {
-      errors.push('Must orthoganalize with respect to at least one predictor')
+      errors.push('Must orthogonalize with respect to at least one predictor')
     }
   }
 
