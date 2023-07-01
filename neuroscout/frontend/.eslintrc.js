@@ -33,7 +33,8 @@ module.exports = {
       "@typescript-eslint/no-unsafe-call": "warn",
       "@typescript-eslint/no-unsafe-return": "warn",
       "@typescript-eslint/no-floating-promises": "off",
-      "@typescript-eslint/restrict-template-expressions": "warn"
+      "@typescript-eslint/restrict-template-expressions": "warn",
+      "react/no-unescaped-entities": "off"
     },
     "settings": {
       "react": {

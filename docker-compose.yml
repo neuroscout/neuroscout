@@ -1,4 +1,4 @@
-version: "2"
+version: "3"
 services:
   neuroscout:
     image: neuroscout_neuroscout
@@ -27,8 +27,11 @@ services:
       - LETSENCRYPT_HOST=${V_HOSTS}
     volumes:
       - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
-    volumes_from:
-      - neuroscout
+      - ./postgres/migrations:/migrations
+      - ${DATASET_DIR}:/datasets
+      - ${KEY_DIR}:/keys
+      - ${FILE_DATA}:/file-data
+      - /logs/scout:/logs:rw
 
   postgres:
     restart: always
