@@ -1,28 +1,31 @@
 @import '~antd/dist/antd.css';
 
 @keyframes App-logo-spin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 body {
-    background-color: white;
+  background-color: white;
 }
 
 pre {
-    padding: 10px;
-    border-radius: 10px;
-    color: white;
-    background-color: black;
+  padding: 10px;
+  border-radius: 10px;
+  color: white;
+  background-color: black;
 }
-
 
 .Login-col {
   float: right;
 }
 
 .homeBtn {
-    justify-content: center;
+  justify-content: center;
 }
 
 .nextButton {
@@ -30,36 +33,35 @@ pre {
 }
 
 .privateSwitch {
-    text-align: center;
-    padding-right: 10px;
-    display: inline-block;
+  text-align: center;
+  padding-right: 10px;
+  display: inline-block;
 }
 
 .builderTabs {
-    padding-bottom: 50px;
+  padding-bottom: 50px;
 }
 
 .builderCol {
-    padding: 0 10px 0 10px;
+  padding: 0 10px 0 10px;
 }
 
 .mainCol {
-    padding: 0 0px 0 0px;
+  padding: 0 0px 0 0px;
 }
 
 .headerRow {
-    padding-top: 20px;
+  padding-top: 20px;
 }
 
 .ant-layout {
-    background-color: white;
+  background-color: white;
 }
 
 .statusHeader {
-    float: right;
-    position: relative;
-    z-index: 10;
-       
+  float: right;
+  position: relative;
+  z-index: 10;
 }
 
 .splashLogo {
@@ -70,17 +72,16 @@ pre {
 }
 
 .instLogo {
-    display: block;
-    margin-left: auto;
-    margin-right: auto;
-    width: 15%;
-  }
-
-.instLogo2 {
-    height: auto;
-    width: 100%
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  width: 15%;
 }
 
+.instLogo2 {
+  height: auto;
+  width: 100%;
+}
 
 .splashText {
   text-align: center;
@@ -88,9 +89,8 @@ pre {
 }
 
 .introCardsText {
-    font-size: 16px;
-  }
-
+  font-size: 16px;
+}
 
 .footerText {
   text-align: center;
@@ -109,7 +109,7 @@ pre {
   margin: 10px;
 }
 
-.headerAvatar>.anticon {
+.headerAvatar > .anticon {
   margin-right: 0px;
 }
 
@@ -117,20 +117,20 @@ pre {
 }
 
 .selectedXform {
-    box-shadow: 0 0 5px rgba(80, 200, 240, 1);
+  box-shadow: 0 0 5px rgba(80, 200, 240, 1);
 }
 
 .contrast-type-form-item {
-    margin-bottom: 0px;
+  margin-bottom: 0px;
 }
 
 .designMatrix {
-    max-width: 100%;
-    max-height: 80vh;
+  max-width: 100%;
+  max-height: 80vh;
 }
 
 .recordName {
-    word-break: break-all;
+  word-break: break-all;
 }
 
 .runSelectorContainer {
@@ -140,68 +140,68 @@ pre {
 }
 
 .runSelectorBtn {
-    margin: 10px 0 0 0;
-    float: right;
+  margin: 10px 0 0 0;
+  float: right;
 }
 
 .viewTitle {
   font-size: 20px;
   padding: 0px 0px;
-} 
+}
 
 .viewTitleDescriptor {
   font-size: 12px;
   height: 32px;
-  margin-top: .5em
-} 
+  margin-top: 0.5em;
+}
 
 .plotRunSelectorContainer {
-    display: flex;
-    margin: 10px 0;
+  display: flex;
+  margin: 10px 0;
 }
 
 .plotRunSelector {
-    flex: 1;
+  flex: 1;
 }
 
 .plotRunSelectorBtn {
-    margin: 0 0 0 10px;
-    float: right;
+  margin: 0 0 0 10px;
+  float: right;
 }
 
 .profileHeader {
-    font-size: 16px;
-    font-weight: 500;
+  font-size: 16px;
+  font-weight: 500;
 }
 
 .profileName {
-    margin: 0 0 0 10px;
+  margin: 0 0 0 10px;
 }
 
 .editDetails .ant-collapse-borderless {
-    background-color: #fff;
-    border: 0px;
+  background-color: #fff;
+  border: 0px;
 }
 
 .ant-table-expand-icon-col {
-    width: 32px;
+  width: 32px;
 }
 
 .ant-checkbox-wrapper {
-    display: flex;
+  display: flex;
 }
 
 .ant-dropdown-menu-item .ant-checkbox-wrapper {
-    display: inline-flex;
+  display: inline-flex;
 }
 
 .ant-checkbox-wrapper :not(.ant-checkbox) {
-    overflow: hidden;
-    text-overflow: ellipsis;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .ant-checkbox-wrapper + .ant-checkbox-wrapper {
-    margin-left: 0px;
+  margin-left: 0px;
 }
 
 .home-flex-item {
@@ -211,69 +211,77 @@ pre {
 }
 
 .stat-title {
-    color: rgba(0, 0, 0, 0.45);
-    font-size: 20px;
+  color: rgba(0, 0, 0, 0.45);
+  font-size: 20px;
 }
 
 .stat-value {
-    font-size: 28px;
-    color: #3f8600;
+  font-size: 28px;
+  color: #3f8600;
 }
 .stat-container {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    text-align: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  text-align: center;
 }
 
 .analysisListRouteWrapper {
-    display: flex;
-    flex-wrap: wrap;
+  display: flex;
+  flex-wrap: wrap;
 }
 
 .analysisListRouteWrapper .analysisListTitle {
-    font-size: 20px;
-    margin-left: 20px;
+  font-size: 20px;
+  margin-left: 20px;
 }
 .analysisListRouteWrapper .analysisListSearch {
-    align-self: flex-end;
-    flex: 1;
-    margin-left: 20px;
-    height: 100%;
-    margin-top: auto;
-    margin-bottom: auto;
+  align-self: flex-end;
+  flex: 1;
+  margin-left: 20px;
+  height: 100%;
+  margin-top: auto;
+  margin-bottom: auto;
 }
 .analysisListRouteWrapper .analysisListTable {
-    flex-basis: 100%;
+  flex-basis: 100%;
 }
 
 .tagLink {
- text-decoration: underline;
+  text-decoration: underline;
 }
 
 .tagLink:hover {
- text-decoration: none;
+  text-decoration: none;
 }
 
 .colorIndexPredictorList {
-    margin-bottom: 20px;
+  margin-bottom: 20px;
 }
 
 @keyframes kfcolors {
-    0% {background:#69c0ff;}
-    40% {background:#1890ff;}
-    60% {background:#096dd9;}
-    100% {background:#0050b3;}
+  0% {
+    background: #69c0ff;
+  }
+  40% {
+    background: #1890ff;
+  }
+  60% {
+    background: #096dd9;
+  }
+  100% {
+    background: #0050b3;
+  }
 }
 
 #rainbow-btn {
-    background:red;
-    animation: kfcolors ease;
-    animation-direction: alternate;
-    animation-duration: 4s;
-    animation-iteration-count: infinite;
+  background: red;
+  animation: kfcolors ease;
+  animation-direction: alternate;
+  animation-duration: 4s;
+  animation-iteration-count: infinite;
 }
 
 .colab-tag {
-    margin: 0px 8px;
+  margin: 0px 8px;
 }

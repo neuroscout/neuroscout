@@ -7,8 +7,8 @@ Top-level App component containing AppState. The App component is currently resp
 import * as React from 'react'
 import { BrowserRouter as Router, Route, Redirect } from 'react-router-dom'
 import { Layout, Modal, message } from 'antd'
-import ReactGA from 'react-ga'
 import memoize from 'memoize-one'
+import { Helmet, HelmetProvider } from 'react-helmet-async'
 
 import './css/App.css'
 import { api } from './api'
@@ -24,17 +24,12 @@ import {
 import { LoginModal, ResetPasswordModal, SignupModal } from './Modals'
 import Routes from './Routes'
 import { jwtFetch, timeout } from './utils'
-import { withTracker } from './utils/analytics'
 import Navbar from './Navbar'
 import Tour from './Tour'
 
 const DOMAINROOT = config.server_url
 
 const { Content } = Layout
-
-if (config.ga_key) {
-  ReactGA.initialize(config.ga_key)
-}
 
 type JWTChangeProps = {
   loadAnalyses: () => any
@@ -220,8 +215,6 @@ class App extends React.Component<Record<string, never>, AppState> {
     })
   }
 
-  AnalyticIndex = withTracker(Routes)
-
   render() {
     if (this.state.user.loggingOut) {
       return (
@@ -230,38 +223,46 @@ class App extends React.Component<Record<string, never>, AppState> {
         </Router>
       )
     }
-
     return (
-      <Router>
-        <div>
-          <JWTChange
-            loadAnalyses={this.state.loadAnalyses}
-            checkAnalysesStatus={this.checkAnalysesStatus}
-            jwt={this.state.user.jwt}
-            user_name={this.state.user.profile.user_name}
-          />
-          {this.state.user.openLogin && <LoginModal {...this.state.user} />}
-          {this.state.user.openReset && (
-            <ResetPasswordModal {...this.state.user} />
-          )}
-          {this.state.user.openSignup && <SignupModal {...this.state.user} />}
-          <Tour
-            isOpen={this.state.user.openTour}
-            closeTour={this.state.user.closeTour}
-          />
-          <Layout>
-            <Content style={{ background: '#fff' }}>
-              <Navbar {...this.state.user} />
-              <br />
-              <Route
-                render={routeProps => (
-                  <this.AnalyticIndex {...{ ...routeProps, ...this.state }} />
-                )}
-              />
-            </Content>
-          </Layout>
-        </div>
-      </Router>
+      <HelmetProvider>
+        <Router>
+          <Helmet>
+            <script
+              async
+              src="https://www.googletagmanager.com/gtag/js?id=G-WHXN332J31"
+            ></script>
+            <script>
+              window.dataLayer = window.dataLayer || [];
+              window.dataLayer.push(['js', new Date()]);
+              window.dataLayer.push(['config', 'G-WHXN332J31']);
+            </script>
+          </Helmet>
+          <div>
+            <JWTChange
+              loadAnalyses={this.state.loadAnalyses}
+              checkAnalysesStatus={this.checkAnalysesStatus}
+              jwt={this.state.user.jwt}
+              user_name={this.state.user.profile.user_name}
+            />
+            {this.state.user.openLogin && <LoginModal {...this.state.user} />}
+            {this.state.user.openReset && (
+              <ResetPasswordModal {...this.state.user} />
+            )}
+            {this.state.user.openSignup && <SignupModal {...this.state.user} />}
+            <Tour
+              isOpen={this.state.user.openTour}
+              closeTour={this.state.user.closeTour}
+            />
+            <Layout>
+              <Content style={{ background: '#fff' }}>
+                <Navbar {...this.state.user} />
+                <br />
+                <Routes {...this.state} />
+              </Content>
+            </Layout>
+          </div>
+        </Router>
+      </HelmetProvider>
     )
   }
 
