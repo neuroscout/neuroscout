@@ -13,13 +13,13 @@ class DatasetSchema(Schema):
     summary = fields.Str(
         description='Dataset summary description')
     url = fields.Str(
-        descrption='Link to external resources')
+        description='Link to external resources')
     mimetypes = fields.List(
         fields.Str(), description='Dataset mimetypes/modalities')
     mean_age = fields.Float(
-        descrption='Mean age in years of subjects')
+        description='Mean age in years of subjects')
     percent_female = fields.Float(
-        descrption='Percent female subjects')
+        description='Percent female subjects')
     runs = fields.Pluck(
         'RunSchema', 'id', many=True)
     tasks = fields.Nested(

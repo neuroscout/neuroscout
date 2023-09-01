@@ -21,7 +21,7 @@ class Serializer(object):
 
 class PredictorSerializer(Serializer):
     def __init__(self, add_all=True, include=None, exclude=None, TR=None):
-        """ Initalize serializer for ingested features.
+        """ Initialize serializer for ingested features.
         Args:
             add_all - Add all variables including those not in the schema
             include - List of variables to include
@@ -140,7 +140,7 @@ class FeatureSerializer(Serializer):
             sub_df - df with ef values
             default_active - set to active by default?
         """
-        # If name is in schema, substitue regex patterns from schema pattern
+        # If name is in schema, substitute regex patterns from schema pattern
         # and fill in format strings from extractor_dict
         feat = feat.replace(',', '')  # Remove commas
         if 'name' in schema:

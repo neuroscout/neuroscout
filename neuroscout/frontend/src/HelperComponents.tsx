@@ -6,7 +6,7 @@ import { Link } from 'react-router-dom'
 import { predictorColor } from './utils'
 import { Predictor } from './coretypes'
 
-// Simple space component to seperate buttons, etc.
+// Simple space component to separate buttons, etc.
 // eslint-disable-next-line react/self-closing-comp
 export const Space = () => <span> </span>
 

@@ -26,7 +26,7 @@ and saving as `neuroscout/frontend/src/config.ts`.
 For single sign on using Google, a [sign-in project](https://developers.google.com/identity/sign-in/web/sign-in) is needed.
 
 
-## Initalizing backend
+## Initializing backend
 Build the containers and start services using the development configuration:
 
     docker-compose -f docker-compose.yml -f docker-compose.dev.yml build
@@ -36,7 +36,7 @@ The server should now be running at http://localhost/
 
 Next, initialize, migrate and upgrade the database migrations.
 If you have a database file, load it using `pg_restore`. Otherwise, delete the migrations folder,
-initalize the database and add a test user.
+initialize the database and add a test user.
 
     docker-compose exec neuroscout bash
     rm -rf /migrations/migrations

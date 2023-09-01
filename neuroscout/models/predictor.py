@@ -51,7 +51,7 @@ class Predictor(db.Model):
 
 
     def get_top_bottom(self, bottom=False, limit=None):
-        """ Get the Stimuli associated with the top or botton N values for this Predictor """
+        """ Get the Stimuli associated with the top or bottom N values for this Predictor """
         try:
             val = cast(ExtractedEvent.value, Float)
             if bottom:

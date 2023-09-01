@@ -165,7 +165,7 @@ def add_task(task_name, dataset_name, local_path,
             include_predictors - set of predictors to ingest
             exclude_predictors - set of predictors to exclude from ingestions
             reingest - force reingesting even if dataset already exists
-            scan_length - default scan length in case it cant be found in image
+            scan_length - default scan length in case it can't be found in image
             summary - Task summary description,
             layout - Preinstantiated BIDSLayout
             kwargs - arguments to filter runs by

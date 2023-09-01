@@ -104,7 +104,7 @@ def _find_create_google(ginfo):
 
 def authenticate(username, password):
     """ Authenticate user and password combination
-    Returns user object if succesful, otherwise None """
+    Returns user object if successful, otherwise None """
     if username == 'GOOGLE':
         ginfo = _authenticate_google(password)
         if ginfo:

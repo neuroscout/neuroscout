@@ -50,11 +50,11 @@ def hash_stim(stim, blocksize=65536):
         filename = stim.history.source_file \
                     if stim.history \
                     else stim.filename
-        with open(filename, 'rb') as afile:
-            buf = afile.read(blocksize)
+        with open(filename, 'rb') as f:
+            buf = f.read(blocksize)
             while len(buf) > 0:
                 hasher.update(buf)
-                buf = afile.read(blocksize)
+                buf = f.read(blocksize)
 
     return hasher.hexdigest()
 

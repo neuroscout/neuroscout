@@ -319,7 +319,7 @@ export class UserStore {
         Modal.success({
           title: 'Account created!',
           content:
-            'Your account has been sucessfully created. \
+            'Your account has been successfully created. \
         You will receive a confirmation email shortly. Please follow the instructions to activate your account\
         and start using Neuroscout. ',
           okText: 'Okay',
