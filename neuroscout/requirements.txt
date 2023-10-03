@@ -49,7 +49,7 @@ packaging==16.8
 pandas==1.1.5
 passlib==1.7.1
 patsy
-Pillow==8.2.0
+Pillow==10.0.1
 tqdm
 psycopg2==2.8.3
 PyJWT==1.4.2
