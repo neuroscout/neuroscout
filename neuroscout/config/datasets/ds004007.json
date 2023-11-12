@@ -1,0 +1,14 @@
+{
+    "name": "ds004007",
+    "dataset_address": "https://github.com/OpenNeuroDatasets/ds004007.git",
+    "preproc_address": "https://github.com/neuroscout-datasets/ds004007.git",
+    "path": "/datasets/raw/ds004007/",
+    "summary": "High-order areas and auditory cortex both represent the high-level event structure of music.",
+    "long_description": "Twenty-five subjects listened to various audio clips of music.",
+    "url": "https://openneuro.org/datasets/ds004007",
+    "tasks": {
+        "listen": {
+            "summary": "Music listening"
+        }
+    }
+}
