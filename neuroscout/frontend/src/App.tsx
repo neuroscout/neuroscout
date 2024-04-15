@@ -250,7 +250,7 @@ class App extends React.Component<Record<string, never>, AppState> {
             )}
             {this.state.user.openEnterResetToken && (
               <EnterResetTokenModal {...this.state.user} />
-            )
+            )}
             {this.state.user.openSignup && <SignupModal {...this.state.user} />}
             <Tour
               isOpen={this.state.user.openTour}
