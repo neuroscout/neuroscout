@@ -21,12 +21,12 @@ import {
   Dataset,
   profileEditItems,
 } from './coretypes'
-import { 
-  LoginModal, 
-  ResetPasswordModal, 
-  EnterResetTokenModal, 
-  SignupModal
- } from './Modals'
+import {
+  LoginModal,
+  ResetPasswordModal,
+  EnterResetTokenModal,
+  SignupModal,
+} from './Modals'
 import Routes from './Routes'
 import { jwtFetch, timeout } from './utils'
 import Navbar from './Navbar'
