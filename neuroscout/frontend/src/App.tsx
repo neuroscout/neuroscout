@@ -21,12 +21,12 @@ import {
   Dataset,
   profileEditItems,
 } from './coretypes'
-import { 
-  LoginModal, 
-  ResetPasswordModal, 
-  EnterResetTokenModal, 
-  SignupModal
- } from './Modals'
+import {
+  LoginModal,
+  ResetPasswordModal,
+  EnterResetTokenModal,
+  SignupModal,
+} from './Modals'
 import Routes from './Routes'
 import { jwtFetch, timeout } from './utils'
 import Navbar from './Navbar'
@@ -234,12 +234,12 @@ class App extends React.Component<Record<string, never>, AppState> {
           <Helmet>
             <script
               async
-              src="https://www.googletagmanager.com/gtag/js?id=G-CTJXTP5TB2"
+              src="https://www.googletagmanager.com/gtag/js?id=G-WHXN332J31"
             ></script>
             <script>
               window.dataLayer = window.dataLayer || [];
               window.dataLayer.push(['js', new Date()]);
-              window.dataLayer.push(['config', 'G-CTJXTP5TB2']);
+              window.dataLayer.push(['config', 'G-WHXN332J31']);
             </script>
           </Helmet>
           <div>
