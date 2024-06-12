@@ -1,0 +1,4 @@
+[codespell]
+skip = .git,*.pdf,*.svg,bibliography.json,yarn.lock,tslint.json,lunr.js
+# Mor - name
+ignore-words-list = mor,ser,pres

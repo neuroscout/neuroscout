@@ -22,6 +22,6 @@ def test_get_dataset(auth_client, add_local_task_json):
     assert dataset['summary'] == "A test dataset"
     assert dataset['url'] == "https://github.com/adelavega/bids_test"
 
-    # Try getting nonexistent datset
+    # Try getting nonexistent dataset
     resp = auth_client.get('/api/datasets/{}'.format('1324'))
     assert resp.status_code == 404

@@ -428,7 +428,7 @@
           "description": "Mean concreteness rating of spoken words."
         },
         "aoa.AoA_Kup": {
-          "description": "Age of aquisition of spoken words."
+          "description": "Age of acquisition of spoken words."
         },
         "massiveauditorylexicaldecision_IsWord": {
           "description": "Whether the item is a word or pseudo-word."

@@ -218,7 +218,7 @@ def ingest_from_json(config_file, reingest=False, auto_fetch=False):
 
 def extract_from_json(extract_config, dataset_name=None, task_name=None):
     """ Applies JSON file specifying conversion and extractions to
-    specifed tasks.
+    specified tasks.
 
     Args:
         extract_config: JSON specifying the arguments to each step

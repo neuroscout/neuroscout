@@ -135,7 +135,7 @@ const _sortRuns = (keys, a, b) => {
   return 0
 }
 
-// Comparison functions to pass to sort for arrays of type Run by differnt keys
+// Comparison functions to pass to sort for arrays of type Run by different keys
 export const sortSub = _sortRuns.bind(null, ['subject', 'number', 'session'])
 export const sortNum = _sortRuns.bind(null, ['number', 'subject', 'session'])
 export const sortSes = _sortRuns.bind(null, ['session', 'subject', 'number'])

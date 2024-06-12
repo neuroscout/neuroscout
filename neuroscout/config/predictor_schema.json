@@ -16,7 +16,7 @@
     "source": "fmriprep"
   },
   "^framewise_displacement$": {
-    "description": "Esimated bulk-head motion",
+    "description": "Estimated bulk-head motion",
     "source": "fmriprep"
   },
   "^non_steady_state_outlier([0-9]{2,3})$": {

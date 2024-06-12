@@ -77,7 +77,7 @@ def _extract_to_serial(graphs, stim_object, serializer):
     """ For a stim_object, load stim and apply graphs, and serialize """
     results = []
     for stim_obj, pliers_stim in _load_stim(stim_object):
-        # For each graph, check compatability, and then extract
+        # For each graph, check compatibility, and then extract
         for graph in graphs:
             ext = graph.roots[0].transformer
             if ext._stim_matches_input_types(pliers_stim):

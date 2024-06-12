@@ -11,7 +11,7 @@ from ..models import (Analysis, Predictor,
 from .. import populate
 
 """
-Session / db managment tools
+Session / db management tools
 """
 
 

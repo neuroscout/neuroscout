@@ -62,7 +62,7 @@ def auth_required(function):
 def owner_required(function):
     """ A JWT matching the user id of the analysis is required,
         assumes analysis id is second argument, and replaces id with
-        Analysis object if succesfull. """
+        Analysis object if successful. """
     @auth_required
     @fetch_analysis
     def wrapper(*args, **kwargs):

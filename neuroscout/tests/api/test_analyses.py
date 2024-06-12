@@ -145,7 +145,7 @@ def test_post(auth_client, add_task, add_predictor):
     assert Analysis.query.filter_by(
         hash_id=rv_json['hash_id']).one().name == 'some analysis'
 
-    # Re post analysis, check that id is diffeent
+    # Re post analysis, check that id is different
     rv_2 = auth_client.post('/api/analyses', data=test_analysis)
     assert rv_2.status_code == 200
     assert decode_json(rv_2)['hash_id'] != decode_json(resp)['hash_id']
