@@ -21,7 +21,12 @@ import {
   Dataset,
   profileEditItems,
 } from './coretypes'
-import { LoginModal, ResetPasswordModal, SignupModal } from './Modals'
+import {
+  LoginModal,
+  ResetPasswordModal,
+  EnterResetTokenModal,
+  SignupModal,
+} from './Modals'
 import Routes from './Routes'
 import { jwtFetch, timeout } from './utils'
 import Navbar from './Navbar'
@@ -247,6 +252,9 @@ class App extends React.Component<Record<string, never>, AppState> {
             {this.state.user.openLogin && <LoginModal {...this.state.user} />}
             {this.state.user.openReset && (
               <ResetPasswordModal {...this.state.user} />
+            )}
+            {this.state.user.openEnterResetToken && (
+              <EnterResetTokenModal {...this.state.user} />
             )}
             {this.state.user.openSignup && <SignupModal {...this.state.user} />}
             <Tour
